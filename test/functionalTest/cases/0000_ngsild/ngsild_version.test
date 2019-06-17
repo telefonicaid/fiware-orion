@@ -73,7 +73,7 @@ Date: REGEX(.*)
   "kjson version": "0.2",
   "boost version": "1_53",
   "microhttpd version": "0.9.48",
-  "openssl version": "0x1010100fL", #convert
+  "openssl version": "0x1010100fL",
   "mongo version": 10102,
   "rapidjson version": "1.0.2"
 }

@@ -39,11 +39,11 @@ extern "C"
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
-#include "/usr/include/boost/version.hpp"                      // BOOST_LIB_VERSION
-#include "/usr/local/include/microhttpd.h"                     // MHD_VERSION (returns a number)
-#include "/usr/include/openssl/opensslv.h"                     // OPENSSL_VERSION_NUMBER
-#include "/usr/local/include/mongo/version.h"                  // MONGOCLIENT_VERSION
-#include "/usr/include/rapidjson/rapidjson.h"                  // RAPIDJSON_VERSION_STRING
+#include <boost/version.hpp>                                   // BOOST_LIB_VERSION
+#include <microhttpd.h>                                        // MHD_VERSION (returns a number)
+#include <openssl/opensslv.h>                                  // OPENSSL_VERSION_NUMBER
+#include <mongo/version.h>                                     // MONGOCLIENT_VERSION
+#include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
 // libcurl version not found, keep searching
 // libuuid version not found, keep searching
 // gtest and gmock don't contain any function or header to check versions
