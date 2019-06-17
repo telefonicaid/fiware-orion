@@ -78,7 +78,6 @@ static void getAttributeTypes
   std::vector<std::string>*        attrTypes
 )
 {
-
   BSONObjBuilder bob;
 
   if (entityType == "")
