@@ -99,7 +99,7 @@ TEST(orionld, partialUpdateResponse)
   //
   // Create a request tree with attributes A1, A2, and A3
   //
-  ci.requestTree = kjObject(orionldState.kjsonP, NULL);
+  orionldState.requestTree = kjObject(orionldState.kjsonP, NULL);
 
   for (unsigned int ix = 0; ix < sizeof(attrNamesV) / sizeof(attrNamesV[0]); ix++)
   {
@@ -111,7 +111,7 @@ TEST(orionld, partialUpdateResponse)
     kNodeP = kjString(orionldState.kjsonP, "value", attrNamesV[ix]);
     kjChildAdd(attrNodeP, kNodeP);
 
-    kjChildAdd(ci.requestTree, attrNodeP);
+    kjChildAdd(orionldState.requestTree, attrNodeP);
   }
 
   //
@@ -128,22 +128,22 @@ TEST(orionld, partialUpdateResponse)
   LM_TMP(("Calling orionldPartialUpdateResponseCreate"));
   orionldPartialUpdateResponseCreate(&ci);
   LM_TMP(("After orionldPartialUpdateResponseCreate"));
-  EXPECT_EQ(NULL, ci.requestTree);
+  EXPECT_EQ(NULL, orionldState.requestTree);
 
   //
-  // Now, ci.responseTree should contain only A2
+  // Now, orionldState.responseTree should contain only A2
   //
-  if (ci.responseTree->value.firstChildP == NULL)
+  if (orionldState.responseTree->value.firstChildP == NULL)
   {
-    EXPECT_STREQ("ci.responseTree->value.firstChildP == NULL", "It should be != NULL");
+    EXPECT_STREQ("orionldState.responseTree->value.firstChildP == NULL", "It should be != NULL");
   }
 
-  for (kNodeP = ci.responseTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  for (kNodeP = orionldState.responseTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
     LM_TMP(("  Node: '%s'", kNodeP->name));
   
-  EXPECT_EQ(NULL, ci.responseTree->value.firstChildP->next);
+  EXPECT_EQ(NULL, orionldState.responseTree->value.firstChildP->next);
 
-  char* attrName = ci.responseTree->value.firstChildP->name;
+  char* attrName = orionldState.responseTree->value.firstChildP->name;
 
   EXPECT_STREQ("A2", attrName);
 
