@@ -78,7 +78,6 @@ using mongo::BSONObj;
 using mongo::BSONElement;
 using mongo::BSONArrayBuilder;
 using mongo::BSONObjBuilder;
-using mongo::fromjson;
 using mongo::Query;
 using mongo::AssertionException;
 using mongo::BSONArray;
@@ -860,80 +859,101 @@ static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
 
 /* ****************************************************************************
 *
-* fillQueryServicePath -
+* servicePathFilterNeeded -
 *
-* The regular expression for servicePath.
-*
-* If the servicePath is empty, then we return all entities, no matter their servicePath. This
-* can be seen as a query on "/#" considering that entities without servicePath are implicitly
-* assigned to "/" service path.
 */
-BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
+bool servicePathFilterNeeded(const std::vector<std::string>& servicePath)
 {
-  /* Due to limitations in the BSONArrayBuilder class (that hopefully will be solved in legacy-1.0.0
-   * MongoDB driver) we need to compose the JSON string, then apply fromjson() function. Current
-   * implementation uses an array element for each regex tokens, but we could use only
-   * one element, concatenating all regex tokens using "|" (not sure what is more efficient from a
-   * computational point of view). However, note that we need the $in array as "null" has to be added
-   * as element in any case.
-   *
-   * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
-   *
-   */
-
-  //
   // Note that by construction servicePath vector must have at least one element. Note that the
   // case in which first element is "" is special, it means that the SP were not provided and
   // we have to apply the default
-  //
   if (servicePath[0] == "")
   {
-    LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
-    return fromjson("{$in: [ /^\\/.*/, null] }");
+    return false;
   }
 
-  std::string  servicePathValue  = "{ $in: [ ";
-  bool         nullAdded         = false;
-
+  // If some of the elements is /# then it means that all service paths have to be taken into account
+  // so no filter has to be used
   for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
   {
-    //
-    // Add "null" in the following service path cases: / or /#. In order to avoid adding null
-    // several times, the nullAdded flag is used
-    //
-    if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
+    if (servicePath[ix] == "/#")
     {
-      servicePathValue += "null, ";
-      nullAdded = true;
+      return false;
     }
+  }
 
-    char path[SERVICE_PATH_MAX_TOTAL * 2];
-    slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+  return true;
+}
 
-    if (path[strlen(path) - 1] == '#')
+
+
+/* ****************************************************************************
+*
+* addServicePathInTokens -
+*
+*/
+static void addServicePathInTokens(BSONArrayBuilder* servicePathIn, const std::string& sp)
+{
+  char escapedPath[SERVICE_PATH_MAX_TOTAL * 2];
+  slashEscape(sp.c_str(), escapedPath, sizeof(escapedPath));
+
+  /* Remove '/#' and '\/#' trailing part of the string */
+  std::string path = sp.substr(0, sp.length() - 2);
+  escapedPath[strlen(escapedPath) - 3] = 0;
+
+  /* Two tokens: one for the service path itself (string match) and other for its children (as regex) */
+  servicePathIn->append(path);
+  servicePathIn->appendRegex(std::string("^") + escapedPath + "\\/.*");
+}
+
+
+
+/* ****************************************************************************
+*
+* fillQueryServicePath -
+*
+* Returns the BSON element associated to the service path query. Note this function
+* is invoked only if there is need of a servicePath filter, the caller should call it
+* only if servicePathFilterNeeded() in the same servicePath vector is true. That means that
+* this fucntions can assume that:
+*
+* - The servicePath vector has at least one not empty element
+* - The servicePath vector doesn't contain any /# element
+*/
+BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath)
+{
+  BSONArrayBuilder servicePathIn;
+
+  // Special case (although the most common one): only one service path
+  if (servicePath.size() == 1)
+  {
+    std::string sp = servicePath[0];
+    if (sp.at(sp.length() - 1) == '#')
     {
-      /* Remove '\/#' trailing part of the string */
-      int l = strlen(path);
-
-      path[l - 3] = 0;
-      servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
+      addServicePathInTokens(&servicePathIn, sp);
+      return BSON(spKey << BSON("$in" << servicePathIn.arr()));
     }
     else
     {
-      servicePathValue += std::string("/^") + path + "$/";
-    }
-
-    /* Prepare concatenation for next token in regex */
-    if (ix < servicePath.size() - 1)
-    {
-      servicePathValue += std::string(", ");
+      // Use simple matching. Avoid "$in: [ ... ]" pattern. This is the most common case
+      return BSON(spKey << servicePath[0]);
     }
   }
 
-  servicePathValue += " ] }";
-  LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
+  for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  {
+    std::string sp = servicePath[ix];
+    if (sp.at(sp.length() - 1) == '#')
+    {
+      addServicePathInTokens(&servicePathIn, sp);
+    }
+    else
+    {
+      servicePathIn.append(servicePath[ix]);
+    }
+  }
 
-  return fromjson(servicePathValue);
+  return BSON(spKey << BSON("$in" << servicePathIn.arr()));
 }
 
 
@@ -1475,9 +1495,10 @@ bool entitiesQuery
   finalQuery.append("$or", orEnt.arr());
 
   /* Part 2: service path */
-  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-
-  finalQuery.append(servicePathString, fillQueryServicePath(servicePath));
+  if (servicePathFilterNeeded(servicePath))
+  {
+    finalQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
+  }
 
   /* Part 3: attributes */
   BSONArrayBuilder attrs;
@@ -2106,9 +2127,10 @@ bool registrationsQuery
   //
   // 'And-in' the service path
   //
-  const std::string  servicePathString = REG_SERVICE_PATH;
-
-  queryBuilder.append(servicePathString, fillQueryServicePath(servicePathV));
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    queryBuilder.appendElements(fillQueryServicePath(REG_SERVICE_PATH, servicePathV));
+  }
 
 
   //

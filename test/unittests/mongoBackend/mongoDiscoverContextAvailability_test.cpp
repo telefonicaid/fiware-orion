@@ -2261,8 +2261,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
               "{ $or: [ { contextRegistration.entities.id: \"E3\", contextRegistration.entities.type: \"T3\" }, "
                        "{ contextRegistration.entities.id: \".*\", contextRegistration.entities.isPattern: \"true\", contextRegistration.entities.type: { $in: [ \"T3\" ] } }, "
                        "{ contextRegistration.entities.id: \".*\", contextRegistration.entities.isPattern: \"true\", contextRegistration.entities.type: { $exists: false } } ], "
-              "expiration: { $gt: 1360232700 }, "
-              "servicePath: { $in: [ /^/.*/, null ] } }, "
+              "expiration: { $gt: 1360232700 } }, "
               "orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
     EXPECT_EQ(0, res.responseVector.size());
 
