@@ -22,6 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+#include <boost/version.hpp>                                   // BOOST_LIB_VERSION
+#include <microhttpd.h>                                        // MHD_VERSION (returns a number)
+#include <openssl/opensslv.h>                                  // OPENSSL_VERSION_TEXT
+#include <mongo/version.h>                                     // MONGOCLIENT_VERSION
+#include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
+
 extern "C"
 {
 #include "kbase/version.h"                                     // kbaseVersion
@@ -39,14 +45,29 @@ extern "C"
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
-#include <boost/version.hpp>                                   // BOOST_LIB_VERSION
-#include <microhttpd.h>                                        // MHD_VERSION (returns a number)
-#include <openssl/opensslv.h>                                  // OPENSSL_VERSION_NUMBER
-#include <mongo/version.h>                                     // MONGOCLIENT_VERSION
-#include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
-// libcurl version not found, keep searching
-// libuuid version not found, keep searching
-// gtest and gmock don't contain any function or header to check versions
+
+
+// ----------------------------------------------------------------------------
+//
+// mhdVersionGet -
+//0x00094800 : 0.9.48-0
+void mhdVersionGet(char* buff, int buflen, int iVersion)
+{
+  char major;
+  char minor;
+  char bugfix;
+  char revision;
+
+  major    =  iVersion >> 24;
+  minor    =  (iVersion >> 16) & 0xFF;
+  bugfix   =  (iVersion >> 8)  & 0xFF;
+  revision =  iVersion & 0xFF;
+
+  snprintf(buff, buflen, "%d.%d.%d-%d", major, minor, bugfix, revision);
+}
+
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -55,6 +76,10 @@ extern "C"
 bool orionldGetVersion(ConnectionInfo* ciP)
 {
   KjNode* nodeP;
+  char    mhdVersion[32];
+
+  mhdVersionGet(mhdVersion, sizeof(mhdVersion), MHD_VERSION);
+
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
@@ -71,13 +96,17 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   // Libs versions
   nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjInteger(orionldState.kjsonP, "microhttpd version", MHD_VERSION); // (FIX ME)
+  nodeP = kjString(orionldState.kjsonP, "microhttpd version", mhdVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjInteger(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_NUMBER); // (FIX ME)
+  nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjInteger(orionldState.kjsonP, "mongo version", MONGOCLIENT_VERSION);
+  nodeP = kjString(orionldState.kjsonP, "mongo version", mongo::client::kVersionString);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
   kjChildAdd(orionldState.responseTree, nodeP);
 
 
