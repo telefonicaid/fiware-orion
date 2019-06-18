@@ -50,7 +50,7 @@ extern "C"
 // ----------------------------------------------------------------------------
 //
 // mhdVersionGet -
-//0x00094800 : 0.9.48-0
+//
 void mhdVersionGet(char* buff, int buflen, int iVersion)
 {
   char major;
@@ -58,10 +58,10 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
   char bugfix;
   char revision;
 
-  major    =  iVersion >> 24;
-  minor    =  (iVersion >> 16) & 0xFF;
-  bugfix   =  (iVersion >> 8)  & 0xFF;
-  revision =  iVersion & 0xFF;
+  major    = iVersion >> 24;
+  minor    = (iVersion >> 16) & 0xFF;
+  bugfix   = (iVersion >> 8)  & 0xFF;
+  revision = iVersion & 0xFF;
 
   snprintf(buff, buflen, "%x.%x.%x-%x", major, minor, bugfix, revision);
 }
@@ -80,12 +80,13 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   mhdVersionGet(mhdVersion, sizeof(mhdVersion), MHD_VERSION);
 
-
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
+  // Branch
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
   kjChildAdd(orionldState.responseTree, nodeP);
 
+  // K-Lib versions
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
@@ -93,7 +94,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  // Libs versions
+  // Lib versions
   nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "microhttpd version", mhdVersion);
