@@ -62,7 +62,7 @@ echo
 
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
+egrep 'SUMMARY' /tmp/${BROKER}.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g' | tail -4
 echo
 echo
 
