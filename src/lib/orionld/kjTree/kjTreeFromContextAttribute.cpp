@@ -69,6 +69,9 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   char*    nameAlias = orionldAliasLookup(contextP, caP->name.c_str());
   KjNode*  nodeP     = NULL;
 
+  if (nameAlias == NULL)
+    nameAlias = (char*) caP->name.c_str();
+
   LM_TMP(("NOTIF: Adding attribute '%s'", nameAlias));
 
   if (renderFormat == NGSI_LD_V1_KEYVALUES)

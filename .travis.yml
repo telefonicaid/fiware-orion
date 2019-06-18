@@ -55,6 +55,10 @@ notifications:
     - ken.zangelin@fiware.org
     - josemanuel.cantera@fiware.org
     - dmitrii.demin@fiware.org
+    - jorgepereirasb@gmail.com
+    - icazevedo10@gmail.com
+    - douglasrolim@gmail.com
+    - larysse.izidio@gmail.com
     on_success: never
     on_failure: always
   webhooks:

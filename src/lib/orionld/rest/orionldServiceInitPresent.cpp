@@ -65,7 +65,6 @@ void orionldServiceInitPresent(void)
       printf("  charsBeforeSecondWildcardSum: %d\n", serviceP->charsBeforeSecondWildcardSum);
       printf("  matchForSecondWildcard:       %s\n", serviceP->matchForSecondWildcard);
       printf("  matchForSecondWildcardLen:    %d\n", serviceP->matchForSecondWildcardLen);
-      printf("  supportedVerbMask:            0x%x\n", serviceP->supportedVerbMask);
       printf("\n");
     }
   }

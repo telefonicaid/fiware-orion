@@ -55,23 +55,22 @@ static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
   // Initialize counters with the first byte, then skip the first byte for the loop
   cSumV[0] = url[0];
 
-  int sLen = 1;
+  int sLen;
   int ix   = 1;
 
   while ((url[ix] != 0) && (ix < MAX_CHARS_BEFORE_WILDCARD))
   {
     cSumV[ix]  = cSumV[ix - 1] + url[ix];
-    sLen      += 1;
     ++ix;
   }
   *cSumsP = ix;
 
   while (url[ix] != 0)
   {
-    sLen += 1;
     ++ix;
   }
 
+  sLen   = ix;
   *sLenP = sLen;
 }
 
