@@ -63,7 +63,7 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
   bugfix   =  (iVersion >> 8)  & 0xFF;
   revision =  iVersion & 0xFF;
 
-  snprintf(buff, buflen, "%d.%d.%d-%d", major, minor, bugfix, revision);
+  snprintf(buff, buflen, "%x.%x.%x-%x", major, minor, bugfix, revision);
 }
 
 
