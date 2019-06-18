@@ -76,10 +76,17 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "boost version": "REGEX(.*)",
     "branch": "REGEX(.*)",
     "kalloc version": "REGEX(.*)",
     "kbase version": "REGEX(.*)",
     "kjson version": "REGEX(.*)"
+    "libcurl version": "UNKNOWN",
+    "libuuid version": "UNKNOWN",
+    "microhttpd version": "0.9.48-0",
+    "mongo version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
 }
 
 
