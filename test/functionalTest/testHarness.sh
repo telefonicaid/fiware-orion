@@ -169,7 +169,7 @@ function usage()
   echo "CB_NO_CACHE:         Start the broker without subscription cache (if set to 'ON')"
   echo "CB_THREADPOOL:       Start the broker without thread pool (if set to 'OFF')"
   echo "CB_DIFF_TOOL:        To view diff of failing tests with diff/tkdiff/meld/..."
-  echo "CB_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON'"
+  echo "CB_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
   echo
   exit $1
 }
