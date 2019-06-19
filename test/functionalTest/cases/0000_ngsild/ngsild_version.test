@@ -70,7 +70,14 @@ Date: REGEX(.*)
   "branch": "REGEX(.*)",
   "kbase version": "0.2",
   "kalloc version": "0.2",
-  "kjson version": "0.2"
+  "kjson version": "0.2",
+  "boost version": "REGEX(.*)",
+  "microhttpd version": "0.9.48-0",
+  "openssl version": "REGEX(.*)",
+  "mongo version": "REGEX(.*)",
+  "rapidjson version": "REGEX(.*)",
+  "libcurl version": "UNKNOWN",
+  "libuuid version": "UNKNOWN"
 }
 
 

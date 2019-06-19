@@ -22,6 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+#include <boost/version.hpp>                                   // BOOST_LIB_VERSION
+#include <microhttpd.h>                                        // MHD_VERSION (returns a number)
+#include <openssl/opensslv.h>                                  // OPENSSL_VERSION_TEXT
+#include <mongo/version.h>                                     // MONGOCLIENT_VERSION
+#include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
+
 extern "C"
 {
 #include "kbase/version.h"                                     // kbaseVersion
@@ -43,23 +49,67 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
+// mhdVersionGet -
+//
+void mhdVersionGet(char* buff, int buflen, int iVersion)
+{
+  char major;
+  char minor;
+  char bugfix;
+  char revision;
+
+  major    = iVersion >> 24;
+  minor    = (iVersion >> 16) & 0xFF;
+  bugfix   = (iVersion >> 8)  & 0xFF;
+  revision = iVersion & 0xFF;
+
+  snprintf(buff, buflen, "%x.%x.%x-%x", major, minor, bugfix, revision);
+}
+
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldGetVersion -
 //
 bool orionldGetVersion(ConnectionInfo* ciP)
 {
   KjNode* nodeP;
+  char    mhdVersion[32];
+
+  mhdVersionGet(mhdVersion, sizeof(mhdVersion), MHD_VERSION);
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
+  // Branch
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
   kjChildAdd(orionldState.responseTree, nodeP);
 
+  // K-Lib versions
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Lib versions
+  nodeP = kjString(orionldState.kjsonP, "boost version", BOOST_LIB_VERSION);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "microhttpd version", mhdVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "openssl version", OPENSSL_VERSION_TEXT);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "mongo version", mongo::client::kVersionString);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
+  kjChildAdd(orionldState.responseTree, nodeP);
+
 
   // This request is ALWAYS returned with pretty-print
   orionldState.kjsonP->spacesPerIndent   = 2;
