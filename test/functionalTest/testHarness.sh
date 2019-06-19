@@ -162,6 +162,7 @@ function usage()
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
   echo ""
   echo "Env Vars:"
+  echo "BROKER:              the name of the executable (orionld or contextBroker - orionld is the default value)"
   echo "CB_MAX_TRIES:        the number of tries before giving up on a failing test case"
   echo "CB_SKIP_LIST:        default value for option --skipList"
   echo "CB_SKIP_FUNC_TESTS:  comma-separated list of names of func tests to skip"
