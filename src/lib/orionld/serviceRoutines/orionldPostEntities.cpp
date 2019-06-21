@@ -68,6 +68,20 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// ATTRIBUTE_ERROR -
+//
+#define ATTRIBUTE_ERROR(errorString, details)                                                            \
+do                                                                                                       \
+{                                                                                                        \
+  LM_E((errorString));                                                                                   \
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorString, details, OrionldDetailsAttribute); \
+  return false;                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // stringContentCheck -
 //
 static bool stringContentCheck(char* name, char** detailsPP)
@@ -236,20 +250,19 @@ static bool payloadCheck
 
 // -----------------------------------------------------------------------------
 //
-// compoundCreate -
+// Forward declaration - compoundCreate is used by compoundValueNodeValueSet
+//                       and compoundValueNodeValueSet uses compoundCreate
 //
-static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNodeP, KjNode* parentP, int level = 0)
+static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNodeP, KjNode* parentP, int level = 0);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// compoundValueNodeValueSet - set the value of a CompoundeValueNode instance
+//
+bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueNode* cNodeP, KjNode* kNodeP, int* levelP)
 {
-  if (kNodeP->type != KjArray)
-    LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' called '%s' on level %d", kjValueType(kNodeP->type), kNodeP->name, level));
-  else
-    LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' on level %d", kjValueType(kNodeP->type), level));
-
-  orion::CompoundValueNode* cNodeP = new orion::CompoundValueNode();
-
-  if ((parentP != NULL) && (parentP->type == KjObject))
-    cNodeP->name = kNodeP->name;
-
   if (kNodeP->type == KjString)
   {
     cNodeP->valueType   = orion::ValueTypeString;
@@ -276,159 +289,33 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
   }
   else if (kNodeP->type == KjObject)
   {
-    ++level;
+    *levelP += 1;;
     cNodeP->valueType = orion::ValueTypeObject;
 
     for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
     {
-      orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, level);
+      orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, *levelP);
       cNodeP->childV.push_back(cChildP);
     }
   }
   else if (kNodeP->type == KjArray)
   {
-    ++level;
+    *levelP += 1;;
     cNodeP->valueType = orion::ValueTypeVector;
 
     for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
     {
-      orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, level);
+      orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, *levelP);
 
       cNodeP->childV.push_back(cChildP);
     }
   }
-
-  return cNodeP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// metadataAdd -
-//
-static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName)
-{
-  LM_T(LmtMetadata, ("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), caName));
-
-  KjNode*   typeNodeP       = NULL;
-  KjNode*   valueNodeP      = NULL;
-  KjNode*   objectNodeP     = NULL;
-  bool      isProperty      = false;
-  bool      isRelationship  = false;
-
-  if (nodeP->type == KjObject)
-  {
-    for (KjNode* kNodeP = nodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-    {
-      if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
-      {
-        DUPLICATE_CHECK(typeNodeP, "metadata type", kNodeP);
-        STRING_CHECK(kNodeP, "metadata type");
-
-        if (SCOMPARE9(kNodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
-        {
-          isProperty = true;
-        }
-        else if (SCOMPARE13(kNodeP->value.s, 'R', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 0))
-        {
-          isRelationship = true;
-        }
-        else
-        {
-          LM_E(("Invalid type for metadata '%s': '%s'", kNodeP->name, kNodeP->value.s));
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid type for attribute", kNodeP->value.s, OrionldDetailsString);
-          return false;
-        }
-
-        typeNodeP = kNodeP;
-      }
-      else if (SCOMPARE6(kNodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
-      {
-        DUPLICATE_CHECK(valueNodeP, "metadata value", kNodeP);
-        valueNodeP = kNodeP;
-      }
-      else if (SCOMPARE7(kNodeP->name, 'o', 'b', 'j', 'e', 'c', 't', 0))
-      {
-        DUPLICATE_CHECK(objectNodeP, "metadata object", kNodeP);
-        objectNodeP = kNodeP;
-      }
-    }
-
-    if (typeNodeP == NULL)
-    {
-      LM_E(("No 'type' for metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'type' is missing for a metadata", nodeP->name, OrionldDetailsString);
-      return false;
-    }
-
-    if ((isProperty == true) && (valueNodeP == NULL))
-    {
-      LM_E(("No 'value' for Property metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'value' is missing for a Property metadata", nodeP->name, OrionldDetailsString);
-      return false;
-    }
-    else if ((isRelationship == true) && (objectNodeP == NULL))
-    {
-      LM_E(("No 'object' for Relationship metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'value' is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
-      return false;
-    }
-  }
   else
   {
-    isProperty = true;
-    valueNodeP = nodeP;
-  }
-
-  Metadata* mdP = new Metadata();
-
-  if (mdP == NULL)
-  {
-    LM_E(("out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, caName));
-    orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create property/relationship for attribute", "out of memory", OrionldDetailsString);
+    LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
     return false;
   }
-
-  mdP->name = nodeP->name;
-
-  if (typeNodeP != NULL)  // Only if the metadata is a JSON Object
-    mdP->type = typeNodeP->value.s;
-
-  if (isProperty == true)
-  {
-    switch (valueNodeP->type)
-    {
-    case KjBoolean:    mdP->valueType = orion::ValueTypeBoolean; mdP->boolValue      = valueNodeP->value.b; break;
-    case KjInt:        mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.i; break;
-    case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; break;
-    case KjString:     mdP->valueType = orion::ValueTypeString;  mdP->stringValue    = valueNodeP->value.s; break;
-    case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL); break;
-    case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL);  break;
-    case KjNull:       mdP->valueType = orion::ValueTypeNull;    break;
-    case KjNone:
-      LM_E(("Invalid json type (KjNone!) for value field of metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
-      delete mdP;
-      return false;
-    }
-  }
-  else  // Relationship
-  {
-    // A "Relationship" has no 'value', instead it has 'object', that must be of string type
-    if (objectNodeP->type != KjString)
-    {
-      LM_E(("invalid json type for relationship-object '%s' of attribute '%s'", nodeP->name, caName));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid json type for relationship-object", nodeP->name, OrionldDetailsString);
-      delete mdP;
-      return false;
-    }
-
-    mdP->valueType   = orion::ValueTypeString;
-    mdP->stringValue = objectNodeP->value.s;
-  }
-
-  caP->metadataVector.push_back(mdP);
 
   return true;
 }
@@ -437,15 +324,28 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 
 // -----------------------------------------------------------------------------
 //
-// ATTRIBUTE_ERROR -
+// compoundCreate -
 //
-#define ATTRIBUTE_ERROR(errorString, details)                                                            \
-do                                                                                                       \
-{                                                                                                        \
-  LM_E((errorString));                                                                                   \
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorString, details, OrionldDetailsAttribute); \
-  return false;                                                                                          \
-} while (0)
+static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNodeP, KjNode* parentP, int level)
+{
+  if (kNodeP->type != KjArray)
+    LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' called '%s' on level %d", kjValueType(kNodeP->type), kNodeP->name, level));
+  else
+    LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' on level %d", kjValueType(kNodeP->type), level));
+
+  orion::CompoundValueNode* cNodeP = new orion::CompoundValueNode();
+
+  if ((parentP != NULL) && (parentP->type == KjObject))
+    cNodeP->name = kNodeP->name;
+
+  if (compoundValueNodeValueSet(ciP, cNodeP, kNodeP, &level) == false)
+  {
+    // compoundValueNodeValueSet calls orionldErrorResponseCreate
+    return NULL;
+  }
+
+  return cNodeP;
+}
 
 
 
@@ -514,6 +414,183 @@ bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
       return false;
     }
   }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attributeValueSet - set the value of a ContextAttribute instance
+//
+bool attributeValueSet(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* valueP)
+{
+  switch (valueP->type)
+  {
+  case KjBoolean:    caP->valueType = orion::ValueTypeBoolean; caP->boolValue      = valueP->value.b; break;
+  case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
+  case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
+  case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
+  case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
+  case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
+  case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
+  case KjNone:
+    LM_E(("Invalid type from kjson"));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+    return false;
+  }
+
+  if (valueP->type == KjObject)
+  {
+    if (specialCompoundCheck(ciP, valueP) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// metadataValueSet - set the value of a Metadata instance
+//
+bool metadataValueSet(ConnectionInfo* ciP, Metadata* mdP, KjNode* valueNodeP)
+{
+  switch (valueNodeP->type)
+  {
+  case KjBoolean:    mdP->valueType = orion::ValueTypeBoolean; mdP->boolValue      = valueNodeP->value.b; break;
+  case KjInt:        mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.i; break;
+  case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; break;
+  case KjString:     mdP->valueType = orion::ValueTypeString;  mdP->stringValue    = valueNodeP->value.s; break;
+  case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL); break;
+  case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL);  break;
+  case KjNull:       mdP->valueType = orion::ValueTypeNull;    break;
+  case KjNone:
+    LM_E(("Invalid json type (KjNone!) for value field of metadata '%s'", valueNodeP->name));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// metadataAdd -
+//
+static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName)
+{
+  LM_T(LmtMetadata, ("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), caName));
+
+  KjNode*   typeNodeP       = NULL;
+  KjNode*   valueNodeP      = NULL;
+  KjNode*   objectNodeP     = NULL;
+  bool      isProperty      = false;
+  bool      isRelationship  = false;
+
+  if (nodeP->type == KjObject)
+  {
+    for (KjNode* kNodeP = nodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+    {
+      if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
+      {
+        DUPLICATE_CHECK(typeNodeP, "metadata type", kNodeP);
+        STRING_CHECK(kNodeP, "metadata type");
+
+        if (SCOMPARE9(kNodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+          isProperty = true;
+        else if (SCOMPARE13(kNodeP->value.s, 'R', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 0))
+          isRelationship = true;
+        else
+        {
+          LM_E(("Invalid type for metadata '%s': '%s'", kNodeP->name, kNodeP->value.s));
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid type for attribute", kNodeP->value.s, OrionldDetailsString);
+          return false;
+        }
+
+        typeNodeP = kNodeP;
+      }
+      else if (SCOMPARE6(kNodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
+      {
+        DUPLICATE_CHECK(valueNodeP, "metadata value", kNodeP);
+        valueNodeP = kNodeP;
+      }
+      else if (SCOMPARE7(kNodeP->name, 'o', 'b', 'j', 'e', 'c', 't', 0))
+      {
+        DUPLICATE_CHECK(objectNodeP, "metadata object", kNodeP);
+        objectNodeP = kNodeP;
+      }
+    }
+
+    if (typeNodeP == NULL)
+    {
+      LM_E(("No 'type' for metadata '%s'", nodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'type' is missing for a metadata", nodeP->name, OrionldDetailsString);
+      return false;
+    }
+
+    if ((isProperty == true) && (valueNodeP == NULL))
+    {
+      LM_E(("No 'value' for Property metadata '%s'", nodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'value' is missing for a Property metadata", nodeP->name, OrionldDetailsString);
+      return false;
+    }
+    else if ((isRelationship == true) && (objectNodeP == NULL))
+    {
+      LM_E(("No 'object' for Relationship metadata '%s'", nodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'value' is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
+      return false;
+    }
+  }
+  else
+  {
+    isProperty = true;
+    valueNodeP = nodeP;
+  }
+
+  Metadata* mdP = new Metadata();
+
+  if (mdP == NULL)
+  {
+    LM_E(("out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, caName));
+    orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create property/relationship for attribute", "out of memory", OrionldDetailsString);
+    return false;
+  }
+
+  mdP->name = nodeP->name;
+
+  if (typeNodeP != NULL)  // Only if the metadata is a JSON Object
+    mdP->type = typeNodeP->value.s;
+
+  if (isProperty == true)
+  {
+    if (metadataValueSet(ciP, mdP, valueNodeP) == false)
+    {
+      // metadataValueSet calls metadataValueSet
+      delete mdP;
+      return false;
+    }
+  }
+  else  // Relationship
+  {
+    // A "Relationship" has no 'value', instead it has 'object', that must be of string type
+    if (objectNodeP->type != KjString)
+    {
+      LM_E(("invalid json type for relationship-object '%s' of attribute '%s'", nodeP->name, caName));
+      orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid json type for relationship-object", nodeP->name, OrionldDetailsString);
+      delete mdP;
+      return false;
+    }
+
+    mdP->valueType   = orion::ValueTypeString;
+    mdP->stringValue = objectNodeP->value.s;
+  }
+
+  caP->metadataVector.push_back(mdP);
 
   return true;
 }
@@ -788,28 +865,10 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
     }
     else
     {
-      //
-      // "Normal" Property, can be any JSON type
-      //
-      switch (valueP->type)
+      if (attributeValueSet(ciP, caP, valueP) == false)
       {
-      case KjBoolean:    caP->valueType = orion::ValueTypeBoolean; caP->boolValue      = valueP->value.b; break;
-      case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
-      case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
-      case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
-      case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
-      case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
-      case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
-      case KjNone:
-        LM_E(("Invalid type from kjson"));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+        // attributeValueSet calls orionldErrorResponseCreate
         return false;
-      }
-
-      if (valueP->type == KjObject)
-      {
-        if (specialCompoundCheck(ciP, valueP) == false)
-          return false;
       }
     }
   }
