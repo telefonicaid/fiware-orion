@@ -27,6 +27,11 @@
 #
 # 1. heck that there is no duplication in _id fields (for mongo {_id: {x: 1, y: 2}} and {_id: {y:2, x:1}} are different documents)
 # 2. All attribute in 'attrs' are in 'attrNames' and the other way around
+#
+#
+# FIXME: integrate the checkings in check_location_coherence.py into this script (maybe using some kind of
+# modular approach?)
+
 
 __author__ = 'fermin'
 
