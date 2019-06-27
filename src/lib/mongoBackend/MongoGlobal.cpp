@@ -822,37 +822,39 @@ bool includedAttribute(const std::string& attrName, const StringList& attrsV)
 *
 * fillQueryEntity -
 */
-static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
+static void fillQueryEntity(BSONObjBuilder* bobP, const EntityId* enP)
 {
-  BSONObjBuilder     ent;
   const std::string  idString    = "_id." ENT_ENTITY_ID;
   const std::string  typeString  = "_id." ENT_ENTITY_TYPE;
 
   if (enP->isPattern == "true")
   {
-    ent.appendRegex(idString, enP->id);
+    // In the case of "universal pattern" we can avoid adding anything (simpler query)
+    if (enP->id != ".*")
+    {
+      bobP->appendRegex(idString, enP->id);
+    }
   }
   else
   {
-    ent.append(idString, enP->id);
+    bobP->append(idString, enP->id);
   }
 
   if (enP->type != "")
   {
     if (enP->isTypePattern)
     {
-      ent.appendRegex(typeString, enP->type);
+      // In the case of "universal pattern" we can avoid adding anything (simpler query)
+      if (enP->type != ".*")
+      {
+        bobP->appendRegex(typeString, enP->type);
+      }
     }
     else
     {
-      ent.append(typeString, enP->type);
+      bobP->append(typeString, enP->type);
     }
   }
-
-  BSONObj entObj = ent.obj();
-  baP->append(entObj);
-
-  LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
 }
 
 
@@ -1473,7 +1475,7 @@ bool entitiesQuery
   /* Query structure is as follows
    *
    * {
-   *    "$or": [ ... ],            (always)
+   *    "$or": [ {}1 ... {}N ],    (always, optimized to just {}1 in the case of only one element)
    *    "_id.servicePath: { ... }  (always, in some cases using {$exists: false})
    *    "attrNames": { ... },      (only if attributes are used in the query)
    *    "location.coords": { ... } (only in the case of geo-queries)
@@ -1484,15 +1486,29 @@ bool entitiesQuery
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
 
-  /* Part 1: entities */
-
-  for (unsigned int ix = 0; ix < enV.size(); ++ix)
+  /* Part 1: entities - avoid $or in the case of a single element */
+  if (enV.size() == 1)
   {
-    fillQueryEntity(&orEnt, enV[ix]);
-  }
+    BSONObjBuilder bob;
+    fillQueryEntity(&bob, enV[0]);
+    BSONObj entObj = bob.obj();
+    finalQuery.appendElements(entObj);
 
-  /* The result of orEnt is appended to the final query */
-  finalQuery.append("$or", orEnt.arr());
+    LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
+  }
+  else
+  {
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+      BSONObjBuilder bob;
+      fillQueryEntity(&bob, enV[ix]);
+      BSONObj entObj = bob.obj();
+      orEnt.append(entObj);
+
+      LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
+    }
+    finalQuery.append("$or", orEnt.arr());
+  }
 
   /* Part 2: service path */
   if (servicePathFilterNeeded(servicePath))
