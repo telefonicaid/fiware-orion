@@ -1052,11 +1052,15 @@ static void addFilterScope(const Scope* scoP, std::vector<BSONObj>* filtersP)
   {
     if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
     {
-      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
-            BSON(entityTypeString << BSON("$exists" << false)) :
-            BSON(entityTypeString << BSON("$exists" << true));
-
-      filtersP->push_back(b);
+      // Previous versions added {$exists: true} in the case scoP->oper != SCOPE_OPERATOR_NOT
+      // but this not the needed, as this kind of query already has a _id.type: ... token.
+      // Anyway SCOPE_FILTER_EXISTENTECE is NGSIv1 funcionality now deprecated and mabye we should
+      // remove all this stuff
+      if (scoP->oper == SCOPE_OPERATOR_NOT)
+      {
+        BSONObj b = BSON(entityTypeString << BSON("$exists" << false));
+        filtersP->push_back(b);
+      }
     }
     else
     {
