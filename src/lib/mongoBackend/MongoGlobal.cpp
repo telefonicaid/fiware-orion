@@ -2075,6 +2075,9 @@ bool registrationsQuery
   //   expiration: { $gt: ... }
   // }
   //
+  // Note that by construction the $or array always has at least two elemetns (the two ones corresponding to the
+  // universal pattern) so we cannot avoid to use this operator.
+  //
   // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
   // but this would need a data model migration in DB
 
@@ -2132,9 +2135,6 @@ bool registrationsQuery
 
   BSONObjBuilder queryBuilder;
 
-  /* The $or clause could be omitted if it contains only one element, but we can assume that
-   * it has no impact on MongoDB query optimizer
-   */
   queryBuilder.append("$or", entityOr.arr());
   queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
