@@ -1044,23 +1044,20 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
 *
 * addFilterScope -
 */
-static void addFilterScope(const Scope* scoP, std::vector<BSONObj>* filtersP)
+static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<BSONObj>* filtersP)
 {
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
   if (scoP->type == SCOPE_FILTER_EXISTENCE)
   {
-    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
+    // Entity type existence filter only makes sense in NGSIv1
+    if ((apiVersion = V1) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
     {
-      // Previous versions added {$exists: true} in the case scoP->oper != SCOPE_OPERATOR_NOT
-      // but this not the needed, as this kind of query already has a _id.type: ... token.
-      // Anyway SCOPE_FILTER_EXISTENTECE is NGSIv1 funcionality now deprecated and mabye we should
-      // remove all this stuff
-      if (scoP->oper == SCOPE_OPERATOR_NOT)
-      {
-        BSONObj b = BSON(entityTypeString << BSON("$exists" << false));
-        filtersP->push_back(b);
-      }
+      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
+            BSON(entityTypeString << BSON("$exists" << false)) :
+            BSON(entityTypeString << BSON("$exists" << true));
+
+      filtersP->push_back(b);
     }
     else
     {
@@ -1562,7 +1559,7 @@ bool entitiesQuery
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
       // FIXME P5: NGSIv1 filter, probably to be removed in the future
-      addFilterScope(scopeP, &filters);
+      addFilterScope(apiVersion, scopeP, &filters);
     }
     else if (scopeP->type == FIWARE_LOCATION ||
              scopeP->type == FIWARE_LOCATION_DEPRECATED ||
