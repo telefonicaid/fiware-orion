@@ -1046,12 +1046,19 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
 */
 static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<BSONObj>* filtersP)
 {
+  if ((apiVersion == V2) && (scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
+  {
+    // Early return to avoid _id.type: {$exits: true} in NGSIv2 case. Entity type existence filter only
+    // makes sense in NGSIv1 (and may be removed soon as NGSIv1 is deprecated functionality)
+    return;
+  }
+
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
   if (scoP->type == SCOPE_FILTER_EXISTENCE)
   {
     // Entity type existence filter only makes sense in NGSIv1
-    if ((apiVersion = V1) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
+    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
     {
       BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
             BSON(entityTypeString << BSON("$exists" << false)) :
