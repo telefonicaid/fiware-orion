@@ -822,37 +822,39 @@ bool includedAttribute(const std::string& attrName, const StringList& attrsV)
 *
 * fillQueryEntity -
 */
-static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
+static void fillQueryEntity(BSONObjBuilder* bobP, const EntityId* enP)
 {
-  BSONObjBuilder     ent;
   const std::string  idString    = "_id." ENT_ENTITY_ID;
   const std::string  typeString  = "_id." ENT_ENTITY_TYPE;
 
   if (enP->isPattern == "true")
   {
-    ent.appendRegex(idString, enP->id);
+    // In the case of "universal pattern" we can avoid adding anything (simpler query)
+    if (enP->id != ".*")
+    {
+      bobP->appendRegex(idString, enP->id);
+    }
   }
   else
   {
-    ent.append(idString, enP->id);
+    bobP->append(idString, enP->id);
   }
 
   if (enP->type != "")
   {
     if (enP->isTypePattern)
     {
-      ent.appendRegex(typeString, enP->type);
+      // In the case of "universal pattern" we can avoid adding anything (simpler query)
+      if (enP->type != ".*")
+      {
+        bobP->appendRegex(typeString, enP->type);
+      }
     }
     else
     {
-      ent.append(typeString, enP->type);
+      bobP->append(typeString, enP->type);
     }
   }
-
-  BSONObj entObj = ent.obj();
-  baP->append(entObj);
-
-  LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
 }
 
 
@@ -1042,12 +1044,20 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
 *
 * addFilterScope -
 */
-static void addFilterScope(const Scope* scoP, std::vector<BSONObj>* filtersP)
+static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<BSONObj>* filtersP)
 {
+  if ((apiVersion == V2) && (scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
+  {
+    // Early return to avoid _id.type: {$exits: true} in NGSIv2 case. Entity type existence filter only
+    // makes sense in NGSIv1 (and may be removed soon as NGSIv1 is deprecated functionality)
+    return;
+  }
+
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
   if (scoP->type == SCOPE_FILTER_EXISTENCE)
   {
+    // Entity type existence filter only makes sense in NGSIv1
     if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
     {
       BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
@@ -1473,7 +1483,7 @@ bool entitiesQuery
   /* Query structure is as follows
    *
    * {
-   *    "$or": [ ... ],            (always)
+   *    "$or": [ {}1 ... {}N ],    (always, optimized to just {}1 in the case of only one element)
    *    "_id.servicePath: { ... }  (always, in some cases using {$exists: false})
    *    "attrNames": { ... },      (only if attributes are used in the query)
    *    "location.coords": { ... } (only in the case of geo-queries)
@@ -1484,15 +1494,29 @@ bool entitiesQuery
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
 
-  /* Part 1: entities */
-
-  for (unsigned int ix = 0; ix < enV.size(); ++ix)
+  /* Part 1: entities - avoid $or in the case of a single element */
+  if (enV.size() == 1)
   {
-    fillQueryEntity(&orEnt, enV[ix]);
-  }
+    BSONObjBuilder bob;
+    fillQueryEntity(&bob, enV[0]);
+    BSONObj entObj = bob.obj();
+    finalQuery.appendElements(entObj);
 
-  /* The result of orEnt is appended to the final query */
-  finalQuery.append("$or", orEnt.arr());
+    LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
+  }
+  else
+  {
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+      BSONObjBuilder bob;
+      fillQueryEntity(&bob, enV[ix]);
+      BSONObj entObj = bob.obj();
+      orEnt.append(entObj);
+
+      LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
+    }
+    finalQuery.append("$or", orEnt.arr());
+  }
 
   /* Part 2: service path */
   if (servicePathFilterNeeded(servicePath))
@@ -1542,7 +1566,7 @@ bool entitiesQuery
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
       // FIXME P5: NGSIv1 filter, probably to be removed in the future
-      addFilterScope(scopeP, &filters);
+      addFilterScope(apiVersion, scopeP, &filters);
     }
     else if (scopeP->type == FIWARE_LOCATION ||
              scopeP->type == FIWARE_LOCATION_DEPRECATED ||
@@ -2055,6 +2079,9 @@ bool registrationsQuery
   //   expiration: { $gt: ... }
   // }
   //
+  // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
+  // universal pattern) so we cannot avoid to use this operator.
+  //
   // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
   // but this would need a data model migration in DB
 
@@ -2112,9 +2139,6 @@ bool registrationsQuery
 
   BSONObjBuilder queryBuilder;
 
-  /* The $or clause could be omitted if it contains only one element, but we can assume that
-   * it has no impact on MongoDB query optimizer
-   */
   queryBuilder.append("$or", entityOr.arr());
   queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
