@@ -110,4 +110,3 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
   return true;
 }
-  

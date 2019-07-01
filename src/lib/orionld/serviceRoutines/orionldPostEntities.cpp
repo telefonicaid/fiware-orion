@@ -289,7 +289,7 @@ bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueNode* cN
   }
   else if (kNodeP->type == KjObject)
   {
-    *levelP += 1;;
+    *levelP += 1;
     cNodeP->valueType = orion::ValueTypeObject;
 
     for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
@@ -300,7 +300,7 @@ bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueNode* cN
   }
   else if (kNodeP->type == KjArray)
   {
-    *levelP += 1;;
+    *levelP += 1;
     cNodeP->valueType = orion::ValueTypeVector;
 
     for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)

@@ -46,9 +46,9 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
 #include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // kjTreeToSubscriptionExpression
-#include "orionld/kjTree/kjTreeToEndpoint.h"  	      	       // kjTreeToEndpoint
-#include "orionld/kjTree/kjTreeToNotification.h"  	           // kjTreeToNotification
-#include "orionld/kjTree/kjTreeToSubscription.h"  	           // kjTreeToSubscription
+#include "orionld/kjTree/kjTreeToEndpoint.h"                   // kjTreeToEndpoint
+#include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
+#include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
 
