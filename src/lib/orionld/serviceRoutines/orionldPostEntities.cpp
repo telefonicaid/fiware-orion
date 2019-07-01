@@ -312,7 +312,7 @@ bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueNode* cN
   }
   else
   {
-    LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name));
+    LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name.c_str()));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
     return false;
   }
