@@ -59,7 +59,7 @@ echo
 
 echo "03. GET E1, with 'Accept: application/json' - see 'Content-Type: application/json'"
 echo "=================================================================================="
-url=`urlencode http://a.b.c/entity/E1`
+url="http://a.b.c/entity/E1"
 orionCurl --url /ngsi-ld/v1/entities/$url -H "Accept: application/json"
 echo
 echo
