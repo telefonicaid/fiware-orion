@@ -28,6 +28,12 @@ SET (SOURCES
     kjTreeFromQueryContextResponseWithAttrList.cpp
     kjTreeFromSubscription.cpp
     kjTreeFromNotification.cpp
+    kjTreeToEntIdVector.cpp
+    kjTreeToStringList.cpp
+    kjTreeToSubscriptionExpression.cpp
+    kjTreeToEndpoint.cpp
+    kjTreeToNotification.cpp
+    kjTreeToSubscription.cpp
 )
 
 # Include directories

@@ -146,25 +146,21 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   case orion::ValueTypeString:
     nodeP = kjString(orionldState.kjsonP, "value", caP->stringValue.c_str());
     ALLOCATION_CHECK(nodeP);
-    kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeNumber:
     nodeP = kjFloat(orionldState.kjsonP, "value", caP->numberValue);  // FIXME: kjInteger or kjFloat ...
     ALLOCATION_CHECK(nodeP);
-    kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeBoolean:
     nodeP = kjBoolean(orionldState.kjsonP, "value", (KBool) caP->boolValue);
     ALLOCATION_CHECK(nodeP);
-    kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeNull:
     nodeP = kjNull(orionldState.kjsonP, "value");
     ALLOCATION_CHECK(nodeP);
-    kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeVector:
@@ -172,15 +168,14 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, detailsP);
     if (nodeP == NULL)
       return NULL;
-    kjChildAdd(aTopNodeP, nodeP);
     break;
 
   case orion::ValueTypeNotGiven:
     nodeP = kjString(orionldState.kjsonP, "value", "UNKNOWN TYPE");
     ALLOCATION_CHECK(nodeP);
-    kjChildAdd(aTopNodeP, nodeP);
     break;
   }
+  kjChildAdd(aTopNodeP, nodeP);
 
   // Metadata
   for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)

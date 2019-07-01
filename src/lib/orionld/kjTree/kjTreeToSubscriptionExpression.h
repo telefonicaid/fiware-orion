@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTIONEXPRESSION_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTIONEXPRESSION_H_
 
 /*
 *
@@ -25,22 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include <vector>                                              // std::vector
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/EntID.h"                                  // EntID
+#include "apiTypesV2/SubscriptionExpression.h"                 // SubscriptionExpression
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToEntIdVector -
+// kjTreeToSubscriptionExpression -
 //
-extern bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP);
+extern bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, SubscriptionExpression* subExpressionP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTIONEXPRESSION_H_

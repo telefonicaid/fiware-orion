@@ -1,0 +1,141 @@
+/*
+*
+* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+*
+* This file is part of Orion Context Broker.
+*
+* Orion Context Broker is free software: you can redistribute it and/or
+* modify it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Orion Context Broker is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+* General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+*
+* For those usages not covered by this license please contact with
+* iot_support at tid dot es
+*
+* Author: Ken Zangelin
+*/
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjRender.h"                                    // kjRender
+}
+
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "apiTypesV2/SubscriptionExpression.h"                 // SubscriptionExpression
+
+#include "orionld/common/CHECK.h"                              // CHECKx()
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjTreeToSubscriptionExpression -
+//
+bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, SubscriptionExpression* subExpressionP)
+{
+  KjNode*  itemP;
+  char*    geometryP          = NULL;
+  KjNode*  coordinatesNodeP   = NULL;
+  char*    georelP            = NULL;
+  char*    geoPropertyP       = NULL;
+
+  for (itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    if (SCOMPARE9(itemP->name, 'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', 0))
+    {
+      DUPLICATE_CHECK(geometryP, "GeoQuery::geometry", itemP->value.s);
+      STRING_CHECK(itemP, "GeoQuery::geometry");
+    }
+    else if (SCOMPARE12(itemP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
+    {
+      if (itemP->type == KjString)
+      {
+        DUPLICATE_CHECK(coordinatesNodeP, "GeoQuery::coordinates", itemP);
+      }
+      else if (itemP->type == KjArray)
+      {
+        DUPLICATE_CHECK(coordinatesNodeP, "GeoQuery::coordinates", itemP);
+      }
+      else
+      {
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates", OrionldDetailsString);
+        return false;
+      }
+      LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
+    }
+    else if (SCOMPARE7(itemP->name, 'g', 'e', 'o', 'r', 'e', 'l', 0))
+    {
+      DUPLICATE_CHECK(georelP, "GeoQuery::georel", itemP->value.s);
+      STRING_CHECK(itemP, "GeoQuery::georel");
+    }
+    else if (SCOMPARE12(itemP->name, 'g', 'e', 'o', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+    {
+      DUPLICATE_CHECK(geoPropertyP, "GeoQuery::geoproperty", itemP->value.s);
+      STRING_CHECK(itemP, "GeoQuery::geoproperty");
+    }
+    else
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unknown GeoQuery field", itemP->name, OrionldDetailsString);
+      return false;
+    }
+  }
+
+  if (geometryP == NULL)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "GeoQuery::geometry missing in Subscription", NULL, OrionldDetailsString);
+    return false;
+  }
+
+  if (coordinatesNodeP == NULL)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "GeoQuery::coordinates missing in Subscription", NULL, OrionldDetailsString);
+    return false;
+  }
+
+  if (georelP == NULL)
+  {
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "GeoQuery::georel missing in Subscription", NULL, OrionldDetailsString);
+    return false;
+  }
+
+  LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
+  if (coordinatesNodeP->type == KjArray)
+  {
+    char coords[512];
+
+    //
+    // We have a little problem here ...
+    // SubscriptionExpression::coords is a std::string in APIv2.
+    // NGSI-LD needs it to be able to be an array.
+    // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
+    //
+    kjRender(orionldState.kjsonP, coordinatesNodeP, coords, sizeof(coords));
+    coords[strlen(coords) - 1] = 0;
+    LM_T(LmtGeoJson, ("Rendered coords array: '%s'", &coords[1]));
+    subExpressionP->coords = &coords[1];
+  }
+  else
+    subExpressionP->coords = coordinatesNodeP->value.s;
+
+  subExpressionP->geometry = geometryP;
+  subExpressionP->georel   = georelP;
+
+  //
+  // FIXME: geoproperty is not part of SubscriptionExpression in APIv2.
+  //        For now, we skip geoproperty and only work on 'location'.
+  //
+
+  return true;
+}

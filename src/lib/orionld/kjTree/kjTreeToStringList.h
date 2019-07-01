@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOSTRINGLIST_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREETOSTRINGLIST_H_
 
 /*
 *
@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
 #include <vector>                                              // std::vector
 
 extern "C"
@@ -33,14 +34,13 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/EntID.h"                                  // EntID
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToEntIdVector -
+// kjTreeToStringList -
 //
-extern bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP);
+extern bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::string>* stringListP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSTRINGLIST_H_
