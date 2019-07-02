@@ -96,7 +96,7 @@ Date: REGEX(.*)
 02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved (from tenant 'openiot') - OK
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 223
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -107,7 +107,6 @@ Date: REGEX(.*)
             "type": "vehicle"
         }
     ],
-    "expires": "2038-01-19T03:14:07Z",
     "id": "urn:ngsi-ld:Subscription:testsubscription",
     "notification": {
         "endpoint": {
