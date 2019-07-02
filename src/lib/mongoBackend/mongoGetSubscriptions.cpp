@@ -244,6 +244,7 @@ static void setStatus(Subscription* s, const BSONObj& r)
 }
 
 
+
 #ifdef ORIONLD
 /* ****************************************************************************
 *
@@ -659,9 +660,12 @@ bool mongoGetLdSubscriptions
 
     setSubscriptionId(&s, r);
     setDescription(&s, r);
+    setMimeType(&s, r);
     setSubject(&s, r);
-    setStatus(&s, r);
     setNotification(&s, r, tenant);
+    setStatus(&s, r);
+    setName(&s, r);
+    setContext(&s, r);
 
     subVecP->push_back(s);
   }
