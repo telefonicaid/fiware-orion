@@ -135,7 +135,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
     subP->id += randomId;
   }
 
-  if (ciP->httpHeaders.ngsildContent)  // Context in payload
+  if (orionldState.ngsildContent)  // Context in payload
   {
     if (contextNodeP == NULL)
     {
