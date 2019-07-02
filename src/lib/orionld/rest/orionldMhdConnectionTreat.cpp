@@ -406,7 +406,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         orionldState.contextP = NULL;  // FIXME: Memleak?
         orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to clone context tree - out of memory?", NULL, OrionldDetailsString);
         ciP->httpStatusCode = SccReceiverInternalError;
-        
+
         goto respond;
       }
 
