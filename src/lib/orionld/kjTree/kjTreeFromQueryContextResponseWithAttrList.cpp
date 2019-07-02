@@ -557,7 +557,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     // Set MIME Type to JSONLD if JSONLD is in the Accept header of the incoming request
     // FIXME: probably no longer necessary - done in orionldMhdConnectionTreat.cpp::acceptHeaderCheck()
     //
-    if (ciP->httpHeaders.acceptJsonld == true)
+    if (orionldState.acceptJsonld == true)
     {
       ciP->outMimeType = JSONLD;
     }
@@ -568,7 +568,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     //
     if (atContextAttributeP == NULL)
     {
-      if (ciP->httpHeaders.acceptJsonld == true)
+      if (orionldState.acceptJsonld == true)
       {
         nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
         kjChildAdd(top, nodeP);
@@ -578,7 +578,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     else
     {
       // NOTE: HTTP Link header is added ONLY in orionldMhdConnectionTreat
-      if (ciP->httpHeaders.acceptJsonld == true)
+      if (orionldState.acceptJsonld == true)
       {
         if (atContextAttributeP->valueType == orion::ValueTypeString)
         {

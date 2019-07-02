@@ -367,7 +367,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   }
 
   // @context - in payload if Mime Type is application/ld+json, else in Link header
-  if (ciP->httpHeaders.acceptJsonld)
+  if (orionldState.acceptJsonld)
   {
     if (subscriptionP->ldContext != "")
       nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());

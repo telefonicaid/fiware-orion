@@ -57,6 +57,7 @@ static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
   if (contextP == NULL)
   {
     LM_E(("Invalid context '%s': %s", url, details));
+    orionldState.contextP = NULL;  // Leak?
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
     return NULL;
   }
@@ -189,6 +190,7 @@ bool orionldContextTreat
         {
           LM_E(("contextItemNodeTreat failed"));
           // Error payload set by contextItemNodeTreat
+          orionldState.contextP = NULL;  // Leak?
           return false;
         }
       }
@@ -197,6 +199,7 @@ bool orionldContextTreat
         if (orionldContextTreat(ciP, contextArrayItemP, entityId, caPP) == false)
         {
           LM_E(("Error treating context object inside array"));
+          orionldState.contextP = NULL;  // Leak?
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error treating context object inside array", NULL, OrionldDetailsString);
           return false;
         }
@@ -204,6 +207,7 @@ bool orionldContextTreat
       else
       {
         LM_E(("Context Array Item is not a String nor an Object, but of type '%s'", kjValueType(contextArrayItemP->type)));
+        orionldState.contextP = NULL;  // Leak?
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item of unsupported type", NULL, OrionldDetailsString);
         return false;
       }
@@ -215,6 +219,7 @@ bool orionldContextTreat
     {
       // orionldContextInlineCheck sets the error response
       LM_E(("Invalid inline context"));
+      orionldState.contextP = NULL;  // Leak?
       return false;
     }
 
@@ -231,6 +236,7 @@ bool orionldContextTreat
   else
   {
     LM_E(("invalid JSON type of @context member"));
+    orionldState.contextP = NULL;  // Leak?
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
     return false;
   }

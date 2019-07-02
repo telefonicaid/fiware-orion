@@ -36,7 +36,7 @@
 *
 * HttpHeaders::HttpHeaders - 
 */
-HttpHeaders::HttpHeaders(): gotHeaders(false), servicePathReceived(false), contentLength(0), linkUrl(NULL), acceptJson(false), acceptJsonld(false), ngsildContent(false)
+HttpHeaders::HttpHeaders(): gotHeaders(false), servicePathReceived(false), contentLength(0), linkUrl(NULL)
 {
 }
 

@@ -112,7 +112,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP, char** e
       return false;
     }
   }
-  else if (ciP->httpHeaders.ngsildContent == true)
+  else if (orionldState.ngsildContent == true)
   {
     LM_T(LmtContext, ("Content-Type is: application/ld+json"));
 
@@ -147,9 +147,9 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
-    ciP->httpHeaders.acceptJson   = true;
-    ciP->httpHeaders.acceptJsonld = false;
-    ciP->outMimeType              = JSON;
+    orionldState.acceptJson   = true;
+    orionldState.acceptJsonld = false;
+    ciP->outMimeType          = JSON;
   }
 
   for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
@@ -162,26 +162,26 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
       const char* appType = &mediaRange[12];
 
       LM_T(LmtAccept, ("mediaRange is application/..."));
-      if      (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  ciP->httpHeaders.acceptJsonld = true;
-      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))                 ciP->httpHeaders.acceptJson   = true;
+      if      (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  orionldState.acceptJsonld = true;
+      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))                 orionldState.acceptJson   = true;
       else if (SCOMPARE2(appType, '*', 0))
       {
-        ciP->httpHeaders.acceptJsonld = true;
-        ciP->httpHeaders.acceptJson   = true;
+        orionldState.acceptJsonld = true;
+        orionldState.acceptJson   = true;
       }
 
-      LM_T(LmtAccept, ("acceptJsonld: %s", FT(ciP->httpHeaders.acceptJsonld)));
-      LM_T(LmtAccept, ("acceptJson:   %s", FT(ciP->httpHeaders.acceptJson)));
+      LM_T(LmtAccept, ("acceptJsonld: %s", FT(orionldState.acceptJsonld)));
+      LM_T(LmtAccept, ("acceptJson:   %s", FT(orionldState.acceptJson)));
     }
     else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
     {
-      ciP->httpHeaders.acceptJsonld = true;
-      ciP->httpHeaders.acceptJson   = true;
+      orionldState.acceptJsonld = true;
+      orionldState.acceptJson   = true;
       LM_T(LmtAccept, ("*/* - both json and jsonld OK"));
     }
   }
 
-  if ((ciP->httpHeaders.acceptJsonld == false) && (ciP->httpHeaders.acceptJson == false))
+  if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false))
   {
     *errorTitleP = (char*) "invalid mime-type";
     *detailsP    = (char*) "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'";
@@ -189,7 +189,7 @@ static bool acceptHeaderCheck(ConnectionInfo* ciP, char** errorTitleP, char** de
     return false;
   }
 
-  if (ciP->httpHeaders.acceptJsonld == true)
+  if (orionldState.acceptJsonld == true)
     ciP->outMimeType = JSONLD;
 
   return true;
@@ -336,7 +336,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       //   o The @context in the payload is not a simple URI string
       //   o The HTTP Accept header does not include application/ld+json => application/json should be returned
       //
-      if ((contextNodeP != NULL) && (ciP->httpHeaders.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (contextNodeP->type != KjString))
+      if ((contextNodeP != NULL) && (orionldState.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (contextNodeP->type != KjString))
         contextToBeCreated = true;
     }
 
@@ -403,8 +403,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
       if (clonedTree == NULL)
       {
+        orionldState.contextP = NULL;  // FIXME: Memleak?
         orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to clone context tree - out of memory?", NULL, OrionldDetailsString);
         ciP->httpStatusCode = SccReceiverInternalError;
+        
         goto respond;
       }
 
@@ -453,6 +455,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       if ((contextP = orionldContextAppend(contextId, clonedTree, OrionldUserContext, &details)) == NULL)
       {
         kjFree(clonedTree);
+        orionldState.contextP = NULL;  // FIXME: Memleak?
         orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context", details, OrionldDetailsString);
         ciP->httpStatusCode = SccReceiverInternalError;
         goto respond;
@@ -498,7 +501,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // If "Accept: application/json", then the context goes in the HTTP Header (Link)
     //
-    if ((ciP->httpHeaders.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (ciP->httpStatusCode < 400))
+    if ((orionldState.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (ciP->httpStatusCode < 400))
     {
       httpHeaderLinkAdd(ciP, orionldState.link);
     }
@@ -517,7 +520,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       orionldErrorResponseCreate(ciP, OrionldInternalError, "Out of memory", NULL, OrionldDetailsString);
     }
   }
-  else if ((contextToBeCreated == true) && (ciP->httpHeaders.acceptJsonld == false) && (ciP->httpHeaders.acceptJson == true) && (orionldState.useLinkHeader == true))
+  else if ((contextToBeCreated == true) && (orionldState.acceptJsonld == false) && (orionldState.acceptJson == true) && (orionldState.useLinkHeader == true))
   {
     //
     // If a new context has been created, it must be returned as a Link header.

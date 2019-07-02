@@ -561,7 +561,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
 
 #ifdef ORIONLD
     if (strcmp(value, "application/ld+json") == 0)
-      headerP->ngsildContent = true;
+      orionldState.ngsildContent = true;
 #endif
   }
   else if (strcasecmp(key.c_str(), HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
