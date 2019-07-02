@@ -2353,7 +2353,7 @@ static BSONArray processConditionVector
         conds.append(nc->condValueList[jx]);
       }
 
-      LM_TMP(("SUB: status == %d", status));
+      LM_TMP(("SUB: status == %s", status.c_str()));
       if ((status == STATUS_ACTIVE) &&
           (processOnChangeConditionForSubscription(enV,
                                                    attrL,

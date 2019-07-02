@@ -39,6 +39,8 @@ brokerStart CB 0-255
 # 06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure
 # 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 # 08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK
+# 09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
+# 10. GET sub09 and make sure no 'expires' nor 'throttling' is returned
 #
 
 
@@ -321,6 +323,40 @@ echo
 echo
 
 
+echo "09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK"
+echo "========================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub09",
+  "type": "Subscription",
+  "name": "Test subscription 09",
+  "description": "Description of Test subscription 09",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "attributes": [ "P1" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "10. GET sub09 and make sure no 'expires' nor 'throttling' is returned"
+echo "====================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /ngsi-ld/v1/subscriptions, with a sub-id
 =================================================
@@ -551,6 +587,47 @@ Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub03
 Date: REGEX(.*)
 
+
+
+09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09
+Date: REGEX(.*)
+
+
+
+10. GET sub09 and make sure no 'expires' nor 'throttling' is returned
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 317
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Description of Test subscription 09",
+    "entities": [
+        {
+            "id": "urn:ngsi-ld:E01",
+            "type": "T1"
+        }
+    ],
+    "id": "http://a.b.c/subs/sub09",
+    "name": "Test subscription 09",
+    "notification": {
+        "attributes": [
+            "P1"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "uri": "http://valid.url/url"
+        },
+        "format": "keyValues"
+    },
+    "type": "Subscription"
+}
 
 
 --TEARDOWN--

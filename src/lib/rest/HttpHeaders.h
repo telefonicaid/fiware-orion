@@ -144,9 +144,6 @@ typedef struct HttpHeaders
 
 #ifdef ORIONLD
   char*         linkUrl;        // FIXME: To be removed, perhaps moved to OrionldConnection
-  bool          acceptJson;     // FIXME: To be moved to OrionldConnection
-  bool          acceptJsonld;   // FIXME: To be moved to OrionldConnection
-  bool          ngsildContent;  // FIXME: To be moved to OrionldConnection
 #endif
 } HttpHeaders;
 
