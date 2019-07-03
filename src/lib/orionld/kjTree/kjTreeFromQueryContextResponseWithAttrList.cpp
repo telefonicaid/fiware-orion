@@ -571,6 +571,9 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
       LM_TMP(("KZ: no context inside attribute list - Content.Type is appliction/json and the context came via HTTP Header, if at all"));
       if (orionldState.acceptJsonld == true)
       {
+        if (orionldState.contextP == NULL)
+          orionldState.contextP = &orionldDefaultContext;
+
         LM_TMP(("KZ: adding default context to payload"));
         nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
         kjChildAdd(top, nodeP);

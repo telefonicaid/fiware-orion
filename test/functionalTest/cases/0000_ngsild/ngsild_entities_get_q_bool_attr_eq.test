@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that has an attribute A equal to false - see E3
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 242
+Content-Length: 220
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -161,7 +161,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": false
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
