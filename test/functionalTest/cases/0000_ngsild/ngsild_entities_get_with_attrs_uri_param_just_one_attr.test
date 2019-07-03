@@ -181,7 +181,7 @@ Date: REGEX(.*)
 05. GET all entities with attr A1, see E1 only
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 245
+Content-Length: 223
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -193,7 +193,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1/A1"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 06. GET all entities with attr A2, see E1 and E2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 487
+Content-Length: 443
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -214,7 +214,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1/A2"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E2",
@@ -223,7 +223,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E2/A2"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 

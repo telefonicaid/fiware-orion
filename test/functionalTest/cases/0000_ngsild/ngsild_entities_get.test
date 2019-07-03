@@ -182,7 +182,7 @@ Date: REGEX(.*)
 05. GET all entities of type T, see E1 and E3
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 481
+Content-Length: 437
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -194,7 +194,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E3",
@@ -203,7 +203,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E3"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
@@ -212,7 +212,7 @@ Date: REGEX(.*)
 06. GET all entities of type T2, see E2 and E4
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 439
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -224,7 +224,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E2"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E4",
@@ -233,7 +233,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E4"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 07. GET all entities with id E1, see entity E1 only
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 242
+Content-Length: 220
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -254,7 +254,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 08. GET all entities with id E.*, see all four entities
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 961
+Content-Length: 873
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -275,7 +275,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E1"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E2",
@@ -284,7 +284,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E2"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E3",
@@ -293,7 +293,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E3"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
   {
     "id": "http://a.b.c/entity/E4",
@@ -302,7 +302,7 @@ Date: REGEX(.*)
       "type": "Property",
       "value": "E4"
     },
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }
 ]
 
