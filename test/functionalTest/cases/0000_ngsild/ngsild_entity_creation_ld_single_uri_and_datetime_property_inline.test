@@ -202,7 +202,7 @@ Date: REGEX(.*)
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789"
   },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 }
 
 
