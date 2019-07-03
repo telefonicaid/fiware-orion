@@ -568,9 +568,11 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     //
     if (atContextAttributeP == NULL)
     {
+      LM_TMP(("KZ: no context inside attribute list - Content.Type is appliction/json and the context came via HTTP Header, if at all"));
       if (orionldState.acceptJsonld == true)
       {
-        nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
+        LM_TMP(("KZ: adding default context to payload"));
+        nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
         kjChildAdd(top, nodeP);
       }
       // NOTE: HTTP Link header is added ONLY in orionldMhdConnectionTreat
@@ -578,10 +580,12 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
     else
     {
       // NOTE: HTTP Link header is added ONLY in orionldMhdConnectionTreat
+      LM_TMP(("KZ: context found inside attribute list. orion value type: %d", atContextAttributeP->valueType));
       if (orionldState.acceptJsonld == true)
       {
         if (atContextAttributeP->valueType == orion::ValueTypeString)
         {
+          LM_TMP(("KZ: string context '%s' to payload", atContextAttributeP->stringValue.c_str()));
           nodeP = kjString(orionldState.kjsonP, "@context", atContextAttributeP->stringValue.c_str());
           kjChildAdd(top, nodeP);
         }
@@ -589,6 +593,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         {
           if (atContextAttributeP->compoundValueP->valueType == orion::ValueTypeVector)
           {
+            LM_TMP(("KZ: vector context to payload"));
             nodeP = kjArray(orionldState.kjsonP, "@context");
             kjChildAdd(top, nodeP);
 
@@ -601,6 +606,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           }
           else
           {
+            LM_TMP(("KZ: inline context to payload - must be implemented!!!"));
             orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "inline contexts not supported - wait it's coming ...", OrionldDetailsString);
             return orionldState.responseTree;
           }

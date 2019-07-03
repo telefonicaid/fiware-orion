@@ -369,12 +369,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         goto respond;
       }
 
+      LM_TMP(("KZ: Context in Link header: %s", ciP->httpHeaders.linkUrl));
       if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, ciP->httpHeaders.linkUrl, OrionldUserContext, &details)) == NULL)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;
         goto respond;
       }
+      LM_TMP(("KZ: orionldState.contextP points to '%s'", orionldState.contextP->url));
     }
     else
       orionldState.contextP = NULL;
