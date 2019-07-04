@@ -47,6 +47,17 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// qAliasCompress -
+//
+static void qAliasCompress(char* qString)
+{
+  LM_TMP(("SUB: Compressing long-names to aliases in Q-String '%s'", qString));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // coordinateTransform -
 //
 void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
@@ -200,6 +211,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
+    qAliasCompress(nodeP->value.s);
     kjChildAdd(topP, nodeP);
   }
 

@@ -172,6 +172,10 @@ public:
   ~StringFilterItem();
 
   bool                      parse(char* qItem, std::string* errorStringP, StringFilterType _type);
+#ifdef ORIONLD
+  int                       render(char* buf, int bufLen);
+  void                      valueAsString(char* buf, int bufLen);
+#endif
   void                      lhsParse(void);
   const char*               opName(void);
   const char*               valueTypeName(void);
@@ -245,6 +249,9 @@ public:
   ~StringFilter();
 
   bool  parse(const char* q, std::string* errorStringP);
+#ifdef ORIONLD
+  bool  render(char* buf, int bufLen, std::string* errorStringP);
+#endif
   bool  mongoFilterPopulate(std::string* errorStringP);
   bool  match(ContextElementResponse* cerP);
   bool  qMatch(ContextElementResponse* cerP);

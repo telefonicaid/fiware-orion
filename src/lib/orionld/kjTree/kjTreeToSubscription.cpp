@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -241,8 +243,38 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::q");
 
-      // FIXME: Need to parse the Q and to URI Expansion
-      subP->subject.condition.expression.q = kNodeP->value.s;
+      LM_TMP(("SUB: q == '%s'", kNodeP->value.s));
+
+      LM_TMP(("SUB: Parsing the Q value but must also do URI Expansion"));
+      Scope*      scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
+      std::string errorString;
+
+      scopeP->stringFilterP = new StringFilter(SftQ);
+
+      if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
+      {
+        delete scopeP->stringFilterP;
+        delete scopeP;
+
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for Subscription::q", kNodeP->value.s, OrionldDetailsString);
+        return false;
+      }
+
+      char stringFilterExpanded[512];
+      bool b;
+
+      b = scopeP->stringFilterP->render(stringFilterExpanded, sizeof(stringFilterExpanded), &errorString);
+      if (b == false)
+      {
+        delete scopeP->stringFilterP;
+        delete scopeP;
+
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "Internal Error", "Unable to render StringFilter", OrionldDetailsString);
+        return false;
+      }
+
+      subP->subject.condition.expression.q = stringFilterExpanded;
+      subP->restriction.scopeVector.push_back(scopeP);
     }
     else if (SCOMPARE5(kNodeP->name, 'g', 'e', 'o', 'Q', 0))
     {
@@ -340,4 +372,3 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
 
   return true;
 }
-
