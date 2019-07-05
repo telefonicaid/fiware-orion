@@ -245,7 +245,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
 
       LM_TMP(("SUB: q == '%s'", kNodeP->value.s));
 
-      LM_TMP(("SUB: Parsing the Q value but must also do URI Expansion"));
+      LM_TMP(("SUB: Parsing the Q value and doing URI Expansion"));
       Scope*      scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
       std::string errorString;
 

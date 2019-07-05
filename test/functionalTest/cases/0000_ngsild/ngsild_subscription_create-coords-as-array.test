@@ -124,7 +124,7 @@ MongoDB server version: REGEX(.*)
 		"http://example.org/P2"
 	],
 	"expression" : {
-		"q" : "P2==1",
+		"q" : "http://example=org/P2==1",
 		"mq" : "",
 		"geometry" : "valid geometry",
 		"coords" : "1,2",

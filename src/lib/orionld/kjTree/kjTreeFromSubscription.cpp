@@ -47,11 +47,92 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// qAliasCompress -
+// qAliasCompress - replace long attr names to their corresponding aliases
 //
-static void qAliasCompress(char* qString)
+// Possibilities:
+//   var
+//   !var
+//   var!=XXX
+//   var==XXX
+//   var<=XXX
+//   var>=XXX
+//   var>XXX
+//   var<XXX
+//
+static bool qAliasCompress(char* qString)
 {
-  LM_TMP(("SUB: Compressing long-names to aliases in Q-String '%s'", qString));
+  char* cP       = qString;
+  char* varStart = qString;
+  char  out[512];
+  int   outIx = 0;
+  bool  insideVarName = true;
+
+  LM_TMP(("SUB: In qAliasCompress: '%s'", qString));
+  while (*cP != 0)
+  {
+    if (*cP == '!')
+    {
+      varStart = &cP[1];
+      out[outIx] = '!';
+      ++outIx;
+    }
+    else if (((cP[1] == '=') && ((cP[0] == '=') || (cP[0] == '!') || (cP[0] == '<') || (cP[0] == '>'))) || (cP[0] == '<') || (cP[0] == '>'))
+    {
+      char  savedCp0 = cP[0];
+      char* alias;
+      char* eqP;
+
+      cP[0] = 0;
+
+      LM_TMP(("SUB: Looking for alias for '%s'", varStart));
+
+      eqP = varStart;
+      while (*eqP != 0)
+      {
+        if (*eqP == '=')
+          *eqP = '.';
+        ++eqP;
+      }
+
+      alias = orionldAliasLookup(orionldState.contextP, varStart);
+
+      if (alias != NULL)
+      {
+        strcpy(&out[outIx], alias);
+        outIx += strlen(alias);
+      }
+      else
+      {
+        strcpy(&out[outIx], varStart);
+        outIx += strlen(varStart);
+      }
+
+      out[outIx++] = savedCp0;
+      if (cP[1] == '=')
+      {
+        out[outIx++] = cP[1];
+        ++cP;
+      }
+
+      insideVarName = false;
+    }
+    else if (*cP == ';')
+    {
+      insideVarName = true;
+      out[outIx++] = ';';
+    }
+    else if (insideVarName == false)
+    {
+      out[outIx++] = *cP;
+    }
+
+    ++cP;
+  }
+
+  out[outIx] = 0;
+  strcpy(qString, out);
+  LM_TMP(("SUB: From qAliasCompress: '%s'", qString));
+  return true;
 }
 
 
