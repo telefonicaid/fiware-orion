@@ -556,5 +556,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   orionldStateRelease();
 
+  LM_TMP(("Request finished"));
   return MHD_YES;
 }

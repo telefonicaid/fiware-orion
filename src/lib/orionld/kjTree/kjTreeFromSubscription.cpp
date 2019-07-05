@@ -47,6 +47,98 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// qAliasCompress - replace long attr names to their corresponding aliases
+//
+// Possibilities:
+//   var
+//   !var
+//   var!=XXX
+//   var==XXX
+//   var<=XXX
+//   var>=XXX
+//   var>XXX
+//   var<XXX
+//
+static bool qAliasCompress(char* qString)
+{
+  char* cP       = qString;
+  char* varStart = qString;
+  char  out[512];
+  int   outIx = 0;
+  bool  insideVarName = true;
+
+  LM_TMP(("SUB: In qAliasCompress: '%s'", qString));
+  while (*cP != 0)
+  {
+    if (*cP == '!')
+    {
+      varStart = &cP[1];
+      out[outIx] = '!';
+      ++outIx;
+    }
+    else if (((cP[1] == '=') && ((cP[0] == '=') || (cP[0] == '!') || (cP[0] == '<') || (cP[0] == '>'))) || (cP[0] == '<') || (cP[0] == '>'))
+    {
+      char  savedCp0 = cP[0];
+      char* alias;
+      char* eqP;
+
+      cP[0] = 0;
+
+      LM_TMP(("SUB: Looking for alias for '%s'", varStart));
+
+      eqP = varStart;
+      while (*eqP != 0)
+      {
+        if (*eqP == '=')
+          *eqP = '.';
+        ++eqP;
+      }
+
+      alias = orionldAliasLookup(orionldState.contextP, varStart);
+
+      if (alias != NULL)
+      {
+        strcpy(&out[outIx], alias);
+        outIx += strlen(alias);
+      }
+      else
+      {
+        strcpy(&out[outIx], varStart);
+        outIx += strlen(varStart);
+      }
+
+      out[outIx++] = savedCp0;
+      if (cP[1] == '=')
+      {
+        out[outIx++] = cP[1];
+        ++cP;
+      }
+
+      insideVarName = false;
+    }
+    else if (*cP == ';')
+    {
+      insideVarName = true;
+      out[outIx++] = ';';
+    }
+    else if (insideVarName == false)
+    {
+      out[outIx++] = *cP;
+    }
+
+    ++cP;
+  }
+
+  out[outIx] = 0;
+  strcpy(qString, out);
+  LM_TMP(("SUB: From qAliasCompress: '%s'", qString));
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // coordinateTransform -
 //
 void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
@@ -200,6 +292,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
+    qAliasCompress(nodeP->value.s);
     kjChildAdd(topP, nodeP);
   }
 

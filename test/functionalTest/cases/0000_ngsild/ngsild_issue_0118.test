@@ -39,7 +39,6 @@ brokerStart CB 0-255
 # 06. GET particular subscription, Accept MIME type explicitly set to application/json, make sure application/json is returned
 # 07. GET particular subscription, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 #
-#
 
 
 echo "01. Create a subscription"
@@ -100,42 +99,42 @@ echo
 
 echo "02. GET subscriptions, no Accept MIME type, make sure application/json is returned"
 echo "=================================================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions
+orionCurl --url /ngsi-ld/v1/subscriptions -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "03. GET subscriptions, Accept MIME type explicitly set to application/json, make sure application/json is returned"
 echo "=================================================================================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions -H "Accept: application/json"
+orionCurl --url /ngsi-ld/v1/subscriptions -H "Accept: application/json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "04. GET subscriptions, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned"
 echo "========================================================================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions -H "Accept: application/ld+json"
+orionCurl --url /ngsi-ld/v1/subscriptions -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "05. GET particular subscription, no Accept MIME type, make sure application/json is returned"
 echo "============================================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub01
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub01 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "06. GET particular subscription, Accept MIME type explicitly set to application/json, make sure application/json is returned"
 echo "============================================================================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub01 -H "Accept: application/json"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub01 -H "Accept: application/json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "07. GET particular subscription, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned"
 echo "=================================================================================================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub01 -H "Accept: application/ld+json"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub01 -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -155,7 +154,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 583
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -212,7 +211,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 583
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -326,7 +325,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 581
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -381,7 +380,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 581
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

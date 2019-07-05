@@ -637,6 +637,37 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   lhsParse();
 
+#ifdef ORIONLD
+  //
+  // URI-expand the attribute name
+  //
+  if (orionldState.apiVersion == NGSI_LD_V1)
+  {
+    char*  details;
+    char   expanded[256];
+
+    if (orionldUriExpand(orionldState.contextP, (char*) attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
+    {
+      *errorStringP = details;
+      return false;
+    }
+
+    //
+    // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo
+    //
+    for (unsigned int ix = 0; ix < sizeof(expanded); ix++)
+    {
+      if (expanded[ix] == '.')
+        expanded[ix] = '=';
+      else if (expanded[ix] == 0)
+        break;
+    }
+
+    attributeName = expanded;
+    LM_TMP(("SUB: expanded attribute name: '%s'", attributeName.c_str()));
+  }
+
+#endif
 
   //
   // Check for empty RHS
@@ -718,6 +749,195 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
 /* ****************************************************************************
 *
+* floatTrim - remove trailing zeroes in decimal part
+*/
+static void floatTrim(char* floatString)
+{
+  //
+  // 1. Is there a decimal part?
+  //
+  char* cP          = floatString;
+  bool  decimalPart = false;
+
+  while (*cP != 0)
+  {
+    if (*cP == '.')
+    {
+      decimalPart = true;
+      break;
+    }
+    ++cP;
+  }
+
+  if (decimalPart == false)
+    return;
+
+  //
+  // 2. Remove last char if it's a '0'
+  //
+  int lastCharIx = strlen(floatString) - 1;
+  while (floatString[lastCharIx] == '0')
+  {
+    floatString[lastCharIx] = 0;
+    --lastCharIx;
+  }
+
+  //
+  // 3. Remove last char if it's a '.'
+  //
+  if (floatString[lastCharIx] == '.')
+    floatString[lastCharIx] = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::valueAsString -
+*/
+void StringFilterItem::valueAsString(char* buf, int bufLen)
+{
+  switch (valueType)
+  {
+  case SfvtString:
+    strncpy(buf, stringValue.c_str(), bufLen);
+    break;
+
+  case SfvtBool:
+    if (SfvtBool)
+      strncpy(buf, "true", bufLen);
+    else
+      strncpy(buf, "false", bufLen);
+    break;
+
+  case SfvtNumber:
+    snprintf(buf, bufLen, "%f", numberValue);
+    floatTrim(buf);
+    break;
+
+  case SfvtNull:
+    strncpy(buf, "null", bufLen);
+    break;
+
+  case SfvtDate:
+    snprintf(buf, bufLen, "%f", numberValue);
+    break;
+
+  case SfvtNumberRange:
+  case SfvtDateRange:
+  case SfvtStringRange:
+    snprintf(buf, bufLen, "Ranges not implemented");
+    break;
+
+  case SfvtNumberList:
+  case SfvtDateList:
+  case SfvtStringList:
+    snprintf(buf, bufLen, "Lists not implemented");
+    break;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::render
+*/
+int StringFilterItem::render(char* buf, int bufLen)
+{
+  int  needChars        = 0;
+  int  attributeNameLen = strlen(attributeName.c_str());
+  char valueBuf[256];
+  int  valueLen = 0;
+
+  if (attributeNameLen >= bufLen)
+  {
+    LM_E(("Not enough room in rendering output buffer"));
+    return -1;
+  }
+
+  if ((op != SfopExists) && (op != SfopNotExists))
+  {
+    valueAsString(valueBuf, sizeof(valueBuf));
+    valueLen = strlen(valueBuf);
+  }
+
+  switch (op)
+  {
+  case SfopExists:
+    needChars = attributeNameLen;
+    break;
+
+  case SfopNotExists:
+    needChars =	attributeNameLen + 1;
+    break;
+
+  case SfopEquals:
+  case SfopDiffers:
+  case SfopGreaterThanOrEqual:
+  case SfopLessThanOrEqual:
+  case SfopMatchPattern:
+    needChars = attributeNameLen + 2 + valueLen;
+    break;
+
+  case SfopGreaterThan:
+  case SfopLessThan:
+    needChars = attributeNameLen + 1 + valueLen;
+    break;
+  }
+
+  if (needChars >= bufLen)
+  {
+    LM_E(("Not enough room in rendering output buffer"));
+    return -1;
+  }
+
+  switch (op)
+  {
+  case SfopExists:
+    snprintf(buf, bufLen, "%s", attributeName.c_str());
+    break;
+
+  case SfopNotExists:
+    snprintf(buf, bufLen, "!%s", attributeName.c_str());
+    break;
+
+  case SfopEquals:
+    snprintf(buf, bufLen, "%s==%s", attributeName.c_str(), valueBuf);
+    break;
+
+  case SfopDiffers:
+    snprintf(buf, bufLen, "%s!=%s", attributeName.c_str(), valueBuf);
+    break;
+
+  case SfopGreaterThanOrEqual:
+    snprintf(buf, bufLen, "%s>=%s", attributeName.c_str(), valueBuf);
+    break;
+
+  case SfopLessThanOrEqual:
+    snprintf(buf, bufLen, "%s<=%s", attributeName.c_str(), valueBuf);
+    break;
+
+  case SfopMatchPattern:
+    snprintf(buf, bufLen, "%s=%s", attributeName.c_str(), valueBuf);
+    break;
+
+  case SfopGreaterThan:
+    snprintf(buf, bufLen, "%s>%s", attributeName.c_str(), valueBuf);
+    break;
+
+  case SfopLessThan:
+    snprintf(buf, bufLen, "%s<%s", attributeName.c_str(), valueBuf);
+    break;
+  }
+
+  return needChars;
+}
+
+
+
+/* ****************************************************************************
+*
 * lhsDotToEqualIfInsideQuote - change dots for equals, then remove all quotes
 */
 static char* lhsDotToEqualIfInsideQuote(char* s)
@@ -725,6 +945,8 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
   char* scopyP        = strdup(s);
   char* dotP          = scopyP;
   bool  insideQuotes  = false;
+
+  LM_TMP(("SUB: IN: '%s'", s));
 
   //
   // Replace '.' for '=' if inside quotes
@@ -763,6 +985,8 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
   s[sIx] = 0;
 
   free(scopyP);
+
+  LM_TMP(("SUB: OUT: '%s'", s));
   return s;
 }
 
@@ -777,18 +1001,24 @@ void StringFilterItem::lhsParse(void)
   char* start = (char*) left.c_str();
   char* dotP  = start;
 
+  LM_TMP(("SUB: start: %s", start));
   start = lhsDotToEqualIfInsideQuote(start);
+  LM_TMP(("SUB: start: '%s'", start));
 
   attributeName = "";
   metadataName  = "";
   compoundPath  = "";
 
+  LM_TMP(("SUB: start: '%s'", start));
   dotP = strchr(start, '.');
+  LM_TMP(("SUB: start: '%s'", start));
   if (dotP == NULL)
   {
     attributeName = start;
     metadataName  = "";
     compoundPath  = "";
+
+    LM_TMP(("SUB: attributeName: '%s'", attributeName.c_str()));
     return;
   }
 
@@ -796,6 +1026,7 @@ void StringFilterItem::lhsParse(void)
   ++dotP;  // Step over the dot
 
   attributeName = start;
+  LM_TMP(("SUB: attributeName: '%s'", attributeName));
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
   if (type == SftMq)
@@ -1739,6 +1970,46 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 
 /* ****************************************************************************
 *
+* StringFilter::render -
+*/
+bool StringFilter::render(char* buf, int bufLen, std::string* errorStringP)
+{
+  char* bufP       = buf;
+  int   charsUsed  = 0;
+  int   chars;
+
+  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  {
+    StringFilterItem*  itemP = filters[ix];
+
+    if (ix != 0)
+    {
+      *bufP = ';';
+      ++charsUsed;
+    }
+
+    chars = itemP->render(bufP, bufLen - charsUsed);
+
+    if (chars == -1)
+    {
+      *errorStringP = "Internal error - Not enough room in rendering output buffer of StringFilter";
+      LM_E((errorStringP->c_str()));
+      return false;
+    }
+
+    bufP = &bufP[chars];
+    charsUsed += chars;
+    buf[charsUsed] = 0;
+  }
+
+  LM_TMP(("SUB: renderer StringFilter: %s", buf));
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilter::mongoFilterPopulate -
 */
 bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
@@ -1754,12 +2025,16 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     BSONObj            f;
     std::string        left = std::string(itemP->left.c_str());
 
-#ifdef ORIONLD
+#if 0
+    //
+    // This is now taken care of in StringFilter::parse instead.
+    // Leaving it here commented out for some time ...
+    //
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
       char  expanded[256];
       char* details;
-    
+
       if (orionldUriExpand(orionldState.contextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
       {
         *errorStringP = details;

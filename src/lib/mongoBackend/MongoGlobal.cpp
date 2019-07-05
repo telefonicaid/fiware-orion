@@ -1379,6 +1379,7 @@ bool entitiesQuery
   std::vector<BSONObj>  filters;
   unsigned int          geoScopes = 0;
 
+  LM_TMP(("SUB: Scopes ... %d items in scope vector", res.scopeVector.size()));
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
     const Scope* scopeP = res.scopeVector[ix];

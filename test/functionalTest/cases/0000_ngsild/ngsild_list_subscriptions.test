@@ -107,21 +107,21 @@ echo
 
 echo "02. GET subscriptions - see the first 20"
 echo "========================================"
-orionCurl --url /ngsi-ld/v1/subscriptions
+orionCurl --url /ngsi-ld/v1/subscriptions -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "03. GET subscriptions with limit 5 - see the first 5"
 echo "===================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions?limit=5
+orionCurl --url /ngsi-ld/v1/subscriptions?limit=5 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "04. GET subscriptions with limit 5 and offset 25, see subs 25-29"
 echo "================================================================"
-orionCurl --url '/ngsi-ld/v1/subscriptions?limit=5&offset=25'
+orionCurl --url '/ngsi-ld/v1/subscriptions?limit=5&offset=25' -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -386,7 +386,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 12041
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -1298,7 +1298,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 3011
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -1535,7 +1535,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 3011
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

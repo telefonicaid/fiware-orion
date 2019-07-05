@@ -109,14 +109,14 @@ echo
 
 echo "03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header"
 echo "====================================================================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload"
 echo "===================================================================================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json"
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -352,7 +352,7 @@ echo
 
 echo "10. GET sub09 and make sure no 'expires' nor 'throttling' is returned"
 echo "====================================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -415,7 +415,7 @@ MongoDB server version: REGEX(.*)
 		"http://example.org/P2"
 	],
 	"expression" : {
-		"q" : "P2>10",
+		"q" : "http://example=org/P2>10",
 		"mq" : "",
 		"geometry" : "circle",
 		"coords" : "1,2",
@@ -431,7 +431,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 820
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -603,7 +603,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 317
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

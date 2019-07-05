@@ -98,7 +98,7 @@ echo
 
 echo "02. GET subscription 'http://a.b.c/subs/sub01' and see it"
 echo "========================================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 820
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -245,7 +245,7 @@ MongoDB server version: REGEX(.*)
 		"http://example.org/P2"
 	],
 	"expression" : {
-		"q" : "P2>10",
+		"q" : "http://example=org/P2>10",
 		"mq" : "",
 		"geometry" : "circle",
 		"coords" : "1,2",

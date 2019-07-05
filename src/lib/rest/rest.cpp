@@ -633,6 +633,8 @@ static void requestCompleted
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
+  LM_TMP(("IN requestCompleted"));
+
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
@@ -724,6 +726,7 @@ static void requestCompleted
 #endif
 
   *con_cls = NULL;
+  LM_TMP(("FROM requestCompleted"));
 }
 
 
