@@ -172,7 +172,7 @@ Date: REGEX(.*)
 =====================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 333
+Content-Length: 326
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -190,7 +190,7 @@ Content-Type: application/json; charset=utf-8
             "id": "urn:ngsi-ld:Vehicle:V1234", 
             "speed": {
                 "type": "Property", 
-                "value": 81.0
+                "value": 81
             }, 
             "type": "Vehicle"
         }

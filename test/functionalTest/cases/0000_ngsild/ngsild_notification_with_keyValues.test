@@ -165,7 +165,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 313
+Content-Length: 306
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -176,7 +176,7 @@ Content-Type: application/ld+json
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
     "data": [
         {
-            "P1": 1.0,
+            "P1": 1,
             "P2": "ok",
             "id": "urn:ngsi-ld:E01",
             "type": "T"
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 314
+Content-Length: 307
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -213,7 +213,7 @@ Content-Type: application/ld+json
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
     "data": [
         {
-            "P1": 11.0,
+            "P1": 11,
             "P2": "ok",
             "id": "urn:ngsi-ld:E01",
             "type": "T"
@@ -239,7 +239,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 328
+Content-Length: 314
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -250,9 +250,9 @@ Content-Type: application/ld+json
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
     "data": [
         {
-            "P1": 11.0,
+            "P1": 11,
             "P2": "ok",
-            "P3": 3.0,
+            "P3": 3,
             "id": "urn:ngsi-ld:E01",
             "type": "T"
         }

@@ -138,7 +138,7 @@ bye
 03. Get the entity from broker
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 329
+Content-Length: 318
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -148,10 +148,10 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 12.000000,
+    "value": 12,
     "P1_P1": {
       "type": "Property",
-      "value": 0.790000
+      "value": 0.79
     },
     "P1_R1": {
       "type": "Relationship",

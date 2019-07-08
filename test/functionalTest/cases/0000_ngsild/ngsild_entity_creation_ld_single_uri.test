@@ -82,7 +82,7 @@ Date: REGEX(.*)
 02. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 423
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -94,8 +94,8 @@ Date: REGEX(.*)
     "value": {
       "type": "Point",
       "coordinates": [
-        -8.000000,
-        40.000000
+        -8,
+        40
       ]
     }
   },

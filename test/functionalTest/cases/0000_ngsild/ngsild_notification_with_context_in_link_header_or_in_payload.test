@@ -158,7 +158,7 @@ Date: REGEX(.*)
 ==========================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 284
+Content-Length: 277
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -171,7 +171,7 @@ Content-Type: application/json; charset=utf-8
         {
             "P1": {
                 "type": "Property",
-                "value": 1.0
+                "value": 1
             },
             "P2": {
                 "type": "Property",
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 =========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 369
+Content-Length: 362
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -215,7 +215,7 @@ Content-Type: application/ld+json
         {
             "P1": {
                 "type": "Property",
-                "value": 1.0
+                "value": 1
             },
             "P2": {
                 "type": "Property",

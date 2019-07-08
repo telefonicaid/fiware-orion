@@ -180,7 +180,7 @@ Date: REGEX(.*)
 05. Geoquery with Max Distance 100000 - all three matching
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 438
+Content-Length: 434
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -260,7 +260,7 @@ Date: REGEX(.*)
 07. Geoquery with Max Distance 10 at GeoPoint Leganes - only Leganes matching
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 146
+Content-Length: 142
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

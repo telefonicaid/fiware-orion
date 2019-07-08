@@ -92,7 +92,7 @@ Date: REGEX(.*)
 02. GET entity, accepting application/ld+json, and with same context as the entity creation
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 650
+Content-Length: 639
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -101,10 +101,10 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 12.000000,
+    "value": 12,
     "P1_P1": {
       "type": "Property",
-      "value": 0.790000
+      "value": 0.79
     },
     "P1_R1": {
       "type": "Relationship",

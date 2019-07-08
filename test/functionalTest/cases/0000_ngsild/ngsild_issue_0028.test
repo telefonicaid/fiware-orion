@@ -102,7 +102,7 @@ Date: REGEX(.*)
 03. Get the entity to see the new value of P1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 311
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -115,7 +115,7 @@ Date: REGEX(.*)
     "value": "Hola",
     "P1_P1": {
       "type": "Property",
-      "value": 0.790000
+      "value": 0.79
     },
     "P1_R1": {
       "type": "Relationship",

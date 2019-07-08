@@ -82,7 +82,7 @@ Date: REGEX(.*)
 02. Query Relationship over its object (really: value)
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 414
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -93,7 +93,7 @@ Date: REGEX(.*)
     "type": "T_Query",
     "P1": {
       "type": "Property",
-      "value": 12.000000
+      "value": 12
     },
     "R100": {
       "type": "Relationship",

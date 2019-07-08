@@ -88,7 +88,7 @@ Date: REGEX(.*)
 02. Query the property P over its compound value L1.L2.L3.L4, in the fifth level for correct value 12, see the entity
 =====================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 309
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -104,7 +104,7 @@ Date: REGEX(.*)
           "L2": {
             "L3": {
               "L4": {
-                "val": 12.000000
+                "val": 12
               }
             }
           }

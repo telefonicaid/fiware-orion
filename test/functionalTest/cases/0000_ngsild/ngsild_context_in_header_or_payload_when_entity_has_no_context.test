@@ -99,7 +99,7 @@ Date: REGEX(.*)
 02. GET all entities using application/json - see context in Link HTTP Header
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 287
+Content-Length: 280
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -110,7 +110,7 @@ Date: REGEX(.*)
     "type": "T",
     "P1": {
       "type": "Property",
-      "value": 12.000000,
+      "value": 12,
       "P1_R1": {
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
@@ -125,7 +125,7 @@ Date: REGEX(.*)
 03. GET all entities using application/ld+json - see context in payload
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 393
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -135,7 +135,7 @@ Date: REGEX(.*)
     "type": "T",
     "P1": {
       "type": "Property",
-      "value": 12.000000,
+      "value": 12,
       "P1_R1": {
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
@@ -151,7 +151,7 @@ Date: REGEX(.*)
 04. GET the entity using application/json - see context in Link HTTP Header
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 257
+Content-Length: 250
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -161,7 +161,7 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 12.000000,
+    "value": 12,
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 05. GET the entity using application/ld+json - see context in payload
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 361
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -184,7 +184,7 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 12.000000,
+    "value": 12,
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"

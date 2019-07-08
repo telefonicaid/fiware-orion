@@ -86,7 +86,7 @@ Date: REGEX(.*)
 02. GET entity with the first three attributes only, using URI param 'attrs'
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 235
+Content-Length: 214
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -96,15 +96,15 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 1.000000
+    "value": 1
   },
   "P2": {
     "type": "Property",
-    "value": 2.000000
+    "value": 2
   },
   "P3": {
     "type": "Property",
-    "value": 3.000000
+    "value": 3
   }
 }
 
