@@ -121,6 +121,8 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
 //
 // orionldPostEntity -
 //
+// POST /ngsi-ld/v1/entities/*/attrs
+//
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
   // 1. Check that the entity exists
