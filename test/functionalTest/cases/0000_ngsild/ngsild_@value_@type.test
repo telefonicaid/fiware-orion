@@ -398,7 +398,7 @@ Date: REGEX(.*)
 12. GET entity E10
 ==================
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 134
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -409,7 +409,7 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": {
-      "A": 1.000000,
+      "A": 1,
       "B": "2"
     }
   }

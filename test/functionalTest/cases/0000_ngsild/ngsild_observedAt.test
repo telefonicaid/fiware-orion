@@ -80,7 +80,7 @@ Date: REGEX(.*)
 02. Get the entity from broker, see speed::observedAt as a string
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 175
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -91,7 +91,7 @@ Date: REGEX(.*)
     "type": "Vehicle",
     "speed": {
       "type": "Property",
-      "value": 22.000000,
+      "value": 22,
       "observedAt": "2012-09-09T12:00:00Z"
     }
   }
@@ -102,7 +102,7 @@ Date: REGEX(.*)
 03. Get the entity with attrList, see speed::observedAt as a string
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 160
+Content-Length: 153
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -112,7 +112,7 @@ Date: REGEX(.*)
   "type": "Vehicle",
   "speed": {
     "type": "Property",
-    "value": 22.000000,
+    "value": 22,
     "observedAt": "2012-09-09T12:00:00Z"
   }
 }

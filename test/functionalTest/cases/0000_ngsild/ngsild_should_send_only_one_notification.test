@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creation and a simple notification
+Subscription Creation and update and ONE notification
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,13 +32,15 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 --SHELL--
 
 #
-# 01. An entity urn:ngsi-ld:Vehicle:V1234 is created
-# 02. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234
-# 03. Dump accumulator to see one notification
+# 01. An entity urn:ngsi-ld:Vehicle:V1234 is created, with speed == 34
+# 02. A Subscription is created, with q == speed>80, NOT matching the entity urn:ngsi-ld:Vehicle:V1234
+# 03. Dump accumulator to see no notification
+# 04. Update speed to 81 (to provoke a notification)
+# 05. Dump accumulator to see ONE notification
 #
 
-echo "01. An entity urn:ngsi-ld:Vehicle:V1234 is created"
-echo "=================================================="
+echo "01. An entity urn:ngsi-ld:Vehicle:V1234 is created, with speed == 34"
+echo "===================================================================="
 payload='{
   "id": "urn:ngsi-ld:Vehicle:V1234",
   "type": "Vehicle",
@@ -56,8 +58,8 @@ echo
 echo
 
 
-echo "02. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234"
-echo "============================================================================"
+echo "02. A Subscription is created, with q == speed>80, NOT matching the entity urn:ngsi-ld:Vehicle:V1234"
+echo "===================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:Subscription:mySubscription:XXX",
   "type": "Subscription",
@@ -66,6 +68,7 @@ payload='{
       "type": "Vehicle"
     }
   ],
+  "q": "speed>80",
   "notification": {
     "endpoint": {
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -78,16 +81,35 @@ echo
 echo
 
 
-echo "03. Dump accumulator to see one notification"
+echo "03. Dump accumulator to see no notification"
+echo "==========================================="
+sleep .1
+accumulatorDump
+echo
+echo
+
+
+echo "04. Update speed to 81 (to provoke a notification)"
+echo "=================================================="
+payload='{
+  "speed": { "value": 81, "type": "Property" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234/attrs?options=keyValues --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator to see ONE notification"
 echo "============================================"
+sleep .1
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. An entity urn:ngsi-ld:Vehicle:V1234 is created
-==================================================
+01. An entity urn:ngsi-ld:Vehicle:V1234 is created, with speed == 34
+====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
@@ -95,8 +117,8 @@ Date: REGEX(.*)
 
 
 
-02. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234
-============================================================================
+02. A Subscription is created, with q == speed>80, NOT matching the entity urn:ngsi-ld:Vehicle:V1234
+====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription:XXX
@@ -104,7 +126,19 @@ Date: REGEX(.*)
 
 
 
-03. Dump accumulator to see one notification
+03. Dump accumulator to see no notification
+===========================================
+
+
+04. Update speed to 81 (to provoke a notification)
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator to see ONE notification
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
@@ -126,7 +160,7 @@ Content-Type: application/json; charset=utf-8
             "id": "urn:ngsi-ld:Vehicle:V1234", 
             "speed": {
                 "type": "Property", 
-                "value": 34
+                "value": 81
             }, 
             "type": "Vehicle"
         }

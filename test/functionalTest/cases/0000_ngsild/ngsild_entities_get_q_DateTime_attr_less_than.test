@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that has an attribute A < 2018-11-22T08:00:00.00Z - see E1
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 240
+Content-Length: 233
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -159,7 +159,7 @@ Date: REGEX(.*)
     "type": "T",
     "A": {
       "type": "TemporalProperty",
-      "value": 1542787200.000000
+      "value": 1542787200
     },
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }

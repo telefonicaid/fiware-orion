@@ -149,7 +149,7 @@ Date: REGEX(.*)
 05. GET all entities that has an attribute A2 not equal to 4 - see E2
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 225
+Content-Length: 218
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -159,7 +159,7 @@ Date: REGEX(.*)
     "type": "T2",
     "A2": {
       "type": "Property",
-      "value": 2.000000
+      "value": 2
     },
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }

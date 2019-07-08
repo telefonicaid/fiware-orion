@@ -165,7 +165,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 369
+Content-Length: 362
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -178,7 +178,7 @@ Content-Type: application/ld+json
         {
             "P1": {
                 "type": "Property",
-                "value": 1.0
+                "value": 1
             },
             "P2": {
                 "type": "Property",
@@ -208,7 +208,7 @@ Date: REGEX(.*)
 ========================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 370
+Content-Length: 363
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -221,7 +221,7 @@ Content-Type: application/ld+json
         {
             "P1": {
                 "type": "Property",
-                "value": 11.0
+                "value": 11
             },
             "P2": {
                 "type": "Property",
@@ -251,7 +251,7 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 412
+Content-Length: 398
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -264,7 +264,7 @@ Content-Type: application/ld+json
         {
             "P1": {
                 "type": "Property",
-                "value": 11.0
+                "value": 11
             },
             "P2": {
                 "type": "Property",
@@ -272,7 +272,7 @@ Content-Type: application/ld+json
             },
             "P3": {
                 "type": "Property",
-                "value": 3.0
+                "value": 3
             },
             "id": "urn:ngsi-ld:E01",
             "type": "T"

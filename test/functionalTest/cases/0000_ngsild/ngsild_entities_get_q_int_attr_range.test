@@ -175,7 +175,7 @@ Date: REGEX(.*)
 06. GET all entities that has an attribute A == 1 to 3 - see E1 and E3
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 443
+Content-Length: 429
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
     "type": "T",
     "A": {
       "type": "Property",
-      "value": 1.000000
+      "value": 1
     },
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   },
@@ -194,7 +194,7 @@ Date: REGEX(.*)
     "type": "T",
     "A": {
       "type": "Property",
-      "value": 3.000000
+      "value": 3
     },
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   }

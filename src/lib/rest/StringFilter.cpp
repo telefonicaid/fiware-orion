@@ -25,6 +25,11 @@
 #include <string>
 #include <vector>
 
+extern "C"
+{
+#include "kbase/kFloatTrim.h"                 // kFloatTrim
+}
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -749,50 +754,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
 /* ****************************************************************************
 *
-* floatTrim - remove trailing zeroes in decimal part
-*/
-static void floatTrim(char* floatString)
-{
-  //
-  // 1. Is there a decimal part?
-  //
-  char* cP          = floatString;
-  bool  decimalPart = false;
-
-  while (*cP != 0)
-  {
-    if (*cP == '.')
-    {
-      decimalPart = true;
-      break;
-    }
-    ++cP;
-  }
-
-  if (decimalPart == false)
-    return;
-
-  //
-  // 2. Remove last char if it's a '0'
-  //
-  int lastCharIx = strlen(floatString) - 1;
-  while (floatString[lastCharIx] == '0')
-  {
-    floatString[lastCharIx] = 0;
-    --lastCharIx;
-  }
-
-  //
-  // 3. Remove last char if it's a '.'
-  //
-  if (floatString[lastCharIx] == '.')
-    floatString[lastCharIx] = 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * StringFilterItem::valueAsString -
 */
 void StringFilterItem::valueAsString(char* buf, int bufLen)
@@ -812,7 +773,7 @@ void StringFilterItem::valueAsString(char* buf, int bufLen)
 
   case SfvtNumber:
     snprintf(buf, bufLen, "%f", numberValue);
-    floatTrim(buf);
+    kFloatTrim(buf);
     break;
 
   case SfvtNull:

@@ -92,7 +92,7 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities to see the 'observedAt' of the attribute P1 as an ISO 8601 string
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 401
+Content-Length: 390
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -110,7 +110,7 @@ Date: REGEX(.*)
             },
             "observedAt": "2018-12-04T12:00:00Z",
             "type": "Property",
-            "value": 12.0
+            "value": 12
         },
         "R1": {
             "R1_P1": {

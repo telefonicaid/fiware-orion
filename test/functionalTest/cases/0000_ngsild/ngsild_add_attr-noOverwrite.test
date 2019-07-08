@@ -119,7 +119,7 @@ Date: REGEX(.*)
 03. GET the entity, make sure P2 == 12
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 187
+Content-Length: 173
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -129,11 +129,11 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 11.000000
+    "value": 11
   },
   "P2": {
     "type": "Property",
-    "value": 12.000000
+    "value": 12
   }
 }
 
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 05. GET the entity, make sure P2 == 42
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 187
+Content-Length: 173
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -160,11 +160,11 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": 11.000000
+    "value": 11
   },
   "P2": {
     "type": "Property",
-    "value": 42.000000
+    "value": 42
   }
 }
 

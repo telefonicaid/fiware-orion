@@ -235,7 +235,7 @@ Date: REGEX(.*)
 04. Query the property P100 over 'observedAt' after 2018-12-04 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 826
+Content-Length: 807
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -246,10 +246,10 @@ Date: REGEX(.*)
     "type": "T_Query",
     "P100": {
       "type": "Property",
-      "value": 12.000000,
+      "value": 12,
       "P1_P1": {
         "type": "Property",
-        "value": 0.790000
+        "value": 0.79
       },
       "P1_R1": {
         "type": "Relationship",
@@ -287,7 +287,7 @@ Date: REGEX(.*)
 05. Query the property P100 over 'observedAt' of EXACT 2018-12-04T12:00:00.00Z - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 ==================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 826
+Content-Length: 807
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -298,10 +298,10 @@ Date: REGEX(.*)
     "type": "T_Query",
     "P100": {
       "type": "Property",
-      "value": 12.000000,
+      "value": 12,
       "P1_P1": {
         "type": "Property",
-        "value": 0.790000
+        "value": 0.79
       },
       "P1_R1": {
         "type": "Relationship",

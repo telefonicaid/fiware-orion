@@ -107,7 +107,7 @@ Date: REGEX(.*)
 02. Query with q=R100=="urn:ngsi-ld:T2:6789"
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 500
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -125,7 +125,7 @@ Date: REGEX(.*)
             },
             "observedAt": "2018-12-04T12:00:00Z",
             "type": "Property",
-            "value": 12.0
+            "value": 12
         },
         "R100": {
             "R1_P1": {
@@ -158,7 +158,7 @@ Date: REGEX(.*)
 03. Same query, but with id=urn:ngsi-ld:T_Query:EntityForQuery2345 also
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 500
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -176,7 +176,7 @@ Date: REGEX(.*)
             },
             "observedAt": "2018-12-04T12:00:00Z",
             "type": "Property",
-            "value": 12.0
+            "value": 12
         },
         "R100": {
             "R1_P1": {
