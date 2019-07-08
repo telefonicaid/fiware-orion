@@ -953,7 +953,7 @@ static std::string servicePathSubscriptionRegex(const std::string& servicePath, 
 *
 * getCommonAttributes -
 */
-static void getCommonAttributes
+/*static void getCommonAttributes
 (
   const bool                        type,
   const std::vector<std::string>&   fVector,
@@ -987,7 +987,7 @@ static void getCommonAttributes
       }
     }
   }
-}
+}*/
 
 
 
@@ -1009,8 +1009,6 @@ static bool addTriggeredSubscriptions_withCache
 {
   std::string                       servicePath = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
-  std::vector<std::string>          condAttrs;
-  std::vector<std::string>          notifyAttrs;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
@@ -1048,48 +1046,14 @@ static bool addTriggeredSubscriptions_withCache
     //           instead of its std::vector<std::string> ... ?
     //
     StringList aList;
-    if (cSubP->onlyChanged && !cSubP->blacklist)
+    bool op = false;
+    if (cSubP->onlyChanged)
     {
-      if (cSubP->notifyConditionV.size() == 0 && cSubP->attributes.size() == 0)
-      {
-        aList.fill(modifiedAttrs);
-      }
-      else if (cSubP->notifyConditionV.size() == 0 && cSubP->attributes.size() != 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, cSubP->attributes, notifyAttrs);
-      }
-      else if (cSubP->notifyConditionV.size() != 0 && cSubP->attributes.size() == 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, attributes, notifyAttrs);
-      }
-      else
-      {
-        getCommonAttributes(true, modifiedAttrs, cSubP->attributes, condAttrs);
-        getCommonAttributes(true, condAttrs, cSubP->notifyConditionV, notifyAttrs);
-      }
-      if (notifyAttrs.size() == 0 && cSubP->notifyConditionV.size() != 0 && cSubP->attributes.size() != 0)
+      subToNotifyList(modifiedAttrs, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
+      if (op)
       {
         continue;
       }
-      aList.fill(notifyAttrs);
-    }
-    else if (cSubP->onlyChanged && cSubP->blacklist)
-    {
-      if (cSubP->notifyConditionV.size() == 0 && cSubP->attributes.size() != 0)
-      {
-        getCommonAttributes(false, modifiedAttrs, cSubP->attributes, notifyAttrs);
-      }
-      else
-      {
-        getCommonAttributes(false, modifiedAttrs, cSubP->attributes, condAttrs);
-        getCommonAttributes(true, condAttrs, cSubP->notifyConditionV, notifyAttrs);
-      }
-
-      if (notifyAttrs.size() == 0)
-      {
-        continue;
-      }
-      aList.fill(notifyAttrs);
     }
     else
     {
@@ -1367,6 +1331,7 @@ static bool addTriggeredSubscriptions_noCache
 (
   const std::string&                             entityId,
   const std::string&                             entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1509,10 +1474,19 @@ static bool addTriggeredSubscriptions_noCache
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
+      bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
       httpInfo.fill(sub);
+
+      bool op = false;
+      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
+      if (op)
+      {
+         continue;
+      }
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
@@ -1520,9 +1494,16 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           renderFormat,
           httpInfo,
-          subToAttributeList(sub), "", "");
+          aList, "", "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      if (!onlyChanged)
+      {
+        trigs->blacklist = blacklist;
+      }
+      else
+      {
+        trigs->blacklist = false;
+      }
 
       if (sub.hasField(CSUB_METADATA))
       {
@@ -1639,7 +1620,7 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
   }
   else
   {

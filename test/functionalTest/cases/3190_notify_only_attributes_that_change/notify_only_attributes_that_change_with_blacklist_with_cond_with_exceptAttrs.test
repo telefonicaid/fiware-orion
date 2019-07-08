@@ -39,9 +39,9 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
 # 07. Dump and reset accumulator, see C.
 # 08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
-# 09. Dump and reset accumulator, see C.
+# 09. Dump and reset accumulator, see C and D.
 # 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
-# 11. Dump and reset accumulator, see A and C.
+# 11. Dump and reset accumulator, see A, C and D.
 #
 
 echo '01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
@@ -178,8 +178,8 @@ echo
 echo
 
 
-echo '09. Dump and reset accumulator, see C.'
-echo '======================================'
+echo '09. Dump and reset accumulator, see C and D.'
+echo '============================================'
 accumulatorDump
 accumulatorReset
 echo
@@ -211,8 +211,8 @@ echo
 echo
 
 
-echo '11. Dump and reset accumulator, see A and C.'
-echo '============================================'
+echo '11. Dump and reset accumulator, see A, C and D.'
+echo '==============================================='
 accumulatorDump
 accumulatorReset
 echo
@@ -364,11 +364,11 @@ Date: REGEX(.*)
 
 
 
-09. Dump and reset accumulator, see C.
-======================================
+09. Dump and reset accumulator, see C and D.
+============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 131
+Content-Length: 179
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -383,6 +383,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "metadata": {}, 
                 "type": "Integer", 
                 "value": 34
+            }, 
+            "D": {
+                "metadata": {}, 
+                "type": "Integer", 
+                "value": 42
             }, 
             "id": "Room1", 
             "type": "Room"
@@ -402,11 +407,11 @@ Date: REGEX(.*)
 
 
 
-11. Dump and reset accumulator, see A and C.
-============================================
+11. Dump and reset accumulator, see A, C and D.
+===============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 179
+Content-Length: 227
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -427,6 +432,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "type": "Integer", 
                 "value": 20
             },			
+            "D": {
+                "metadata": {}, 
+                "type": "Integer", 
+                "value": 10
+            }, 
             "id": "Room1", 
             "type": "Room"
         }

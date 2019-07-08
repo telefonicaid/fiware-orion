@@ -154,7 +154,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 05. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 622
+Content-Length: 647
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -187,6 +187,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 1
         },
         "status": "active",

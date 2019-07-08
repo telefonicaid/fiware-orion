@@ -42,6 +42,8 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 09. Dump and reset accumulator, see C.
 # 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
 # 11. Dump and reset accumulator, see B and C.
+# 12. PATCH /v2/entities/Room1/attrs, update the value of A attribute.
+# 13. Dump and reset accumulator, see nothing.
 #
 
 echo '01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
@@ -212,6 +214,27 @@ echo
 
 
 echo '11. Dump and reset accumulator, see B and C.'
+echo '============================================'
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo '12. PATCH /v2/entities/Room1/attrs, update the value of A attribute.'
+echo '===================================================================='
+payload='{
+  "A": {
+    "value": 50,
+    "type": "Integer"
+  }
+}'
+orionCurl --url /v2/entities/Room1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '13. Dump and reset accumulator, see nothing.'
 echo '============================================'
 accumulatorDump
 accumulatorReset
@@ -439,6 +462,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+
+
+12. PATCH /v2/entities/Room1/attrs, update the value of A attribute.
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+13. Dump and reset accumulator, see nothing.
+============================================
 
 
 --TEARDOWN--

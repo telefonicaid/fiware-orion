@@ -172,7 +172,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: false is rendered
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 359
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +190,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized", 
         "http": {
             "url": "http://localhost:1028/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     }, 
     "status": "active", 
     "subject": {

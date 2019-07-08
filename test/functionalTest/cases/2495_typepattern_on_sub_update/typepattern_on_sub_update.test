@@ -113,7 +113,7 @@ Date: REGEX(.*)
 02. Get subscription and do not see typePattern
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 370
+Content-Length: 395
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -130,7 +130,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -162,7 +163,7 @@ Date: REGEX(.*)
 04. Get subscription and see typePattern
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 354
+Content-Length: 379
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -179,7 +180,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {

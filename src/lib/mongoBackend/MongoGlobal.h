@@ -395,6 +395,41 @@ extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
 
 /* ****************************************************************************
 *
+* subToNotifyList -
+*/
+void subToNotifyList
+(
+  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  conditionVector,
+  const std::vector<std::string>&  notificationVector,
+  const std::vector<std::string>&  entityAttrsVector,
+  StringList&                      attrL,
+  const bool&                      blacklist,
+  bool&                            op
+);
+
+
+
+/* ****************************************************************************
+*
+* subToAttributeList -
+*
+* Extract the attribute list from a BSON document (in the format of the csubs collection)
+*/
+extern StringList subToAttributeList
+(
+  const mongo::BSONObj&           attrL,
+  const bool&                     onlyChanged,
+  const bool&                     blacklist,
+  const std::vector<std::string>  modifiedAttrs,
+  const std::vector<std::string>  attributes,
+  bool&                           op
+);
+
+
+
+/* ****************************************************************************
+*
 * subToAttributeList -
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)

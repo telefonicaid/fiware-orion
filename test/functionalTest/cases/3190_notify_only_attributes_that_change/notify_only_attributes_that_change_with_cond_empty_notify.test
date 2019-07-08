@@ -41,7 +41,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 08. PATCH /v2/entities/Room1/attrs, update the value of A and D attribute.
 # 09. Dump and reset accumulator, see A and D.
 # 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
-# 11. Dump and reset accumulator, see A, B and C.
+# 11. Dump and reset accumulator, see A, B, C and D.
 #
 
 echo '01. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.'
