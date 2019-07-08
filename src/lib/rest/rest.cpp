@@ -136,6 +136,8 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
+  LM_TMP(("URI PARAM: '%s': '%s'", ckey, val));
+
   if (val == NULL || *val == 0)
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
