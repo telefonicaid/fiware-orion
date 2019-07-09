@@ -1,0 +1,141 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 131 - Crash
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Create the entity of issue #131, which crashes the broker according to the issue
+# 02. GET the entity
+#
+
+echo "01. Create the entity of issue #131, which crashes the broker according to the issue"
+echo "===================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store00221",
+  "type": "Building",
+  "category":{
+  	"type": "Property",
+    "value": ["commercial"]
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Bornholmer Straße 65",
+      "addressRegion": "Berlin",
+      "addressLocality": "Prenzlauer Berg",
+      "postalCode": "10439"
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [13.3986, 52.5547]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
+  },
+  "@context": [
+    "https://schema.lab.fiware.org/ld/context",
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the entity"
+echo "=================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create the entity of issue #131, which crashes the broker according to the issue
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store00221>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221
+Date: REGEX(.*)
+
+
+
+02. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 632
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Building:store00221",
+  "type": "Building",
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Bornholmer Straße 65",
+      "addressRegion": "Berlin",
+      "addressLocality": "Prenzlauer Berg",
+      "postalCode": "10439"
+    }
+  },
+  "category": {
+    "type": "Property",
+    "value": [
+      "commercial"
+    ]
+  },
+  "http://uri.etsi.org/ngsi-ld/name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.3986,
+        52.5547
+      ]
+    }
+  }
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
