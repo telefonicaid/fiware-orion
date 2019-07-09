@@ -987,7 +987,7 @@ void StringFilterItem::lhsParse(void)
   ++dotP;  // Step over the dot
 
   attributeName = start;
-  LM_TMP(("SUB: attributeName: '%s'", attributeName));
+  LM_TMP(("SUB: attributeName: '%s'", attributeName.c_str()));
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
   if (type == SftMq)
