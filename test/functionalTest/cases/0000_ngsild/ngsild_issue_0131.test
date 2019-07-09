@@ -31,12 +31,52 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. Create the entity of issue #131, which crashes the broker according to the issue
-# 02. GET the entity
+# 01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error
+# 02. Create the entity of issue #131, with @context in payload and application/ld+json
+# 03. GET the entity
 #
 
-echo "01. Create the entity of issue #131, which crashes the broker according to the issue"
-echo "===================================================================================="
+echo "01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error"
+echo "============================================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store00221",
+  "type": "Building",
+  "category":{
+  	"type": "Property",
+    "value": ["commercial"]
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Bornholmer Straße 65",
+      "addressRegion": "Berlin",
+      "addressLocality": "Prenzlauer Berg",
+      "postalCode": "10439"
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [13.3986, 52.5547]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
+  },
+  "@context": [
+    "https://schema.lab.fiware.org/ld/context",
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. Create the entity of issue #131, with @context in payload and application/ld+json"
+echo "====================================================================================="
 payload='{
   "id": "urn:ngsi-ld:Building:store00221",
   "type": "Building",
@@ -74,7 +114,7 @@ echo
 echo
 
 
-echo "02. GET the entity"
+echo "03. GET the entity"
 echo "=================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
@@ -82,8 +122,22 @@ echo
 
 
 --REGEXPECT--
-01. Create the entity of issue #131, which crashes the broker according to the issue
-====================================================================================
+01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error
+=============================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 191
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "For @context in payload, the MIME type must be application/ld+json",
+    "title": "Invalid MIME-type for @context in payload",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Create the entity of issue #131, with @context in payload and application/ld+json
+=====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store00221>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -92,7 +146,7 @@ Date: REGEX(.*)
 
 
 
-02. GET the entity
+03. GET the entity
 ==================
 HTTP/1.1 200 OK
 Content-Length: 632

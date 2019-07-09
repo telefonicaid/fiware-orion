@@ -43,10 +43,10 @@ before_script: true
 script:
 - if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then $(pwd)/docker/build.sh
   -s compliance -t -p $(pwd); fi
-- if [[ "${TEST_STATUS}" && "${PLATFORM}" == "DEBIAN" && "${STAGE}" != "complinace" ]]; then docker run -t --rm
+- if [[ "${TEST_STATUS}" && "${PLATFORM}" == "debian" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
   -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
   -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt; fi
-- if [[ "${TEST_STATUS}" && "${PLATFORM}" == "CENTOS" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
+- if [[ "${TEST_STATUS}" && "${PLATFORM}" == "centos" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
   -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
   -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS_CENTOS} build.sh -s ${STAGE_TYPE} --os centos -dqt; fi
 - if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then docker build --build-arg

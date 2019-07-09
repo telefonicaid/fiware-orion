@@ -252,14 +252,18 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     return tree;
   }
 
-  LM_T(LmtContext, ("Starting collision loop"));
+#if 0
+  //
+  // Temporarily disabling the context item collision loop
+  //
+  LM_T(LmtContext, ("Starting collision loop for context: '%s'", url));
   for (KjNode* kNodeP = contextNodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    LM_T(LmtContext, ("Checking for collisions for context '%s'", kNodeP->name));
+    LM_T(LmtContext, ("Checking for collisions for context item '%s' in core context", kNodeP->name));
 
-    for (KjNode* coreNodeP = orionldCoreContext.tree->value.firstChildP; coreNodeP != NULL; coreNodeP = coreNodeP->next)
+    for (KjNode* coreNodeP = orionldCoreContext.tree->value.firstChildP->value.firstChildP; coreNodeP != NULL; coreNodeP = coreNodeP->next)
     {
-      // LM_T(LmtContext, ("Comparing '%s' to '%s'", kNodeP->name, coreNodeP->name));
+      LM_T(LmtContext, ("Comparing '%s' to '%s'", kNodeP->name, coreNodeP->name));
       if (strcmp(kNodeP->name, coreNodeP->name) == 0)
       {
         LM_E(("New context collides with core context. Offending alias: '%s'", kNodeP->name));
@@ -269,6 +273,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
       }
     }
   }
+#endif
 
   return tree;
 }
