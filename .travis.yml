@@ -3,8 +3,10 @@ sudo: false
 language: minimal
 env:
   global:
-  - IMAGE_RELEASE=fiware/orion-ld
-  - IMAGE_DEPS=fiware/orion-ld:deps-debian
+  - IMAGE_RELEASE_DEBIAN=fiware/orion-ld
+  - IMAGE_RELEASE_CENTOS=fiware/otion-ld:centos
+  - IMAGE_DEPS_DEBIAN=fiware/orion-ld:deps-debian
+  - IMAGE_DEPS_CENTOSN=fiware/orion-ld:deps-centos
   - HOME=/opt/orion
   - secure: tVGPaHVXk+oRNs3civESLFQImhM5bpYTbjk9SXwHg/2hdX5laANEtxAKS8k7X5TZwj2oMV8nDzJojU1NOm3292IZsP/0BijCnkwSrLgN2zi/AK8FmiO0KT9+jkQH7T8/K9KisqVSUIaBFlIlFhhDwR2OPGjlPWZpt7DuTePNV4jgFhkMjfROzLZDc4aWA7uzKvw4XTegMvP/lRiU3urlTqJGXuKaCmkQeTHr1cGPbnycAqwDKYKxzKQdRhyQT96+MsZnfwgg8JLKQJpqEIFVQ22rxoZWUZaYbMpDJP1ZPnoF7v12ODNoFoZM7xWom98VAQ6L7SBcY7laInfa/N7zzu0GeIjGa7RwigLy9BPmOfpXBOSifdcAE6sZ9vLYoMKdE4SOYZ8uOfeuK5kJe0AY4tqVvCvuTdsQp0wmCnd8spH3L9sHlt7QJz+q+RklhFk2h9duyPNr5mfv/maWF8lJz/9eR8Lmmzeg/B79nvZEd2eCOYi2I9HcAucYZL4bZXIW6ROnf5WFdPcbHZtbeB5iBWKwhHp2gcDwTZtS6Ugx9axXMV4pAOS5qPKZNmH6n1GSCj25iGzluObje72xDy0s0lsLDlym7xvey3Ox/udSj17nEZf1ylQ9HR+ey7YS3UBRadopfvAyWy7ss03Tj2dobI7HcICknuztb+IdlAXceqE=
   - secure: dGrPDCxNNZe72esWl6Lvj7mn9IFYT8rbOJ9QPjsU0CsRFTu2t2XwDAMNRzbwlLIO3ANWTuMXuURsjQwdIh+fIjIG48rS4iTn7TiI4q3kP5pDbw0tZ5twpleZ5xh7twkb5CYTUeOtkBAbL/onOFavqAwZN3lu8sqFqOSbWi1VTAW2ZRTEX6QXUTd6fs0rXpdzSRzIqVZceHcDKcy1X07LmEWcm92jZf1jlJ2snhxOoSx/Ox29gSsbfyIyAl1HByVxqq20od6IViWh8Gpt4HJZU6+4Gp0MU+0yQI34heD7q02PB+/TQElVMmnadsd9HU1HfVF5uv4TuYO0zcmEgQHfwLKLD+d/mZhwrH2RgRwLSiCol6DJkpMHPbDEpB5l8Z32Ex+E6h7CtIE9l3nCGLJu4m+wbL0TT1wHGI8lpXW4RifW4vd6Zf+71CVW3OjFptXEjJPtrdGH51r3BH4LnTTMrOXzI8ZRyFpBi8EorLJAnrMc+7EwzVd1NTU07gDB22jNmtJkDty7BfE31GL4C04q9BBQSefFuZI92EnMKbYHHQUPdl9rLxn1QACcS2W+CYYA78X+R8RoTeu4Lrmcb7x6ByQuzenwj//Udu+0TBh3F5O1S4hC3FMDjwi5RC8u8GiEdLxmnKQXuhD/839SeFJXtmFnyN27wfrceAOivsP1rjw=
@@ -36,18 +38,32 @@ script:
   -s compliance -t -p $(pwd); fi
 - if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
   -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
-  -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS} build.sh -s ${STAGE}
+  -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE}
   -dqt; fi
+- if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
+  -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
+  -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS_CENTOS} build.sh -s ${STAGE}
+  -dqt --os centos; fi
 - if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker build --build-arg
-  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE}
+  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE_DEBIAN}
+  -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker build --build-arg
+  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_RELEASE_CENTOS}
+  -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ; fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker build --build-arg
+  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_DEPS_DEBIAN}
   -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
 - if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker build --build-arg
-  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_DEPS}
-  -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
+  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=${STAGE} -t ${IMAGE_DEPS_CENTOS}
+  -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ; fi
 after_success:
-- if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker push ${IMAGE_RELEASE};
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker push ${IMAGE_RELEASE_DEBIAN};
   fi
-- if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker push ${IMAGE_DEPS};
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "release" ]]; then docker push ${IMAGE_RELEASE_CENTOS};
+  fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker push ${IMAGE_DEPS_DEBIAN};
+  fi
+- if [[ "${PUSH_STATUS}" && "${STAGE}" == "deps" ]]; then docker push ${IMAGE_DEPS_CENTOS};
   fi
 notifications:
   email:
