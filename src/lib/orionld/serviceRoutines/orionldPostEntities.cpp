@@ -226,7 +226,7 @@ static bool payloadCheck
 
   if (typeNodeP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No 'type' of the entity", "The 'type' field is mandatory", OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No type of the entity", "The type field is mandatory", OrionldDetailsString);
     return false;
   }
 
@@ -528,21 +528,21 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 
     if (typeNodeP == NULL)
     {
-      LM_E(("No 'type' for metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'type' is missing for a metadata", nodeP->name, OrionldDetailsString);
+      LM_E(("No type for metadata '%s'", nodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field type is missing for a metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
 
     if ((isProperty == true) && (valueNodeP == NULL))
     {
-      LM_E(("No 'value' for Property metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'value' is missing for a Property metadata", nodeP->name, OrionldDetailsString);
+      LM_E(("No value for Property metadata '%s'", nodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field value is missing for a Property metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
     else if ((isRelationship == true) && (objectNodeP == NULL))
     {
       LM_E(("No 'object' for Relationship metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field 'value' is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field value is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
   }
@@ -577,7 +577,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
   }
   else  // Relationship
   {
-    // A "Relationship" has no 'value', instead it has 'object', that must be of string type
+    // A "Relationship" has no value, instead it has 'object', that must be of string type
     if (objectNodeP->type != KjString)
     {
       LM_E(("invalid json type for relationship-object '%s' of attribute '%s'", nodeP->name, caName));
@@ -771,7 +771,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to an attribute", nodeP->name, OrionldDetailsString);
         return false;
       }
     }
@@ -790,8 +790,8 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
   //
   if (typeP == NULL)  // Attr Type is mandatory!
   {
-    LM_E(("'type' missing for attribute '%s'", kNodeP->name));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "attribute without 'type' field", kNodeP->name, OrionldDetailsAttribute);
+    LM_E(("type missing for attribute '%s'", kNodeP->name));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute found, but the type field is missing", kNodeP->name, OrionldDetailsAttribute);
     return false;
   }
 
@@ -804,18 +804,18 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
     {
       if (isGeoProperty == true)
       {
-        LM_E(("'value' missing for GeoProperty '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
+        LM_E(("value missing for GeoProperty '%s'", kNodeP->name));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute with type GeoProperty found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
       }
       else if (isTemporalProperty == true)
       {
-        LM_E(("'value' missing for TemporalProperty '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "temporal-property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
+        LM_E(("value missing for TemporalProperty '%s'", kNodeP->name));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute with type TemporalProperty found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
       }
       else
       {
-        LM_E(("'value' missing for Property '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "property attribute without 'value' field", kNodeP->name, OrionldDetailsAttribute);
+        LM_E(("value missing for Property '%s'", kNodeP->name));
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute with type Property found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
       }
 
       return false;
@@ -823,8 +823,8 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
 
     if (valueP->type == KjNull)
     {
-      LM_E(("NULL 'value' for Property '%s'", kNodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "property attribute with NULL 'value' field", kNodeP->name, OrionldDetailsAttribute);
+      LM_E(("NULL value for Property '%s'", kNodeP->name));
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attributes with type Property cannot be given the value NULL", kNodeP->name, OrionldDetailsAttribute);
       return NULL;
     }
 
@@ -838,14 +838,14 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       if (valueP->type != KjObject)
       {
         LM_E(("geo-property attribute value must be a JSON Object: %s", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value must be a JSON Object for a GeoProperty", kNodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value of an attribute of type GeoProperty must be a JSON Object", kNodeP->name, OrionldDetailsString);
         return false;
       }
 
       if (geoJsonCheck(ciP, valueP, &details) == false)
       {
         LM_E(("geoJsonCheck error for %s: %s", caName, details));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "geo-property attribute must have a valid GeoJson value", details, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value of an attribute of type GeoProperty be valid GeoJson", details, OrionldDetailsString);
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;
@@ -971,7 +971,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     {
       if ((urlCheck(idNodeP->value.s, &details) == false) && (urnCheck(idNodeP->value.s, &details) == false))
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN", OrionldDetailsString);
         mongoRequest.release();
         return false;
       }
@@ -1150,7 +1150,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (ciP->httpStatusCode != SccOk)
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", OrionldDetailsString);
     return false;
   }
 

@@ -438,7 +438,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     if (numberToDate((time_t) subscriptionP->expires, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'expires'"));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+      orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified expires date", details, OrionldDetailsEntity);
       return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "expires", date);

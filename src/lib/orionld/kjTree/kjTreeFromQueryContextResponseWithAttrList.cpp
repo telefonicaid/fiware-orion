@@ -193,7 +193,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         if (contextTree == NULL)
         {
           LM_E(("Unable to create context tree for @context attribute of entity '%s': %s", eId, details));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context tree for @context attribute", details, OrionldDetailsEntity);
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context tree for the @context attribute", details, OrionldDetailsEntity);
           return NULL;
         }
 
@@ -240,7 +240,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           if (nodeP == NULL)
           {
             LM_E(("out of memory"));
-            orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+            orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node", "out of memory", OrionldDetailsEntity);
             return NULL;
           }
         }
@@ -267,7 +267,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         if (nodeP == NULL)
         {
           LM_E(("out of memory"));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node", "out of memory", OrionldDetailsEntity);
           return NULL;
         }
       }
@@ -352,7 +352,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, &details) == NULL)
             {
               LM_E(("kjTreeFromCompoundValue: %s", details));
-              orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node from compound value", details, OrionldDetailsEntity);
+              orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node from compound value", details, OrionldDetailsEntity);
               return NULL;
             }
           }
@@ -366,7 +366,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         if (aTop == NULL)
         {
           LM_E(("kjTreeFromCompoundValue: %s", details));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node for compound value", "out of memory", OrionldDetailsEntity);
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node for compound value", "out of memory", OrionldDetailsEntity);
           return NULL;
         }
 
@@ -378,7 +378,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
         if (aTop == NULL)
         {
           LM_E(("Error creating a KjNode Object"));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node", "out of memory", OrionldDetailsEntity);
           return NULL;
         }
 
@@ -389,7 +389,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           if (nodeP == NULL)
           {
             LM_E(("Error creating a KjNode String"));
-            orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node", "out of memory", OrionldDetailsEntity);
+            orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node", "out of memory", OrionldDetailsEntity);
             return NULL;
           }
 
@@ -411,7 +411,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
             if (numberToDate((time_t) aP->numberValue, date, sizeof(date), &details) == false)
             {
               LM_E(("Error creating a stringified date"));
-              orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+              orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified observedAt date", details, OrionldDetailsEntity);
               return NULL;
             }
 
@@ -432,14 +432,14 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           if (nodeP == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
-            orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node for compound value", "out of memory", OrionldDetailsEntity);
+            orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node for compound value", "out of memory", OrionldDetailsEntity);
             return NULL;
           }
 
           if (kjTreeFromCompoundValue(aP->compoundValueP, nodeP, &details) == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
-            orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create tree node from compound value", details, OrionldDetailsEntity);
+            orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create tree node from compound value", details, OrionldDetailsEntity);
             return NULL;
           }
           break;
@@ -490,7 +490,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
                 if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
                 {
                   LM_E(("Error creating a stringified date"));
-                  orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+                  orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified date", details, OrionldDetailsEntity);
                   return NULL;
                 }
 
@@ -525,7 +525,7 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
                 if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
                 {
                   LM_E(("Error creating a stringified date"));
-                  orionldErrorResponseCreate(ciP, OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+                  orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified date", details, OrionldDetailsEntity);
                   return NULL;
                 }
 
