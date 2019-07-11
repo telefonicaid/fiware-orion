@@ -220,13 +220,13 @@ static bool payloadCheck
   //
   if (idNodeP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No 'id' of the entity", "The 'id' field is mandatory", OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory", OrionldDetailsString);
     return false;
   }
 
   if (typeNodeP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No type of the entity", "The type field is mandatory", OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity type missing", "The type field is mandatory", OrionldDetailsString);
     return false;
   }
 
@@ -529,20 +529,20 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     if (typeNodeP == NULL)
     {
       LM_E(("No type for metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field type is missing for a metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The type field is missing for a metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
 
     if ((isProperty == true) && (valueNodeP == NULL))
     {
       LM_E(("No value for Property metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field value is missing for a Property metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value field is missing for a Property metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
     else if ((isRelationship == true) && (objectNodeP == NULL))
     {
       LM_E(("No 'object' for Relationship metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The field value is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value field is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
   }
