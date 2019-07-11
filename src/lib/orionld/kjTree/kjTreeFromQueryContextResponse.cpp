@@ -468,7 +468,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
                 if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
                 {
                   LM_E(("Error creating a stringified date"));
-                  orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified observedAt observedAt date", details, OrionldDetailsEntity);
+                  orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified observedAt date", details, OrionldDetailsEntity);
                   return NULL;
                 }
 
