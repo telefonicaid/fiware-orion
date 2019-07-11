@@ -93,6 +93,7 @@ void orionldStateInit(void)
   orionldState.uriParamOptions.noOverwrite = false;
   orionldState.prettyPrintSpaces           = 2;
   orionldState.prettyPrint                 = false;
+  orionldState.locationAttributeP          = NULL;
 }
 
 

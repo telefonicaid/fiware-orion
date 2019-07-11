@@ -669,7 +669,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
 
         if (orionldState.locationAttributeP != NULL)
         {
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "More than one Geo Location attribute", nodeP->name, OrionldDetailsString);
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Multiple attributes cannot be defined using the GeoProperty type", nodeP->name, OrionldDetailsString);
           return false;
         }
 
