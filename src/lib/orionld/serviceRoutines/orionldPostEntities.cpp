@@ -845,7 +845,7 @@ bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, 
       if (geoJsonCheck(ciP, valueP, &details) == false)
       {
         LM_E(("geoJsonCheck error for %s: %s", caName, details));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value of an attribute of type GeoProperty be valid GeoJson", details, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value of an attribute of type GeoProperty must be valid GeoJson", details, OrionldDetailsString);
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;

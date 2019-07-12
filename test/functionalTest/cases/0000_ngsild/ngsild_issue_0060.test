@@ -102,7 +102,7 @@ Date: REGEX(.*)
 
 {
     "details": "urn:ngsi-ld:Subscription:testsubscription",
-    "title": "subscription already exists",
+    "title": "Subscription already exists",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

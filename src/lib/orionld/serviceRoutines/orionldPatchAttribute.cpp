@@ -83,6 +83,6 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   ciP->httpStatusCode = SccNotImplemented;
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", orionldState.wildcard[0], OrionldDetailsString);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", orionldState.wildcard[0], OrionldDetailsString);
   return true;
 }
