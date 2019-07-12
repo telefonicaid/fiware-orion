@@ -226,7 +226,7 @@ static bool payloadCheck
 
   if (typeNodeP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity type missing", "The type field is mandatory", OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity type is missing", "The type field is mandatory", OrionldDetailsString);
     return false;
   }
 
