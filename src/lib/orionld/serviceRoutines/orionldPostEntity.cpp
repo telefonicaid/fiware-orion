@@ -137,7 +137,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload found", NULL, OrionldDetailsString);
     return false;
   }
 
@@ -315,7 +315,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     else
     {
       LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from mongo backend", OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from Mongo-DB Backend", OrionldDetailsString);
     }
 
     retValue = false;

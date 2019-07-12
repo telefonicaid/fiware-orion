@@ -107,7 +107,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
 
     if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &ciP->httpStatusCode, &details) == true)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "subscription already exists", subIdP, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription already exists", subIdP, OrionldDetailsString);
       return false;
     }
   }

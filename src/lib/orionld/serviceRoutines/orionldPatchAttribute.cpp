@@ -54,7 +54,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is missing", NULL, OrionldDetailsString);
     return false;
   }
 
