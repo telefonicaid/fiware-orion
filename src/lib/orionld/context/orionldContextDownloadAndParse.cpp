@@ -76,6 +76,8 @@ static __thread OrionldResponseBuffer  httpResponse;
 //
 KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useInternalBuffer, char** detailsPP)
 {
+  LM_TMP(("KZ: In orionldContextDownloadAndParse"));
+
   //
   // Prepare the httpResponse buffer
   //

@@ -52,6 +52,7 @@ extern "C"
 //
 OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsPP)
 {
+  LM_TMP(("KZ: In orionldContextCreateFromUrl"));
   OrionldContext* contextP = orionldContextLookup(url);
 
   //
@@ -108,6 +109,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   // </DEBUG>
 
   // FIXME: Don't clone if core or vocab context
+  LM_TMP(("KZ: Cloning context tree for '%s'", url));
   contextP->tree = kjClone(contextP->tree);
 
   // <DEBUG>
@@ -122,6 +124,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   if (contextP->tree->value.firstChildP->type == KjArray)
   {
     KjNode* arrayP = contextP->tree->value.firstChildP;
+    LM_TMP(("KZ: We got an array - need to download more contexts"));
 
     LM_T(LmtContextList, ("We got an array - need to download more contexts"));
     for (KjNode* aItemP = arrayP->value.firstChildP; aItemP != NULL; aItemP = aItemP->next)
@@ -147,11 +150,11 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
 
       if ((arrayItemContextP = orionldContextCreateFromUrl(ciP, aItemP->value.s, OrionldUserContext, detailsPP)) == NULL)
       {
-        LM_E(("orionldContextCreateFromUrl error: %s", *detailsPP));
+        LM_E(("KZ: orionldContextCreateFromUrl error: %s", *detailsPP));
         ciP->httpStatusCode = SccBadRequest;
         return NULL;
       }
-
+      LM_TMP(("KZ: clone context '%s'?", aItemP->value.s));
       LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
       orionldContextListInsert(arrayItemContextP, false);
     }

@@ -548,26 +548,21 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     //
     if (atContextAttributeP == NULL)
     {
-      LM_TMP(("KZ: no context inside attribute list - Content-Type is appliction/json and the context came via HTTP Header, if at all"));
-
       if (orionldState.acceptJsonld == true)
       {
         if (orionldState.contextP == NULL)
           orionldState.contextP = &orionldDefaultContext;
 
-        LM_TMP(("KZ: adding default context to payload"));
         nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
         kjChildAdd(top, nodeP);
       }
     }
     else
     {
-      LM_TMP(("KZ: context found inside attribute list. orion value type: %d", atContextAttributeP->valueType));
       if (orionldState.acceptJsonld == true)
       {
         if (atContextAttributeP->valueType == orion::ValueTypeString)
         {
-          LM_TMP(("KZ: string context '%s' to payload", atContextAttributeP->stringValue.c_str()));
           nodeP = kjString(orionldState.kjsonP, "@context", atContextAttributeP->stringValue.c_str());
           kjChildAdd(top, nodeP);
         }
@@ -575,7 +570,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         {
           if (atContextAttributeP->compoundValueP->valueType == orion::ValueTypeVector)
           {
-            LM_TMP(("KZ: vector context to payload"));
             nodeP = kjArray(orionldState.kjsonP, "@context");
             kjChildAdd(top, nodeP);
 
@@ -588,7 +582,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           }
           else
           {
-            LM_TMP(("KZ: inline context to payload - must be implemented!!!"));
             orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid context", "inline contexts not supported - wait it's coming ...", OrionldDetailsString);
             return orionldState.responseTree;
           }

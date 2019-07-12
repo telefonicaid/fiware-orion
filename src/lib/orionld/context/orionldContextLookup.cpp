@@ -53,11 +53,11 @@ OrionldContext* orionldContextLookup(const char* url)
   {
     if (contextP->url == NULL)
     {
-      LM_E(("KZ: This seems like a bug. Every context should have a URL ..."));
-      LM_E(("KZ: tree at %p", contextP->tree));
-      LM_E(("KZ: type: %d", contextP->type));
-      LM_E(("KZ: ignore: %s", FT(contextP->ignore)));
-      LM_E(("KZ: next at %p", contextP->next));
+      LM_E(("This seems like a bug. Every context should have a URL ..."));
+      LM_E(("  tree at %p", contextP->tree));
+      LM_E(("  type: %d", contextP->type));
+      LM_E(("  ignore: %s", FT(contextP->ignore)));
+      LM_E(("  next at %p", contextP->next));
       orionldContextListSemGive("Looking up a context - no luck");
       return NULL;
     }
