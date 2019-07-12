@@ -65,7 +65,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
       if (!urlCheck(uriP, &details) && !urnCheck(uriP, &details))
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::uri", "Not a URL nor a URN", OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN", OrionldDetailsString);
         return false;
       }
 

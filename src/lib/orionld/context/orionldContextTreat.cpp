@@ -128,7 +128,7 @@ bool orionldContextTreat
     if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from URL", details, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
       return false;
     }
 
@@ -155,7 +155,7 @@ bool orionldContextTreat
       if (linkPath == NULL)
       {
         LM_E(("out of memory creating Link HTTP Header"));
-        orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldInternalError, "Cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
         return false;
       }
     }
@@ -172,7 +172,7 @@ bool orionldContextTreat
     if (orionldState.contextP == NULL)
     {
       LM_E(("Failed to create context from Tree : %s", details));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "failure to create context from tree", details, OrionldDetailsString);
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from tree", details, OrionldDetailsString);
       return false;
     }
 
@@ -208,7 +208,7 @@ bool orionldContextTreat
       {
         LM_E(("Context Array Item is not a String nor an Object, but of type '%s'", kjValueType(contextArrayItemP->type)));
         orionldState.contextP = NULL;  // Leak?
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item of unsupported type", NULL, OrionldDetailsString);
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is of an unsupported type", NULL, OrionldDetailsString);
         return false;
       }
     }
