@@ -283,7 +283,7 @@ Date: REGEX(.*)
 
 {
     "details": "no details",
-    "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations",
+    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -297,7 +297,7 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations/*",
+    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations/*",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -357,7 +357,7 @@ Date: REGEX(.*)
 
 {
     "details": "no details",
-    "title": "not implemented - GET /ngsi-ld/v1/csourceRegistrations",
+    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -385,7 +385,7 @@ Date: REGEX(.*)
 
 {
     "details": "S1",
-    "title": "not implemented - PATCH /ngsi-ld/v1/subscriptions/*",
+    "title": "Not implemented - PATCH /ngsi-ld/v1/subscriptions/*",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -399,7 +399,7 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
+    "title": "Not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -455,7 +455,7 @@ Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*",
+    "title": "Not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

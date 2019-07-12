@@ -40,7 +40,7 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldDeleteRegistration"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*", orionldState.wildcard[0], OrionldDetailsString);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*", orionldState.wildcard[0], OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

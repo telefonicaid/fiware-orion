@@ -49,13 +49,13 @@ echo
 01. POST /ngsi-ld/v1/entities with an 'id' that is not a URI
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Not a URL nor a URN",
-    "title": "Invalid Entity ID",
+    "details": "The id specified cannot be resolved to a URL or URN",
+    "title": "Invalid Entity id",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

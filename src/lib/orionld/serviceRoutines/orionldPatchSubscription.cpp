@@ -40,7 +40,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldPatchSubscription"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not implemented - PATCH /ngsi-ld/v1/subscriptions/*", orionldState.wildcard[0], OrionldDetailsString);
+  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - PATCH /ngsi-ld/v1/subscriptions/*", orionldState.wildcard[0], OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

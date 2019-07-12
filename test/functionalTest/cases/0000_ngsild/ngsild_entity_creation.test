@@ -305,13 +305,13 @@ Date: REGEX(.*)
 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 138
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "no details",
-    "title": "Context Array Item of unsupported type",
+    "title": "Context Array Item is of an unsupported type",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -319,13 +319,13 @@ Date: REGEX(.*)
 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 153
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://example.org/ngsi-ld/default/name",
-    "title": "attribute without 'type' field",
+    "title": "Attribute found, but the type field is missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -361,13 +361,13 @@ Date: REGEX(.*)
 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 163
+Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://example.org/ngsi-ld/default/name",
-    "title": "property attribute without 'value' field",
+    "title": "Attribute with type Property found, but the associated value field is missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -389,13 +389,13 @@ Date: REGEX(.*)
 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 167
+Content-Length: 203
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "http://example.org/ngsi-ld/default/name",
-    "title": "geo-property attribute without 'value' field",
+    "title": "Attribute with type GeoProperty found, but the associated value field is missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
