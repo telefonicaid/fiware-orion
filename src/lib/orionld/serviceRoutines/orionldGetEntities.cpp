@@ -277,7 +277,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (typeVecItems == 1)  // type needs to be modified according to @context
   {
-    if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
+    char* details;
+
+    if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "http://", 7) == 0)) && (urlCheck(type, &details) == true))
+    {
+      // No expansion desired, the type is already a FQN
+      strncpy(typeExpanded, type, sizeof(typeExpanded));
+    }
+    else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
       return false;
@@ -299,6 +306,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
+      // FIXME: Check for FQN HERE TOO (once it is decided by ETSI)
       if (orionldUriExpand(orionldState.contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), &details) == false)
       {
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
