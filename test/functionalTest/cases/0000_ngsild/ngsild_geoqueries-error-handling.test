@@ -301,12 +301,12 @@ Date: REGEX(.*)
 11. 'coordinates' missing in URI param for query - see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 130
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "geometry without coordinates ,,,",
+    "details": "geometry without coordinates",
     "title": "no coordinates",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

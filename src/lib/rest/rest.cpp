@@ -133,12 +133,10 @@ static void correlatorGenerate(char* buffer)
 int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
-  std::string      key   = ckey;
-  std::string      value = (val == NULL)? "" : val;
 
   LM_TMP(("URI PARAM: '%s': '%s'", ckey, val));
 
-  if (val == NULL || *val == 0)
+  if ((val == NULL) || (*val == 0))
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
@@ -156,6 +154,9 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 
     return MHD_YES;
   }
+
+  std::string      key   = ckey;
+  std::string      value = (val == NULL)? "" : val;
 
   if (key == URI_PARAM_PAGINATION_OFFSET)
   {
