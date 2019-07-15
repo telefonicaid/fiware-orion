@@ -1,0 +1,417 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# Create three entites, two of them with the same type, the third with a different one.
+# Then perform two GET operations using the two different entity types.
+#
+# 01. Create entity store001, with type Building
+# 02. Create entity store002, with type Building
+# 03. Create entity store003, with type Byggnad
+# 04. GET entities with type Building, see stores 1 and 2
+# 05. GET entities with type Byggnad, see Store 3
+#
+
+
+echo "01. Create entity store001, with type Building"
+echo "=============================================="
+payload='{
+    "id": "urn:ngsi-ld:Building:store001",
+    "type": "Building",
+    "category": {
+    	"type": "Property",
+        "value": ["commercial"]
+    },
+    "address": {
+        "type": "Property",
+        "value": {
+            "streetAddress": "Bornholmer Straße 65",
+            "addressRegion": "Berlin",
+            "addressLocality": "Prenzlauer Berg",
+            "postalCode": "10439"
+        }
+    },
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+             "type": "Point",
+             "coordinates": [13.3986, 52.5547]
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Bösebrücke Einkauf"
+    },
+    "@context": [
+        "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+    ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Create entity store002, with type Building"
+echo "=============================================="
+payload='{
+    "id": "urn:ngsi-ld:Building:store002",
+    "type": "Building",
+    "category": {
+    	"type": "Property",
+        "value": ["commercial"]
+    },
+    "address": {
+        "type": "Property",
+        "value": {
+            "streetAddress": "Friedrichstraße 44",
+            "addressRegion": "Berlin",
+            "addressLocality": "Kreuzberg",
+            "postalCode": "10969"
+        }
+    },
+     "location": {
+        "type": "GeoProperty",
+        "value": {
+             "type": "Point",
+              "coordinates": [13.3903, 52.5075]
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Checkpoint Markt"
+    },
+    "@context": [
+      "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+      "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+    ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Create entity store003, with type Byggnad"
+echo "============================================="
+payload='{
+    "id": "urn:ngsi-ld:Building:store003",
+    "type": "Byggnad",
+    "category": {
+    	"type": "Property",
+        "value": ["commercial"]
+    },
+    "address": {
+        "type": "Property",
+        "value": {
+            "streetAddress": "Friedrichstraße 44",
+            "addressRegion": "Berlin",
+            "addressLocality": "Kreuzberg",
+            "postalCode": "10969"
+        }
+    },
+     "location": {
+        "type": "GeoProperty",
+        "value": {
+             "type": "Point",
+              "coordinates": [13.3903, 52.5075]
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Checkpoint Markt"
+    },
+    "@context": [
+      "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+      "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+    ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. GET entities with type Building, see stores 1 and 2"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://schema.lab.fiware.org/ld/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "05. GET entities with type Byggnad, see Store 3"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Byggnad -H 'Link: <https://schema.lab.fiware.org/ld/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "06. GET Building-typed entities, using context https://schema.lab.fiware.org/ld/context.jsonld"
+echo "=============================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://schema.lab.fiware.org/ld/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity store001, with type Building
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store001>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
+Date: REGEX(.*)
+
+
+
+02. Create entity store002, with type Building
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store002>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store002
+Date: REGEX(.*)
+
+
+
+03. Create entity store003, with type Byggnad
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store003>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store003
+Date: REGEX(.*)
+
+
+
+04. GET entities with type Building, see stores 1 and 2
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 833
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "address": {
+            "type": "Property",
+            "value": {
+                "addressLocality": "Prenzlauer Berg",
+                "addressRegion": "Berlin",
+                "postalCode": "10439",
+                "streetAddress": "Bornholmer Stra\u00dfe 65"
+            }
+        },
+        "category": {
+            "type": "Property",
+            "value": [
+                "commercial"
+            ]
+        },
+        "id": "urn:ngsi-ld:Building:store001",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3986,
+                    52.5547
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "type": "Property",
+            "value": "B\u00f6sebr\u00fccke Einkauf"
+        },
+        "type": "Building"
+    },
+    {
+        "address": {
+            "type": "Property",
+            "value": {
+                "addressLocality": "Kreuzberg",
+                "addressRegion": "Berlin",
+                "postalCode": "10969",
+                "streetAddress": "Friedrichstra\u00dfe 44"
+            }
+        },
+        "category": {
+            "type": "Property",
+            "value": [
+                "commercial"
+            ]
+        },
+        "id": "urn:ngsi-ld:Building:store002",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3903,
+                    52.5075
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "type": "Property",
+            "value": "Checkpoint Markt"
+        },
+        "type": "Building"
+    }
+]
+
+
+05. GET entities with type Byggnad, see Store 3
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 410
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "address": {
+            "type": "Property",
+            "value": {
+                "addressLocality": "Kreuzberg",
+                "addressRegion": "Berlin",
+                "postalCode": "10969",
+                "streetAddress": "Friedrichstra\u00dfe 44"
+            }
+        },
+        "category": {
+            "type": "Property",
+            "value": [
+                "commercial"
+            ]
+        },
+        "id": "urn:ngsi-ld:Building:store003",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3903,
+                    52.5075
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "type": "Property",
+            "value": "Checkpoint Markt"
+        },
+        "type": "Byggnad"
+    }
+]
+
+
+06. GET Building-typed entities, using context https://schema.lab.fiware.org/ld/context.jsonld
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 833
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "address": {
+            "type": "Property",
+            "value": {
+                "addressLocality": "Prenzlauer Berg",
+                "addressRegion": "Berlin",
+                "postalCode": "10439",
+                "streetAddress": "Bornholmer Stra\u00dfe 65"
+            }
+        },
+        "category": {
+            "type": "Property",
+            "value": [
+                "commercial"
+            ]
+        },
+        "id": "urn:ngsi-ld:Building:store001",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3986,
+                    52.5547
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "type": "Property",
+            "value": "B\u00f6sebr\u00fccke Einkauf"
+        },
+        "type": "Building"
+    },
+    {
+        "address": {
+            "type": "Property",
+            "value": {
+                "addressLocality": "Kreuzberg",
+                "addressRegion": "Berlin",
+                "postalCode": "10969",
+                "streetAddress": "Friedrichstra\u00dfe 44"
+            }
+        },
+        "category": {
+            "type": "Property",
+            "value": [
+                "commercial"
+            ]
+        },
+        "id": "urn:ngsi-ld:Building:store002",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3903,
+                    52.5075
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "type": "Property",
+            "value": "Checkpoint Markt"
+        },
+        "type": "Building"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB
