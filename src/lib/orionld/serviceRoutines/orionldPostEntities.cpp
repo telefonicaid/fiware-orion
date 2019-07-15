@@ -951,7 +951,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (contextNodeP != NULL)
   {
     // ContextAttribute* caP;  // Last param in orionldContextTreat
-
     if (orionldContextTreat(ciP, contextNodeP, idNodeP->value.s, NULL) == false)
     {
       LM_E(("orionldContextTreat failed"));

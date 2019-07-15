@@ -51,6 +51,8 @@ extern "C"
 //
 static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
 {
+  LM_TMP(("KZ: Treating contextitem '%s' by calling orionldContextAdd", url));
+
   char*            details;
   OrionldContext*  contextP = orionldContextAdd(ciP, url, OrionldUserContext, &details);
 
@@ -138,6 +140,7 @@ bool orionldContextTreat
   {
     char* details;
 
+    LM_TMP(("KZ: Context is an Array"));
     //
     // REMEMBER
     //   This context is just the array of context-strings: [ "url1", "url2" ]
