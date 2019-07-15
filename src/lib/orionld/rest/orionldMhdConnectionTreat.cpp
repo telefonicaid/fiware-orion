@@ -391,7 +391,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     LM_T(LmtServiceRoutine, ("Calling Service Routine %s", orionldState.serviceP->url));
     bool b = orionldState.serviceP->serviceRoutine(ciP);
-    LM_T(LmtServiceRoutine, ("service routine '%s' done", orionldState.serviceP->url));
+    LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
 
     LM_TMP(("KZ: serviceRoutine OK? %s, contextToBeCreated: %s", FT(b), FT(contextToBeCreated)));
     if ((b == true) && (contextToBeCreated == true))

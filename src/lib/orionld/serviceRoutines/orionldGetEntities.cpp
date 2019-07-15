@@ -181,12 +181,25 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     if (coordinates == NULL)
     {
-      LM_W(("Bad Input (No coordinates)"));
+      LM_W(("Bad Input (coordinates missing)"));
 
       orionldErrorResponseCreate(ciP,
                                  OrionldBadRequestData,
                                  "no coordinates",
-                                 "geometry without coordinates ,,,",
+                                 "geometry without coordinates",
+                                 OrionldDetailsString);
+
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
+    else if (georel == NULL)
+    {
+      LM_W(("Bad Input (georel missing)"));
+
+      orionldErrorResponseCreate(ciP,
+                                 OrionldBadRequestData,
+                                 "no georel",
+                                 "geometry with coordinates but without georel",
                                  OrionldDetailsString);
 
       ciP->httpStatusCode = SccBadRequest;
