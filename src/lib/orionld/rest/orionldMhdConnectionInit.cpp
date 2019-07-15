@@ -22,13 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                         // strlen
-#include <microhttpd.h>                                     // MHD
-
-extern "C"
-{
-#include "kalloc/kaBufferInit.h"                               // kaBufferInit
-}
+#include <string.h>                                            // strlen
+#include <microhttpd.h>                                        // MHD
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
@@ -204,15 +199,6 @@ int orionldMhdConnectionInit
   // Remember ciP for consequent connection callbacks from MHD
   *con_cls = ciP;
 
-  // Keep a pointer to the method/verb
-  orionldState.verbString = (char*) method;
-
-  //
-  // Creating kjson environment for KJson parse and render
-  //
-  bzero(orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer));
-  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
-
   //
   // 1. Prepare orionldState
   //
@@ -228,6 +214,9 @@ int orionldMhdConnectionInit
 
   // IP Address and port of caller
   ipAddressAndPort(ciP);
+
+  // Keep a pointer to the method/verb
+  orionldState.verbString = (char*) method;
 
   // Save URL path in ConnectionInfo
   orionldState.urlPath = (char*) url;

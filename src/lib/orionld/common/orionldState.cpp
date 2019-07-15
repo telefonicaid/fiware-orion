@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
+#include "kalloc/kaBufferInit.h"                               // kaBufferInit
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -75,6 +76,12 @@ void orionldStateInit(void)
   //        If I bzero orionldState, I get a SIGSEGV inside kjson ...
   //
   bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
+
+  //
+  // Creating kjson environment for KJson parse and render
+  //
+  bzero(orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer));
+  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
 
   orionldState.requestNo                   = requestNo;
   orionldState.tenant                      = (char*) "";
