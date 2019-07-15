@@ -76,7 +76,7 @@ payload='{
         "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
     ]
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -115,7 +115,7 @@ payload='{
       "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
     ]
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -154,7 +154,7 @@ payload='{
       "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
     ]
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -185,7 +185,7 @@ echo
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store001>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store001>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
 Date: REGEX(.*)
 
@@ -195,7 +195,7 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store002>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store002>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store002
 Date: REGEX(.*)
 
@@ -205,7 +205,7 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store003>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store003>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store003
 Date: REGEX(.*)
 
