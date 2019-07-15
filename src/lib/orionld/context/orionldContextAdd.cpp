@@ -29,6 +29,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -128,7 +129,7 @@ OrionldContext* orionldContextAdd
     return contextP;
   }
 
-  LM_T(LmtContext, ("Downloading and parsing context of URL '%s'", url));
+  LM_TMP(("KZ: Calling orionldContextDownloadAndParse('%s')", url));
   KjNode* tree = orionldContextDownloadAndParse(kjsonP, url, true, detailsPP);
 
   if (tree == NULL)
@@ -202,6 +203,8 @@ OrionldContext* orionldContextAdd
   // - an object with key-values (a "leaf")
   // - a vector of contexts (URL strings)
   //
+  LM_TMP(("KZ: Cloning context '%s'", url));
+  tree = kjClone(tree);
 
   if ((contextP = orionldContextAppend(url, tree, contextType, detailsPP)) == NULL)
     return NULL;
@@ -267,6 +270,7 @@ OrionldContext* orionldContextAdd
     if (orionldContextLookup(url) != NULL)
       continue;
 
+    LM_TMP(("KZ: Calling orionldContextDownloadAndParse(%s)", url));
     tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, detailsPP);
     if (tree == NULL)
     {
@@ -277,7 +281,7 @@ OrionldContext* orionldContextAdd
 
       return NULL;
     }
-
+    tree = kjClone(tree);
     if (orionldContextAppend(url, tree, contextType, detailsPP) == NULL)
     {
       LM_T(LmtContext, (*detailsPP));
