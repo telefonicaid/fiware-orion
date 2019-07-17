@@ -33,26 +33,29 @@
 
 Orion Context Broker は、データベース管理者に柔軟性を提供するために、このセクションの最後で説明されている2つの例外を除いて、任意のデータベースコレクションにインデックスを作成しません。インデックスの使用には、読取り効率 (インデックスの使用率は一般的に読取り速度を向上させる) と書込み効率 (インデックスの使用量が書込みを遅くする) と記憶域 (インデックスはデータベースおよびマップ RAM メモリーのスペースを消費する) の間のトレードオフがあります。管理者 (Orion ではなく) が優先順位を決定する必要があります。
 
-ただし、このタスクの管理者を支援するために、次のインデックスを推奨します :
+ただし、このタスクの管理者を支援するために、次の*一般* (general) インデックスを推奨します :
 
 * [エンティティのコレクション](database_model.md#entities-collection)
-    * `_id.id`
-    * `_id.type`
-    * `_id.servicePath`
-    * `attrNames`
+    * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (これは複合インデックスであり、この場合のキー順は重要です)
     * `creDate`
 
-`orderBy` クエリ (つまり `GET /v2/entities?orderBy=A`) を使用する場合、それらのインデックスを
-作成することもお勧めします。特に、指定された属性 'A' によって昇順 (つまり `orderBy=A`) に
+さらに、クエリによっては *追加* インデックスが必要になるかもしれません。
+
+* クエリで属性フィルタを使用する場合 (例えば `GET /v2/entities?q=A<10`)、それらに対して、インデックスを作成することをお勧めします。特に、与えられた属性 'A' でフィルタリングしているのなら、インデックス `{attrs.A.value: 1}` を作成するべきです。同じクエリの中で複数の属性でフィルタリングしている場合 (例えば `GET /v2/entities?q=A<10;B>20`）、それらすべてを複合インデックス `{attrs.A.value: 1, attrs.B.value: 1}` にまとめてください。(この場合、キーの順序は関係ありません)
+
+* `orderBy` クエリ (つまり `GET /v2/entities?orderBy=A`) を使用する場合、それらのインデックスを
+作成することをお勧めします。特に、指定された属性 'A' によって昇順 (つまり `orderBy=A`) に
 並べ替える場合は、インデックス `{attrs.A.value: 1}` を作成する必要があります。指定された属性 'A' を
-降順で並べ替える場合 (つまり、`orderBy=!A`)、インデックス `{attrs.A.value: -1}` を作成する必要があります。
+降順で並べ替える場合 (つまり、`orderBy=!A`)、インデックス `{attrs.A.value: -1}` を作成する必要があります。順序付けに複数の属性を使用する場合 (つまり `orderBy=A,!B,C`)、順序付けの方向を考慮して複合インデックスを作成する必要があります。つまり `{attrs.A.value: 1, attrs.B.value: -1, attrs.C.value: 1}` (この場合、キーの順序は重要です)
+
+* フィルタが `dateCreate` または `dateModified` の場合、上記の規則は少し修正されています。エンティティの作成/修正日 (たとえば `GET /v2/entities?dateModified<2019-01-01`) の場合、`attrs.A.value` の代わりに `creDate` と `modDate` を使用してください。属性の作成/修正日 (たとえば `GET /v2/entities?mq=A.dateModified<2019-01-01`) の場合、`attrs.A.value` の代わりに `attrs.A.creDate` と `attrs.A.modDate` を使用してください
 
 Orion Context Broker が実際に保証している唯一のインデックスは以下のものです。どちらも Orion の起動時またはエンティティの作成時に保証されます。
 
 * [ジオロケーション機能](../user/geolocation.md)の機能的な必要性のために、エンティティ・コレクション内にある `location.coords` フィールドの "2dsphere" インデックス
 * [一時的なエンティティ機能](../user/transient_entities.md)の機能的な必要性のために、エンティティ・コレクション内にある `expDate` フィールドに `expireAfterSeconds: 0` を持つインデックス
 
-[このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md)では、古い Orion バージョンをベースにしていますが、インデックスの影響についての分析を見つけることができますが、古くなった可能性があります。
+[このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md)では、古い Orion バージョンをベースにしていますが、インデックスの影響についての分析を見つけることができますが、古くなった可能性があります。さらに、MongoDB の公式ドキュメントから、[複合インデックス](https://docs.mongodb.com/manual/core/index-compound/) および [インデックスを使用した結果の並べ替え](https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/) に関する有用な参考文献を見つけてください。
 
 [トップ](#top)
 
