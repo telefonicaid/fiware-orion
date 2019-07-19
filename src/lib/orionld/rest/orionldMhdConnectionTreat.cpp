@@ -113,7 +113,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP)
 
     if (contextInPayload == false)
     {
-      errorTitle	 = (char*) "@context missing in JSON payload";
+      errorTitle   = (char*) "@context missing in JSON payload";
       errorDetails = (char*) "For application/ld+json, the @context must be present in the JSON payload";
     }
   }
@@ -123,7 +123,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP)
 
     if (contextInPayload == true)
     {
-      errorTitle	  = (char*) "Invalid MIME-type for @context in payload";
+      errorTitle   = (char*) "Invalid MIME-type for @context in payload";
       errorDetails = (char*) "For @context in payload, the MIME type must be application/ld+json";
     }
   }
