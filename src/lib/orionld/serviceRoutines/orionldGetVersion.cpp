@@ -27,6 +27,10 @@
 #include <openssl/opensslv.h>                                  // OPENSSL_VERSION_TEXT
 #include <mongo/version.h>                                     // MONGOCLIENT_VERSION
 #include <rapidjson/rapidjson.h>                               // RAPIDJSON_VERSION_STRING
+#include <curl/curl.h>                                         // curl_version_info_data, curl_version_info, CURLversion
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 extern "C"
 {
@@ -77,6 +81,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 {
   KjNode* nodeP;
   char    mhdVersion[32];
+  curl_version_info_data*  curlVersionP;
 
   mhdVersionGet(mhdVersion, sizeof(mhdVersion), MHD_VERSION);
 
@@ -105,11 +110,30 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "rapidjson version", RAPIDJSON_VERSION_STRING);
   kjChildAdd(orionldState.responseTree, nodeP);
-  nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
+
+  //
+  // CURL lib
+  //
+  curlVersionP = curl_version_info(CURLVERSION_NOW);
+  if (curlVersionP != NULL)
+    nodeP = kjString(orionldState.kjsonP, "libcurl version", curlVersionP->version);
+  else
+    nodeP = kjString(orionldState.kjsonP, "libcurl version", "UNKNOWN");
+
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
   kjChildAdd(orionldState.responseTree, nodeP);
 
+  //
+  // Opening and closing an arbitrary file (/etc/passwd) only to see the next non-open
+  // file descriptor.
+  // This is to detect fd-leakage.
+  //
+  int fd;
+  fd = open("/etc/passwd", O_RDONLY);
+  nodeP = kjInteger(orionldState.kjsonP, "Next File Descriptor", fd);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  close(fd);
 
   // This request is ALWAYS returned with pretty-print
   orionldState.kjsonP->spacesPerIndent   = 2;
