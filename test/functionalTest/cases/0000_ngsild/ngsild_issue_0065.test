@@ -76,12 +76,13 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "Next File Descriptor": REGEX(\d+),
     "boost version": "REGEX(.*)",
     "branch": "REGEX(.*)",
     "kalloc version": "REGEX(.*)",
     "kbase version": "REGEX(.*)",
     "kjson version": "REGEX(.*)"
-    "libcurl version": "UNKNOWN",
+    "libcurl version": "REGEX(.*)",
     "libuuid version": "UNKNOWN",
     "microhttpd version": "0.9.48-0",
     "mongo version": "REGEX(.*)",

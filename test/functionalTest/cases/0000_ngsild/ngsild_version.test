@@ -76,8 +76,9 @@ Date: REGEX(.*)
   "openssl version": "REGEX(.*)",
   "mongo version": "REGEX(.*)",
   "rapidjson version": "REGEX(.*)",
-  "libcurl version": "UNKNOWN",
-  "libuuid version": "UNKNOWN"
+  "libcurl version": "REGEX(.*)",
+  "libuuid version": "UNKNOWN",
+  "Next File Descriptor": REGEX(\d+)
 }
 
 
