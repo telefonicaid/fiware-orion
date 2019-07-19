@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInit, orionldContextListInsert
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
+#include "orionld/serviceRoutines/orionldPostEntities.h"       // orionldPostEntities
 #include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
 
 
@@ -179,6 +180,23 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
       strncpy(serviceP->matchForSecondWildcard, wildCardStart, wildCardEnd - wildCardStart);
       LM_T(LmtUrlParse, ("matchForSecondWildcard: %s", serviceP->matchForSecondWildcard));
     }
+  }
+
+  //
+  // Set options for the OrionLdRestService
+  //
+  // 1. For POST /ngsi-ld/v1/entities:
+  //    - The context may have to be saved in the context cache (if @context is non-string in payload)
+  //      - Why?  The broker needs to be able to serve it later
+  //    - The Entity ID and type must be looked up and removed from the payload (pointers to the trees in orionldState
+  //      - Why? The Entity ID is used when naming the context
+  //      - The Entity Type is removed and saved to save time in the service routine (all on level 1 are attributes)
+  //
+  //
+  if (serviceP->serviceRoutine == orionldPostEntities)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
 }
 

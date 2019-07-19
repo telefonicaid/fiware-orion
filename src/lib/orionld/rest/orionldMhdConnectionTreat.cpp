@@ -78,7 +78,7 @@ static int volatileContextNo = 1;
 //   For this function to work properly, the payload must have been parsed, so that we know whether there is
 //   a "@context" member as part of the payload or not.
 //
-static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP)
+static bool contentTypeCheck(ConnectionInfo* ciP)
 {
   if ((ciP->verb != POST) && (ciP->verb != PATCH))
     return true;
@@ -93,8 +93,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP, KjNode* contextNodeP)
     return true;  // No error detected about Content-Type, error postponed to later check
 
 
-  bool  contextInPayload     = (contextNodeP      != NULL);
-  bool  contextInHttpHeader  = (orionldState.link != NULL);
+  bool  contextInPayload     = (orionldState.contextTree != NULL);
+  bool  contextInHttpHeader  = (orionldState.link        != NULL);
   char* errorTitle           = NULL;
   char* errorDetails         = NULL;
 
@@ -265,12 +265,26 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
+// kjNodeDecouple -
+//
+static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
+{
+#if 0
+  if (prev != NULL)
+    prev->next = nodeToDecouple->next;
+  else
+    parent->value.firstChildP = nodeToDecouple->next;
+#endif
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // payloadParseAndExtractSpecialFields -
 //
-static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* contextToBeCreatedP, KjNode**  contextNodePP)
+static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* contextToBeCreatedP)
 {
-  KjNode* contextNodeP = NULL;
-
   //
   // Parse the payload
   //
@@ -310,30 +324,117 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
 
   //
   // Looking up "@context" attribute at first level in payload
+  // Checking also for duplicates.
   //
-  for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  // If ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID is set in Service Options, also look up entity::id,type
+  //
+  if (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID)
   {
-    if (attrNodeP->name == NULL)
-      continue;
+    KjNode* prev = NULL;
 
-    if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+    for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
     {
-      contextNodeP = attrNodeP;
-      LM_T(LmtContext, ("Found a @context in the payload (%p)", contextNodeP));
-      break;
+      if (attrNodeP->name == NULL)
+        continue;
+
+      if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+      {
+        if (orionldState.contextTree != NULL)
+        {
+          LM_W(("Bad Input (duplicated attribute: '@context'"));
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "@context", OrionldDetailsString);
+          return false;
+        }
+
+        orionldState.contextTree = attrNodeP;
+        LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.contextTree));
+
+        kjNodeDecouple(orionldState.contextTree, prev, orionldState.requestTree);
+      }
+
+      if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0))
+      {
+        if (orionldState.entityIdTree != NULL)
+        {
+          LM_W(("Bad Input (duplicated attribute: 'Entity:id'"));
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "Entity:id", OrionldDetailsString);
+          return false;
+        }
+
+        orionldState.entityIdTree = attrNodeP;
+        LM_T(LmtContext, ("Found Entity::id in the payload (%p)", orionldState.entityIdTree));
+
+        kjNodeDecouple(orionldState.entityIdTree, prev, orionldState.requestTree);
+      }
+
+      if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0))
+      {
+        if (orionldState.entityTypeTree != NULL)
+        {
+          LM_W(("Bad Input (duplicated attribute: 'Entity:type'"));
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "Entity:type", OrionldDetailsString);
+          return false;
+        }
+
+        orionldState.entityTypeTree = attrNodeP;
+        LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.entityTypeTree));
+
+        kjNodeDecouple(orionldState.entityTypeTree, prev, orionldState.requestTree);
+      }
+
+      prev = attrNodeP;
+    }
+  }
+  else
+  {
+    KjNode* prev = NULL;
+
+    for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+    {
+      if (attrNodeP->name == NULL)
+        continue;
+
+      if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+      {
+        if (orionldState.contextTree != NULL)
+        {
+          LM_W(("Bad Input (duplicated attribute: '@context'"));
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "@context", OrionldDetailsString);
+          return false;
+        }
+
+        orionldState.contextTree = attrNodeP;
+        LM_T(LmtContext, ("Found a @context in the payload (%p)", orionldState.contextTree));
+
+        kjNodeDecouple(orionldState.entityIdTree, prev, orionldState.requestTree);
+      }
+
+      prev = attrNodeP;
     }
   }
 
-  if (contextNodeP != NULL)
+
+  if (orionldState.contextTree != NULL)
   {
+#if 0
+    orionldState.contextTree->next = NULL;
+#endif
+
     // A @context in the payload must be a JSON String, Array, or an Object
-    if ((contextNodeP->type != KjString) && (contextNodeP->type != KjArray) && (contextNodeP->type != KjObject))
+    if ((orionldState.contextTree->type != KjString) && (orionldState.contextTree->type != KjArray) && (orionldState.contextTree->type != KjObject))
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context", OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
   }
+
+#if 0
+  if (orionldState.entityTypeTree != NULL)
+    orionldState.entityTypeTree->next = NULL;
+  if (orionldState.entityIdTree != NULL)
+    orionldState.entityIdTree->next = NULL;
+#endif
 
   //
   // If Content-Type is application/ld+json and Accept does not include application/ld+json and the @context is in the payload,
@@ -342,16 +443,14 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   // After responding (both to the current request and after serving the context in a subsequent request), theoretically the context
   // could be removed from  the context server.
   //
-  // It could be marked at "volatile" so that the context sewrver would know to remove it after servoing it the first (and only) time.
+  // It could be marked at "volatile" so that the context server would know to remove it after servoing it the first (and only) time.
   //
   // All of this only applies if:
   //   o The @context in the payload is not a simple URI string
   //   o The HTTP Accept header does not include application/ld+json => application/json should be returned
   //
-  if ((contextNodeP != NULL) && (orionldState.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (contextNodeP->type != KjString))
+  if ((orionldState.contextTree != NULL) && (orionldState.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (orionldState.contextTree->type != KjString))
     *contextToBeCreatedP = true;
-
-  *contextNodePP = contextNodeP;
 
   return true;
 }
@@ -402,29 +501,42 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
 //   Actually, that is not entirely true. The callback function for MHD is set to 'connectionTreat', from lib/rest/rest.cpp,
 //   and 'connectionTreat' has been programmer to call this function when the entire request has been read.
 //
+//
 //   01. Check for predected error
 //   02. Look up the Service
 //   03. Check for empty payload for POST/PATCH/PUT
-//   04. Parse the payload, and check for empty payload, and make sure @context member is of a valid type
-//   05. Check the Content-Type
-//   06. Check the Accept header
-//   07. Check the @context in HTTP Header
-//   08. Call the SERVICE ROUTINE
-//   09. If necessary, create the context in the context cache
-//   10. If the service routine failed (returned FALSE), but no HTTP status ERROR code is set, the HTTP status code defaults to 400
-//   11. Check for existing responseTree, in case of httpStatusCode >= 400 (except for 405)
-//   12. Render response tree
-//   13. IF accept == app/json, add the Link HTTP header
-//   14. REPLY
-//   15. Cleanup
-//   16. DONE
+//   04. Parse the payload
+//   05. Check for empty payload ( {}, [] )
+//   06. Lookup "@context" member, remove it from the request tree - same with "entity::id" and "entity::type" if the request type needs it
+//       - orionldState.payloadContextTree    (KjNode*)
+//       - orionldState.payloadEntityIdTree   (KjNode*)
+//       - orionldState.payloadEntityTypeTree (KjNode*)
+//   07. Check for HTTP Link header
+//   08. Make sure Context-Type is consistent with HTTP Link Header and Payload Context
+//   09. Make sure @context member is valid
+//   10. Check the Accept header and decide output MIME-type
+//   11. Make sure the HTTP Header "Link" is valid
+//   12. Check the @context in HTTP Header
+//   13. if (Link):     orionldState.contextP = orionldContextCreateFromUrl()
+//   14. if (@context): orionldState.contextP orionldContextCreateFromTree()
+//   15. if (@context != SimpleString): Create OrionldContext with 13|14
+//   16. if (@context != SimpleString): Insert context in context cache
+//   17. Call the SERVICE ROUTINE
+//   18. If the service routine failed (returned FALSE), but no HTTP status ERROR code is set, the HTTP status code defaults to 400
+//   19. Check for existing responseTree, in case of httpStatusCode >= 400 (except for 405)
+//   20. If (orionldState.acceptNgsild): Add orionldState.payloadContextTree to orionldState.responseTree
+//   21. If (orionldState.acceptNgsi):   Set HTTP Header "Link" to orionldState.contextP->url
+//   22. Render response tree
+//   23. IF accept == app/json, add the Link HTTP header
+//   24. REPLY
+//   25. Cleanup
+//   26. DONE
 //
 //
 //
 int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCreated    = false;
-  KjNode*  contextNodeP          = NULL;
   bool     serviceRoutineResult;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
@@ -445,6 +557,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if ((orionldState.serviceP = serviceLookup(ciP)) == NULL)
     goto respond;
 
+  if (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CREATE_CONTEXT)
+    LM_TMP(("KZ: ORIONLD_SERVICE_OPTION_CREATE_CONTEXT is set"));
 
   //
   // 03. Check for empty payload for POST/PATCH/PUT
@@ -456,14 +570,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // 04. Parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
-  if ((ciP->payload != NULL) && (payloadParseAndExtractSpecialFields(ciP, &contextToBeCreated, &contextNodeP) == false))
+  if ((ciP->payload != NULL) && (payloadParseAndExtractSpecialFields(ciP, &contextToBeCreated) == false))
     goto respond;
 
 
   //
   // 05. Check the Content-Type
   //
-  if (contentTypeCheck(ciP, contextNodeP) == false)
+  if (contentTypeCheck(ciP) == false)
     goto respond;
 
 
@@ -505,7 +619,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
 
     // The Context tree must be cloned, as it is created inside the thread's kjson
-    KjNode* clonedTree = kjClone(contextNodeP);
+    KjNode* clonedTree = kjClone(orionldState.contextTree);
 
     if (clonedTree == NULL)
     {

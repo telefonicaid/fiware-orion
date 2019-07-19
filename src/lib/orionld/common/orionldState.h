@@ -100,6 +100,9 @@ typedef struct OrionldConnectionState
   bool                    acceptJson;
   bool                    acceptJsonld;
   bool                    ngsildContent;
+  KjNode*                 contextTree;
+  KjNode*                 entityIdTree;
+  KjNode*                 entityTypeTree;
 } OrionldConnectionState;
 
 
