@@ -101,6 +101,7 @@ void orionldStateInit(void)
   orionldState.prettyPrintSpaces           = 2;
   orionldState.prettyPrint                 = false;
   orionldState.locationAttributeP          = NULL;
+  orionldState.contextP                    = NULL;
 }
 
 
