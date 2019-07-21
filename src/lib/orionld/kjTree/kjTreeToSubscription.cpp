@@ -55,8 +55,6 @@ extern "C"
 bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP)
 {
   KjNode*                   kNodeP;
-  char*                     idP                       = NULL;
-  char*                     typeP                     = NULL;
   char*                     nameP                     = NULL;
   char*                     descriptionP              = NULL;
   char*                     timeIntervalP             = NULL;
@@ -75,10 +73,10 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   char*                     expiresP                  = NULL;
   uint64_t                  throttling                = -1;
   bool                      throttlingPresent         = false;
-  KjNode*                   idNodeP                   = NULL;
-  KjNode*                   contextNodeP              = NULL;
 
+  //
   // Default values
+  //
   subP->attrsFormat                        = NGSI_LD_V1_KEYVALUES;
   subP->descriptionProvided                = false;
   subP->expires                            = 0x7FFFFFFF;
@@ -93,41 +91,19 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   subP->notification.httpInfo.custom       = false;
   subP->notification.httpInfo.mimeType     = JSON;
 
+
   //
-  // 1. First lookup the tree nodes of 'id' and '@context'
-  // 2. Then create a context attribute for the context - FIXME: combine code with POST Entities
+  // Already pretreated (by orionMhdConnectionTreat):
   //
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
-    {
-      contextNodeP = kNodeP;
-      if (idNodeP != NULL)
-        break;
-    }
-    else if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
-    {
-      idNodeP = kNodeP;
-      if (contextNodeP != NULL)
-        break;
-    }
-  }
+  // o @context (if any)
+  // o id
+  // o type
+  //
 
-  if (idNodeP != NULL)
-  {
-    STRING_CHECK(idNodeP, "Subscription::id");
+  // id
+  char* subscriptionId;
 
-    // Must be a URI
-    if ((urlCheck(idNodeP->value.s, NULL) == false) && (urnCheck(idNodeP->value.s, NULL) == false))
-    {
-      LM_E(("Subscription::id is not a URI"));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription::id is not a URI", idNodeP->value.s, OrionldDetailsAttribute);
-      return false;
-    }
-
-    subP->id = idNodeP->value.s;
-  }
-  else
+  if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
 
@@ -135,66 +111,58 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
 
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
-  }
 
-  if (orionldState.ngsildContent)  // Context in payload
+    subscriptionId = (char*) subP->id.c_str();
+  }
+  else
+    subscriptionId = orionldState.payloadIdNode->value.s;
+
+  if ((urlCheck(subscriptionId, NULL) == false) && (urnCheck(subscriptionId, NULL) == false))
   {
-    if (contextNodeP == NULL)
-    {
-      // error
-      return false;
-    }
-
-
-    if (orionldContextTreat(ciP, contextNodeP, (char*) subP->id.c_str(), NULL) == false)
-    {
-      // error
-      return false;
-    }
+    LM_W(("Bad Input (Subscription::id is not a URI)"));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription::id is not a URI", subscriptionId, OrionldDetailsAttribute);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
   }
 
-#if 0
-  else if (ciP->httpHeaders.linkUrl != NULL)  // Context in Link HTTP Header
-  {
-    ...
-  }
-#endif
+  subP->id  = subscriptionId;
+  *subIdPP  = subscriptionId;
 
-  // Add caP
 
   //
-  // Now loop over the tree
+  // type
+  //
+  // NOTE
+  //   The spec of ngsi-ld states that the field "type" is MANDATORY and MUST be set to "Subscription".
+  //   A bit funny in my opinion.
+  //   However, here we make sure that the spec is followed, but we add nothing to the database.
+  //   When rendering (serializing) subscriptions for GET /subscriptions, the field
+  //     "type": "Subscription"
+  //   is added to the response payload.
+  //
+  if (orionldState.payloadTypeNode == NULL)
+  {
+    LM_W(("Bad Input (Mandatory field missing: Subscription::type)"));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Mandatory field missing", "Subscription::type", OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (!SCOMPARE13(orionldState.payloadTypeNode->value.s, 'S', 'u', 'b', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 0))
+  {
+    LM_W(("Bad Input (subscription type must have the value /Subscription/)"));
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for Subscription::type", orionldState.payloadTypeNode->value.s, OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+
+  //
+  // Loop over the tree
   //
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
-    {
-      DUPLICATE_CHECK(idP, "Subscription::id", kNodeP->value.s);
-      STRING_CHECK(kNodeP, "Subscription::id");
-      subP->id  = kNodeP->value.s;
-      *subIdPP  = (char*) subP->id.c_str();
-    }
-    else if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
-    {
-      //
-      // NOTE
-      //   The spec of ngsi-ld states that the field "type" is MANDATORY and MUST be set to "Subscription".
-      //   A bit funny in my opinion.
-      //   However, here we make sure that the spec is followed, but we add nothing to the database.
-      //   When rendering (serializing) subscriptions for GET /subscriptions, the field
-      //     "type": "Subscription"
-      //   is added to the response payload.
-      //
-      DUPLICATE_CHECK(typeP, "Subscription::type", kNodeP->value.s);
-      STRING_CHECK(kNodeP, "Subscription::type");
-
-      if (!SCOMPARE13(kNodeP->value.s, 'S', 'u', 'b', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 0))
-      {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for Subscription::type", kNodeP->value.s, OrionldDetailsString);
-        return false;
-      }
-    }
-    else if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Subscription::name", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::name");

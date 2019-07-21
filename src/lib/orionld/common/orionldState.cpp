@@ -102,9 +102,9 @@ void orionldStateInit(void)
   orionldState.prettyPrint                 = false;
   orionldState.locationAttributeP          = NULL;
   orionldState.contextP                    = NULL;
-  orionldState.contextTree                 = NULL;
-  orionldState.entityIdTree                = NULL;
-  orionldState.entityTypeTree              = NULL;
+  orionldState.payloadContextNode          = NULL;
+  orionldState.payloadIdNode               = NULL;
+  orionldState.payloadTypeNode             = NULL;
 }
 
 

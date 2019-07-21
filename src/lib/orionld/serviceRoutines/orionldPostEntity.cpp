@@ -187,7 +187,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     {
       contextNodeP = kNodeP;
 
-      if (orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str(), NULL) == false)
+      if (orionldContextTreat(ciP, contextNodeP, NULL) == false)
       {
         // Error payload set by orionldContextTreat
         mongoRequest.release();

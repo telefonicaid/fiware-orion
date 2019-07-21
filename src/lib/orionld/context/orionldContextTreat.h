@@ -43,7 +43,6 @@ extern bool orionldContextTreat
 (
   ConnectionInfo*     ciP,
   KjNode*             contextNodeP,
-  char*               entityId,
   ContextAttribute**  csPP
 );
 

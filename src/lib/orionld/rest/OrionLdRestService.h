@@ -89,8 +89,8 @@ typedef struct OrionLdRestServiceSimplifiedVector
 //
 // Options
 //
-#define ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID  (1 << 0)
-#define ORIONLD_SERVICE_OPTION_CREATE_CONTEXT      (1 << 1)
+#define ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE  (1 << 0)
+#define ORIONLD_SERVICE_OPTION_CREATE_CONTEXT        (1 << 1)
 
 
 

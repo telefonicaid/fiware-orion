@@ -43,9 +43,11 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                          // linkCheck
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
+#include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
+#include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
 #include "orionld/serviceRoutines/orionldBadVerb.h"            // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
@@ -80,38 +82,50 @@ static int volatileContextNo = 1;
 //
 static bool contentTypeCheck(ConnectionInfo* ciP)
 {
+  LM_TMP(("KZ: In contentTypeCheck"));
+
+  LM_TMP(("KZ: verb: %s", orionldState.verbString));
   if ((ciP->verb != POST) && (ciP->verb != PATCH))
     return true;
 
+  LM_TMP(("KZ: requestTree at %p", orionldState.requestTree));
   if (orionldState.requestTree == NULL)
     return true;  // No error detected about Content-Type, error postponed to later check
 
-  if (orionldState.requestTree->value.firstChildP == NULL)
-    return true;  // No error detected about Content-Type, error postponed to later check
-
+  LM_TMP(("KZ: orionldState.requestTree->type: %s", kjValueType(orionldState.requestTree->type)));
   if (orionldState.requestTree->type != KjObject)  // FIXME: Are all payloads JSON Objects ... ?
     return true;  // No error detected about Content-Type, error postponed to later check
 
+  LM_TMP(("KZ: Still in contentTypeCheck"));
 
-  bool  contextInPayload     = (orionldState.contextTree != NULL);
-  bool  contextInHttpHeader  = (orionldState.link        != NULL);
+  //
+  // Checking that Content-Type is consistent with how context is added
+  // - application/ld+json:
+  //     @context MUST be in payload
+  //     HTTP Link header cannot be present
+  // - application/json:
+  //     @context cannot be in payload
+  //     HTTP Link header may or not be present
+  //
+  LM_TMP(("KZ: orionldState.payloadContextNode at %p", orionldState.payloadContextNode));
+  LM_TMP(("KZ: orionldState.link        at %p", orionldState.link));
+  LM_TMP(("KZ: ngsildContent:              %s", FT(orionldState.ngsildContent)));
+
   char* errorTitle           = NULL;
   char* errorDetails         = NULL;
-
-  LM_T(LmtContext, ("Context In JSON Payload: %s", (contextInPayload == true)?    "YES" : "NO"));
-  LM_T(LmtContext, ("Context In HTTP Header:  %s", (contextInHttpHeader == true)? "YES" : "NO"));
 
   if (orionldState.ngsildContent == true)
   {
     LM_T(LmtContext, ("Content-Type is: application/ld+json"));
+    LM_TMP(("KZ: Content-Type is: application/ld+json"));
 
-    if (contextInHttpHeader == true)
+    if (orionldState.link != NULL)
     {
       errorTitle   = (char*) "@context in Link HTTP Header";
       errorDetails = (char*) "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header";
     }
 
-    if (contextInPayload == false)
+    if (orionldState.payloadContextNode == NULL)
     {
       errorTitle   = (char*) "@context missing in JSON payload";
       errorDetails = (char*) "For application/ld+json, the @context must be present in the JSON payload";
@@ -121,7 +135,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
   {
     LM_T(LmtContext, ("Content-Type is: application/json"));
 
-    if (contextInPayload == true)
+    if (orionldState.payloadContextNode != NULL)
     {
       errorTitle   = (char*) "Invalid MIME-type for @context in payload";
       errorDetails = (char*) "For @context in payload, the MIME type must be application/ld+json";
@@ -130,7 +144,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 
   if (errorTitle != NULL)
   {
-    LM_E(("Bad Request (%s: %s)", errorTitle, errorDetails));
+    LM_E(("KZ: Bad Request (%s: %s)", errorTitle, errorDetails));
 
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorTitle, errorDetails, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
@@ -150,13 +164,16 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
 {
   LM_T(LmtAccept, ("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
-  LM_T(LmtAccept, ("ciP->httpHeaders.acceptHeaederV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
+  LM_T(LmtAccept, ("ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
+  LM_TMP(("KZ: ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
+  LM_TMP(("KZ: ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
     orionldState.acceptJson   = true;   // Default Accepted MIME-type is application/json
     orionldState.acceptJsonld = false;
     ciP->outMimeType          = JSON;
+    LM_TMP(("KZ: Default accept; JSON and NOT JSONLD"));
   }
 
   for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
@@ -265,16 +282,53 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
+// kjTreeFirstLevelPresent
+//
+static void kjTreeFirstLevelPresent(const char* what, KjNode* tree)
+{
+  LM_TMP(("KZ: --------------- %s ----------------", what));
+
+  if (tree == NULL)
+  {
+    LM_TMP(("KZ: Empty tree"));
+    return;
+  }
+
+  int ix = 0;
+  for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    LM_TMP(("KZ: node %d: %s", ix, nodeP->name));
+    ++ix;
+  }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjNodeDecouple -
 //
 static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
 {
-#if 0
+  LM_TMP(("KZ: Removing '%s' from the KjNode tree", nodeToDecouple->name));
+  kjTreeFirstLevelPresent("Before decoupling", parent);
+
   if (prev != NULL)
+  {
+    if (nodeToDecouple->next != NULL)
+      LM_TMP(("KZ: Making '%s' point to '%s'", prev->name, nodeToDecouple->next->name));
+    else
+      LM_TMP(("KZ: Making '%s' point to NULL", prev->name));
+
     prev->next = nodeToDecouple->next;
+  }
   else
+  {
     parent->value.firstChildP = nodeToDecouple->next;
-#endif
+  }
+
+  kjTreeFirstLevelPresent("After decoupling", parent);
 }
 
 
@@ -328,62 +382,82 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   // If ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID is set in Service Options, also look up entity::id,type
   //
-  if (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID)
+  if (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE)
   {
-    KjNode* prev = NULL;
+    KjNode* prev      = NULL;
+    KjNode* attrNodeP = orionldState.requestTree->value.firstChildP;
 
-    for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+    kjTreeFirstLevelPresent("Before Removing", orionldState.requestTree);
+    while (attrNodeP != NULL)
     {
       if (attrNodeP->name == NULL)
+      {
+        attrNodeP = attrNodeP->next;
         continue;
+      }
 
       if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
       {
-        if (orionldState.contextTree != NULL)
+        if (orionldState.payloadContextNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "@context", OrionldDetailsString);
           return false;
         }
 
-        orionldState.contextTree = attrNodeP;
-        LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.contextTree));
+        orionldState.payloadContextNode = attrNodeP;
+        LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.payloadContextNode));
 
-        kjNodeDecouple(orionldState.contextTree, prev, orionldState.requestTree);
+        attrNodeP = orionldState.payloadContextNode->next;
+        kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
       }
-
-      if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0))
+      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0))
       {
-        if (orionldState.entityIdTree != NULL)
+        if (orionldState.payloadIdNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:id'"));
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "Entity:id", OrionldDetailsString);
           return false;
         }
 
-        orionldState.entityIdTree = attrNodeP;
-        LM_T(LmtContext, ("Found Entity::id in the payload (%p)", orionldState.entityIdTree));
+        orionldState.payloadIdNode = attrNodeP;
+        STRING_CHECK(orionldState.payloadIdNode, "entity id");
+        LM_T(LmtContext, ("Found Entity::id in the payload (%p)", orionldState.payloadIdNode));
 
-        kjNodeDecouple(orionldState.entityIdTree, prev, orionldState.requestTree);
+        attrNodeP = orionldState.payloadIdNode->next;
+        kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
       }
-
-      if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0))
+      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0))
       {
-        if (orionldState.entityTypeTree != NULL)
+        if (orionldState.payloadTypeNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:type'"));
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "Entity:type", OrionldDetailsString);
           return false;
         }
 
-        orionldState.entityTypeTree = attrNodeP;
-        LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.entityTypeTree));
+        orionldState.payloadTypeNode = attrNodeP;
 
-        kjNodeDecouple(orionldState.entityTypeTree, prev, orionldState.requestTree);
+        STRING_CHECK(orionldState.payloadTypeNode, "entity type");
+        extern bool orionldValidName(char* name, char** detailsPP);
+        char* details;
+        if (orionldValidName(orionldState.payloadTypeNode->value.s, &details) == false)
+        {
+          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid entity type name", details, OrionldDetailsString);
+          return false;
+        }
+        LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.payloadTypeNode));
+
+        attrNodeP = orionldState.payloadTypeNode->next;
+        kjNodeDecouple(orionldState.payloadTypeNode, prev, orionldState.requestTree);
       }
-
-      prev = attrNodeP;
+      else
+      {
+        prev      = attrNodeP;
+        attrNodeP = attrNodeP->next;
+      }
     }
+    kjTreeFirstLevelPresent("After Removing ALL 3", orionldState.requestTree);
   }
   else
   {
@@ -396,17 +470,17 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
 
       if (SCOMPARE9(attrNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
       {
-        if (orionldState.contextTree != NULL)
+        if (orionldState.payloadContextNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "@context", OrionldDetailsString);
           return false;
         }
 
-        orionldState.contextTree = attrNodeP;
-        LM_T(LmtContext, ("Found a @context in the payload (%p)", orionldState.contextTree));
+        orionldState.payloadContextNode = attrNodeP;
+        LM_T(LmtContext, ("Found a @context in the payload (%p)", orionldState.payloadContextNode));
 
-        kjNodeDecouple(orionldState.entityIdTree, prev, orionldState.requestTree);
+        kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
       }
 
       prev = attrNodeP;
@@ -414,27 +488,16 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   }
 
 
-  if (orionldState.contextTree != NULL)
+  if (orionldState.payloadContextNode != NULL)
   {
-#if 0
-    orionldState.contextTree->next = NULL;
-#endif
-
     // A @context in the payload must be a JSON String, Array, or an Object
-    if ((orionldState.contextTree->type != KjString) && (orionldState.contextTree->type != KjArray) && (orionldState.contextTree->type != KjObject))
+    if ((orionldState.payloadContextNode->type != KjString) && (orionldState.payloadContextNode->type != KjArray) && (orionldState.payloadContextNode->type != KjObject))
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context", OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
   }
-
-#if 0
-  if (orionldState.entityTypeTree != NULL)
-    orionldState.entityTypeTree->next = NULL;
-  if (orionldState.entityIdTree != NULL)
-    orionldState.entityIdTree->next = NULL;
-#endif
 
   //
   // If Content-Type is application/ld+json and Accept does not include application/ld+json and the @context is in the payload,
@@ -449,7 +512,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //   o The @context in the payload is not a simple URI string
   //   o The HTTP Accept header does not include application/ld+json => application/json should be returned
   //
-  if ((orionldState.contextTree != NULL) && (orionldState.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (orionldState.contextTree->type != KjString))
+  if ((orionldState.payloadContextNode != NULL) && (orionldState.acceptJsonld == false) && (orionldState.useLinkHeader == true) && (orionldState.payloadContextNode->type != KjString))
     *contextToBeCreatedP = true;
 
   return true;
@@ -600,6 +663,12 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // FIXME: Check the @context from payload ... move from orionldPostEntities()
   //
+  //
+  // First treat the @context, if none, use the default context
+  // orionldContextTreat needs ceP to push the '@context' attribute to the ContextElement.
+  //
+  if ((orionldState.payloadContextNode != NULL) && (orionldContextTreat(ciP, orionldState.payloadContextNode, NULL) == false))
+      goto respond;
 
 
   // ********************************************************************************************
@@ -610,8 +679,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
   LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
 
-  LM_TMP(("KZ: serviceRoutine OK? %s, contextToBeCreated: %s", FT(serviceRoutineResult), FT(contextToBeCreated)));
-  if ((serviceRoutineResult == true) && (contextToBeCreated == true))
+  //
+  // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
+  // the HTTP status code defaults to 400
+  //
+  LM_TMP(("KZ: serviceRoutine OK? %s, contextToBeCreated: %s, ciP->httpStatusCode: %d", FT(serviceRoutineResult), FT(contextToBeCreated), ciP->httpStatusCode));
+  if ((serviceRoutineResult == false) && (ciP->httpStatusCode < 400))
+    ciP->httpStatusCode = SccBadRequest;
+  else if ((serviceRoutineResult == true) && (contextToBeCreated == true))
   {
     LM_TMP(("KZ: Creating the context in Context Server"));
     //
@@ -619,7 +694,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
 
     // The Context tree must be cloned, as it is created inside the thread's kjson
-    KjNode* clonedTree = kjClone(orionldState.contextTree);
+    KjNode* clonedTree = kjClone(orionldState.payloadContextNode);
 
     if (clonedTree == NULL)
     {
@@ -683,15 +758,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     orionldState.link          = urlP;
     orionldState.useLinkHeader = true;
-  }
-  else if (serviceRoutineResult == false)
-  {
-    //
-    // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
-    // the HTTP status code defaults to 400
-    //
-    if (ciP->httpStatusCode < 400)
-      ciP->httpStatusCode = SccBadRequest;
   }
 
 

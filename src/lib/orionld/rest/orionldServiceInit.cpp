@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/serviceRoutines/orionldPostEntities.h"       // orionldPostEntities
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
 
 
@@ -195,7 +196,12 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //
   if (serviceP->serviceRoutine == orionldPostEntities)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID;
+    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+  }
+  else if (serviceP->serviceRoutine == orionldPostSubscriptions)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
 }

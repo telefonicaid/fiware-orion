@@ -61,6 +61,7 @@ static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
     LM_E(("Invalid context '%s': %s", url, details));
     orionldState.contextP = NULL;  // Leak?
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
     return NULL;
   }
 
@@ -119,7 +120,6 @@ bool orionldContextTreat
 (
   ConnectionInfo*     ciP,
   KjNode*             contextNodeP,
-  char*               entityId,
   ContextAttribute**  caPP
 )
 {
@@ -131,6 +131,7 @@ bool orionldContextTreat
     {
       LM_E(("Failed to create context from URL: %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -148,7 +149,8 @@ bool orionldContextTreat
     //
     // contextUrl = "http://" host + ":" + port + "/ngsi-ld/ex/v1/contexts/" + entity.id;
     //
-    unsigned int  linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(entityId) + 1;
+    const char*   contextId   = (orionldState.payloadIdNode != NULL)? orionldState.payloadIdNode->value.s : "ContextID";
+    unsigned int  linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(contextId) + 1;
     char          linkPathV[256];
     char*         linkPath;
 
@@ -159,13 +161,14 @@ bool orionldContextTreat
       {
         LM_E(("out of memory creating Link HTTP Header"));
         orionldErrorResponseCreate(ciP, OrionldInternalError, "Cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
         return false;
       }
     }
     else
       linkPath = linkPathV;
 
-    snprintf(linkPath, linkPathLen, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), entityId);
+    snprintf(linkPath, linkPathLen, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), contextId);
 
     orionldState.contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
 
@@ -176,6 +179,7 @@ bool orionldContextTreat
     {
       LM_E(("Failed to create context from Tree : %s", details));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from tree", details, OrionldDetailsString);
+      ciP->httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -199,11 +203,12 @@ bool orionldContextTreat
       }
       else if (contextArrayItemP->type == KjObject)
       {
-        if (orionldContextTreat(ciP, contextArrayItemP, entityId, caPP) == false)
+        if (orionldContextTreat(ciP, contextArrayItemP, caPP) == false)
         {
           LM_E(("Error treating context object inside array"));
           orionldState.contextP = NULL;  // Leak?
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error treating context object inside array", NULL, OrionldDetailsString);
+          ciP->httpStatusCode = SccBadRequest;
           return false;
         }
       }
@@ -212,6 +217,7 @@ bool orionldContextTreat
         LM_E(("Context Array Item is not a String nor an Object, but of type '%s'", kjValueType(contextArrayItemP->type)));
         orionldState.contextP = NULL;  // Leak?
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Array Item is of an unsupported type", NULL, OrionldDetailsString);
+        ciP->httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -241,6 +247,7 @@ bool orionldContextTreat
     LM_E(("invalid JSON type of @context member"));
     orionldState.contextP = NULL;  // Leak?
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", "invalid JSON type of @context member", OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -261,6 +268,7 @@ bool orionldContextTreat
   if (orionldUserContextKeyValuesCheck(orionldState.contextP->tree, orionldState.contextP->url, &details) == false)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context", details, OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 #endif
