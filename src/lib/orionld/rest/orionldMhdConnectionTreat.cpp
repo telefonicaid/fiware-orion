@@ -791,6 +791,20 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       httpHeaderLinkAdd(ciP, orionldState.link);
     }
 
+#if 0
+    //
+    // Should a @context be added to the response payload?
+    //
+    if ((orionldState.acceptJsonld == true) && (ciP->httpStatusCode < 300))
+    {
+      //
+      // ToDo:
+      //   - Make a KjNode out of orionldState.contextP
+      //   - Insert the new KjNode as first member of orionldState.responseTree
+      //
+    }
+#endif
+
     // FIXME: Smarter allocation !!!
     int bufLen = 1024 * 1024 * 32;
     orionldState.responsePayload = (char*) malloc(bufLen);

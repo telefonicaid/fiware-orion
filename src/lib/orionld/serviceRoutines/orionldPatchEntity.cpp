@@ -33,6 +33,7 @@
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
@@ -133,13 +134,11 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     KjNode*            attrTypeNodeP = NULL;
     ContextAttribute*  caP           = new ContextAttribute();
 
-    // FIXME: Move attributeTreat to separate file
-    extern bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP);
-    if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
+    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
       mongoRequest.release();
-      ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
-      LM_E(("attributeTreat failed"));
+      ciP->httpStatusCode = SccBadRequest;
+      LM_E(("orionldAttributeTreat failed"));
       delete caP;
       return false;
     }
