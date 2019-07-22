@@ -167,7 +167,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
       mongoRequest.release();
-      ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'orionldAttributeTreat' - could be 500, not 400 ...
       LM_E(("orionldAttributeTreat failed"));
       delete caP;
       return false;

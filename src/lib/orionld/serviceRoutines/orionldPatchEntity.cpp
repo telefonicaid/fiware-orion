@@ -137,7 +137,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
       mongoRequest.release();
-      ciP->httpStatusCode = SccBadRequest;
       LM_E(("orionldAttributeTreat failed"));
       delete caP;
       return false;

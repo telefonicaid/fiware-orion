@@ -229,8 +229,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   char*    entityId           = orionldState.payloadIdNode->value.s;
   char*    entityType         = orionldState.payloadTypeNode->value.s;
 
-  orionldState.useLinkHeader  = false;  // FIXME: WHY???   Remove and see what happens
-
   if ((urlCheck(entityId, &details) == false) && (urnCheck(entityId, &details) == false))
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN", OrionldDetailsString);
@@ -364,7 +362,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
       {
         LM_E(("orionldAttributeTreat failed"));
-        ciP->httpStatusCode = SccBadRequest;  // FIXME: set HTTP Status Code inside 'orionldAttributeTreat'?
         delete caP;
         mongoRequest.release();
         return false;
