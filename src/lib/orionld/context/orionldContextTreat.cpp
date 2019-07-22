@@ -32,7 +32,6 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/rest.h"                                         // restPortGet
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                  // orionldState
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostNameLen
@@ -119,8 +118,7 @@ static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
 bool orionldContextTreat
 (
   ConnectionInfo*     ciP,
-  KjNode*             contextNodeP,
-  ContextAttribute**  caPP
+  KjNode*             contextNodeP
 )
 {
   if (contextNodeP->type == KjString)
@@ -203,7 +201,7 @@ bool orionldContextTreat
       }
       else if (contextArrayItemP->type == KjObject)
       {
-        if (orionldContextTreat(ciP, contextArrayItemP, caPP) == false)
+        if (orionldContextTreat(ciP, contextArrayItemP) == false)
         {
           LM_E(("Error treating context object inside array"));
           orionldState.contextP = NULL;  // Leak?
@@ -273,67 +271,5 @@ bool orionldContextTreat
   }
 #endif
 
-  if (caPP == NULL)
-  {
-    return true;
-  }
-
-  // Create a context attribute of the context
-  ContextAttribute* caP = NULL;
-  LM_T(LmtContextTreat, ("The @context is treated as an attribute"));
-
-  // The attribute's value is either a string or a vector (compound)
-  if (contextNodeP->type == KjString)
-  {
-    caP = new ContextAttribute("@context", "ContextString", contextNodeP->value.s);
-  }
-  else if (contextNodeP->type == KjArray)
-  {
-    // Create the Compound, just a vector of strings
-    orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeVector);
-    int                       siblingNo = 0;
-
-    // Loop over the kNode vector and create the strings
-    for (KjNode* contextItemNodeP = contextNodeP->value.firstChildP; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
-    {
-      LM_T(LmtContextTreat, ("string: %s", contextItemNodeP->value.s));
-      orion::CompoundValueNode* stringNode = new orion::CompoundValueNode(compoundP, "", "", contextItemNodeP->value.s, siblingNo++, orion::ValueTypeString);
-
-      compoundP->add(stringNode);
-    }
-
-    // Now set 'compoundP' as value of the attribute
-    caP = new ContextAttribute();
-
-    caP->type           = "ContextVector";
-    caP->name           = "@context";
-    caP->valueType      = orion::ValueTypeObject;  // All compounds have Object as value type (I think)
-    caP->compoundValueP = compoundP;
-  }
-  else if (contextNodeP->type == KjObject)
-  {
-    orion::CompoundValueNode* compoundP = new orion::CompoundValueNode(orion::ValueTypeObject);
-    int                       siblingNo = 0;
-
-    // Loop over the kNode tree and create the strings
-    for (KjNode* contextItemNodeP = contextNodeP->value.firstChildP; contextItemNodeP != NULL; contextItemNodeP = contextItemNodeP->next)
-    {
-      LM_T(LmtContextTreat, ("string: %s", contextItemNodeP->value.s));
-      orion::CompoundValueNode* stringNode = new orion::CompoundValueNode(compoundP, "", "", contextItemNodeP->value.s, siblingNo++, orion::ValueTypeString);
-
-      compoundP->add(stringNode);
-    }
-
-    // Now set 'compoundP' as value of the attribute
-    caP = new ContextAttribute();
-
-    caP->type           = "ContextObject";
-    caP->name           = "@context";
-    caP->valueType      = orion::ValueTypeObject;
-    caP->compoundValueP = compoundP;
-  }
-
-  *caPP = caP;
-
-  return caP;
+  return true;
 }

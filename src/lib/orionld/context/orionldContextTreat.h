@@ -31,7 +31,6 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "ngsi/ContextAttribute.h"                           // ContextAttribute
 
 
 
@@ -42,8 +41,7 @@ extern "C"
 extern bool orionldContextTreat
 (
   ConnectionInfo*     ciP,
-  KjNode*             contextNodeP,
-  ContextAttribute**  csPP
+  KjNode*             contextNodeP
 );
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_

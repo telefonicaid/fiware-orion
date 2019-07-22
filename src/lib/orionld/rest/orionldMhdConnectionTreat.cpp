@@ -667,7 +667,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // First treat the @context, if none, use the default context
   // orionldContextTreat needs ceP to push the '@context' attribute to the ContextElement.
   //
-  if ((orionldState.payloadContextNode != NULL) && (orionldContextTreat(ciP, orionldState.payloadContextNode, NULL) == false))
+  if ((orionldState.payloadContextNode != NULL) && (orionldContextTreat(ciP, orionldState.payloadContextNode) == false))
       goto respond;
 
 
