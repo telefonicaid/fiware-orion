@@ -305,11 +305,6 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
     {
       // Ignored - read-only
     }
-    else if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
-    {
-      STRING_CHECK(kNodeP, "Subscription::@context");
-      subP->ldContext = kNodeP->value.s;
-    }
     else
     {
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Subscription", kNodeP->name, OrionldDetailsString);
