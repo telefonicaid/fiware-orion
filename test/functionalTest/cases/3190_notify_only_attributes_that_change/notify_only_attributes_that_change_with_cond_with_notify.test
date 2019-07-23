@@ -39,9 +39,9 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
 # 07. Dump and reset accumulator, see B and C.
 # 08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
-# 09. Dump and reset accumulator, see C.
+# 09. Dump and reset accumulator, see C and D.
 # 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
-# 11. Dump and reset accumulator, see B and C.
+# 11. Dump and reset accumulator, see B, C and D.
 # 12. PATCH /v2/entities/Room1/attrs, update the value of A attribute.
 # 13. Dump and reset accumulator, see nothing.
 #
