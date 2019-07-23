@@ -740,13 +740,16 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
   //
   // Context in Link HTTP header?
-  //   YES - if JSONLD is accepted
-  //   NO  - if there isn't any payload!
-  //   NO  - if the service routine explicitly has asked to not include the Link HTTP header in the response
+  //    YES - if payloadParseAndExtractSpecialFields() says so (setting contextToBeCashed to true)
+  //     NO - if service routine resulted in error
+  // OR
+  //    YES - if JSONLD is accepted
+  //    NO  - if there isn't any payload!
+  //    NO  - if the service routine explicitly has asked to not include the Link HTTP header in the response
   //
-  if ((orionldState.acceptJsonld == false) && (orionldState.responseTree != NULL) && (orionldState.useLinkHeader == true))
+  if ((contextToBeCashed == true) && (serviceRoutineResult == true))
     httpHeaderLinkAdd(ciP, orionldState.link);
-  else if (contextToBeCashed)
+  else if ((orionldState.acceptJsonld == false) && (orionldState.responseTree != NULL) && (orionldState.useLinkHeader == true))
     httpHeaderLinkAdd(ciP, orionldState.link);
 
   //
