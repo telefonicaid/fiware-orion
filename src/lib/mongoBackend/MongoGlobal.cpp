@@ -2342,8 +2342,7 @@ void subToNotifyList
       }
       else
       {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, condAttrs);
-        getCommonAttributes(true, condAttrs, conditionVector, notifyAttrs);
+        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
       }
       if (notifyAttrs.size() == 0 && (conditionVector.size() != 0 || notificationVector.size() != 0))
       {

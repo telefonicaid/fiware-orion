@@ -496,15 +496,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   // Attributes
   std::string errorString;
 
-  if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs") && notification.HasMember("onlyChangedAttrs"))
-  {
-    return badInput(ciP, "http notification has attrs onlyChangedAttrs and exceptAttrs");
-  }
-  else if (notification.HasMember("onlyChangedAttrs") && !notification.HasMember("attrs") && !notification.HasMember("exceptAttrs"))
-  {
-    return badInput(ciP, "http notification has onlyChangedAttrs and neither attrs nor exceptAttrs");
-  }
-  else if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
+  if (notification.HasMember("attrs") && notification.HasMember("exceptAttrs"))
   {
     return badInput(ciP, "http notification has attrs and exceptAttrs");
   }

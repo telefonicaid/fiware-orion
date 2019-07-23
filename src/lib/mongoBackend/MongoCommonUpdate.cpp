@@ -951,48 +951,6 @@ static std::string servicePathSubscriptionRegex(const std::string& servicePath, 
 
 /* ****************************************************************************
 *
-* getCommonAttributes -
-*/
-/*static void getCommonAttributes
-(
-  const bool                        type,
-  const std::vector<std::string>&   fVector,
-  const std::vector<std::string>&   sVector,
-  std::vector<std::string>&         resultVector
-)
-{
-  if (type)
-  {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
-    {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
-        if (fVector[cavOc] == sVector[avOc])
-        {
-          resultVector.push_back(fVector[cavOc]);
-        }
-      }
-    }
-  }
-  else
-  {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
-    {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
-        if (fVector[cavOc] != sVector[avOc])
-        {
-          resultVector.push_back(fVector[cavOc]);
-        }
-      }
-    }
-  }
-}*/
-
-
-
-/* ****************************************************************************
-*
 * addTriggeredSubscriptions_withCache
 */
 static bool addTriggeredSubscriptions_withCache

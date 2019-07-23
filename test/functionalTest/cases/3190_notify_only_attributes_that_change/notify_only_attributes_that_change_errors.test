@@ -142,29 +142,25 @@ echo
 01. POST /v2/subscriptions, create subscription with attrs, exceptAttrs and onlyChangedAttrs.
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 99
+Content-Length: 82
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "http notification has attrs onlyChangedAttrs and exceptAttrs", 
+    "description": "http notification has attrs and exceptAttrs", 
     "error": "BadRequest"
 }
 
 
 02. POST /v2/subscriptions, create subscription with onlyChangedAttrs.
 ======================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 111
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "description": "http notification has onlyChangedAttrs and neither attrs nor exceptAttrs", 
-    "error": "BadRequest"
-}
 
 
 03. POST /v2/subscriptions, create subscription with attrs and onlyChangedAttrs set to incorrect value.

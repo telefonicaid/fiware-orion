@@ -33,8 +33,8 @@ brokerStart CB
 #
 # 01. POST /v2/subscriptions, Create a subscription with onlyChanged: true.
 # 02. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: true is rendered
-# 05. PATCH /v2/subscriptions/{subscription_id}, Modify subscription to change onlyChanged to false
-# 06. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: false is rendered
+# 03. PATCH /v2/subscriptions/{subscription_id}, Modify subscription to change onlyChanged to false
+# 04. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: false is rendered
 #
 
 
