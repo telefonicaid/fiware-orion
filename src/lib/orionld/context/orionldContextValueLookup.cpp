@@ -64,6 +64,21 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
 {
   *useStringValueP = false;
 
+  //
+  // FIXME:
+  //
+  //   - Does the context tree point to the "value" of "@context": value ?
+  //
+  //   - Or is it an object with a "@context" member?
+  //     {
+  //       "@context": {
+  //         ...
+  //       }
+  //     }
+  //
+  //   If it's the latter case, make the tree point to the value of the "@context" item
+  //
+
   if (contextP == NULL)
     return NULL;
 
@@ -236,9 +251,14 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
   }
   else if (atContextP->type == KjString)
   {
-    KjNode* nodeP = orionldContextValueLookup(atContextP->value.s, value, useStringValueP);
-    if (nodeP != NULL)
-      return nodeP;
+    for (KjNode* contextItemP = contextP->tree->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
+    {
+      if (strcmp(contextItemP->value.s, value) == 0)
+      {
+        LM_T(LmtContextValueLookup, ("found it!"));
+        return contextItemP;
+      }
+    }
   }
 
   LM_T(LmtContextValueLookup, ("found no expansion: returning NULL :("));

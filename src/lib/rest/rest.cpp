@@ -590,7 +590,8 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
 #ifdef ORIONLD
   else if (strcasecmp(key.c_str(), HTTP_LINK) == 0)
   {
-    orionldState.link = (char*) value;
+    orionldState.link                  = (char*) value;
+    orionldState.linkHttpHeaderPresent = true;
   }
 #endif
   else

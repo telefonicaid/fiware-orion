@@ -69,10 +69,11 @@ typedef struct OrionldConnectionState
   char*                   responsePayload;
   bool                    responsePayloadAllocated;
   char*                   tenant;
+  bool                    linkHttpHeaderPresent;
   char*                   link;
-  bool                    useLinkHeader;
-  bool                    linkToBeFreed;
+  char                    linkBuffer[1024];
   bool                    linkHeaderAdded;
+  bool                    useLinkHeader;
   OrionldContext          inlineContext;
   OrionldContext*         contextP;
   bool                    contextToBeFreed;

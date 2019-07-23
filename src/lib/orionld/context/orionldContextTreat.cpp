@@ -50,8 +50,6 @@ extern "C"
 //
 static OrionldContext* contextItemNodeTreat(ConnectionInfo* ciP, char* url)
 {
-  LM_TMP(("KZ: Treating contextitem '%s' by calling orionldContextAdd", url));
-
   char*            details;
   OrionldContext*  contextP = orionldContextAdd(ciP, url, OrionldUserContext, &details);
 
@@ -139,39 +137,7 @@ bool orionldContextTreat
   {
     char* details;
 
-    LM_TMP(("KZ: Context is an Array"));
-    //
-    // REMEMBER
-    //   This context is just the array of context-strings: [ "url1", "url2" ]
-    //   The individual contexts (the items of the vector - "url1", ...) are treated a few lines down
-    //
-    // contextUrl = "http://" host + ":" + port + "/ngsi-ld/ex/v1/contexts/" + entity.id;
-    //
-    const char*   contextId   = (orionldState.payloadIdNode != NULL)? orionldState.payloadIdNode->value.s : "ContextID";
-    unsigned int  linkPathLen = 7 + orionldHostNameLen + 1 + 5 + 27 + strlen(contextId) + 1;
-    char          linkPathV[256];
-    char*         linkPath;
-
-    if (linkPathLen > sizeof(linkPathV))
-    {
-      linkPath = (char*) malloc(linkPathLen);
-      if (linkPath == NULL)
-      {
-        LM_E(("out of memory creating Link HTTP Header"));
-        orionldErrorResponseCreate(ciP, OrionldInternalError, "Cannot create Link HTTP Header", "out of memory", OrionldDetailsString);
-        ciP->httpStatusCode = SccBadRequest;
-        return false;
-      }
-    }
-    else
-      linkPath = linkPathV;
-
-    snprintf(linkPath, linkPathLen, "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", orionldHostName, restPortGet(), contextId);
-
-    orionldState.contextP = orionldContextCreateFromTree(contextNodeP, linkPath, OrionldUserContext, &details);
-
-    if (linkPath != linkPathV)
-      free(linkPath);  // orionldContextCreateFromTree strdups the URL
+    orionldState.contextP = orionldContextCreateFromTree(contextNodeP, orionldState.link, OrionldUserContext, &details);
 
     if (orionldState.contextP == NULL)
     {
@@ -230,7 +196,7 @@ bool orionldContextTreat
       return false;
     }
 
-    orionldState.inlineContext.url       = (char*) "inline context";
+    orionldState.inlineContext.url       = orionldState.link;
     orionldState.inlineContext.tree      = contextNodeP;
     orionldState.inlineContext.type      = OrionldUserContext;
     orionldState.inlineContext.ignore    = false;

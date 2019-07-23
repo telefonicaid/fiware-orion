@@ -39,6 +39,8 @@ brokerStart CB 0-255 --prettyPrint
 # 06. Get the entity, with its creation context, see only P3 and with shortname, as P3 is found in creation context
 #
 
+HOST=$(hostname)
+
 echo "01. Create an entity with three attrs P1-P3, Using an inline context, where P1, P2, and P3 is defined"
 echo "====================================================================================================="
 payload='{
@@ -69,7 +71,7 @@ echo
 
 echo "02. Delete P1 using the alias and the context created for the entity"
 echo "===================================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P1 -X DELETE -H 'Link: <http://localhost:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P1 -X DELETE -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -97,7 +99,6 @@ echo
 
 echo "06. Get the entity, with its creation context, see only P3 and with shortname, as P3 is found in creation context"
 echo "================================================================================================================="
-HOST=$(hostname)
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14 -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix
 echo
 echo
