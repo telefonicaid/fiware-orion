@@ -87,6 +87,15 @@ typedef struct OrionLdRestServiceSimplifiedVector
 
 // -----------------------------------------------------------------------------
 //
+// Options
+//
+#define ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE  (1 << 0)
+#define ORIONLD_SERVICE_OPTION_CREATE_CONTEXT        (1 << 1)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionLdRestService -
 //
 // NOTE
@@ -105,6 +114,7 @@ typedef struct OrionLdRestService
   int                    charsBeforeSecondWildcardSum;  // -"- 'a' + 't' + 't' + 'r' + 's' - used to find start of wildcard no 2
   char                   matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
   int                    matchForSecondWildcardLen;     // strlen of last path to match
+  uint32_t               options;                       // Peculiarities of this type of requests
 } OrionLdRestService;
 
 

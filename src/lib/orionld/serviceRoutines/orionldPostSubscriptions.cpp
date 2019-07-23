@@ -84,11 +84,15 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   std::string          subId;
   OrionError           oError;
 
-  LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
+  if (orionldState.contextP != NULL)
+    sub.ldContext = orionldState.contextP->url;
+  else
+    sub.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
 
   // FIXME: attrsFormat should be set to default by constructor
   sub.attrsFormat = DEFAULT_RENDER_FORMAT;
 
+  LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
   char* subIdP = NULL;
   if (kjTreeToSubscription(ciP, &sub, &subIdP) == false)
   {
@@ -115,9 +119,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Create the subscription
   //
-  if (sub.ldContext == "")
-    sub.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
-
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   orionldState.tenant,

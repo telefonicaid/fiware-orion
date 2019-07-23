@@ -33,6 +33,7 @@ SET (SOURCES
     geoJsonCreate.cpp
     numberToDate.cpp
     orionldState.cpp
+    orionldAttributeTreat.cpp
 )
 
 # Include directories

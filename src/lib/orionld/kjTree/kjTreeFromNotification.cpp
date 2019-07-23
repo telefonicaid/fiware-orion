@@ -60,9 +60,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextLookup(context);
 
-  LM_TMP(("NOTIF: mimeType == %d", mimeType));
-  LM_TMP(("NOTIF: context  == %s", context));
-
   // id
   strcpy(&idBuffer[25], id);
   nodeP = kjString(orionldState.kjsonP, "id", idBuffer);

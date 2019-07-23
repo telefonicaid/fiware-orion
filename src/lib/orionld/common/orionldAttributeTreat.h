@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
 
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,21 +27,18 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                    // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                             // ConnectionInfo
+#include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldContextTreat -
+// orionldAttributeTreat -
 //
-extern bool orionldContextTreat
-(
-  ConnectionInfo*     ciP,
-  KjNode*             contextNodeP
-);
+extern bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTTREAT_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_

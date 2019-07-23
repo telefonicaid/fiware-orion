@@ -133,6 +133,7 @@ echo
 echo "10. POST /ngsi-ld/v1/subscriptions"
 echo "=================================="
 payload='{
+  "type": "Subscription",
   "watchedAttributes": [ "A1", "A2" ],
   "isActive": false,
   "notification": {

@@ -530,7 +530,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       // Only interested in the attribute "@context"
       qReq.attributeList.push_back("@context");
 
-      // mongoQueryContext requires a ServicePath, even though ngsi-ld doesn't support service paths
+      // ngsi-ld doesn't support service paths, but mongoQueryContext requires one
       servicePathV.push_back("/#");
 
       HttpStatusCode sCode = mongoQueryContext(&qReq,

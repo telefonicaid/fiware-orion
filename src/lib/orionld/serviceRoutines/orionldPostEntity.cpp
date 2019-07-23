@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/context/orionldContextTreat.h"                 // orionldContextTreat
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
@@ -125,6 +126,9 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
 //
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
+  // Is the payload not a JSON object?
+  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
+
   // 1. Check that the entity exists
   if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
   {
@@ -132,26 +136,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
-
-  // Is the payload empty?
-  if (orionldState.requestTree == NULL)
-  {
-    ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "No payload found", NULL, OrionldDetailsString);
-    return false;
-  }
-
-  // Is the payload not a JSON object?
-  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
-
-  // Is the payload an empty object?
-  if (orionldState.requestTree->value.firstChildP == NULL)
-  {
-    ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
-    return false;
-  }
-
 
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
@@ -174,82 +158,50 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   entityIdP->id = orionldState.wildcard[0];
 
-
-  //
-  // 1. Lookup special nodes and actuate over them
-  //   FIXME: Why not remove them from the tree? Only Properties/Relationships left after that ...
-  //
-  KjNode* contextNodeP = NULL;
-
+  // Iterate over the object, to get all attributes
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    if (SCOMPARE9(kNodeP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+    KjNode*           attrTypeNodeP = NULL;
+    ContextAttribute* caP           = new ContextAttribute();
+
+    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
-      contextNodeP = kNodeP;
-
-      if (orionldContextTreat(ciP, contextNodeP, (char*) entityIdP->id.c_str(), NULL) == false)
-      {
-        // Error payload set by orionldContextTreat
-        mongoRequest.release();
-        return false;
-      }
-
-      // FIXME: Remove the @context node from the tree - to avoid 'if (kNodeP != contextNodeP)' in the following loop
-      break;
+      mongoRequest.release();
+      LM_E(("orionldAttributeTreat failed"));
+      delete caP;
+      return false;
     }
-  }
 
-  // 3. Iterate over the object, to get all attributes
-  for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    KjNode* attrTypeNodeP = NULL;
-
-    if (kNodeP != contextNodeP)
+    //
+    // URI Expansion for the attribute name, except if "location", "observationSpace", or "operationSpace"
+    //
+    if (SCOMPARE9(kNodeP->name,       'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+      caP->name = kNodeP->name;
+    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
+      caP->name = kNodeP->name;
+    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
+      caP->name = kNodeP->name;
+    else
     {
-      ContextAttribute* caP = new ContextAttribute();
+      char  longName[256];
+      char* details;
 
-      // FIXME: Mode attributeTreat to separate file
-      extern bool attributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP);
-      if (attributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
+      if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
       {
-        mongoRequest.release();
-        ciP->httpStatusCode = SccBadRequest;  // FIXME: Should be set inside 'attributeTreat' - could be 500, not 400 ...
-        LM_E(("attributeTreat failed"));
         delete caP;
+        mongoRequest.release();
+        orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
         return false;
       }
 
-      //
-      // URI Expansion for the attribute name, except if "location", "observationSpace", or "operationSpace"
-      //
-      if (SCOMPARE9(kNodeP->name,       'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
-        caP->name = kNodeP->name;
-      else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-        caP->name = kNodeP->name;
-      else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-        caP->name = kNodeP->name;
-      else
-      {
-        char  longName[256];
-        char* details;
-
-        if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
-        {
-          delete caP;
-          mongoRequest.release();
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
-          return false;
-        }
-
-        caP->name = longName;
-      }
-
-      // NO URI Expansion for Attribute TYPE
-      caP->type = attrTypeNodeP->value.s;
-
-      // Add the attribute to the attr vector
-      ceP->contextAttributeVector.push_back(caP);
+      caP->name = longName;
     }
+
+    // NO URI Expansion for Attribute TYPE
+    caP->type = attrTypeNodeP->value.s;
+
+    // Add the attribute to the attr vector
+    ceP->contextAttributeVector.push_back(caP);
   }
 
   //
