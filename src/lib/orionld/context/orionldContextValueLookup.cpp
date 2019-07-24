@@ -37,18 +37,129 @@ extern "C"
 #include "orionld/context/orionldContextValueLookup.h"         // Own interface
 
 
-static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* value)
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextValueLookupInArray -
+//
+static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value, bool* useStringValueP);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextValueLookupInUrl -
+//
+static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* value, bool* useStringValueP)
 {
-  for (KjNode* contextNodeP = contextP->value.firstChildP; contextNodeP != NULL; contextNodeP = contextNodeP->next)
+  LM_TMP(("CTX: Looking up '%s' in URI STRING context '%s'", value, contextUrl));
+
+  OrionldContext* contextP = orionldContextLookup(contextUrl);
+
+  if (contextP == NULL)
   {
-    if (contextNodeP->type != KjString)
+    LM_E(("Can't find context '%s'", contextUrl));
+    return NULL;
+  }
+
+  return orionldContextValueLookup(contextP, value, useStringValueP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextValueLookupInObject -
+//
+static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* value, bool* useStringValueP)
+{
+  LM_TMP(("CTX: Looking up '%s' in OBJECT context '%s'", value, contextP->name));
+
+  if ((contextP->name == NULL) || (strcmp(contextP->name, "@context") == 0))
+  {
+    LM_TMP(("CTX: Looking up '%s' - looping over items in @context", value));
+    for (KjNode* contextItemP = contextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
-      LM_E(("An object context at this level needs to be a collection of key-values"));
+      if (contextItemP->type == KjString)
+      {
+        // Skip members whose value is a string that starts with "@" - they are information, not translations
+        if (contextItemP->value.s[0] == '@')
+        {
+          LM_TMP(("CTX: Skipping '%s'", contextItemP->value.s));
+          continue;
+        }
+        LM_TMP(("CTX: Looking for '%s'. Comparing with '%s'", value, contextItemP->value.s));
+        if (strcmp(contextItemP->value.s, value) == 0)
+          return contextItemP;
+      }
+      else if (contextItemP->type == KjObject)
+      {
+        for (KjNode* idNodeP = contextItemP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
+        {
+          if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
+          {
+            *useStringValueP = false;  // FIXME - useStringValueP not needed!
+            if (strcmp(idNodeP->value.s, value) == 0)
+              return contextItemP;
+          }
+        }
+      }
+      else
+      {
+        LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
+        return NULL;
+      }
+    }
+  }
+  else if (strcmp(contextP->value.firstChildP->name, "@context") == 0)
+  {
+    LM_E(("CTX: First child is called '%s' and its type is '%s'", contextP->value.firstChildP->name, kjValueType(contextP->value.firstChildP->type)));
+    KjNode* firstChildP = contextP->value.firstChildP;
+
+    if (firstChildP->type == KjArray)
+      return orionldContextValueLookupInArray(firstChildP, value, useStringValueP);
+    else if (firstChildP->type == KjObject)
+      return orionldContextValueLookupInObject(firstChildP, value, useStringValueP);
+    else if (firstChildP->type == KjString)
+      return orionldContextValueLookupInUrl(firstChildP->value.s, value, useStringValueP);
+    else
+      LM_E(("CTX: invalid type: %s", kjValueType(firstChildP->type)));
+  }
+  else
+  {
+    LM_E(("CTX: Invalid context: '%s'", contextP->name));
+    return NULL;
+  }
+
+  return NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextValueLookupInArray -
+//
+static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value, bool* useStringValueP)
+{
+  LM_TMP(("CTX: Looking up '%s' in ARRAY context '%s'", value, contextVector->name));
+
+  for (KjNode* contextNodeP = contextVector->value.firstChildP; contextNodeP != NULL; contextNodeP = contextNodeP->next)
+  {
+    KjNode* itemP;
+
+    if (contextNodeP->type == KjString)
+      itemP = orionldContextValueLookupInUrl(contextNodeP->value.s, value, useStringValueP);
+    else if (contextNodeP->type == KjObject)
+      itemP = orionldContextValueLookupInObject(contextNodeP, value, useStringValueP);
+    else
+    {
+      LM_E(("Invalid array member - must be String or Object, not '%s'", kjValueType(contextNodeP->type)));
       return NULL;
     }
 
-    if (strcmp(contextNodeP->value.s, value) == 0)
-      return contextNodeP;
+    if (itemP != NULL)
+      return itemP;
   }
 
   return NULL;
@@ -64,253 +175,18 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, b
 {
   *useStringValueP = false;
 
-  //
-  // FIXME:
-  //
-  //   - Does the context tree point to the "value" of "@context": value ?
-  //
-  //   - Or is it an object with a "@context" member?
-  //     {
-  //       "@context": {
-  //         ...
-  //       }
-  //     }
-  //
-  //   If it's the latter case, make the tree point to the value of the "@context" item
-  //
-
   if (contextP == NULL)
     return NULL;
+
+  LM_TMP(("CTX: Looking up '%s' in context '%s' (which is of type '%s')", value, contextP->url, kjValueType(contextP->tree->type)));
 
   if (contextP->tree->type == KjString)
-  {
-    LM_T(LmtContextValueLookup, ("The context is of type String - must lookup a new context"));
-
-    // Lookup the context
-    OrionldContext* dereferencedContextP = orionldContextLookup(contextP->tree->value.s);
-    if (dereferencedContextP == NULL)
-    {
-      LM_E(("Can't find context '%s'", contextP->tree->value.s));
-      return NULL;  // Or: download it?
-    }
-
-    // Lookup the value
-    LM_T(LmtContextValueLookup, ("Now we can search for '%s' (in context '%s'", value, dereferencedContextP->url));
-    return orionldContextValueLookup(dereferencedContextP, value, useStringValueP);
-  }
+    return orionldContextValueLookupInUrl(contextP->tree->value.s, value, useStringValueP);
   else if (contextP->tree->type == KjArray)
-  {
-    LM_T(LmtContextValueLookup, ("The context is of type Array"));
-
-    for (KjNode* contextNodeP = contextP->tree->value.firstChildP; contextNodeP != NULL; contextNodeP = contextNodeP->next)
-    {
-      if (contextNodeP->type != KjString)
-      {
-        LM_E(("The Context Array must only contain JSON Strings"));
-        return NULL;
-      }
-
-      OrionldContext* dereferencedContextP = orionldContextLookup(contextNodeP->value.s);
-
-      if (dereferencedContextP == NULL)
-      {
-        LM_W(("Can't find context '%s'", contextNodeP->value.s));
-        continue;   // Or: download it?
-      }
-
-      // Lookup the value
-      LM_T(LmtContextValueLookup, ("Now we can search for '%s' in context '%s'", value, dereferencedContextP->url));
-      KjNode* kNodeP = orionldContextValueLookup(dereferencedContextP, value, useStringValueP);
-
-      if (kNodeP != NULL)
-      {
-        LM_T(LmtContextValueLookup, ("Found '%s' in context '%s'", value, dereferencedContextP->url));
-        return kNodeP;
-      }
-    }
-
-    return NULL;
-  }
+    return orionldContextValueLookupInArray(contextP->tree, value, useStringValueP);
   else if (contextP->tree->type == KjObject)
-  {
-    //
-    // JSON Object - only check here. Do the lookup later.
-    // this way, the default context gets the lookup as well
-    //
-    // Now, either we have an inline context, with many key-values, or
-    // the object has a single member "@context".
-    //
-    LM_T(LmtContextValueLookup, ("Looking up '%s' in the %s context '%s'",
-                                 value,
-                                 kjValueType(contextP->tree->type),
-                                 contextP->url));
-#if 0
-    if (contextP->tree->value.firstChildP == NULL)
-    {
-      LM_E(("ERROR: Context tree is a JSON object, but, it has no children!"));
-      return NULL;
-    }
+    return orionldContextValueLookupInObject(contextP->tree, value, useStringValueP);
 
-    if (contextP->tree->value.firstChildP->next != NULL)
-    {
-      LM_E(("ERROR: Context tree is a JSON object, but, it has more than one child! (%s)", contextP->url));
-      return NULL;
-    }
-
-    if (strcmp(contextP->tree->value.firstChildP->name, "@context") != 0)
-    {
-      LM_E(("Context tree is a JSON object, and it has exactly one child, but its name must be '@context', not '%s'",
-            contextP->tree->value.firstChildP->name));
-      return NULL;
-    }
-#endif
-  }
-  else
-  {
-    LM_E(("The '@context' is a %s - must be either Object, String or Array",
-          kjValueType(contextP->tree->value.firstChildP->type)));
-    return NULL;
-  }
-
-  //
-  // If we reach this point, the context is a JSON Object
-  //
-  KjNode*  atContextP    = contextP->tree->value.firstChildP;
-
-  LM_T(LmtContextValueLookup, ("@context is of type '%s'", kjValueType(atContextP->type)));
-
-  if (atContextP->type == KjObject)
-  {
-    for (KjNode* contextItemP = atContextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
-    {
-      if ((contextItemP->type != KjString) && (contextItemP->type !=  KjObject))
-      {
-        LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s",
-              kjValueType(contextItemP->type)));
-        return NULL;
-      }
-
-      //
-      // Skip members whose value is a string that starts with "@" - they are information, not translations
-      //
-      if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@'))
-      {
-        LM_T(LmtContextValueLookup, ("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
-        continue;
-      }
-
-
-      if (contextItemP->type == KjObject)
-      {
-        //
-        // Does the value of the item '@id' inside the object match the long-name?
-        //   Lookup item "@id" inside contextItemP that is a JSON object ...
-        //   and return contextItemP (its 'name' is the alias) if @iud matches the long-name)
-        //
-        for (KjNode* idNodeP = contextItemP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
-        {
-          if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
-          {
-            *useStringValueP = false;  // FIXME - useStringValueP not needed!
-            if (strcmp(idNodeP->value.s, value) == 0)
-            {
-              return contextItemP;
-            }
-          }
-        }
-      }
-      else if (contextItemP->type == KjString)
-      {
-        LM_T(LmtContextValueLookup, ("looking for '%s', comparing with '%s' that has the value '%s'", value, contextItemP->name, contextItemP->value.s));
-        if (strcmp(contextItemP->value.s, value) == 0)
-        {
-          LM_T(LmtContextValueLookup, ("found it!"));
-          return contextItemP;
-        }
-      }
-      else
-      {
-        // error
-      }
-    }
-  }
-  else if (atContextP->type == KjArray)
-  {
-    for (KjNode* contextP = atContextP->value.firstChildP; contextP != NULL; contextP = contextP->next)
-    {
-      KjNode* nodeP;
-
-      if (contextP->type == KjString)
-        nodeP = orionldContextValueLookup(contextP->value.s, value, useStringValueP);
-      else
-        nodeP = orionldContextValueLookupInObject(contextP, value);
-
-      if (nodeP != NULL)
-        return nodeP;
-    }
-  }
-  else if (atContextP->type == KjString)
-  {
-    for (KjNode* contextItemP = contextP->tree->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
-    {
-      if (strcmp(contextItemP->value.s, value) == 0)
-      {
-        LM_T(LmtContextValueLookup, ("found it!"));
-        return contextItemP;
-      }
-    }
-  }
-
-  LM_T(LmtContextValueLookup, ("found no expansion: returning NULL :("));
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextValueLookup -
-//
-KjNode* orionldContextValueLookup(char* contextUrl, const char* value, bool* useStringValueP)
-{
-  OrionldContext* contextP = orionldContextLookup(contextUrl);
-
-  if (contextP == NULL)
-    return NULL;
-
-  return orionldContextValueLookup(contextP, value, useStringValueP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextValueLookup -
-//
-KjNode* orionldContextValueLookup(KjNode* contextVector, const char* value, bool* useStringValueP)
-{
-  if (contextVector->type != KjArray)
-  {
-    LM_E(("Not an Array"));
-    return NULL;
-  }
-
-  KjNode* contextNodeP = contextVector->value.firstChildP;
-  KjNode* itemP;
-
-  while (contextNodeP != NULL)
-  {
-    OrionldContext* contextP = orionldContextLookup(contextNodeP->value.s);
-
-    if (contextP == NULL)
-      return NULL;
-
-    itemP = orionldContextValueLookup(contextP, value, useStringValueP);
-    if (itemP != NULL)
-      return itemP;
-
-    contextNodeP = contextNodeP->next;
-  }
-
+  LM_E(("Error: contexts must be either a String, an Object ot an Array"));
   return NULL;
 }
