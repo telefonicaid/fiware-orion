@@ -540,6 +540,23 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
+// contextNameLookup -
+//
+static char* contextNameLookup(char* url)
+{
+  const char*  needle       = "/ngsi-ld/ex/v1/contexts/";
+  char*        needleStart  = strstr(url, needle);
+
+  if (needleStart == NULL)
+    return NULL;
+
+  return &needleStart[strlen(needle)];
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // contextToCache -
 //
 static bool contextToCache(ConnectionInfo* ciP)
@@ -570,6 +587,8 @@ static bool contextToCache(ConnectionInfo* ciP)
   contextP->temporary = false;
 
   orionldContextListInsert(contextP, false);
+
+  contextP->name      = contextNameLookup(contextP->url);
 
   return true;
 }

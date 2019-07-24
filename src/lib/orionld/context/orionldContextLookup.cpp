@@ -80,6 +80,13 @@ OrionldContext* orionldContextLookup(const char* url)
       return contextP;
     }
 
+    if ((contextP->name != NULL) && (strcmp(contextP->name, url) == 0))
+    {
+      LM_T(LmtContextLookup, ("Found the context '%s' (using context name)", url));
+      orionldContextListSemGive("Looking up a context - Found it");
+      return contextP;
+    }
+
     contextP = contextP->next;
     LM_T(LmtContextLookup, ("No match. Next context at %p", contextP));
     ++contextIx;

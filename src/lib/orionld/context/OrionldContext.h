@@ -54,6 +54,7 @@ typedef enum OrionldContextType
 typedef struct OrionldContext
 {
   char*                   url;
+  char*                   name;
   KjNode*                 tree;
   OrionldContextType      type;
   bool                    ignore;     // Core/Default URL Context inside USER contexts

@@ -74,7 +74,9 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, Orio
   //
   // FIXME TPUT: A char-sum would make these comparisons faster
   //
-  if ((strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL) == 0) || (strcmp(contextP->url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0))
+  if ((strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL)        == 0) ||
+      (strcmp(contextP->url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0) ||
+      (strcmp(contextP->url, ORIONLD_DEFAULT_CONTEXT_URL)     == 0))
   {
     LM_T(LmtContext, ("Context '%s' is IGNORED", contextP->url));
     contextP->ignore = true;
