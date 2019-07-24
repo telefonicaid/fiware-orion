@@ -646,7 +646,7 @@ static bool contextToCache(ConnectionInfo* ciP)
 int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;
-  bool     serviceRoutineResult;
+  bool     serviceRoutineResult = false;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
   LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, orionldState.verbString, orionldState.urlPath, ciP->payload));
