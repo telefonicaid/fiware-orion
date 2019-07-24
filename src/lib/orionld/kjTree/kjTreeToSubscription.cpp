@@ -211,11 +211,8 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       DUPLICATE_CHECK(qP, "Subscription::q", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::q");
 
-      LM_TMP(("SUB: q == '%s'", kNodeP->value.s));
-
-      LM_TMP(("SUB: Parsing the Q value and doing URI Expansion"));
-      Scope*      scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
-      std::string errorString;
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, kNodeP->value.s);
+      std::string  errorString;
 
       scopeP->stringFilterP = new StringFilter(SftQ);
 

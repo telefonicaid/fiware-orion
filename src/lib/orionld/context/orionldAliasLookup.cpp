@@ -53,10 +53,10 @@ char* orionldAliasLookup(OrionldContext* contextP, const char* longName)
 
   LM_T(LmtAlias, ("Calling orionldContextValueLookup for long-name '%s'", longName));
   bool    useStringValue = false;
-  LM_TMP(("CTX:"));
-  LM_TMP(("CTX: =============================== Calling orionldContextValueLookup for '%s'", longName));
+  LM_T(LmtContextValueLookup, ("CTX:"));
+  LM_T(LmtContextValueLookup, ("CTX: =============================== Calling orionldContextValueLookup for '%s'", longName));
   KjNode* aliasNodeP     = orionldContextValueLookup(contextP, longName, &useStringValue);
-  LM_TMP(("CTX: =================================================================================================="));
+  LM_T(LmtContextValueLookup, ("CTX: =================================================================================================="));
   if (aliasNodeP != NULL)
   {
     if (aliasNodeP->type == KjObject)

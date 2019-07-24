@@ -90,11 +90,6 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     return NULL;
   }
 
-  // <DEBUG>
-  extern void contextArrayPresent(KjNode* tree, const char* what);
-  contextArrayPresent(contextP->tree, "Just after orionldContextDownloadAndParse");
-  // </DEBUG>
-
   if (contextP->tree && contextP->tree->value.firstChildP)
     LM_T(LmtContextList, ("The downloaded context (%s) is of type '%s'", contextP->url, kjValueType(contextP->tree->value.firstChildP->type)));
   else
@@ -103,17 +98,8 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   orionldState.contextToBeFreed = false;
   LM_T(LmtContextList, ("Context is to be inserted into the common context list, so, it needs to be cloned"));
 
-  // <DEBUG>
-  contextArrayPresent(contextP->tree, "Before cloning");
-  // </DEBUG>
-
   // FIXME: Don't clone if core or vocab context
   contextP->tree = kjClone(contextP->tree);
-
-  // <DEBUG>
-  contextArrayPresent(contextP->tree, "Just after cloning");
-  // </DEBUG>
-
 
   LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
 

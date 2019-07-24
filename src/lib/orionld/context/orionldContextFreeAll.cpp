@@ -50,7 +50,6 @@ void orionldContextFreeAll(void)
   {
     OrionldContext* next = contextP->next;
 
-    LM_TMP(("CONTEXT FREE: Freeing context '%s' at %p (by calling orionldContextFree)", contextP->url, contextP));
     orionldContextFree(contextP);
     contextP = next;
   }

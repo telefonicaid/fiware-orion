@@ -49,8 +49,6 @@ TEST(orionld, partialUpdateCreation)
   orionldStateInit();
   ConnectionInfo    ci("/ngsi-ld/v1/entities/urn:entity:E1/attrs", "POST", "1.1");
 
-  LM_TMP(("In partialUpdateCreation"));
-
   utInit();
 
   orionldStateErrorAttributeAdd("A1");
@@ -93,7 +91,6 @@ TEST(orionld, partialUpdateResponse)
   const char*          attrNamesV[3] = { "A1", "A2", "A3" };
   utInit();
 
-  LM_TMP(("In partialUpdateResponse"));
   orionldStateInit();
 
   //
@@ -125,9 +122,7 @@ TEST(orionld, partialUpdateResponse)
   //
   // Create the Response Tree (with only A2) 
   //
-  LM_TMP(("Calling orionldPartialUpdateResponseCreate"));
   orionldPartialUpdateResponseCreate(&ci);
-  LM_TMP(("After orionldPartialUpdateResponseCreate"));
   EXPECT_EQ(NULL, orionldState.requestTree);
 
   //
@@ -138,9 +133,6 @@ TEST(orionld, partialUpdateResponse)
     EXPECT_STREQ("orionldState.responseTree->value.firstChildP == NULL", "It should be != NULL");
   }
 
-  for (kNodeP = orionldState.responseTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-    LM_TMP(("  Node: '%s'", kNodeP->name));
-  
   EXPECT_EQ(NULL, orionldState.responseTree->value.firstChildP->next);
 
   char* attrName = orionldState.responseTree->value.firstChildP->name;

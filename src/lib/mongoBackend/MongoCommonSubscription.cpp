@@ -320,7 +320,6 @@ void setCondsAndInitialNotify
   // the original subscription has to be taken; the caller deal with that)
   //
 
-  LM_TMP(("SUB: In setCondsAndInitialNotify - calling processConditionVector"));
   /* Conds vector (and maybe an initial notification) */
   *notificationDone = false;
 

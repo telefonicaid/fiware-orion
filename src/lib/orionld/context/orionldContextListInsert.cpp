@@ -43,8 +43,6 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
 {
   LM_T(LmtContextList, ("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
 
-  LM_TMP(("CONTEXT LIST: Adding context '%s' to context list. Type: %s", contextP->url, kjValueType(contextP->tree->type)));
-
   if (semAlreadyTaken == false)
     orionldContextListSemTake(__FILE__);
 

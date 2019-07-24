@@ -227,7 +227,6 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 #ifdef ORIONLD
     if (strcmp(vec[ix].c_str(), "noOverwrite") == 0)
     {
-      LM_TMP(("AppendAttributes: Setting orionldState.uriParamOptions.noOverwrite to TRUE"));
       orionldState.uriParamOptions.noOverwrite = true;
     }
 #endif

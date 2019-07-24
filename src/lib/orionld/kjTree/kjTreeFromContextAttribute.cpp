@@ -72,8 +72,6 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   if (nameAlias == NULL)
     nameAlias = (char*) caP->name.c_str();
 
-  LM_TMP(("NOTIF: Adding attribute '%s'", nameAlias));
-
   if (renderFormat == NGSI_LD_V1_KEYVALUES)
   {
     //
@@ -183,8 +181,6 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     Metadata*   mdP    = caP->metadataVector[ix];
     const char* mdName = mdP->name.c_str();
 
-    LM_TMP(("NOTIF: Adding metadata '%s' for attribute '%s'", mdName, nameAlias));
-
     // Special case: observedAt - stored as Number but must be served as a string ...
     if (strcmp(mdName, "observedAt") == 0)
     {
@@ -197,7 +193,6 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
         return NULL;
       }
 
-      LM_TMP(("NOTIF: inserting metadata observedAt: %s", date));
       nodeP = kjString(orionldState.kjsonP, mdName, date);
     }
     else

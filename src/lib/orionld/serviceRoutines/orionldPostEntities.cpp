@@ -223,9 +223,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (payloadCheck(ciP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP) == false)
     return false;
 
-  LM_TMP(("In orionldPostEntities. orionldState.payloadIdNode at %p", orionldState.payloadIdNode));
-  LM_TMP(("In orionldPostEntities. orionldState.payloadTypeNode at %p", orionldState.payloadTypeNode));
-
   char*    entityId           = orionldState.payloadIdNode->value.s;
   char*    entityType         = orionldState.payloadTypeNode->value.s;
 
@@ -239,7 +236,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   // If the entity already exists, an error should be returned
   //
-  LM_TMP(("In orionldPostEntities"));
   if (mongoEntityExists(entityId, orionldState.tenant) == true)
   {
     orionldErrorResponseCreate(ciP, OrionldAlreadyExists, "Entity already exists", entityId, OrionldDetailsString);
@@ -247,27 +243,22 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_TMP(("In orionldPostEntities"));
   orionldState.entityId = entityId;
 
-  LM_TMP(("In orionldPostEntities"));
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
   ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
   EntityId*              entityIdP;
 
-  LM_TMP(("In orionldPostEntities"));
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
   mongoRequest.updateActionType = ActionTypeAppend;
-  LM_TMP(("In orionldPostEntities"));
 
   entityIdP->id        = entityId;
   entityIdP->type      = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
   entityIdP->isPattern = "false";
   entityIdP->creDate   = getCurrentTime();
   entityIdP->modDate   = getCurrentTime();
-  LM_TMP(("In orionldPostEntities"));
 
   //
   // Entity TYPE
