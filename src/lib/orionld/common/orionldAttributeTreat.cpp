@@ -418,7 +418,6 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 {
   char* caName = kNodeP->name;
 
-  LM_TMP(("KZ: Treating attribute '%s' (KjNode at %p)", kNodeP->name, kNodeP));
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", kNodeP->name, kNodeP));
 
   ATTRIBUTE_IS_OBJECT_CHECK(kNodeP);

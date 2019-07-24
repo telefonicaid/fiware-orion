@@ -37,17 +37,12 @@
 // Example link:
 //   <https://fiware.github.io/X/Y/Z.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 //
-bool linkCheck(char* link, char** uriP, char** detailsP)
+// NOTE
+//   The initial '<' is stepped over before clling this function, by linkHeaderCheck() in orionldMhdConnectionTreat.cpp
+//
+bool linkCheck(char* link, char** detailsP)
 {
   char* cP = link;
-
-  if (*cP != '<')
-  {
-    *detailsP = (char*) "link doesn't start with '<'";
-    return false;
-  }
-
-  ++link;  // skip over the initial '<'
 
   while (*cP != '>')
   {
@@ -61,9 +56,6 @@ bool linkCheck(char* link, char** uriP, char** detailsP)
   }
 
   *cP = 0;  // End of string for the URL
-
-  // Save a pointer to the URL of the Link
-  *uriP = link;
 
   if ((urlCheck(link, detailsP) == false) && (urnCheck(link, detailsP) == false))
     return false;

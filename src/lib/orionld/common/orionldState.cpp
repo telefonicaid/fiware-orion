@@ -86,11 +86,11 @@ void orionldStateInit(void)
   orionldState.requestNo                   = requestNo;
   orionldState.tenant                      = (char*) "";
   orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
+  orionldState.linkHttpHeaderPresent       = false;
   orionldState.link                        = NULL;
   orionldState.useLinkHeader               = true;  // Service routines can set this value to 'false' to avoid having the Link HTTP Header in its output
   orionldState.entityCreated               = false;
   orionldState.entityId                    = NULL;
-  orionldState.linkToBeFreed               = false;
   orionldState.linkHeaderAdded             = false;
   orionldState.httpReqBuffer               = NULL;
   orionldState.errorAttributeArrayP        = orionldState.errorAttributeArray;

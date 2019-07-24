@@ -59,7 +59,9 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
     orionldContextTail       = contextP;
   }
 
+
   contextP->next      = NULL;
+  contextP->name      = NULL;  // For locally crated contexts, 'name' is set in orionldMhdConnectionTreat.cpp :: contextToCache
   contextP->temporary = false;
 
   if (semAlreadyTaken == false)

@@ -129,7 +129,6 @@ OrionldContext* orionldContextAdd
     return contextP;
   }
 
-  LM_TMP(("KZ: Calling orionldContextDownloadAndParse('%s')", url));
   KjNode* tree = orionldContextDownloadAndParse(kjsonP, url, true, detailsPP);
 
   if (tree == NULL)
@@ -203,7 +202,6 @@ OrionldContext* orionldContextAdd
   // - an object with key-values (a "leaf")
   // - a vector of contexts (URL strings)
   //
-  LM_TMP(("KZ: Cloning context '%s'", url));
   tree = kjClone(tree);
 
   if ((contextP = orionldContextAppend(url, tree, contextType, detailsPP)) == NULL)
@@ -270,7 +268,6 @@ OrionldContext* orionldContextAdd
     if (orionldContextLookup(url) != NULL)
       continue;
 
-    LM_TMP(("KZ: Calling orionldContextDownloadAndParse(%s)", url));
     tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, detailsPP);
     if (tree == NULL)
     {

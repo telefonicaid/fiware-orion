@@ -32,6 +32,6 @@
 //
 // linkCheck -
 //
-extern bool linkCheck(char* link, char** uriP, char** detailsPP);
+extern bool linkCheck(char* link, char** detailsPP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_LINKCHECK_H_

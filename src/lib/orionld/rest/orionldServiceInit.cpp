@@ -528,12 +528,31 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
 
+  //
+  // Setting the Core/Default contexts to be ignored in lookups
+  // This is to ignore Core/Default contexts as part of User Contexts
+  //
+  // An alternative method would to be to not add the Core/Default context to the context cache
+  // But, if we do that, then orionldContextLookup would need to do strcmp with the Core Context also
+  //
+  orionldCoreContext.ignore        = true;
+  orionldDefaultUrlContext.ignore  = true;
+  orionldDefaultContext.ignore     = true;
+
+#if 1
+  //
+  // FIXME: Should the Core/Default context be in the Cache or not ?
+  //
 
   // Adding the core context to the list of contexts
   orionldContextListInsert(&orionldCoreContext, false);
 
   // Adding the Default URL context to the list of contexts
   orionldContextListInsert(&orionldDefaultUrlContext, false);
+
+  // Adding the Default context to the list of contexts
+  orionldContextListInsert(&orionldDefaultContext, false);
+#endif
 
   //
   // Checking the "Default URL Context" and extracting the Default URL path.

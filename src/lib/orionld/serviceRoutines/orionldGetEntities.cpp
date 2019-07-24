@@ -279,10 +279,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     char* details;
 
-    LM_TMP(("KZ: Checking for FQN of entity type: %s", type));
     if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
     {
-      LM_TMP(("KZ: FQN found"));
       // No expansion desired, the type is already a FQN
       strncpy(typeExpanded, type, sizeof(typeExpanded));
     }
