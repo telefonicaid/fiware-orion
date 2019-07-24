@@ -42,6 +42,7 @@ SET (SOURCES
     orionldBadVerb.cpp
     orionldGetContext.cpp
     orionldGetVersion.cpp
+    orionldNotImplemented.cpp
 )
 
 # Include directories

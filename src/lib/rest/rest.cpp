@@ -134,8 +134,6 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
 
-  LM_TMP(("URI PARAM: '%s': '%s'", ckey, val));
-
   if ((val == NULL) || (*val == 0))
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
@@ -637,8 +635,6 @@ static void requestCompleted
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
-  LM_TMP(("IN requestCompleted"));
-
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
@@ -730,7 +726,6 @@ static void requestCompleted
 #endif
 
   *con_cls = NULL;
-  LM_TMP(("FROM requestCompleted"));
 }
 
 
@@ -1227,6 +1222,9 @@ ConnectionInfo* connectionTreatInit
 {
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
+
+  if ((reqNo % 100) == 0)
+    LM_TMP(("Request No %d", reqNo));
 
   *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 
