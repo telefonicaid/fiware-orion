@@ -78,8 +78,6 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
   if (orionldState.linkHeaderAdded == true)
     return;
 
-  LM_TMP(("LINK: Setting Link header to URI: '%s'", _url));
-
   // If no context URL is given, the default context is used
   if (_url == NULL)
     url = ORIONLD_DEFAULT_CONTEXT_URL;
@@ -101,8 +99,6 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
         *cP = 0;
     }
   }
-
-  LM_TMP(("LINK: Setting Link header to URI: '%s'", url));
 
   urlLen = strlen(url);
   if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 3)

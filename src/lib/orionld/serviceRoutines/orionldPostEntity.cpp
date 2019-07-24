@@ -54,16 +54,11 @@ extern "C"
 //
 void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
 {
-  LM_TMP(("PART-UPDATE: the erroneous attrs are: '%s'", orionldState.errorAttributeArrayP));
-
   //
   // Rob the incoming Request Tree - performance to be won!
   //
-  LM_TMP(("PART-UPDATE: Here"));
   orionldState.responseTree = orionldState.requestTree;
-  LM_TMP(("PART-UPDATE: Here"));
   orionldState.requestTree  = NULL;
-  LM_TMP(("PART-UPDATE: Here"));
 
   //
   // For all attrs in orionldState.responseTree, remove those that are found in orionldState.errorAttributeArrayP.
@@ -71,15 +66,6 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
   //
   //   |attrName|attrName|attrName|...
   //
-
-  // <TMP>
-  int ix = 1;
-  for (KjNode* attrNodeP = orionldState.responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
-  {
-    LM_TMP(("PART-UPDATE: Attr %d: '%s'", ix, attrNodeP->name));
-    ++ix;
-  }
-  // </TMP>
 
   KjNode* attrNodeP = orionldState.responseTree->value.firstChildP;
 
@@ -89,12 +75,10 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
     KjNode* next = attrNodeP->next;
     bool    moved = false;
 
-    LM_TMP(("PART-UPDATE: calling match for '%s'", attrNodeP->name));
     if ((match = strstr(orionldState.errorAttributeArrayP, attrNodeP->name)) != NULL)
     {
       if ((match[-1] == '|') && (match[strlen(attrNodeP->name)] == '|'))
       {
-        LM_TMP(("PART-UPDATE: removing child '%s'", attrNodeP->name));
         kjChildRemove(orionldState.responseTree, attrNodeP);
         attrNodeP = next;
         moved = true;
@@ -104,16 +88,6 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
     if (moved == false)
       attrNodeP = attrNodeP->next;
   }
-
-  // <TMP>
-  for (KjNode* attrNodeP = orionldState.responseTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
-  {
-    LM_TMP(("PART-UPDATE: Attr %d: '%s'", ix, attrNodeP->name));
-    ++ix;
-  }
-  // </TMP>
-
-  LM_TMP(("PART-UPDATE: Created"));
 }
 
 
@@ -146,15 +120,9 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
 
   if (orionldState.uriParamOptions.noOverwrite == true)
-  {
-    LM_TMP(("AppendAttributes: mongoRequest.updateActionType = ActionTypeAppendStrict (as 'noOverwrite' was set)"));
     mongoRequest.updateActionType = ActionTypeAppendStrict;
-  }
   else
-  {
-    LM_TMP(("AppendAttributes: mongoRequest.updateActionType = ActionTypeAppend (as 'noOverwrite' was NOT set)"));
     mongoRequest.updateActionType = ActionTypeAppend;
-  }
 
   entityIdP->id = orionldState.wildcard[0];
 

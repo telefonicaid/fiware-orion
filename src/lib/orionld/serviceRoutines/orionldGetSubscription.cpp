@@ -50,7 +50,6 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   subscription.throttling          = -1;  // 0?
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", orionldState.wildcard[0]));
-  LM_TMP(("TENANT: %s", orionldState.tenant));
 
   if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
   {

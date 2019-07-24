@@ -66,7 +66,6 @@ static bool qAliasCompress(char* qString)
   int   outIx = 0;
   bool  insideVarName = true;
 
-  LM_TMP(("SUB: In qAliasCompress: '%s'", qString));
   while (*cP != 0)
   {
     if (*cP == '!')
@@ -82,8 +81,6 @@ static bool qAliasCompress(char* qString)
       char* eqP;
 
       cP[0] = 0;
-
-      LM_TMP(("SUB: Looking for alias for '%s'", varStart));
 
       eqP = varStart;
       while (*eqP != 0)
@@ -130,7 +127,7 @@ static bool qAliasCompress(char* qString)
 
   out[outIx] = 0;
   strcpy(qString, out);
-  LM_TMP(("SUB: From qAliasCompress: '%s'", qString));
+
   return true;
 }
 

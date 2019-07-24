@@ -44,24 +44,20 @@ void orionldContextFree(OrionldContext* contextP)
 {
   if (contextP == NULL)
   {
-    LM_TMP(("CONTEXT FREE: NOT Freeing context (as it is NULL)"));
     LM_T(LmtContext, ("NOT Freeing LIST context (NULL)"));
     return;
   }
 
   LM_T(LmtContext, ("Freeing context %p, tree:%p, next:%p, url:%s", contextP, contextP->tree, contextP->next, contextP->url));
 
-  LM_TMP(("CONTEXT FREE: Freeing context at %p ('%s')", contextP, contextP->url));
   if (contextP->tree != NULL)
   {
-    LM_TMP(("CONTEXT FREE: Freeing context TREE at %p for context '%s'", contextP->tree, contextP->url));
     kjFree(contextP->tree);
     contextP->tree = NULL;
   }
 
   if (contextP->type == OrionldUserContext)
   {
-    LM_TMP(("CONTEXT FREE: Freeing context + URL for context '%s'", contextP->url));
     if (contextP->url != NULL)
       free(contextP->url);
     free(contextP);

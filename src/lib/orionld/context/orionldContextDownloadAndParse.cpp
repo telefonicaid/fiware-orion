@@ -134,11 +134,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
   KjNode* tree = kjParse(kjsonP, httpResponse.buf);
   LM_T(LmtContext, ("Got @context - parsed it"));
 
-  // <DEBUG>
-  extern void contextArrayPresent(KjNode* tree, const char* what);
-  contextArrayPresent(tree, "Just after parsing");
-  // </DEBUG>
-
   if (tree == NULL)
   {
     *detailsPP = kjsonP->errorString;
@@ -146,11 +141,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     return NULL;
   }
   LM_T(LmtContext, ("@context parsed without errors"));
-
-  // <DEBUG>
-  extern void contextArrayPresent(KjNode* tree, const char* what);
-  contextArrayPresent(tree, "Just after freeing httpResponse");
-  // </DEBUG>
 
   if ((tree->type != KjArray) && (tree->type != KjString) && (tree->type != KjObject))
   {
@@ -234,21 +224,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
   {
     LM_T(LmtContext,  ("Not an object ('@context' in '%s' is of type '%s') - we are done here (no collision check necessary)",
                        url, kjValueType(contextNodeP->type)));
-
-    // <DEBUG>
-    if ((tree->type == KjObject) && (tree->value.firstChildP->type == KjArray))
-    {
-      int childNo = 0;
-
-      LM_T(LmtContext, ("Just before returning the tree: got a @context array:"));
-      for (KjNode* kP = tree->value.firstChildP->value.firstChildP; kP != NULL; kP = kP->next)
-      {
-        LM_T(LmtContext, ("  Child %d: %s", childNo, kP->value.s));
-        ++childNo;
-      }
-    }
-    // </DEBUG>
-
     return tree;
   }
 

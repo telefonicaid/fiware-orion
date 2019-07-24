@@ -57,8 +57,6 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, Orio
     return NULL;
   }
 
-  LM_TMP(("CONTEXT ALLOCATE: Allocated Context object for context '%s' at %p", url, contextP));
-
   contextP->url        = strdup(url);
   contextP->tree       = tree;
   contextP->type       = contextType;

@@ -180,7 +180,7 @@ void orionldContextPresent(OrionldContext* contextP)
   if (contextP == NULL)
     allCachedContextsPresent();
   else if (contextP->tree == NULL)
-    LM_TMP(("contextP->tree == NULL!!!"));
+    ;
   else if (contextP->tree->type == KjObject)
     objectContextPresent(contextP);
   else if (contextP->tree->type == KjString)

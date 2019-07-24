@@ -42,22 +42,8 @@ extern "C"
 //
 OrionldContext* orionldContextLookup(const char* url)
 {
-  OrionldContext* contextP = orionldContextHead;
-
-  int contextIx = 0;
-
-  // <TMP>
-  orionldContextListSemTake("Looking up a context");
-  int ix = 0;
-  LM_T(LmtContextLookup, ("----- In orionldContextLookup. Looking for context '%s'", url));
-  while (contextP != NULL)
-  {
-    LM_TMP(("Context %d: %s", ix, contextP->url));
-    ++ix;
-    contextP = contextP->next;
-  }
-  contextP = orionldContextHead;
-  // </TMP>
+  OrionldContext*  contextP  = orionldContextHead;
+  int              contextIx = 0;
 
   while (contextP != NULL)
   {

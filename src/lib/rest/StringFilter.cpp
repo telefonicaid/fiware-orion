@@ -669,7 +669,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     }
 
     attributeName = expanded;
-    LM_TMP(("SUB: expanded attribute name: '%s'", attributeName.c_str()));
   }
 
 #endif
@@ -907,8 +906,6 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
   char* dotP          = scopyP;
   bool  insideQuotes  = false;
 
-  LM_TMP(("SUB: IN: '%s'", s));
-
   //
   // Replace '.' for '=' if inside quotes
   //
@@ -947,7 +944,6 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
 
   free(scopyP);
 
-  LM_TMP(("SUB: OUT: '%s'", s));
   return s;
 }
 
@@ -962,24 +958,19 @@ void StringFilterItem::lhsParse(void)
   char* start = (char*) left.c_str();
   char* dotP  = start;
 
-  LM_TMP(("SUB: start: %s", start));
   start = lhsDotToEqualIfInsideQuote(start);
-  LM_TMP(("SUB: start: '%s'", start));
 
   attributeName = "";
   metadataName  = "";
   compoundPath  = "";
 
-  LM_TMP(("SUB: start: '%s'", start));
   dotP = strchr(start, '.');
-  LM_TMP(("SUB: start: '%s'", start));
   if (dotP == NULL)
   {
     attributeName = start;
     metadataName  = "";
     compoundPath  = "";
 
-    LM_TMP(("SUB: attributeName: '%s'", attributeName.c_str()));
     return;
   }
 
@@ -987,7 +978,6 @@ void StringFilterItem::lhsParse(void)
   ++dotP;  // Step over the dot
 
   attributeName = start;
-  LM_TMP(("SUB: attributeName: '%s'", attributeName.c_str()));
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
   if (type == SftMq)
@@ -1963,7 +1953,6 @@ bool StringFilter::render(char* buf, int bufLen, std::string* errorStringP)
     buf[charsUsed] = 0;
   }
 
-  LM_TMP(("SUB: renderer StringFilter: %s", buf));
   return true;
 }
 

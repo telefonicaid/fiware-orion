@@ -76,7 +76,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   // context - if JSONLD
   if (mimeType == JSONLD)
   {
-    LM_TMP(("NOTIF: Context == '%s', at %p", context, context));
     if (context == NULL)
       nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
     else

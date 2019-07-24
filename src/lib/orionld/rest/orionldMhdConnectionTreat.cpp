@@ -258,7 +258,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
 }
 
 
-
+#if 0
 // -----------------------------------------------------------------------------
 //
 // kjTreeFirstLevelPresent
@@ -280,7 +280,7 @@ static void kjTreeFirstLevelPresent(const char* what, KjNode* tree)
     ++ix;
   }
 }
-
+#endif
 
 
 
@@ -290,14 +290,14 @@ static void kjTreeFirstLevelPresent(const char* what, KjNode* tree)
 //
 static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
 {
-  kjTreeFirstLevelPresent("Before decoupling", parent);
+  // kjTreeFirstLevelPresent("Before decoupling", parent);
 
   if (prev != NULL)
     prev->next = nodeToDecouple->next;
   else
     parent->value.firstChildP = nodeToDecouple->next;
 
-  kjTreeFirstLevelPresent("After decoupling", parent);
+  // kjTreeFirstLevelPresent("After decoupling", parent);
 }
 
 
@@ -356,7 +356,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     KjNode* prev      = NULL;
     KjNode* attrNodeP = orionldState.requestTree->value.firstChildP;
 
-    kjTreeFirstLevelPresent("Before Removing", orionldState.requestTree);
+    // kjTreeFirstLevelPresent("Before Removing", orionldState.requestTree);
     while (attrNodeP != NULL)
     {
       if (attrNodeP->name == NULL)
@@ -426,7 +426,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = attrNodeP->next;
       }
     }
-    kjTreeFirstLevelPresent("After Removing ALL 3", orionldState.requestTree);
+    // kjTreeFirstLevelPresent("After Removing ALL 3", orionldState.requestTree);
   }
   else
   {
@@ -525,7 +525,6 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_TMP(("Context in Link header: %s - calling orionldContextCreateFromUrl", orionldState.link));
   if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, orionldState.link, OrionldUserContext, &details)) == NULL)
   {
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailsString);
@@ -561,7 +560,6 @@ static char* contextNameLookup(char* url)
 //
 static bool contextToCache(ConnectionInfo* ciP)
 {
-  LM_TMP(("KZ: Creating the context in Context Server"));
   //
   // Creating the context in Context Server
   //
@@ -666,8 +664,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if ((orionldState.serviceP = serviceLookup(ciP)) == NULL)
     goto respond;
 
-  if (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CREATE_CONTEXT)
-    LM_TMP(("KZ: ORIONLD_SERVICE_OPTION_CREATE_CONTEXT is set"));
 
   //
   // 03. Check for empty payload for POST/PATCH/PUT
@@ -729,7 +725,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
   // the HTTP status code defaults to 400
   //
-  LM_TMP(("serviceRoutine OK? %s, contextToBeCashed: %s, ciP->httpStatusCode: %d", FT(serviceRoutineResult), FT(contextToBeCashed), ciP->httpStatusCode));
   if (serviceRoutineResult == false)
   {
     if (ciP->httpStatusCode < 400)
@@ -816,6 +811,5 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   orionldStateRelease();
 
-  LM_TMP(("Request finished"));
   return MHD_YES;
 }
