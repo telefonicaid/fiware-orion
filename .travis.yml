@@ -13,13 +13,6 @@ env:
   - secure: aTkQKOSU2eSx5DjEqj5/GPiu0UiyBKNmXPoGYd6wQFajnKbk6ErEW66onFJGMiL3g/yiyP6Utwm4JaBgqxQ1WJDHSn8MbljFJ03xAtJsyz+E0Wh65kshK3IFxF2M7glt0ZHH3kvLEH9czFrNcZ3eusMC8GEWAkXQ0jwK7DVW4+rVaajHpZLsxgU3TOwxMML0AT+kfSPnOKBsjUwOtLmU+ffatGxA1r5leYvVTpzza9di6bqJf/hQN6z07gnhkAX3Ypz3JNPDYuFjK0jHwhkDFeN91FmoShuB5dOuvs16fXojjxYJDwMQIW/Eo0WjVEV6qhGtnYI6RnGFDI6Cc/NjDN4CAmssarj8pXdAQSzQVzSXohxsILIMuY1QdQpwLjJJdmHMwtPegeS49PCIaRKpgKPR9/FuqUpRFFkAX6Hy0fxC9rRkSTCSIwpFL37PWpRZKE5e12wNZPPDK2A2gpFIruv/upDmL1dhK5YjNoMENtBgOrG3Uo/YfCIEngDesNzE9XwGisW1u4TqaQ1rNVrdezS4KzC1njnjqw6MC+w9rCUNk4d/lR1y/h0q68Pa3c7IdLWUhdKDjLPAZdH0G4dpRxpZzwV/ocBmWSwcWT+74hBe1BC8kWPL7J2Q0T7IxcLDEKQvnfT1q2/Gg4oPrgh3Zp2mOrXtTKgmCHo5FrNdTnI=
   matrix:
   - STAGE=compliance
-  - STAGE=centos_unit
-  - STAGE=centos_functional_1_300
-  - STAGE=centos_functional_301_600
-  - STAGE=centos_functional_601_900
-  - STAGE=centos_functional_901_1200
-  - STAGE=centos_release
-  - STAGE=centos_deps
   - STAGE=debian_unit
   - STAGE=debian_functional_1_300
   - STAGE=debian_functional_301_600
