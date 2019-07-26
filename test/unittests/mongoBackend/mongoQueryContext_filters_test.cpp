@@ -91,10 +91,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * - cobingingSeveralFilters
 * - repeatSameFilter
 * - rangeWithDecimals
-*
-* FIXME 5: missing tests (see https://github.com/telefonicaid/fiware-orion/issues/1129)
-* - Number as strings, eg. '23'
-* - Dates as string
+* - numberAsString
+* - dateAsString
 *
 * The prefix _s, _n and _d means string, number or date (in the cases distinguishing makes sense)
 *
@@ -123,23 +121,23 @@ static void prepareDatabase(bool extraEntities = false)
    * - E1
    *     S: "running"
    *     N: 26.5
-   *     D: ISODate("2017-06-17T07:12:25.823Z")
+   *     D: date 2019-07-25T10:00:00Z
    * - E2
    *     S: "running"
    *     N: 27
-   *     D: ISODate("2017-06-17T07:21:24.238Z")
+   *     D: date 2019-07-25T11:00:00Z
    * - E3
    *     S: "shutdown"
    *     N: 31
-   *     D: ISODate("2017-06-17T08:19:12.231Z")
+   *     D: date 2019-07-25T12:00:00Z
    * - E4
    *     S: "error"
    *     N: 17.8
-   *     D: ISODate("2017-06-17T07:22:43.112Z")
+   *     D: date 2019-07-25T13:00:00Z
    * - E5
    *     S: "shutdown"
    *     N: 24
-   *     D: ISODate("2017-06-17T07:10:12.328Z")
+   *     D: date 2019-07-25T14:00:00Z
    * - C1
    *     colour=black,white
    * - C2
@@ -148,43 +146,40 @@ static void prepareDatabase(bool extraEntities = false)
    *     colour=red, blue
    */
 
-  // FIXME: D will be set with dates once https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  // gets addressed
-
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "running") <<
                        "N" << BSON("type" << "T" << "value" << 26.5) <<
-                       "D" << BSON("type" << "T" << "value" << "")));
+                       "D" << BSON("type" << "T" << "value" << 1564048800)));  // 2019-07-25T10:00:00Z
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "running") <<
                        "N" << BSON("type" << "T" << "value" << 27) <<
-                       "D" << BSON("type" << "T" << "value" << "")));
+                       "D" << BSON("type" << "T" << "value" << 1564052400))); // 2019-07-25T11:00:00Z
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "shutdown") <<
                        "N" << BSON("type" << "T" << "value" << 31) <<
-                       "D" << BSON("type" << "T" << "value" << "")));
+                       "D" << BSON("type" << "T" << "value" << 1564056000))); // 2019-07-25T12:00:00Z
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "error") <<
                        "N" << BSON("type" << "T" << "value" << 17.8) <<
-                       "D" << BSON("type" << "T" << "value" << "")));
+                       "D" << BSON("type" << "T" << "value" << 1564059600))); // 2019-07-25T13:00:00Z
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E5" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "shutdown") <<
                        "N" << BSON("type" << "T" << "value" << 24) <<
-                       "D" << BSON("type" << "T" << "value" << "")));
+                       "D" << BSON("type" << "T" << "value" << 1564063200))); // 2019-07-25T14:00:00Z
 
   BSONObj c1 = BSON("_id" << BSON("id" << "C1" << "type" << "T") <<
                     "attrNames" << BSON_ARRAY("colour") <<
@@ -221,9 +216,6 @@ static void prepareDatabase(bool extraEntities = false)
      *     N: 27
      */
 
-    // FIXME: D will be set with dates once https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-    // gets addressed
-
     BSONObj en6 = BSON("_id" << BSON("id" << "E6" << "type" << "T") <<
                        "attrNames" << BSON_ARRAY("N") <<
                        "attrs" << BSON(
@@ -243,6 +235,89 @@ static void prepareDatabase(bool extraEntities = false)
     connection->insert(ENTITIES_COLL, en7);
     connection->insert(ENTITIES_COLL, en8);
   }
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseAsString -
+*
+* Similar to prepareDatabase, to be used by the "date/number as string" tests
+*/
+static void prepareDatabaseAsString(void)
+{
+  /* Set database */
+  setupDatabase();
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1
+   *     N: "26.5"
+   *     D: "2019-07-25T10:00:00Z"
+   * - E2
+   *     N: 26.5
+   *     D: date 2019-07-25T10:00:00Z
+   * - E3
+   *     N: "31"
+   *     D: "2019-07-25T12:00:00Z"
+   * - E4
+   *     N: 31
+   *     D: date 2019-07-25T12:00:00Z
+   * - C1
+   *     colour=black,white
+   * - C2
+   *     colour=red,blue
+   * - C3
+   *     colour=red, blue
+   */
+
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("N" << "D") <<
+                     "attrs" << BSON(
+                       "N" << BSON("type" << "T" << "value" << "26.5") <<
+                       "D" << BSON("type" << "T" << "value" << "2019-07-25T10:00:00Z")));
+
+  BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("N" << "D") <<
+                     "attrs" << BSON(
+                       "N" << BSON("type" << "T" << "value" << 26.5) <<
+                       "D" << BSON("type" << "T" << "value" << 1564048800))); // 2019-07-25T10:00:00Z
+
+  BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("N" << "D") <<
+                     "attrs" << BSON(
+                       "N" << BSON("type" << "T" << "value" << "31") <<
+                       "D" << BSON("type" << "T" << "value" << "2019-07-25T12:00:00Z"))); // 2019-07-25T12:00:00Z
+
+  BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
+                     "attrNames" << BSON_ARRAY("N" << "D") <<
+                     "attrs" << BSON(
+                       "N" << BSON("type" << "T" << "value" << 31) <<
+                       "D" << BSON("type" << "T" << "value" << 1564056000))); // 2019-07-25T12:00:00Z
+
+  BSONObj c1 = BSON("_id" << BSON("id" << "C1" << "type" << "T") <<
+                    "attrNames" << BSON_ARRAY("colour") <<
+                    "attrs" << BSON(
+                      "colour" << BSON("type" << "T" << "value" << "black,white")));
+
+  BSONObj c2 = BSON("_id" << BSON("id" << "C2" << "type" << "T") <<
+                    "attrNames" << BSON_ARRAY("colour") <<
+                    "attrs" << BSON(
+                      "colour" << BSON("type" << "T" << "value" << "red,blue")));
+
+  BSONObj c3 = BSON("_id" << BSON("id" << "C3" << "type" << "T") <<
+                    "attrNames" << BSON_ARRAY("colour") <<
+                    "attrs" << BSON(
+                      "colour" << BSON("type" << "T" << "value" << "black, white")));
+
+  connection->insert(ENTITIES_COLL, en1);
+  connection->insert(ENTITIES_COLL, en2);
+  connection->insert(ENTITIES_COLL, en3);
+  connection->insert(ENTITIES_COLL, en4);
+  connection->insert(ENTITIES_COLL, c1);
+  connection->insert(ENTITIES_COLL, c2);
+  connection->insert(ENTITIES_COLL, c3);
 }
 
 
@@ -354,10 +429,50 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
 * equalToOne_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_equalToOne_d)
+TEST(mongoQueryContextRequest_filters, equalToOne_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D==2019-07-25T12:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  EXPECT_EQ("E3", RES_CER(0).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -470,10 +585,51 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
 * equalToMulti_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_equalToMulti_d)
+TEST(mongoQueryContextRequest_filters, equalToMulti_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D==2019-07-25T11:00:00Z,2019-07-25T13:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  EXPECT_EQ("E2", RES_CER(0).id);
+  EXPECT_EQ("E4", RES_CER(1).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -588,10 +744,53 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
 * unequalToOne_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_unequalToOne_d)
+TEST(mongoQueryContextRequest_filters, unequalToOne_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D!=2019-07-25T12:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(4, res.contextElementResponseVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E4", RES_CER(2).id);
+  EXPECT_EQ("E5", RES_CER(3).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -704,10 +903,52 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
 * unequalToMany_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_unequalToMany_d)
+TEST(mongoQueryContextRequest_filters, unequalToMany_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D!=2019-07-25T10:00:00Z,2019-07-25T14:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(3, res.contextElementResponseVector.size());
+  EXPECT_EQ("E2", RES_CER(0).id);
+  EXPECT_EQ("E3", RES_CER(1).id);
+  EXPECT_EQ("E4", RES_CER(2).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -768,10 +1009,52 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
 * greaterThan_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_greaterThan_d)
+TEST(mongoQueryContextRequest_filters, greaterThan_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D>2019-07-25T11:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(3, res.contextElementResponseVector.size());
+  EXPECT_EQ("E3", RES_CER(0).id);
+  EXPECT_EQ("E4", RES_CER(1).id);
+  EXPECT_EQ("E5", RES_CER(2).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -831,10 +1114,51 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
 * greaterThanOrEqual_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_greaterThanOrEqual_d)
+TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D>=2019-07-25T13:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  EXPECT_EQ("E4", RES_CER(0).id);
+  EXPECT_EQ("E5", RES_CER(1).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -895,10 +1219,52 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
 * lessThan_d-
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_lessThan_d)
+TEST(mongoQueryContextRequest_filters, lessThan_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D<2019-07-25T13:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(3, res.contextElementResponseVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+  EXPECT_EQ("E3", RES_CER(2).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -958,10 +1324,51 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
 * lessThanOrEqual_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_lessThanOrEqual_d)
+TEST(mongoQueryContextRequest_filters, lessThanOrEqual_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D<=2019-07-25T11:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E2", RES_CER(1).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1021,10 +1428,51 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
 * insideRange_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_insideRange_d)
+TEST(mongoQueryContextRequest_filters, insideRange_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D==2019-07-25T11:00:00Z..2019-07-25T12:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  EXPECT_EQ("E2", RES_CER(0).id);
+  EXPECT_EQ("E3", RES_CER(1).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1085,10 +1533,52 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
 * outsideRange_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_outsideRange_d)
+TEST(mongoQueryContextRequest_filters, outsideRange_d)
 {
-  // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
-  EXPECT_EQ(1, 2);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D!=2019-07-25T11:00:00Z..2019-07-25T12:00:00Z");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(3, res.contextElementResponseVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+  EXPECT_EQ("E4", RES_CER(1).id);
+  EXPECT_EQ("E5", RES_CER(2).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -1406,3 +1896,102 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   utExit();
 }
 
+/* ****************************************************************************
+*
+* numberAsString -
+*
+*/
+TEST(mongoQueryContextRequest_filters, numberAsString)
+{
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabaseAsString();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N=='26.5'");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  EXPECT_EQ("E1", RES_CER(0).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* numberAsString -
+*
+*/
+TEST(mongoQueryContextRequest_filters, dateAsString)
+{
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabaseAsString();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "D=='2019-07-25T12:00:00Z'");
+  std::string  errorString;
+  bool         b;
+
+  sc.stringFilterP = new StringFilter(SftQ);
+  b = sc.stringFilterP->parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
+  req.entityIdVector.push_back(&en);
+  req.restriction.scopeVector.push_back(&sc);
+  /* Invoke the function in mongoBackend library */
+  servicePathVector.clear();
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself) */
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  EXPECT_EQ("E3", RES_CER(0).id);
+
+  /* Release dynamic memory used by response (mongoBackend allocates it) */
+  res.contextElementResponseVector.release();
+
+  utExit();
+}
