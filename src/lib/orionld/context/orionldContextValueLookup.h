@@ -38,7 +38,7 @@ extern "C"
 //
 // orionldContextValueLookup -
 //
-extern KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, bool* useStringValueP);
+extern KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value);
 
 
 

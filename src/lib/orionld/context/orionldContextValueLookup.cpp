@@ -42,7 +42,7 @@ extern "C"
 //
 // orionldContextValueLookupInArray -
 //
-static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value, bool* useStringValueP);
+static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value);
 
 
 
@@ -50,7 +50,7 @@ static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const cha
 //
 // orionldContextValueLookupInUrl -
 //
-static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* value, bool* useStringValueP)
+static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* value)
 {
   LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in URI STRING context '%s'", value, contextUrl));
 
@@ -62,7 +62,7 @@ static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* valu
     return NULL;
   }
 
-  return orionldContextValueLookup(contextP, value, useStringValueP);
+  return orionldContextValueLookup(contextP, value);
 }
 
 
@@ -71,7 +71,7 @@ static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* valu
 //
 // orionldContextValueLookupInObject -
 //
-static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* value, bool* useStringValueP)
+static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* value)
 {
   LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in OBJECT context '%s'", value, contextP->name));
 
@@ -98,7 +98,6 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
         {
           if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
           {
-            *useStringValueP = false;  // FIXME - useStringValueP not needed!
             if (strcmp(idNodeP->value.s, value) == 0)
               return contextItemP;
           }
@@ -117,11 +116,11 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
     KjNode* firstChildP = contextP->value.firstChildP;
 
     if (firstChildP->type == KjArray)
-      return orionldContextValueLookupInArray(firstChildP, value, useStringValueP);
+      return orionldContextValueLookupInArray(firstChildP, value);
     else if (firstChildP->type == KjObject)
-      return orionldContextValueLookupInObject(firstChildP, value, useStringValueP);
+      return orionldContextValueLookupInObject(firstChildP, value);
     else if (firstChildP->type == KjString)
-      return orionldContextValueLookupInUrl(firstChildP->value.s, value, useStringValueP);
+      return orionldContextValueLookupInUrl(firstChildP->value.s, value);
     else
       LM_E(("CTX: invalid type: %s", kjValueType(firstChildP->type)));
   }
@@ -140,7 +139,7 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
 //
 // orionldContextValueLookupInArray -
 //
-static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value, bool* useStringValueP)
+static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value)
 {
   LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in ARRAY context '%s'", value, contextVector->name));
 
@@ -149,9 +148,9 @@ static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const cha
     KjNode* itemP;
 
     if (contextNodeP->type == KjString)
-      itemP = orionldContextValueLookupInUrl(contextNodeP->value.s, value, useStringValueP);
+      itemP = orionldContextValueLookupInUrl(contextNodeP->value.s, value);
     else if (contextNodeP->type == KjObject)
-      itemP = orionldContextValueLookupInObject(contextNodeP, value, useStringValueP);
+      itemP = orionldContextValueLookupInObject(contextNodeP, value);
     else
     {
       LM_E(("Invalid array member - must be String or Object, not '%s'", kjValueType(contextNodeP->type)));
@@ -171,21 +170,19 @@ static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const cha
 //
 // orionldContextValueLookup -
 //
-KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value, bool* useStringValueP)
+KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 {
-  *useStringValueP = false;
-
   if (contextP == NULL)
     return NULL;
 
   LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in context '%s' (which is of type '%s')", value, contextP->url, kjValueType(contextP->tree->type)));
 
   if (contextP->tree->type == KjString)
-    return orionldContextValueLookupInUrl(contextP->tree->value.s, value, useStringValueP);
+    return orionldContextValueLookupInUrl(contextP->tree->value.s, value);
   else if (contextP->tree->type == KjArray)
-    return orionldContextValueLookupInArray(contextP->tree, value, useStringValueP);
+    return orionldContextValueLookupInArray(contextP->tree, value);
   else if (contextP->tree->type == KjObject)
-    return orionldContextValueLookupInObject(contextP->tree, value, useStringValueP);
+    return orionldContextValueLookupInObject(contextP->tree, value);
 
   LM_E(("Error: contexts must be either a String, an Object ot an Array"));
   return NULL;
