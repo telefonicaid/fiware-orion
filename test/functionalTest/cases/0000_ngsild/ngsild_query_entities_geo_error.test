@@ -1,0 +1,252 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geoquery: problem with maxDistance, Haversine states 853m, Pythagorus 1531m
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create Entity Building:store002
+# 02. Check contents in mongo
+# 03. GeoQuery near. Max Distance: 1290m - see empty array
+# 04. GeoQuery near. Max Distance: 1291m - see Building:store002
+#
+
+#
+# Friedrichstrasse 44 in Berlin is at:
+#   Longitude: 13.3903
+#   Latitude:  52.5075
+#
+# GeoJSON states that a set of geo-location-coordinates must be:
+#   The first two elements are longitude and latitude, or easting and northing, precisely in that order
+#
+# So, First Longitude, then Latitude: [ 13.3903, 52.5075 ]
+#
+#
+# Now, mongo saves the coordinates as: [ Long, Lat ], so they should be seen in Step 02 exactly as they are input in Step 01
+#
+# In step 3, we compare with the point [ 13.3777, 52.5162 ], also at [Long, Lat], which is not very far away.
+# 1290.986 meters according to http://www.onlineconversion.com/maps_distance_gmap.htm?lat1=52.5075&lon1=13.3903&lat2=52.5162&lon2=13.3777
+# mongodb seems to use this way of measuring.
+# => maxDistance=1290 should not find the entity, 1291 should.
+#
+# The coordinates in Step 3: '?geometry=Point&coordinates=[13.3777,52.5162]&georel=near;maxDistance==1291' are also in [Long, Lat] order
+#
+
+
+echo "01. Create Entity Building:store002"
+echo "==================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store002",
+  "type": "Building",
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Friedrichstraße 44",
+      "addressRegion": "Berlin",
+      "addressLocality": "Kreuzberg",
+      "postalCode": "10969"
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Checkpoint Markt"
+  },
+  "category": {
+    "type": "Property",
+    "value": ["commercial"]
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [13.3903, 52.5075]
+    }
+  },
+  "@context": "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Check contents in mongo"
+echo "==========================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GeoQuery near. Max Distance: 1290m - see empty array"
+echo "========================================================"
+orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1290&options=keyValues" -H 'Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "04. GeoQuery near. Max Distance: 1291m - see Building:store002"
+echo "=============================================================="
+orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1291&options=keyValues" -H 'Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity Building:store002
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store002
+Date: REGEX(.*)
+
+
+
+02. Check contents in mongo
+===========================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Building:store002",
+		"type" : "https://uri.fiware.org/ns/datamodels/Building",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"http://schema.org/address",
+		"http://schema.org/name",
+		"https://uri.fiware.org/ns/datamodels/category",
+		"location"
+	],
+	"attrs" : {
+		"http://schema=org/address" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"streetAddress" : "Friedrichstraße 44",
+				"addressRegion" : "Berlin",
+				"addressLocality" : "Kreuzberg",
+				"postalCode" : "10969"
+			},
+			"mdNames" : [ ]
+		},
+		"http://schema=org/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Checkpoint Markt",
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/datamodels/category" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : [
+				"commercial"
+			],
+			"mdNames" : [ ]
+		},
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					13.3903,
+					52.5075
+				]
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"location" : {
+		"attrName" : "location",
+		"coords" : {
+			"type" : "Point",
+			"coordinates" : [
+				13.3903,
+				52.5075
+			]
+		}
+	},
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GeoQuery near. Max Distance: 1290m - see empty array
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[]
+
+
+04. GeoQuery near. Max Distance: 1291m - see Building:store002
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 296
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "address": {
+            "addressLocality": "Kreuzberg",
+            "addressRegion": "Berlin",
+            "postalCode": "10969",
+            "streetAddress": "Friedrichstra\u00dfe 44"
+        },
+        "category": [
+            "commercial"
+        ],
+        "id": "urn:ngsi-ld:Building:store002",
+        "location": {
+            "coordinates": [
+                13.3903,
+                52.5075
+            ],
+            "type": "Point"
+        },
+        "name": "Checkpoint Markt",
+        "type": "Building"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -198,8 +198,8 @@ MongoDB server version: REGEX(.*)
 		"coords" : {
 			"type" : "Point",
 			"coordinates" : [
-				75.01,
-				-30.01
+				-30.01,
+				75.01
 			]
 		}
 	},

@@ -123,6 +123,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP)
 
       if ((numbers != 0) && (arrays != 0))
       {
+        LM_E(("Bad Input (invalid coordinates)"));
         *detailsP = (char*) "invalid coordinates'";
         return false;
       }
