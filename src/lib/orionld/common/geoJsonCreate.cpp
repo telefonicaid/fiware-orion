@@ -43,8 +43,8 @@ extern "C"
 //
 static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, char** errorStringP)
 {
-  KjNode* aLongNodeP;
-  KjNode* aLatNodeP;
+  KjNode* aLatitudeNodeP;
+  KjNode* aLongitudeNodeP;
 
   if (coordsNodeP->type != KjArray)
   {
@@ -53,18 +53,18 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
     return false;
   }
 
-  aLatNodeP  = coordsNodeP->value.firstChildP;
-  aLongNodeP = coordsNodeP->value.firstChildP->next;
+  aLongitudeNodeP  = coordsNodeP->value.firstChildP;
+  aLatitudeNodeP   = coordsNodeP->value.firstChildP->next;
 
-  if ((aLatNodeP == NULL) || (aLongNodeP == NULL) || (aLongNodeP->next != NULL))
+  if ((aLongitudeNodeP == NULL) || (aLatitudeNodeP == NULL) || (aLatitudeNodeP->next != NULL))
   {
     LM_E(("The coordinates must be a JSON Array with TWO members"));
     *errorStringP = (char*) "The coordinates must be a JSON Array";
     return false;
   }
 
-  if      (aLatNodeP->type == KjFloat)  *aLatP = aLatNodeP->value.f;
-  else if (aLatNodeP->type == KjInt)    *aLatP = aLatNodeP->value.i;
+  if      (aLongitudeNodeP->type == KjFloat)  *aLongP = aLongitudeNodeP->value.f;
+  else if (aLongitudeNodeP->type == KjInt)    *aLongP = aLongitudeNodeP->value.i;
   else
   {
     LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(orionldState.geoTypeP->type)));
@@ -72,8 +72,8 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
     return false;
   }
 
-  if      (aLongNodeP->type == KjFloat)  *aLongP = aLongNodeP->value.f;
-  else if (aLongNodeP->type == KjInt)    *aLongP = aLongNodeP->value.i;
+  if      (aLatitudeNodeP->type == KjFloat)  *aLatP = aLatitudeNodeP->value.f;
+  else if (aLatitudeNodeP->type == KjInt)    *aLatP = aLatitudeNodeP->value.i;
   else
   {
     LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(orionldState.geoTypeP->type)));

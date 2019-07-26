@@ -157,8 +157,8 @@ MongoDB server version: REGEX(.*)
 		"coords" : {
 			"type" : "Point",
 			"coordinates" : [
-				40,
-				-8
+				-8,
+				40
 			]
 		}
 	},

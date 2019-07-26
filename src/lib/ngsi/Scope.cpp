@@ -114,10 +114,22 @@ int Scope::fill
   std::string                 coordsString2 = coordsString;
   std::string                 georelString2 = georelString;
 
+  LM_T(LmtGeoJson, ("coordsString: %s", coordsString.c_str()));
+
   type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
 #ifdef ORIONLD
-  char* convertedCoordsString = NULL;
+  //
+  // The syntaxis of a polygon in APIv2 is:
+  //   40,-3;36,-4;44,-4;40,-3 ...
+  //
+  // In NGSI-LD it is:
+  // [ [40, -3], [36, -4], [44, -4], [40, -3] ... ]
+  //
+  //
+  // This loop eliminates all '[' and ']' and changes the outer commas for ';'
+  //
+  char convertedCoordsString[512];  // Simply HAS to be enough!
 
   if ((apiVersion == NGSI_LD_V1) && (geometryString == "Polygon"))
   {
@@ -125,7 +137,7 @@ int Scope::fill
     char* in    = cP;
     int   ccsIx = 0;
 
-    convertedCoordsString = (char*) calloc(1, strlen(cP));
+    bzero(convertedCoordsString, sizeof(convertedCoordsString));
 
     // Skip whitespace
     while (*cP == ' ') ++cP;
@@ -135,7 +147,6 @@ int Scope::fill
       // Error
       LM_E(("Geo: Converting NGSI-LD polygon coordinates: not starting with '['"));
       *errorStringP = std::string("Converting NGSI-LD polygon coordinates: not starting with '['");
-      free(convertedCoordsString);
       return -1;
     }
     ++cP;  // Skipping initial '['
@@ -148,7 +159,6 @@ int Scope::fill
       // Error
       LM_E(("Geo: Converting NGSI-LD polygon coordinates: not starting with '[['"));
       *errorStringP = std::string("Converting NGSI-LD polygon coordinates: not starting with '[['");
-      free(convertedCoordsString);
       return -1;
     }
     ++cP;  // Skipping second '['
@@ -175,7 +185,6 @@ int Scope::fill
         {
           LM_E(("Geo: Converting NGSI-LD polygon coordinates: invalid character: '%c' (whole string: %s)", *cP, in));
           *errorStringP = std::string("Converting NGSI-LD polygon coordinates: invalid character");
-          free(convertedCoordsString);
           return -1;
         }
 
@@ -219,7 +228,6 @@ int Scope::fill
         {
           LM_E(("Geo: Invalid polygon: '%s' (at: '%s')", in, cP));
           *errorStringP = std::string("Invalid polygon");
-          free(convertedCoordsString);
           return -1;
         }
       }
@@ -231,20 +239,17 @@ int Scope::fill
     {
       LM_E(("Garbage coordinates URI param?"));
       *errorStringP = std::string("Garbage coordinates URI param?");
-      free(convertedCoordsString);
       return -1;
     }
     else if (coords == 1)
     {
       LM_E(("At least TWO coordinates must be present"));
       *errorStringP = std::string("At least TWO coordinates must be present");
-      free(convertedCoordsString);
       return -1;
     }
 
     convertedCoordsString[ccsIx] = 0;
     coordsString2 = convertedCoordsString;
-    free(convertedCoordsString);
 
     if (georelString == "within")
       georelString2 = "coveredBy";
@@ -325,7 +330,9 @@ int Scope::fill
     LM_E(("geometry.parse: %s", errorStringP->c_str()));
     return -1;
   }
+  LM_T(LmtGeoJson, ("calling stringSplit with ';' as FS and string '%s'", coordsString2.c_str()));
   points = stringSplit(coordsString2, ';', pointStringV);
+  LM_T(LmtGeoJson, ("got %d points", points));
 
   if (points == 0)
   {
@@ -337,6 +344,7 @@ int Scope::fill
   //
   // Convert point-strings into instances of the orion::Point class
   //
+  LM_T(LmtGeoJson, ("%d points", points));
   for (int ix = 0; ix < points; ++ix)
   {
     std::vector<std::string>  coordV;
@@ -380,6 +388,18 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
+
+    if (apiVersion == NGSI_LD_V1)  // SWAP
+    {
+      double saved = longitude;
+
+      LM_T(LmtGeoJson, ("swapping longitude and latitude"));
+      longitude    = latitude;
+      latitude     = saved;
+    }
+
+    LM_T(LmtGeoJson, ("longitude: %f", longitude));
+    LM_T(LmtGeoJson, ("latitude:  %f", latitude));
 
     orion::Point* pointP = new Point(latitude, longitude);
     pointV.push_back(pointP);
