@@ -225,17 +225,17 @@ static void prepareDatabase(bool extraEntities = false)
     // gets addressed
 
     BSONObj en6 = BSON("_id" << BSON("id" << "E6" << "type" << "T") <<
-                       "attrNames" << BSON_ARRAY("S" << "N") <<
+                       "attrNames" << BSON_ARRAY("N") <<
                        "attrs" << BSON(
                          "N" << BSON("type" << "T" << "value" << 26.5)));
 
     BSONObj en7 = BSON("_id" << BSON("id" << "E7" << "type" << "") <<
-                       "attrNames" << BSON_ARRAY("S" << "N") <<
+                       "attrNames" << BSON_ARRAY("N") <<
                        "attrs" << BSON(
                          "N" << BSON("type" << "T" << "value" << 27)));
 
     BSONObj en8 = BSON("_id" << BSON("id" << "E8") <<
-                       "attrNames" << BSON_ARRAY("S" << "N") <<
+                       "attrNames" << BSON_ARRAY("N") <<
                        "attrs" << BSON(
                          "N" << BSON("type" << "T" << "value" << 27)));
 
@@ -257,6 +257,8 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -292,6 +294,8 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -304,6 +308,8 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -339,6 +345,8 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -362,6 +370,8 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -399,6 +409,8 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -411,6 +423,8 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -447,6 +461,8 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -470,6 +486,8 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -507,6 +525,8 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -519,6 +539,8 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -557,6 +579,8 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -580,6 +604,8 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -616,6 +642,8 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -628,6 +656,8 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -665,6 +695,8 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -688,6 +720,8 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -725,6 +759,8 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -748,6 +784,8 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -784,6 +822,8 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -807,6 +847,8 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -844,6 +886,8 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -867,6 +911,8 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -903,6 +949,8 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -926,6 +974,8 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -962,6 +1012,8 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -985,6 +1037,8 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
   HttpStatusCode         ms;
   QueryContextRequest   req;
   QueryContextResponse  res;
+
+  utInit();
 
   /* Prepare database */
   prepareDatabase();
@@ -1022,6 +1076,8 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
+
+  utExit();
 }
 
 /* ****************************************************************************

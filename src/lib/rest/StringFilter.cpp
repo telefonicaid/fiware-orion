@@ -39,6 +39,7 @@
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/Metadata.h"
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 using namespace mongo;
 
@@ -765,7 +766,7 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
 */
 void StringFilterItem::lhsParse(void)
 {
-  char* start = (char*) left.c_str();
+  char* start = strdup((char*) left.c_str());
   char* dotP  = start;
 
   start = lhsDotToEqualIfInsideQuote(start);
@@ -780,6 +781,7 @@ void StringFilterItem::lhsParse(void)
     attributeName = start;
     metadataName  = "";
     compoundPath  = "";
+    free(start);
     return;
   }
 
@@ -797,6 +799,7 @@ void StringFilterItem::lhsParse(void)
     {
       metadataName  = dotP;
       compoundPath  = "";
+      free(start);
       return;
     }
 
@@ -813,6 +816,8 @@ void StringFilterItem::lhsParse(void)
     //
     compoundPath = dotP;
   }
+
+  free(start);
 }
 
 
@@ -1819,14 +1824,32 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     switch (itemP->op)
     {
     case SfopExists:
-      bb.append("$exists", true);
-      bob.append(k, bb.obj());
+      // Compounds needs $exists operator but regular attributes can be queried based in attrsName,
+      // which is more efficient (see issue #3505)
+      if ((itemP->type == SftMq) || (itemP->compoundPath.size() != 0))
+      {
+        bb.append("$exists", true);
+        bob.append(k, bb.obj());
+      }
+      else
+      {
+        bob.append(ENT_ATTRNAMES, dbDotDecode(itemP->attributeName));
+      }
       f = bob.obj();
       break;
 
     case SfopNotExists:
-      bb.append("$exists", false);
-      bob.append(k, bb.obj());
+      // Compounds and metadata needs $exists operator but regular attributes can be queried based in attrsName,
+      // which is more efficient (see issue #3505)
+      if ((itemP->type == SftMq) || (itemP->compoundPath.size() != 0))
+      {
+        bb.append("$exists", false);
+        bob.append(k, bb.obj());
+      }
+      else
+      {
+        bob.append(ENT_ATTRNAMES, BSON("$ne" << dbDotDecode(itemP->attributeName)));
+      }
       f = bob.obj();
       break;
 
@@ -1860,7 +1883,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         break;
 
       case SfvtBool:
-        bb.append("$exists", true).append("$in", BSON_ARRAY(itemP->boolValue));
+        bb.append("$eq", itemP->boolValue);
         break;
 
       case SfvtNull:
@@ -1868,16 +1891,16 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
         // NOTE: $type 10 corresponds to NULL value
         // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
         //
-        bb.append("$exists", true).append("$type", 10);
+        bb.append("$type", 10);
         break;
 
       case SfvtNumber:
       case SfvtDate:
-        bb.append("$exists", true).append("$in", BSON_ARRAY(itemP->numberValue));
+        bb.append("$eq", itemP->numberValue);
         break;
 
       case SfvtString:
-        bb.append("$in", BSON_ARRAY(itemP->stringValue));
+        bb.append("$eq", itemP->stringValue);
         break;
 
       default:
@@ -1894,6 +1917,9 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       if ((itemP->valueType == SfvtNumberRange) || (itemP->valueType == SfvtDateRange))
       {
         bb.append("$gte", itemP->numberRangeFrom).append("$lte", itemP->numberRangeTo);
+
+        // In this case we cannot avoid to use $exists. Otherwise, $not will match entities
+        // not having the k field at all
         bb2.append("$exists", true).append("$not", bb.obj());
         bob.append(k, bb2.obj());
         f = bob.obj();
@@ -1905,6 +1931,8 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
           ba.append(itemP->numberList[ix]);
         }
 
+        // In this case we cannot avoid to use $exists. Otherwise, $nin will match entities
+        // not having the k field at all
         bb.append("$exists", true).append("$nin", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
@@ -1912,6 +1940,9 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else if (itemP->valueType == SfvtStringRange)
       {
         bb.append("$gte", itemP->stringRangeFrom).append("$lte", itemP->stringRangeTo);
+
+        // In this case we cannot avoid to use $exists. Otherwise, $not will match entities
+        // not having the k field at all
         bb2.append("$exists", true).append("$not", bb.obj());
         bob.append(k, bb2.obj());
         f = bob.obj();
@@ -1923,35 +1954,46 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
           ba.append(itemP->stringList[ix]);
         }
 
+        // In this case we cannot avoid to use $exists. Otherwise, $nin will match entities
+        // not having the k field at all
         bb.append("$exists", true).append("$nin", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
       }
       else if (itemP->valueType == SfvtBool)
       {
-        bb.append("$exists", true).append("$nin", BSON_ARRAY(itemP->boolValue));
+        // In this case we cannot avoid to use $exists. Otherwise, $ne will match entities
+        // not having the k field at all
+        bb.append("$exists", true).append("$ne", itemP->boolValue);
         bob.append(k, bb.obj());
         f = bob.obj();
       }
       else if (itemP->valueType == SfvtNull)
       {
+        // In this case we cannot avoid to use $exists. Otherwise, $not+$type will match entities
+        // not having the k field at all
         //
         // NOTE: $type 10 corresponds to NULL value
         // SEE:  https://docs.mongodb.com/manual/reference/bson-types/
         //
         bb.append("$exists", true).append("$not", BSON("$type" << 10));
+        bb.append("$not", BSON("$type" << 10));
         bob.append(k, bb.obj());
         f = bob.obj();
       }
       else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
       {
-        bb.append("$exists", true).append("$nin", BSON_ARRAY(itemP->numberValue));
+        // In this case we cannot avoid to use $exists. Otherwise, $ne will match entities
+        // not having the k field at all
+        bb.append("$exists", true).append("$ne", itemP->numberValue);
         bob.append(k, bb.obj());
         f = bob.obj();
       }
       else if (itemP->valueType == SfvtString)
       {
-        bb.append("$exists", true).append("$nin", BSON_ARRAY(itemP->stringValue));
+        // In this case we cannot avoid to use $exists. Otherwise, $ne will match entities
+        // not having the k field at all
+        bb.append("$exists", true).append("$ne", itemP->stringValue);
         bob.append(k, bb.obj());
         f = bob.obj();
       }
