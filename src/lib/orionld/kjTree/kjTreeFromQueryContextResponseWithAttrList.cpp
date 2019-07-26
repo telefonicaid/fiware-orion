@@ -248,15 +248,12 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       if (nodeP == NULL)
       {
-        bool    useStringValue = false;
-        KjNode* aliasNodeP     = orionldContextValueLookup(contextP, ceP->entityId.type.c_str(), &useStringValue);
+        KjNode* aliasNodeP     = orionldContextValueLookup(contextP, ceP->entityId.type.c_str());
 
         if (aliasNodeP != NULL)
         {
-          char* alias = (useStringValue == false)? aliasNodeP->name: aliasNodeP->value.s;
-
-          LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), alias));
-          nodeP = kjString(orionldState.kjsonP, "type", alias);
+          LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", ceP->entityId.type.c_str(), aliasNodeP->name));
+          nodeP = kjString(orionldState.kjsonP, "type", aliasNodeP->name);
         }
         else
         {
@@ -307,19 +304,16 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
 
       // Is it the default URL ?
       if ((orionldDefaultUrlLen != -1) && (strncmp(attrName, orionldDefaultUrl, orionldDefaultUrlLen) == 0))
-      {
         attrName = &attrName[orionldDefaultUrlLen];
-      }
       else
       {
         //
         // Lookup alias for the Attribute Name
         //
-        bool    useStringValue = false;
-        KjNode* aliasNodeP     = orionldContextValueLookup(contextP, aP->name.c_str(), &useStringValue);
+        KjNode* aliasNodeP = orionldContextValueLookup(contextP, aP->name.c_str());
 
         if (aliasNodeP != NULL)
-          attrName = (useStringValue == false)? aliasNodeP->name : aliasNodeP->value.s;
+          attrName = aliasNodeP->name;
       }
 
       char* match;

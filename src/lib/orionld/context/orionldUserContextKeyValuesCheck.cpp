@@ -79,9 +79,7 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
     }
     if (childP->type == KjString)
     {
-      bool useStringValue = false;
-
-      if (orionldContextValueLookup(&orionldCoreContext, childP->value.s, &useStringValue) != NULL)
+      if (orionldContextValueLookup(&orionldCoreContext, childP->value.s) != NULL)
       {
         LM_E(("In context '%s', the context item '%s' uses a value from the Core Context (%s)",
               url, childP->name, childP->value.s));
@@ -104,11 +102,9 @@ static bool orionldUserContextKeyValuesCheck2(KjNode* tree, char* url, char** de
 
         if (SCOMPARE4(itemP->name, '@', 'i', 'd', 0))
         {
-          bool useStringValue = false;
-
           atidP = itemP;
           LM_T(LmtContext, ("Checking value '%s' for iten named '%s'", itemP->value.s, itemP->name));
-          if (orionldContextValueLookup(&orionldCoreContext, itemP->value.s, &useStringValue) != NULL)
+          if (orionldContextValueLookup(&orionldCoreContext, itemP->value.s) != NULL)
           {
             LM_E(("In context '%s', the context item '%s' of '%s' uses a value from the Core Context (%s)",
                   url, itemP->name, childP->name, itemP->value.s));
