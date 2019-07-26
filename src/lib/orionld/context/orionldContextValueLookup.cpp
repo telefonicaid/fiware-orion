@@ -52,7 +52,7 @@ static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const cha
 //
 static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* value)
 {
-  LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in URI STRING context '%s'", value, contextUrl));
+  LM_T(LmtContextValueLookup, ("Looking up '%s' in URI STRING context '%s'", value, contextUrl));
 
   OrionldContext* contextP = orionldContextLookup(contextUrl);
 
@@ -73,11 +73,11 @@ static KjNode* orionldContextValueLookupInUrl(char* contextUrl, const char* valu
 //
 static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* value)
 {
-  LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in OBJECT context '%s'", value, contextP->name));
+  LM_T(LmtContextValueLookup, ("Looking up '%s' in OBJECT context '%s'", value, contextP->name));
 
   if ((contextP->name == NULL) || (strcmp(contextP->name, "@context") == 0))
   {
-    LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' - looping over items in @context", value));
+    LM_T(LmtContextValueLookup, ("Looking up '%s' - looping over items in @context", value));
     for (KjNode* contextItemP = contextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
       if (contextItemP->type == KjString)
@@ -85,10 +85,10 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
         // Skip members whose value is a string that starts with "@" - they are information, not translations
         if (contextItemP->value.s[0] == '@')
         {
-          LM_T(LmtContextValueLookup, ("CTX: Skipping '%s'", contextItemP->value.s));
+          LM_T(LmtContextValueLookup, ("Skipping '%s'", contextItemP->value.s));
           continue;
         }
-        LM_T(LmtContextValueLookup, ("CTX: Looking for '%s'. Comparing with '%s'", value, contextItemP->value.s));
+        LM_T(LmtContextValueLookup, ("Looking for '%s'. Comparing with '%s'", value, contextItemP->value.s));
         if (strcmp(contextItemP->value.s, value) == 0)
           return contextItemP;
       }
@@ -112,7 +112,7 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
   }
   else if (strcmp(contextP->value.firstChildP->name, "@context") == 0)
   {
-    LM_E(("CTX: First child is called '%s' and its type is '%s'", contextP->value.firstChildP->name, kjValueType(contextP->value.firstChildP->type)));
+    LM_E(("First child is called '%s' and its type is '%s'", contextP->value.firstChildP->name, kjValueType(contextP->value.firstChildP->type)));
     KjNode* firstChildP = contextP->value.firstChildP;
 
     if (firstChildP->type == KjArray)
@@ -122,11 +122,11 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
     else if (firstChildP->type == KjString)
       return orionldContextValueLookupInUrl(firstChildP->value.s, value);
     else
-      LM_E(("CTX: invalid type: %s", kjValueType(firstChildP->type)));
+      LM_E(("invalid type: %s", kjValueType(firstChildP->type)));
   }
   else
   {
-    LM_E(("CTX: Invalid context: '%s'", contextP->name));
+    LM_E(("Invalid context: '%s'", contextP->name));
     return NULL;
   }
 
@@ -141,7 +141,7 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
 //
 static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const char* value)
 {
-  LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in ARRAY context '%s'", value, contextVector->name));
+  LM_T(LmtContextValueLookup, ("Looking up '%s' in ARRAY context '%s'", value, contextVector->name));
 
   for (KjNode* contextNodeP = contextVector->value.firstChildP; contextNodeP != NULL; contextNodeP = contextNodeP->next)
   {
@@ -175,7 +175,7 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
   if (contextP == NULL)
     return NULL;
 
-  LM_T(LmtContextValueLookup, ("CTX: Looking up '%s' in context '%s' (which is of type '%s')", value, contextP->url, kjValueType(contextP->tree->type)));
+  LM_T(LmtContextValueLookup, ("Looking up '%s' in context '%s' (which is of type '%s')", value, contextP->url, kjValueType(contextP->tree->type)));
 
   if (contextP->tree->type == KjString)
     return orionldContextValueLookupInUrl(contextP->tree->value.s, value);

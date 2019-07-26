@@ -114,13 +114,13 @@ Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
   "DateProp": {
     "type": "Property",
     "value": "2018-12-04T12:00:00"
-  },
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+  }
 }
 
 

@@ -105,20 +105,11 @@ void orionldErrorResponseCreate
     detailsP = kjString(orionldState.kjsonP, "details", contextDetails);
   }
   else
-  {
     detailsP = kjString(orionldState.kjsonP, "details", "no details");
-  }
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
   kjChildAdd(orionldState.responseTree, typeP);
   kjChildAdd(orionldState.responseTree, titleP);
   kjChildAdd(orionldState.responseTree, detailsP);
-
-  if ((orionldState.acceptJsonld) && (orionldState.contextP != NULL))
-  {
-    KjNode* contextP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
-
-    kjChildAdd(orionldState.responseTree, contextP);
-  }
 }

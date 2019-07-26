@@ -1223,9 +1223,6 @@ ConnectionInfo* connectionTreatInit
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
 
-  if ((reqNo % 100) == 0)
-    LM_TMP(("Request No %d", reqNo));
-
   *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics

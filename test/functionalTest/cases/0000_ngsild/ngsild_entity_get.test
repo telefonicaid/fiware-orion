@@ -126,13 +126,13 @@ Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "A",
     "name": {
         "type": "Property",
         "value": "John 6"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
 }
 
 
@@ -145,13 +145,13 @@ Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "id": "http://a.b.c/entity/E2",
   "type": "A",
   "name": {
     "type": "Property",
     "value": "John 6"
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  }
 }
 
 
@@ -163,7 +163,7 @@ Content-Length: 171
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
-{"id":"http://a.b.c/entity/E2","type":"A","name":{"type":"Property","value":"John 6"},"@context":"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"}
+{"@context":"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld","id":"http://a.b.c/entity/E2","type":"A","name":{"type":"Property","value":"John 6"}}
 
 
 06. Attempt to GET non-existing E3, see 404 not Found

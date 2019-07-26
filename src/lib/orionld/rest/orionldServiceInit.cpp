@@ -52,6 +52,8 @@ extern "C"
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/serviceRoutines/orionldPostEntities.h"       // orionldPostEntities
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
+#include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // orionldGetSubscriptions
+#include "orionld/serviceRoutines/orionldGetSubscription.h"    // orionldGetSubscription
 #include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
 
 
@@ -203,6 +205,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+  }
+  else if (serviceP->serviceRoutine == orionldGetSubscriptions)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldGetSubscription)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
 }
 

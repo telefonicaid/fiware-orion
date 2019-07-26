@@ -155,22 +155,22 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A": {
       "type": "Property",
       "value": 1
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "A": {
       "type": "Property",
       "value": 3
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 

@@ -210,13 +210,13 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A1": {
       "type": "Property",
       "value": "E1/A1"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 
@@ -231,22 +231,22 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A1": {
       "type": "Property",
       "value": "E1/A1"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E4",
     "type": "T",
     "A5": {
       "type": "Property",
       "value": "E4/A5"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 
@@ -261,22 +261,22 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A2": {
       "type": "Property",
       "value": "E1/A2"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E2",
     "type": "T",
     "A2": {
       "type": "Property",
       "value": "E2/A2"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 
@@ -291,15 +291,16 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A2": {
       "type": "Property",
       "value": "E1/A2"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E2",
     "type": "T",
     "A2": {
@@ -309,10 +310,10 @@ Date: REGEX(.*)
     "A3": {
       "type": "Property",
       "value": "E2/A3"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "A3": {
@@ -322,17 +323,16 @@ Date: REGEX(.*)
     "A4": {
       "type": "Property",
       "value": "E3/A4"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E4",
     "type": "T",
     "A4": {
       "type": "Property",
       "value": "E4/A4"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 
@@ -347,15 +347,16 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A2": {
       "type": "Property",
       "value": "E1/A2"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E2",
     "type": "T",
     "A2": {
@@ -365,17 +366,16 @@ Date: REGEX(.*)
     "A3": {
       "type": "Property",
       "value": "E2/A3"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   },
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "A3": {
       "type": "Property",
       "value": "E3/A3"
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 
