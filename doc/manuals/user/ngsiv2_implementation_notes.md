@@ -291,14 +291,14 @@ Apart from the `status` values defined for subscription in the NGSIv2 specificat
 
 ## Notify only attributes that change
 
-Orion supports an extra field `onChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
+Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
 the NGSIv2 specification. This field takes a `true` or `false` value (default is `false`, if the field is ommitted). If
 set to `true` then notifications associated to the subscription include only attributes that changed in the triggering
 update request, in combination with the `attrs` or `exceptAttrs` field.
 
-For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onChangedAttrs` is `false`) and the triggering
+For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onlyChangedAttrs` is `false`) and the triggering
 update modified only A, then A, B and C are notified (in other words, the triggering update doesn't matter). However,
-if `onChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
+if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
 
 [Top](#top)
 
