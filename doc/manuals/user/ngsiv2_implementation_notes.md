@@ -288,6 +288,8 @@ Check details in the document about [initial notifications](initial_notification
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
+TBD: to be completed by Fermin
+
 [Top](#top)
 
 # `lastFailureReason` and `lastSuccessCode` subscriptions fields

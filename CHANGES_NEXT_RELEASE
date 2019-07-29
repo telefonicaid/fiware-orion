@@ -12,3 +12,4 @@
 - Add: CLI option -outReqMsgMaxSize to let users decide the maximum allowed total size of any outgoing request message (for forwards and notifications) (#3492)
 - Add: NGSIv2 forwards now work for queries and updates - for simple cases (#3068)
 - Fix: The 'Allow:' header for the service /v2/registrations had the incorrect value of "Allow: POST". The correct value is: "Allow: GET, POST"
+- Add: Notify only attributes that change (#3190)

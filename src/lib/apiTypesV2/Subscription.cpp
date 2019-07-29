@@ -123,13 +123,25 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastNotification", this->lastNotification);
   }
 
-  if (!this->blacklist)
+  if (!this->blacklist && !this->onlyChanged)
   {
     jh.addRaw("attrs", vectorToJson(this->attributes));
+    jh.addBool("onlyChangedAttrs", false);
+  }
+  else if (!this->blacklist && this->onlyChanged)
+  {
+    jh.addRaw("attrs", vectorToJson(this->attributes));
+    jh.addBool("onlyChangedAttrs", this->onlyChanged);
+  }
+  else if (this->blacklist && this->onlyChanged)
+  {
+    jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
+    jh.addBool("onlyChangedAttrs", this->onlyChanged);
   }
   else
   {
     jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
+    jh.addBool("onlyChangedAttrs", false);
   }
 
   jh.addString("attrsFormat", attrsFormat);

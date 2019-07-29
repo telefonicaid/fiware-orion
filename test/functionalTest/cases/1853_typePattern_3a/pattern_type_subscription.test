@@ -127,7 +127,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 460
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -143,7 +143,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -181,7 +182,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 479
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +198,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {

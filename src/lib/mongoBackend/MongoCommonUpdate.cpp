@@ -953,6 +953,7 @@ static bool addTriggeredSubscriptions_withCache
 (
   std::string                                    entityId,
   std::string                                    entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -999,8 +1000,19 @@ static bool addTriggeredSubscriptions_withCache
     //           instead of its std::vector<std::string> ... ?
     //
     StringList aList;
-
-    aList.fill(cSubP->attributes);
+    bool op = false;
+    if (cSubP->onlyChanged)
+    {
+      subToNotifyList(modifiedAttrs, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
+      if (op)
+      {
+        continue;
+      }
+    }
+    else
+    {
+      aList.fill(cSubP->attributes);
+    }
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1048,7 +1060,14 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
-    subP->blacklist = cSubP->blacklist;
+    if (cSubP->onlyChanged)
+    {
+      subP->blacklist = false;
+    }
+    else
+    {
+      subP->blacklist = cSubP->blacklist;
+    }
     subP->metadata  = cSubP->metadata;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
@@ -1258,6 +1277,7 @@ static bool addTriggeredSubscriptions_noCache
 (
   const std::string&                             entityId,
   const std::string&                             entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1397,10 +1417,19 @@ static bool addTriggeredSubscriptions_noCache
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
+      bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
       httpInfo.fill(sub);
+
+      bool op = false;
+      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
+      if (op)
+      {
+         continue;
+      }
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
@@ -1408,9 +1437,16 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           renderFormat,
           httpInfo,
-          subToAttributeList(sub), "", "");
+          aList, "", "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      if (!onlyChanged)
+      {
+        trigs->blacklist = blacklist;
+      }
+      else
+      {
+        trigs->blacklist = false;
+      }
 
       if (sub.hasField(CSUB_METADATA))
       {
@@ -1515,6 +1551,7 @@ static bool addTriggeredSubscriptions
 (
   const std::string&                             entityId,
   const std::string&                             entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1526,11 +1563,11 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
   }
 }
 
@@ -2325,6 +2362,7 @@ static bool processContextAttributeVector
   std::string               entityDetail    = cerP->entity.toString();
   bool                      entityModified  = false;
   std::vector<std::string>  modifiedAttrs;
+  std::vector<std::string>  attributes;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2427,6 +2465,7 @@ static bool processContextAttributeVector
     {
       modifiedAttrs.push_back(ca->name);
     }
+    attributes.push_back(ca->name);
   }
 
   /* Add triggered subscriptions */
@@ -2436,7 +2475,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3516,6 +3555,7 @@ void processContextElement
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
         std::vector<std::string>                       attrNames;
+        std::vector<std::string>                       attributes;
 
         for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
         {
@@ -3524,6 +3564,7 @@ void processContextElement
 
         if (!addTriggeredSubscriptions(eP->id,
                                        eP->type,
+                                       attrNames,
                                        attrNames,
                                        subsToNotify,
                                        err,

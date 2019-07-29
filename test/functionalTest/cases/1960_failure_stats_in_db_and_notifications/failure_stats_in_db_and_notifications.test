@@ -216,7 +216,7 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 361
+Content-Length: 386
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -233,6 +233,7 @@ Date: REGEX(.*)
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Couldn't resolve host name",
             "lastNotification": "REGEX(.*)",
+            "onlyChangedAttrs": false,
             "timesSent": 1
         },
         "status": "failed",
@@ -262,7 +263,7 @@ Date: REGEX(.*)
 05. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -281,6 +282,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 2
         },
         "status": "active",
@@ -310,7 +312,7 @@ Date: REGEX(.*)
 07. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -329,6 +331,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 3
         },
         "status": "active",
@@ -412,7 +415,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 423
+Content-Length: 448
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -431,6 +434,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 4
         },
         "status": "failed",

@@ -4234,7 +4234,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", "
               "custom: false, throttling: -1, servicePath: \"/#\", status: \"active\", "
               "entities: [ { id: \"E1\", isPattern: \"false\", type: \"T1\", isTypePattern: false } ], "
-              "attrs: [], metadata: [], blacklist: false, conditions: [ \"A\" ], "
+              "attrs: [], metadata: [], blacklist: false, onlyChanged: false, conditions: [ \"A\" ], "
               "expression: { q: \"\", mq: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
               "- exception: boom!!)", s2);
 

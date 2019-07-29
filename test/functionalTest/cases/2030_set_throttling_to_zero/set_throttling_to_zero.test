@@ -101,7 +101,7 @@ Date: REGEX(.*)
 02. Get the subscription, see throttling=5
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 292
+Content-Length: 317
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -116,7 +116,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:9997/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -148,7 +149,7 @@ Date: REGEX(.*)
 04. Get the subscription, see throttling=0 (throttling is not rendered in the response if it is zero)
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 277
+Content-Length: 302
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -163,7 +164,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:9997/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {

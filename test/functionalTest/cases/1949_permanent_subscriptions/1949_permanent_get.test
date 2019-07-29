@@ -130,7 +130,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (w/o expires field)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 415
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -145,7 +145,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -183,7 +184,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (with expires field)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -199,7 +200,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {
@@ -237,7 +239,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID (w/o expires field)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 415
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -252,7 +254,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:1234"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
