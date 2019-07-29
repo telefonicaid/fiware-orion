@@ -125,7 +125,7 @@ Date: REGEX(.*)
 02. Get subscription, see notification.exceptAttrs
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 598
+Content-Length: 623
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -147,7 +147,8 @@ Date: REGEX(.*)
             "previousValue",
             "actionType",
             "*"
-        ]
+        ],
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {
@@ -191,7 +192,7 @@ Date: REGEX(.*)
 04. Get subscription again, see notification.attrs
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 539
+Content-Length: 564
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -208,7 +209,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://127.0.0.1:5678"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "expired",
     "subject": {

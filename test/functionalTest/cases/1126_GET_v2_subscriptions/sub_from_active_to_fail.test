@@ -131,7 +131,7 @@ Date: REGEX(.*)
 02. Get subscription (no last* field)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 277
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -144,7 +144,8 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -174,7 +175,7 @@ Date: REGEX(.*)
 04. Get subscription see status: active, lastSuccessCode: 200
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 373
+Content-Length: 398
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -191,6 +192,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -222,7 +224,7 @@ Date: REGEX(.*)
 07. Get subscription see status: failed, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
 =========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 462
+Content-Length: 487
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -241,6 +243,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 2
     },
     "status": "failed",

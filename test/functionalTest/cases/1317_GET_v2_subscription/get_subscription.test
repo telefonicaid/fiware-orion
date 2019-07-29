@@ -156,7 +156,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 385
+Content-Length: 410
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -173,7 +173,8 @@ Date: REGEX(.*)
         "attrsFormat": "legacy",
         "http": {
             "url": "http://127.0.0.1:REGEX(\d+)/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {
@@ -201,7 +202,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 317
+Content-Length: 342
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -217,7 +218,8 @@ Date: REGEX(.*)
         "attrsFormat": "legacy",
         "http": {
             "url": "http://127.0.0.1:REGEX(\d+)/notify"
-        }
+        },
+        "onlyChangedAttrs": false
     },
     "status": "active",
     "subject": {

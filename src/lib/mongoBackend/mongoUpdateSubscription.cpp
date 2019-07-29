@@ -664,6 +664,27 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
 
 /* ****************************************************************************
 *
+* setOnlyChanged -
+*/
+static void setOnlyChanged(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.onlyChangedProvided)
+  {
+    setOnlyChanged(subUp, b);
+  }
+  else
+  {
+    bool oList = subOrig.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(subOrig, CSUB_ONLYCHANGED) : false;
+
+    b->append(CSUB_ONLYCHANGED, oList);
+    LM_T(LmtMongo, ("Subscription onlyChanged: %s", oList? "true" : "false"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * setMetadata -
 */
 static void setMetadata(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
@@ -916,6 +937,7 @@ std::string mongoUpdateSubscription
   setAttrs(subUp, subOrig, &b);
   setMetadata(subUp, subOrig, &b);
   setBlacklist(subUp, subOrig, &b);
+  setOnlyChanged(subUp, subOrig, &b);
 
   setCondsAndInitialNotify(subUp,
                            subOrig,

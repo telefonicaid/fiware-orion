@@ -2314,6 +2314,154 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 
 /* ****************************************************************************
 *
+* getCommonAttributes -
+*/
+static void getCommonAttributes
+(
+  const bool                        type,
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  if (type)
+  {
+    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    {
+      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      {
+        if (fVector[cavOc] == sVector[avOc])
+        {
+          resultVector.push_back(fVector[cavOc]);
+        }
+      }
+    }
+  }
+  else
+  {
+    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    {
+      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      {
+        if (fVector[cavOc] != sVector[avOc])
+        {
+          resultVector.push_back(fVector[cavOc]);
+        }
+      }
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* subToNotifyList -
+*/
+void subToNotifyList
+(
+  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  conditionVector,
+  const std::vector<std::string>&  notificationVector,
+  const std::vector<std::string>&  entityAttrsVector,
+  StringList&                      attrL,
+  const bool&                      blacklist,
+  bool&                            op
+)
+{
+    std::vector<std::string>  condAttrs;
+    std::vector<std::string>  notifyAttrs;
+
+    if (!blacklist)
+    {
+      if (conditionVector.size() == 0 && notificationVector.size() == 0)
+      {
+        attrL.fill(modifiedAttrs);
+      }
+      else if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      {
+        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      else if (conditionVector.size() != 0 && notificationVector.size() == 0)
+      {
+        getCommonAttributes(true, modifiedAttrs, entityAttrsVector, notifyAttrs);
+      }
+      else
+      {
+        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      if (notifyAttrs.size() == 0 && (conditionVector.size() != 0 || notificationVector.size() != 0))
+      {
+        op = true;
+      }
+      attrL.fill(notifyAttrs);
+    }
+    else if (blacklist)
+    {
+      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      {
+        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      else
+      {
+        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
+        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+      }
+
+      if (notifyAttrs.size() == 0)
+      {
+        op = true;
+      }
+      attrL.fill(notifyAttrs);
+    }
+}
+
+
+
+/* ****************************************************************************
+*
+* subToAttributeList -
+*
+* Extract the attribute list from a BSON document (in the format of the csubs/casub
+* collection)
+*/
+StringList subToAttributeList
+(
+  const BSONObj&                  sub,
+  const bool&                     onlyChanged,
+  const bool&                     blacklist,
+  const std::vector<std::string>  modifiedAttrs,
+  const std::vector<std::string>  attributes,
+  bool&                           op
+)
+{
+  if (!onlyChanged)
+  {
+    return subToAttributeList(sub);
+  }
+  StringList                attrL;
+  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<std::string>          conditionAttrs;
+  std::vector<std::string>          notificationAttrs;
+  for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
+  {
+    std::string subAttr = subAttrs[ix].String();
+    notificationAttrs.push_back(subAttr);
+  }
+  for (unsigned int ix = 0; ix < condAttrs.size() ; ++ix)
+  {
+    std::string subAttr = condAttrs[ix].String();
+    conditionAttrs.push_back(subAttr);
+  }
+  subToNotifyList(modifiedAttrs, conditionAttrs, notificationAttrs, attributes, attrL, blacklist, op);
+  return attrL;
+}
+
+
+
+/* ****************************************************************************
+*
 * subToAttributeList -
 *
 * Extract the attribute list from a BSON document (in the format of the csubs/casub

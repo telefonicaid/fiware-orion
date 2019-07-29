@@ -639,7 +639,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 409
+Content-Length: 434
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -656,6 +656,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 2
     },
     "status": "active",
@@ -676,7 +677,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 411
+Content-Length: 436
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -693,6 +694,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 2
     },
     "status": "active",
@@ -713,7 +715,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 435
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -730,6 +732,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
         "timesSent": 2
     },
     "status": "active",

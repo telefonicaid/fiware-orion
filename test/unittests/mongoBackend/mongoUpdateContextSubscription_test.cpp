@@ -4429,6 +4429,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
                                                                      "isPattern" << "false")) <<
                                        "attrs" << BSONArray() <<
                                        "blacklist" << false <<
+                                       "onlyChanged" << false <<
                                        "conditions" << BSONArray());
 
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
@@ -4469,7 +4470,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
               "{ expiration: 1360250700, reference: \"http://notify1.me\", custom: false, "
               "servicePath: \"/#\", "
               "entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ],"
-              " attrs: [], metadata: [], blacklist: false, "
+              " attrs: [], metadata: [], blacklist: false, onlyChanged: false, "
               "conditions: [], lastNotification: 15000000, "
               "lastFailure: -1, lastSuccess: -1, "
               "expression: { q: \"\", mq: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" }> "
