@@ -134,9 +134,9 @@ Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
   "id": "urn:ngsi-ld:T:12:13:14",
-  "type": "T",
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+  "type": "T"
 }
 
 

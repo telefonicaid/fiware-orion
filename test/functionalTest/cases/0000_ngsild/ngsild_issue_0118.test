@@ -113,7 +113,7 @@ echo
 
 echo "04. GET subscriptions, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned"
 echo "========================================================================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url "/ngsi-ld/v1/subscriptions" -H "Accept: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 

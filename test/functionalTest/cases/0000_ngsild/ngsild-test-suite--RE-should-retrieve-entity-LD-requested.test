@@ -97,6 +97,7 @@ Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
   "id": "urn:ngsi-ld:T:00:00:00",
   "type": "T",
   "P1": {
@@ -123,8 +124,7 @@ Date: REGEX(.*)
       "type": "Relationship",
       "object": "urn:ngsi-ld:T3:A2345"
     }
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+  }
 }
 
 

@@ -183,69 +183,11 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   for (int ix = 0; ix < hits; ix++)
   {
     ContextElement* ceP      = &responseP->contextElementResponseVector[ix]->contextElement;
-    char*           eId      = (char*) ceP->entityId.id.c_str();
-    OrionldContext* contextP = orionldState.contextP;
 
     if (oneHit == false)
     {
       top = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(root, top);
-    }
-
-    if (contextP == NULL)
-    {
-      ContextAttribute* contextAttributeP = ceP->contextAttributeVector.lookup("@context");
-
-      if (contextAttributeP != NULL)
-      {
-        //
-        // Now we need to convert the ContextAttribute "@context" into a OrionldContext
-        //
-        // Let's compare a Context Tree with the ContextAttribute "@context"
-        //
-        // Context Tree:
-        //   ----------------------------------------------
-        //   {
-        //     "@context": {} | [] | ""
-        //   }
-        //
-        // ContextAttribute:
-        //   ----------------------------------------------
-        //   "@context": {
-        //     "type": "xxx",
-        //     "value": {} | [] | ""
-        //
-        // What we have in ContextAttribute::value is what we need as value of "@context" in the Context Tree.
-        // We must create the toplevel object and the "@context" member, and give it the value of "ContextAttribute::value".
-        // If ContextAttribute::value is a string, then the Context Tree will be simply a string called "@context" with the value of ContextAttribute::value.
-        // If ContextAttribute::value is a vector ...
-        // If ContextAttribute::value is an object ...
-        // The function kjTreeFromContextContextAttribute does just this
-        //
-
-        char*    details;
-        KjNode*  contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);  // FIXME: Use global kalloc buffer somehow - to avoid kjClone()
-
-        if (contextTree == NULL)
-        {
-          LM_E(("Unable to create context tree for @context attribute of entity '%s': %s", eId, details));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context tree for @context attribute", details, OrionldDetailsEntity);
-          return NULL;
-        }
-
-        contextP = orionldContextCreateFromTree(contextTree, eId, OrionldUserContext, &details);
-        if (contextP == NULL)
-        {
-          LM_E(("Unable to create context from tree: %s", details));
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create context from tree", details, OrionldDetailsEntity);
-          return NULL;
-        }
-
-        contextP->tree = kjClone(contextP->tree);   // This call may be avoided by using non-thread allocation, see FIXME on call to kjTreeFromContextContextAttribute()
-
-        orionldContextListInsert(contextP, false);  // Inserting context for an entity
-        orionldContextListPresent();
-      }
     }
 
 
@@ -265,7 +207,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     {
       char* alias;
 
-      alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
+      alias = orionldAliasLookup(orionldState.contextP, ceP->entityId.type.c_str());
       nodeP = kjString(orionldState.kjsonP, "type", alias);
       if (nodeP == NULL)
       {
@@ -290,11 +232,10 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
 
     //
-    // Attributes, including @context
+    // Attributes
     //
     // FIXME: Use kjTreeFromContextAttribute() !!!
     //
-    ContextAttribute* atContextAttributeP = NULL;
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
@@ -303,13 +244,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       const char*       aName    = aP->name.c_str();
       KjNode*           aTop     = NULL;
 
-      if (strcmp(aP->name.c_str(), "@context") == 0)
-      {
-        atContextAttributeP = aP;
-        continue;
-      }
-
-      attrName = orionldAliasLookup(contextP, aP->name.c_str());
+      attrName = orionldAliasLookup(orionldState.contextP, aP->name.c_str());
 
       char* valueFieldName;
       if (keyValues)
@@ -527,69 +462,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             LM_E(("Error in creation of KjNode for metadata (%s)", (details != NULL)? details : "no details"));
           else
             kjChildAdd(aTop, nodeP);
-        }
-      }
-    }
-
-    //
-    // Set MIME Type to JSONLD if JSONLD is in the Accept header of the incoming request
-    // FIXME: Probably not necessary, as it is done in orionldMhdConnectionTreat.cpp::acceptHeaderCheck()
-    //
-    if (orionldState.acceptJsonld == true)
-    {
-      ciP->outMimeType = JSONLD;
-    }
-
-
-    //
-    // If no context inside attribute list, then the default context has been used
-    //
-    // NOTE: HTTP Link header is added ONLY in orionldMhdConnectionTreat
-    //
-    if (atContextAttributeP == NULL)
-    {
-      if (orionldState.acceptJsonld == true)
-      {
-        if (orionldState.contextP == NULL)
-          orionldState.contextP = &orionldDefaultContext;
-
-        nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
-        kjChildAdd(top, nodeP);
-      }
-    }
-    else
-    {
-      if (orionldState.acceptJsonld == true)
-      {
-        if (atContextAttributeP->valueType == orion::ValueTypeString)
-        {
-          nodeP = kjString(orionldState.kjsonP, "@context", atContextAttributeP->stringValue.c_str());
-          kjChildAdd(top, nodeP);
-        }
-        else if (atContextAttributeP->compoundValueP != NULL)
-        {
-          if (atContextAttributeP->compoundValueP->valueType == orion::ValueTypeVector)
-          {
-            nodeP = kjArray(orionldState.kjsonP, "@context");
-            kjChildAdd(top, nodeP);
-
-            for (unsigned int ix = 0; ix < atContextAttributeP->compoundValueP->childV.size(); ix++)
-            {
-              orion::CompoundValueNode*  compoundP     = atContextAttributeP->compoundValueP->childV[ix];
-              KjNode*                    contextItemP  = kjString(orionldState.kjsonP, NULL, compoundP->stringValue.c_str());
-              kjChildAdd(nodeP, contextItemP);
-            }
-          }
-          else
-          {
-            orionldErrorResponseCreate(ciP, OrionldInternalError, "Invalid context", "Inline contexts are not supported - the functionality is not supported yet.", OrionldDetailsString);
-            return orionldState.responseTree;
-          }
-        }
-        else
-        {
-          orionldErrorResponseCreate(ciP, OrionldInternalError, "Invalid context", "The context is neither a string nor an array", OrionldDetailsString);
-          return orionldState.responseTree;
         }
       }
     }

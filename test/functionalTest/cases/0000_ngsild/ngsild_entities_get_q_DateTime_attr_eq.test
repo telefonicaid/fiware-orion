@@ -155,13 +155,13 @@ Date: REGEX(.*)
 
 [
   {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "A": {
       "type": "TemporalProperty",
       "value": 1542960000
-    },
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    }
   }
 ]
 

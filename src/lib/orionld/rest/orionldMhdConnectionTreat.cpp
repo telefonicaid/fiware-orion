@@ -27,6 +27,7 @@
 
 extern "C"
 {
+#include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
 #include "kjson/kjParse.h"                                     // kjParse
 #include "kjson/kjRender.h"                                    // kjRender
@@ -45,6 +46,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_CONTEXT_URL
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
@@ -265,18 +267,18 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
 //
 static void kjTreeFirstLevelPresent(const char* what, KjNode* tree)
 {
-  LM_TMP(("--------------- %s ----------------", what));
+  // LM_TMP(("--------------- %s ----------------", what));
 
   if (tree == NULL)
   {
-    LM_TMP(("Empty tree"));
+    // LM_TMP(("Empty tree"));
     return;
   }
 
   int ix = 0;
   for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    LM_TMP(("node %d: %s", ix, nodeP->name));
+    // LM_TMP(("node %d: %s", ix, nodeP->name));
     ++ix;
   }
 }
@@ -351,7 +353,9 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   // If ORIONLD_SERVICE_OPTION_PREFETCH_ENTITY_ID is set in Service Options, also look up entity::id,type
   //
-  if (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE)
+  bool idAndType = ((orionldState.serviceP != NULL) && (orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE));
+
+  if (idAndType)
   {
     KjNode* prev      = NULL;
     KjNode* attrNodeP = orionldState.requestTree->value.firstChildP;
@@ -373,8 +377,8 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated field", "@context", OrionldDetailsString);
           return false;
         }
-
         orionldState.payloadContextNode = attrNodeP;
+        LM_TMP(("CTX: Found @context in payload: %p, orionldState.payloadContextNode"));
         LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.payloadContextNode));
 
         attrNodeP = orionldState.payloadContextNode->next;
@@ -426,7 +430,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = attrNodeP->next;
       }
     }
-    // kjTreeFirstLevelPresent("After Removing ALL 3", orionldState.requestTree);
   }
   else
   {
@@ -595,6 +598,75 @@ static bool contextToCache(ConnectionInfo* ciP)
 
 // -----------------------------------------------------------------------------
 //
+// contextToPayload -
+//
+static void contextToPayload(void)
+{
+  LM_TMP(("CTX: Accepts JSON-LD, Service Routine OK"));
+  // If no contest node exists, create it with the default context
+
+  if (orionldState.payloadContextNode == NULL)
+  {
+    LM_TMP(("CTX: payloadContextNode == NULL, using Incoming Link header: '%s'", orionldState.link));
+    if (orionldState.link == NULL)
+      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
+    else
+      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
+  }
+
+  if (orionldState.payloadContextNode == NULL)
+  {
+    orionldErrorResponseCreate(NULL, OrionldInternalError, "Out of memory", NULL, OrionldDetailsString);
+    return;
+  }
+
+  //
+  // Response tree type:
+  //   Object: Add @context node as first member
+  //   Array:  Create object for the @context, add it to the new object and add the new object as first member of responseTree
+  //
+  if (orionldState.responseTree->type == KjObject)
+  {
+    LM_TMP(("CTX: Adding orionldState.payloadContextNode to payload"));
+    orionldState.payloadContextNode->next = orionldState.responseTree->value.firstChildP;
+    orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
+  }
+  else if (orionldState.responseTree->type == KjArray)
+  {
+    for (KjNode* rTreeItemP = orionldState.responseTree->value.firstChildP; rTreeItemP != NULL; rTreeItemP = rTreeItemP->next)
+    {
+      KjNode* contextNode;
+
+      if (orionldState.payloadContextNode == NULL)
+      {
+        if (orionldState.link == NULL)
+          contextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
+        else
+          contextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
+      }
+      else
+        contextNode = kjClone(orionldState.payloadContextNode);
+
+      if (contextNode == NULL)
+      {
+        orionldErrorResponseCreate(NULL, OrionldInternalError, "Out of memory", NULL, OrionldDetailsString);
+        return;
+      }
+
+      contextNode->next = rTreeItemP->value.firstChildP;
+      rTreeItemP->value.firstChildP = contextNode;
+    }
+  }
+  else
+  {
+    // Any other type ??? Error
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
@@ -701,13 +773,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck(ciP) == false))
     goto respond;
 
-
+  LM_TMP(("orionldState.payloadContextNode at %p", orionldState.payloadContextNode));
   //
-  // FIXME: Check the @context from payload ... move from orionldPostEntities()
-  //
-  //
-  // First treat the @context, if none, use the default context
-  // orionldContextTreat needs ceP to push the '@context' attribute to the ContextElement.
+  // Treat the context from the payload, if any
   //
   if ((orionldState.payloadContextNode != NULL) && (orionldContextTreat(ciP, orionldState.payloadContextNode) == false))
       goto respond;
@@ -771,21 +839,23 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if (orionldState.responseTree != NULL)
   {
-#if 0
     //
     // Should a @context be added to the response payload?
     //
-    if ((orionldState.acceptJsonld == true) && (ciP->httpStatusCode < 300))
-    {
-      //
-      // ToDo:
-      //   - Make a KjNode out of orionldState.contextP
-      //   - Insert the new KjNode as first member of orionldState.responseTree
-      //
-    }
-#endif
+    bool addContext = ((orionldState.serviceP != NULL) && ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0));
 
+    if (addContext)
+    {
+      if ((orionldState.acceptJsonld == true) && (ciP->httpStatusCode < 300))
+        contextToPayload();
+    }
+
+
+    //
+    // Render the payload to get a string for restReply to send the response
+    //
     // FIXME: Smarter allocation !!!
+    //
     int bufLen = 1024 * 1024 * 32;
     orionldState.responsePayload = (char*) malloc(bufLen);
     if (orionldState.responsePayload != NULL)

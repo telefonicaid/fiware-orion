@@ -1975,37 +1975,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     BSONObj            f;
     std::string        left = std::string(itemP->left.c_str());
 
-#if 0
-    //
-    // This is now taken care of in StringFilter::parse instead.
-    // Leaving it here commented out for some time ...
-    //
-    if (orionldState.apiVersion == NGSI_LD_V1)
-    {
-      char  expanded[256];
-      char* details;
-
-      if (orionldUriExpand(orionldState.contextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
-      {
-        *errorStringP = details;
-        return false;
-      }
-
-      //
-      // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo
-      //
-      for (unsigned int ix = 0; ix < sizeof(expanded); ix++)
-      {
-        if (expanded[ix] == '.')
-          expanded[ix] = '=';
-        else if (expanded[ix] == 0)
-          break;
-      }
-
-      itemP->attributeName = expanded;
-    }
-#endif
-
     //
     // Left hand side might have to change, in case of Metadata filters (mq)
     // The change consists in adding a '.md.' between attribute-name and metadata-name.
