@@ -30,6 +30,8 @@ test/functionalTest/cases/*.contextBroker.log
 test/functionalTest/cases/*/*.contextBroker.log
 test/functionalTest/cases/*/*.log
 test/functionalTest/cases/*.log
+test/jMeter/output/
+test/jMeter/*.log
 
 core*
 test/valgrind/*.out
