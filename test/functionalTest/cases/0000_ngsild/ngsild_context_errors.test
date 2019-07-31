@@ -38,16 +38,17 @@ brokerStart CB 212-249
 # 04. @context is an empty string
 # 05. URL in context is an invalid URL
 # 06. URL in context is a valid URL but it doesn't exist
+# 07. Ugly Parse Error: @context: { 'https://...' ]
 #
-# Need Cantera for the rest:
-# 07. Parse Error in the resulting context
-# 08. resulting payload not a JSON object?
-# 09. resulting payload is an empty object
-# 10. Not a single member
-# 11. Single member not called '@context
-# 12. Single member not object or array
-# 13. Array with member that is not a string
-# 14. Array with member that is not a valid URL
+# Need Cantera for the rest (no longer true - have inline contexts now ...):
+# 08. Parse Error in the resulting context
+# 09. resulting payload not a JSON object?
+# 10. resulting payload is an empty object
+# 11. Not a single member
+# 12. Single member not called '@context
+# 13. Single member not object or array
+# 14. Array with member that is not a string
+# 15. Array with member that is not a valid URL
 # 
 
 echo "01. @context is a Boolean"
@@ -146,6 +147,20 @@ echo
 echo
 
 
+echo "07. Ugly Parse Error: @context: { 'https://...' ]"
+echo "================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "@context": { "http://valid.url/oh/yes" ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
 
 --REGEXPECT--
 01. @context is a Boolean
@@ -229,6 +244,20 @@ Date: REGEX(.*)
     "details": "http://valid.url/oh/yes",
     "title": "Failure to create context from URL",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Ugly Parse Error: @context: { 'https://...' ]
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 168
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "Line 0, Pos 0: JSON Parse Error: no colon found after name of member",
+    "title": "JSON Parse Error",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
 
