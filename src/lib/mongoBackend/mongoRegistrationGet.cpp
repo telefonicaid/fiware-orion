@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin and Larysse Savanna
 */
 #include <string>
 #include <vector>
@@ -30,6 +30,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/idCheck.h"
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
@@ -233,6 +234,73 @@ static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 
 
 
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* setLdRegistrationId -
+*/
+static void setLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  reg->id = getStringFieldF(r, "_id");
+}
+
+
+
+/* ****************************************************************************
+*
+* setLdName -
+*/
+static void setLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  reg->name = r.hasField(REG_NAME) ? getStringFieldF(r, REG_NAME) : "";
+}
+
+
+
+/* ****************************************************************************
+*
+* setLdObservationInterval -
+*/
+static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  if(r.hasField(REG_OBSERVATION_INTERVAL))
+  {
+    mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
+    reg->observationInterval.start  = getStringFieldF(obj, REG_INTERVAL_START);
+    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getStringFieldF(obj, REG_INTERVAL_END) : "";
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setLdManagementInterval -
+*/
+static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  if(r.hasField(REG_MANAGEMENT_INTERVAL))
+  {
+    mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
+    reg->managementInterval.start  = getStringFieldF(obj, REG_INTERVAL_START);
+    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getStringFieldF(obj, REG_INTERVAL_END) : "";
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setLdEndpoint -
+*/
+static void setLdEndpoint(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  reg->endpoint = r.hasField(REG_ENDPOINT) ? getStringFieldF(r, REG_ENDPOINT) : "";
+}
+#endif  //ORIONLD
+
+
+
 /* ****************************************************************************
 *
 * mongoRegistrationGet - 
@@ -427,3 +495,108 @@ void mongoRegistrationsGet
 
   oeP->fill(SccOk, "");
 }
+
+
+
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* mongoLdRegistrationGet - 
+*/
+bool mongoLdRegistrationGet
+(
+  ngsiv2::Registration*  regP,
+  const char*            regId,
+  const char*            tenant,
+  HttpStatusCode*        statusCodeP,
+  char**                 detailsP
+)
+{
+  bool                                  reqSemTaken = false;
+  std::string                           err;
+  std::auto_ptr<mongo::DBClientCursor>  cursor;
+  mongo::BSONObj                        q = BSON("_id" << regId);
+
+  reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
+
+  LM_T(LmtMongo, ("Mongo Get Registration"));
+
+  TIME_STAT_MONGO_READ_WAIT_START();
+  mongo::DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+    *detailsP    = (char*) "Internal Error during DB-query";
+    *statusCodeP = SccReceiverInternalError;
+    return false;
+  }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  LM_TMP(("qBSON %s", q.toString().c_str()));
+
+  /* Process query result */
+  if (moreSafe(cursor))
+  {
+    mongo::BSONObj r;
+
+    if (!nextSafeOrErrorF(cursor, &r, &err))
+    {
+      releaseMongoConnection(connection);
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *detailsP    = (char*) "Runtime Error (exception in nextSafe)";
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+
+    setLdRegistrationId(regP, r);
+    setLdName(regP, r);
+    setDescription(regP, r);
+
+    if (setDataProvided(regP, r, false) == false)
+    {
+      releaseMongoConnection(connection);
+      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+
+    setLdObservationInterval(regP, r);
+    setLdManagementInterval(regP, r);
+    setExpires(regP, r);
+    setStatus(regP, r);
+    setLdEndpoint(regP, r);
+
+    if (moreSafe(cursor))
+    {
+      releaseMongoConnection(connection);
+
+      // Ooops, we expected only one
+      LM_T(LmtMongo, ("more than one registration: '%s'", regId));
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *detailsP    = (char*) "more than one registration matched";
+      *statusCodeP = SccConflict;
+      return false;
+    }
+  }
+  else
+  {
+    releaseMongoConnection(connection);
+    LM_T(LmtMongo, ("registration not foundd: '%s'", regId));
+    reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+    *detailsP    = (char*) "registration not found";
+    *statusCodeP = SccContextElementNotFound;
+    return false;
+  }
+
+  releaseMongoConnection(connection);
+  reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+
+  *statusCodeP = SccOk;
+  return true;
+}
+#endif

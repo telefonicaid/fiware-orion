@@ -121,6 +121,20 @@ struct DataProvided
 
 /* ****************************************************************************
 *
+* TimeInterval -
+*/
+struct TimeInterval
+{
+  std::string  start;
+  std::string  end;
+
+  std::string  toJson();
+};
+
+
+
+/* ****************************************************************************
+*
 * Registration -
 */
 struct Registration
@@ -130,13 +144,21 @@ struct Registration
   std::string            description;
   bool                   descriptionProvided;
   DataProvided           dataProvided;
+  TimeInterval           observationInterval;
+  TimeInterval           managementInterval;
   long long              expires;
+  std::string            endpoint;
   std::string            status;
   Provider               provider;
   ForwardingInformation  forwardingInformation;
 
   Registration();
   ~Registration();
+
+  #ifdef ORIONLD
+    std::string          name;
+  #endif
+
   std::string            toJson();
 };
 }

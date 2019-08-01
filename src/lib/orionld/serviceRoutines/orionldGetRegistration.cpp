@@ -20,15 +20,22 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin and Larysse Savanna
 */
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
+#include "mongoBackend/mongoRegistrationGet.h"                 // mongoLdRegistrationGet
 #include "orionld/common/orionldState.h"                       // orionldState
+
+#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultContext
+
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
+#include "orionld/kjTree/kjTreeFromRegistration.h"             // kjTreeFromRegistration
 
 
 
@@ -38,11 +45,22 @@
 //
 bool orionldGetRegistration(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldGetRegistration"));
+  ngsiv2::Registration  registration;
+  char*                 details;
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - GET /ngsi-ld/v1/csourceRegistrations/*", orionldState.wildcard[0], OrionldDetailsString);
+  LM_T(LmtServiceRoutine, ("In orionldGetRegistration (%s)", orionldState.wildcard[0]));
+  LM_TMP(("TENANT: %s", orionldState.tenant));
 
-  ciP->httpStatusCode = SccNotImplemented;
+  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
+  {
+    LM_E(("mongoLdRegistrationGet error: %s", details));
+    orionldErrorResponseCreate(ciP, OrionldResourceNotFound, details, orionldState.wildcard[0], OrionldDetailsString);
+    return false;
+  }
+
+  // Transform to KjNode tree
+  ciP->httpStatusCode       = SccOk;
+  orionldState.responseTree = kjTreeFromRegistration(ciP, &registration);
 
   return true;
 }

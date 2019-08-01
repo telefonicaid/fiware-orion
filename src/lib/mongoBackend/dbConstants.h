@@ -60,6 +60,12 @@
 #define REG_FORMAT                   "format"
 #define REG_DESCRIPTION              "description"
 #define REG_STATUS                   "status"
+#define REG_NAME                     "name"
+#define REG_OBSERVATION_INTERVAL     "observationInterval"
+#define REG_MANAGEMENT_INTERVAL      "managementInterval"
+#define REG_INTERVAL_START           "start"
+#define REG_INTERVAL_END             "end"
+#define REG_ENDPOINT                 "endpoint"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ATTRNAMES                "attrNames"
