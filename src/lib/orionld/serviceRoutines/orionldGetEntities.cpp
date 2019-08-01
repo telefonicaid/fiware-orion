@@ -40,7 +40,10 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/qLex.h"                               // qLex
+#include "orionld/common/qParse.h"                             // qParse
+#include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
@@ -48,10 +51,12 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 
 
+
+// ----------------------------------------------------------------------------
 //
-// FIXME: URI Expansion from 'orionldPostEntities.cpp' to its own module!
+// NGSILD_Q_FILTER - use the new Q-filter for NGSI-LD
 //
-extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
+#define NGSILD_Q_FILTER   1
 
 
 
@@ -147,13 +152,13 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (georel != NULL)
   {
-    if ((strncmp(georel, "near", 4)       != 0) &&
-        (strncmp(georel, "within", 6)     != 0) &&
-        (strncmp(georel, "contains", 8)   != 0) &&
-        (strncmp(georel, "overlaps", 8)   != 0) &&
+    if ((strncmp(georel, "near", 4)        != 0) &&
+        (strncmp(georel, "within", 6)      != 0) &&
+        (strncmp(georel, "contains", 8)    != 0) &&
+        (strncmp(georel, "overlaps", 8)    != 0) &&
         (strncmp(georel, "intersects", 10) != 0) &&
-        (strncmp(georel, "equals", 6)     != 0) &&
-        (strncmp(georel, "disjoint", 8)   != 0))
+        (strncmp(georel, "equals", 6)      != 0) &&
+        (strncmp(georel, "disjoint", 8)    != 0))
     {
       LM_W(("Bad Input (invalid value for georel)"));
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "invalid value for georel", georel, OrionldDetailsString);
@@ -348,7 +353,48 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     }
   }
 
+#if NGSILD_Q_FILTER
   if (q != NULL)
+  {
+    char* title;
+    char* details;
+
+    LM_TMP(("Q: got a Q-Filter: %s", q));
+
+    QNode* lexList;
+    QNode* qTree;
+
+    if ((lexList = qLex(q, &title, &details)) == NULL)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, title, details, OrionldDetailsString);
+      parseData.qcr.res.release();
+      return false;
+    }
+
+    if ((qTree = qParse(lexList, &title, &details)) == NULL)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, title, details, OrionldDetailsString);
+      parseData.qcr.res.release();
+      return false;
+    }
+
+    orionldState.qMongoFilterP = new mongo::BSONObj;
+
+    LM_TMP(("Q: Calling qTreeToBsonObj"));
+    mongo::BSONObjBuilder objBuilder;
+    if (qTreeToBsonObj(qTree, &objBuilder, &title, &details) == false)
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, title, details, OrionldDetailsString);
+      parseData.qcr.res.release();
+      return false;
+    }
+    LM_TMP(("Q: Setting qMongoFilterP"));
+    *orionldState.qMongoFilterP = objBuilder.obj();
+  }
+
+#else
+
+  if (q != NULL)  // Old APIv2 StringFilter
   {
     //
     // ngsi-ld doesn't support metadata which orion APIv1 and v2 does.
@@ -494,6 +540,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
   }
+#endif
 
   // Call standard op postQueryContext
   std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
