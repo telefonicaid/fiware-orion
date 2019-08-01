@@ -26,8 +26,17 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
+#include "rest/OrionError.h"                                   // OrionError
+#include "apiTypesV2/Registration.h"                           // Registration
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
+#include "mongoBackend/mongoRegistrationCreate.h"              // mongoRegistrationCreate
+
+#include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
 
 
 
@@ -37,11 +46,51 @@
 //
 bool orionldPostRegistrations(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldPostRegistrations"));
+ ngsiv2::Registration reg;
+ std::string regId;
+ OrionError oError;
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - GET /ngsi-ld/v1/csourceRegistrations", NULL, OrionldDetailsString);
+  if (orionldState.contextP != NULL)
+      reg.ldContext = orionldState.contextP->url;
+  else
+    reg.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
 
-  ciP->httpStatusCode = SccNotImplemented;
+  char* regIdP = NULL;
+  if (kjTreeToRegistration(ciP, &reg, &regIdP) == false)
+  {
+    LM_E(("kjTreeToRegistration FAILED"));
+    // orionldErrorResponseCreate is invoked by kjTreeToRegistration
+    return false;
+  }
+   //
+  // Does the Registration already exist?
+  //
+  if (regIdP != NULL)
+  {
+    ngsiv2::Registration  registration;
+
+    mongoRegistrationGet(&registration, regIdP, orionldState.tenant, ciP->servicePathV[0], &oError);
+
+    if (!registration.id.empty())
+    {
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
+      return false;
+    }
+  }
+
+  //
+  // Create the Registration
+  //
+
+  mongoRegistrationCreate(&reg,
+                                  orionldState.tenant,
+                                  ciP->servicePathV[0],
+                                  &regId,
+                                  &oError);
+
+  ciP->httpStatusCode = SccCreated;
+
+  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/registration/", regId.c_str());
 
   return true;
 }

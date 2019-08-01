@@ -135,6 +135,11 @@ struct Registration
   Provider               provider;
   ForwardingInformation  forwardingInformation;
 
+#ifdef ORIONLD
+  std::string   name;
+  std::string   ldContext;
+#endif
+
   Registration();
   ~Registration();
   std::string            toJson();
