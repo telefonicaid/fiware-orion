@@ -24,6 +24,9 @@ RAMP_TIME = 1
 DOMAIN_IP = 'localhost'
 PORT = 1026
 PATH_SERVICE = '/ngsi-ld/v1/entities/'
+
+HTTP_VERBS = ['GET', 'POST', 'PATCH', 'DELETE']
+
 HTTP_VERB = 'GET'
 
 OUTPUT_FILE_NAME = HTTP_VERB + '_num_threads_' + \
@@ -45,10 +48,11 @@ BODY_DATA = """
 def defineParams(tree):
     root = tree.getroot()
 
-    if HTTP_VERB != "GET" or HTTP_VERB != "POST" or HTTP_VERB != "PATCH" or HTTP_VERB != "DELETE":
+    verbSelected = list(filter(lambda verb: verb == HTTP_VERB, HTTP_VERBS))
+
+    if verbSelected == []:
         print('ERROR:', 'Use a Orion-LD Broker supported HTTP verb.')
         os.abort()
-        
 
     for item in root.iter('stringProp'):
         if item.attrib['name'] == "ThreadGroup.num_threads":
