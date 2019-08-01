@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET without Accept gives application/ld+json back
+Issue 160 says GET without Accept gives application/ld+json back. This test proves it does not
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -73,7 +73,7 @@ payload='{
     "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
   ]
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -99,7 +99,7 @@ echo
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store002>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store002>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store002
 Date: REGEX(.*)
 
