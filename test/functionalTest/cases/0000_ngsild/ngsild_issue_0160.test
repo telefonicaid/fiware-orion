@@ -1,0 +1,160 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET without Accept gives application/ld+json back
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Create entity store002
+# 02. GET the entity with 'Accept: application/json' - see response as application/json 
+#
+
+echo "01. Create entity store002"
+echo "=========================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store002",
+  "type": "Building",
+  "category": {
+    "type": "Property",
+    "value": ["commercial"]
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Friedrichstrasse 44",
+      "addressRegion": "Berlin",
+      "addressLocality": "Kreuzberg",
+      "postalCode": "10969"
+    },
+    "verified": {
+      "type": "Property",
+      "value": true
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [13.3903, 52.5075]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Checkpoint Markt"
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the entity with 'Accept: application/json' - see response as application/json"
+echo "====================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Building&prettyPrint=yes&spaces=2' --noPayloadCheck \
+-H "Accept: application/json" \
+-H "Cache-Control: no-cache" \
+-H "Connection: keep-alive" \
+-H "Host: localhost:1030" \
+-H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
+-H "Postman-Token: fc8edb97-40a1-4d21-9b64-b3a991800109,66e5101b-4769-49e4-8b87-04b4c8076950" \
+-H "User-Agent: PostmanRuntime/7.13.0" \
+-H "accept-encoding: gzip, deflate" \
+-H "cache-control: no-cache"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity store002
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store002>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store002
+Date: REGEX(.*)
+
+
+
+02. GET the entity with 'Accept: application/json' - see response as application/json
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 739
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:Building:store002",
+    "type": "Building",
+    "address": {
+      "type": "Property",
+      "value": {
+        "streetAddress": "Friedrichstrasse 44",
+        "addressRegion": "Berlin",
+        "addressLocality": "Kreuzberg",
+        "postalCode": "10969"
+      },
+      "verified": {
+        "type": "Property",
+        "value": true
+      }
+    },
+    "name": {
+      "type": "Property",
+      "value": "Checkpoint Markt"
+    },
+    "category": {
+      "type": "Property",
+      "value": [
+        "commercial"
+      ]
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.3903,
+          52.5075
+        ]
+      }
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
