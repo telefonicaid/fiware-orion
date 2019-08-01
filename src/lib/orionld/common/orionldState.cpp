@@ -105,6 +105,8 @@ void orionldStateInit(void)
   orionldState.payloadContextNode          = NULL;
   orionldState.payloadIdNode               = NULL;
   orionldState.payloadTypeNode             = NULL;
+  orionldState.acceptJson                  = false;
+  orionldState.acceptJsonld                = false;
 }
 
 
