@@ -55,6 +55,14 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     }
     topBsonObjP->append("$or", arrBuilder.arr());
   }
+  else if (treeP->type == QNodeAnd)
+  {
+    for (QNode* qNodeP = treeP->value.children; qNodeP != NULL; qNodeP = qNodeP->next)
+    {
+      if (qTreeToBsonObj(qNodeP, topBsonObjP, titleP, detailsP) == false)
+        return false;
+    }
+  }
   else if (treeP->type == QNodeEQ)
   {
     QNode*                 leftP  = treeP->value.children;
