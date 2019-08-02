@@ -148,6 +148,40 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
 
 
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* setObservationInterval
+*/
+static void setObservationInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder intervalObj;
+
+  intervalObj.append("start", (long long) interval.start);
+  intervalObj.append("end",   (long long) interval.end);
+
+  bobP->append("observationInterval", intervalObj.obj());
+}
+
+
+
+/* ****************************************************************************
+*
+* setManagementInterval
+*/
+static void setManagementInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder intervalObj;
+
+  intervalObj.append("start", (long long) interval.start);
+  intervalObj.append("end",   (long long) interval.end);
+
+  bobP->append("managementInterval", intervalObj.obj());
+}
+#endif
+
+
+
 /* ****************************************************************************
 *
 * setStatus -
@@ -209,6 +243,11 @@ void mongoRegistrationCreate
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+
+#ifdef ORIONLD
+  setObservationInterval(regP->observationInterval, &bob);
+  setManagementInterval(regP->managementInterval, &bob);
+#endif
 
   //
   // Insert in DB
