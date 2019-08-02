@@ -88,7 +88,6 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
 
   *regIdPP  = (char*) regP->id.c_str();
 
-  
   //
   // type
   //
@@ -127,7 +126,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   // Loop over the tree
   //
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {   
+  {
     if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Registration::name", kNodeP);
@@ -157,7 +156,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
         for (KjNode* eNodeP = informationItemP->value.firstChildP; eNodeP != NULL; eNodeP = eNodeP->next)
         {
           if (SCOMPARE9(eNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
-          {           
+          {
             if (kjTreeToEntIdVector(ciP, eNodeP, &regP->dataProvided.entities) == false)
             {
               LM_E(("kjTreeToEntIdVector failed"));
@@ -171,7 +170,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             {
                STRING_CHECK(propP, "PropertyInfo::name");
                regP->dataProvided.attributes.push_back(propP->value.s);
-            }      
+            }
           }
           else if (SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
           {
@@ -183,7 +182,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             {
                STRING_CHECK(relP, "RelationInfo::name");
                regP->dataProvided.attributes.push_back(relP->value.s);
-            }      
+            }
           }
           else
           {
@@ -245,7 +244,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     {
       DUPLICATE_CHECK(endpointP, "Registration::endpoint", kNodeP);
       STRING_CHECK(kNodeP, "Registration::endpoint");
-  
+
       regP->provider.http.url = endpointP->value.s;
     }
     else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
@@ -259,7 +258,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     else
     {
       //
-      // FIXME: Add to Property vector - To be fixed when we decide to break the data model of Orion APIv2 
+      // FIXME: Add to Property vector - To be fixed when we decide to break the data model of Orion APIv2
       //
       orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Registration - ngsi-ld still follows Orion APIv2 data model", kNodeP->name, OrionldDetailsString);
       return false;

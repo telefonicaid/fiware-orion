@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
