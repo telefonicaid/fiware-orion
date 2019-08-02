@@ -100,9 +100,6 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   // o type
   //
 
-  // id
-  char* subscriptionId;
-
   if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
@@ -111,22 +108,19 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
 
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
-
-    subscriptionId = (char*) subP->id.c_str();
   }
   else
-    subscriptionId = orionldState.payloadIdNode->value.s;
+    subP->id = orionldState.payloadIdNode->value.s;
 
-  if ((urlCheck(subscriptionId, NULL) == false) && (urnCheck(subscriptionId, NULL) == false))
+  if ((urlCheck((char*) subP->id.c_str(), NULL) == false) && (urnCheck((char*) subP->id.c_str(), NULL) == false))
   {
     LM_W(("Bad Input (Subscription::id is not a URI)"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription::id is not a URI", subscriptionId, OrionldDetailsAttribute);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription::id is not a URI", subP->id.c_str(), OrionldDetailsAttribute);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
-  subP->id  = subscriptionId;
-  *subIdPP  = subscriptionId;
+  *subIdPP  = (char*) subP->id.c_str();
 
 
   //

@@ -22,12 +22,23 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
+#include "rest/OrionError.h"                                   // OrionError
+#include "apiTypesV2/Registration.h"                           // Registration
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
+#include "mongoBackend/mongoRegistrationCreate.h"              // mongoRegistrationCreate
+
+#include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
 
 
 
@@ -37,11 +48,58 @@
 //
 bool orionldPostRegistrations(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldPostRegistrations"));
+  ngsiv2::Registration  reg;
+  std::string           regId;
+  OrionError            oError;
+  char*                 regIdP = NULL;
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - GET /ngsi-ld/v1/csourceRegistrations", NULL, OrionldDetailsString);
+  if (orionldState.contextP != NULL)
+    reg.ldContext = orionldState.contextP->url;
+  else
+    reg.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
 
-  ciP->httpStatusCode = SccNotImplemented;
+  if (kjTreeToRegistration(ciP, &reg, &regIdP) == false)
+  {
+    LM_E(("kjTreeToRegistration FAILED"));
+    // orionldErrorResponseCreate is invoked by kjTreeToRegistration
+    return false;
+  }
+
+  //
+  // Does the Registration already exist?
+  //
+  // FIXME: Create a new function that simply llos up the registration!!!
+  //        See mongoEntityExists.cpp.
+  //        That will be a lot faster than the current solution.
+  //
+
+  // FIXME - Let's skip this for now
+  // ngsiv2::Registration  registration;
+  // mongoRegistrationGet(&registration, regIdP, orionldState.tenant, ciP->servicePathV[0], &oError);
+
+  // if (!registration.id.empty())
+  // {
+  //   orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
+  //   return false;
+  // }
+
+
+  //
+  // Create the Registration
+  //
+  LM_TMP(("REG: regIdP == %s", regIdP));
+  LM_TMP(("Translated the KTree to a Registration - now calling mongoRegistrationCreate"));
+  mongoRegistrationCreate(&reg,
+                          orionldState.tenant,
+                          ciP->servicePathV[0],
+                          &regId,
+                          &oError);
+  LM_TMP(("REG: regId == %s", regId.c_str()));
+
+  // FIXME: Check oError for failure!
+  ciP->httpStatusCode = SccCreated;
+
+  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/csourceRegistrations/", regIdP);
 
   return true;
 }
