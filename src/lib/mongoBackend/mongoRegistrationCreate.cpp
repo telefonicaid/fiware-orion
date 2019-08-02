@@ -36,6 +36,7 @@
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
+#include "orionld/common/orionldState.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -48,6 +49,12 @@
 *
 * setRegistrationId - 
 */
+#ifdef ORIONLD
+static void setNgsildRegistrationId(mongo::BSONObjBuilder* bobP, const char* regId)
+{
+  bobP->append("_id", regId);
+}
+#endif
 static void setRegistrationId(mongo::BSONObjBuilder* bobP, std::string* regIdP)
 {
   mongo::OID oId;
@@ -191,7 +198,11 @@ void mongoRegistrationCreate
   //
   mongo::BSONObjBuilder  bob;
 
-  setRegistrationId(&bob, regIdP);
+  if (orionldState.apiVersion == NGSI_LD_V1)
+    setNgsildRegistrationId(&bob, regP->id.c_str());
+  else
+    setRegistrationId(&bob, regIdP);
+
   setDescription(regP->description, &bob);
   setExpiration(regP->expires, &bob);
   setServicePath(servicePath, &bob);
@@ -209,6 +220,7 @@ void mongoRegistrationCreate
   {
     reqSemGive(__FUNCTION__, "Mongo Create Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);
+
     return;
   }
 

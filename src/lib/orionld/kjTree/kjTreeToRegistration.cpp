@@ -43,55 +43,52 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
 
+
+
 // -----------------------------------------------------------------------------
 //
 // kjTreeToRegistration -
 //
 bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char** regIdPP)
 {
-  KjNode*                   kNodeP;
-  char*                     nameP                     = NULL;
-  char*                     descriptionP              = NULL;
-  char*                     timeIntervalP             = NULL;
-  char*                     informationP              = NULL;
-  char*                     endpointP                 = NULL;
-  bool                      entitiesPresent           = false;
-  char*                     expiresP                  = NULL;
-  KjNode*                   entArrayNodeP             = NULL; //Information::entities Array Node Pointer
-  KjNode*                   eNodeP                    = NULL; //Entities Node Pointer
-
-
-  // id
-  char* registrationId;
+  KjNode*  kNodeP;
+  KjNode*  nameP                     = NULL;
+  KjNode*  descriptionP              = NULL;
+  KjNode*  informationP              = NULL;
+  KjNode*  observationIntervalP      = NULL;
+  KjNode*  managementIntervalP       = NULL;
+  KjNode*  locationP                 = NULL;
+  KjNode*  endpointP                 = NULL;
+  KjNode*  observationSpaceP         = NULL;
+  KjNode*  operationSpaceP           = NULL;
+  bool     entitiesPresent           = false;
+  KjNode*  expiresP                  = NULL;
 
   if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
 
+    LM_T(LmtServiceRoutine, ("jorge-log: orionldState.payloadIdNode == NULL"));
+
     mongoIdentifier(randomId);
 
     regP->id  = "urn:ngsi-ld:ContextSourceRegistration:";
     regP->id += randomId;
-
-    registrationId = (char*) regP->id.c_str();
-
-    LM_T(LmtServiceRoutine, ("jorge-log: orionldState.payloadIdNode == NULL"));
   }
   else
-    registrationId = orionldState.payloadIdNode->value.s;
+    regP->id = orionldState.payloadIdNode->value.s;
 
-  if ((urlCheck(registrationId, NULL) == false) && (urnCheck(registrationId, NULL) == false))
+  if ((urlCheck((char*) regP->id.c_str(), NULL) == false) && (urnCheck((char*) regP->id.c_str(), NULL) == false))
   {
     LM_W(("Bad Input (Registration::id is not a URI)"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration::id is not a URI", registrationId, OrionldDetailsAttribute);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
-  regP->id  = registrationId;
-  *regIdPP  = registrationId;
+  *regIdPP  = (char*) regP->id.c_str();
 
-
+  
   //
   // type
   //
@@ -103,96 +100,90 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   //     "type": "ContextSourceRegistration"
   //   is added to the response payload.
   //
-
-//FIXME payload is null
-  /*  if (orionldState.payloadTypeNode == NULL)
+  if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Registration::type)"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Mandatory field missing", "Registration::type", OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
-  }  */
+  }
 
-// FIXME:
-// Create function SCOMPARE25 for compare if type is ContextSourceRegistration
-  /* if (!SCOMPARE13(orionldState.payloadTypeNode->value.s, 'R', 'e', 'g', 'i', 's', 't', 'r', 'a', 't', 'i', 'o', 'n', 0))
+  if (strcmp(orionldState.payloadTypeNode->value.s, "ContextSourceRegistration") != 0)
   {
     LM_W(("Bad Input (Registration type must have the value /Registration/)"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for Registration::type", orionldState.payloadTypeNode->value.s, OrionldDetailsString);
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration::type must have a value of /ContextSourceRegistration/", orionldState.payloadTypeNode->value.s, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
-  } 
+  }
 
- */
+  //
+  // FIXME: add type to Registration
+  //        To be fixed when we decide to break the data model of Orion APIv2
+  // regP->type = (char*) "ContextSourceRegistration";
+  //
+
 
   //
   // Loop over the tree
   //
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {   
-    if (SCOMPARE3(kNodeP->name, 'i', 'd', 0))
+    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
-      //FiXME
-       //do nothing, solve problem, the id must be in the orionldState.payloadIdNode
-
-    }
-    else if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
-    {
-       //FiXME
-       //do nothing, solve problem, the type must be in the orionldState.payloadTypeNode
-
-    }
-    else if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
-    {
-      DUPLICATE_CHECK(nameP, "Registration::name", kNodeP->value.s);
+      DUPLICATE_CHECK(nameP, "Registration::name", kNodeP);
       STRING_CHECK(kNodeP, "Registration::name");
-      regP->name = nameP;
+      regP->name = nameP->value.s;
     }
     else if (SCOMPARE12(kNodeP->name, 'd', 'e', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 0))
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::description", kNodeP->value.s);
+      DUPLICATE_CHECK(descriptionP, "Registration::description", kNodeP);
       STRING_CHECK(kNodeP, "Registration::description");
 
-      regP->description         = descriptionP;
+      regP->description         = descriptionP->value.s;
       regP->descriptionProvided = true;
     }
-    else if(SCOMPARE12(kNodeP->name, 'i', 'n', 'f', 'o', 'r', 'm', 'a', 't', 'i', 'o', 'n', 0))
+    else if (SCOMPARE12(kNodeP->name, 'i', 'n', 'f', 'o', 'r', 'm', 'a', 't', 'i', 'o', 'n', 0))
     {
-      DUPLICATE_CHECK(informationP, "Regisratrion::information", kNodeP->value.s);
+      DUPLICATE_CHECK(informationP, "Registatrion::information", kNodeP);
       ARRAY_CHECK(kNodeP, "Registration::information");
       EMPTY_ARRAY_CHECK(kNodeP, "Registration::information");
 
-      for(entArrayNodeP = kNodeP->value.firstChildP; entArrayNodeP != NULL; entArrayNodeP = entArrayNodeP->next)
+      for (KjNode* informationItemP = kNodeP->value.firstChildP; informationItemP != NULL; informationItemP = informationItemP->next)
       {
-        for(eNodeP = entArrayNodeP->value.firstChildP; eNodeP != NULL; eNodeP = eNodeP->next)
+        //
+        // FIXME: create a kjTree function for this:
+        //   kjTreeToInformationNode(informationItemP);
+        //
+        for (KjNode* eNodeP = informationItemP->value.firstChildP; eNodeP != NULL; eNodeP = eNodeP->next)
         {
           if (SCOMPARE9(eNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
           {           
-            entitiesPresent = kjTreeToEntIdVector(ciP, eNodeP, &regP->dataProvided.entities);
-
-            if (!entitiesPresent)
+            if (kjTreeToEntIdVector(ciP, eNodeP, &regP->dataProvided.entities) == false)
             {
               LM_E(("kjTreeToEntIdVector failed"));
               return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
             }
+            entitiesPresent = true;
           }
-          else if(SCOMPARE11(eNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
+          else if (SCOMPARE11(eNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
           {
-            KjNode* propP; //Entities Node Pointer
-            for(propP = eNodeP->value.firstChildP; propP!= NULL; propP = propP->next)
+            for (KjNode* propP = eNodeP->value.firstChildP; propP != NULL; propP = propP->next)
             {
-               char*    propNameP         = NULL;
-               DUPLICATE_CHECK(propNameP, "PropertyInfo::name",propP->value.s);
                STRING_CHECK(propP, "PropertyInfo::name");
-
-               std::string property = propNameP;
-
-               regP->dataProvided.attributes.push_back(property);
+               regP->dataProvided.attributes.push_back(propP->value.s);
             }      
           }
-          else if(SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
+          else if (SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
           {
-            //encontrar uma forma de salvar essa informação
+            //
+            // FIXME: We mix Properties and Relationships for now
+            //        To be fixed when we decide to break the data model of Orion APIv2
+            //
+            for (KjNode* relP = eNodeP->value.firstChildP; relP != NULL; relP = relP->next)
+            {
+               STRING_CHECK(relP, "RelationInfo::name");
+               regP->dataProvided.attributes.push_back(relP->value.s);
+            }      
           }
           else
           {
@@ -201,41 +192,63 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
           }
         }
       }
-
     }
-
-    else if (SCOMPARE19(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 't', 'i','o','n', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
+    else if (SCOMPARE20(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
-      DUPLICATE_CHECK(timeIntervalP, "Registration::observationInterval", kNodeP->value.s);
-      INTEGER_CHECK(kNodeP, "Registration::observationInterval");
-      // FIXME: Implement this ???
+      DUPLICATE_CHECK(observationIntervalP, "Registration::observationInterval", kNodeP);
+      OBJECT_CHECK(kNodeP, "Registration::observationInterval");
+      //
+      // FIXME: kjTreeToTimeInterval(kNodeP, &regP->observationInterval);
+      //        To be fixed when we decide to break the data model of Orion APIv2
     }
-     else if (SCOMPARE19(kNodeP->name, 'm', 'a', 'n', 'a', 'g', 'e', 'm', 'e','n','t', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
+    else if (SCOMPARE19(kNodeP->name, 'm', 'a', 'n', 'a', 'g', 'e', 'm', 'e', 'n', 't', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
-      DUPLICATE_CHECK(timeIntervalP, "Registration::managementInterval", kNodeP->value.s);
-      INTEGER_CHECK(kNodeP, "Registration::managementInterval");
-      // FIXME: Implement this ???
+      DUPLICATE_CHECK(managementIntervalP, "Registration::managementInterval", kNodeP);
+      OBJECT_CHECK(kNodeP, "Registration::managementInterval");
+      //
+      // FIXME: kjTreeToTimeInterval(kNodeP, &regP->managementInterval);
+      //        To be fixed when we decide to break the data model of Orion APIv2
+    }
+    else if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+    {
+      DUPLICATE_CHECK(locationP, "Registration::location", kNodeP);
+      OBJECT_CHECK(locationP, "Registration::location");
+      //
+      // FIXME: kjTreeToGeoLocation(kNodeP, &regP->location);
+      //        To be fixed when we decide to break the data model of Orion APIv2
+    }
+    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
+    {
+      DUPLICATE_CHECK(observationSpaceP, "Registration::observationSpace", kNodeP);
+      OBJECT_CHECK(observationSpaceP, "Registration::observationSpace");
+      //
+      // FIXME: kjTreeToGeoLocation(kNodeP, &regP->observationSpace);
+      //        To be fixed when we decide to break the data model of Orion APIv2
+    }
+    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
+    {
+      DUPLICATE_CHECK(operationSpaceP, "Registration::operationSpace", kNodeP);
+      OBJECT_CHECK(operationSpaceP, "Registration::operationSpace");
+      //
+      // FIXME: kjTreeToGeoLocation(kNodeP, &regP->operationSpace);
+      //        To be fixed when we decide to break the data model of Orion APIv2
     }
     else if (SCOMPARE8(kNodeP->name, 'e', 'x', 'p', 'i', 'r', 'e', 's', 0))
     {
-      DUPLICATE_CHECK(expiresP, "Registration::expires", kNodeP->value.s);
+      DUPLICATE_CHECK(expiresP, "Registration::expires", kNodeP);
       STRING_CHECK(kNodeP, "Registration::expires");
-      DATETIME_CHECK(expiresP, "Registration::expires");
+      DATETIME_CHECK(expiresP->value.s, "Registration::expires");
 
-      regP->expires = parse8601Time(expiresP);
-    }
-    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
-    {
-      // Ignored - read-only
+      regP->expires = parse8601Time(expiresP->value.s);
     }
     else if (SCOMPARE9(kNodeP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
     {
-      DUPLICATE_CHECK(endpointP, "Registration::endpoint", kNodeP->value.s);
+      DUPLICATE_CHECK(endpointP, "Registration::endpoint", kNodeP);
       STRING_CHECK(kNodeP, "Registration::endpoint");
   
-      regP->provider.http.url = endpointP;
+      regP->provider.http.url = endpointP->value.s;
     }
-    else if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
     {
       // Ignored - read-only
     }
@@ -245,13 +258,16 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     }
     else
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Registration", kNodeP->name, OrionldDetailsString);
+      //
+      // FIXME: Add to Property vector - To be fixed when we decide to break the data model of Orion APIv2 
+      //
+      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Registration - ngsi-ld still follows Orion APIv2 data model", kNodeP->name, OrionldDetailsString);
       return false;
     }
   }
 
 
-  if ((entitiesPresent == false))
+  if (entitiesPresent == false)
   {
     LM_E(("At least one 'entity' must be present"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, "At least one 'entity' must be present", NULL, OrionldDetailsString);

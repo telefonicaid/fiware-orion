@@ -46,51 +46,58 @@
 //
 bool orionldPostRegistrations(ConnectionInfo* ciP)
 {
- ngsiv2::Registration reg;
- std::string regId;
- OrionError oError;
+  ngsiv2::Registration  reg;
+  std::string           regId;
+  OrionError            oError;
+  char*                 regIdP = NULL;
 
   if (orionldState.contextP != NULL)
-      reg.ldContext = orionldState.contextP->url;
+    reg.ldContext = orionldState.contextP->url;
   else
     reg.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
 
-  char* regIdP = NULL;
   if (kjTreeToRegistration(ciP, &reg, &regIdP) == false)
   {
     LM_E(("kjTreeToRegistration FAILED"));
     // orionldErrorResponseCreate is invoked by kjTreeToRegistration
     return false;
   }
-   //
+
+  //
   // Does the Registration already exist?
   //
-  if (regIdP != NULL)
-  {
-    ngsiv2::Registration  registration;
+  // FIXME: Create a new function that simply llos up the registration!!!
+  //        See mongoEntityExists.cpp.
+  //        That will be a lot faster than the current solution.
+  //
 
-    mongoRegistrationGet(&registration, regIdP, orionldState.tenant, ciP->servicePathV[0], &oError);
+  // FIXME - Let's skip this for now
+  // ngsiv2::Registration  registration;
+  // mongoRegistrationGet(&registration, regIdP, orionldState.tenant, ciP->servicePathV[0], &oError);
 
-    if (!registration.id.empty())
-    {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
-      return false;
-    }
-  }
+  // if (!registration.id.empty())
+  // {
+  //   orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
+  //   return false;
+  // }
+
 
   //
   // Create the Registration
   //
-
+  LM_TMP(("REG: regIdP == %s", regIdP));
+  LM_TMP(("Translated the KTree to a Registration - now calling mongoRegistrationCreate"));
   mongoRegistrationCreate(&reg,
-                                  orionldState.tenant,
-                                  ciP->servicePathV[0],
-                                  &regId,
-                                  &oError);
+                          orionldState.tenant,
+                          ciP->servicePathV[0],
+                          &regId,
+                          &oError);
+  LM_TMP(("REG: regId == %s", regId.c_str()));
 
+  // FIXME: Check oError for failure!
   ciP->httpStatusCode = SccCreated;
 
-  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/registration/", regId.c_str());
+  httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/csourceRegistrations/", regIdP);
 
   return true;
 }

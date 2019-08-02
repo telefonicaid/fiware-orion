@@ -158,7 +158,19 @@ echo
 echo "11. POST /ngsi-ld/v1/csourceRegistrations"
 echo "========================================="
 payload='{
-  "expiration": "now"
+  "type": "ContextSourceRegistration",
+  "expires": "2028-12-31T10:00:00",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "http://a.b.c/E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -351,16 +363,11 @@ Date: REGEX(.*)
 
 11. POST /ngsi-ld/v1/csourceRegistrations
 =========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 148
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)
 Date: REGEX(.*)
 
-{
-    "details": "no details",
-    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
 12. PATCH /ngsi-ld/v1/entities/E1/attrs
