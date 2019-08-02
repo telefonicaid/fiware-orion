@@ -52,6 +52,21 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     }
 #endif
   }
+  else if (treeP->type == QNodeEQ)
+  {
+    QNode*                 leftP  = treeP->value.children;
+    QNode*                 rightP = leftP->next;
+
+    LM_TMP(("Q: Creating EQ-Object"));
+    if (rightP->type == QNodeIntegerValue)
+      topBsonObjP->append(leftP->value.v, rightP->value.i);
+    else if (rightP->type == QNodeFloatValue)
+      topBsonObjP->append(leftP->value.v, rightP->value.f);
+    else if (rightP->type == QNodeStringValue)
+      topBsonObjP->append(leftP->value.v, rightP->value.s);
+
+    // LM_TMP(("Q: Added EQ-Object to top-level object: %s", topBsonObjP->obj().toString().c_str()));
+  }
   else if ((treeP->type == QNodeGT) || (treeP->type == QNodeGE) || (treeP->type == QNodeLT) || (treeP->type == QNodeLE))
   {
     QNode*                 leftP  = treeP->value.children;
@@ -69,25 +84,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     if      (rightP->type == QNodeIntegerValue)  gtObj.append(op, rightP->value.i);
     else if (rightP->type == QNodeFloatValue)    gtObj.append(op, rightP->value.f);
     else if (rightP->type == QNodeStringValue)   gtObj.append(op, rightP->value.s);
-
-    LM_TMP(("Q: Adding GT-Object to top-level object: var: '%s'", leftP->value.v));
-    topBsonObjP->append(leftP->value.v, gtObj.obj());
-    LM_TMP(("Q: Added GT-Object to top-level object"));
-  }
-  else if (treeP->type == QNodeGE)
-  {
-    QNode*                 leftP  = treeP->value.children;
-    QNode*                 rightP = leftP->next;
-    mongo::BSONObjBuilder  gtObj;
-    mongo::BSONObjBuilder  compObj;
-
-    LM_TMP(("Q: Creating GT-Object"));
-    if (rightP->type == QNodeIntegerValue)
-      gtObj.append("$gt", rightP->value.i);
-    else if (rightP->type == QNodeFloatValue)
-      gtObj.append("$gt", rightP->value.f);
-    else if (rightP->type == QNodeStringValue)
-      gtObj.append("$gt", rightP->value.s);
 
     LM_TMP(("Q: Adding GT-Object to top-level object: var: '%s'", leftP->value.v));
     topBsonObjP->append(leftP->value.v, gtObj.obj());

@@ -189,15 +189,24 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
                (qnP->type == QNodeGE) || (qnP->type == QNodeGT) ||
                (qnP->type == QNodeLE) || (qnP->type == QNodeLT))
       {
-        if ((nextType != QNodeFloatValue)   &&
-            (nextType != QNodeIntegerValue) &&
-            (nextType != QNodeStringValue)  &&
-            (nextType != QNodeTrueValue)    &&
-            (nextType != QNodeFalseValue))
+        //
+        // MHD seems to remove the qauetaion marks ...
+        // Workaround: If Variable found on RHS, convert to String
+        //
+        if (nextType == QNodeVariable)
+          qnP->next->type = QNodeStringValue;
+        else
         {
-          *titleP   = (char*) "ngsi-ld query language: after non-regexp comparison operator must come a non-regexp Value";
-          *detailsP = (char*) qNodeType(nextType);
-          return false;
+          if ((nextType != QNodeFloatValue)   &&
+              (nextType != QNodeIntegerValue) &&
+              (nextType != QNodeStringValue)  &&
+              (nextType != QNodeTrueValue)    &&
+              (nextType != QNodeFalseValue))
+          {
+            *titleP   = (char*) "ngsi-ld query language: after non-regexp comparison operator must come a non-regexp Value";
+            *detailsP = (char*) qNodeType(nextType);
+            return false;
+          }
         }
       }
       else if ((qnP->type == QNodeMatch) || (qnP->type == QNodeNoMatch))

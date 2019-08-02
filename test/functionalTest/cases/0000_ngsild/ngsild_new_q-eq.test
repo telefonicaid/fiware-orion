@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Retrieval of Entities with q filter > INTEGER
+Retrieval of Entities with q filter == INTEGER, STRING, FLOAT, 
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -33,13 +33,13 @@ brokerStart CB 212-249
 #
 # 01. Create E1 with type T and attr A=1
 # 02. Create E2 with type T and attr A=2
-# 03. Create E3 with type T and attr A=3
-# 04. Create E4 with type T and attr A=4
-# 05. Create E5 with type T and attr A=5
-# 06. GET all entities that has an attribute A > 3 - see E4 and E5
-# 07. GET all entities that has an attribute A >= 3 - see E3, E4 and E5
-# 08. GET all entities that has an attribute A < 3 - see E1 and E2
-# 09. GET all entities that has an attribute A <= 3 - see E1, E2 and E3
+# 03. Create E3 with type T and attr A="String1"
+# 04. Create E4 with type T and attr A="String2"
+# 05. Create E5 with type T and attr A=1.01
+# 06. Create E6 with type T and attr A=1.02
+# 07. GET all entities that have an attribute A == 1 - see E1
+# 08. GET all entities that have an attribute A == 1.02 - see E6
+# 09. GET all entities that have an attribute A == "String2" - see E4
 #
 
 echo '01. Create E1 with type T and attr A=1'
@@ -72,14 +72,14 @@ echo
 echo
 
 
-echo '03. Create E3 with type T and attr A=3'
-echo '======================================'
+echo '03. Create E3 with type T and attr A="String1"'
+echo '=============================================='
 payload='{
   "id": "http://a.b.c/entity/E3",
   "type": "T",
   "A": {
     "type": "Property",
-    "value": 3
+    "value": "String1"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
@@ -87,14 +87,14 @@ echo
 echo
 
 
-echo '04. Create E4 with type T and attr A=4'
-echo '======================================'
+echo '04. Create E4 with type T and attr A="String2"'
+echo '=============================================='
 payload='{
   "id": "http://a.b.c/entity/E4",
   "type": "T",
   "A": {
     "type": "Property",
-    "value": 4
+    "value": "String2"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
@@ -102,14 +102,14 @@ echo
 echo
 
 
-echo '05. Create E5 with type T and attr A=5'
-echo '======================================'
+echo '05. Create E5 with type T and attr A=1.01'
+echo '========================================='
 payload='{
   "id": "http://a.b.c/entity/E5",
   "type": "T",
   "A": {
     "type": "Property",
-    "value": 5
+    "value": 1.01
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
@@ -117,30 +117,38 @@ echo
 echo
 
 
-echo '06. GET all entities that has an attribute A > 3 - see E4 and E5'
-echo '================================================================'
-orionCurl --url "/ngsi-ld/v1/entities?q=A>3&prettyPrint=yes&type=T" --noPayloadCheck
+echo '06. Create E6 with type T and attr A=1.02'
+echo '========================================='
+payload='{
+  "id": "http://a.b.c/entity/E6",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1.02
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
 echo
 
 
-echo "07. GET all entities that has an attribute A >= 3 - see E3, E4 and E5"
-echo "====================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?q=A>=3&prettyPrint=yes&type=T" --noPayloadCheck
+echo '07. GET all entities that have an attribute A == 1 - see E1'
+echo '==========================================================='
+orionCurl --url "/ngsi-ld/v1/entities?q=A==1&prettyPrint=yes&type=T" --noPayloadCheck
 echo
 echo
 
 
-echo "08. GET all entities that has an attribute A < 3 - see E1 and E2"
-echo "================================================================"
-orionCurl --url "/ngsi-ld/v1/entities?q=A<3&prettyPrint=yes&type=T" --noPayloadCheck
+echo "08. GET all entities that have an attribute A == 1.02 - see E6"
+echo "=============================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=A==1.02&prettyPrint=yes&type=T" --noPayloadCheck
 echo
 echo
 
 
-echo "09. GET all entities that has an attribute A <= 3 - see E1, E2 and E3"
-echo "====================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?q=A<=3&prettyPrint=yes&type=T" --noPayloadCheck
+echo '09. GET all entities that have an attribute A == "String2" - see E4'
+echo '==================================================================='
+orionCurl --url '/ngsi-ld/v1/entities?q=A=="String2"&prettyPrint=yes&type=T' --noPayloadCheck
 echo
 echo
 
@@ -164,8 +172,8 @@ Date: REGEX(.*)
 
 
 
-03. Create E3 with type T and attr A=3
-======================================
+03. Create E3 with type T and attr A="String1"
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
@@ -173,8 +181,8 @@ Date: REGEX(.*)
 
 
 
-04. Create E4 with type T and attr A=4
-======================================
+04. Create E4 with type T and attr A="String2"
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
@@ -182,8 +190,8 @@ Date: REGEX(.*)
 
 
 
-05. Create E5 with type T and attr A=5
-======================================
+05. Create E5 with type T and attr A=1.01
+=========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E5
@@ -191,76 +199,19 @@ Date: REGEX(.*)
 
 
 
-06. GET all entities that has an attribute A > 3 - see E4 and E5
-================================================================
-HTTP/1.1 200 OK
-Content-Length: 247
-Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+06. Create E6 with type T and attr A=1.02
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
 
-[
-  {
-    "id": "http://a.b.c/entity/E4",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 4
-    }
-  },
-  {
-    "id": "http://a.b.c/entity/E5",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 5
-    }
-  }
-]
 
 
-
-07. GET all entities that has an attribute A >= 3 - see E3, E4 and E5
-=====================================================================
+07. GET all entities that have an attribute A == 1 - see E1
+===========================================================
 HTTP/1.1 200 OK
-Content-Length: 369
-Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-[
-  {
-    "id": "http://a.b.c/entity/E3",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 3
-    }
-  },
-  {
-    "id": "http://a.b.c/entity/E4",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 4
-    }
-  },
-  {
-    "id": "http://a.b.c/entity/E5",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 5
-    }
-  }
-]
-
-
-
-08. GET all entities that has an attribute A < 3 - see E1 and E2
-================================================================
-HTTP/1.1 200 OK
-Content-Length: 247
+Content-Length: 125
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -273,50 +224,47 @@ Date: REGEX(.*)
       "type": "Property",
       "value": 1
     }
-  },
-  {
-    "id": "http://a.b.c/entity/E2",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 2
-    }
   }
 ]
 
 
 
-09. GET all entities that has an attribute A <= 3 - see E1, E2 and E3
-=====================================================================
+08. GET all entities that have an attribute A == 1.02 - see E6
+==============================================================
 HTTP/1.1 200 OK
-Content-Length: 369
+Content-Length: 128
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "id": "http://a.b.c/entity/E1",
+    "id": "http://a.b.c/entity/E6",
     "type": "T",
     "A": {
       "type": "Property",
-      "value": 1
+      "value": 1.02
     }
-  },
+  }
+]
+
+
+
+09. GET all entities that have an attribute A == "String2" - see E4
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
   {
-    "id": "http://a.b.c/entity/E2",
+    "id": "http://a.b.c/entity/E4",
     "type": "T",
     "A": {
       "type": "Property",
-      "value": 2
-    }
-  },
-  {
-    "id": "http://a.b.c/entity/E3",
-    "type": "T",
-    "A": {
-      "type": "Property",
-      "value": 3
+      "value": "String2"
     }
   }
 ]
