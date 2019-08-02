@@ -1,0 +1,185 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# FIXME: Due to the fact that the NGSI-LD data model doesn't follow the Orion APIv2 data model
+#        in terms of registrations, we have decided to restrict NGSI-LD registrations to only allow
+#        ONE item in the information vector.
+#        Once this is fixed (possibly some time 2020), this test should inclide an "information" vector
+#        with more than one item.
+#
+# 01. Create a registration with ALL fields
+# 02. See the registration in mongo
+#
+
+echo "01. Create a registration with ALL fields"
+echo "========================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+  "type": "ContextSourceRegistration",
+  "name": "name of reg 1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with ALL fields
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341
+Date: REGEX(.*)
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+	"description" : "description of reg 1",
+	"expiration" : NumberLong(1861869600),
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "http://example.org/ngsi-ld/default/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "brandName",
+					"type" : "",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "speed",
+					"type" : "",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "isParked",
+					"type" : "",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"observationInterval" : {
+		"start" : NumberLong(1546250400),
+		"end" : NumberLong(1861869600)
+	},
+	"managementInterval" : {
+		"start" : NumberLong(1546250400),
+		"end" : NumberLong(1861869600)
+	}
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -36,6 +36,7 @@
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
+#include "orionld/common/orionldState.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -48,6 +49,12 @@
 *
 * setRegistrationId - 
 */
+#ifdef ORIONLD
+static void setNgsildRegistrationId(mongo::BSONObjBuilder* bobP, const char* regId)
+{
+  bobP->append("_id", regId);
+}
+#endif
 static void setRegistrationId(mongo::BSONObjBuilder* bobP, std::string* regIdP)
 {
   mongo::OID oId;
@@ -141,6 +148,40 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
 
 
+#ifdef ORIONLD
+/* ****************************************************************************
+*
+* setObservationInterval
+*/
+static void setObservationInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder intervalObj;
+
+  intervalObj.append("start", (long long) interval.start);
+  intervalObj.append("end",   (long long) interval.end);
+
+  bobP->append("observationInterval", intervalObj.obj());
+}
+
+
+
+/* ****************************************************************************
+*
+* setManagementInterval
+*/
+static void setManagementInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder intervalObj;
+
+  intervalObj.append("start", (long long) interval.start);
+  intervalObj.append("end",   (long long) interval.end);
+
+  bobP->append("managementInterval", intervalObj.obj());
+}
+#endif
+
+
+
 /* ****************************************************************************
 *
 * setStatus -
@@ -191,13 +232,22 @@ void mongoRegistrationCreate
   //
   mongo::BSONObjBuilder  bob;
 
-  setRegistrationId(&bob, regIdP);
+  if (orionldState.apiVersion == NGSI_LD_V1)
+    setNgsildRegistrationId(&bob, regP->id.c_str());
+  else
+    setRegistrationId(&bob, regIdP);
+
   setDescription(regP->description, &bob);
   setExpiration(regP->expires, &bob);
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+
+#ifdef ORIONLD
+  setObservationInterval(regP->observationInterval, &bob);
+  setManagementInterval(regP->managementInterval, &bob);
+#endif
 
   //
   // Insert in DB
@@ -209,6 +259,7 @@ void mongoRegistrationCreate
   {
     reqSemGive(__FUNCTION__, "Mongo Create Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);
+
     return;
   }
 

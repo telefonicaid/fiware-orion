@@ -34,7 +34,8 @@ SET (SOURCES
     kjTreeToEndpoint.cpp
     kjTreeToNotification.cpp
     kjTreeToSubscription.cpp
-    kjTreeFromRegistration.cpp
+    kjTreeToRegistration.cpp
+    kjTreeToTimeInterval.cpp
 )
 
 # Include directories

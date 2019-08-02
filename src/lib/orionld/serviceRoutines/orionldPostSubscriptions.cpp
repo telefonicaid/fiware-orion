@@ -104,6 +104,8 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Does the subscription already exist?
   //
+  // FIXME: Implement a function to ONLY check for existence - much faster
+  //
   if (subIdP != NULL)
   {
     ngsiv2::Subscription  subscription;
@@ -127,6 +129,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
                                   ciP->httpHeaders.correlator,
                                   sub.ldContext);
 
+  // FIXME: Check oError for failure!
   ciP->httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
 

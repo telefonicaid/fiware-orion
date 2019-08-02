@@ -30,6 +30,11 @@
 
 #include "apiTypesV2/EntID.h"
 
+#ifdef ORIONLD
+#include "orionld/types/OrionldTimeInterval.h"
+#endif
+
+
 
 namespace ngsiv2
 {
@@ -151,6 +156,13 @@ struct Registration
   std::string            status;
   Provider               provider;
   ForwardingInformation  forwardingInformation;
+
+#ifdef ORIONLD
+  std::string           name;
+  std::string           ldContext;
+  OrionldTimeInterval   observationInterval;
+  OrionldTimeInterval   managementInterval;
+#endif
 
   Registration();
   ~Registration();
