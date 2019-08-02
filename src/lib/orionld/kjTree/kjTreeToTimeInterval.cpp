@@ -47,7 +47,7 @@ bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterv
 {
   KjNode* startP = NULL;
   KjNode* endP   = NULL;
-  
+
   for (KjNode* intervalItemP = kNodeP->value.firstChildP; intervalItemP != NULL; intervalItemP = intervalItemP->next)
   {
     if (SCOMPARE6(intervalItemP->name, 's', 't', 'a', 'r', 't', 0))
