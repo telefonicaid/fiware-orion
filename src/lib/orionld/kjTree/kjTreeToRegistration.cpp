@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
+#include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
 
 
@@ -196,17 +197,13 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     {
       DUPLICATE_CHECK(observationIntervalP, "Registration::observationInterval", kNodeP);
       OBJECT_CHECK(kNodeP, "Registration::observationInterval");
-      //
-      // FIXME: kjTreeToTimeInterval(kNodeP, &regP->observationInterval);
-      //        To be fixed when we decide to break the data model of Orion APIv2
+      kjTreeToTimeInterval(ciP, kNodeP, &regP->observationInterval);
     }
     else if (SCOMPARE19(kNodeP->name, 'm', 'a', 'n', 'a', 'g', 'e', 'm', 'e', 'n', 't', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
       DUPLICATE_CHECK(managementIntervalP, "Registration::managementInterval", kNodeP);
       OBJECT_CHECK(kNodeP, "Registration::managementInterval");
-      //
-      // FIXME: kjTreeToTimeInterval(kNodeP, &regP->managementInterval);
-      //        To be fixed when we decide to break the data model of Orion APIv2
+      kjTreeToTimeInterval(ciP, kNodeP, &regP->managementInterval);
     }
     else if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
     {
