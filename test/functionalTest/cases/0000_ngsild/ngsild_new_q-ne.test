@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Retrieval of Entities with q filter == INTEGER, STRING, FLOAT, 
+Retrieval of Entities with q filter != for INTEGER, STRING, FLOAT, RANGE
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,15 +31,20 @@ brokerStart CB 212-249
 --SHELL--
 
 #
+# FIXME:  Really it's a doubt
+#         In step 10, why don't "String 1" and "String 2" match   != 2..6 ?
+#
+#
 # 01. Create E1 with type T and attr A=1
 # 02. Create E2 with type T and attr A=2
 # 03. Create E3 with type T and attr A="String 1"
 # 04. Create E4 with type T and attr A="String 2"
 # 05. Create E5 with type T and attr A=1.01
 # 06. Create E6 with type T and attr A=1.02
-# 07. GET all entities that have an attribute A == 1 - see E1
-# 08. GET all entities that have an attribute A == 1.02 - see E6
-# 09. GET all entities that have an attribute A == "String 2" - see E4
+# 07. GET all entities that have an attribute A != 1 - see all but E1
+# 08. GET all entities that have an attribute A != 1.02 - see all buf E6
+# 09. GET all entities that have an attribute A != "String 2" - see all but E4
+# 10. GET all entities that have an attribute A != 2..6 - see E1, E5 and E6
 #
 
 echo '01. Create E1 with type T and attr A=1'
@@ -132,16 +137,16 @@ echo
 echo
 
 
-echo '07. GET all entities that have an attribute A == 1 - see E1'
-echo '==========================================================='
-orionCurl --url "/ngsi-ld/v1/entities?q=A==1&prettyPrint=yes&type=T" --noPayloadCheck
+echo "07. GET all entities that have an attribute A != 1 - see all but E1"
+echo "==================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=A!=1&prettyPrint=yes&type=T" --noPayloadCheck
 echo
 echo
 
 
-echo "08. GET all entities that have an attribute A == 1.02 - see E6"
-echo "=============================================================="
-orionCurl --url "/ngsi-ld/v1/entities?q=A==1.02&prettyPrint=yes&type=T" --noPayloadCheck
+echo "08. GET all entities that have an attribute A != 1.02 - see all buf E6"
+echo "======================================================================"
+orionCurl --url "/ngsi-ld/v1/entities?q=A!=1.02&prettyPrint=yes&type=T" --noPayloadCheck
 echo
 echo
 
@@ -153,9 +158,16 @@ echo
 # However, there is a problem installing urlencode in CentOS so instead of
 # using urlencode, %22 and %20 are added directly in the Q-string
 #
-echo '09. GET all entities that have an attribute A == "String 2" - see E4'
-echo '===================================================================='
-orionCurl --url '/ngsi-ld/v1/entities?q=A==%22String%202%22&prettyPrint=yes&type=T' --noPayloadCheck
+echo '09. GET all entities that have an attribute A != "String 2" - see all but E4'
+echo '============================================================================'
+orionCurl --url '/ngsi-ld/v1/entities?q=A!=%22String%202%22&prettyPrint=yes&type=T' --noPayloadCheck
+echo
+echo
+
+
+echo "10. GET all entities that have an attribute A != 2..6 - see E1, E5 and E6"
+echo "========================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=A!=2..6&prettyPrint=yes&type=T' --noPayloadCheck
 echo
 echo
 
@@ -215,36 +227,47 @@ Date: REGEX(.*)
 
 
 
-07. GET all entities that have an attribute A == 1 - see E1
-===========================================================
+07. GET all entities that have an attribute A != 1 - see all but E1
+===================================================================
 HTTP/1.1 200 OK
-Content-Length: 125
+Content-Length: 637
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
-    "id": "http://a.b.c/entity/E1",
+    "id": "http://a.b.c/entity/E2",
     "type": "T",
     "A": {
       "type": "Property",
-      "value": 1
+      "value": 2
     }
-  }
-]
-
-
-
-08. GET all entities that have an attribute A == 1.02 - see E6
-==============================================================
-HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-[
+  },
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E4",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 2"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
   {
     "id": "http://a.b.c/entity/E6",
     "type": "T",
@@ -257,21 +280,143 @@ Date: REGEX(.*)
 
 
 
-09. GET all entities that have an attribute A == "String 2" - see E4
-====================================================================
+08. GET all entities that have an attribute A != 1.02 - see all buf E6
+======================================================================
 HTTP/1.1 200 OK
-Content-Length: 134
+Content-Length: 634
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
   {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 2
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
     "id": "http://a.b.c/entity/E4",
     "type": "T",
     "A": {
       "type": "Property",
       "value": "String 2"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  }
+]
+
+
+
+09. GET all entities that have an attribute A != "String 2" - see all but E4
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 628
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 2
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E6",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.02
+    }
+  }
+]
+
+
+
+10. GET all entities that have an attribute A != 2..6 - see E1, E5 and E6
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 375
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E6",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.02
     }
   }
 ]

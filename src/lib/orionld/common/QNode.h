@@ -74,7 +74,7 @@ typedef enum QNodeType
 //
 // QNodeValue -
 //
-typedef	union QNodeValue
+typedef union QNodeValue
 {
   struct QNode* children;    // pointer to first child of this container
   char*         v;           // Variable name

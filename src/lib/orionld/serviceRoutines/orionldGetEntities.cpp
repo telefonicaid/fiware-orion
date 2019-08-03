@@ -388,6 +388,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       parseData.qcr.res.release();
       return false;
     }
+    // LM_TMP(("Q: Setting qMongoFilterP: %s (DESTRUCTIVE!!!)", objBuilder.obj().toString().c_str()));
     LM_TMP(("Q: Setting qMongoFilterP"));
     *orionldState.qMongoFilterP = objBuilder.obj();
   }

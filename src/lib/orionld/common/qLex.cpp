@@ -42,7 +42,24 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
   qNodeP->value.s = stringValue;
 
   prev->next = qNodeP;
-  
+
+  return qNodeP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// qDateTimePush -
+//
+static QNode* qDateTimePush(QNode* prev, long long dateTime)
+{
+  QNode* qNodeP = qNode(QNodeIntegerValue);
+
+  qNodeP->value.i = dateTime;
+
+  prev->next = qNodeP;
+
   return qNodeP;
 }
 
@@ -60,7 +77,7 @@ static QNode* qRegexpPush(QNode* prev, char* regexpValue)
   qNodeP->value.re = regexpValue;
 
   prev->next = qNodeP;
-  
+
   return qNodeP;
 }
 
@@ -347,13 +364,17 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       {
         *titleP = (char*) "ngsi-ld query language: non-terminated string";
         *detailsP = sP;
-        
+
         return NULL;
       }
 
       *sP = 0;
       ++sP;
-      current = qStringPush(current, start);
+      long long dateTime;
+      if ((start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
+        current = qDateTimePush(current, dateTime);
+      else
+        current = qStringPush(current, start);
     }
     else if (*sP == ' ')
     {
@@ -388,7 +409,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
             // LM_TMP(("Q: RE:Loop: found '(': new level: %d", level));
           }
         }
- 
+
         if (level == 0)
           break;
         prev = *sP;
@@ -443,6 +464,6 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
   if (qLexCheck(dummy.next, titleP, detailsP) == false)
     return NULL;
-    
+
   return dummy.next;
 }

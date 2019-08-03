@@ -34,7 +34,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// qTreeToBson - 
+// qTreeToBson -
 //
 bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
 {
@@ -94,7 +94,7 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
       *detailsP = (char*) qNodeType(rightP->type);
       return false;
     }
-    
+
     bson_append_document_end(bsonP, &gtBson);
   }
   else if ((treeP->type == QNodeLT) || (treeP->type == QNodeLE))
@@ -123,7 +123,7 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
       *detailsP = (char*) qNodeType(rightP->type);
       return false;
     }
-    
+
     bson_append_document_end(bsonP, &ltBson);
   }
   else if (treeP->type == QNodeEQ)
@@ -183,14 +183,14 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
       bson_append_document_begin(bsonP, leftP->value.v, -1, &inBson);
 
       bson_append_array_begin(&inBson, "$in", -1, &commaArrayBson);
-      
+
       for (QNode* valueNodeP = rightP->value.children; valueNodeP != NULL; valueNodeP = valueNodeP->next)
       {
         if (valueNodeP->type == QNodeIntegerValue)
           bson_append_int32(&commaArrayBson, "0", 1, valueNodeP->value.i);
         else if (valueNodeP->type == QNodeFloatValue)
           bson_append_double(&commaArrayBson, "0", 1, valueNodeP->value.f);
-        else if	(valueNodeP->type == QNodeStringValue)
+        else if (valueNodeP->type == QNodeStringValue)
           bson_append_utf8(&commaArrayBson, "0", 1, valueNodeP->value.s, -1);
       }
       bson_append_array_end(&inBson, &commaArrayBson);
@@ -265,7 +265,7 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
       //
       // P1 != 12..15:
       //
-      // { "$or": [ { "P1": { "$gt": 15 }, { "P1" lt 12 } ] }
+      // { "$or": [ { "P1": { "$gt": 15 } }, { "P1": { "$lt": 12 } } ] }
       //
       QNode* lowerLimitNodeP = rightP->value.children;
       QNode* upperLimitNodeP = lowerLimitNodeP->next;

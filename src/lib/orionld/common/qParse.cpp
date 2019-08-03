@@ -41,64 +41,192 @@
 // - If attr.b.c, then 'attr' must be extracted, expanded and then '.md.b.c' appended
 // - If attr[b.c], then 'attr' must be extracted, expanded and then '.b.c' appended
 //
-static char* varFix(void* contextP, char* varName, char* longName, int longNameLen, char** detailsP)
+static char* varFix(void* contextP, char* varPath, char* longName, int longNameLen, char** detailsP)
 {
-  char* varNameP = varName;
-  bool  qPath    = false;
-  bool  mqPath   = false;
-  char* rest     = NULL;
-  char* alias    = varName;
+  char* cP            = varPath;
+  char* attrNameP     = varPath;
+  char* firstDotP     = NULL;
+  char* secondDotP    = NULL;
+  char* startBracketP = NULL;
+  char* endBracketP   = NULL;
+  char* mdNameP       = NULL;
+  char* rest          = NULL;
+  char  fullPath[512];
 
-  LM_TMP(("Q: In varFix"));
-  while (*varNameP != 0)
+
+  LM_TMP(("Q: In varFix: Var PATH == '%s'", varPath));
+
+  //
+  // Cases:
+  //
+  // 1. A                 => single attribute     => attrs.A.value
+  // 2. A[B]    (qPath)   => B is inside A.value  => attrs.A.value.B
+  // 3. A.B     (mqPath)  => B is a metadata      => attrs.A.md.B.value
+  // 4. A.B.C   (mqPath)  => B is a metadata      => attrs.A.md.B.value.C
+  //
+  // - There can be only one '[' in the path
+  // - If '[' is found, then there must be a matching ']'
+  //
+  // So, we need to know:
+  // - attrName
+  // - mdName (if NO '[' in path)
+  // - rest
+  //   - For "A.B.C",  attrName == "A",                rest == "B.C"
+  //   - For "A[B.C]", attrName == "A", mdName == "B", rest == "C"
+  //   => rest == After first '.'
+  //
+  while (*cP != 0)
   {
-    if (*varNameP == '.')
+    if (*cP == '.')
     {
-      mqPath = true;
-      break;
-    }
-    else if (*varNameP == '[')
-    {
-      qPath = true;
-      break;
-    }
-
-    ++varNameP;
-  }
-
-  if (mqPath == true)
-  {
-    *varNameP = 0;
-    rest = &varNameP[1];
-  }
-  else if (qPath == true)
-  {
-    *varNameP = 0;
-    ++varNameP;
-    rest = varNameP;
-
-    // Null out ending ']'
-    while (*varNameP != 0)
-    {
-      if (*varNameP == ']')
+      if (firstDotP == NULL)
       {
-        *varNameP = 0;
-        ++varNameP;
-        if (*varNameP != 0)
-        {
-          *detailsP = (char*) "garbage after ending ']' in attribute path";
-          return NULL;
-        }
-        break;
+        firstDotP = cP;
+        LM_TMP(("Q: firstDot: %s", firstDotP));
       }
-      ++varNameP;
+      else if (secondDotP == NULL)
+      {
+        secondDotP = cP;
+        LM_TMP(("Q: secondDot: %s", secondDotP));
+      }
     }
+    else if (*cP == '[')
+    {
+      if (startBracketP != NULL)
+      {
+        *detailsP = (char*) "More than one start brackets found";
+        return NULL;
+      }
+      startBracketP  = cP;
+      LM_TMP(("Q: startBracketP: %s", startBracketP));
+    }
+    else if (*cP == ']')
+    {
+      if (endBracketP != NULL)
+      {
+        *detailsP = (char*) "More than one end brackets found";
+        return NULL;
+      }
+      endBracketP = cP;
+      LM_TMP(("Q: endBracketP: %s", endBracketP));
+    }
+
+    ++cP;
   }
 
-  orionldUriExpand(orionldState.contextP, alias, longName, longNameLen, detailsP);
-  LM_TMP(("Q: alias:    %s", alias));
-  LM_TMP(("Q: rest:     %s", rest));
-  LM_TMP(("Q: expanded: %s", longName));
+  //
+  // Error handling
+  //
+  if ((startBracketP != NULL) && (endBracketP == NULL))
+  {
+    *detailsP = (char*) "missing end bracket";
+    LM_W(("Bad Input (%s)", *detailsP));
+    return NULL;
+  }
+  else if ((startBracketP == NULL) && (endBracketP != NULL))
+  {
+    *detailsP = (char*) "end bracket but no start bracket";
+    LM_W(("Bad Input (%s)", *detailsP));
+    return NULL;
+  }
+  else if ((firstDotP != NULL) && (startBracketP != NULL) && (firstDotP < startBracketP))
+  {
+    *detailsP = (char*) "found a dot before a start bracket";
+    LM_W(("Bad Input (%s)", *detailsP));
+    return NULL;
+  }
+
+  //
+  // Now we need to NULL out certain characters:
+  //
+  // Again, four cases:
+  // 1. A
+  // 2. A[B]
+  // 3. A.B
+  // 4. A.B.C
+  //
+  // - If A:  ((startBracketP == NULL) && (firstDotP == NULL))
+  //   - attribute: A
+  //   => nothing to NULL our
+  //   - fullPath:  A-EXPANDED.value
+  //
+  // - if A[B]: (startBracketP != NULL)
+  //   - attribute: A
+  //   - rest:      B
+  //   => Must NULL out '[' and ']'
+  //   - fullPath:  A-EXPANDED.value.B
+  //
+  // - if A.B ((startBracketP == NULL) && (firstDotP != NULL) && (secondDotP == NULL))
+  //   - attribute:  A
+  //   - metadata:   B
+  //   => Must NULL out the first dot
+  //   - fullPath:  A-EXPANDED.md.B.value
+  //
+  // - if A.B.C ((startBracketP == NULL) && (firstDotP != NULL) && (secondDotP != NULL))
+  //   - attribute:  A
+  //   - metadata:   B
+  //   - rest:       C
+  //   => Must NULL out the first two dots
+  //   - fullPath:  A-EXPANDED.md.B.value.C
+  //
+  int caseNo = 0;
+
+  if ((startBracketP == NULL) && (firstDotP == NULL))
+  {
+    caseNo = 1;
+
+    LM_TMP(("Q: Case 1: A => nothing to NULL our"));
+    LM_TMP(("Q: attrName: '%s'", attrNameP));
+  }
+  else if (startBracketP != NULL)
+  {
+    LM_TMP(("Q: Case 2: A[B] => Must NULL out '[' and ']'"));
+    *startBracketP = 0;
+    *endBracketP   = 0;
+    rest           = &startBracketP[1];
+    caseNo         = 2;
+
+    LM_TMP(("Q: attrNameP: '%s'", attrNameP));
+    LM_TMP(("Q: rest:      '%s'", rest));
+  }
+  else if (firstDotP != NULL)
+  {
+    if (secondDotP == NULL)
+    {
+      LM_TMP(("Q: Case 3: A.B => Must NULL out the first dot"));
+      *firstDotP = 0;
+      mdNameP    = &firstDotP[1];
+      caseNo     = 3;
+
+      LM_TMP(("Q: attrName: '%s'", attrNameP));
+      LM_TMP(("Q: mdNameP:  '%s'", mdNameP));
+    }
+    else
+    {
+      LM_TMP(("Q: Case 4: A.B.C => Must NULL out the first two dots"));
+      *firstDotP  = 0;
+      mdNameP     = &firstDotP[1];
+      *secondDotP = 0;
+      rest        = &secondDotP[1];
+      caseNo = 4;
+
+      LM_TMP(("Q: attrName: '%s'", attrNameP));
+      LM_TMP(("Q: mdNameP:  '%s'", mdNameP));
+      LM_TMP(("Q: rest:     '%s'", rest));
+    }
+  }
+  LM_TMP(("Q: Case: %d", caseNo));
+
+  if (caseNo == 0)
+  {
+    *detailsP = (char*) "invalid RHS in Q-filter";
+    return NULL;
+  }
+
+  //
+  // All OK - let's compose ...
+  //
+  orionldUriExpand(orionldState.contextP, attrNameP, longName, longNameLen, detailsP);
 
   // Turn '.' into '=' for longName
   char* sP = longName;
@@ -109,15 +237,16 @@ static char* varFix(void* contextP, char* varName, char* longName, int longNameL
     ++sP;
   }
 
-  LM_TMP(("Q: expanded: %s", longName));
+  LM_TMP(("Q: longName: %s", longName));
 
-  char fullPath[512];
-  if (qPath == true)
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.%s.value", longName, rest);
-  else if (mqPath == true)
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value", longName, rest);
-  else
+  if (caseNo == 1)
     snprintf(fullPath, sizeof(fullPath), "attrs.%s.value", longName);
+  else if (caseNo == 2)
+    snprintf(fullPath, sizeof(fullPath), "attrs.%s.value.%s", longName, rest);
+  else if (caseNo == 3)
+    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value", longName, mdNameP);
+  else
+    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
 
   LM_TMP(("Q: fullPath: %s", fullPath));
   return strdup(fullPath);
@@ -167,7 +296,7 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
 //
 // * ';' means '&'
 // * On the same parenthesis level, the same op must be used (op: AND|OR)
-// * 
+// *
 //
 QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
 {
@@ -200,7 +329,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         prevP = qLexP;
         qLexP = qLexP->next;
       }
-      
+
       if (qLexP == NULL)
       {
         *titleP   = (char*) "mismatching parenthesis";
@@ -244,7 +373,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         qNodeAppend(compOpP, qLexP);
         qNodeV[qNodeIx++] = compOpP;
         break;
-      }        
+      }
       // NO BREAK !!!
     case QNodeIntegerValue:
     case QNodeFloatValue:
@@ -252,12 +381,12 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
     case QNodeTrueValue:
     case QNodeFalseValue:
     case QNodeRegexpValue:
-      if (compOpP == NULL) // Left-Hand side
+      if (compOpP == NULL)  // Left-Hand side
       {
         LM_TMP(("Q: Saving '%s' as left-hand-side", qNodeType(qLexP->type)));
         leftP = qLexP;
       }
-      else // Right hand side
+      else  // Right hand side
       {
         QNode* rangeP = NULL;
         QNode* commaP = NULL;
@@ -267,7 +396,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         {
           QNode*    lowerLimit;
           QNode*    upperLimit;
-          
+
           lowerLimit = qLexP;        // referencing the lower limit
           qLexP      = qLexP->next;  // step over the lower limit
           rangeP     = qLexP;        // referencing the range
@@ -317,22 +446,20 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         //
         if (compOpP->type != QNodeNotExists)
           qNodeAppend(compOpP, leftP);
-          
-        {
-          LM_TMP(("Q: Creating op-left-right mini-tree for %s", qNodeType(compOpP->type)));
 
-          if (rangeP != NULL)
-            qNodeAppend(compOpP, rangeP);
-          else if (commaP != NULL)
-            qNodeAppend(compOpP, commaP);
-          else
-            qNodeAppend(compOpP, qLexP);
+        LM_TMP(("Q: Creating op-left-right mini-tree for %s", qNodeType(compOpP->type)));
 
-          LM_TMP(("Q: Adding part-tree to qNodeV, on index %d", qNodeIx));
-          qNodeV[qNodeIx++] = compOpP;
-          compOpP    = NULL;
-          leftP      = NULL;
-        }
+        if (rangeP != NULL)
+          qNodeAppend(compOpP, rangeP);
+        else if (commaP != NULL)
+          qNodeAppend(compOpP, commaP);
+        else
+          qNodeAppend(compOpP, qLexP);
+
+        LM_TMP(("Q: Adding part-tree to qNodeV, on index %d", qNodeIx));
+        qNodeV[qNodeIx++] = compOpP;
+        compOpP    = NULL;
+        leftP      = NULL;
       }
       break;
 

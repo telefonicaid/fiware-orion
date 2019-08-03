@@ -33,7 +33,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// qTreeToBson - 
+// qTreeToBson -
 //
 extern bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP);
 

@@ -95,14 +95,14 @@ echo
 
 echo "03. Retrieve entities with condition over object"
 echo "================================================"
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=R100==urn:ngsi-ld:T2:6789'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=R100==%22urn:ngsi-ld:T2:6789%22'
 echo
 echo
 
 
 echo "04. Retrieve entities with condition over object that does not match"
 echo "===================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=R100==urn:ngsi-ld:T2:6780'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=R100==%22urn:ngsi-ld:T2:6780%22'
 echo
 echo
 

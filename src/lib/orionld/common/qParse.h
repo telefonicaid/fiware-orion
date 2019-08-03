@@ -31,7 +31,7 @@
 
 // -----------------------------------------------------------------------------
 //
-// qParse - 
+// qParse -
 //
 extern QNode* qParse(QNode* qLexList, char** titleP, char** detailsP);
 

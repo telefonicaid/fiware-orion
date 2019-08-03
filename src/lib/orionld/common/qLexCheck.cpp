@@ -105,7 +105,7 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
   QNode* prevNodeP = &dummyStart;
 
   dummyStart.type = QNodeOpen;
-  
+
   for (QNode* qnP = qLexP; qnP != NULL; qnP = qnP->next)
   {
     LM_TMP(("Q: Checking %s token", qNodeType(qnP->type)));
@@ -189,24 +189,15 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
                (qnP->type == QNodeGE) || (qnP->type == QNodeGT) ||
                (qnP->type == QNodeLE) || (qnP->type == QNodeLT))
       {
-        //
-        // MHD seems to remove the qauetaion marks ...
-        // Workaround: If Variable found on RHS, convert to String
-        //
-        if (nextType == QNodeVariable)
-          qnP->next->type = QNodeStringValue;
-        else
+        if ((nextType != QNodeFloatValue)   &&
+            (nextType != QNodeIntegerValue) &&
+            (nextType != QNodeStringValue)  &&
+            (nextType != QNodeTrueValue)    &&
+            (nextType != QNodeFalseValue))
         {
-          if ((nextType != QNodeFloatValue)   &&
-              (nextType != QNodeIntegerValue) &&
-              (nextType != QNodeStringValue)  &&
-              (nextType != QNodeTrueValue)    &&
-              (nextType != QNodeFalseValue))
-          {
-            *titleP   = (char*) "ngsi-ld query language: after non-regexp comparison operator must come a non-regexp Value";
-            *detailsP = (char*) qNodeType(nextType);
-            return false;
-          }
+          *titleP   = (char*) "ngsi-ld query language: after non-regexp comparison operator must come a non-regexp Value";
+          *detailsP = (char*) qNodeType(nextType);
+          return false;
         }
       }
       else if ((qnP->type == QNodeMatch) || (qnP->type == QNodeNoMatch))
@@ -242,7 +233,7 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
           LM_TMP(("Q: this type == %s", qNodeType(qnP->type)));
           LM_TMP(("Q: prev type == %s", qNodeType(prevNodeP->type)));
 #endif
-        
+
         if ((nextType != QNodeClose) &&
             (nextType != QNodeAnd)   &&
             (nextType != QNodeOr))
@@ -282,7 +273,7 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
             *detailsP = (char*) "Excess of START Tokens '('";
           else
             *detailsP = (char*) "Excess of END Tokens ')'";
-            
+
           return false;
         }
       }

@@ -195,7 +195,7 @@ Date: REGEX(.*)
 07. GET all entities that have an attribute A == 1 OR A == 2 - see E1 and E2
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 247
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

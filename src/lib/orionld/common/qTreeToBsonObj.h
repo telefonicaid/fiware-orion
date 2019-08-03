@@ -33,7 +33,7 @@
 
 // ----------------------------------------------------------------------------
 //
-// qTreeToBsonObj - 
+// qTreeToBsonObj -
 //
 extern bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** titleP, char** detailsP);
 

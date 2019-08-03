@@ -65,5 +65,5 @@ void qTreePresent(QNode* qNodeP, int level)
     LM_TMP(("Q: %s%s", indent, qNodeType(qNodeP->type)));
     for (QNode* childP = qNodeP->value.children; childP != NULL; childP = childP->next)
       qTreePresent(childP, level);
-  }    
+  }
 }
