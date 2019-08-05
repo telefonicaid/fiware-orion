@@ -15,6 +15,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
@@ -248,6 +249,21 @@ NGSIv2 仕様では、サブスクリプションの対象となるエンティ�
 Orionは、NGSIv2 仕様のサブスクリプション用に定義された `status` 値の他に、
 `oneshot`を使用することもできます。
 [Oneshot サブスクリプションのドキュメント](oneshot_subscription.md)で詳細を確認してください
+
+[トップ](#top)
+
+<a name="notify-only-attributes-that-change"></a>
+## 変更された属性のみを通知
+
+Orion は、NGSIv2 仕様で説明されているものとは別に、サブスクリプションの中で追加のフィールド `onlyChangedAttrs`
+(`notification` 内に) をサポートしています。 このフィールドは `true` または `false` の値を取ります
+(フィールドが省略された場合、デフォルトは `false` です)。 `true` に設定されている場合、サブスクリプションに
+関連した通知は `attrs` または `exceptAttrs` フィールドと組み合わせて、トリガーしている更新リクエストで
+変更された属性のみを含みます。
+
+例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
+A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
+が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
 
 [トップ](#top)
 
