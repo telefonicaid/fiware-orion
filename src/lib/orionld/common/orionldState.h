@@ -25,14 +25,31 @@
 *
 * Author: Ken Zangelin
 */
+#include "mongo/client/dbclient.h"                             // mongo::BSONObj
+
 extern "C"
 {
 #include "kjson/kjson.h"                                       // Kjson
 #include "kjson/KjNode.h"                                      // KjNode
 }
 #include "common/globals.h"                                    // ApiVersion
+#include "orionld/common/QNode.h"                              // QNode
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 
+
+
+// -----------------------------------------------------------------------------
+//
+// QNODE_SIZE - maximum number of QNodes allowed
+//
+#define QNODE_SIZE 100
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionLdRestService -
+//
 struct OrionLdRestService;
 
 
@@ -105,6 +122,10 @@ typedef struct OrionldConnectionState
   KjNode*                 payloadIdNode;
   KjNode*                 payloadTypeNode;
   char                    contextId[256];
+  QNode                   qNodeV[QNODE_SIZE];
+  int                     qNodeIx;
+  char                    qDebugBuffer[24 * 1024];
+  mongo::BSONObj*         qMongoFilterP;
 } OrionldConnectionState;
 
 

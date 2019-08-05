@@ -34,6 +34,14 @@ SET (SOURCES
     numberToDate.cpp
     orionldState.cpp
     orionldAttributeTreat.cpp
+    QNode.cpp
+    qLex.cpp
+    qLexCheck.cpp
+    qLexRender.cpp
+    qParse.cpp
+    qTreePresent.cpp
+    qTreeToBsonObj.cpp
+    # qTreeToBson.cpp
 )
 
 # Include directories

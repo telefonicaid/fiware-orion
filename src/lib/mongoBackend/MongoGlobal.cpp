@@ -1361,11 +1361,19 @@ bool entitiesQuery
 
   if (attrs.arrSize() > 0)
   {
-    /* If we don't do this checking, the {$in: [] } in the attribute name part will
-     * make the query fail*/
+    // If we don't do this check, the {$in: [] } in the attribute name part will make the query fail
     finalQuery.append(ENT_ATTRNAMES, BSON("$in" << attrs.arr()));
   }
 
+#ifdef ORIONLD
+  if (orionldState.qMongoFilterP != NULL)
+  {
+    LM_TMP(("Q: Adding NGSI-LD Q-filter to finalQuery"));
+    finalQuery.appendElements(*orionldState.qMongoFilterP);
+    LM_TMP(("Q: orionldState.qMongoFilterP: %s", orionldState.qMongoFilterP->toString().c_str()));
+    // LM_TMP(("Q: finalQuery: %s (DESTRUCTIVE!!!)", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
+  }
+#endif
   /* Part 5: scopes */
   std::vector<BSONObj>  filters;
   unsigned int          geoScopes = 0;
@@ -1445,6 +1453,7 @@ bool entitiesQuery
 
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
+  // LM_TMP(("Q: finalQuery: %s (DESTRUCTIVE)", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
   Query                          query(finalQuery.obj());
 
   if (sortOrderList == "")

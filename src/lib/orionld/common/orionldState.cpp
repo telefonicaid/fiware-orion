@@ -34,6 +34,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/context/orionldContextFree.h"                // orionldContextFree
+#include "orionld/common/QNode.h"                              // QNode
 #include "orionld/common/OrionldConnection.h"                  // OrionldConnectionState
 
 
@@ -107,6 +108,16 @@ void orionldStateInit(void)
   orionldState.payloadTypeNode             = NULL;
   orionldState.acceptJson                  = false;
   orionldState.acceptJsonld                = false;
+  orionldState.qMongoFilterP               = NULL;
+
+  //
+  // FIXME: This initialization of qNodeV is only necessary if a String-Filter is part of the request
+  //        Should be moved elsewhere:
+  //          if (ciP->uriParam["q"] != "")
+  //            bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
+  //
+  bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
+  orionldState.qNodeIx       = 0;
 }
 
 
