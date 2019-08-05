@@ -109,12 +109,15 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
     //
     // Integer, Float, or variable?
     // Special cases: 'true' & 'false'
+    // Or: DateTime?
     //
-    int        digits  = 0;
-    int        dots    = 0;
-    int        others  = 0;
-    int        spaces  = 0;
-    char*      sP      = term;
+    int        digits   = 0;
+    int        dots     = 0;
+    int        others   = 0;
+    int        spaces   = 0;
+    int        hyphens  = 0;
+    char*      sP       = term;
+    bool       dateTime = false;
     QNodeType  type;
 
     if (strncmp(sP, "RE(", 3) == 0)
@@ -133,6 +136,8 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
           ++dots;
         else if (*sP == ' ')
           ++spaces;
+        else if (*sP == '-')
+          ++hyphens;
         else
           ++others;
 
@@ -141,7 +146,12 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
 
       if (others == 0)
       {
-        if (dots == 0)
+        if (hyphens > 0)
+        {
+          dateTime = true;               // MIGHT be a DateTime
+          type     = QNodeIntegerValue;
+        }
+        else if (dots == 0)
           type = QNodeIntegerValue;
         else if (dots == 1)
           type = QNodeFloatValue;
@@ -156,7 +166,27 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
     QNode* qNodeP = qNode(type);
 
     if (type == QNodeIntegerValue)
-      qNodeP->value.i = strtoul(term, NULL, 10);
+    {
+      long long dTime;
+
+      if (dateTime == true)
+      {
+        if ((dTime = parse8601Time(term)) == -1)
+        {
+          LM_TMP(("Q: Seemed like a DateTime but parse8601Time said NO"));
+          dateTime = false;
+        }
+      }
+      if (dateTime == false)
+      {
+        qNodeP->value.i = strtoul(term, NULL, 10);
+      }
+      else
+      {
+        LM_TMP(("Q: Pushing term '%s': the type is finally a DateTime", term));
+        qNodeP->value.i = dTime;
+      }
+    }
     else if (type == QNodeFloatValue)
       qNodeP->value.f = strtod(term, NULL);
     else if (type == QNodeVariable)
@@ -436,8 +466,11 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
     else
     {
       //
-      // Must be part of a Number or Variable
-      // The only valid characters for this is: a-zA-Z0-9_.
+      // Must be part of a Number, a Variable, or a DateTime
+      // Valid characters for:
+      // - Number:   a-zA-Z0-9_.
+      // - Variable: a-zA-Z0-9_.
+      // - DateTime: Z0-9_:.
       //
       if ((*sP >= '0') && (*sP <= '9'))
       {}
@@ -450,6 +483,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       else if (*sP == '_')
       {}
       else if (*sP == '.')
+      {}
+      else if (*sP == '-')
       {}
       else
       {
