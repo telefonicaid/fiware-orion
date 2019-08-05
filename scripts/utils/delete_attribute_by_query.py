@@ -20,6 +20,7 @@
 # iot_support at tid dot es
 
 import requests
+import sys
 requests.packages.urllib3.disable_warnings()
 
 __author__ = 'fermin'
@@ -39,7 +40,7 @@ page_size = 500
 
 attr_to_delete = 'a2'
 
-filter = '&type=device'
+filter = '&q=a2'
 
 # END of the configuration part (don't touch below this line ;)
 ##############################################################
@@ -112,21 +113,16 @@ def initial_statistics():
     return total
 
 
-def process_page(entities):
+def send_batch(entities):
     """
-    Process a page of entities, removing the attribute in all them
-    :param entities: page of entities (a list) to be processed
+    Send a POST /v2/op/update batch
+
+    :param entities: the entities to be included in the batch (up to page_size, but construction)
     :return: True if removal was ok, False otherwise
     """
 
-    ens = []
-
-    for entity in entities:
-        en = {'id': entity['id'], 'type': entity['type'], attr_to_delete: 0}
-        ens.append(en)
-
     body = {
-        'entities': ens,
+        'entities': entities,
         'actionType': 'delete'
     }
 
@@ -149,22 +145,47 @@ confirm = raw_input()
 if (confirm != 'yes'):
     sys.exit()
 
-#testing_populate(109, 'device')
+#testing_populate(1876, 'device')
 
 count = initial_statistics()
+
+if count == 0:
+    print 'Nothing to do'
+    sys.exit(0)
+
+entities = []
 
 # Number of batches
 pages = count / page_size
 for i in range(0, pages + 1):
-    print '- Processing page %d' % (i + 1)
+    print '- Getting entities page %d' % (i + 1)
     offset = i * page_size
-    res = requests.get('%s/v2/entities?offset=%s&limit=%s' % (cb_endpoint, str(offset), str(page_size)),
+    res = requests.get('%s/v2/entities?offset=%s&limit=%s%s' % (cb_endpoint, str(offset), str(page_size), filter),
                        headers=headers, verify=False)
 
     if res.status_code != 200:
         print 'Error getting entities (%d): %s' % (res.status_code, res.json())
         sys.exit(1)
 
-    process_page(res.json())
+    for entity in res.json():
+        entities.append({'id': entity['id'], 'type': entity['type']})
+
+accum = 0
+batch = []
+for entity in entities:
+
+    batch.append({'id': entity['id'], 'type': entity['type'], attr_to_delete: 0})
+    accum += 1
+
+    if (accum == page_size):
+        print '- Update batch of %d entities' % len(batch)
+        send_batch(batch)
+        accum = 0
+        batch = []
+
+# Last batch
+if len(batch) > 0:
+    print '- Update batch of %d entities' % len(batch)
+    send_batch(batch)
 
 print 'We are done!'
