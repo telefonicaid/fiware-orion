@@ -22,6 +22,8 @@
 *
 * Author: Fermín Galán Márquez
 */
+#include <strings.h>                         // bzero
+
 #include <string>
 
 #include "apiTypesV2/Registration.h"
@@ -45,8 +47,12 @@ ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), 
 *
 * Registration::Registration -
 */
-Registration::Registration(): descriptionProvided(false), expires(-1)
+  Registration::Registration(): descriptionProvided(false), expires(-1)
 {
+#ifdef ORIONLD
+  bzero(&observationInterval, sizeof(observationInterval));
+  bzero(&managementInterval,  sizeof(managementInterval));
+#endif
 }
 
 

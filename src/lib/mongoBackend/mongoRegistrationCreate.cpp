@@ -123,19 +123,55 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (eP->type == "")  // No type provided => all types
+    if (orionldState.apiVersion == NGSI_LD_V1)
     {
-      entities.append(BSON(REG_ENTITY_ID << eP->id));
+      if (eP->id != "")
+      {
+        LM_TMP(("KZ: reg entity id == '%s'", eP->id.c_str()));
+        if (eP->type == "")
+          entities.append(BSON(REG_ENTITY_ID << eP->id));
+        else
+          entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      }
+      else if (eP->idPattern != "")
+      {
+        LM_TMP(("KZ: reg entity idPattern == '%s'", eP->idPattern.c_str()));
+        if (eP->type == "")
+          entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
+        else
+          entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true" << REG_ENTITY_TYPE << eP->type));
+      }
+      else
+      {
+        // Error
+      }
     }
     else
     {
-      entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      if (eP->type == "")  // No type provided => all types
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      }
     }
   }
 
-  for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)
+  if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << "" << REG_ATTRS_ISDOMAIN << "false"));
+    for (unsigned int pIx = 0; pIx < regP->dataProvided.propertyV.size(); ++pIx)
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.propertyV[pIx] << REG_ATTRS_TYPE << "Property" << REG_ATTRS_ISDOMAIN << "false"));
+    for (unsigned int rIx = 0; rIx < regP->dataProvided.relationshipV.size(); ++rIx)
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.relationshipV[rIx] << REG_ATTRS_TYPE << "Relationship" << REG_ATTRS_ISDOMAIN << "false"));
+  }
+  else
+  {
+    for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)
+    {
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << "" << REG_ATTRS_ISDOMAIN << "false"));
+    }
   }
 
   contextRegistration.append(
@@ -245,8 +281,10 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
-  setObservationInterval(regP->observationInterval, &bob);
-  setManagementInterval(regP->managementInterval, &bob);
+  if (regP->observationInterval.start != 0)
+    setObservationInterval(regP->observationInterval, &bob);
+  if (regP->managementInterval.start != 0)
+    setManagementInterval(regP->managementInterval, &bob);
 #endif
 
   //
