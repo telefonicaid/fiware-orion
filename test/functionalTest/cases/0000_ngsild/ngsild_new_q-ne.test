@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Retrieval of Entities with q filter != for INTEGER, STRING, FLOAT, RANGE
+Retrieval of Entities with q filter != for INTEGER, STRING, FLOAT, RANGE, INTEGER-RANGE, and INTEGER-LIST
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,8 +31,8 @@ brokerStart CB 212-249
 --SHELL--
 
 #
-# FIXME:  Really it's a doubt
-#         In step 10, why don't "String 1" and "String 2" match   != 2..6 ?
+# FIXME:  Really it's a DOUBT
+#         In step 10 and 11, why don't "String 1" and "String 2" match   != 2..6 ?
 #
 #
 # 01. Create E1 with type T and attr A=1
@@ -45,6 +45,9 @@ brokerStart CB 212-249
 # 08. GET all entities that have an attribute A != 1.02 - see all buf E6
 # 09. GET all entities that have an attribute A != "String 2" - see all but E4
 # 10. GET all entities that have an attribute A != 2..6 - see E1, E5 and E6
+# 11. GET all entities that have an attribute A != 12..14 - see E1, E2, E5 and E6
+# 12. GET all entities that have an attribute A != 1,2,3 - see E3, E4, E5 and E6
+# 13. GET all entities that have an attribute A != 5,6,7,8 - see all 6 entities
 #
 
 echo '01. Create E1 with type T and attr A=1'
@@ -168,6 +171,27 @@ echo
 echo "10. GET all entities that have an attribute A != 2..6 - see E1, E5 and E6"
 echo "========================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?q=A!=2..6&prettyPrint=yes&type=T' --noPayloadCheck
+echo
+echo
+
+
+echo "11. GET all entities that have an attribute A != 12..14 - see E1, E2, E5 and E6"
+echo "==============================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=A!=12..14&prettyPrint=yes&type=T' --noPayloadCheck
+echo
+echo
+
+
+echo "12. GET all entities that have an attribute A != 1,2,3 - see E3, E4, E5 and E6"
+echo "=============================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=A!=1,2,3&prettyPrint=yes&type=T' --noPayloadCheck
+echo
+echo
+
+
+echo "13. GET all entities that have an attribute A != 5,6,7,8 - see all 6 entities"
+echo "============================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=A!=5,6,7,8&prettyPrint=yes&type=T' --noPayloadCheck
 echo
 echo
 
@@ -401,6 +425,157 @@ Date: REGEX(.*)
     "A": {
       "type": "Property",
       "value": 1
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E6",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.02
+    }
+  }
+]
+
+
+
+11. GET all entities that have an attribute A != 12..14 - see E1, E2, E5 and E6
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 497
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 2
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E6",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.02
+    }
+  }
+]
+
+
+
+12. GET all entities that have an attribute A != 1,2,3 - see E3, E4, E5 and E6
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 515
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E4",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 2"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E5",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.01
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E6",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1.02
+    }
+  }
+]
+
+
+
+13. GET all entities that have an attribute A != 5,6,7,8 - see all 6 entities
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 759
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 2
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E3",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 1"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E4",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": "String 2"
     }
   },
   {

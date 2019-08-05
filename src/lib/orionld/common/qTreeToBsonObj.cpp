@@ -225,7 +225,50 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     }
     else if (rightP->type == QNodeComma)
     {
-      // FIXME: Implement!!!
+      LM_TMP(("Q: != CommaList"));
+
+      mongo::BSONArrayBuilder  ninVec;
+      mongo::BSONObjBuilder    ninObj;
+
+      for (QNode* ninValueP = rightP->value.children; ninValueP != NULL; ninValueP = ninValueP->next)
+      {
+        //
+        // FIXME: I could skip this if for each loop.
+        //        We already know that all "comma values" are of the same type - checked by qParse.
+        //
+        // So, this would be faster in execution:
+        //   if (rightP->value.children->type == QNodeIntegerValue)
+        //   {
+        //     for (Qnode* ninValueP = rightP->value.children; ninValueP != NULL; ninValueP = ninValueP->next)
+        //     {
+        //       ninVec.append(ninValueP->value.i);
+        //     }
+        //   }
+        //   else if (ninValueP->type == QNodeFloatValue) ...
+        //
+        if (ninValueP->type == QNodeIntegerValue)
+          ninVec.append(ninValueP->value.i);
+        else if (ninValueP->type == QNodeFloatValue)
+          ninVec.append(ninValueP->value.f);
+        else if (ninValueP->type == QNodeStringValue)
+          ninVec.append(ninValueP->value.s);
+      }
+
+      ninObj.append("$nin", ninVec.arr());
+      topBsonObjP->append(leftP->value.v, ninObj.obj());
+    }
+    else if (treeP->type == QNodeMatch)
+    {
+      QNode*                 leftP  = treeP->value.children;
+      QNode*                 rightP = leftP->next;
+      mongo::BSONObjBuilder  notObj;
+      mongo::BSONObjBuilder  matchObj;
+
+      LM_TMP(("Q: Creating REGEX-Object"));
+
+      matchObj.append("$regex", rightP->value.s);
+      notObj.append("$not", matchObj.obj());
+      topBsonObjP->append(leftP->value.v, notObj.obj());
     }
   }
   else if ((treeP->type == QNodeGT) || (treeP->type == QNodeGE) || (treeP->type == QNodeLT) || (treeP->type == QNodeLE))
