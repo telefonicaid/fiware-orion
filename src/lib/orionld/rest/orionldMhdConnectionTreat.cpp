@@ -147,6 +147,11 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 //
 static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
 {
+  bool  explicit_application_json   = false;
+  bool  explicit_application_jsonld = false;
+  float weight_application_json     = 0;
+  float weight_application_jsonld   = 0;
+
   LM_T(LmtAccept, ("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
   LM_T(LmtAccept, ("ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
@@ -171,8 +176,19 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
       const char* appType = &mediaRange[12];
 
       LM_T(LmtAccept, ("mediaRange is application/..."));
-      if      (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  orionldState.acceptJsonld = true;
-      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))                 orionldState.acceptJson   = true;
+
+      if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
+      {
+        orionldState.acceptJsonld   = true;
+        explicit_application_jsonld = true;
+        weight_application_jsonld   = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
+      }
+      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))
+      {
+        orionldState.acceptJson     = true;
+        explicit_application_json   = true;
+        weight_application_json     = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
+      }
       else if (SCOMPARE2(appType, '*', 0))
       {
         orionldState.acceptJsonld = true;
@@ -203,6 +219,15 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
     ciP->httpStatusCode = SccNotAcceptable;
 
     return false;
+  }
+
+  if ((explicit_application_json == true) && (explicit_application_jsonld == false))
+    orionldState.acceptJsonld = false;
+
+  if ((weight_application_json != 0) || (weight_application_jsonld != 0))
+  {
+    if (weight_application_json > weight_application_jsonld)
+      orionldState.acceptJsonld = false;
   }
 
   if (orionldState.acceptJsonld == true)
