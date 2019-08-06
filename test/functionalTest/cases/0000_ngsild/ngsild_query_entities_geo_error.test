@@ -134,7 +134,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:Building:store002",
-		"type" : "https://uri.fiware.org/ns/datamodels/Building",
+		"type" : "https://uri.fiware.org/ns/datamodels/entity-types/Building",
 		"servicePath" : "/"
 	},
 	"attrNames" : [

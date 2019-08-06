@@ -105,7 +105,7 @@ echo
 
 echo "07. GET entities with	type https://uri.fiware.org/ns/datamodels/AgriProductType, giving NO context - see the entity"
 echo "==================================================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/datamodels/AgriProductType"
+orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/datamodels/entity-types/AgriProductType"
 echo
 echo
 
@@ -210,7 +210,7 @@ Date: REGEX(.*)
 07. GET entities with	type https://uri.fiware.org/ns/datamodels/AgriProductType, giving NO context - see the entity
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 157
+Content-Length: 170
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -222,7 +222,7 @@ Date: REGEX(.*)
             "value": "John 5"
         },
         "id": "http://a.b.c/entity/E5",
-        "type": "https://uri.fiware.org/ns/datamodels/AgriProductType"
+        "type": "https://uri.fiware.org/ns/datamodels/entity-types/AgriProductType"
     }
 ]
 
