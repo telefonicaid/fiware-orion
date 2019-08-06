@@ -165,7 +165,7 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
     const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
 
     LM_T(LmtAccept, ("ciP->Accept header %d: '%s'", ix, mediaRange));
-    // LM_TMP(("LINK: ciP->Accept header %d: '%s'", ix, mediaRange));
+
     if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
     {
       const char* appType = &mediaRange[12];
@@ -188,19 +188,19 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
       orionldState.acceptJson   = true;
       LM_T(LmtAccept, ("*/* - both json and jsonld OK"));
     }
-
-    // LM_TMP(("LINK: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
-    // LM_TMP(("LINK: acceptJson:   %s", FT(orionldState.acceptJson)));
   }
+
+  // LM_TMP(("LINK: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
+  // LM_TMP(("LINK: acceptJson:   %s", FT(orionldState.acceptJson)));
 
   if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false))
   {
     const char* title   = "invalid mime-type";
     const char* details = "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'";
 
-    LM_E(("HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'"));
+    LM_W(("Bad Input (HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json')"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, title, details, OrionldDetailsString);
-    ciP->httpStatusCode = SccBadRequest;
+    ciP->httpStatusCode = SccNotAcceptable;
 
     return false;
   }
@@ -814,6 +814,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // For error responses, there is ALWAYS payload, describing the error
   // If, for some reason (bug!) this payload is missing, then we add a generic error response here
+  //
+  // The only exception is 405 that has no payload - the info comes in the "Accepted" HTTP header.
   //
   if ((ciP->httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (ciP->httpStatusCode != 405))
     orionldErrorResponseCreate(ciP, OrionldInternalError, "Unknown Error", "The reason for this error is unknown", OrionldDetailsString);
