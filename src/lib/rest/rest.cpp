@@ -545,7 +545,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   HttpHeaders*     headerP = &ciP->httpHeaders;
   std::string      key     = ckey;
 
-  LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", key.c_str(), value));
+  LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", ckey, value));
 
   if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
   else if (strcasecmp(key.c_str(), HTTP_HOST) == 0)              headerP->host           = value;

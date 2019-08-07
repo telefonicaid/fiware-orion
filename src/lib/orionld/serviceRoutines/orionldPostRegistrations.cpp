@@ -68,7 +68,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   //
   // Does the Registration already exist?
   //
-  // FIXME: Create a new function that simply llos up the registration!!!
+  // FIXME: Create a new function that simply looks up the registration!!!
   //        See mongoEntityExists.cpp.
   //        That will be a lot faster than the current solution.
   //

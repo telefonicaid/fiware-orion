@@ -119,6 +119,11 @@ struct DataProvided
   std::vector<EntID>        entities;
   std::vector<std::string>  attributes;
 
+#ifdef ORIONLD
+  std::vector<std::string>  propertyV;
+  std::vector<std::string>  relationshipV;
+#endif
+
   std::string               toJson();
 };
 

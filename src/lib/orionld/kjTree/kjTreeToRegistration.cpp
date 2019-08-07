@@ -111,7 +111,11 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if (strcmp(orionldState.payloadTypeNode->value.s, "ContextSourceRegistration") != 0)
   {
     LM_W(("Bad Input (Registration type must have the value /Registration/)"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration::type must have a value of /ContextSourceRegistration/", orionldState.payloadTypeNode->value.s, OrionldDetailsString);
+    orionldErrorResponseCreate(ciP,
+                               OrionldBadRequestData,
+                               "Registration::type must have a value of /ContextSourceRegistration/",
+                               orionldState.payloadTypeNode->value.s,
+                               OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -170,7 +174,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* propP = eNodeP->value.firstChildP; propP != NULL; propP = propP->next)
             {
                STRING_CHECK(propP, "PropertyInfo::name");
-               regP->dataProvided.attributes.push_back(propP->value.s);
+               regP->dataProvided.propertyV.push_back(propP->value.s);
             }
           }
           else if (SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
@@ -182,7 +186,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* relP = eNodeP->value.firstChildP; relP != NULL; relP = relP->next)
             {
                STRING_CHECK(relP, "RelationInfo::name");
-               regP->dataProvided.attributes.push_back(relP->value.s);
+               regP->dataProvided.relationshipV.push_back(relP->value.s);
             }
           }
           else

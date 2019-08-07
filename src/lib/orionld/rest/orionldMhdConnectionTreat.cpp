@@ -147,6 +147,11 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 //
 static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
 {
+  bool  explicit_application_json   = false;
+  bool  explicit_application_jsonld = false;
+  float weight_application_json     = 0;
+  float weight_application_jsonld   = 0;
+
   LM_T(LmtAccept, ("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
   LM_T(LmtAccept, ("ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
@@ -165,14 +170,25 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
     const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
 
     LM_T(LmtAccept, ("ciP->Accept header %d: '%s'", ix, mediaRange));
-    // LM_TMP(("LINK: ciP->Accept header %d: '%s'", ix, mediaRange));
+
     if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
     {
       const char* appType = &mediaRange[12];
 
       LM_T(LmtAccept, ("mediaRange is application/..."));
-      if      (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))  orionldState.acceptJsonld = true;
-      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))                 orionldState.acceptJson   = true;
+
+      if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
+      {
+        orionldState.acceptJsonld   = true;
+        explicit_application_jsonld = true;
+        weight_application_jsonld   = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
+      }
+      else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))
+      {
+        orionldState.acceptJson     = true;
+        explicit_application_json   = true;
+        weight_application_json     = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
+      }
       else if (SCOMPARE2(appType, '*', 0))
       {
         orionldState.acceptJsonld = true;
@@ -188,21 +204,30 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
       orionldState.acceptJson   = true;
       LM_T(LmtAccept, ("*/* - both json and jsonld OK"));
     }
-
-    // LM_TMP(("LINK: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
-    // LM_TMP(("LINK: acceptJson:   %s", FT(orionldState.acceptJson)));
   }
+
+  // LM_TMP(("LINK: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
+  // LM_TMP(("LINK: acceptJson:   %s", FT(orionldState.acceptJson)));
 
   if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false))
   {
     const char* title   = "invalid mime-type";
     const char* details = "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'";
 
-    LM_E(("HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'"));
+    LM_W(("Bad Input (HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json')"));
     orionldErrorResponseCreate(ciP, OrionldBadRequestData, title, details, OrionldDetailsString);
-    ciP->httpStatusCode = SccBadRequest;
+    ciP->httpStatusCode = SccNotAcceptable;
 
     return false;
+  }
+
+  if ((explicit_application_json == true) && (explicit_application_jsonld == false))
+    orionldState.acceptJsonld = false;
+
+  if ((weight_application_json != 0) || (weight_application_jsonld != 0))
+  {
+    if (weight_application_json > weight_application_jsonld)
+      orionldState.acceptJsonld = false;
   }
 
   if (orionldState.acceptJsonld == true)
@@ -814,6 +839,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // For error responses, there is ALWAYS payload, describing the error
   // If, for some reason (bug!) this payload is missing, then we add a generic error response here
+  //
+  // The only exception is 405 that has no payload - the info comes in the "Accepted" HTTP header.
   //
   if ((ciP->httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (ciP->httpStatusCode != 405))
     orionldErrorResponseCreate(ciP, OrionldInternalError, "Unknown Error", "The reason for this error is unknown", OrionldDetailsString);

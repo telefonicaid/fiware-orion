@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Creation of a registration
+NGSI-LD Test Suite Failure at create a registration
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,23 +31,15 @@ brokerStart CB
 --SHELL--
 
 #
-# FIXME: Due to the fact that the NGSI-LD data model doesn't follow the Orion APIv2 data model
-#        in terms of registrations, we have decided to restrict NGSI-LD registrations to only allow
-#        ONE item in the information vector.
-#        Once this is fixed (possibly some time 2020), this test should inclide an "information" vector
-#        with more than one item.
-#
-# 01. Create a registration with ALL fields
+# 01. Create a registration exactly like the NGSI-LD Test Suite case 'should create registration from ETSI Example'
 # 02. See the registration in mongo
 #
 
-echo "01. Create a registration with ALL fields"
-echo "========================================="
+echo "01. Create a registration exactly like the NGSI-LD Test Suite case 'should create registration from ETSI Example'"
+echo "================================================================================================================="
 payload='{
-  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a3456",
   "type": "ContextSourceRegistration",
-  "name": "name of reg 1",
-  "description": "description of reg 1",
   "information": [
     {
       "entities": [
@@ -56,56 +48,31 @@ payload='{
           "type": "Vehicle"
         }
       ],
-      "properties": [ "brandName", "speed" ],
-      "relationships": [ "isParked" ]
+      "properties": ["brandName", "speed"],
+      "relationships": ["isParked"]
+    },
+    {
+      "entities": [
+        {
+          "idPattern": ".*downtown$",
+          "type": "OffStreetParking"
+        },
+        {
+          "idPattern": ".*47$",
+          "type": "OffStreetParking"
+        }
+      ],
+      "properties": ["availableSotNumber", "totalSpotNumber"],
+      "relationships": ["isNextToBuilding"]
     }
   ],
-  "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
-  },
-  "managementInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
-  },
+  "endpoint": "http://my.csource.org:1026",
   "location": {
     "type": "Polygon",
     "coordinates": [
-      [
-        [ 100.0, 0.0 ],
-        [ 101.0, 0.0 ],
-        [ 101.0, 1.0 ],
-        [ 100.0, 1.0 ],
-        [ 100.0, 0.0 ]
-      ]
+      [[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]]
     ]
-  },
-  "observationSpace": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [ 200.0, 0.0 ],
-        [ 201.0, 0.0 ],
-        [ 201.0, 1.0 ],
-        [ 200.0, 1.0 ],
-        [ 200.0, 0.0 ]
-      ]
-    ]
-  },
-  "operationSpace": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [ 300.0, 0.0 ],
-        [ 301.0, 0.0 ],
-        [ 301.0, 1.0 ],
-        [ 300.0, 1.0 ],
-        [ 300.0, 0.0 ]
-      ]
-    ]
-  },
-  "expires": "2028-12-31T10:00:00",
-  "endpoint": "http://my.csource.org:1026"
+  }
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -120,11 +87,11 @@ echo
 
 
 --REGEXPECT--
-01. Create a registration with ALL fields
-=========================================
+01. Create a registration exactly like the NGSI-LD Test Suite case 'should create registration from ETSI Example'
+=================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a3456
 Date: REGEX(.*)
 
 
@@ -135,9 +102,7 @@ MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
-	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
-	"description" : "description of reg 1",
-	"expiration" : NumberLong(1861869600),
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a3456",
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
@@ -145,6 +110,16 @@ MongoDB server version: REGEX(.*)
 				{
 					"id" : "urn:ngsi-ld:Vehicle:A456",
 					"type" : "http://example.org/ngsi-ld/default/Vehicle"
+				},
+				{
+					"id" : ".*downtown$",
+					"isPattern" : "true",
+					"type" : "http://example.org/ngsi-ld/default/OffStreetParking"
+				},
+				{
+					"id" : ".*47$",
+					"isPattern" : "true",
+					"type" : "http://example.org/ngsi-ld/default/OffStreetParking"
 				}
 			],
 			"attrs" : [
@@ -159,7 +134,22 @@ MongoDB server version: REGEX(.*)
 					"isDomain" : "false"
 				},
 				{
+					"name" : "availableSotNumber",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "totalSpotNumber",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
 					"name" : "isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "isNextToBuilding",
 					"type" : "Relationship",
 					"isDomain" : "false"
 				}
@@ -167,15 +157,7 @@ MongoDB server version: REGEX(.*)
 			"providingApplication" : "http://my.csource.org:1026"
 		}
 	],
-	"format" : "JSON",
-	"observationInterval" : {
-		"start" : NumberLong(1546250400),
-		"end" : NumberLong(1861869600)
-	},
-	"managementInterval" : {
-		"start" : NumberLong(1546250400),
-		"end" : NumberLong(1861869600)
-	}
+	"format" : "JSON"
 }
 bye
 
