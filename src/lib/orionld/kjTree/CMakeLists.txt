@@ -28,6 +28,7 @@ SET (SOURCES
     kjTreeFromQueryContextResponseWithAttrList.cpp
     kjTreeFromSubscription.cpp
     kjTreeFromNotification.cpp
+    kjTreeFromRegistration.cpp
     kjTreeToEntIdVector.cpp
     kjTreeToStringList.cpp
     kjTreeToSubscriptionExpression.cpp

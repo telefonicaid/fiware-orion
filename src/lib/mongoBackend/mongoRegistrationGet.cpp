@@ -259,15 +259,15 @@ static void setLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
-* setLdObservationInterval -
+* setLdObservationInterval - FIXME
 */
 static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
   if(r.hasField(REG_OBSERVATION_INTERVAL))
   {
     mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
-    reg->observationInterval.start  = getStringFieldF(obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getStringFieldF(obj, REG_INTERVAL_END) : "";
+    reg->observationInterval.start  = getIntFieldF(obj, REG_INTERVAL_START);
+    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getIntFieldF(obj, REG_INTERVAL_END) : -1;
   }
 }
 
@@ -275,28 +275,20 @@ static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSO
 
 /* ****************************************************************************
 *
-* setLdManagementInterval -
+* setLdManagementInterval - FIXME
 */
 static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
   if(r.hasField(REG_MANAGEMENT_INTERVAL))
   {
     mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
-    reg->managementInterval.start  = getStringFieldF(obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getStringFieldF(obj, REG_INTERVAL_END) : "";
+    reg->managementInterval.start  = getIntFieldF(obj, REG_INTERVAL_START);
+    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getIntFieldF(obj, REG_INTERVAL_END) : -1;
   }
 }
 
 
 
-/* ****************************************************************************
-*
-* setLdEndpoint -
-*/
-static void setLdEndpoint(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  reg->endpoint = r.hasField(REG_ENDPOINT) ? getStringFieldF(r, REG_ENDPOINT) : "";
-}
 #endif  //ORIONLD
 
 
@@ -375,6 +367,8 @@ void mongoRegistrationGet
       return;
     }
 
+    setLdObservationInterval(regP, r);
+    setLdManagementInterval(regP, r);
     setExpires(regP, r);
     setStatus(regP, r);
 
@@ -565,11 +559,10 @@ bool mongoLdRegistrationGet
       return false;
     }
 
-    setLdObservationInterval(regP, r);
-    setLdManagementInterval(regP, r);
+    // setLdObservationInterval(regP, r);
+    // setLdManagementInterval(regP, r);
     setExpires(regP, r);
     setStatus(regP, r);
-    setLdEndpoint(regP, r);
 
     if (moreSafe(cursor))
     {
