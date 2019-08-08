@@ -45,6 +45,14 @@
 
 
 
+// Declaration
+#ifdef ORIONLD
+  static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
+  static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
+#endif
+
+
+
 /* ****************************************************************************
 *
 * setRegistrationId -
@@ -207,6 +215,11 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
   setAttributes(regP, cr0);
   setProvider(regP, cr0);
 
+  #ifdef ORIONLD
+    setLdPropertyV(regP, cr0);
+    setLdRelationshipV(regP, cr0);
+  #endif
+
   return true;
 }
 
@@ -259,7 +272,7 @@ static void setLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
-* setLdObservationInterval - FIXME
+* setLdObservationInterval
 */
 static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
@@ -275,7 +288,7 @@ static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSO
 
 /* ****************************************************************************
 *
-* setLdManagementInterval - FIXME
+* setLdManagementInterval
 */
 static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
@@ -288,6 +301,59 @@ static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSON
 }
 
 
+
+/* ****************************************************************************
+*
+* setLdPropertyV
+*/
+static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  std::vector<mongo::BSONElement> dbPropertyV = getFieldF(r, REG_ATTRS).Array();
+
+  for (unsigned int ix = 0; ix < dbPropertyV.size(); ++ix)
+  {
+    mongo::BSONObj  pobj = dbPropertyV[ix].embeddedObject();
+    std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
+    std::string     propName;
+    if(type == REG_PROPERTIES_TYPE)
+    {
+      LM_TMP(("Inside the if"));
+      propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
+
+      if (propName != "")
+      {
+        reg->dataProvided.propertyV.push_back(propName);
+      }
+    }   
+  }
+}
+
+
+/* ****************************************************************************
+*
+* setLdRelationshipV
+*/
+static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
+{
+  std::vector<mongo::BSONElement> dbRelationshipV = getFieldF(r, REG_ATTRS).Array();
+
+  for (unsigned int ix = 0; ix < dbRelationshipV.size(); ++ix)
+  {
+    mongo::BSONObj  robj = dbRelationshipV[ix].embeddedObject();
+    std::string     type = getStringFieldF(robj, REG_ATTRS_TYPE);
+    std::string     relName;
+
+    if(type == REG_RELATIONSHIPS_TYPE)
+    {
+      relName = getStringFieldF(robj, REG_RELATIONSHIPS_NAME);
+      
+      if (relName != "")
+      {
+        reg->dataProvided.relationshipV.push_back(relName);
+      }
+    }   
+  }
+}
 
 #endif  //ORIONLD
 

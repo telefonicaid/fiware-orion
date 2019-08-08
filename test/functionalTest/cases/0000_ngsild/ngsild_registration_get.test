@@ -215,17 +215,16 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 532
-Content-Type: application/ld+json
+Content-Length: 467
+Content-Type: application/json
 
 Date: REGEX(.*)
 
 {
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
   "type": "ContextSource Registration",
   "name": "name of reg test 1",
-  "description": "description of reg 1 testando",
+  "description": "description of reg test 1",
   "information": [
     {
       "entities": [
@@ -234,10 +233,12 @@ Date: REGEX(.*)
           "type": "Building"
         }
       ],
-      "attrs": [
+      "properties": [ 
         "size", 
-        "high",
-        "isAvailable"
+        "high" 
+      ],
+      "relationships": [ 
+        "isAvailable" 
       ]
     }
   ],
@@ -294,12 +295,11 @@ Date: REGEX(.*)
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 534
-Content-Type: application/ld+json
+Content-Length: 465
+Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
   "type": "ContextSource Registration",
   "name": "name of reg test 2",
@@ -312,10 +312,12 @@ Date: REGEX(.*)
           "type": "Vehicle"
         }
       ],
-      "attrs": [
+      "properties": [ 
         "brandName",
-        "speed",
-        "isParked"
+        "speed" 
+      ],
+      "relationships": [ 
+        "isParked" 
       ]
     }
   ],

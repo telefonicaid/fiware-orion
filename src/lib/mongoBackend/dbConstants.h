@@ -66,6 +66,10 @@
 #define REG_INTERVAL_START           "start"
 #define REG_INTERVAL_END             "end"
 #define REG_ENDPOINT                 "endpoint"
+#define REG_PROPERTIES_TYPE          "Property"
+#define REG_PROPERTIES_NAME          "name"
+#define REG_RELATIONSHIPS_TYPE       "Relationship"
+#define REG_RELATIONSHIPS_NAME       "name"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ATTRNAMES                "attrNames"
