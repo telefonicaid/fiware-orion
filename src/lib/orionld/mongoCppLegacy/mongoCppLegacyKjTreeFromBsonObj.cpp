@@ -22,40 +22,44 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
+#include <string>                                                    // std::string
 
-#ifdef DB_DRIVER_MONGOC
-
-#include <bson/bson.h>                                         // BSON
+#include "mongo/client/dbclient.h"                                   // mongo::BSONObj
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/KjNode.h"                                            // KjNode
+#include "kjson/kjParse.h"                                           // kjParse
 }
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/kjTree/kjTreeFromBson.h"                     // Own interface
+#include "logMsg/logMsg.h"                                           // LM_*
+#include "logMsg/traceLevels.h"                                      // Lmt*
+
+#include "orionld/common/orionldState.h"                             // orionldState
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromBson -
+// mongoCppLegacyKjTreeFromBsonObj -
 //
-KjNode* kjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP)
+KjNode* mongoCppLegacyKjTreeFromBsonObj(void* dataP, char** titleP, char** detailsP)
 {
-  char*    json;
-  KjNode*  treeP = NULL;
+  mongo::BSONObj* bsonObjP = (mongo::BSONObj*) dataP;
+  KjNode*         treeP    = NULL;
 
-  if ((json = bson_as_json(bsonP, NULL)) == NULL)
+  std::string jsonString = bsonObjP->jsonString();
+
+  if (jsonString == "")
   {
     *titleP   = (char*) "Internal Error";
-    *detailsP = (char*) "Error creating JSON from BSON";
+    *detailsP = (char*) "Error creating JSON from BSONObj";
   }
   else
   {
-    treeP = kjParse(orionldState.kjsonP, json);
+    orionldState.jsonBuf = strdup(jsonString.c_str());
+    treeP = kjParse(orionldState.kjsonP, orionldState.jsonBuf);
     if (treeP == NULL)
     {
       *titleP   = (char*) "Internal Error";
@@ -63,9 +67,5 @@ KjNode* kjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP)
     }
   }
 
-  bson_free(json);
-
   return treeP;
 }
-
-#endif

@@ -24,6 +24,7 @@ SET (SOURCES
     mongocInit.cpp
     mongocEntityLookup.cpp
     mongocEntityUpdate.cpp
+    mongocKjTreeFromBson.cpp
 )
 
 # Include directories

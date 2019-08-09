@@ -24,6 +24,8 @@ SET (SOURCES
     mongoCppLegacyInit.cpp
     mongoCppLegacyEntityLookup.cpp
     mongoCppLegacyEntityUpdate.cpp
+    mongoCppLegacyKjTreeFromBsonObj.cpp
+    mongoCppLegacyKjTreeToBsonObj.cpp
 )
 
 # Include directories

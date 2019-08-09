@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeFromBsonObj.h"                    // kjTreeFromBsonObj
 #include "orionld/kjTree/kjTreeToBsonObj.h"                      // kjTreeToBsonObj
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
+#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"   // Own interface
 
 
@@ -52,8 +53,7 @@ bool mongoCppLegacyEntityUpdate(char* entityId, KjNode* requestTree)
   mongo::BSONObj         payloadAsBsonObj;
 
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-
-  kjTreeToBsonObj(requestTree, &payloadAsBsonObj);
+  dbDataFromKjTree(requestTree, &payloadAsBsonObj);
 
 
   //
@@ -73,6 +73,3 @@ bool mongoCppLegacyEntityUpdate(char* entityId, KjNode* requestTree)
 
   return true;
 }
-
-
-

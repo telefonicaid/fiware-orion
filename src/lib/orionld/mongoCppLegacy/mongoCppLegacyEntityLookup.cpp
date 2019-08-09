@@ -35,8 +35,8 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/kjTree/kjTreeFromBsonObj.h"                    // kjTreeFromBsonObj
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
+#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"   // Own interface
 
 
@@ -77,7 +77,7 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
     bsonObj = cursorP->nextSafe();
 
     LM_TMP(("MERGE: Creating a kjTree from BSONObj '%s'", bsonObj.toString().c_str()));
-    kjTree = kjTreeFromBsonObj(&bsonObj, &title, &details);
+    kjTree = dbDataToKjTree(&bsonObj, &title, &details);
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
 

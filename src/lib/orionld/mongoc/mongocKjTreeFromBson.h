@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMBSON_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMBSON_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREEFROMBSON_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREEFROMBSON_H_
 
 /*
 *
@@ -36,8 +36,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromBson -
+// mongocKjTreeFromBson -
 //
-extern KjNode* kjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP);
+extern KjNode* mongocKjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMBSON_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREEFROMBSON_H_

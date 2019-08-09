@@ -22,21 +22,44 @@
 *
 * Author: Ken Zangelin
 */
+#include <bson/bson.h>                                         // BSON
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjParse.h"                                     // kjParse
 }
 
-#include "orionld/db/dbConfiguration.h"                          // Own interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/mongoc/mongocKjTreeFromBson.h"               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// mongocKjTreeFromBson -
 //
-DbEntityLookupFunction   dbEntityLookup;
-DbEntityUpdateFunction   dbEntityUpdate;
-DbDataToKjTreeFunction   dbDataToKjTree;
-DbDataFromKjTreeFunction dbDataFromKjTree;
+KjNode* mongocKjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP)
+{
+  char*    json;
+  KjNode*  treeP = NULL;
+
+  if ((json = bson_as_json(bsonP, NULL)) == NULL)
+  {
+    *titleP   = (char*) "Internal Error";
+    *detailsP = (char*) "Error creating JSON from BSON";
+  }
+  else
+  {
+    treeP = kjParse(orionldState.kjsonP, json);
+    if (treeP == NULL)
+    {
+      *titleP   = (char*) "Internal Error";
+      *detailsP = (char*) "Error parsing JSON output from bson_as_json";
+    }
+  }
+
+  bson_free(json);
+
+  return treeP;
+}

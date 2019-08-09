@@ -36,9 +36,6 @@ SET (SOURCES
     kjTreeToSubscription.cpp
     kjTreeToRegistration.cpp
     kjTreeToTimeInterval.cpp
-    kjTreeFromBson.cpp
-    kjTreeFromBsonObj.cpp
-    kjTreeToBsonObj.cpp
 )
 
 # Include directories

@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYKJTREETOBSONOBJ_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYKJTREETOBSONOBJ_H_
+
 /*
 *
 * Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,21 +25,23 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/db/dbConfiguration.h"                          // Own interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// mongoCppLegacyKjTreeToBsonObj -
 //
-DbEntityLookupFunction   dbEntityLookup;
-DbEntityUpdateFunction   dbEntityUpdate;
-DbDataToKjTreeFunction   dbDataToKjTree;
-DbDataFromKjTreeFunction dbDataFromKjTree;
+extern void mongoCppLegacyKjTreeToBsonObj(KjNode* nodeP, void* dbDataP);
+
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYKJTREETOBSONOBJ_H_
