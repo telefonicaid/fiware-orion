@@ -46,7 +46,6 @@ extern "C"
 //
 KjNode* kjTreeFromBsonObj(const mongo::BSONObj* bsonObjP, char** titleP, char** detailsP)
 {
-  char*    json;
   KjNode*  treeP = NULL;
 
   std::string jsonString = bsonObjP->jsonString();
