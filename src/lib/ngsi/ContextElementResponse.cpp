@@ -239,7 +239,7 @@ ContextElementResponse::ContextElementResponse
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d ('value' field of attribute: %s))", getFieldF(attr, ENT_ATTRS_VALUE).type(), ca.name.c_str()));
       }
     }
 

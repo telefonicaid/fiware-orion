@@ -1,4 +1,4 @@
-# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,24 +21,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    kjTreeFromQueryContextResponse.cpp
-    kjTreeFromContextAttribute.cpp
-    kjTreeFromContextContextAttribute.cpp
-    kjTreeFromCompoundValue.cpp
-    kjTreeFromQueryContextResponseWithAttrList.cpp
-    kjTreeFromSubscription.cpp
-    kjTreeFromNotification.cpp
-    kjTreeToEntIdVector.cpp
-    kjTreeToStringList.cpp
-    kjTreeToSubscriptionExpression.cpp
-    kjTreeToEndpoint.cpp
-    kjTreeToNotification.cpp
-    kjTreeToSubscription.cpp
-    kjTreeToRegistration.cpp
-    kjTreeToTimeInterval.cpp
-    kjTreeFromBson.cpp
-    kjTreeFromBsonObj.cpp
-    kjTreeToBsonObj.cpp
+    mongocInit.cpp
+    mongocEntityLookup.cpp
+    mongocEntityUpdate.cpp
 )
 
 # Include directories
@@ -48,4 +33,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_kjTree STATIC ${SOURCES})
+ADD_LIBRARY(orionld_mongoc STATIC ${SOURCES})

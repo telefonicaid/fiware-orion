@@ -35,7 +35,8 @@ extern "C"
 
 #include "orionld/context/orionldContextFree.h"                // orionldContextFree
 #include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/OrionldConnection.h"                  // OrionldConnectionState
+#include "orionld/common/orionldState.h"                       // Own interface
+#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
 
 
 
@@ -55,14 +56,27 @@ __thread OrionldConnectionState orionldState = { 0 };
 // orionldThreadState.cpp/h
 // orionldGlobalState.cpp/h
 //
-int             requestNo                = 0;             // Never mind protecting with semaphore. Just a debugging help
+// Some of the global variables are defined in orionld.cpp:
+// - dbName
+// - dbUser
+// - dbPwd
+//
 char            kallocBuffer[32 * 1024];
+int             requestNo                = 0;             // Never mind protecting with semaphore. Just a debugging help
 KAlloc          kalloc;
 Kjson           kjson;
 Kjson*          kjsonP;
 uint16_t        portNo                   = 0;
 char*           hostname                 = (char*) "localhost";
+int             dbNameLen;
 
+#ifdef DB_DRIVER_MONGOC
+//
+// Variables for Mongo C Driver
+//
+mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;
+mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;
+#endif
 
 
 // -----------------------------------------------------------------------------
@@ -73,8 +87,9 @@ void orionldStateInit(void)
 {
   //
   // FIXME: bzero(&orionldState, sizeof(orionldState)) ... ?
-  //        Should not be necessary - look it up
+  //        This is NOT DONE by the operating system
   //        If I bzero orionldState, I get a SIGSEGV inside kjson ...
+  //        Must try again!
   //
   bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
 
@@ -112,12 +127,13 @@ void orionldStateInit(void)
 
   //
   // FIXME: This initialization of qNodeV is only necessary if a String-Filter is part of the request
-  //        Should be moved elsewhere:
+  //        Should be moved elsewhere (unless I do the bzero of the entire orionldState):
   //          if (ciP->uriParam["q"] != "")
   //            bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
   //
   bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
   orionldState.qNodeIx       = 0;
+  orionldState.jsonBuf       = NULL;
 }
 
 
@@ -145,6 +161,12 @@ void orionldStateRelease(void)
   if ((orionldState.contextP != NULL) && (orionldState.contextToBeFreed == true))
     orionldContextFree(orionldState.contextP);
 #endif
+
+  if (orionldState.jsonBuf != NULL)
+  {
+    free(orionldState.jsonBuf);
+    orionldState.jsonBuf = NULL;
+  }
 }
 
 

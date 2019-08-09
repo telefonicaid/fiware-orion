@@ -191,6 +191,11 @@ Metadata::Metadata(const std::string& _name, const BSONObj& mdB)
     stringValue = getStringFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
+  case NumberInt:
+    valueType   = orion::ValueTypeNumber;
+    numberValue = (double) getIntFieldF(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
     numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);

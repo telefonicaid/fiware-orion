@@ -109,6 +109,7 @@ extern "C"
 
 #include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
+#include "orionld/db/dbInit.h"                              // dbInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -144,8 +145,8 @@ int             port;
 char            dbHost[64];
 char            rplSet[64];
 char            dbName[64];
-char            user[64];
-char            pwd[64];
+char            dbUser[64];
+char            dbPwd[64];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -153,7 +154,7 @@ bool            useOnlyIPv6;
 char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
-bool            mtenant;
+bool            multitenancy;
 char            rush[256];
 char            allowedOrigin[64];
 int             maxAge;
@@ -266,8 +267,8 @@ PaArgument paArgs[] =
 
   { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
   { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
-  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
-  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
+  { "-dbuser",        dbUser,        "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
+  { "-dbpwd",         dbPwd,         "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
   { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
@@ -281,7 +282,7 @@ PaArgument paArgs[] =
   { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
   { "-rush",          rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
-  { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
+  { "-multiservice",  &multitenancy, "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
   { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt,  0,          0,     PaNL,  REQ_TMO_DESC       },
@@ -606,6 +607,8 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 
   /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
+
+  dbInit(dbHost, dbName);
 }
 
 
@@ -868,6 +871,13 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+
+
+  //
+  // Setting global variables from the arguments
+  //
+  dbNameLen = strlen(dbName);
+
   //
   // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
   //       The exit-function removes the PID-file and we don't want that. We want
@@ -967,7 +977,8 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+
+  mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
@@ -990,7 +1001,7 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
-    subCacheInit(mtenant);
+    subCacheInit(multitenancy);
 
     if (subCacheInterval == 0)
     {
@@ -1013,7 +1024,7 @@ int main(int argC, char* argV[])
   // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
   // Otherwise, we have empirically checked that CB may randomly crash
   //
-  contextBrokerInit(dbName, mtenant);
+  contextBrokerInit(dbName, multitenancy);
 
 
   //
@@ -1049,7 +1060,7 @@ int main(int argC, char* argV[])
     orionRestServicesInit(ipVersion,
                           bindAddress,
                           port,
-                          mtenant,
+                          multitenancy,
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
@@ -1060,7 +1071,7 @@ int main(int argC, char* argV[])
                           reqTimeout,
                           httpsPrivateServerKey,
                           httpsCertificate);
-    
+
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
@@ -1069,7 +1080,7 @@ int main(int argC, char* argV[])
     orionRestServicesInit(ipVersion,
                           bindAddress,
                           port,
-                          mtenant,
+                          multitenancy,
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
@@ -1083,7 +1094,7 @@ int main(int argC, char* argV[])
   }
 
   // orionldServiceInitPresent();
-  
+
   LM_I(("Startup completed"));
   if (simulatedNotification)
   {

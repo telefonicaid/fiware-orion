@@ -180,6 +180,11 @@ SET (ORION_LIBS
     orionld_context
     orionld_common
     orionld_context
+    orionld_db
+    orionld_mongoc
+    orionld_mongoCppLegacy
+    orionld_db
+
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
@@ -225,6 +230,8 @@ SET (BOOST_MT
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mongoclient.a
+    mongoc-static-1.0.a
+    bson-static-1.0.a
     kjson.a
     kalloc.a
     kbase.a
@@ -236,9 +243,14 @@ SET (DYNAMIC_LIBS
     pthread
     gcrypt
     ssl
+    rt
     uuid
     crypto
     sasl2
+    icuuc
+    icudata
+    z
+    resolv
 )
 
 #
@@ -257,6 +269,8 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("${PROJECT_SOURCE_DIR}/..")
 
 #
@@ -311,6 +325,9 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/common)
   ADD_SUBDIRECTORY(src/lib/orionld/context)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
+  ADD_SUBDIRECTORY(src/lib/orionld/db)
+  ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
+  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
