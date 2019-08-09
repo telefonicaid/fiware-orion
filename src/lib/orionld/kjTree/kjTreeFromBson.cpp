@@ -22,6 +22,10 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
+
+#ifdef DB_DRIVER_MONGOC
+
 #include <bson/bson.h>                                         // BSON
 
 extern "C"
@@ -63,3 +67,5 @@ KjNode* kjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP)
 
   return treeP;
 }
+
+#endif

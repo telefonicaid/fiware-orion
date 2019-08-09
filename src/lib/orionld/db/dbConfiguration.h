@@ -45,7 +45,7 @@ extern "C"
 //
 // DB_DRIVER_MONGOC - Use the "newest" mongo C driver
 //
-#define DB_DRIVER_MONGOC
+// #define DB_DRIVER_MONGOC
 
 
 
