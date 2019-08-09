@@ -247,10 +247,10 @@ SET (DYNAMIC_LIBS
     uuid
     crypto
     sasl2
-    icuuc
-    icudata
-    z
-    resolv
+#    icuuc
+#    icudata
+#    z
+#    resolv
 )
 
 #
