@@ -25,7 +25,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // mongo::BSONObj
+#include "orionld/db/dbDriver.h"                               // database driver header
+#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
 
 extern "C"
 {
@@ -126,6 +127,16 @@ typedef struct OrionldConnectionState
   int                     qNodeIx;
   char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
+  char*                   jsonBuf;    // Used by kjTreeFromBsonObj
+
+#ifdef DB_DRIVER_MONGOC
+  //
+  // MongoDB stuff
+  //
+  mongoc_uri_t*           mongoUri;
+  mongoc_client_t*        mongoClient;
+  mongoc_database_t*      mongoDatabase;
+#endif
 } OrionldConnectionState;
 
 
@@ -142,14 +153,29 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
-extern int       requestNo;  // Never mind protecting with semaphore. Just a debugging help
 extern char      kallocBuffer[32 * 1024];
+extern int       requestNo;  // Never mind protecting with semaphore. Just a debugging help
 extern KAlloc    kalloc;
 extern Kjson     kjson;
 extern Kjson*    kjsonP;
 extern char*     hostname;
 extern uint16_t  portNo;
+extern char      dbName[];            // From orionld.cpp
+extern int       dbNameLen;
+extern char      dbUser[];            // From orionld.cpp
+extern char      dbPwd[];             // From orionld.cpp
+extern bool      multitenancy;        // From orionld.cpp
+extern char*     tenant;              // From orionld.cpp
 
+
+
+#ifdef DB_DRIVER_MONGOC
+//
+// Variables for Mongo C Driver
+//
+extern mongoc_collection_t*  mongoEntitiesCollectionP;
+extern mongoc_collection_t*  mongoRegistrationsCollectionP;
+#endif
 
 
 // -----------------------------------------------------------------------------

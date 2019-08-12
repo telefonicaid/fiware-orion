@@ -95,6 +95,8 @@ bool orionldValidName(char* name, char** detailsPP)
       continue;
     if (*name == '_')
       continue;
+    if (*name == ':')
+      continue;
 
     *detailsPP = (char*) "invalid character in name";
     return false;

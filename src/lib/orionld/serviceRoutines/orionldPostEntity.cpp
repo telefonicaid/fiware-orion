@@ -27,6 +27,9 @@
 extern "C"
 {
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
+#include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -42,6 +45,8 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
+#include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
+#include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/context/orionldContextTreat.h"                 // orionldContextTreat
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
@@ -92,40 +97,12 @@ void orionldPartialUpdateResponseCreate(ConnectionInfo* ciP)
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldPostEntity -
+// kjTreeToContextElement -
 //
-// POST /ngsi-ld/v1/entities/*/attrs
-//
-bool orionldPostEntity(ConnectionInfo* ciP)
+bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* treeP, ContextElement* ceP)
 {
-  // Is the payload not a JSON object?
-  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
-
-  // 1. Check that the entity exists
-  if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
-  {
-    ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
-    return false;
-  }
-
-  UpdateContextRequest   mongoRequest;
-  UpdateContextResponse  mongoResponse;
-  ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
-  EntityId*              entityIdP;
-
-  mongoRequest.contextElementVector.push_back(ceP);
-  entityIdP = &mongoRequest.contextElementVector[0]->entityId;
-
-  if (orionldState.uriParamOptions.noOverwrite == true)
-    mongoRequest.updateActionType = ActionTypeAppendStrict;
-  else
-    mongoRequest.updateActionType = ActionTypeAppend;
-
-  entityIdP->id = orionldState.wildcard[0];
-
   // Iterate over the object, to get all attributes
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
@@ -134,7 +111,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
-      mongoRequest.release();
       LM_E(("orionldAttributeTreat failed"));
       delete caP;
       return false;
@@ -157,7 +133,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
       if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
       {
         delete caP;
-        mongoRequest.release();
         orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
         return false;
       }
@@ -170,6 +145,429 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
     // Add the attribute to the attr vector
     ceP->contextAttributeVector.push_back(caP);
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjTreeMergeAddNewAttrsIgnoreExisting -
+//
+bool kjTreeMergeAddNewAttrsIgnoreExisting(KjNode* sourceTree, KjNode* modTree)
+{
+  for (KjNode* modAttrP = modTree->value.firstChildP; modAttrP != NULL; modAttrP = modAttrP->next)
+  {
+    //
+    // If modAttrP exists in sourceTree, then we ignore the attr and it stays in modTree
+    //
+    if (kjLookup(sourceTree, modAttrP->name) != NULL)
+      continue;
+
+    // Not there - remove modAttrP from modTree and add to sourceTree
+    kjChildRemove(modTree, modAttrP);
+    kjChildAdd(sourceTree, modAttrP);
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjNodeAttributeMerge
+//
+bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
+{
+  //
+  // Go over the entire updateP tree and replace all those nodes in sourceP
+  // Also, update the modDate node to the current date/time
+  //
+  KjNode* modDateP = kjLookup(sourceP, "modDate");
+
+  modDateP->value.i = time(NULL);
+
+  int ix = 0;
+  KjNode* nodeP = updateP->value.firstChildP;
+
+  while (nodeP != NULL)
+  {
+    KjNode* next = nodeP->next;
+
+    LM_TMP(("MERGE: Checking item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
+    KjNode* sameNodeInSourceP = kjLookup(sourceP, nodeP->name);
+
+    if (sameNodeInSourceP != NULL)
+    {
+      LM_TMP(("MERGE: Found '%s' member in source - removing it", sameNodeInSourceP->name));
+      kjChildRemove(sourceP, sameNodeInSourceP);
+    }
+
+    LM_TMP(("MERGE: Adding '%s' member to source", nodeP->name));
+    kjChildAdd(sourceP, nodeP);
+    ++ix;
+    LM_TMP(("MERGE: Treated item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
+
+    nodeP = next;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjSysAttrs - add sysAttrs (creDate + modDate) to an attribute
+//
+void kjSysAttrs(KjNode* attrP)
+{
+  KjNode* creDateP = NULL;
+  KjNode* modDateP = NULL;
+
+  for (KjNode* nodeP = attrP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (SCOMPARE8(nodeP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
+      modDateP = nodeP;
+    else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
+      creDateP = nodeP;
+  }
+
+  if (creDateP == NULL)
+  {
+    creDateP = kjInteger(orionldState.kjsonP, "creDate", time(NULL));
+    kjChildAdd(attrP, creDateP);
+  }
+
+  if (modDateP != NULL)
+  {
+    modDateP->value.i = time(NULL);
+    modDateP->type    = KjInt;
+  }
+  else
+  {
+    modDateP = kjInteger(orionldState.kjsonP, "modDate", time(NULL));
+    kjChildAdd(attrP, modDateP);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjModDateSet -
+//
+void kjModDateSet(KjNode* attrP)
+{
+  for (KjNode* nodeP = attrP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (SCOMPARE8(nodeP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
+    {
+      nodeP->value.i = time(NULL);
+      return;
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjTreeMergeAddNewAttrsOverwriteExisting -
+//
+bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree, char** titleP, char** detailsP)
+{
+  //
+  // The data model of Orion is that all attributes go in toplevel::attrs
+  // So, we need to reposition "sourceTree" so that it points to the sourceTree::atts
+  //
+  KjNode* attrNamesP = kjLookup(sourceTree, (char*) "attrNames");
+  KjNode* attrsP     = kjLookup(sourceTree, (char*) "attrs");
+
+  if (attrsP == NULL)
+  {
+    *titleP   = (char*) "Corrupt Database";
+    *detailsP = (char*) "No /attrs/ member found in Entity DB data";
+    return NULL;
+  }
+
+  if (attrNamesP == NULL)
+  {
+    *titleP   = (char*) "Corrupt Database";
+    *detailsP = (char*) "No /attrNamess/ member found in Entity DB data";
+    return NULL;
+  }
+
+  KjNode* modAttrP = modTree->value.firstChildP;
+
+  while (modAttrP != NULL)
+  {
+    KjNode* next = modAttrP->next;
+
+    //
+    // If "modAttrP" exists in sourceTree, then we have to remove it - to later add the one from "modTree"
+    //   - if found in sourceTree: merge sourceTreeAttrP with modAttrP
+    //   - if NOT found:
+    //     - remove modAttrP from modTree
+    //     - add modAttrP to sourceTree
+    //     - add slot in "attrNames"
+    //
+    KjNode* sourceTreeAttrP = NULL;
+    if ((sourceTreeAttrP = kjLookup(attrsP, modAttrP->name)) != NULL)
+    {
+      char renderBuffer[1024];
+
+      LM_TMP(("MERGE: Found attribute '%s' is source tree - merging with the new one", modAttrP->name));
+      kjRender(orionldState.kjsonP, sourceTreeAttrP, renderBuffer, sizeof(renderBuffer));
+      LM_TMP(("MERGE: sourceTreeAttrP: '%s'", renderBuffer));
+      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));
+      LM_TMP(("MERGE: modAttrP: '%s'", renderBuffer));
+
+      LM_TMP(("MERGE: calling kjNodeAttributeMerge"));
+      kjNodeAttributeMerge(sourceTreeAttrP, modAttrP);
+      kjModDateSet(sourceTreeAttrP);
+    }
+    else
+    {
+      LM_TMP(("MERGE: Did not find attribute '%s' in source tree - adding the new one", modAttrP->name));
+
+      char renderBuffer[1024];
+      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));
+      LM_TMP(("MERGE: modAttrP: '%s'", renderBuffer));
+
+      // Remove modAttrP from modTree and add to sourceTree
+      LM_TMP(("MERGE: Remove modAttrP from modTree and add to sourceTree"));
+      kjChildRemove(modTree, modAttrP);
+      kjChildAdd(attrsP, modAttrP);
+      kjSysAttrs(modAttrP);
+
+      // Orion Data Model: Must add a mdNames: []
+      KjNode* mdArrayP = kjArray(orionldState.kjsonP, "mdNames");
+      kjChildAdd(modAttrP, mdArrayP);
+
+      // Debugging
+      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));
+      LM_TMP(("MERGE: modAttrP II: '%s'", renderBuffer));
+
+      //
+      // Add attribute name to "attrNames"
+      //
+      KjNode* attrName = kjString(orionldState.kjsonP, "", modAttrP->name);
+
+      //
+      // The dots in the attribute name have been replaced with '='
+      // We need to change that back before adding to "attrNames"
+      //
+      char* cP = attrName->value.s;
+
+      while (*cP != 0)
+      {
+        if (*cP == '=')
+          *cP = '.';
+        ++cP;
+      }
+      kjChildAdd(attrNamesP, attrName);
+    }
+
+    modAttrP = next;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// expandAttrNames -
+//
+static bool expandAttrNames(KjNode* treeP, char** detailsP)
+{
+  for (KjNode* attrP = treeP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    char expanded[512];
+
+    if (orionldUriExpand(orionldState.contextP, attrP->name, expanded, sizeof(expanded), detailsP) == false)
+      return false;
+
+    int sLen = strlen(expanded);
+
+    if ((attrP->name = kaAlloc(&orionldState.kalloc, sLen + 1)) == NULL)
+    {
+      *detailsP = (char*) "out of memory";
+      return false;
+    }
+
+    strcpy(attrP->name, expanded);
+
+    //
+    // Any '.' must be converted into a '='
+    //
+    char* nameP = attrP->name;
+    while (*nameP != 0)
+    {
+      if (*nameP == '.')
+        *nameP = '=';
+      ++nameP;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldPostEntityOverwrite -
+//
+bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
+{
+  LM_TMP(("In orionldPostEntityOverwrite"));
+  //
+  // Forwarding and Subscriptions will be taken care of later.
+  // For now, just local updates
+  //
+  // 1. Get entity, as a KjNode tree
+  // 2. For each attribute in orionldState.requestTree:
+  //    - If found in currentEntityTreeP, merge both
+  //    - If not found - add attribute from orionldState.requestTree to currentEntityTreeP (also add to "attrNames[]")
+  // 3. Write to mongo
+  //
+  char*   entityId           = orionldState.wildcard[0];
+  LM_TMP(("-------------- Calling dbEntityLookup(%s)", entityId));
+  KjNode* currentEntityTreeP = dbEntityLookup(entityId);
+  LM_TMP(("-------------- After dbEntityLookup(%s)", entityId));
+  char*   title;
+  char*   details;
+
+  if (currentEntityTreeP == NULL)
+  {
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
+    return false;
+  }
+
+#if DEBUG
+  char renderBuffer[1024];
+  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));
+  LM_TMP(("MERGE: Got the entity: '%s'", renderBuffer));
+
+  kjRender(orionldState.kjsonP, orionldState.requestTree, renderBuffer, sizeof(renderBuffer));
+  LM_TMP(("MERGE: Update/noOverwrite: '%s'", renderBuffer));
+#endif
+
+  // Expand attribute names
+  if (expandAttrNames(orionldState.requestTree, &details) == false)
+  {
+    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Can't expand attribute names", details, OrionldDetailsString);
+    return false;
+  }
+
+  // Merge orionldState.requestTree with currentEntityTreeP
+  if (kjTreeMergeAddNewAttrsOverwriteExisting(currentEntityTreeP, orionldState.requestTree, &title, &details) == false)
+  {
+    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldErrorResponseCreate(ciP, OrionldInternalError, title, details, OrionldDetailsString);
+    return false;
+  }
+
+#if DEBUG
+  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));
+  LM_TMP(("MERGE: resulting tree: '%s'", renderBuffer));
+#endif
+
+  //
+  // Setting the modification date of the entity
+  //
+  kjModDateSet(currentEntityTreeP);
+
+  // Write to database
+  char buffer[1024];
+  kjRender(orionldState.kjsonP, currentEntityTreeP, buffer, sizeof(buffer));
+  LM_TMP(("MERGE: writing to DB: %s", buffer));
+  dbEntityUpdate(entityId, currentEntityTreeP);
+
+  //
+  // All OK - set HTTP STatus Code
+  //
+  ciP->httpStatusCode = SccNoContent;
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldPostEntity -
+//
+// POST /ngsi-ld/v1/entities/*/attrs
+//
+// URI PARAMETERS
+//   options=noOverwrite
+//
+// From ETSI spec:
+//   Behaviour
+//   * If the Entity Id is not present or it is not a valid URI then an error of type BadRequestData shall be raised.
+//   * If the NGSI-LD endpoint does not know about this Entity, because there is no an existing Entity which id
+//     (URI) is equivalent to the one passed as parameter, an error of type ResourceNotFound shall be raised.
+//   * For each Attribute (Property or Relationship) included by the Entity Fragment at root level:
+//     * If the target Entity does not include a matching Attribute then such Attribute shall be appended to the target Entity
+//     * If the target Entity already includes a matching Attribute
+//       - If no datasetId is present in the Attribute included by the Entity Fragment:
+//         * If options==noOverwrite: the existing Attribute in the target Entity shall be left untouched
+//         * If options!=noOverwrite: the existing Attribute in the target Entity shall be replaced by the new one supplied.
+//
+//
+// If options=noOverwrite is set, then we can simply use updateActionType == ActionTypeAppendStrict
+//
+// If options=noOverwrite is NOT set, then we have no matching already existing function.
+// Tries have been made to modify mongoBackend but without success - see issue https://github.com/FIWARE/context.Orion-LD/issues/153
+//
+// Instead we will REIMPLEMENT the whole DB-part, using the newest C driver for mongodb
+//
+bool orionldPostEntity(ConnectionInfo* ciP)
+{
+  LM_TMP(("In orionldPostEntity"));
+
+  // Is the payload not a JSON object?
+  OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
+
+  if (orionldState.uriParamOptions.noOverwrite == false)
+    return orionldPostEntityOverwrite(ciP);
+
+  // 1. Check that the entity exists
+  if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
+  {
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
+    return false;
+  }
+
+  UpdateContextRequest   mongoRequest;
+  UpdateContextResponse  mongoResponse;
+  ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
+  EntityId*              entityIdP;
+
+  mongoRequest.updateActionType = ActionTypeAppendStrict;
+
+  mongoRequest.contextElementVector.push_back(ceP);
+  entityIdP     = &mongoRequest.contextElementVector[0]->entityId;
+  entityIdP->id = orionldState.wildcard[0];
+
+
+
+  if (kjTreeToContextElement(ciP, orionldState.requestTree, ceP) == false)
+  {
+    // kjTreeToContextElement fills in error using 'orionldErrorResponseCreate()'
+    mongoRequest.release();
+    LM_E(("kjTreeToContextElement failed"));
+    return false;
   }
 
   //
