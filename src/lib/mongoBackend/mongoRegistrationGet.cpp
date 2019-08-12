@@ -645,7 +645,7 @@ bool mongoLdRegistrationGet
   else
   {
     releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("registration not foundd: '%s'", regId));
+    LM_T(LmtMongo, ("registration not found: '%s'", regId));
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     *detailsP    = (char*) "registration not found";
     *statusCodeP = SccContextElementNotFound;
