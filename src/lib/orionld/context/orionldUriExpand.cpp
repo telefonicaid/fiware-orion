@@ -60,7 +60,6 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
   const char*  contextUrl    = (contextP == NULL)? "NULL" : contextP->url;  // For debugging only
   char*        colonP        = NULL;
 
-  
   *expandedNameP = NULL;
   *expandedTypeP = NULL;
 
@@ -105,9 +104,8 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
       *expandedNameP = buf;
       return 1;
     }
-
   }
-  
+
   LM_T(LmtUriExpansion, ("expanding '%s' in context at %p", name, contextP));
 
   //
