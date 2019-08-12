@@ -25,11 +25,13 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostNameLen
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
@@ -56,10 +58,56 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
 {
   KjNode*      contextValueP = NULL;
   const char*  contextUrl    = (contextP == NULL)? "NULL" : contextP->url;  // For debugging only
+  char*        colonP        = NULL;
 
+  
   *expandedNameP = NULL;
   *expandedTypeP = NULL;
 
+  if ((colonP = strchr((char*) name, ':')) != NULL)
+  {
+    char* rest = &colonP[1];
+    *colonP = 0;
+
+    //
+    // More than one colon would be an error
+    //
+    char* colon2;
+    if ((colon2 = strchr(rest, ':')) != NULL)
+    {
+      LM_E(("Bad Input (two colons in expandable item - only ONE allowed)"));
+      return -1;
+    }
+
+    //
+    // lookup 'name'
+    // If found: expand to "$name$rest"
+    // If not: return the ':' and continue with the uriExpansion
+    //
+    char* expandedPrefix;
+    char* expandedType;
+    int   r = uriExpansion(contextP, name, &expandedPrefix, &expandedType, detailsPP);
+
+    if (r == -1)  // Error - let the rest of the function deal with it
+      *colonP = ':';
+    else if (r == -2)  // Prefix NOT FOUND - let the rest of the function deal with it
+      *colonP = ':';
+    else
+    {
+      int expandedPrefixLen = strlen(expandedPrefix);
+      int restLen           = strlen(rest);
+      int sLen              = expandedPrefixLen + restLen + 1;
+      char* buf             = kaAlloc(&orionldState.kalloc, sLen);
+
+      strcpy(buf, expandedPrefix);
+      strcpy(&buf[expandedPrefixLen], rest);
+
+      *expandedNameP = buf;
+      return 1;
+    }
+
+  }
+  
   LM_T(LmtUriExpansion, ("expanding '%s' in context at %p", name, contextP));
 
   //
