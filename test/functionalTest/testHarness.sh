@@ -142,6 +142,7 @@ function usage()
   echo "$empty [-v (verbose)]"
   echo "$empty [-s (silent)]"
   echo "$empty [-ld (only ngsild tests)]"
+  echo "$empty [-eb (external broker)]"
   echo "$empty [--filter <test filter>]"
   echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
@@ -387,6 +388,7 @@ ixList=""
 noCache=""
 threadpool=ON
 ngsild=OFF
+externalBroker=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
@@ -395,6 +397,7 @@ do
   elif [ "$1" == "-v" ];             then verbose=on;
   elif [ "$1" == "-s" ];             then silent=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
+  elif [ "$1" == "-eb" ];            then externalBroker=ON;
   elif [ "$1" == "--dryrun" ];       then dryrun=on;
   elif [ "$1" == "--keep" ];         then keep=on;
   elif [ "$1" == "--stopOnError" ];  then stopOnError=on;
@@ -423,6 +426,17 @@ do
 done
 
 logMsg "options parsed"
+
+
+
+# -----------------------------------------------------------------------------
+#
+# If -eb is set, then the env var EXTERNAL_BROKER is set to "ON"
+#
+if [ "$externalBroker" == "ON" ]
+then
+  export CB_EXTERNAL_BROKER=ON
+fi
 
 
 
