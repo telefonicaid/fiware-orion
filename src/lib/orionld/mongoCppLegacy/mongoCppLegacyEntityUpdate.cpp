@@ -35,8 +35,6 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/kjTree/kjTreeFromBsonObj.h"                    // kjTreeFromBsonObj
-#include "orionld/kjTree/kjTreeToBsonObj.h"                      // kjTreeToBsonObj
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"   // Own interface

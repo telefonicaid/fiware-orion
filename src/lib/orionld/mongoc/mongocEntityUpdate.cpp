@@ -32,7 +32,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/kjTree/kjTreeFromBson.h"                       // kjTreeFromBson
 #include "orionld/db/dbNameGet.h"                                // dbNameGet
 #include "orionld/mongoc/mongocEntityUpdate.h"                   // Own interface
 

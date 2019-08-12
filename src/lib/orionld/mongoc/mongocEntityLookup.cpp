@@ -34,7 +34,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/kjTree/kjTreeFromBson.h"                       // kjTreeFromBson
+#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/db/dbNameGet.h"                                // dbNameGet
 
 
@@ -81,9 +81,9 @@ KjNode* mongocEntityLookup(char* entityId)
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    LM_TMP(("DB: After mongoc_cursor_next - calling kjTreeFromBson"));
-    entityNodeP = kjTreeFromBson(mongoDocP, &title, &details);
-    LM_TMP(("DB: back from kjTreeFromBson, entityNodeP at %p", entityNodeP));
+    LM_TMP(("DB: After mongoc_cursor_next - calling dbDataToKjTree"));
+    entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);
+    LM_TMP(("DB: back from dbDataToKjTree, entityNodeP at %p", entityNodeP));
     break;  // Just using the first one - should be no more than one!
   }
 
