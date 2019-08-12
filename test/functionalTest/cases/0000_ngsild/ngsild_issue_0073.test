@@ -48,7 +48,7 @@ payload='{
     "value": 12
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -65,7 +65,7 @@ echo
 ===============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://xps:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:EntityWithPrefixExpansion>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:EntityWithPrefixExpansion>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:EntityWithPrefixExpansion
 Date: REGEX(.*)
 
