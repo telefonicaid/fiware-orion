@@ -41,7 +41,7 @@ brokerStart CB 212-249
 # and the port with the static string "PORT".
 #
 # If you look down in the REGEXPECT part of "01. Create an entity with a complex context ...", you see the Link header like this:
-#   Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+#   Link: <http://IP:PORT/ld/contexts/urn:volatile:1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 # which is the modified Link line after sed substitution of hostname and port
 #
 hostName=$(hostname)
@@ -65,13 +65,14 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/json" --linkHeaderFix
+contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $6}' | awk -F\> '{ print $1 }')
 echo
 echo
 
 
 echo "02. Obtain the context from the Link header"
 echo "==========================================="
-orionCurl --url /ngsi-ld/ex/v1/contexts/http://a.b.c/entity/E1
+orionCurl --url /ngsi-ld/contexts/$contextId
 echo
 echo
 
@@ -81,7 +82,7 @@ echo
 =====================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/http://a.b.c/entity/E1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 

@@ -61,7 +61,7 @@ static OrionLdRestServiceSimplified getServices[] =
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration    },
   { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations   },
-  { "/ngsi-ld/ex/v1/contexts/*",           orionldGetContext         },
+  { "/ngsi-ld/contexts/*",                 orionldGetContext         },
   { "/ngsi-ld/ex/v1/version",              orionldGetVersion         },
   { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented     }
