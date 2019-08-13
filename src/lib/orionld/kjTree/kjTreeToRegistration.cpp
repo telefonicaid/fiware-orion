@@ -82,7 +82,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if ((urlCheck((char*) regP->id.c_str(), NULL) == false) && (urnCheck((char*) regP->id.c_str(), NULL) == false))
   {
     LM_W(("Bad Input (Registration::id is not a URI)"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -103,7 +103,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Registration::type)"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Mandatory field missing", "Registration::type", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Registration::type", OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -111,8 +111,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if (strcmp(orionldState.payloadTypeNode->value.s, "ContextSourceRegistration") != 0)
   {
     LM_W(("Bad Input (Registration type must have the value /Registration/)"));
-    orionldErrorResponseCreate(ciP,
-                               OrionldBadRequestData,
+    orionldErrorResponseCreate(OrionldBadRequestData,
                                "Registration::type must have a value of /ContextSourceRegistration/",
                                orionldState.payloadTypeNode->value.s,
                                OrionldDetailsString);
@@ -191,7 +190,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
           }
           else
           {
-            orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Registration::information::entities", eNodeP->name, OrionldDetailsString);
+            orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::information::entities", eNodeP->name, OrionldDetailsString);
             return false;
           }
         }
@@ -261,7 +260,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
       //
       // FIXME: Add to Property vector - To be fixed when we decide to break the data model of Orion APIv2
       //
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid field for Registration - ngsi-ld still follows Orion APIv2 data model", kNodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration - ngsi-ld still follows Orion APIv2 data model", kNodeP->name, OrionldDetailsString);
       return false;
     }
   }
@@ -270,7 +269,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if (entitiesPresent == false)
   {
     LM_E(("At least one 'entity' must be present"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "At least one 'entity' must be present", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "At least one 'entity' must be present", NULL, OrionldDetailsString);
     return false;
   }
 

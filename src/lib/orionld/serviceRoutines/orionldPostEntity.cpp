@@ -133,7 +133,7 @@ bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* treeP, ContextElement* 
       if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
       {
         delete caP;
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
+        orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
         return false;
       }
 
@@ -447,7 +447,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   if (currentEntityTreeP == NULL)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 
@@ -464,7 +464,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   if (expandAttrNames(orionldState.requestTree, &details) == false)
   {
     ciP->httpStatusCode = SccReceiverInternalError;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Can't expand attribute names", details, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Can't expand attribute names", details, OrionldDetailsString);
     return false;
   }
 
@@ -472,7 +472,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   if (kjTreeMergeAddNewAttrsOverwriteExisting(currentEntityTreeP, orionldState.requestTree, &title, &details) == false)
   {
     ciP->httpStatusCode = SccReceiverInternalError;
-    orionldErrorResponseCreate(ciP, OrionldInternalError, title, details, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldInternalError, title, details, OrionldDetailsString);
     return false;
   }
 
@@ -545,7 +545,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 
@@ -633,7 +633,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     else
     {
       LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from Mongo-DB Backend", OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB Backend", OrionldDetailsString);
     }
 
     retValue = false;
