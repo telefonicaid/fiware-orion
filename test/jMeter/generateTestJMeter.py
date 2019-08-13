@@ -12,6 +12,9 @@ now = datetime.datetime.now()
 # Allow/Not Allow to save jmx test file for option 3.
 NOT_SAVE_FILE_JMX_FOR_OPTION_3 = True
 
+# Allow/Not Allow to generate data of CPU and RAM of machine which running the broker.
+GENERATE_DATA_OF_CPU_RAM = False
+
 # Const options parameters
 GENERATE_COMPLETE_REPORT = 1
 GENERATE_ONLY_CSV_FILE = 2
@@ -29,9 +32,9 @@ HTTP_VERBS = ['GET', 'POST', 'PATCH', 'DELETE']
 
 HTTP_VERB = 'GET'
 
-OUTPUT_FILE_NAME = HTTP_VERB + '_num_threads_' + \
-    str(NUM_OF_THREADS) + '_loops_' + \
-    str(LOOPS) + '_ramp_time_' + str(RAMP_TIME) + '_' + str(now.isoformat())
+OUTPUT_FILE_NAME = \
+    "{HTTP_VERB}_num_threads_{NUM_OF_THREADS}_loops_{LOOPS}_ramp_time_{RAMP_TIME}_{timeNow}"\
+    .format(HTTP_VERB=HTTP_VERB, NUM_OF_THREADS=NUM_OF_THREADS, LOOPS=LOOPS, RAMP_TIME=RAMP_TIME, timeNow=str(now.isoformat()))
 
 BODY_DATA = """
 {
@@ -45,7 +48,7 @@ BODY_DATA = """
 # @params : isCreateHTMLReport - Works like a switch for choose the structure
 
 
-def defineParams(tree):
+def defineParams(tree, op):
     root = tree.getroot()
 
     verbSelected = list(filter(lambda verb: verb == HTTP_VERB, HTTP_VERBS))
@@ -69,6 +72,15 @@ def defineParams(tree):
             item.text = str(PATH_SERVICE)
         if item.attrib['name'] == "HTTPSampler.method":
             item.text = str(HTTP_VERB)
+        if item.attrib['name'] == "filename" and item.text:
+            if GENERATE_DATA_OF_CPU_RAM:
+                dirpath = os.getcwd()
+                if int(op) == GENERATE_COMPLETE_REPORT:
+                    item.text = dirpath + '/output/' + OUTPUT_FILE_NAME + '_Report/' + item.text
+                else:
+                    item.text = dirpath + '/output/' + OUTPUT_FILE_NAME + '/' + item.text
+            else:
+                item.text = ''            
 
         if HTTP_VERB == "GET":
             if item.attrib['name'] == "Argument.value":
@@ -98,29 +110,30 @@ def createFolders(isCreateHTMLReport):
 
 # executeTest: execute one of the options of menu for JMeter Test
 
-
 def executeTest(operation, tree):
+    pathReportJmx    = os.path.join('output', OUTPUT_FILE_NAME+'_Report', OUTPUT_FILE_NAME+'.jmx')
+    pathReportCsv    = os.path.join('output', OUTPUT_FILE_NAME+'_Report', OUTPUT_FILE_NAME+'.csv')
+    pathReportFolder = os.path.join('output', OUTPUT_FILE_NAME+'_Report', 'Report')
+    pathCsvFileJmx   = os.path.join('output', OUTPUT_FILE_NAME, OUTPUT_FILE_NAME+'.jmx')
+    pathCsvFileCsv   = os.path.join('output', OUTPUT_FILE_NAME, OUTPUT_FILE_NAME+'.csv')
+    
     if operation == GENERATE_COMPLETE_REPORT:
         createFolders(True)
-        tree.write('output/' + OUTPUT_FILE_NAME +
-                   '_Report/' + OUTPUT_FILE_NAME + '.jmx')
-        os.system('jmeter -n -t output/' + OUTPUT_FILE_NAME + '_Report/' + OUTPUT_FILE_NAME + '.jmx -l output/' + OUTPUT_FILE_NAME +
-                  '_Report/' + OUTPUT_FILE_NAME + '.csv -e -o output/' + OUTPUT_FILE_NAME + '_Report/Report')
+        tree.write(pathReportJmx)
+        os.system('jmeter -n -t {pathJmx} -l {pathCsv} -e -o {reportFolder}'\
+            .format(pathJmx=pathReportJmx, pathCsv=pathReportCsv, reportFolder=pathReportFolder))
     elif operation == GENERATE_ONLY_CSV_FILE:
         createFolders(False)
-        tree.write('output/' + OUTPUT_FILE_NAME +
-                   '/' + OUTPUT_FILE_NAME + '.jmx')
-        os.system('jmeter -n -t output/' + OUTPUT_FILE_NAME + '/' +
-                  OUTPUT_FILE_NAME + '.jmx -l output/' + OUTPUT_FILE_NAME + '/' + OUTPUT_FILE_NAME + '.csv')
+        tree.write(pathCsvFileJmx)
+        os.system('jmeter -n -t {pathJmx} -l {pathCsv}'\
+            .format(pathJmx=pathCsvFileJmx, pathCsv=pathCsvFileCsv))
     elif operation == ONLY_RESULTS:
-        tree.write(OUTPUT_FILE_NAME + '.jmx')
-        os.system('jmeter -n -t ' + OUTPUT_FILE_NAME + '.jmx')
+        tree.write('{OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
+        os.system('jmeter -n -t {OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
         if NOT_SAVE_FILE_JMX_FOR_OPTION_3:
-            os.remove(OUTPUT_FILE_NAME+'.jmx')
+            os.remove('{OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
 
 # execute: It is a selector to execute one of the options of menu for JMeter Test
-
-
 def execute(op, tree):
     if op.isdigit():
         op = int(op)
@@ -140,14 +153,14 @@ def execute(op, tree):
 
 def main():
     tree = ET.parse('testTemplate.jmx')
-    defineParams(tree)
 
     print('1 - Generate complete report (.csv + HTML)')
     print('2 - Generate only .csv file')
     print('3 - Only results on terminal')
     print('0 - Exit')
     op = input('Chose the option: ')
-
+    
+    defineParams(tree, op)
     execute(op, tree)
 
 
