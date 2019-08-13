@@ -31,7 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -65,7 +64,6 @@ static const char* errorTypeStringV[] =
 //
 void orionldErrorResponseCreate
 (
-  ConnectionInfo*           ciP,
   OrionldResponseErrorType  errorType,
   const char*               title,
   const char*               details,

@@ -79,7 +79,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
 
   // if (!registration.id.empty())
   // {
-  //   orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
+  //   orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
   //   return false;
   // }
 

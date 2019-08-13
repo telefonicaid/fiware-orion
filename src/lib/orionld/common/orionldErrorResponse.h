@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
@@ -65,7 +64,6 @@ typedef enum OrionldDetailsType
 //
 extern void orionldErrorResponseCreate
 (
-  ConnectionInfo*           ciP,
   OrionldResponseErrorType  errorType,
   const char*               title,
   const char*               details,

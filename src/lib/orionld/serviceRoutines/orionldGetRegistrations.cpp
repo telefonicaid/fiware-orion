@@ -39,7 +39,7 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
 {
   LM_T(LmtServiceRoutine, ("In orionldGetRegistration"));
 
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Not implemented - GET /ngsi-ld/v1/csourceRegistrations", NULL, OrionldDetailsString);
+  orionldErrorResponseCreate(OrionldBadRequestData, "Not implemented - GET /ngsi-ld/v1/csourceRegistrations", NULL, OrionldDetailsString);
 
   ciP->httpStatusCode = SccNotImplemented;
 

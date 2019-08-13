@@ -62,7 +62,7 @@ bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterv
     }
     else
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unexpected field in TimeInterval", intervalItemP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected field in TimeInterval", intervalItemP->name, OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
@@ -71,21 +71,21 @@ bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterv
   if ((startP == NULL) || (endP == NULL))
   {
     const char* missing = (startP == NULL)? "TimeInterval::start" : "TimeInterval::end";
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Missing field in TimeInterval", missing, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in TimeInterval", missing, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
   if ((intervalP->start = parse8601Time(startP->value.s)) == -1)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
   if ((intervalP->end = parse8601Time(endP->value.s)) == -1)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }

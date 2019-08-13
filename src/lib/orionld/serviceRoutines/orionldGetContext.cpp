@@ -79,7 +79,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
     if (response.errorCode.code == SccBadRequest)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Bad Request", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", NULL, OrionldDetailsString);
       return false;
     }
     else if (response.contextElementResponseVector.size() > 0)
@@ -96,7 +96,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
     if (contextTree == NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0], OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0], OrionldDetailsString);
       ciP->httpStatusCode = SccContextElementNotFound;
       return false;
     }
@@ -107,7 +107,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
   if (orionldState.responseTree == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "kjObject failed", "out of memory?", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "kjObject failed", "out of memory?", OrionldDetailsString);
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
