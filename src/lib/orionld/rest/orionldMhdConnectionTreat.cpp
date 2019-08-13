@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <uuid/uuid.h>                                         // uuid_t, uuid_generate_time_safe, uuid_unparse_lower
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -338,6 +340,20 @@ static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
 
 // -----------------------------------------------------------------------------
 //
+// uuidGenerate -
+//
+static void uuidGenerate(char* buf)
+{
+  uuid_t uuid;
+
+  uuid_generate_time_safe(uuid);
+  uuid_unparse_lower(uuid, buf);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // payloadParseAndExtractSpecialFields -
 //
 static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* contextToBeCashedP)
@@ -526,7 +542,10 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     if (orionldState.payloadIdNode == NULL)
       LM_X(1, ("Context must be created but the 'id' node in the payload is missing - we shouldn't get this far - BUG!"));
 
-    snprintf(orionldState.linkBuffer, sizeof(orionldState.linkBuffer), "http://%s:%d/ngsi-ld/ex/v1/contexts/%s", hostname, portNo, orionldState.payloadIdNode->value.s);
+    char uuid[37];
+
+    uuidGenerate(uuid);
+    snprintf(orionldState.linkBuffer, sizeof(orionldState.linkBuffer), "http://%s:%d/ngsi-ld/contexts/%s", hostname, portNo, uuid);
     orionldState.link = orionldState.linkBuffer;
   }
 
@@ -578,7 +597,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
 //
 static char* contextNameLookup(char* url)
 {
-  const char*  needle       = "/ngsi-ld/ex/v1/contexts/";
+  const char*  needle       = "/ngsi-ld/contexts/";
   char*        needleStart  = strstr(url, needle);
 
   if (needleStart == NULL)
