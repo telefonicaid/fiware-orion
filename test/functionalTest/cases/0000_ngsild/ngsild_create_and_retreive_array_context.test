@@ -47,13 +47,14 @@ payload='{
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $6}' | awk -F\> '{ print $1 }')
 echo
 echo
 
 
 echo "02. GET the context"
 echo "==================="
-orionCurl --url /ngsi-ld/ex/v1/contexts/http://a.b.c/E1
+orionCurl --url /ngsi-ld/contexts/$contextId
 echo
 echo
 
@@ -63,7 +64,7 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/http://a.b.c/E1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/E1
 Date: REGEX(.*)
 

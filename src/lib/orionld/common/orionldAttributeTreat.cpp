@@ -47,13 +47,13 @@ extern "C"
 //
 // ATTRIBUTE_ERROR -
 //
-#define ATTRIBUTE_ERROR(errorString, details)                                                            \
-do                                                                                                       \
-{                                                                                                        \
-  LM_E((errorString));                                                                                   \
-  orionldErrorResponseCreate(ciP, OrionldBadRequestData, errorString, details, OrionldDetailsAttribute); \
-  ciP->httpStatusCode = SccBadRequest;                                                                   \
-  return false;                                                                                          \
+#define ATTRIBUTE_ERROR(errorString, details)                                                        \
+do                                                                                                   \
+{                                                                                                    \
+  LM_E((errorString));                                                                               \
+  orionldErrorResponseCreate(OrionldBadRequestData, errorString, details, OrionldDetailsAttribute);  \
+  ciP->httpStatusCode = SccBadRequest;                                                               \
+  return false;                                                                                      \
 } while (0)
 
 
@@ -123,7 +123,7 @@ static bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueN
   else
   {
     LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name.c_str()));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
     return false;
   }
 
@@ -193,7 +193,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
   {
     if (otherNodeP != NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name, OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
@@ -211,7 +211,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
   {
     if (otherNodeP != NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name, OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
@@ -220,7 +220,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
   {
     if (valueNodeP == NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "missing @value in @value/@type compound", "@value is mandatory", OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "missing @value in @value/@type compound", "@value is mandatory", OrionldDetailsString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
@@ -248,7 +248,7 @@ static bool attributeValueSet(ConnectionInfo* ciP, ContextAttribute* caP, KjNode
   case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
   case KjNone:
     LM_E(("Invalid type from kjson"));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
@@ -281,7 +281,7 @@ static bool metadataValueSet(ConnectionInfo* ciP, Metadata* mdP, KjNode* valueNo
   case KjNull:       mdP->valueType = orion::ValueTypeNull;    break;
   case KjNone:
     LM_E(("Invalid json type (KjNone!) for value field of metadata '%s'", valueNodeP->name));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson", OrionldDetailsString);
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
@@ -321,7 +321,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
         else
         {
           LM_E(("Invalid type for metadata '%s': '%s'", kNodeP->name, kNodeP->value.s));
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid type for attribute", kNodeP->value.s, OrionldDetailsString);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid type for attribute", kNodeP->value.s, OrionldDetailsString);
           return false;
         }
 
@@ -342,20 +342,20 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     if (typeNodeP == NULL)
     {
       LM_E(("No type for metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The type field is missing for a metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "The type field is missing for a metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
 
     if ((isProperty == true) && (valueNodeP == NULL))
     {
       LM_E(("No value for Property metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value field is missing for a Property metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "The value field is missing for a Property metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
     else if ((isRelationship == true) && (objectNodeP == NULL))
     {
       LM_E(("No 'object' for Relationship metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value field is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "The value field is missing for a Relationship metadata", nodeP->name, OrionldDetailsString);
       return false;
     }
   }
@@ -370,7 +370,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
   if (mdP == NULL)
   {
     LM_E(("out of memory creating property/relationship '%s' for attribute '%s'", nodeP->name, caName));
-    orionldErrorResponseCreate(ciP, OrionldInternalError, "cannot create property/relationship for attribute", "out of memory", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldInternalError, "cannot create property/relationship for attribute", "out of memory", OrionldDetailsString);
     return false;
   }
 
@@ -394,7 +394,7 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
     if (objectNodeP->type != KjString)
     {
       LM_E(("invalid json type for relationship-object '%s' of attribute '%s'", nodeP->name, caName));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "invalid json type for relationship-object", nodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldInternalError, "invalid json type for relationship-object", nodeP->name, OrionldDetailsString);
       delete mdP;
       return false;
     }
@@ -475,7 +475,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
         if (orionldState.locationAttributeP != NULL)
         {
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Multiple attributes cannot be defined using the GeoProperty type", nodeP->name, OrionldDetailsString);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Multiple attributes cannot be defined using the GeoProperty type", nodeP->name, OrionldDetailsString);
           return false;
         }
 
@@ -489,7 +489,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       else
       {
         LM_E(("Invalid type for attribute '%s': '%s'", nodeP->name, nodeP->value.s));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid type for attribute", nodeP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid type for attribute", nodeP->value.s, OrionldDetailsString);
         return false;
       }
 
@@ -506,7 +506,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
         return false;
       }
     }
@@ -541,7 +541,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
         return false;
       }
     }
@@ -551,7 +551,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
         return false;
       }
     }
@@ -561,7 +561,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name, OrionldDetailsString);
         return false;
       }
     }
@@ -570,14 +570,14 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
       {
         LM_E(("Duplicated attribute property '%s' for attribute '%s'", nodeP->name, caP->name.c_str()));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Duplicated attribute property", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated attribute property", nodeP->name, OrionldDetailsString);
         return false;
       }
 
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error adding metadata to an attribute", nodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to an attribute", nodeP->name, OrionldDetailsString);
         return false;
       }
     }
@@ -597,7 +597,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   if (typeP == NULL)  // Attr Type is mandatory!
   {
     LM_E(("type missing for attribute '%s'", kNodeP->name));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute found, but the type field is missing", kNodeP->name, OrionldDetailsAttribute);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute found, but the type field is missing", kNodeP->name, OrionldDetailsAttribute);
     return false;
   }
 
@@ -611,17 +611,17 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (isGeoProperty == true)
       {
         LM_E(("value missing for GeoProperty '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute with type GeoProperty found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Attribute with type GeoProperty found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
       }
       else if (isTemporalProperty == true)
       {
         LM_E(("value missing for TemporalProperty '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute with type TemporalProperty found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Attribute with type TemporalProperty found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
       }
       else
       {
         LM_E(("value missing for Property '%s'", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attribute with type Property found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Attribute with type Property found, but the associated value field is missing", kNodeP->name, OrionldDetailsAttribute);
       }
 
       return false;
@@ -630,7 +630,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     if (valueP->type == KjNull)
     {
       LM_E(("NULL value for Property '%s'", kNodeP->name));
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Attributes with type Property cannot be given the value NULL", kNodeP->name, OrionldDetailsAttribute);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Attributes with type Property cannot be given the value NULL", kNodeP->name, OrionldDetailsAttribute);
       return NULL;
     }
 
@@ -644,14 +644,14 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       if (valueP->type != KjObject)
       {
         LM_E(("geo-property attribute value must be a JSON Object: %s", kNodeP->name));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value of an attribute of type GeoProperty must be a JSON Object", kNodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "The value of an attribute of type GeoProperty must be a JSON Object", kNodeP->name, OrionldDetailsString);
         return false;
       }
 
       if (geoJsonCheck(ciP, valueP, &details) == false)
       {
         LM_E(("geoJsonCheck error for %s: %s", caName, details));
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "The value of an attribute of type GeoProperty must be valid GeoJson", details, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "The value of an attribute of type GeoProperty must be valid GeoJson", details, OrionldDetailsString);
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;

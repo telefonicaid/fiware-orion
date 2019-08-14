@@ -60,13 +60,14 @@ payload='{
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/json" --linkHeaderFix
+contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $6}' | awk -F\> '{ print $1 }')
 echo
 echo
 
 
 echo "02. Obtain the context from the Link header"
 echo "==========================================="
-orionCurl --url /ngsi-ld/ex/v1/contexts/urn:entity:E1
+orionCurl --url /ngsi-ld/contexts/$contextId
 echo
 echo
 
@@ -74,7 +75,7 @@ echo
 HOST=$(hostname)
 echo "03. Get the entity, with its creation context - see that attr_A1/2 are returned as short names"
 echo "=============================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities/urn:entity:E1?prettyPrint=yes" -H "Link: <http://$HOST:$CB_PORT/ngsi-ld/ex/v1/contexts/urn:entity:E1>;"' rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix --noPayloadCheck
+orionCurl --url "/ngsi-ld/v1/entities/urn:entity:E1?prettyPrint=yes" -H "Link: <http://$HOST:$CB_PORT/ngsi-ld/contexts/"$contextId">;"' rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix --noPayloadCheck
 echo
 echo
 
@@ -91,7 +92,7 @@ echo
 =====================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:entity:E1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Location: /ngsi-ld/v1/entities/urn:entity:E1
 Date: REGEX(.*)
 
@@ -121,7 +122,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 185
 Content-Type: application/json
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:entity:E1>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Date: REGEX(.*)
 
 {

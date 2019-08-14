@@ -1079,6 +1079,11 @@ function orionCurl()
     shift
   done
 
+  #
+  # Remove the old HTTP header file
+  #
+  \rm -f /tmp/httpHeaders2.out /tmp/httpHeaders.out
+
   if [ "$_payload" != "" ]
   then
     if [ "$_in" == "jsonld" ]
@@ -1219,11 +1224,6 @@ function orionCurl()
     sed '/Connection: Close/d'      /tmp/httpHeaders.out
 
   fi
-
-  #
-  # Unless we remove the HTTP header file, it will remain for the next execution
-  #
-  \rm -f /tmp/httpHeaders2.out /tmp/httpHeaders.out
 
   #
   # Print and beautify response body, if any - and if option --noPayloadCheck hasn't been set

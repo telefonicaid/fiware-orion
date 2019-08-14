@@ -54,7 +54,7 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
   {
     LM_E(("mongoGetLdSubscription error: %s", details));
-    orionldErrorResponseCreate(ciP, OrionldResourceNotFound, details, orionldState.wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
 
