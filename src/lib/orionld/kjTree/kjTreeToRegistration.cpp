@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
+#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 
 
 
@@ -174,7 +175,17 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* propP = eNodeP->value.firstChildP; propP != NULL; propP = propP->next)
             {
                STRING_CHECK(propP, "PropertyInfo::name");
+               
+               char  longName[256];
+               char* details;
+               if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
+               {
+                 return false;
+               }
+
+               propP->value.s = longName;
                regP->dataProvided.propertyV.push_back(propP->value.s);
+                LM_T(LmtServiceRoutine, ("jorge-log: long name %s", longName));
             }
           }
           else if (SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
@@ -186,6 +197,15 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* relP = eNodeP->value.firstChildP; relP != NULL; relP = relP->next)
             {
                STRING_CHECK(relP, "RelationInfo::name");
+               //regP->dataProvided.relationshipV.push_back(relP->value.s);
+               char  longName[256];
+               char* details;
+               if (orionldUriExpand(orionldState.contextP, relP->value.s, longName, sizeof(longName), &details) == false)
+               {
+                 return false;
+               }
+
+               relP->value.s = longName;
                regP->dataProvided.relationshipV.push_back(relP->value.s);
             }
           }
