@@ -170,7 +170,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
                LM_E(("Orion-ld currently supports only 1 array of entities within Information"));
 
                ciP->httpStatusCode = SccNotImplemented;
-               orionldErrorResponseCreate(ciP, OrionldOperationNotSupported,
+               orionldErrorResponseCreate(OrionldOperationNotSupported,
                 "Operation not implemented. Orion-ld currently supports only 1 array of entities within Information.", NULL, OrionldDetailsString);
                return false;
             }

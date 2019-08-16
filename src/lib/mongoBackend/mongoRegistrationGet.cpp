@@ -233,7 +233,7 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
 */
 static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntFieldF(r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getLongField(r, REG_EXPIRATION) : -1;
 }
 
 
@@ -281,8 +281,13 @@ static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSO
   if(r.hasField(REG_OBSERVATION_INTERVAL))
   {
     mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
-    reg->observationInterval.start  = getIntFieldF(obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getIntFieldF(obj, REG_INTERVAL_END) : -1;
+    reg->observationInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
+    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
+  }
+  else
+  {
+    reg->observationInterval.start = -1;
+    reg->observationInterval.end   = -1;
   }
 }
 
@@ -297,8 +302,13 @@ static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSON
   if(r.hasField(REG_MANAGEMENT_INTERVAL))
   {
     mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
-    reg->managementInterval.start  = getIntFieldF(obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getIntFieldF(obj, REG_INTERVAL_END) : -1;
+    reg->managementInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
+    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
+  }
+  else
+  {
+    reg->managementInterval.start = -1;
+    reg->managementInterval.end   = -1;
   }
 }
 
@@ -435,8 +445,6 @@ void mongoRegistrationGet
       return;
     }
 
-    setLdObservationInterval(regP, r);
-    setLdManagementInterval(regP, r);
     setExpires(regP, r);
     setStatus(regP, r);
 
@@ -627,8 +635,8 @@ bool mongoLdRegistrationGet
       return false;
     }
 
-    // setLdObservationInterval(regP, r);
-    // setLdManagementInterval(regP, r);
+    setLdObservationInterval(regP, r);
+    setLdManagementInterval(regP, r);
     setExpires(regP, r);
     setStatus(regP, r);
 
