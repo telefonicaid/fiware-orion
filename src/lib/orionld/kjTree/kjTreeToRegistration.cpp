@@ -163,6 +163,18 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
         {
           if (SCOMPARE9(eNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
           {
+            if(entitiesPresent == true)
+            {
+              //FIXME: It is not yet possible to register more than 1 array of intomations 
+              //inside an Iformation because datamodel V2 only supports one endpoint.
+
+               LM_E(("Orion-ld currently supports only 1 array of entities within Information"));
+
+               ciP->httpStatusCode = SccNotImplemented;
+               orionldErrorResponseCreate(ciP, OrionldOperationNotSupported,
+                "Operation not implemented. Orion-ld currently supports only 1 array of entities within Information.", NULL, OrionldDetailsString);
+               return false;
+            }
             if (kjTreeToEntIdVector(ciP, eNodeP, &regP->dataProvided.entities) == false)
             {
               LM_E(("kjTreeToEntIdVector failed"));
@@ -185,7 +197,6 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
 
                propP->value.s = longName;
                regP->dataProvided.propertyV.push_back(propP->value.s);
-                LM_T(LmtServiceRoutine, ("jorge-log: long name %s", longName));
             }
           }
           else if (SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))

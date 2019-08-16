@@ -42,7 +42,6 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationCreate.h"
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 
 
 
@@ -162,27 +161,10 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    
     for (unsigned int pIx = 0; pIx < regP->dataProvided.propertyV.size(); ++pIx)
-    {
-      char  typeExpanded[256];
-      char* details;
-      std::string type = "Property";
-      
-      orionldUriExpand(orionldState.contextP, &type[0], typeExpanded, sizeof(typeExpanded), &details);
-
-      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.propertyV[pIx] << REG_ATTRS_TYPE << typeExpanded << REG_ATTRS_ISDOMAIN << "false"));
-    }
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.propertyV[pIx] << REG_ATTRS_TYPE << "Property" << REG_ATTRS_ISDOMAIN << "false"));
     for (unsigned int rIx = 0; rIx < regP->dataProvided.relationshipV.size(); ++rIx)
-    {
-      char  typeExpanded[256];
-      char* details;
-      std::string type = "Relationship";
-
-      orionldUriExpand(orionldState.contextP, &type[0], typeExpanded, sizeof(typeExpanded), &details);
-
-      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.relationshipV[rIx] << REG_ATTRS_TYPE << typeExpanded << REG_ATTRS_ISDOMAIN << "false"));
-    }  
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.relationshipV[rIx] << REG_ATTRS_TYPE << "Relationship" << REG_ATTRS_ISDOMAIN << "false"));
   }
   else
   {
