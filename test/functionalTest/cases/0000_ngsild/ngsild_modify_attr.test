@@ -162,11 +162,11 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"http://example=org/ngsi-ld/default/P1" : {
-			"value" : 2,
-			"type" : "Property",
-			"mdNames" : [ ],
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*)
+			"mdNames" : [ ],
+			"type" : "Property",
+			"value" : 2
 		}
 	},
 	"creDate" : REGEX(.*),

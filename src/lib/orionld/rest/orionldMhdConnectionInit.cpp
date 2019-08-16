@@ -249,7 +249,7 @@ int orionldMhdConnectionInit
   if (ciP->verb == NOVERB)
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not a valid verb", method, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method, OrionldDetailsString);
     ciP->httpStatusCode   = SccBadRequest;
     return MHD_YES;
   }
@@ -283,8 +283,7 @@ int orionldMhdConnectionInit
     //
     if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
     {
-      orionldErrorResponseCreate(ciP,
-                                 OrionldBadRequestData,
+      orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
                                  "only application/json and application/ld+json are supported",
                                  OrionldDetailsString);
@@ -330,7 +329,7 @@ int orionldMhdConnectionInit
   if ((ciP->verb != POST) && (ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->verb != PATCH))
   {
     LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Verb not supported by NGSI-LD", method, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method, OrionldDetailsString);
     ciP->httpStatusCode = SccBadRequest;
   }
 

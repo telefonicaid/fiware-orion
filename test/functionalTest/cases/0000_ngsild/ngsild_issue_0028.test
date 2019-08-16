@@ -32,8 +32,11 @@ brokerStart CB 0-255
 
 #
 # 01. Create entity with an attribute P1
-# 02. Append to the entity, overwriting P1
-# 03. Get the entity to see the new value of P1
+# 02. See mongo content
+# 03. GET the entity, see initial value of P1
+# 04. Append to the entity, overwriting P1
+# 05. See mongo	content
+# 06. Get the entity to see the new value of P1
 #
 
 
@@ -61,7 +64,22 @@ echo
 echo
 
 
-echo "02. Append to the entity, overwriting P1"
+echo "02. See mongo content"
+echo "====================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+ 
+echo "03. GET the entity, see initial value of P1"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:00.00.00?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Append to the entity, overwriting P1"
 echo "========================================"
 payload='{
   "P1": {
@@ -74,7 +92,14 @@ echo
 echo
 
 
-echo "03. Get the entity to see the new value of P1"
+echo "05. See mongo content"
+echo "====================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. Get the entity to see the new value of P1"
 echo "============================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:00.00.00?prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
@@ -91,7 +116,82 @@ Date: REGEX(.*)
 
 
 
-02. Append to the entity, overwriting P1
+02. See mongo content
+=====================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:00.00.00",
+		"type" : "http://example.org/ngsi-ld/default/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"http://example.org/ngsi-ld/default/P1"
+	],
+	"attrs" : {
+		"http://example=org/ngsi-ld/default/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"md" : {
+				"observedAt" : {
+					"value" : 1543924800
+				},
+				"P1_R1" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:T2:6789"
+				},
+				"P1_P1" : {
+					"type" : "Property",
+					"value" : 0.79
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"P1_R1",
+				"P1_P1"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET the entity, see initial value of P1
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 307
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:T:00.00.00",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 12,
+    "P1_P1": {
+      "type": "Property",
+      "value": 0.79
+    },
+    "P1_R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T2:6789"
+    },
+    "observedAt": "2018-12-04T12:00:00Z"
+  }
+}
+
+
+
+04. Append to the entity, overwriting P1
 ========================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -99,7 +199,54 @@ Date: REGEX(.*)
 
 
 
-03. Get the entity to see the new value of P1
+05. See mongo content
+=====================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:00.00.00",
+		"type" : "http://example.org/ngsi-ld/default/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"http://example.org/ngsi-ld/default/P1"
+	],
+	"attrs" : {
+		"http://example=org/ngsi-ld/default/P1" : {
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"md" : {
+				"observedAt" : {
+					"value" : 1543924800
+				},
+				"P1_R1" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:T2:6789"
+				},
+				"P1_P1" : {
+					"type" : "Property",
+					"value" : 0.79
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"P1_R1",
+				"P1_P1"
+			],
+			"type" : "Property",
+			"value" : "Hola"
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+06. Get the entity to see the new value of P1
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 311

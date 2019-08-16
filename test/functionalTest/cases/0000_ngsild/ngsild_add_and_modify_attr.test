@@ -26,7 +26,7 @@ Add and modify attributes in existing entity
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB
 
 --SHELL--
 
@@ -175,7 +175,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*)
 			"modDate" : REGEX(.*)
-			"value" : "new",
+			"value" : "new"REGEX(.*)
 			"mdNames" : [ ]REGEX(.*)
 #SORT_END
 		},

@@ -1079,9 +1079,19 @@ function orionCurl()
     shift
   done
 
+  #
+  # Remove the old HTTP header file
+  #
+  \rm -f /tmp/httpHeaders2.out /tmp/httpHeaders.out
+
   if [ "$_payload" != "" ]
   then
-    _inFormat='--header "Content-Type: application/json"'
+    if [ "$_in" == "jsonld" ]
+    then
+      _inFormat='--header "Content-Type: application/ld+json"'
+    else
+      _inFormat='--header "Content-Type: application/json"'
+    fi
   fi
 
   #
@@ -1109,16 +1119,19 @@ function orionCurl()
   fi
 
   # 3. Fix for 'Content-Type' and 'Accept' short names 'xml' and 'json'
-  if   [ "$_in"   == "application/xml" ];  then _in='xml';   fi
-  if   [ "$_in"   == "application/json" ]; then _in='json';  fi
-  if   [ "$_out"  == "application/xml" ];  then _out='xml';  fi
-  if   [ "$_out"  == "application/json" ]; then _out='json'; fi
-  if   [ "$_out"  == "text/plain" ];       then _out='text'; fi
+  if   [ "$_in"   == "application/xml"     ]; then _in='xml';     fi
+  if   [ "$_in"   == "application/json"    ]; then _in='json';    fi
+  if   [ "$_in"   == "application/ld+json" ]; then _in='jsonld';  fi
+  if   [ "$_out"  == "application/xml"     ]; then _out='xml';    fi
+  if   [ "$_out"  == "application/json"    ]; then _out='json';   fi
+  if   [ "$_out"  == "application/ld+json" ]; then _out='jsonld'; fi
+  if   [ "$_out"  == "text/plain"          ]; then _out='text';   fi
 
-  if   [ "$_in"  == "xml" ];   then _inFormat='--header "Content-Type: application/xml"'
-  elif [ "$_in"  == "json" ];  then _inFormat='--header "Content-Type: application/json"'
-  elif [ "$_in"  == "text" ];  then _inFormat='--header "Content-Type: text/plain"'
-  elif [ "$_in"  != "" ];      then _inFormat='--header "Content-Type: '${_in}'"'
+  if   [ "$_in"  == "xml"    ];  then _inFormat='--header "Content-Type: application/xml"'
+  elif [ "$_in"  == "json"   ];  then _inFormat='--header "Content-Type: application/json"'
+  elif [ "$_in"  == "jsonld" ];  then _inFormat='--header "Content-Type: application/ld+json"'
+  elif [ "$_in"  == "text"   ];  then _inFormat='--header "Content-Type: text/plain"'
+  elif [ "$_in"  != ""       ];  then _inFormat='--header "Content-Type: '${_in}'"'
   fi
 
   # Note that payloadCheckFormat is also json in the case of --in xml, as the CB also returns error in JSON in this case
@@ -1211,11 +1224,6 @@ function orionCurl()
     sed '/Connection: Close/d'      /tmp/httpHeaders.out
 
   fi
-
-  #
-  # Unless we remove the HTTP header file, it will remain for the next execution
-  #
-  \rm -f /tmp/httpHeaders2.out /tmp/httpHeaders.out
 
   #
   # Print and beautify response body, if any - and if option --noPayloadCheck hasn't been set

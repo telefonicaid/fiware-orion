@@ -99,8 +99,8 @@ echo
 echo
 
 
-echo "02. Checking mongo to see a correct context"
-echo "==========================================="
+echo "02. Checking mongo to see a correct entity"
+echo "=========================================="
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
@@ -111,14 +111,14 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/http://a.b.c/entity/E3>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
 Date: REGEX(.*)
 
 
 
-02. Checking mongo to see a correct context
-===========================================
+02. Checking mongo to see a correct entity
+==========================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)

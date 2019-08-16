@@ -55,7 +55,7 @@ static bool formatExtract(ConnectionInfo* ciP, char* format, ngsiv2::Subscriptio
   else
   {
     LM_E(("Invalid value for Notification::format: '%s'", format));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for Notification::format", format, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Notification::format", format, OrionldDetailsString);
     return false;
   }
 
@@ -129,7 +129,7 @@ bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscript
     }
     else
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unknown Notification field", itemP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown Notification field", itemP->name, OrionldDetailsString);
       return false;
     }
   }

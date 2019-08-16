@@ -65,13 +65,14 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $6}' | awk -F\> '{ print $1 }')
 echo
 echo
 
 
 echo "02. Delete P1 using the alias and the context created for the entity"
 echo "===================================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P1 -X DELETE -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P1 -X DELETE -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/contexts/'$contextId'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -99,7 +100,7 @@ echo
 
 echo "06. Get the entity, with its creation context, see only P3 and with shortname, as P3 is found in creation context"
 echo "================================================================================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14 -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14 -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/contexts/'$contextId'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix
 echo
 echo
 
@@ -109,7 +110,7 @@ echo
 =====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
 Date: REGEX(.*)
 
@@ -168,7 +169,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 80
 Content-Type: application/json
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
 Date: REGEX(.*)
 
 {
