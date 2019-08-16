@@ -40,8 +40,10 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "orionld/common/orionldState.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationGet.h"
+#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
 
 
 
@@ -315,9 +317,9 @@ static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
     mongo::BSONObj  pobj = dbPropertyV[ix].embeddedObject();
     std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
     std::string     propName;
+
     if(type == REG_PROPERTIES_TYPE)
     {
-      LM_TMP(("Inside the if"));
       propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
 
       if (propName != "")
@@ -346,7 +348,7 @@ static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& 
     if(type == REG_RELATIONSHIPS_TYPE)
     {
       relName = getStringFieldF(robj, REG_RELATIONSHIPS_NAME);
-      
+     
       if (relName != "")
       {
         reg->dataProvided.relationshipV.push_back(relName);
