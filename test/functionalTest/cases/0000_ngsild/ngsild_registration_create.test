@@ -39,11 +39,17 @@ brokerStart CB
 #
 # 01. Create a registration with ALL fields
 # 02. See the registration in mongo
+# 03. Create R1 registration with embebed context
+# 04. See the R1 registration in mongo
+# 05. create R2 registration without @Context Attribute
 #
 
 echo "01. Create a registration with ALL fields"
 echo "========================================="
 payload='{
+  "@context": [
+	"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
   "type": "ContextSourceRegistration",
   "name": "name of reg 1",
@@ -107,7 +113,7 @@ payload='{
   "expires": "2028-12-31T10:00:00",
   "endpoint": "http://my.csource.org:1026"
 }'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -119,11 +125,73 @@ echo
 echo
 
 
+echo '03. Create R1 registration with embebed context'
+echo '============================================================================='
+payload='{
+ "@context": {
+	"myT": "http://example.org/T1",
+        "myP1": "http://example.org/P1",
+        "myP2": "http://example.org/P2",
+        "myRel1": "http://example.org/Rel1",
+        "myRel2": "http://example.org/Rel2"
+  },
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "name of reg 1",
+  "description": "description of registration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E1",
+          "type": "myT"
+        }
+      ],
+      "properties": [ "myP1", "myP2" ],
+      "relationships": [ "myRel1", "myRel2" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. See the R1 registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne({'_id': 'urn:ngsi-ld:ContextSourceRegistration:R1'})"
+echo
+echo
+
+
+echo '05. create R2 registration without @Context Attribute'
+echo '============================================================================='
+payload='{
+	"id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+	"type": "ContextSourceRegistration",
+	"information": [{
+			"entities": [{
+				"id": "urn:ngsi-ld:entity:E1",
+				"type": "T"
+			}],
+			"properties": ["p1", "p2"],
+			"relationships": ["rel1"]
+		}
+	],
+	"endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create a registration with ALL fields
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: REGEX(.*)
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341
 Date: REGEX(.*)
 
@@ -149,17 +217,17 @@ MongoDB server version: REGEX(.*)
 			],
 			"attrs" : [
 				{
-					"name" : "brandName",
+					"name" : "http://example.org/ngsi-ld/default/brandName",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "speed",
+					"name" : "http://example.org/ngsi-ld/default/speed",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "isParked",
+					"name" : "http://example.org/ngsi-ld/default/isParked",
 					"type" : "Relationship",
 					"isDomain" : "false"
 				}
@@ -178,6 +246,77 @@ MongoDB server version: REGEX(.*)
 	}
 }
 bye
+
+
+03. Create R1 registration with embebed context
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Date: REGEX(.*)
+
+
+
+04. See the R1 registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"description" : "description of registration",
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:E1",
+					"type" : "http://example.org/T1"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "http://example.org/P1",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "http://example.org/P2",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "http://example.org/Rel1",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "http://example.org/Rel2",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+05. create R2 registration without @Context Attribute
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 189
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "For application/ld+json, the @context must be present in the JSON payload",
+    "title": "@context missing in JSON payload",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 --TEARDOWN--

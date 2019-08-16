@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
+#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 
 
 
@@ -161,6 +162,18 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
         {
           if (SCOMPARE9(eNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
           {
+            if(entitiesPresent == true)
+            {
+              //FIXME: It is not yet possible to register more than 1 array of intomations 
+              //inside an Iformation because datamodel V2 only supports one endpoint.
+
+               LM_E(("Orion-ld currently supports only 1 array of entities within Information"));
+
+               ciP->httpStatusCode = SccNotImplemented;
+               orionldErrorResponseCreate(ciP, OrionldOperationNotSupported,
+                "Operation not implemented. Orion-ld currently supports only 1 array of entities within Information.", NULL, OrionldDetailsString);
+               return false;
+            }
             if (kjTreeToEntIdVector(ciP, eNodeP, &regP->dataProvided.entities) == false)
             {
               LM_E(("kjTreeToEntIdVector failed"));
@@ -173,6 +186,15 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* propP = eNodeP->value.firstChildP; propP != NULL; propP = propP->next)
             {
                STRING_CHECK(propP, "PropertyInfo::name");
+               
+               char  longName[256];
+               char* details;
+               if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
+               {
+                 return false;
+               }
+
+               propP->value.s = longName;
                regP->dataProvided.propertyV.push_back(propP->value.s);
             }
           }
@@ -185,6 +207,15 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* relP = eNodeP->value.firstChildP; relP != NULL; relP = relP->next)
             {
                STRING_CHECK(relP, "RelationInfo::name");
+               //regP->dataProvided.relationshipV.push_back(relP->value.s);
+               char  longName[256];
+               char* details;
+               if (orionldUriExpand(orionldState.contextP, relP->value.s, longName, sizeof(longName), &details) == false)
+               {
+                 return false;
+               }
+
+               relP->value.s = longName;
                regP->dataProvided.relationshipV.push_back(relP->value.s);
             }
           }
