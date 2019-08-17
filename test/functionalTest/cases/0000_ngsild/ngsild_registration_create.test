@@ -52,7 +52,7 @@ payload='{
   ],
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
   "type": "ContextSourceRegistration",
-  "name": "name of reg 1",
+  "name": "reg_csr1a341",
   "description": "description of reg 1",
   "information": [
     {
@@ -137,7 +137,7 @@ payload='{
   },
   "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
   "type": "ContextSourceRegistration",
-  "name": "name of reg 1",
+  "name": "reg_1",
   "description": "description of registration",
   "information": [
     {
@@ -205,6 +205,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
 	"description" : "description of reg 1",
+	"name" : "reg_csr1a341",
 	"expiration" : NumberLong(1861869600),
 	"servicePath" : "/",
 	"contextRegistration" : [
@@ -266,6 +267,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
 	"description" : "description of registration",
+	"name" : "reg_1",
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
