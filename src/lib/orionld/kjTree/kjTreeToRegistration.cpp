@@ -39,11 +39,12 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
-#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/kjTree/kjTreeToRegistration.h"               // Own interface
 
 
 
@@ -63,7 +64,6 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   KjNode*  endpointP                 = NULL;
   KjNode*  observationSpaceP         = NULL;
   KjNode*  operationSpaceP           = NULL;
-  bool     entitiesPresent           = false;
   KjNode*  expiresP                  = NULL;
 
   if (orionldState.payloadIdNode == NULL)
@@ -148,7 +148,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     }
     else if (SCOMPARE12(kNodeP->name, 'i', 'n', 'f', 'o', 'r', 'm', 'a', 't', 'i', 'o', 'n', 0))
     {
-      DUPLICATE_CHECK(informationP, "Registatrion::information", kNodeP);
+      DUPLICATE_CHECK(informationP, "Registration::information", kNodeP);
       ARRAY_CHECK(kNodeP, "Registration::information");
       EMPTY_ARRAY_CHECK(kNodeP, "Registration::information");
 
@@ -158,62 +158,50 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
         // FIXME: create a kjTree function for this:
         //   kjTreeToInformationNode(informationItemP);
         //
-        for (KjNode* eNodeP = informationItemP->value.firstChildP; eNodeP != NULL; eNodeP = eNodeP->next)
+        KjNode* entitiesP      = NULL;
+        KjNode* propertiesP    = NULL;
+        KjNode* relationshipsP = NULL;
+
+        for (KjNode* infoNodeP = informationItemP->value.firstChildP; infoNodeP != NULL; infoNodeP = infoNodeP->next)
         {
-          if (SCOMPARE9(eNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
+          if (SCOMPARE9(infoNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
           {
-            if(entitiesPresent == true)
-            {
-              //FIXME: It is not yet possible to register more than 1 array of intomations 
-              //inside an Iformation because datamodel V2 only supports one endpoint.
-
-               LM_E(("Orion-ld currently supports only 1 array of entities within Information"));
-
-               ciP->httpStatusCode = SccNotImplemented;
-               orionldErrorResponseCreate(OrionldOperationNotSupported,
-                "Operation not implemented. Orion-ld currently supports only 1 array of entities within Information.", NULL, OrionldDetailsString);
-               return false;
-            }
-            if (kjTreeToEntIdVector(ciP, eNodeP, &regP->dataProvided.entities) == false)
+            DUPLICATE_CHECK(entitiesP, "Registration::information::entities", kNodeP);
+            if (kjTreeToEntIdVector(ciP, infoNodeP, &regP->dataProvided.entities) == false)
             {
               LM_E(("kjTreeToEntIdVector failed"));
               return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
             }
-            entitiesPresent = true;
           }
-          else if (SCOMPARE11(eNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
+          else if (SCOMPARE11(infoNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
           {
-            for (KjNode* propP = eNodeP->value.firstChildP; propP != NULL; propP = propP->next)
+            DUPLICATE_CHECK(propertiesP, "Registration::information::properties", kNodeP);
+            for (KjNode* propP = infoNodeP->value.firstChildP; propP != NULL; propP = propP->next)
             {
-               STRING_CHECK(propP, "PropertyInfo::name");
-               
-               char  longName[256];
-               char* details;
-               if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
-               {
-                 return false;
-               }
+              STRING_CHECK(propP, "PropertyInfo::name");
 
-               propP->value.s = longName;
-               regP->dataProvided.propertyV.push_back(propP->value.s);
+              char  longName[256];
+              char* details;
+
+              if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
+                return false;
+
+              propP->value.s = longName;
+              regP->dataProvided.propertyV.push_back(propP->value.s);
             }
           }
-          else if (SCOMPARE14(eNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
+          else if (SCOMPARE14(infoNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
           {
-            //
-            // FIXME: We mix Properties and Relationships for now
-            //        To be fixed when we decide to break the data model of Orion APIv2
-            //
-            for (KjNode* relP = eNodeP->value.firstChildP; relP != NULL; relP = relP->next)
+            DUPLICATE_CHECK(relationshipsP, "Registration::information::relationships", kNodeP);
+
+            for (KjNode* relP = infoNodeP->value.firstChildP; relP != NULL; relP = relP->next)
             {
                STRING_CHECK(relP, "RelationInfo::name");
-               //regP->dataProvided.relationshipV.push_back(relP->value.s);
+
                char  longName[256];
                char* details;
                if (orionldUriExpand(orionldState.contextP, relP->value.s, longName, sizeof(longName), &details) == false)
-               {
                  return false;
-               }
 
                relP->value.s = longName;
                regP->dataProvided.relationshipV.push_back(relP->value.s);
@@ -221,9 +209,21 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
           }
           else
           {
-            orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::information::entities", eNodeP->name, OrionldDetailsString);
+            orionldErrorResponseCreate(OrionldBadRequestData,
+                                       "Unknown field inside Registration::information",
+                                       infoNodeP->name,
+                                       OrionldDetailsString);
             return false;
           }
+        }
+
+        if ((entitiesP == NULL) && (propertiesP == NULL) && (relationshipsP == NULL))
+        {
+          orionldErrorResponseCreate(OrionldBadRequestData,
+                                     "Empty Registration::information item",
+                                     NULL,
+                                     OrionldDetailsString);
+          return false;
         }
       }
     }
@@ -295,15 +295,6 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
       return false;
     }
   }
-
-
-  if (entitiesPresent == false)
-  {
-    LM_E(("At least one 'entity' must be present"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "At least one 'entity' must be present", NULL, OrionldDetailsString);
-    return false;
-  }
-
 
   return true;
 }
