@@ -278,7 +278,7 @@ static void setLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 */
 static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
-  if(r.hasField(REG_OBSERVATION_INTERVAL))
+  if (r.hasField(REG_OBSERVATION_INTERVAL))
   {
     mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
     reg->observationInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
@@ -299,7 +299,7 @@ static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSO
 */
 static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
-  if(r.hasField(REG_MANAGEMENT_INTERVAL))
+  if (r.hasField(REG_MANAGEMENT_INTERVAL))
   {
     mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
     reg->managementInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
@@ -328,7 +328,7 @@ static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
     std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
     std::string     propName;
 
-    if(type == REG_PROPERTIES_TYPE)
+    if (type == REG_PROPERTIES_TYPE)
     {
       propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
 
@@ -336,7 +336,7 @@ static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
       {
         reg->dataProvided.propertyV.push_back(propName);
       }
-    }   
+    }
   }
 }
 
@@ -355,25 +355,25 @@ static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& 
     std::string     type = getStringFieldF(robj, REG_ATTRS_TYPE);
     std::string     relName;
 
-    if(type == REG_RELATIONSHIPS_TYPE)
+    if (type == REG_RELATIONSHIPS_TYPE)
     {
       relName = getStringFieldF(robj, REG_RELATIONSHIPS_NAME);
-     
+
       if (relName != "")
       {
         reg->dataProvided.relationshipV.push_back(relName);
       }
-    }   
+    }
   }
 }
 
-#endif  //ORIONLD
+#endif  // ORIONLD
 
 
 
 /* ****************************************************************************
 *
-* mongoRegistrationGet - 
+* mongoRegistrationGet -
 */
 void mongoRegistrationGet
 (
@@ -477,7 +477,7 @@ void mongoRegistrationGet
 
 /* ****************************************************************************
 *
-* mongoRegistrationsGet - 
+* mongoRegistrationsGet -
 */
 void mongoRegistrationsGet
 (
@@ -571,7 +571,7 @@ void mongoRegistrationsGet
 #ifdef ORIONLD
 /* ****************************************************************************
 *
-* mongoLdRegistrationGet - 
+* mongoLdRegistrationGet -
 */
 bool mongoLdRegistrationGet
 (

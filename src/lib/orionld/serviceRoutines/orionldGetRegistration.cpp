@@ -57,7 +57,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0], OrionldDetailsString);
     return false;
   }
-  
+
   // Transform to KjNode tree
   ciP->httpStatusCode       = SccOk;
   orionldState.responseTree = kjTreeFromRegistration(ciP, &registration);

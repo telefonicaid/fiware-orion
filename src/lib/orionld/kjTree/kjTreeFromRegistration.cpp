@@ -72,9 +72,9 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   // type
   nodeP = kjString(orionldState.kjsonP, "type", "ContextSource Registration");
   kjChildAdd(topP, nodeP);
-  
+
   // name
-  if(registrationP->name != "")
+  if (registrationP->name != "")
   {
     nodeP = kjString(orionldState.kjsonP, "name", registrationP->name.c_str());
     kjChildAdd(topP, nodeP);
@@ -147,7 +147,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
 
     // relationships
     size = registrationP->dataProvided.relationshipV.size();
-    if(size != 0)
+    if (size != 0)
     {
       arrayP2 = kjArray(orionldState.kjsonP, "relationships");
 
@@ -162,12 +162,12 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     kjChildAdd(arrayP, objectP);
   }
   kjChildAdd(topP, arrayP);
-  
+
   // observationalInterval
-  if(registrationP->observationInterval.start > 0)
+  if (registrationP->observationInterval.start > 0)
   {
     // start
-    if(numberToDate((time_t) registrationP->observationInterval.start, date, sizeof(date), &details) == false)
+    if (numberToDate((time_t) registrationP->observationInterval.start, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'observationalInterval start'"));
       orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified observationalInterval date", details, OrionldDetailsEntity);
@@ -177,10 +177,10 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     nodeP = kjString(orionldState.kjsonP, "start", date);
     kjChildAdd(objectP, nodeP);
 
-    if(registrationP->observationInterval.end > 0)
+    if (registrationP->observationInterval.end > 0)
     {
       // end
-      if(numberToDate((time_t) registrationP->observationInterval.end, date, sizeof(date), &details) == false)
+      if (numberToDate((time_t) registrationP->observationInterval.end, date, sizeof(date), &details) == false)
       {
         LM_E(("Error creating a stringified date for 'observationalInterval end'"));
         orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified observationalInterval date", details, OrionldDetailsEntity);
@@ -192,12 +192,12 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     kjChildAdd(topP, objectP);
   }
 
-  
+
   // managementInterval
-  if(registrationP->managementInterval.start > 0)
+  if (registrationP->managementInterval.start > 0)
   {
     // start
-    if(numberToDate((time_t) registrationP->managementInterval.start, date, sizeof(date), &details) == false)
+    if (numberToDate((time_t) registrationP->managementInterval.start, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'managementInterval start'"));
       orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified managementInterval date", details, OrionldDetailsEntity);
@@ -207,10 +207,10 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     nodeP = kjString(orionldState.kjsonP, "start", date);
     kjChildAdd(objectP, nodeP);
 
-    if(registrationP->managementInterval.end > 0)
+    if (registrationP->managementInterval.end > 0)
     {
       // end
-      if(numberToDate((time_t) registrationP->managementInterval.end, date, sizeof(date), &details) == false)
+      if (numberToDate((time_t) registrationP->managementInterval.end, date, sizeof(date), &details) == false)
       {
         LM_E(("Error creating a stringified date for 'managementInterval end'"));
         orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified managementInterval date", details, OrionldDetailsEntity);
@@ -221,7 +221,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     }
     kjChildAdd(topP, objectP);
   }
-  
+
 
   // location
 
@@ -244,6 +244,6 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   // endpoint
   nodeP = kjString(orionldState.kjsonP, "endpoint", registrationP->provider.http.url.c_str());
   kjChildAdd(topP, nodeP);
-  
+
   return topP;
 }
