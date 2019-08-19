@@ -59,7 +59,6 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   KjNode*       nodeP;
   char          date[128];
   char*         details;
-  unsigned int  size;
   unsigned int  infoSize;
   unsigned int  i;
   unsigned int  j;
@@ -95,6 +94,8 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
 
   for (i = 0; i < infoSize; i++)
   {
+    unsigned int  size;
+
     objectP = kjObject(orionldState.kjsonP, NULL);
 
     // entities
