@@ -189,14 +189,13 @@ Date: REGEX(.*)
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 508
+Content-Length: 522
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
 
 {
     "description": "Description of REG1",
-    "name": "REG1",
     "endpoint": "http://my.csource.org:1026",
     "expires": "2029-10-31T10:00:25Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
@@ -221,6 +220,7 @@ Date: REGEX(.*)
         "end": "2028-12-31T10:00:00Z",
         "start": "2018-12-31T10:00:00Z"
     },
+    "name": "REG1",
     "observationInterval": {
         "end": "2028-12-31T10:00:00Z",
         "start": "2018-12-31T10:00:00Z"
