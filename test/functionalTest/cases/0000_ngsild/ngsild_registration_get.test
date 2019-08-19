@@ -151,7 +151,7 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 518
+Content-Length: 517
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -186,14 +186,14 @@ Date: REGEX(.*)
         "end": "2028-12-31T10:00:00Z",
         "start": "2018-12-31T10:00:00Z"
     },
-    "type": "ContextSource Registration"
+    "type": "ContextSourceRegistration"
 }
 
 
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 518
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -228,7 +228,7 @@ Date: REGEX(.*)
         "end": "2028-12-31T10:00:00Z",
         "start": "2018-12-31T10:00:00Z"
     },
-    "type": "ContextSource Registration"
+    "type": "ContextSourceRegistration"
 }
 
 
