@@ -158,9 +158,9 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
         // FIXME: create a kjTree function for this:
         //   kjTreeToInformationNode(informationItemP);
         //
-        KjNode* entitiesP      = NULL; 
-        KjNode* propertiesP    = NULL; 
-        KjNode* relationshipsP = NULL; 
+        KjNode* entitiesP      = NULL;
+        KjNode* propertiesP    = NULL;
+        KjNode* relationshipsP = NULL;
 
         for (KjNode* infoNodeP = informationItemP->value.firstChildP; infoNodeP != NULL; infoNodeP = infoNodeP->next)
         {
@@ -179,9 +179,10 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
             for (KjNode* propP = infoNodeP->value.firstChildP; propP != NULL; propP = propP->next)
             {
               STRING_CHECK(propP, "PropertyInfo::name");
-               
+
               char  longName[256];
               char* details;
+
               if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
                 return false;
 
