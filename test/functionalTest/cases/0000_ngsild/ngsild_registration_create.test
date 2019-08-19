@@ -34,12 +34,12 @@ brokerStart CB
 # FIXME: Due to the fact that the NGSI-LD data model doesn't follow the Orion APIv2 data model
 #        in terms of registrations, we have decided to restrict NGSI-LD registrations to only allow
 #        ONE item in the information vector.
-#        Once this is fixed (possibly some time 2020), this test should inclide an "information" vector
+#        Once this is fixed (possibly some time 2020), this test should include an "information" vector
 #        with more than one item.
 #
 # 01. Create a registration with ALL fields
 # 02. See the registration in mongo
-# 03. Create R1 registration with embebed context
+# 03. Create R1 registration with embedded context
 # 04. See the R1 registration in mongo
 # 05. create R2 registration without @Context Attribute
 #
@@ -125,8 +125,8 @@ echo
 echo
 
 
-echo '03. Create R1 registration with embebed context'
-echo '============================================================================='
+echo '03. Create R1 registration with embedded context'
+echo '================================================'
 payload='{
  "@context": {
 	"myT": "http://example.org/T1",
@@ -159,14 +159,14 @@ echo
 
 
 echo "04. See the R1 registration in mongo"
-echo "================================="
+echo "===================================="
 mongoCmd2 ftest "db.registrations.findOne({'_id': 'urn:ngsi-ld:ContextSourceRegistration:R1'})"
 echo
 echo
 
 
 echo '05. create R2 registration without @Context Attribute'
-echo '============================================================================='
+echo '====================================================='
 payload='{
 	"id": "urn:ngsi-ld:ContextSourceRegistration:R2",
 	"type": "ContextSourceRegistration",
@@ -249,8 +249,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Create R1 registration with embebed context
-=============================================================================
+03. Create R1 registration with embedded context
+================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: REGEX(.*)
@@ -260,7 +260,7 @@ Date: REGEX(.*)
 
 
 04. See the R1 registration in mongo
-=================================
+====================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -308,7 +308,7 @@ bye
 
 
 05. create R2 registration without @Context Attribute
-=============================================================================
+=====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 189
 Content-Type: application/json
