@@ -134,13 +134,13 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:Building:store002",
-		"type" : "https://uri.fiware.org/ns/datamodels/entity-types/Building",
+		"type" : "https://uri.fiware.org/ns/datamodels#Building",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
 		"http://schema.org/address",
 		"http://schema.org/name",
-		"https://uri.fiware.org/ns/datamodels/category",
+		"https://uri.fiware.org/ns/datamodels#category",
 		"location"
 	],
 	"attrs" : {
@@ -163,7 +163,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "Checkpoint Markt",
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/datamodels/category" : {
+		"https://uri=fiware=org/ns/datamodels#category" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

@@ -36,9 +36,9 @@ brokerStart CB 212-249
 # 03. GET entities with	type http://example.org/T2, giving NO context - see the entity
 # 04. GET entities with	type T2, giving no context - see nothing
 #
-# 05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels/AgriProductType)
+# 05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels#AgriProductType)
 # 06. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity
-# 07. GET entities with	type https://uri.fiware.org/ns/datamodels/AgriProductType, giving NO context - see the entity
+# 07. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity
 # 08. GET entities with	type AgriProductType, giving no context - see nothing
 #
 
@@ -80,7 +80,7 @@ echo
 echo
 
 
-echo "05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels/AgriProductType)"
+echo "05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels#AgriProductType)"
 echo "================================================================================================================================================"
 payload='{
   "id": "http://a.b.c/entity/E5",
@@ -103,9 +103,9 @@ echo
 echo
 
 
-echo "07. GET entities with	type https://uri.fiware.org/ns/datamodels/AgriProductType, giving NO context - see the entity"
+echo "07. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity"
 echo "==================================================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/datamodels/entity-types/AgriProductType"
+orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/datamodels%23AgriProductType"
 echo
 echo
 
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 []
 
 
-05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels/AgriProductType)
+05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels#AgriProductType)
 ================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -207,10 +207,10 @@ Date: REGEX(.*)
 ]
 
 
-07. GET entities with	type https://uri.fiware.org/ns/datamodels/AgriProductType, giving NO context - see the entity
+07. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 170
+Content-Length: 157
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -222,7 +222,7 @@ Date: REGEX(.*)
             "value": "John 5"
         },
         "id": "http://a.b.c/entity/E5",
-        "type": "https://uri.fiware.org/ns/datamodels/entity-types/AgriProductType"
+        "type": "https://uri.fiware.org/ns/datamodels#AgriProductType"
     }
 ]
 

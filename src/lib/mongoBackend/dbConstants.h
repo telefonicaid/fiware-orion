@@ -59,6 +59,7 @@
 #define REG_SERVICE_PATH             "servicePath"
 #define REG_FORMAT                   "format"
 #define REG_DESCRIPTION              "description"
+#define REG_NAME                     "name"
 #define REG_STATUS                   "status"
 
 #define ENT_ATTRS                    "attrs"
