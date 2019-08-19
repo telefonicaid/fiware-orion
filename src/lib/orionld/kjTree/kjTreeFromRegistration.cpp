@@ -51,25 +51,23 @@ extern "C"
 //
 KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* registrationP)
 {
-  KjNode*       topP = kjObject(orionldState.kjsonP, NULL);
-  KjNode*       objectP;
-  KjNode*       objectP2;
-  KjNode*       arrayP;
-  KjNode*       arrayP2;
-  KjNode*       nodeP;
-  char          date[128];
-  char*         details;
-  unsigned int  infoSize;
-  unsigned int  i;
-  unsigned int  j;
+  KjNode*          topP = kjObject(orionldState.kjsonP, NULL);
+  KjNode*          objectP;
+  KjNode*          objectP2;
+  KjNode*          arrayP;
+  KjNode*          arrayP2;
+  KjNode*          nodeP;
+  char             date[128];
+  char*            details;
+  unsigned int     infoSize;
   OrionldContext*  contextP = orionldContextLookup(registrationP->ldContext.c_str());
 
   // id
   nodeP = kjString(orionldState.kjsonP, "id", registrationP->id.c_str());
   kjChildAdd(topP, nodeP);
 
-  // type
-  nodeP = kjString(orionldState.kjsonP, "type", "ContextSource Registration");
+  // type - must always be ContextSourceRegistration
+  nodeP = kjString(orionldState.kjsonP, "type", "ContextSourceRegistration");
   kjChildAdd(topP, nodeP);
 
   // name
@@ -87,12 +85,12 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   }
 
   // information
-  // FIXME: Change do accept more than one member in the future
+  // FIXME: Change to accept more than one member in the future
 
   infoSize = 1;
   arrayP = kjArray(orionldState.kjsonP, "information");
 
-  for (i = 0; i < infoSize; i++)
+  for (unsigned int iIx = 0; iIx < infoSize; iIx++)
   {
     unsigned int  size;
 
@@ -104,9 +102,9 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     {
       arrayP2 = kjArray(orionldState.kjsonP, "entities");
 
-      for (j = 0; j < size; j++)
+      for (unsigned int eIx = 0; eIx < size; eIx++)
       {
-        ngsiv2::EntID* eP = &registrationP->dataProvided.entities[j];
+        ngsiv2::EntID* eP = &registrationP->dataProvided.entities[eIx];
         objectP2 = kjObject(orionldState.kjsonP, NULL);
 
         if (eP->id != "")
@@ -137,9 +135,9 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     {
       arrayP2 = kjArray(orionldState.kjsonP, "properties");
 
-      for (j = 0; j < size; j++)
+      for (unsigned int pIx = 0; pIx < size; pIx++)
       {
-        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.propertyV[j].c_str());
+        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.propertyV[pIx].c_str());
         nodeP = kjString(orionldState.kjsonP, NULL, alias);
         kjChildAdd(arrayP2, nodeP);
       }
@@ -152,9 +150,9 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     {
       arrayP2 = kjArray(orionldState.kjsonP, "relationships");
 
-      for (j = 0; j < size; j++)
+      for (unsigned int rIx = 0; rIx < size; rIx++)
       {
-        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.relationshipV[j].c_str());
+        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.relationshipV[rIx].c_str());
         nodeP = kjString(orionldState.kjsonP, NULL, alias);
         kjChildAdd(arrayP2, nodeP);
       }
