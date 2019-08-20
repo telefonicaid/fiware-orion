@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,28 +20,89 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin and Gabriel Quaresma
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include <vector>
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/serviceRoutines/orionldGetRegistrations.h"   // Own Interface
+extern "C"
+{
+#include "kjson/KjNode.h"                                    // KjNode
+#include "kjson/kjBuilder.h"                                 // kjObject, kjArray
+#include "kbase/kStringSplit.h"                              // kStringSplit
+}
 
+#include "logMsg/logMsg.h"                                   // LM_*
+#include "logMsg/traceLevels.h"                              // Lmt*
 
+#include "common/string.h"                                   // toString
+#include "rest/uriParamNames.h"                              // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "rest/ConnectionInfo.h"                             // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"             // orionldErrorResponseCreate
+#include "mongoBackend/mongoRegistrationGet.h"               // mongoListRegistrations
+#include "orionld/serviceRoutines/orionldGetRegistrations.h" // Own Interface
+#include "orionld/common/orionldState.h"                     // orionldState
+#include "orionld/common/orionldErrorResponse.h"             // orionldErrorResponseCreate
+#include "orionld/kjTree/kjTreeFromRegistration.h"           // kjTreeFromRegistration
+
+#include "common/defaultValues.h"
 
 // ----------------------------------------------------------------------------
 //
 // orionldGetRegistrations -
+// URI params:
+// - id
+// - type
+// - idPattern
+// - attrs
+// - q
+// - csf
+// - georel
+// - geometry
+// - coordinates
+// - geoproperty
+// - timeproperty
+// - timerel
+// - time
+// - endTime
+// - limit
+// - offset
+// - options=count
 //
-bool orionldGetRegistrations(ConnectionInfo* ciP)
+bool orionldGetRegistrations(ConnectionInfo *ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldGetRegistration"));
+  std::vector<ngsiv2::Registration> registrationVec;
+  char*      id = (ciP->uriParam["id"].empty()) ? NULL : (char*) ciP->uriParam["id"].c_str();
+  OrionError oe;
+  long long  count;
 
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not implemented - GET /ngsi-ld/v1/csourceRegistrations", NULL, OrionldDetailsString);
+  char*        idVector[32];
+  int          idVecItems = (int) sizeof(idVector) / sizeof(idVector[0]);
 
-  ciP->httpStatusCode = SccNotImplemented;
+  LM_T(LmtServiceRoutine, ("In orionldGetCSourceRegistrations"));
+
+  mongoLdRegistrationsGet(ciP, &registrationVec, orionldState.tenant, &count, &oe);
+
+  if ((ciP->uriParamOptions["count"]))
+  {
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeaderValue.push_back(toString(count));
+  }
+
+  orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
+  if (id != NULL){
+      idVecItems = kStringSplit(id, ',', (char**) idVector, idVecItems);
+      for (int ix = 0; ix < idVecItems; ix++)
+      {
+        LM_E(("Param ID: [%s]", idVector[ix]));
+      }
+  } else {
+    for (unsigned int ix = 0; ix < registrationVec.size(); ix++)
+    {
+      KjNode* registrationNodeP = kjTreeFromRegistration(ciP, &registrationVec[ix]);
+      kjChildAdd(orionldState.responseTree, registrationNodeP);
+      ciP->httpStatusCode = SccOk;
+    }
+  }
 
   return true;
 }
