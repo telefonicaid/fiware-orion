@@ -124,32 +124,32 @@ MongoDB server version: REGEX(.*)
 			],
 			"attrs" : [
 				{
-					"name" : "brandName",
+					"name" : "http://example.org/ngsi-ld/default/brandName",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "speed",
+					"name" : "http://example.org/ngsi-ld/default/speed",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "availableSotNumber",
+					"name" : "http://example.org/ngsi-ld/default/availableSotNumber",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "totalSpotNumber",
+					"name" : "http://example.org/ngsi-ld/default/totalSpotNumber",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "isParked",
+					"name" : "http://example.org/ngsi-ld/default/isParked",
 					"type" : "Relationship",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "isNextToBuilding",
+					"name" : "http://example.org/ngsi-ld/default/isNextToBuilding",
 					"type" : "Relationship",
 					"isDomain" : "false"
 				}

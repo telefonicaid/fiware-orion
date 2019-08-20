@@ -303,15 +303,15 @@ Date: REGEX(.*)
 
 06. GET /ngsi-ld/v1/csourceRegistrations/R1
 ===========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 142
+HTTP/1.1 404 Not Found
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "R1",
-    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "title": "registration not found",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

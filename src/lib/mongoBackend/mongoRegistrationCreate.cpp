@@ -80,6 +80,19 @@ static void setDescription(const std::string& description, mongo::BSONObjBuilder
 }
 
 
+/* ****************************************************************************
+*
+* setName -
+*/
+static void setName(const std::string& name, mongo::BSONObjBuilder* bobP)
+{
+  if (name != "")
+  {
+    bobP->append(REG_NAME, name);
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -274,6 +287,7 @@ void mongoRegistrationCreate
     setRegistrationId(&bob, regIdP);
 
   setDescription(regP->description, &bob);
+  setName(regP->name, &bob);
   setExpiration(regP->expires, &bob);
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);

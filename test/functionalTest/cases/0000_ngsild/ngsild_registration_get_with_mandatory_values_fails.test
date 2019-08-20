@@ -1,0 +1,268 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET registration by id with mandatory values
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# FIXME: Due to the fact that the NGSI-LD data model doesn't follow the Orion APIv2 data model
+#        in terms of registrations, we have decided to restrict NGSI-LD registrations to only allow
+#        ONE item in the information vector.
+#        Once this is fixed (possibly some time 2020), this test should inclide an "information" vector
+#        with more than one item.
+# FIXME: Implement the GeoJSON type for location, observationSpace and operationalSpace 
+#        in POST and GET/id Registration.
+# FIXME: For some reason, the POST Registration is not saving the "name" value in MongoDB, even if it's 
+#        included on payload. THIS TEST SHOWS THIS ERROR INTENTIONALY.
+#
+# 01. Create 1 registration with ALL fields
+# 02. Create 1 registration without name, observationInterval and managementInterval
+# 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
+# 04. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
+#
+
+echo "01. Create 1 registration with ALL fields"
+echo "========================================="
+payload='{
+	"@context": [
+		"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	],
+	"id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
+	"type": "ContextSourceRegistration",
+	"name": "REG1",
+	"description": "Description of REG1",
+	"information": [
+		{
+			"entities": [
+				{
+					"id": "urn:ngsi-ld:Building:A456",
+					"type": "Building"
+				}
+			],
+			"properties": [ "size", "high" ],
+			"relationships": [ "isAvailable" ]
+		}
+	],
+    "location": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [ 100.0, 0.0 ],
+                [ 101.0, 0.0 ],
+                [ 101.0, 1.0 ],
+                [ 100.0, 1.0 ],
+                [ 100.0, 0.0 ]
+            ]
+        ]
+    },
+    "observationSpace": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [ 200.0, 0.0 ],
+                [ 201.0, 0.0 ],
+                [ 201.0, 1.0 ],
+                [ 200.0, 1.0 ],
+                [ 200.0, 0.0 ]
+            ]
+        ]
+    },
+    "operationSpace": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [ 300.0, 0.0 ],
+                [ 301.0, 0.0 ],
+                [ 301.0, 1.0 ],
+                [ 300.0, 1.0 ],
+                [ 300.0, 0.0 ]
+            ]
+        ]
+    },
+	"observationInterval": {
+        "start": "2018-12-31T10:00:00",
+        "end": "2028-12-31T10:00:00"
+    },
+    "managementInterval": {
+        "start": "2018-12-31T10:00:00",
+        "end": "2028-12-31T10:00:00"
+    },
+	"expires": "2029-10-31T10:00:25",
+	"endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+REG_ID=urn:ngsi-ld:ContextSourceRegistration:REG1
+echo
+echo
+
+echo "02. Create 1 registration without name, observationInterval and managementInterval"
+echo "=================================================================================="
+payload='{
+	"@context": [
+		"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	],
+	"id": "urn:ngsi-ld:ContextSourceRegistration:REG2",
+	"type": "ContextSourceRegistration",
+	"description": "Description of REG2",
+	"information": [
+		{
+			"entities": [
+				{
+					"id": "urn:ngsi-ld:Vehicle:A456",
+					"type": "Vehicle"
+				}
+			],
+			"properties": [ "brandName", "speed" ],
+			"relationships": [ "isParked" ]
+		}
+	],
+	"expires": "2029-10-31T10:00:25",
+	"endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+REG_ID2=urn:ngsi-ld:ContextSourceRegistration:REG2
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/$REG_ID
+echo
+echo
+
+
+echo "04. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/$REG_ID2
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 1 registration with ALL fields
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:REG1
+Date: REGEX(.*)
+
+
+
+02. Create 1 registration without name, observationInterval and managementInterval
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:REG2
+Date: REGEX(.*)
+
+
+
+03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 521
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+    "description": "Description of REG1",
+    "endpoint": "http://my.csource.org:1026",
+    "expires": "2029-10-31T10:00:25Z",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Building:A456",
+                    "type": "Building"
+                }
+            ],
+            "properties": [
+                "size",
+                "high"
+            ],
+            "relationships": [
+                "isAvailable"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "end": "2028-12-31T10:00:00Z",
+        "start": "2018-12-31T10:00:00Z"
+    },
+    "name": "REG1",
+    "observationInterval": {
+        "end": "2028-12-31T10:00:00Z",
+        "start": "2018-12-31T10:00:00Z"
+    },
+    "type": "ContextSourceRegistration"
+}
+
+
+04. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 341
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+    "description": "Description of REG2",
+    "endpoint": "http://my.csource.org:1026",
+    "expires": "2029-10-31T10:00:25Z",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:REG2",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:A456",
+                    "type": "Vehicle"
+                }
+            ],
+            "properties": [
+                "brandName",
+                "speed"
+            ],
+            "relationships": [
+                "isParked"
+            ]
+        }
+    ],
+    "type": "ContextSourceRegistration"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
