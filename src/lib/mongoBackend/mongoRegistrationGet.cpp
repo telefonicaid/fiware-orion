@@ -36,6 +36,7 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
+#include "common/string.h"                                     // stringSplit
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
@@ -49,18 +50,13 @@
 
 
 
-// Declaration
+// -----------------------------------------------------------------------------
+//
+// Forward declarations
+//
 #ifdef ORIONLD
-  static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
-  static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
-#endif
-
-
-
-// Declaration
-#ifdef ORIONLD
-  static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
-  static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
+static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
+static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
 #endif
 
 
@@ -77,6 +73,7 @@ using mongo::Query;
 using mongo::OID;
 using ngsiv2::Registration;
 using ngsiv2::EntID;
+
 
 
 /* ****************************************************************************
@@ -241,10 +238,10 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
   setAttributes(regP, cr0);
   setProvider(regP, cr0);
 
-  #ifdef ORIONLD
-    setLdPropertyV(regP, cr0);
-    setLdRelationshipV(regP, cr0);
-  #endif
+#ifdef ORIONLD
+  setLdPropertyV(regP, cr0);
+  setLdRelationshipV(regP, cr0);
+#endif
 
   return true;
 }
@@ -305,6 +302,7 @@ static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSO
   if (r.hasField(REG_OBSERVATION_INTERVAL))
   {
     mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
+
     reg->observationInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
     reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
   }
@@ -326,6 +324,7 @@ static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSON
   if (r.hasField(REG_MANAGEMENT_INTERVAL))
   {
     mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
+
     reg->managementInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
     reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
   }
@@ -351,6 +350,7 @@ static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
     mongo::BSONObj  pobj = dbPropertyV[ix].embeddedObject();
     std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
     std::string     propName;
+
     if (type == REG_PROPERTIES_TYPE)
     {
       propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
@@ -362,6 +362,8 @@ static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
     }
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -590,10 +592,12 @@ void mongoRegistrationsGet
   oeP->fill(SccOk, "");
 }
 
+
+
 #if ORIONLD
 // -----------------------------------------------------------------------------
 //
-//
+// mongoLdRegistrationsGet -
 //
 bool mongoLdRegistrationsGet
 (
@@ -602,7 +606,7 @@ bool mongoLdRegistrationsGet
   const char*                         tenant,
   long long*                          countP,
   OrionError*                         oeP
-  ) 
+) 
 {
   bool      reqSemTaken = false;
   int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -617,8 +621,6 @@ bool mongoLdRegistrationsGet
   else
     limit = DEFAULT_PAGINATION_LIMIT_INT;
 
-  reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
-
   LM_T(LmtMongo, ("Mongo GET Registrations"));
 
   /* ONTIMEINTERVAL Registrations are not part of NGSIv2, so they are excluded.
@@ -627,22 +629,39 @@ bool mongoLdRegistrationsGet
    */
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
-  Query                          q;
+  mongo::BSONObjBuilder          queryBuilder;
+  mongo::Query                   query;  
 
-  // FIXME P6: This here is a bug ... See #3099 for more info
-  if (!ciP->servicePathV[0].empty() && (ciP->servicePathV[0] != "/#"))
+  if (ciP->uriParam["id"] != "")
   {
-    q = Query(BSON(CSUB_SERVICE_PATH << ciP->servicePathV[0]));
+    char*	                      idList = (char*) ciP->uriParam["id"].c_str();
+    std::vector<std::string>    idVec;
+    int                         ids;
+    mongo::BSONObjBuilder       bsonInExpression;
+    mongo::BSONArrayBuilder     bsonArray;
+
+    ids = stringSplit(idList, ',', idVec);
+
+    if (ids > 0)
+    {
+      for (int ix = 0; ix < ids; ix++)
+        bsonArray.append(idVec[ix]);
+
+      bsonInExpression.append("$in", bsonArray.arr());
+      queryBuilder.append("_id", bsonInExpression.obj());
+    }
   }
 
-  q.sort(BSON("_id" << 1));
-  LM_TMP(("HERE"));
+  query = queryBuilder.obj();
+  query.sort(BSON("_id" << 1));
 
+  // LM_TMP(("KZ: query: %s", query.toString().c_str()));
   TIME_STAT_MONGO_READ_WAIT_START();
+  reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection,
                              getRegistrationsCollectionName(tenant),
-                             q,
+                             query,
                              limit,
                              offset,
                              &cursor,
@@ -664,13 +683,15 @@ bool mongoLdRegistrationsGet
   /* Process query result */
   unsigned int docs = 0;
 
+  LM_TMP(("KZ: Looping through results"));
   while (moreSafe(cursor))
   {
     BSONObj  r;
 
+    LM_TMP(("KZ: obtaining doc %d", docs));
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
