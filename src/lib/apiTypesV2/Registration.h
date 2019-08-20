@@ -154,6 +154,7 @@ struct Registration
 
   Registration();
   ~Registration();
+
   std::string            toJson();
 };
 }
