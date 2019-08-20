@@ -289,16 +289,13 @@ Date: REGEX(.*)
 
 05. GET /ngsi-ld/v1/csourceRegistrations
 ========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 148
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "details": "no details",
-    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
+[]
 
 
 06. GET /ngsi-ld/v1/csourceRegistrations/R1
