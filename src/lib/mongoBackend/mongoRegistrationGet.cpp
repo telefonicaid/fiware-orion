@@ -591,214 +591,121 @@ void mongoRegistrationsGet
 }
 
 #if ORIONLD
-  bool mongoLdRegistrationsGet
-  (
-    ConnectionInfo*                     ciP,
-    std::vector<ngsiv2::Registration>*  regVecP,
-    const char*                         tenant,
-    long long*                          countP,
-    OrionError*                         oeP
+// -----------------------------------------------------------------------------
+//
+//
+//
+bool mongoLdRegistrationsGet
+(
+  ConnectionInfo*                     ciP,
+  std::vector<ngsiv2::Registration>*  regVecP,
+  const char*                         tenant,
+  long long*                          countP,
+  OrionError*                         oeP
   ) 
+{
+  bool      reqSemTaken = false;
+  int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int       limit;
+
+  if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
   {
-    bool      reqSemTaken = false;
-    int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-    int       limit;
-
-    if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
-    {
-      limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
-      if (limit <= 0)
-        limit = DEFAULT_PAGINATION_LIMIT_INT;
-    }
-    else
+    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+    if (limit <= 0)
       limit = DEFAULT_PAGINATION_LIMIT_INT;
+  }
+  else
+    limit = DEFAULT_PAGINATION_LIMIT_INT;
 
-    reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
 
-    LM_T(LmtMongo, ("Mongo GET Registrations"));
+  LM_T(LmtMongo, ("Mongo GET Registrations"));
 
-    /* ONTIMEINTERVAL Registrations are not part of NGSIv2, so they are excluded.
-    * Note that expiration is not taken into account (in the future, a q= query
-    * could be added to the operation in order to filter results)
-    */
-    std::auto_ptr<DBClientCursor>  cursor;
-    std::string                    err;
-    Query                          q;
+  /* ONTIMEINTERVAL Registrations are not part of NGSIv2, so they are excluded.
+   * Note that expiration is not taken into account (in the future, a q= query
+   * could be added to the operation in order to filter results)
+   */
+  std::auto_ptr<DBClientCursor>  cursor;
+  std::string                    err;
+  Query                          q;
 
-    // FIXME P6: This here is a bug ... See #3099 for more info
-    if (!ciP->servicePathV[0].empty() && (ciP->servicePathV[0] != "/#"))
-    {
-      q = Query(BSON(CSUB_SERVICE_PATH << ciP->servicePathV[0]));
-    }
+  // FIXME P6: This here is a bug ... See #3099 for more info
+  if (!ciP->servicePathV[0].empty() && (ciP->servicePathV[0] != "/#"))
+  {
+    q = Query(BSON(CSUB_SERVICE_PATH << ciP->servicePathV[0]));
+  }
 
-    q.sort(BSON("_id" << 1));
-    LM_TMP(("HERE"));
+  q.sort(BSON("_id" << 1));
+  LM_TMP(("HERE"));
 
-    TIME_STAT_MONGO_READ_WAIT_START();
-    DBClientBase* connection = getMongoConnection();
-    if (!collectionRangedQuery(connection,
-                              getRegistrationsCollectionName(tenant),
-                              q,
-                              limit,
-                              offset,
-                              &cursor,
-                              countP,
-                              &err))
-    {
-      LM_TMP(("INSIDE"));
-
-      releaseMongoConnection(connection);
-      TIME_STAT_MONGO_READ_WAIT_STOP();
-      reqSemGive(__FUNCTION__, "Mongo List Registrations", reqSemTaken);
-
-      oeP->code    = SccReceiverInternalError;
-      oeP->details = err;
-      return false;
-    }
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    /* Process query result */
-    unsigned int docs = 0;
-
-    while (moreSafe(cursor))
-    {
-      BSONObj  r;
-
-      if (!nextSafeOrErrorF(cursor, &r, &err))
-      {
-        LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-        continue;
-      }
-      docs++;
-      LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-
-      Registration reg;
-      setLdRegistrationId(&reg, r);
-      setLdName(&reg, r);
-      setDescription(&reg, r);
-
-      if (setDataProvided(&reg, r, false) == false)
-      {
-        releaseMongoConnection(connection);
-        LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
-        reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-        oeP->code = SccReceiverInternalError;
-        return false;
-      }
-
-      setLdObservationInterval(&reg, r);
-      setLdManagementInterval(&reg, r);
-      setExpires(&reg, r);
-      setStatus(&reg, r);
-    
-      regVecP->push_back(reg);
-    }
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection,
+                             getRegistrationsCollectionName(tenant),
+                             q,
+                             limit,
+                             offset,
+                             &cursor,
+                             countP,
+                             &err))
+  {
+    LM_TMP(("INSIDE"));
 
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo List Registrations", reqSemTaken);
 
-    oeP->code = SccOk;
-    return true;
+    oeP->code    = SccReceiverInternalError;
+    oeP->details = err;
+    return false;
   }
-  /* ****************************************************************************
-  *
-  * mongoLdRegistrationGet - 
-  */
-  bool mongoLdRegistrationGet
-  (
-    ngsiv2::Registration*  regP,
-    const char*            regId,
-    const char*            tenant,
-    HttpStatusCode*        statusCodeP,
-    char**                 detailsP
-  )
+  TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  /* Process query result */
+  unsigned int docs = 0;
+
+  while (moreSafe(cursor))
   {
-    bool                                  reqSemTaken = false;
-    std::string                           err;
-    std::auto_ptr<mongo::DBClientCursor>  cursor;
-    mongo::BSONObj                        q = BSON("_id" << regId);
+    BSONObj  r;
 
-    reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
+    if (!nextSafeOrErrorF(cursor, &r, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      continue;
+    }
+    docs++;
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    LM_T(LmtMongo, ("Mongo Get Registration"));
+    Registration reg;
+    setLdRegistrationId(&reg, r);
+    setLdName(&reg, r);
+    setDescription(&reg, r);
 
-    TIME_STAT_MONGO_READ_WAIT_START();
-    mongo::DBClientBase* connection = getMongoConnection();
-    if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+    if (setDataProvided(&reg, r, false) == false)
     {
       releaseMongoConnection(connection);
-      TIME_STAT_MONGO_READ_WAIT_STOP();
+      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *detailsP    = (char*) "Internal Error during DB-query";
-      *statusCodeP = SccReceiverInternalError;
-      return false;
-    }
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    /* Process query result */
-    if (moreSafe(cursor))
-    {
-      mongo::BSONObj r;
-
-      if (!nextSafeOrErrorF(cursor, &r, &err))
-      {
-        releaseMongoConnection(connection);
-        LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-        reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-        *detailsP    = (char*) "Runtime Error (exception in nextSafe)";
-        *statusCodeP = SccReceiverInternalError;
-        return false;
-      }
-      LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-
-      setLdRegistrationId(regP, r);
-      setLdName(regP, r);
-      setDescription(regP, r);
-
-      if (setDataProvided(regP, r, false) == false)
-      {
-        releaseMongoConnection(connection);
-        LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
-        reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-        *statusCodeP = SccReceiverInternalError;
-        return false;
-      }
-
-      setLdObservationInterval(regP, r);
-      setLdManagementInterval(regP, r);
-      setExpires(regP, r);
-      setStatus(regP, r);
-      // setLdEndpoint(regP, r);
-
-      if (moreSafe(cursor))
-      {
-        releaseMongoConnection(connection);
-
-        // Ooops, we expected only one
-        LM_T(LmtMongo, ("more than one registration: '%s'", regId));
-        reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-        *detailsP    = (char*) "more than one registration matched";
-        *statusCodeP = SccConflict;
-        return false;
-      }
-    }
-    else
-    {
-      releaseMongoConnection(connection);
-      LM_T(LmtMongo, ("registration not foundd: '%s'", regId));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *detailsP    = (char*) "registration not found";
-      *statusCodeP = SccContextElementNotFound;
+      oeP->code = SccReceiverInternalError;
       return false;
     }
 
-    releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("registration not found: '%s'", regId));
-    reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-
-    *statusCodeP = SccOk;
-    return true;
+    setLdObservationInterval(&reg, r);
+    setLdManagementInterval(&reg, r);
+    setExpires(&reg, r);
+    setStatus(&reg, r);
+    
+    regVecP->push_back(reg);
   }
+
+  releaseMongoConnection(connection);
+  reqSemGive(__FUNCTION__, "Mongo List Registrations", reqSemTaken);
+
+  oeP->code = SccOk;
+  return true;
+}
+
+
 
 /* ****************************************************************************
 *
