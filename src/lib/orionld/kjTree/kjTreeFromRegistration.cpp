@@ -162,7 +162,10 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   }
   kjChildAdd(topP, arrayP);
 
+
+  //
   // observationalInterval
+  //
   if (registrationP->observationInterval.start > 0)
   {
     // start
@@ -188,11 +191,14 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
       nodeP = kjString(orionldState.kjsonP, "end", date);
       kjChildAdd(objectP, nodeP);
     }
+
     kjChildAdd(topP, objectP);
   }
 
 
+  //
   // managementInterval
+  //
   if (registrationP->managementInterval.start > 0)
   {
     // start
@@ -203,7 +209,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
       return NULL;
     }
     objectP = kjObject(orionldState.kjsonP, "managementInterval");
-    nodeP = kjString(orionldState.kjsonP, "start", date);
+    nodeP   = kjString(orionldState.kjsonP, "start", date);
     kjChildAdd(objectP, nodeP);
 
     if (registrationP->managementInterval.end > 0)
@@ -218,29 +224,36 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
       nodeP = kjString(orionldState.kjsonP, "end", date);
       kjChildAdd(objectP, nodeP);
     }
+
     kjChildAdd(topP, objectP);
   }
 
 
-  // location
+  // FIXME: location
+  // FIXME: observationSpace
+  // FIXME: operationSpace
 
-  // observationSpace
-
-  // operationSpace
-
+  //
   // expires
-  char             dateExp[64];
-
-  if (numberToDate((time_t) registrationP->expires, dateExp, sizeof(dateExp), &details) == false)
+  //
+  if (registrationP->expires != -1)
   {
-    LM_E(("Error creating a stringified date for 'expires'"));
-    orionldErrorResponseCreate(OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
-    return NULL;
-  }
-  nodeP = kjString(orionldState.kjsonP, "expires", dateExp);
-  kjChildAdd(topP, nodeP);
+    char dateExp[64];
 
+    if (numberToDate((time_t) registrationP->expires, dateExp, sizeof(dateExp), &details) == false)
+    {
+      LM_E(("Error creating a stringified date for 'expires'"));
+      orionldErrorResponseCreate(OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+      return NULL;
+    }
+    nodeP = kjString(orionldState.kjsonP, "expires", dateExp);
+    kjChildAdd(topP, nodeP);
+  }
+
+
+  //
   // endpoint
+  //
   nodeP = kjString(orionldState.kjsonP, "endpoint", registrationP->provider.http.url.c_str());
   kjChildAdd(topP, nodeP);
 

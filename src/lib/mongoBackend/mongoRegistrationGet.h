@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
 #include <string>
 #include <vector>
@@ -78,6 +78,19 @@ extern bool mongoLdRegistrationGet
   const char*            tenant,
   HttpStatusCode*        statusCodeP,
   char**                 detailsP
+);
+
+/* ****************************************************************************
+*
+* mongoLdRegistrationsGet - 
+*/
+extern bool mongoLdRegistrationsGet
+(
+  ConnectionInfo*                     ciP,
+  std::vector<ngsiv2::Registration>*  regVecP,
+  const char*                         tenant,
+  long long*                          countP,
+  OrionError*                         oeP
 );
 
 #endif  // ORIONLD
