@@ -428,8 +428,9 @@ void mongoRegistrationGet
   /* Process query result */
   if (moreSafe(cursor))
   {
-    mongo::BSONObj r;
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    mongo::BSONObj bob;
+
+    if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
@@ -437,15 +438,15 @@ void mongoRegistrationGet
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
 
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(regP, r);
-    setDescription(regP, r);
+    setRegistrationId(regP, bob);
+    setDescription(regP, bob);
 
-    if (setDataProvided(regP, r, false) == false)
+    if (setDataProvided(regP, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -454,10 +455,10 @@ void mongoRegistrationGet
       return;
     }
 
-    setLdObservationInterval(regP, r);
-    setLdManagementInterval(regP, r);
-    setExpires(regP, r);
-    setStatus(regP, r);
+    setLdObservationInterval(regP, bob);
+    setLdManagementInterval(regP, bob);
+    setExpires(regP, bob);
+    setStatus(regP, bob);
 
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -538,25 +539,25 @@ void mongoRegistrationsGet
   int docs = 0;
   while (moreSafe(cursor))
   {
-    mongo::BSONObj        r;
+    mongo::BSONObj        bob;
     ngsiv2::Registration  reg;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
 
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, bob.toString().c_str()));
     ++docs;
 
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(&reg, r);
-    setDescription(&reg, r);
+    setRegistrationId(&reg, bob);
+    setDescription(&reg, bob);
 
-    if (setDataProvided(&reg, r, false) == false)
+    if (setDataProvided(&reg, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -565,8 +566,8 @@ void mongoRegistrationsGet
       return;
     }
 
-    setExpires(&reg, r);
-    setStatus(&reg, r);
+    setExpires(&reg, bob);
+    setStatus(&reg, bob);
 
     regV->push_back(reg);
   }
@@ -676,22 +677,22 @@ bool mongoLdRegistrationsGet
 
   while (moreSafe(cursor))
   {
-    mongo::BSONObj         r;
+    mongo::BSONObj         bob;
     ngsiv2::Registration   reg;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
 
-    setLdRegistrationId(&reg, r);
-    setLdName(&reg, r);
-    setDescription(&reg, r);
+    setLdRegistrationId(&reg, bob);
+    setLdName(&reg, bob);
+    setDescription(&reg, bob);
 
-    if (setDataProvided(&reg, r, false) == false)
+    if (setDataProvided(&reg, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -700,10 +701,10 @@ bool mongoLdRegistrationsGet
       return false;
     }
 
-    setLdObservationInterval(&reg, r);
-    setLdManagementInterval(&reg, r);
-    setExpires(&reg, r);
-    setStatus(&reg, r);
+    setLdObservationInterval(&reg, bob);
+    setLdManagementInterval(&reg, bob);
+    setExpires(&reg, bob);
+    setStatus(&reg, bob);
 
     regVecP->push_back(reg);
   }
@@ -757,9 +758,9 @@ bool mongoLdRegistrationGet
   /* Process query result */
   if (moreSafe(cursor))
   {
-    mongo::BSONObj r;
+    mongo::BSONObj bob;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
@@ -768,13 +769,13 @@ bool mongoLdRegistrationGet
       *statusCodeP = SccReceiverInternalError;
       return false;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
 
-    setLdRegistrationId(regP, r);
-    setLdName(regP, r);
-    setDescription(regP, r);
+    setLdRegistrationId(regP, bob);
+    setLdName(regP, bob);
+    setDescription(regP, bob);
 
-    if (setDataProvided(regP, r, false) == false)
+    if (setDataProvided(regP, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -783,10 +784,10 @@ bool mongoLdRegistrationGet
       return false;
     }
 
-    setLdObservationInterval(regP, r);
-    setLdManagementInterval(regP, r);
-    setExpires(regP, r);
-    setStatus(regP, r);
+    setLdObservationInterval(regP, bob);
+    setLdManagementInterval(regP, bob);
+    setExpires(regP, bob);
+    setStatus(regP, bob);
 
     if (moreSafe(cursor))
     {
