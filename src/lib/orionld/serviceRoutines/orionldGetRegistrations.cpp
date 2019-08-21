@@ -22,29 +22,29 @@
 *
 * Author: Ken Zangelin and Gabriel Quaresma
 */
-#include <vector>
+#include <vector>                                             // std::vector
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                    // KjNode
-#include "kjson/kjBuilder.h"                                 // kjObject, kjArray
-#include "kbase/kStringSplit.h"                              // kStringSplit
+#include "kjson/KjNode.h"                                     // KjNode
+#include "kjson/kjBuilder.h"                                  // kjObject, kjArray
+#include "kbase/kStringSplit.h"                               // kStringSplit
 }
 
-#include "logMsg/logMsg.h"                                   // LM_*
-#include "logMsg/traceLevels.h"                              // Lmt*
-
-#include "common/string.h"                                   // toString
-#include "rest/uriParamNames.h"                              // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "rest/ConnectionInfo.h"                             // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"             // orionldErrorResponseCreate
-#include "mongoBackend/mongoRegistrationGet.h"               // mongoListRegistrations
-#include "orionld/serviceRoutines/orionldGetRegistrations.h" // Own Interface
-#include "orionld/common/orionldState.h"                     // orionldState
-#include "orionld/common/orionldErrorResponse.h"             // orionldErrorResponseCreate
-#include "orionld/kjTree/kjTreeFromRegistration.h"           // kjTreeFromRegistration
+#include "logMsg/logMsg.h"                                    // LM_*
+#include "logMsg/traceLevels.h"                               // Lmt*
 
 #include "common/defaultValues.h"
+#include "common/string.h"                                    // toString
+#include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "rest/ConnectionInfo.h"                              // ConnectionInfo
+#include "mongoBackend/mongoRegistrationGet.h"                // mongoListRegistrations
+#include "orionld/common/orionldState.h"                      // orionldState
+#include "orionld/common/orionldErrorResponse.h"              // orionldErrorResponseCreate
+#include "orionld/kjTree/kjTreeFromRegistration.h"            // kjTreeFromRegistration
+#include "orionld/serviceRoutines/orionldGetRegistrations.h"  // Own Interface
+
+
 
 // ----------------------------------------------------------------------------
 //
@@ -70,13 +70,9 @@ extern "C"
 //
 bool orionldGetRegistrations(ConnectionInfo *ciP)
 {
-  std::vector<ngsiv2::Registration> registrationVec;
-  char*      id = (ciP->uriParam["id"].empty()) ? NULL : (char*) ciP->uriParam["id"].c_str();
-  OrionError oe;
-  long long  count;
-
-  char*        idVector[32];
-  int          idVecItems = (int) sizeof(idVector) / sizeof(idVector[0]);
+  std::vector<ngsiv2::Registration>  registrationVec;
+  OrionError                         oe;
+  long long                          count;
 
   LM_T(LmtServiceRoutine, ("In orionldGetCSourceRegistrations"));
 
@@ -89,20 +85,14 @@ bool orionldGetRegistrations(ConnectionInfo *ciP)
   }
 
   orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
-  if (id != NULL){
-      idVecItems = kStringSplit(id, ',', (char**) idVector, idVecItems);
-      for (int ix = 0; ix < idVecItems; ix++)
-      {
-        LM_E(("Param ID: [%s]", idVector[ix]));
-      }
-  } else {
-    for (unsigned int ix = 0; ix < registrationVec.size(); ix++)
-    {
-      KjNode* registrationNodeP = kjTreeFromRegistration(ciP, &registrationVec[ix]);
-      kjChildAdd(orionldState.responseTree, registrationNodeP);
-      ciP->httpStatusCode = SccOk;
-    }
+
+  for (unsigned int ix = 0; ix < registrationVec.size(); ix++)
+  {
+    KjNode* registrationNodeP = kjTreeFromRegistration(ciP, &registrationVec[ix]);
+    kjChildAdd(orionldState.responseTree, registrationNodeP);
   }
+
+  ciP->httpStatusCode = SccOk;
 
   return true;
 }

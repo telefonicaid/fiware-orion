@@ -606,7 +606,7 @@ bool mongoLdRegistrationsGet
   const char*                         tenant,
   long long*                          countP,
   OrionError*                         oeP
-) 
+)
 {
   bool      reqSemTaken = false;
   int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -630,11 +630,11 @@ bool mongoLdRegistrationsGet
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
   mongo::BSONObjBuilder          queryBuilder;
-  mongo::Query                   query;  
+  mongo::Query                   query;
 
   if (ciP->uriParam["id"] != "")
   {
-    char*	                      idList = (char*) ciP->uriParam["id"].c_str();
+    char*                       idList = (char*) ciP->uriParam["id"].c_str();
     std::vector<std::string>    idVec;
     int                         ids;
     mongo::BSONObjBuilder       bsonInExpression;
@@ -651,6 +651,10 @@ bool mongoLdRegistrationsGet
       queryBuilder.append("_id", bsonInExpression.obj());
     }
   }
+
+  //
+  // FIXME: Many more URI params to be treated and added to queryBuilder
+  //
 
   query = queryBuilder.obj();
   query.sort(BSON("_id" << 1));
@@ -683,12 +687,11 @@ bool mongoLdRegistrationsGet
   /* Process query result */
   unsigned int docs = 0;
 
-  LM_TMP(("KZ: Looping through results"));
   while (moreSafe(cursor))
   {
-    BSONObj  r;
+    BSONObj       r;
+    Registration  reg;
 
-    LM_TMP(("KZ: obtaining doc %d", docs));
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
@@ -697,7 +700,6 @@ bool mongoLdRegistrationsGet
     docs++;
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    Registration reg;
     setLdRegistrationId(&reg, r);
     setLdName(&reg, r);
     setDescription(&reg, r);
@@ -715,7 +717,7 @@ bool mongoLdRegistrationsGet
     setLdManagementInterval(&reg, r);
     setExpires(&reg, r);
     setStatus(&reg, r);
-    
+
     regVecP->push_back(reg);
   }
 
