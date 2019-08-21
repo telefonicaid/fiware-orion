@@ -47,8 +47,9 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationGet.h"
 #include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-
-
+#include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 
 // -----------------------------------------------------------------------------
 //
@@ -638,13 +639,52 @@ bool mongoLdRegistrationsGet
     }
   }
 
+  if (ciP->uriParam["type"] != "")
+  {
+    char*                       typeList = (char*) ciP->uriParam["type"].c_str();
+    std::vector<std::string>    typeVec;
+    int                         types;
+    mongo::BSONObjBuilder       bsonInExpression;
+    mongo::BSONArrayBuilder     bsonArray;
+    char*                       details;
+    char                        typeExpanded[256];
+
+    types = stringSplit(typeList, ',', typeVec);
+
+    if (types > 0)
+    {
+      for (int ix = 0; ix < types; ix++){
+        char type[typeVec[ix].size() + 1];
+        strcpy(type, typeVec[ix].c_str());
+
+        if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
+        {
+          // No expansion desired, the type is already a FQN
+          strncpy(typeExpanded, type, sizeof(typeExpanded));
+        }
+        else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
+        {
+          orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+          return false;
+        }
+
+        typeVec[ix] = typeExpanded;
+        LM_E(("type: %s", typeVec[ix]));
+        bsonArray.append(typeVec[ix]);
+      }
+
+      bsonInExpression.append("$in", bsonArray.arr());
+      queryBuilder.append("contextRegistration.entities.type", bsonInExpression.obj());
+    }
+  }
+
   //
   // FIXME: Many more URI params to be treated and added to queryBuilder
   //
 
   query = queryBuilder.obj();
   query.sort(BSON("_id" << 1));
-
+  LM_E(("Query: %s", query.toString().c_str()));
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));
   TIME_STAT_MONGO_READ_WAIT_START();
   reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
