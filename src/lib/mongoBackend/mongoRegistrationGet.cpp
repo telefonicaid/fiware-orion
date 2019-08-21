@@ -686,7 +686,7 @@ bool mongoLdRegistrationsGet
       continue;
     }
     docs++;
-    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document %d: '%s'", docs, bob.toString().c_str()));
 
     setLdRegistrationId(&reg, bob);
     setLdName(&reg, bob);
