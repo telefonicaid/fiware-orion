@@ -63,21 +63,6 @@ static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& 
 
 /* ****************************************************************************
 *
-* USING -
-*/
-using mongo::BSONObj;
-using mongo::BSONElement;
-using mongo::DBClientCursor;
-using mongo::DBClientBase;
-using mongo::Query;
-using mongo::OID;
-using ngsiv2::Registration;
-using ngsiv2::EntID;
-
-
-
-/* ****************************************************************************
-*
 * setRegistrationId -
 */
 static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
@@ -627,10 +612,10 @@ bool mongoLdRegistrationsGet
    * Note that expiration is not taken into account (in the future, a q= query
    * could be added to the operation in order to filter results)
    */
-  std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
-  mongo::BSONObjBuilder          queryBuilder;
-  mongo::Query                   query;
+  std::auto_ptr<mongo::DBClientCursor>  cursor;
+  std::string                           err;
+  mongo::BSONObjBuilder                 queryBuilder;
+  mongo::Query                          query;
 
   if (ciP->uriParam["id"] != "")
   {
@@ -662,7 +647,9 @@ bool mongoLdRegistrationsGet
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));
   TIME_STAT_MONGO_READ_WAIT_START();
   reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
-  DBClientBase* connection = getMongoConnection();
+
+  mongo::DBClientBase* connection = getMongoConnection();
+
   if (!collectionRangedQuery(connection,
                              getRegistrationsCollectionName(tenant),
                              query,
@@ -689,8 +676,8 @@ bool mongoLdRegistrationsGet
 
   while (moreSafe(cursor))
   {
-    BSONObj       r;
-    Registration  reg;
+    mongo::BSONObj         r;
+    ngsiv2::Registration   reg;
 
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
