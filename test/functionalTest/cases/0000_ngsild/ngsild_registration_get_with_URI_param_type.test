@@ -174,7 +174,7 @@ echo
 
 echo "04. Get registration 01, 03, and 05, using URI param type=T1, T3, T5"
 echo "===================================================================="
-orionCurl --url "/ngsi-ld/v1/csourceRegistrations?type=T1,T2,T3,T5&prettyPrint=yes&spaces=2" --noPayloadCheck
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?type=T1,T3,T5&prettyPrint=yes&spaces=2" --noPayloadCheck
 echo
 echo
 
@@ -270,7 +270,7 @@ Date: REGEX(.*)
 04. Get registration 01, 03, and 05, using URI param type=T1, T3, T5
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1995
+Content-Length: 1497
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -287,30 +287,6 @@ Date: REGEX(.*)
           {
             "id": "urn:ngsi-ld:Vehicle:A456",
             "type": "T1"
-          }
-        ],
-        "properties": [
-          "brandName",
-          "speed"
-        ],
-        "relationships": [
-          "isParked"
-        ]
-      }
-    ],
-    "endpoint": "http://my.csource.org:1026"
-  },
-  {
-    "id": "urn:ngsi-ld:reg02",
-    "type": "ContextSourceRegistration",
-    "name": "reg_02",
-    "description": "description of reg 02",
-    "information": [
-      {
-        "entities": [
-          {
-            "id": "urn:ngsi-ld:Vehicle:A456",
-            "type": "T2"
           }
         ],
         "properties": [

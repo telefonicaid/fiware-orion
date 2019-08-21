@@ -653,7 +653,8 @@ bool mongoLdRegistrationsGet
 
     if (types > 0)
     {
-      for (int ix = 0; ix < types; ix++){
+      for (int ix = 0; ix < types; ix++)
+      {
         char type[typeVec[ix].size() + 1];
         strcpy(type, typeVec[ix].c_str());
 
@@ -669,7 +670,6 @@ bool mongoLdRegistrationsGet
         }
 
         typeVec[ix] = typeExpanded;
-        LM_E(("type: %s", typeVec[ix]));
         bsonArray.append(typeVec[ix]);
       }
 
@@ -684,7 +684,6 @@ bool mongoLdRegistrationsGet
 
   query = queryBuilder.obj();
   query.sort(BSON("_id" << 1));
-  LM_E(("Query: %s", query.toString().c_str()));
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));
   TIME_STAT_MONGO_READ_WAIT_START();
   reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
