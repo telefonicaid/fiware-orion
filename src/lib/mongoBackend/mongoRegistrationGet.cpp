@@ -619,6 +619,27 @@ bool mongoLdRegistrationsGet
   mongo::BSONObjBuilder                 queryBuilder;
   mongo::Query                          query;
 
+  //
+  // FIXME: This function will grow too long - need to create a function for each URI param
+  //        and move all of it out to a separate file: mongoLdRegistrationsGet.cpp
+  //
+  //
+  // The function should do something like this:
+  //
+  // const char*     uriParamId   = ciP->uriParam["id"].c_str();
+  // const char*     uriParamType = ciP->uriParam["type"].c_str();
+  //
+  // if (uriParamId != NULL)
+  //   uriParamIdToFilter(&queryBuilder, uriParamId);
+  //
+  // if (uriParamType != NULL)
+  //   uriParamTypeToFilter(&queryBuilder, uriParamType);
+  //
+  // ... More calls to add uri params to filter ...
+  //
+  // query = queryBuilder.obj();
+  //
+  //
   if (ciP->uriParam["id"] != "")
   {
     char*                       idList = (char*) ciP->uriParam["id"].c_str();
@@ -649,19 +670,29 @@ bool mongoLdRegistrationsGet
     char*                       details;
     char                        typeExpanded[256];
 
+    //
+    // FIXME: Need a new implementation of stringSplit -
+    //        one that doesn't use std::string nor std::vector and that doesn't copy any strings,
+    //        only points to them.
+    //
     types = stringSplit(typeList, ',', typeVec);
 
     if (types > 0)
     {
       for (int ix = 0; ix < types; ix++)
       {
-        char type[typeVec[ix].size() + 1];
-        strcpy(type, typeVec[ix].c_str());
+        char* type = (char*) typeVec[ix].c_str();
 
         if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
         {
           // No expansion desired, the type is already a FQN
-          strncpy(typeExpanded, type, sizeof(typeExpanded));
+          if (strlen(type) <= sizeof(typeExpanded) - 1)
+            strcpy(typeExpanded, type);
+          else
+          {
+            orionldErrorResponseCreate(OrionldInternalError, "Error with entity type URL", "String too long", OrionldDetailsString);
+            return false;
+          }
         }
         else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
         {
@@ -669,8 +700,7 @@ bool mongoLdRegistrationsGet
           return false;
         }
 
-        typeVec[ix] = typeExpanded;
-        bsonArray.append(typeVec[ix]);
+        bsonArray.append(typeExpanded);
       }
 
       bsonInExpression.append("$in", bsonArray.arr());
