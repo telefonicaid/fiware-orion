@@ -141,8 +141,8 @@ bool mongoLdRegistrationsGet
   bool                   reqSemTaken    = false;
   int                    offset         = 0;
   int                    limit          = DEFAULT_PAGINATION_LIMIT_INT;
-  char*                  uriParamId     = (ciP->uriParam["id"].empty())?          NULL       : (char*) ciP->uriParam["id"].c_str();
-  char*                  uriParamType   = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
+  char*                  uriParamId     = (ciP->uriParam["id"].empty())?   NULL : (char*) ciP->uriParam["id"].c_str();
+  char*                  uriParamType   = (ciP->uriParam["type"].empty())? NULL : (char*) ciP->uriParam["type"].c_str();
   std::string            err;
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
