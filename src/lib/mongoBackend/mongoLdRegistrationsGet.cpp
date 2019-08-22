@@ -59,24 +59,17 @@ bool mongoLdRegistrationsGet
 )
 {
   bool      reqSemTaken = false;
-  int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int       limit;
+  int       offset      = 0;
+  int       limit       = DEFAULT_PAGINATION_LIMIT_INT;
 
   if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
-  {
-    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
-    if (limit <= 0)
-      limit = DEFAULT_PAGINATION_LIMIT_INT;
-  }
+    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());  // Error handling already done by uriArgumentGet() in rest.cpp
   else
     limit = DEFAULT_PAGINATION_LIMIT_INT;
 
-  LM_T(LmtMongo, ("Mongo GET Registrations"));
+  if (ciP->uriParam[URI_PARAM_PAGINATION_OFFSET] != "")
+    offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
 
-  /* ONTIMEINTERVAL Registrations are not part of NGSIv2, so they are excluded.
-   * Note that expiration is not taken into account (in the future, a q= query
-   * could be added to the operation in order to filter results)
-   */
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   std::string                           err;
   mongo::BSONObjBuilder                 queryBuilder;
@@ -190,8 +183,6 @@ bool mongoLdRegistrationsGet
                              countP,
                              &err))
   {
-    LM_TMP(("INSIDE"));
-
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo List Registrations", reqSemTaken);

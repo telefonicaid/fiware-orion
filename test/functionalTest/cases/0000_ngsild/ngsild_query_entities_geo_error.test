@@ -139,7 +139,7 @@ MongoDB server version: REGEX(.*)
 	},
 	"attrNames" : [
 		"http://schema.org/address",
-		"http://schema.org/name",
+		"https://uri.etsi.org/ngsi-ld/name",
 		"https://uri.fiware.org/ns/datamodels#category",
 		"location"
 	],
@@ -156,7 +156,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [ ]
 		},
-		"http://schema=org/name" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
