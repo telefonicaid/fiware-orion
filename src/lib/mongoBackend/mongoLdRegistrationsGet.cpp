@@ -45,6 +45,86 @@
 
 
 
+// -----------------------------------------------------------------------------
+//
+// uriParamIdToFilter -
+//
+static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idList)
+{
+  std::vector<std::string>    idVec;
+  int                         ids;
+  mongo::BSONObjBuilder       bsonInExpression;
+  mongo::BSONArrayBuilder     bsonArray;
+
+  ids = stringSplit(idList, ',', idVec);
+
+  if (ids == 0)
+    return true;  // Or ... give error?
+
+  for (int ix = 0; ix < ids; ix++)
+    bsonArray.append(idVec[ix]);
+
+  bsonInExpression.append("$in", bsonArray.arr());
+  queryBuilderP->append("_id", bsonInExpression.obj());
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamTypeToFilter -
+//
+static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typeList)
+{
+  std::vector<std::string>    typeVec;
+  int                         types;
+  mongo::BSONObjBuilder       bsonInExpression;
+  mongo::BSONArrayBuilder     bsonArray;
+  char*                       details;
+
+  //
+  // FIXME: Need a new implementation of stringSplit -
+  //        one that doesn't use std::string nor std::vector and that doesn't copy any strings,
+  //        only points to them.
+  //
+  types = stringSplit(typeList, ',', typeVec);
+
+  if (types == 0)
+    return true;  // Or ... give error?
+
+  char typeExpanded[256];
+
+  for (int ix = 0; ix < types; ix++)
+  {
+    char* type = (char*) typeVec[ix].c_str();
+
+    if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
+    {
+      // No expansion desired, the type is already a FQN
+      bsonArray.append(type);
+    }
+    else
+    {
+      if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+        return false;
+      }
+
+      bsonArray.append(typeExpanded);
+    }
+  }
+
+  bsonInExpression.append("$in", bsonArray.arr());
+  queryBuilderP->append("contextRegistration.entities.type", bsonInExpression.obj());
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * mongoLdRegistrationsGet - 
@@ -58,109 +138,26 @@ bool mongoLdRegistrationsGet
   OrionError*                         oeP
 )
 {
-  bool      reqSemTaken = false;
-  int       offset      = 0;
-  int       limit       = DEFAULT_PAGINATION_LIMIT_INT;
+  bool                   reqSemTaken    = false;
+  int                    offset         = 0;
+  int                    limit          = DEFAULT_PAGINATION_LIMIT_INT;
+  char*                  uriParamId     = (ciP->uriParam["id"].empty())?          NULL       : (char*) ciP->uriParam["id"].c_str();
+  char*                  uriParamType   = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
+  std::string            err;
+  mongo::BSONObjBuilder  queryBuilder;
+  mongo::Query           query;
 
   if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
     limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());  // Error handling already done by uriArgumentGet() in rest.cpp
-  else
-    limit = DEFAULT_PAGINATION_LIMIT_INT;
 
   if (ciP->uriParam[URI_PARAM_PAGINATION_OFFSET] != "")
     offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
 
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  std::string                           err;
-  mongo::BSONObjBuilder                 queryBuilder;
-  mongo::Query                          query;
+  if ((uriParamId != NULL) && (uriParamIdToFilter(&queryBuilder, uriParamId) == false))
+    return false;
 
-  //
-  // FIXME: This function will grow too long - need to create a function for each URI param
-  //        and move all of it out to a separate file: mongoLdRegistrationsGet.cpp
-  //
-  //
-  // The function should do something like this:
-  //
-  // const char*     uriParamId   = ciP->uriParam["id"].c_str();
-  // const char*     uriParamType = ciP->uriParam["type"].c_str();
-  //
-  // if (uriParamId != NULL)
-  //   uriParamIdToFilter(&queryBuilder, uriParamId);
-  //
-  // if (uriParamType != NULL)
-  //   uriParamTypeToFilter(&queryBuilder, uriParamType);
-  //
-  // ... More calls to add uri params to filter ...
-  //
-  // query = queryBuilder.obj();
-  //
-  //
-  if (ciP->uriParam["id"] != "")
-  {
-    char*                       idList = (char*) ciP->uriParam["id"].c_str();
-    std::vector<std::string>    idVec;
-    int                         ids;
-    mongo::BSONObjBuilder       bsonInExpression;
-    mongo::BSONArrayBuilder     bsonArray;
-
-    ids = stringSplit(idList, ',', idVec);
-
-    if (ids > 0)
-    {
-      for (int ix = 0; ix < ids; ix++)
-        bsonArray.append(idVec[ix]);
-
-      bsonInExpression.append("$in", bsonArray.arr());
-      queryBuilder.append("_id", bsonInExpression.obj());
-    }
-  }
-
-  if (ciP->uriParam["type"] != "")
-  {
-    char*                       typeList = (char*) ciP->uriParam["type"].c_str();
-    std::vector<std::string>    typeVec;
-    int                         types;
-    mongo::BSONObjBuilder       bsonInExpression;
-    mongo::BSONArrayBuilder     bsonArray;
-    char*                       details;
-
-    //
-    // FIXME: Need a new implementation of stringSplit -
-    //        one that doesn't use std::string nor std::vector and that doesn't copy any strings,
-    //        only points to them.
-    //
-    types = stringSplit(typeList, ',', typeVec);
-
-    if (types > 0)
-    {
-      char typeExpanded[256];
-
-      for (int ix = 0; ix < types; ix++)
-      {
-        char* type = (char*) typeVec[ix].c_str();
-
-        if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
-        {
-          // No expansion desired, the type is already a FQN
-          bsonArray.append(type);
-        }
-        else
-        {
-          if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
-          {
-            orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
-            return false;
-          }
-
-          bsonArray.append(typeExpanded);
-        }
-      }
-
-      bsonInExpression.append("$in", bsonArray.arr());
-      queryBuilder.append("contextRegistration.entities.type", bsonInExpression.obj());
-    }
-  }
+  if ((uriParamType != NULL) && (uriParamTypeToFilter(&queryBuilder, uriParamType) == false))
+    return false;
 
   //
   // FIXME: Many more URI params to be treated and added to queryBuilder
@@ -168,11 +165,14 @@ bool mongoLdRegistrationsGet
 
   query = queryBuilder.obj();
   query.sort(BSON("_id" << 1));
+
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));
+
   TIME_STAT_MONGO_READ_WAIT_START();
   reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
 
-  mongo::DBClientBase* connection = getMongoConnection();
+  std::auto_ptr<mongo::DBClientCursor>  cursor;
+  mongo::DBClientBase*                  connection = getMongoConnection();
 
   if (!collectionRangedQuery(connection,
                              getRegistrationsCollectionName(tenant),
