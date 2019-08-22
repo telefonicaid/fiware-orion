@@ -668,7 +668,6 @@ bool mongoLdRegistrationsGet
     mongo::BSONObjBuilder       bsonInExpression;
     mongo::BSONArrayBuilder     bsonArray;
     char*                       details;
-    char                        typeExpanded[256];
 
     //
     // FIXME: Need a new implementation of stringSplit -
@@ -679,6 +678,8 @@ bool mongoLdRegistrationsGet
 
     if (types > 0)
     {
+      char typeExpanded[256];
+
       for (int ix = 0; ix < types; ix++)
       {
         char* type = (char*) typeVec[ix].c_str();
@@ -686,21 +687,18 @@ bool mongoLdRegistrationsGet
         if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
         {
           // No expansion desired, the type is already a FQN
-          if (strlen(type) <= sizeof(typeExpanded) - 1)
-            strcpy(typeExpanded, type);
-          else
+          bsonArray.append(type);
+        }
+        else
+        {
+          if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
           {
-            orionldErrorResponseCreate(OrionldInternalError, "Error with entity type URL", "String too long", OrionldDetailsString);
+            orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
             return false;
           }
-        }
-        else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
-          return false;
-        }
 
-        bsonArray.append(typeExpanded);
+          bsonArray.append(typeExpanded);
+        }
       }
 
       bsonInExpression.append("$in", bsonArray.arr());
