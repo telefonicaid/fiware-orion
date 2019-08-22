@@ -36,347 +36,16 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
-#include "common/string.h"                                     // stringSplit
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "orionld/common/orionldState.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoRegistrationGet.h"
-#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-
-
-
-// -----------------------------------------------------------------------------
-//
-// Forward declarations
-//
-#ifdef ORIONLD
-static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
-static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
-#endif
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationId -
-*/
-static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->id = getFieldF(r, "_id").OID().toString();
-}
-
-
-
-/* ****************************************************************************
-*
-* setDescription -
-*/
-static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  if (r.hasField(REG_DESCRIPTION))
-  {
-    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
-    regP->descriptionProvided = true;
-  }
-  else
-  {
-    regP->description         = "";
-    regP->descriptionProvided = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setProvider -
-*/
-static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
-
-  //
-  // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
-  // into account for them).
-  //
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
-
-  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
-  if (format == "JSON")
-  {
-    regP->provider.legacyForwardingMode = true;
-  }
-  else
-  {
-    // FIXME #3068: to be implemented once we define NGSIv2 based forwarding
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setEntities -
-*/
-static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
-  {
-    ngsiv2::EntID    entity;
-    mongo::BSONObj   ce = dbEntityV[ix].embeddedObject();
-
-    if (ce.hasField(REG_ENTITY_ISPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-      else
-      {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-    }
-    else
-    {
-      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-    }
-
-    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-      else
-      {
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-    }
-    else
-    {
-      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-    }
-
-    regP->dataProvided.entities.push_back(entity);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setAttributes -
-*/
-static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
-  {
-    mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
-
-    if (attrName != "")
-    {
-      regP->dataProvided.attributes.push_back(attrName);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDataProvided -
-*
-* Make sure there is only ONE "contextRegistration" in the vector
-* If we have more than one, then the Registration is made in API V1 as this is not
-* possible in V2 and we cannot respond to the request using the current implementation of V2.
-* This function will be changed to work in a different way once issue #3044 is dealt with.
-*/
-static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
-{
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-
-  if (crV.size() > 1)
-  {
-    return false;
-  }
-
-  //
-  // Extract the first (and only) CR from the contextRegistration vector
-  //
-  mongo::BSONObj cr0 = crV[0].embeddedObject();
-
-  setEntities(regP, cr0);
-  setAttributes(regP, cr0);
-  setProvider(regP, cr0);
-
-#ifdef ORIONLD
-  setLdPropertyV(regP, cr0);
-  setLdRelationshipV(regP, cr0);
-#endif
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setExpires -
-*/
-static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->expires = (r.hasField(REG_EXPIRATION))? getLongField(r, REG_EXPIRATION) : -1;
-}
-
-
-
-/* ****************************************************************************
-*
-* setStatus -
-*/
-static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
-}
-
-
-
-#ifdef ORIONLD
-/* ****************************************************************************
-*
-* setLdRegistrationId -
-*/
-static void setLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  reg->id = getStringFieldF(r, "_id");
-}
-
-
-
-/* ****************************************************************************
-*
-* setLdName -
-*/
-static void setLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  reg->name = r.hasField(REG_NAME) ? getStringFieldF(r, REG_NAME) : "";
-}
-
-
-
-/* ****************************************************************************
-*
-* setLdObservationInterval
-*/
-static void setLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  if (r.hasField(REG_OBSERVATION_INTERVAL))
-  {
-    mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
-
-    reg->observationInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
-  }
-  else
-  {
-    reg->observationInterval.start = -1;
-    reg->observationInterval.end   = -1;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setLdManagementInterval
-*/
-static void setLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  if (r.hasField(REG_MANAGEMENT_INTERVAL))
-  {
-    mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
-
-    reg->managementInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
-  }
-  else
-  {
-    reg->managementInterval.start = -1;
-    reg->managementInterval.end   = -1;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setLdPropertyV
-*/
-static void setLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  std::vector<mongo::BSONElement> dbPropertyV = getFieldF(r, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbPropertyV.size(); ++ix)
-  {
-    mongo::BSONObj  pobj = dbPropertyV[ix].embeddedObject();
-    std::string     type = getStringFieldF(pobj, REG_ATTRS_TYPE);
-    std::string     propName;
-
-    if (type == REG_PROPERTIES_TYPE)
-    {
-      propName = getStringFieldF(pobj, REG_PROPERTIES_NAME);
-
-      if (propName != "")
-      {
-        reg->dataProvided.propertyV.push_back(propName);
-      }
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setLdRelationshipV
-*/
-static void setLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
-{
-  std::vector<mongo::BSONElement> dbRelationshipV = getFieldF(r, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbRelationshipV.size(); ++ix)
-  {
-    mongo::BSONObj  robj = dbRelationshipV[ix].embeddedObject();
-    std::string     type = getStringFieldF(robj, REG_ATTRS_TYPE);
-    std::string     relName;
-
-    if (type == REG_RELATIONSHIPS_TYPE)
-    {
-      relName = getStringFieldF(robj, REG_RELATIONSHIPS_NAME);
-
-      if (relName != "")
-      {
-        reg->dataProvided.relationshipV.push_back(relName);
-      }
-    }
-  }
-}
-
-#endif  // ORIONLD
+#include "mongoBackend/mongoRegistrationAux.h"                 // mongoSetXxx
+#include "mongoBackend/mongoLdRegistrationAux.h"               // mongoSetLdXxx
+#include "mongoBackend/mongoRegistrationGet.h"                 // Own interface
 
 
 
@@ -443,10 +112,10 @@ void mongoRegistrationGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(regP, bob);
-    setDescription(regP, bob);
+    mongoSetRegistrationId(regP, bob);
+    mongoSetDescription(regP, bob);
 
-    if (setDataProvided(regP, bob, false) == false)
+    if (mongoSetDataProvided(regP, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -455,10 +124,13 @@ void mongoRegistrationGet
       return;
     }
 
-    setLdObservationInterval(regP, bob);
-    setLdManagementInterval(regP, bob);
-    setExpires(regP, bob);
-    setStatus(regP, bob);
+#ifdef ORIONLD
+    // FIXME: Can this be removed?
+    mongoSetLdObservationInterval(regP, bob);
+    mongoSetLdManagementInterval(regP, bob);
+#endif
+    mongoSetExpires(regP, bob);
+    mongoSetStatus(regP, bob);
 
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -554,10 +226,10 @@ void mongoRegistrationsGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(&reg, bob);
-    setDescription(&reg, bob);
+    mongoSetRegistrationId(&reg, bob);
+    mongoSetDescription(&reg, bob);
 
-    if (setDataProvided(&reg, bob, false) == false)
+    if (mongoSetDataProvided(&reg, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -566,8 +238,8 @@ void mongoRegistrationsGet
       return;
     }
 
-    setExpires(&reg, bob);
-    setStatus(&reg, bob);
+    mongoSetExpires(&reg, bob);
+    mongoSetStatus(&reg, bob);
 
     regV->push_back(reg);
   }
@@ -577,244 +249,3 @@ void mongoRegistrationsGet
 
   oeP->fill(SccOk, "");
 }
-
-
-
-#if ORIONLD
-// -----------------------------------------------------------------------------
-//
-// mongoLdRegistrationsGet -
-//
-bool mongoLdRegistrationsGet
-(
-  ConnectionInfo*                     ciP,
-  std::vector<ngsiv2::Registration>*  regVecP,
-  const char*                         tenant,
-  long long*                          countP,
-  OrionError*                         oeP
-)
-{
-  bool      reqSemTaken = false;
-  int       offset      = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int       limit;
-
-  if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
-  {
-    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
-    if (limit <= 0)
-      limit = DEFAULT_PAGINATION_LIMIT_INT;
-  }
-  else
-    limit = DEFAULT_PAGINATION_LIMIT_INT;
-
-  LM_T(LmtMongo, ("Mongo GET Registrations"));
-
-  /* ONTIMEINTERVAL Registrations are not part of NGSIv2, so they are excluded.
-   * Note that expiration is not taken into account (in the future, a q= query
-   * could be added to the operation in order to filter results)
-   */
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  std::string                           err;
-  mongo::BSONObjBuilder                 queryBuilder;
-  mongo::Query                          query;
-
-  if (ciP->uriParam["id"] != "")
-  {
-    char*                       idList = (char*) ciP->uriParam["id"].c_str();
-    std::vector<std::string>    idVec;
-    int                         ids;
-    mongo::BSONObjBuilder       bsonInExpression;
-    mongo::BSONArrayBuilder     bsonArray;
-
-    ids = stringSplit(idList, ',', idVec);
-
-    if (ids > 0)
-    {
-      for (int ix = 0; ix < ids; ix++)
-        bsonArray.append(idVec[ix]);
-
-      bsonInExpression.append("$in", bsonArray.arr());
-      queryBuilder.append("_id", bsonInExpression.obj());
-    }
-  }
-
-  //
-  // FIXME: Many more URI params to be treated and added to queryBuilder
-  //
-
-  query = queryBuilder.obj();
-  query.sort(BSON("_id" << 1));
-
-  // LM_TMP(("KZ: query: %s", query.toString().c_str()));
-  TIME_STAT_MONGO_READ_WAIT_START();
-  reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
-
-  mongo::DBClientBase* connection = getMongoConnection();
-
-  if (!collectionRangedQuery(connection,
-                             getRegistrationsCollectionName(tenant),
-                             query,
-                             limit,
-                             offset,
-                             &cursor,
-                             countP,
-                             &err))
-  {
-    LM_TMP(("INSIDE"));
-
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-    reqSemGive(__FUNCTION__, "Mongo List Registrations", reqSemTaken);
-
-    oeP->code    = SccReceiverInternalError;
-    oeP->details = err;
-    return false;
-  }
-  TIME_STAT_MONGO_READ_WAIT_STOP();
-
-  /* Process query result */
-  unsigned int docs = 0;
-
-  while (moreSafe(cursor))
-  {
-    mongo::BSONObj         bob;
-    ngsiv2::Registration   reg;
-
-    if (!nextSafeOrErrorF(cursor, &bob, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
-      continue;
-    }
-    docs++;
-    LM_T(LmtMongo, ("retrieved document %d: '%s'", docs, bob.toString().c_str()));
-
-    setLdRegistrationId(&reg, bob);
-    setLdName(&reg, bob);
-    setDescription(&reg, bob);
-
-    if (setDataProvided(&reg, bob, false) == false)
-    {
-      releaseMongoConnection(connection);
-      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      oeP->code = SccReceiverInternalError;
-      return false;
-    }
-
-    setLdObservationInterval(&reg, bob);
-    setLdManagementInterval(&reg, bob);
-    setExpires(&reg, bob);
-    setStatus(&reg, bob);
-
-    regVecP->push_back(reg);
-  }
-
-  releaseMongoConnection(connection);
-  reqSemGive(__FUNCTION__, "Mongo List Registrations", reqSemTaken);
-
-  oeP->code = SccOk;
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoLdRegistrationGet -
-*/
-bool mongoLdRegistrationGet
-(
-  ngsiv2::Registration*  regP,
-  const char*            regId,
-  const char*            tenant,
-  HttpStatusCode*        statusCodeP,
-  char**                 detailsP
-)
-{
-  bool                                  reqSemTaken = false;
-  std::string                           err;
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::BSONObj                        q = BSON("_id" << regId);
-
-  reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
-
-  LM_T(LmtMongo, ("Mongo Get Registration"));
-
-  TIME_STAT_MONGO_READ_WAIT_START();
-  mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
-  {
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-    reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-    *detailsP    = (char*) "Internal Error during DB-query";
-    *statusCodeP = SccReceiverInternalError;
-    return false;
-  }
-  TIME_STAT_MONGO_READ_WAIT_STOP();
-
-  LM_TMP(("qBSON %s", q.toString().c_str()));
-
-  /* Process query result */
-  if (moreSafe(cursor))
-  {
-    mongo::BSONObj bob;
-
-    if (!nextSafeOrErrorF(cursor, &bob, &err))
-    {
-      releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *detailsP    = (char*) "Runtime Error (exception in nextSafe)";
-      *statusCodeP = SccReceiverInternalError;
-      return false;
-    }
-    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
-
-    setLdRegistrationId(regP, bob);
-    setLdName(regP, bob);
-    setDescription(regP, bob);
-
-    if (setDataProvided(regP, bob, false) == false)
-    {
-      releaseMongoConnection(connection);
-      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *statusCodeP = SccReceiverInternalError;
-      return false;
-    }
-
-    setLdObservationInterval(regP, bob);
-    setLdManagementInterval(regP, bob);
-    setExpires(regP, bob);
-    setStatus(regP, bob);
-
-    if (moreSafe(cursor))
-    {
-      releaseMongoConnection(connection);
-
-      // Ooops, we expected only one
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *detailsP    = (char*) "more than one registration matched";
-      *statusCodeP = SccConflict;
-      return false;
-    }
-  }
-  else
-  {
-    releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("registration not found: '%s'", regId));
-    reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-    *detailsP    = (char*) "registration not found";
-    *statusCodeP = SccContextElementNotFound;
-    return false;
-  }
-
-  releaseMongoConnection(connection);
-  reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-
-  *statusCodeP = SccOk;
-  return true;
-}
-#endif

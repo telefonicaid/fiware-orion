@@ -55,6 +55,10 @@ SET (SOURCES
     dateExpiration.cpp
     mongoEntityExists.cpp
     mongoAttributeExists.cpp
+    mongoRegistrationAux.cpp
+    mongoLdRegistrationAux.cpp
+    mongoLdRegistrationGet.cpp
+    mongoLdRegistrationsGet.cpp
 )
 
 SET (HEADERS
