@@ -122,28 +122,31 @@ static void* logSummary(void* vP)
     if (biRaisedNew   < 0)  { biRaisedNew   = LONG_MAX - biRaisedInLastSummary   + biRaised;   }
     if (biReleasedNew < 0)  { biReleasedNew = LONG_MAX - biReleasedInLastSummary + biReleased; }
 
-    LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
+    if (transactionsNow != 0)
+    {
+      LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
 
-    LM_S(("DB status: %s, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
-          deActive? "erroneous" : "ok",
-          deRaised,
-          deRaisedNew,
-          deReleased,
-          deReleasedNew));
+      LM_S(("DB status: %s, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
+            deActive? "erroneous" : "ok",
+            deRaised,
+            deRaisedNew,
+            deReleased,
+            deReleasedNew));
 
-    LM_S(("Notification failure active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
-          neActive,
-          neRaised,
-          neRaisedNew,
-          neReleased,
-          neReleasedNew));
+      LM_S(("Notification failure active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
+            neActive,
+            neRaised,
+            neRaisedNew,
+            neReleased,
+            neReleasedNew));
 
-    LM_S(("Bad input active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
-          biActive,
-          biRaised,
-          biRaisedNew,
-          biReleased,
-          biReleasedNew));
+      LM_S(("Bad input active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)",
+            biActive,
+            biRaised,
+            biRaisedNew,
+            biReleased,
+            biReleasedNew));
+    }
 
     deRaisedInLastSummary   = deRaised;
     deReleasedInLastSummary = deReleased;
