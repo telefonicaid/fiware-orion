@@ -47,8 +47,9 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationGet.h"
 #include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-
-
+#include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 
 // -----------------------------------------------------------------------------
 //
@@ -618,6 +619,27 @@ bool mongoLdRegistrationsGet
   mongo::BSONObjBuilder                 queryBuilder;
   mongo::Query                          query;
 
+  //
+  // FIXME: This function will grow too long - need to create a function for each URI param
+  //        and move all of it out to a separate file: mongoLdRegistrationsGet.cpp
+  //
+  //
+  // The function should do something like this:
+  //
+  // const char*     uriParamId   = ciP->uriParam["id"].c_str();
+  // const char*     uriParamType = ciP->uriParam["type"].c_str();
+  //
+  // if (uriParamId != NULL)
+  //   uriParamIdToFilter(&queryBuilder, uriParamId);
+  //
+  // if (uriParamType != NULL)
+  //   uriParamTypeToFilter(&queryBuilder, uriParamType);
+  //
+  // ... More calls to add uri params to filter ...
+  //
+  // query = queryBuilder.obj();
+  //
+  //
   if (ciP->uriParam["id"] != "")
   {
     char*                       idList = (char*) ciP->uriParam["id"].c_str();
@@ -638,13 +660,58 @@ bool mongoLdRegistrationsGet
     }
   }
 
+  if (ciP->uriParam["type"] != "")
+  {
+    char*                       typeList = (char*) ciP->uriParam["type"].c_str();
+    std::vector<std::string>    typeVec;
+    int                         types;
+    mongo::BSONObjBuilder       bsonInExpression;
+    mongo::BSONArrayBuilder     bsonArray;
+    char*                       details;
+
+    //
+    // FIXME: Need a new implementation of stringSplit -
+    //        one that doesn't use std::string nor std::vector and that doesn't copy any strings,
+    //        only points to them.
+    //
+    types = stringSplit(typeList, ',', typeVec);
+
+    if (types > 0)
+    {
+      char typeExpanded[256];
+
+      for (int ix = 0; ix < types; ix++)
+      {
+        char* type = (char*) typeVec[ix].c_str();
+
+        if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
+        {
+          // No expansion desired, the type is already a FQN
+          bsonArray.append(type);
+        }
+        else
+        {
+          if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
+          {
+            orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+            return false;
+          }
+
+          bsonArray.append(typeExpanded);
+        }
+      }
+
+      bsonInExpression.append("$in", bsonArray.arr());
+      queryBuilder.append("contextRegistration.entities.type", bsonInExpression.obj());
+    }
+  }
+
   //
   // FIXME: Many more URI params to be treated and added to queryBuilder
   //
 
   query = queryBuilder.obj();
   query.sort(BSON("_id" << 1));
-
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));
   TIME_STAT_MONGO_READ_WAIT_START();
   reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);
