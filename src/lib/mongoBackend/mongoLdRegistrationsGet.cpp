@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
+#include <string>                                              // std::string
 #include <vector>                                              // std::vector
 
 #include "common/string.h"                                     // stringSplit

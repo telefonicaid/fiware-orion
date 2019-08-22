@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
+#include <string>                                              // std::string
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"

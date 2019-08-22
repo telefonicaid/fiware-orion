@@ -36,7 +36,6 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
-#include "common/string.h"                                     // stringSplit
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"

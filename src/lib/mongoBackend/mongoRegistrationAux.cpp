@@ -22,20 +22,23 @@
 *
 * Author: Fermin Galan, Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                         // mongo::BSONObj
+#include <string>                                              // std::string
+#include <vector>                                              // std::vector
+
+#include "mongo/client/dbclient.h"                             // mongo::BSONObj
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "apiTypesV2/Registration.h"                       // ngsiv2::Registration
-#include "rest/HttpStatusCode.h"                           // HttpStatusCode
-#include "common/statistics.h"                             // TIME_STAT_MONGO_READ_WAIT_START
-#include "mongoBackend/MongoGlobal.h"                      // getMongoConnection
-#include "mongoBackend/connectionOperations.h"             // collectionQuery
-#include "mongoBackend/dbConstants.h"                      // REG_*
-#include "mongoBackend/safeMongo.h"                        // moreSafe
-#include "mongoBackend/mongoLdRegistrationAux.h"           // mongoSetLd*
-#include "mongoBackend/mongoRegistrationAux.h"             // Own interface
+#include "apiTypesV2/Registration.h"                           // ngsiv2::Registration
+#include "rest/HttpStatusCode.h"                               // HttpStatusCode
+#include "common/statistics.h"                                 // TIME_STAT_MONGO_READ_WAIT_START
+#include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
+#include "mongoBackend/connectionOperations.h"                 // collectionQuery
+#include "mongoBackend/dbConstants.h"                          // REG_*
+#include "mongoBackend/safeMongo.h"                            // moreSafe
+#include "mongoBackend/mongoLdRegistrationAux.h"               // mongoSetLd*
+#include "mongoBackend/mongoRegistrationAux.h"                 // Own interface
 
 
 
