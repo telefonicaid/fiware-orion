@@ -60,42 +60,42 @@ echo
 01. GET  /ngsi-ld/v1/csourceRegistrations GET limit = 0
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "The reason for this error is unknown",
-    "title": "Unknown Error",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "details": "The limit must be an integer value >= 1",
+    "title": "Bad Request",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequest"
 }
 
 
 02. GET  /ngsi-ld/v1/csourceRegistrations GET limit = 1001
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "The reason for this error is unknown",
-    "title": "Unknown Error",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "details": "The maximum allowed value for limit is 1000",
+    "title": "Bad Request",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequest"
 }
 
 
 03. GET  /ngsi-ld/v1/csourceRegistrations GET limit = abc
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "The reason for this error is unknown",
-    "title": "Unknown Error",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "details": "The limit must be an integer value >= 1",
+    "title": "Bad Request",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequest"
 }
 
 
