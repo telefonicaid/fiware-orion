@@ -25,7 +25,7 @@ Handle errors of Context Source Registrations GET
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -60,42 +60,42 @@ echo
 01. GET  /ngsi-ld/v1/csourceRegistrations GET limit = 0
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "The limit must be an integer value >= 1",
-    "title": "Bad Request",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequest"
+    "details": "must be an integer value >= 1",
+    "title": "Invalid value for URI parameter /limit/",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. GET  /ngsi-ld/v1/csourceRegistrations GET limit = 1001
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 
+Content-Length: 155
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "The maximum allowed value for limit is 1000",
-    "title": "Bad Request",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequest"
+    "details": "must be an integer value <= 1000",
+    "title": "Invalid value for URI parameter /limit/",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. GET  /ngsi-ld/v1/csourceRegistrations GET limit = abc
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "The limit must be an integer value >= 1",
-    "title": "Bad Request",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequest"
+    "details": "must be an integer value >= 1",
+    "title": "Invalid value for URI parameter /limit/",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

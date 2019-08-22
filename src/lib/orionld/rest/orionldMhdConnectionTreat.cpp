@@ -778,7 +778,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (ciP->httpStatusCode != SccOk)
     goto respond;
 
-
   //
   // 02. Lookup the Service
   //
