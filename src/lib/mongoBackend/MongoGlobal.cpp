@@ -72,6 +72,7 @@
 *
 * USING
 */
+using mongo::client::Options;
 using mongo::DBClientBase;
 using mongo::DBClientCursor;
 using mongo::BSONObj;
@@ -310,7 +311,7 @@ bool mongoStart
 
   multitenant = _multitenant;
 
-  mongo::Status status = mongo::client::initialize();
+  mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
   if (!status.isOK())
   {
     LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
