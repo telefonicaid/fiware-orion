@@ -31,6 +31,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/context/orionldContextList.h"                // orionldContextHead, orionldContextTail, orionldContextListSemTake/Give
+#include "orionld/context/orionldContextPrefixExpand.h"        // orionldContextPrefixExpand
 #include "orionld/context/orionldContextListInsert.h"          // Own Interface
 
 
@@ -42,6 +43,21 @@ extern "C"
 void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
 {
   LM_T(LmtContextList, ("Adding context '%s' to the list (context at %p, tree at %p)", contextP->url, contextP, contextP->tree));
+
+  //
+  // Perform Context-Prefix-Expansion when inserting a @context of the form { "@context": { ... } }
+  // This is done on a new context, before inserting in the context-list, so, the semaphore is not necessary.
+  //
+  if ((contextP->tree                                              != NULL)     &&
+      (contextP->tree->type                                        == KjObject) &&
+      (contextP->tree->value.firstChildP                           != NULL)     &&
+      (strcmp(contextP->tree->value.firstChildP->name, "@context") == 0)        &&
+      (contextP->tree->value.firstChildP->type                     == KjObject))
+  {
+    // LM_TMP(("KZ: -------------------- Calling orionldContextPrefixExpand -------------------------"));
+    orionldContextPrefixExpand(contextP);
+    // LM_TMP(("KZ: -------------------- After orionldContextPrefixExpand -------------------------"));
+  }
 
   if (semAlreadyTaken == false)
     orionldContextListSemTake(__FILE__);

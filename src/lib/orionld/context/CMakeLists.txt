@@ -41,6 +41,7 @@ SET (SOURCES
     orionldUriExpand.cpp
     orionldAliasLookup.cpp
     orionldContextInlineCheck.cpp
+    orionldContextPrefixExpand.cpp
 )
 
 # Include directories
