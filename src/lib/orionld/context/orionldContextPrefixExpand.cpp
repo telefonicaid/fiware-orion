@@ -62,7 +62,6 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
     return;
 
   // colon found, need to replace
-  int   sLen;
   bool  keepShortName = false;
   char* alias         = kNodeP->value.s;
 
@@ -93,7 +92,8 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
   }
   else
   {
-    sLen = strlen(rest) + cachedPrefixValueLen;
+    int sLen = strlen(rest) + cachedPrefixValueLen;
+
     kNodeP->value.s = kaAlloc(&kalloc, sLen + 1);
     snprintf(kNodeP->value.s, sLen, "%s%s", cachedPrefixValueP, rest);
     // LM_TMP(("KZ: Expanded value to '%s' (cachedPrefixValueP: '%s', rest: '%s')", kNodeP->value.s, rest));
