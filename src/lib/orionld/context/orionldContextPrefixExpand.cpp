@@ -60,7 +60,7 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
     return;
   if (colonP[1] == '/')
     return;
-  
+
   // colon found, need to replace
   int   sLen;
   bool  keepShortName = false;
@@ -95,7 +95,7 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
   {
     sLen = strlen(rest) + cachedPrefixValueLen;
     kNodeP->value.s = kaAlloc(&kalloc, sLen + 1);
-    sprintf(kNodeP->value.s, "%s%s", cachedPrefixValueP, rest);
+    snprintf(kNodeP->value.s, sLen, "%s%s", cachedPrefixValueP, rest);
     // LM_TMP(("KZ: Expanded value to '%s' (cachedPrefixValueP: '%s', rest: '%s')", kNodeP->value.s, rest));
   }
 }
