@@ -33,6 +33,6 @@
 //
 // orionldContextPrefixExpand -
 //
-extern void orionldContextPrefixExpand(OrionldContext* contextP);
+extern void orionldContextPrefixExpand(OrionldContext* contextP, bool inlineContext);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPREFIXEXPAND_H_

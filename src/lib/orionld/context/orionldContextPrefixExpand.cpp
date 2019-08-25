@@ -115,6 +115,9 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
 //   { "@context": { "key": "value, "key": "value", "key": { "@id": "", "@type": "" }, ... } }
 //
 //
+// INLINE contexts comes one layer lower: { "key": "value, "key": "value", "key": { "@id": "", "@type": "" }, ... }
+// So, inline contexts sets the second parameter to false and does not follew the rule of { "@context": ... }
+//
 // Now, what is to be expanded are the values of the context. E.g.:
 //
 // {
@@ -139,7 +142,7 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
 //
 // FIXME: the kaAlloc instance to use (global or thread allocation) should be a parameter to this function
 //
-void orionldContextPrefixExpand(OrionldContext* contextP)
+void orionldContextPrefixExpand(OrionldContext* contextP, bool inlineContext)
 {
   KjNode*  tree = contextP->tree;
 
@@ -147,7 +150,9 @@ void orionldContextPrefixExpand(OrionldContext* contextP)
 
   cachedPrefixValueP = NULL;  // Clear "cache" before lookup starts
 
-  for (KjNode* kNodeP = tree->value.firstChildP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  KjNode* firstChildP = (inlineContext == false)? tree->value.firstChildP->value.firstChildP : tree->value.firstChildP;
+
+  for (KjNode* kNodeP = firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (kNodeP->type == KjString)
       prefixExpand(contextP, kNodeP);
