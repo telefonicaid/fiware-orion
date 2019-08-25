@@ -100,7 +100,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   {
     char* type = (char*) typeVec[ix].c_str();
 
-    if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
+    if ((strncmp(type, "http", 4) == 0) && (urlCheck(type, &details) == true))
     {
       // No expansion desired, the type is already a FQN
       bsonArray.append(type);
@@ -137,7 +137,6 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
   mongo::BSONArrayBuilder     bsonArray;
   char*                       details;
 
-
   attrs = stringSplit(attrsList, ',', attrsVec);
 
   if (attrs == 0)
@@ -149,9 +148,9 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
   {
     char* attr = (char*) attrsVec[ix].c_str();
 
-    if (((strncmp(attr, "http://", 7) == 0) || (strncmp(attr, "https://", 8) == 0)) && (urlCheck(attr, &details) == true))
+    if ((strncmp(attr, "http", 4) == 0) && (urlCheck(attr, &details) == true))
     {
-      // No expansion desired, the type is already a FQN
+      // No expansion desired, the attr is already a FQN
       bsonArray.append(attr);
     }
     else
@@ -171,6 +170,9 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 
   return true;
 }
+
+
+
 /* ****************************************************************************
 *
 * mongoLdRegistrationsGet - 
