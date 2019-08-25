@@ -92,7 +92,7 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
   }
   else
   {
-    int sLen = strlen(rest) + cachedPrefixValueLen;
+    int sLen = strlen(rest) + cachedPrefixValueLen + 1;  // + 1 for 0-termination
 
     kNodeP->value.s = kaAlloc(&kalloc, sLen + 1);
     snprintf(kNodeP->value.s, sLen, "%s%s", cachedPrefixValueP, rest);
