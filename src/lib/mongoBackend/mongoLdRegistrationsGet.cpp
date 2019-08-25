@@ -59,7 +59,7 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
   ids = stringSplit(idList, ',', idVec);
 
   if (ids == 0)
-    return true;  // Or ... give error?
+    return true;  // FIXME: give error?
 
   for (int ix = 0; ix < ids; ix++)
     bsonArray.append(idVec[ix]);
@@ -92,7 +92,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   types = stringSplit(typeList, ',', typeVec);
 
   if (types == 0)
-    return true;  // Or ... give error?
+    return true;  // FIXME: give error?
 
   char typeExpanded[256];
 
@@ -140,8 +140,8 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 
   attrs = stringSplit(attrsList, ',', attrsVec);
 
-   if (attrs == 0)
-    return true;  // Or ... give error?
+  if (attrs == 0)
+    return true;  // FIXME: give error?
 
   char attrExpanded[256];
 
@@ -213,7 +213,7 @@ bool mongoLdRegistrationsGet
   // FIXME: Many more URI params to be treated and added to queryBuilder
   //
 
-  query = queryBuilder.obj();
+  query = queryBuilder.obj();  // Here all the filters added to queryBuilder are "merged" into 'query'
   query.sort(BSON("_id" << 1));
 
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));
