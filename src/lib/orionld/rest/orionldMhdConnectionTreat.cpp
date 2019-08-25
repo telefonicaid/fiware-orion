@@ -534,14 +534,11 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     *contextToBeCashedP = true;
 
     //
-    // Create the name of the context to be cached
+    // Create the name of the context to be cached - a uuid
     //
     // FIXME: This needs to be discussed in the Bindings document.
     // FIXME: What about creation of Subscriptions? Should be treated the same. Context name == sub id
     //
-    if (orionldState.payloadIdNode == NULL)
-      LM_X(1, ("Context must be created but the 'id' node in the payload is missing - we shouldn't get this far - BUG!"));
-
     char uuid[37];
 
     uuidGenerate(uuid);
