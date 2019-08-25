@@ -36,7 +36,7 @@ brokerStart CB
 # 03. Get registration 02 using URI param attrs=attrs2
 # 04. Get registration 01, 03, and 05, using URI param attrs=attrs1,attrs3,attrs5
 # 05. Get registration 02 using URI param attrs=relationship3
-# 06. Get registration 01, 03, and 05, using URI param attrs=relationship2,relationship4,relationship5
+# 06. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5
 #
 
 echo "01. Create 5 registrations with ID urn:ngsi-ld:reg01-05"
@@ -188,7 +188,7 @@ echo
 echo
 
 
-echo "06. Get registration 01, 03, and 05, using URI param attrs=relationship2,relationship4,relationship5"
+echo "06. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5"
 echo "===================================================================================================="
 orionCurl --url "/ngsi-ld/v1/csourceRegistrations?attrs=relationship2,relationship4,relationship5&prettyPrint=yes&spaces=2" --noPayloadCheck
 echo
@@ -405,7 +405,7 @@ Date: REGEX(.*)
 
 
 
-06. Get registration 01, 03, and 05, using URI param attrs=relationship2,relationship4,relationship5
+06. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5
 ====================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1518
