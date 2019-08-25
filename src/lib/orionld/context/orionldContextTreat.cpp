@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextAdd.h"                 // orionldContextAdd
 #include "orionld/context/orionldContextInlineCheck.h"         // orionldContextInlineCheck
+#include "orionld/context/orionldContextPrefixExpand.h"        // orionldContextPrefixExpand
 #include "orionld/context/orionldContextTreat.h"               // Own interface
 
 
@@ -203,6 +204,8 @@ bool orionldContextTreat
     orionldState.inlineContext.temporary = true;
     orionldState.inlineContext.next      = NULL;
     orionldState.contextP                = &orionldState.inlineContext;
+
+    orionldContextPrefixExpand(orionldState.contextP, true);
 
     return true;
   }
