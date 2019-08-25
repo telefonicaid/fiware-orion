@@ -125,6 +125,52 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
 
 
 
+// -----------------------------------------------------------------------------
+//
+// uriParamAttrsToFilter - List of Attributes (Properties or Relationships) to be retrieved
+//
+static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* attrsList)
+{
+  std::vector<std::string>    attrsVec;
+  int                         attrs;
+  mongo::BSONObjBuilder       bsonInExpression;
+  mongo::BSONArrayBuilder     bsonArray;
+  char*                       details;
+
+
+  attrs = stringSplit(attrsList, ',', attrsVec);
+
+   if (attrs == 0)
+    return true;  // Or ... give error?
+
+  char attrExpanded[256];
+
+  for (int ix = 0; ix < attrs; ix++)
+  {
+    char* attr = (char*) attrsVec[ix].c_str();
+
+    if (((strncmp(attr, "http://", 7) == 0) || (strncmp(attr, "https://", 8) == 0)) && (urlCheck(attr, &details) == true))
+    {
+      // No expansion desired, the type is already a FQN
+      bsonArray.append(attr);
+    }
+    else
+    {
+      if (orionldUriExpand(orionldState.contextP, attr, attrExpanded, sizeof(attrExpanded), &details) == false)
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity attribute", details, OrionldDetailsString);
+        return false;
+      }
+
+      bsonArray.append(attrExpanded);
+    }
+  }
+
+  bsonInExpression.append("$in", bsonArray.arr());
+  queryBuilderP->append("contextRegistration.attrs.name", bsonInExpression.obj());
+
+  return true;
+}
 /* ****************************************************************************
 *
 * mongoLdRegistrationsGet - 
@@ -141,8 +187,9 @@ bool mongoLdRegistrationsGet
   bool                   reqSemTaken    = false;
   int                    offset         = 0;
   int                    limit          = DEFAULT_PAGINATION_LIMIT_INT;
-  char*                  uriParamId     = (ciP->uriParam["id"].empty())?   NULL : (char*) ciP->uriParam["id"].c_str();
-  char*                  uriParamType   = (ciP->uriParam["type"].empty())? NULL : (char*) ciP->uriParam["type"].c_str();
+  char*                  uriParamId     = (ciP->uriParam["id"].empty())?    NULL  : (char*) ciP->uriParam["id"].c_str();
+  char*                  uriParamType   = (ciP->uriParam["type"].empty())?  NULL  : (char*) ciP->uriParam["type"].c_str();
+  char*                  uriParamAttrs  = (ciP->uriParam["attrs"].empty())? NULL  : (char*) ciP->uriParam["attrs"].c_str();
   std::string            err;
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
@@ -157,6 +204,9 @@ bool mongoLdRegistrationsGet
     return false;
 
   if ((uriParamType != NULL) && (uriParamTypeToFilter(&queryBuilder, uriParamType) == false))
+    return false;
+
+  if ((uriParamAttrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, uriParamAttrs) == false))
     return false;
 
   //
