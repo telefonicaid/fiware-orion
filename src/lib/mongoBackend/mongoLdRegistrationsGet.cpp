@@ -59,7 +59,7 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
   ids = stringSplit(idList, ',', idVec);
 
   if (ids == 0)
-    return true;  // Or ... give error?
+    return true;  // FIXME: give error?
 
   for (int ix = 0; ix < ids; ix++)
     bsonArray.append(idVec[ix]);
@@ -92,7 +92,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   types = stringSplit(typeList, ',', typeVec);
 
   if (types == 0)
-    return true;  // Or ... give error?
+    return true;  // FIXME: give error?
 
   char typeExpanded[256];
 
@@ -100,7 +100,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   {
     char* type = (char*) typeVec[ix].c_str();
 
-    if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
+    if ((strncmp(type, "http", 4) == 0) && (urlCheck(type, &details) == true))
     {
       // No expansion desired, the type is already a FQN
       bsonArray.append(type);
@@ -125,6 +125,54 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
 
 
 
+// -----------------------------------------------------------------------------
+//
+// uriParamAttrsToFilter - List of Attributes (Properties or Relationships) to be retrieved
+//
+static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* attrsList)
+{
+  std::vector<std::string>    attrsVec;
+  int                         attrs;
+  mongo::BSONObjBuilder       bsonInExpression;
+  mongo::BSONArrayBuilder     bsonArray;
+  char*                       details;
+
+  attrs = stringSplit(attrsList, ',', attrsVec);
+
+  if (attrs == 0)
+    return true;  // FIXME: give error?
+
+  char attrExpanded[256];
+
+  for (int ix = 0; ix < attrs; ix++)
+  {
+    char* attr = (char*) attrsVec[ix].c_str();
+
+    if ((strncmp(attr, "http", 4) == 0) && (urlCheck(attr, &details) == true))
+    {
+      // No expansion desired, the attr is already a FQN
+      bsonArray.append(attr);
+    }
+    else
+    {
+      if (orionldUriExpand(orionldState.contextP, attr, attrExpanded, sizeof(attrExpanded), &details) == false)
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity attribute", details, OrionldDetailsString);
+        return false;
+      }
+
+      bsonArray.append(attrExpanded);
+    }
+  }
+
+  bsonInExpression.append("$in", bsonArray.arr());
+  queryBuilderP->append("contextRegistration.attrs.name", bsonInExpression.obj());
+
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * mongoLdRegistrationsGet - 
@@ -141,8 +189,9 @@ bool mongoLdRegistrationsGet
   bool                   reqSemTaken    = false;
   int                    offset         = 0;
   int                    limit          = DEFAULT_PAGINATION_LIMIT_INT;
-  char*                  uriParamId     = (ciP->uriParam["id"].empty())?   NULL : (char*) ciP->uriParam["id"].c_str();
-  char*                  uriParamType   = (ciP->uriParam["type"].empty())? NULL : (char*) ciP->uriParam["type"].c_str();
+  char*                  uriParamId     = (ciP->uriParam["id"].empty())?    NULL  : (char*) ciP->uriParam["id"].c_str();
+  char*                  uriParamType   = (ciP->uriParam["type"].empty())?  NULL  : (char*) ciP->uriParam["type"].c_str();
+  char*                  uriParamAttrs  = (ciP->uriParam["attrs"].empty())? NULL  : (char*) ciP->uriParam["attrs"].c_str();
   std::string            err;
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
@@ -159,11 +208,14 @@ bool mongoLdRegistrationsGet
   if ((uriParamType != NULL) && (uriParamTypeToFilter(&queryBuilder, uriParamType) == false))
     return false;
 
+  if ((uriParamAttrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, uriParamAttrs) == false))
+    return false;
+
   //
   // FIXME: Many more URI params to be treated and added to queryBuilder
   //
 
-  query = queryBuilder.obj();
+  query = queryBuilder.obj();  // Here all the filters added to queryBuilder are "merged" into 'query'
   query.sort(BSON("_id" << 1));
 
   // LM_TMP(("KZ: query: %s", query.toString().c_str()));

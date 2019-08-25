@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Getting registrations with the id=id1,id2,idX URI param
+Getting registrations with the type=T1, T3, T5, TX URI param
 
 --SHELL-INIT--
 export BROKER=orionld
