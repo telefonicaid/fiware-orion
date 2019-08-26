@@ -456,7 +456,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   char*   entityId           = orionldState.wildcard[0];
   LM_TMP(("-------------- Calling dbEntityLookup(%s)", entityId));
   KjNode* currentEntityTreeP = dbEntityLookup(entityId);
-  LM_TMP(("-------------- After dbEntityLookup(%s)", entityId));
+  LM_TMP(("-------------- After dbEntityLookup(%s): %p", entityId, currentEntityTreeP));
   char*   title;
   char*   details;
 
