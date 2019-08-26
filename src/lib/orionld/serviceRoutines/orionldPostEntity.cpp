@@ -276,6 +276,24 @@ void kjModDateSet(KjNode* attrP)
 
 // -----------------------------------------------------------------------------
 //
+// objectToValue -
+//
+static void objectToValue(KjNode* attrP)
+{
+  if (attrP->type != KjObject)
+    return;
+
+  for (KjNode* itemP = attrP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  {
+    if (strcmp(itemP->name, "object") == 0)
+      itemP->name = (char*) "value";
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeMergeAddNewAttrsOverwriteExisting -
 //
 bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree, char** titleP, char** detailsP)
@@ -306,6 +324,9 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
   while (modAttrP != NULL)
   {
     KjNode* next = modAttrP->next;
+
+    // If the attribute is a Relationship, then the "object" field should change name to "value"
+    objectToValue(modAttrP);
 
     //
     // If "modAttrP" exists in sourceTree, then we have to remove it - to later add the one from "modTree"
@@ -338,7 +359,7 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
 
 
       // Remove modAttrP from modTree and add to sourceTree
-      LM_TMP(("MERGE: Remove modAttrP from modTree and add to sourceTree"));
+      LM_TMP(("MERGE: Remove modAttrP '%s' from modTree and add to sourceTree", modAttrP->name));
       kjChildRemove(modTree, modAttrP);
       kjChildAdd(attrsP, modAttrP);
       kjSysAttrs(modAttrP);
