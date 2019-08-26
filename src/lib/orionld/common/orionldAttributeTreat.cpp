@@ -659,15 +659,39 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else if (isTemporalProperty == true)
     {
-      int64_t dateTime;
+      //
+      // Can be either simply a string (then DateTime is assumed, or an object with @type and @value
+      // If object, then @type can be any of these three:
+      //   o DateTime
+      //   o Date
+      //   o Time
+      //
+      // The @value must be a string and must be valid according to @type
+      //
+      if (valueP->type == KjString)
+      {
+        int64_t dateTime;
 
-      if (valueP->type != KjString)
-        ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String", kjValueType(valueP->type));
-      else if ((dateTime = parse8601Time(valueP->value.s)) == -1)
-        ATTRIBUTE_ERROR("temporal-property attribute must have a valid ISO8601 as value", kNodeP->name);
+        if ((dateTime = parse8601Time(valueP->value.s)) == -1)
+          ATTRIBUTE_ERROR("temporal property must have a valid ISO8601 as value", kNodeP->name);
+        caP->numberValue = dateTime;
+      }
+#if 0
+      else if (valueP->type == KjObject)
+      {
+        KjNode* atId     = NULL;
+        KjNode* atValue  = NULL;
+
+        for (KjNode* nodeP = valueP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+        {
+          if (
+        }
+      }
+#endif
+        else
+        ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String or a JSON object with @value and @type", kjValueType(valueP->type));
 
       caP->valueType   = orion::ValueTypeNumber;
-      caP->numberValue = dateTime;
     }
     else
     {

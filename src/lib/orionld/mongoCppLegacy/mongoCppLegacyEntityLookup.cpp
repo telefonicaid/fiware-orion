@@ -81,8 +81,8 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
 
-#if 1
-    char tmpBuffer[1024];
+#if 0
+    char tmpBuffer[2048];
     kjRender(orionldState.kjsonP, kjTree, tmpBuffer, sizeof(tmpBuffer));
     LM_TMP(("MERGE: json III: %s", tmpBuffer));
 #endif
