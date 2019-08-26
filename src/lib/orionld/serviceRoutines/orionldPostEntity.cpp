@@ -318,6 +318,7 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
     KjNode* sourceTreeAttrP = NULL;
     if ((sourceTreeAttrP = kjLookup(attrsP, modAttrP->name)) != NULL)
     {
+#if 0
       char renderBuffer[1024];
 
       LM_TMP(("MERGE: Found attribute '%s' is source tree - merging with the new one", modAttrP->name));
@@ -327,6 +328,7 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
       LM_TMP(("MERGE: modAttrP: '%s'", renderBuffer));
 
       LM_TMP(("MERGE: calling kjNodeAttributeMerge"));
+#endif
       kjNodeAttributeMerge(sourceTreeAttrP, modAttrP);
       kjModDateSet(sourceTreeAttrP);
     }
@@ -334,9 +336,6 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
     {
       LM_TMP(("MERGE: Did not find attribute '%s' in source tree - adding the new one", modAttrP->name));
 
-      char renderBuffer[1024];
-      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));
-      LM_TMP(("MERGE: modAttrP: '%s'", renderBuffer));
 
       // Remove modAttrP from modTree and add to sourceTree
       LM_TMP(("MERGE: Remove modAttrP from modTree and add to sourceTree"));
@@ -347,10 +346,6 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
       // Orion Data Model: Must add a mdNames: []
       KjNode* mdArrayP = kjArray(orionldState.kjsonP, "mdNames");
       kjChildAdd(modAttrP, mdArrayP);
-
-      // Debugging
-      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));
-      LM_TMP(("MERGE: modAttrP II: '%s'", renderBuffer));
 
       //
       // Add attribute name to "attrNames"
@@ -451,7 +446,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
     return false;
   }
 
-#if DEBUG
+#if 0
   char renderBuffer[1024];
   kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));
   LM_TMP(("MERGE: Got the entity: '%s'", renderBuffer));
@@ -476,7 +471,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
     return false;
   }
 
-#if DEBUG
+#if 0
   kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));
   LM_TMP(("MERGE: resulting tree: '%s'", renderBuffer));
 #endif
@@ -487,9 +482,11 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   kjModDateSet(currentEntityTreeP);
 
   // Write to database
+#if 0
   char buffer[1024];
   kjRender(orionldState.kjsonP, currentEntityTreeP, buffer, sizeof(buffer));
   LM_TMP(("MERGE: writing to DB: %s", buffer));
+#endif
   dbEntityUpdate(entityId, currentEntityTreeP);
 
   //
