@@ -89,10 +89,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://schema.org/name"
+		"http://example.org/ngsi-ld/default/name"
 	],
 	"attrs" : {
-		"http://schema=org/name" : {
+		"http://example=org/ngsi-ld/default/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
