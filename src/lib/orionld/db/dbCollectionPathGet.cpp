@@ -37,7 +37,7 @@
 int dbCollectionPathGet(char* path, int pathLen, const char* collection)
 {
   int dbNameLen     = strlen(dbName);          // Can be faster - global variable can keep this constant
-  int tenantLen     = ((multitenancy == true) && (orionldState.tenant != NULL))? strlen(orionldState.tenant) + 1 : 0;
+  int tenantLen     = ((multitenancy == true) && (orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))? strlen(orionldState.tenant) + 1 : 0;
   int collectionLen = strlen(collection) + 1;  // +1: '.'
 
   if (dbNameLen + tenantLen + collectionLen >= pathLen)
@@ -47,6 +47,10 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
   }
     
   strcpy(path, dbName);
+
+  LM_TMP(("DB: dbName:     '%s'", dbName));
+  LM_TMP(("DB: tenant:     '%s'", (orionldState.tenant != NULL)? orionldState.tenant: "NULL"));
+  LM_TMP(("DB: collection: '%s'", collection));
 
   if (tenantLen != 0)
   {
@@ -58,5 +62,6 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
   strcpy(&path[dbNameLen + tenantLen + 1], collection);
 
   LM_TMP(("DB: collection path: %s", path));
+
   return 0;
 }
