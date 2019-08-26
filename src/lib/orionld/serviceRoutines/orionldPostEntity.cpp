@@ -322,9 +322,9 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
       char renderBuffer[1024];
 
       LM_TMP(("MERGE: Found attribute '%s' is source tree - merging with the new one", modAttrP->name));
-      kjRender(orionldState.kjsonP, sourceTreeAttrP, renderBuffer, sizeof(renderBuffer));
+      kjRender(orionldState.kjsonP, sourceTreeAttrP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
       LM_TMP(("MERGE: sourceTreeAttrP: '%s'", renderBuffer));
-      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));
+      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
       LM_TMP(("MERGE: modAttrP: '%s'", renderBuffer));
 
       LM_TMP(("MERGE: calling kjNodeAttributeMerge"));
@@ -448,10 +448,10 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 
 #if 0
   char renderBuffer[1024];
-  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));
+  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
   LM_TMP(("MERGE: Got the entity: '%s'", renderBuffer));
 
-  kjRender(orionldState.kjsonP, orionldState.requestTree, renderBuffer, sizeof(renderBuffer));
+  kjRender(orionldState.kjsonP, orionldState.requestTree, renderBuffer, sizeof(renderBuffer));  // Outdeffed
   LM_TMP(("MERGE: Update/noOverwrite: '%s'", renderBuffer));
 #endif
 
@@ -472,7 +472,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   }
 
 #if 0
-  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));
+  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
   LM_TMP(("MERGE: resulting tree: '%s'", renderBuffer));
 #endif
 
@@ -484,7 +484,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // Write to database
 #if 0
   char buffer[1024];
-  kjRender(orionldState.kjsonP, currentEntityTreeP, buffer, sizeof(buffer));
+  kjRender(orionldState.kjsonP, currentEntityTreeP, buffer, sizeof(buffer));  // Outdeffed
   LM_TMP(("MERGE: writing to DB: %s", buffer));
 #endif
   dbEntityUpdate(entityId, currentEntityTreeP);
