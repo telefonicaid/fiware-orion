@@ -135,10 +135,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://schema.org/name"
+		"https://uri.etsi.org/ngsi-ld/name"
 	],
 	"attrs" : {
-		"http://schema=org/name" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
