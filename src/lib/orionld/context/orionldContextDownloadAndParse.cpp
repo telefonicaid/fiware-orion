@@ -181,19 +181,23 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     return NULL;
   }
 
-  KjNode* contextNodeP = tree->value.firstChildP;
-  LM_T(LmtContext, ("contextNodeP is named '%s'", contextNodeP->name));
+
+  //
+  // Lookup member called '@context'
+  //
+  KjNode* contextNodeP = NULL;
+  for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (strcmp(nodeP->name, "@context") == 0)
+    {
+      contextNodeP = nodeP;
+      break;
+    }
+  }
 
   if (contextNodeP == NULL)
   {
-    *detailsPP = (char*) "Invalid context - object must have a single member, called '@context'";
-    LM_E((*detailsPP));
-    return NULL;
-  }
-
-  if (strcmp(contextNodeP->name, "@context") != 0)
-  {
-    *detailsPP = (char*) "Invalid context - object must have a single member, called '@context'";
+    *detailsPP = (char*) "Invalid context - object must have a member called '@context'";
     LM_E((*detailsPP));
     return NULL;
   }
@@ -205,20 +209,6 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     return NULL;
   }
 
-  if (contextNodeP->next != NULL)
-  {
-    if ((strcmp(contextNodeP->next->name, "generatedAt") == 0) && (contextNodeP->next->type == KjString))
-    {
-      // OK
-    }
-    else
-    {
-      *detailsPP = (char*) "Invalid context - '@context' and optionally 'generatedAt' must be the only members of the JSON object";
-      LM_E((*detailsPP));
-      return NULL;
-    }
-  }
-
   // Now, we have '@context' - is it an object?
   if (contextNodeP->type != KjObject)
   {
@@ -226,6 +216,13 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
                        url, kjValueType(contextNodeP->type)));
     return tree;
   }
+
+
+  //
+  // Removing all members from toplevel of the tree - except the '@context' member
+  //
+  tree->value.firstChildP = contextNodeP;  // FIXME: Leak?
+  contextNodeP->next = NULL;
 
 #if 0
   //
