@@ -193,6 +193,7 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
   int ix = 0;
   KjNode* nodeP = updateP->value.firstChildP;
 
+  LM_TMP(("MERGE: In kjNodeAttributeMerge for attribute '%s'", updateP->name));
   while (nodeP != NULL)
   {
     KjNode* next = nodeP->next;
@@ -298,6 +299,7 @@ static void objectToValue(KjNode* attrP)
 //
 bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree, char** titleP, char** detailsP)
 {
+  LM_TMP(("MERGE: In kjTreeMergeAddNewAttrsOverwriteExisting"));
   //
   // The data model of Orion is that all attributes go in toplevel::attrs
   // So, we need to reposition "sourceTree" so that it points to the sourceTree::atts
@@ -315,12 +317,15 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
   if (attrNamesP == NULL)
   {
     *titleP   = (char*) "Corrupt Database";
-    *detailsP = (char*) "No /attrNamess/ member found in Entity DB data";
+    *detailsP = (char*) "No /attrNames/ member found in Entity DB data";
     return NULL;
   }
 
   KjNode* modAttrP = modTree->value.firstChildP;
 
+  //
+  // For every attribute in the incoming payload
+  //
   while (modAttrP != NULL)
   {
     KjNode* next = modAttrP->next;
@@ -442,7 +447,7 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
 //
 bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 {
-  LM_TMP(("In orionldPostEntityOverwrite"));
+  LM_TMP(("MERGE: In orionldPostEntityOverwrite"));
   //
   // Forwarding and Subscriptions will be taken care of later.
   // For now, just local updates
@@ -454,9 +459,9 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // 3. Write to mongo
   //
   char*   entityId           = orionldState.wildcard[0];
-  LM_TMP(("-------------- Calling dbEntityLookup(%s)", entityId));
+  LM_TMP(("MERGE: Calling dbEntityLookup(%s)", entityId));
   KjNode* currentEntityTreeP = dbEntityLookup(entityId);
-  LM_TMP(("-------------- After dbEntityLookup(%s): %p", entityId, currentEntityTreeP));
+  LM_TMP(("MERGE: After dbEntityLookup(%s): %p", entityId, currentEntityTreeP));
   char*   title;
   char*   details;
 
@@ -551,7 +556,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 //
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
-  LM_TMP(("In orionldPostEntity"));
+  LM_TMP(("MERGE: In orionldPostEntity"));
 
   // Is the payload not a JSON object?
   OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
