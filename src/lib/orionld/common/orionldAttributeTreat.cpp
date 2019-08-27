@@ -412,6 +412,18 @@ static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 
 // -----------------------------------------------------------------------------
 //
+// atValueCheck -
+//
+static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** titleP, char** detailsP)
+{
+  // FIXME: Implement!!!
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldAttributeTreat -
 //
 bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP)
@@ -674,24 +686,77 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
         if ((dateTime = parse8601Time(valueP->value.s)) == -1)
           ATTRIBUTE_ERROR("temporal property must have a valid ISO8601 as value", kNodeP->name);
+
         caP->numberValue = dateTime;
+        caP->valueType   = orion::ValueTypeNumber;
       }
-#if 0
       else if (valueP->type == KjObject)
       {
-        KjNode* atId     = NULL;
-        KjNode* atValue  = NULL;
+        KjNode* atTypeNodeP   = NULL;
+        KjNode* atValueNodeP  = NULL;
 
         for (KjNode* nodeP = valueP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
         {
-          if (
+          if (SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
+          {
+            DUPLICATE_CHECK(atTypeNodeP, "@type", nodeP);
+            STRING_CHECK(nodeP, "@type");
+          }
+          else if (SCOMPARE7(nodeP->name, '@', 'v', 'a', 'l', 'u', 'e', 0))
+          {
+            DUPLICATE_CHECK(atValueNodeP, "@value", nodeP);
+            STRING_CHECK(nodeP, "@value");
+          }
+          else
+          {
+            LM_E(("Invalid member of value as object of Temporal Property: '%s'", nodeP->name));
+            orionldErrorResponseCreate(OrionldBadRequestData, "Invalid member of value as object of Temporal Property", nodeP->name, OrionldDetailsString);
+            return false;
+          }
         }
-      }
-#endif
-        else
-        ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String or a JSON object with @value and @type", kjValueType(valueP->type));
 
-      caP->valueType   = orion::ValueTypeNumber;
+        if (atValueNodeP == NULL)
+        {
+          LM_E(("@value node missing in value-object of Temporal Property '%s'", valueP->name));
+          orionldErrorResponseCreate(OrionldBadRequestData, "@value node missing in value-object of Temporal Property", valueP->name, OrionldDetailsString);
+          return false;
+        }
+
+        char* title;
+        char* details;
+        if ((atTypeNodeP != NULL) && (atValueCheck(atTypeNodeP, atValueNodeP, &title, &details) == false))
+        {
+          LM_E(("Invalid temporal value of Temporal Property '%s'", valueP->name));
+          orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailsString);
+          return false;
+        }
+
+        orion::CompoundValueNode* cNodeP      = new orion::CompoundValueNode();
+        orion::CompoundValueNode* cValueNodeP = new orion::CompoundValueNode();
+
+        cNodeP->valueType        = orion::ValueTypeObject;
+
+        cValueNodeP->name        = "@value";
+        cValueNodeP->valueType   = orion::ValueTypeNumber;
+        cValueNodeP->numberValue = parse8601Time(atValueNodeP->value.s);  // FIXME: Assuming "DateTime" - "Date"/"Time" ...
+        cNodeP->childV.push_back(cValueNodeP);
+
+        if (atTypeNodeP != NULL)
+        {
+          orion::CompoundValueNode* cTypeNodeP  = new orion::CompoundValueNode();
+
+          cTypeNodeP->name        = "@type";
+          cTypeNodeP->valueType   = orion::ValueTypeString;
+          cTypeNodeP->stringValue = atTypeNodeP->value.s;
+
+          cNodeP->childV.push_back(cTypeNodeP);
+        }
+
+        caP->valueType      = orion::ValueTypeObject;
+        caP->compoundValueP = cNodeP;
+      }
+      else
+        ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String or a JSON object with @value and @type", kjValueType(valueP->type));
     }
     else
     {
