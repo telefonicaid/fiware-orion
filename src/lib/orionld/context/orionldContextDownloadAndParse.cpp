@@ -223,7 +223,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
   //
   tree->value.firstChildP = contextNodeP;  // FIXME: Leak?
   contextNodeP->next = NULL;
-  
+
 #if 0
   //
   // Temporarily disabling the context item collision loop
