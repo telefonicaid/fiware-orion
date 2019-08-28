@@ -67,6 +67,24 @@ typedef struct OrionldUriParamOptions
 
 // -----------------------------------------------------------------------------
 //
+// OrionldUriParams -
+//
+typedef struct OrionldUriParams
+{
+  char* id;
+  char* type;
+  char* idPattern;
+  char* attrs;
+  char* options;   // Not Implemented - use ciP->uriParams for now
+  int   offset;    // Not Implemented - use ciP->uriParams for now
+  int   limit;     // Not Implemented - use ciP->uriParams for now
+  // To Be Continued ...
+} OrionldUriParams;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionldConnectionState - the state of the connection
 //
 // This struct contains all the state of a connection, like the Kjson pointer, the pointer to
@@ -106,6 +124,7 @@ typedef struct OrionldConnectionState
   char*                   entityId;
   char*                   httpReqBuffer;
   OrionldUriParamOptions  uriParamOptions;
+  OrionldUriParams        uriParams;
   char*                   errorAttributeArrayP;
   char                    errorAttributeArray[512];
   int                     errorAttributeArrayUsed;
