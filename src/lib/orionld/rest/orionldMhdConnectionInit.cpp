@@ -32,6 +32,7 @@
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, OrionldDetailsString, ...
 #include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
+#include "orionld/common/SCOMPARE.h"                           // SCOMPARE
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
@@ -161,7 +162,42 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
     port = 0;
     snprintf(ip, sizeof(ip), "IP unknown");
   }
+
   ciP->port = port;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldUriArgumentGet -
+//
+static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+{
+  if (SCOMPARE3(key, 'i', 'd', 0))
+    orionldState.uriParams.id = (char*) value;
+  else if (SCOMPARE5(key, 't', 'y', 'p', 'e', 0))
+    orionldState.uriParams.type = (char*) value;
+  else if (SCOMPARE10(key, 'i', 'd', 'P', 'a', 't', 't', 'e', 'r', 'n', 0))
+    orionldState.uriParams.idPattern = (char*) value;
+  else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
+    orionldState.uriParams.attrs = (char*) value;
+
+  return MHD_YES;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriArgumentsPresent - temp - FIXME: TO BE REMOVED
+//
+static void uriArgumentsPresent(void)
+{
+  LM_TMP(("orionldUriArguments: id:        '%s'", orionldState.uriParams.id));
+  LM_TMP(("orionldUriArguments: type:      '%s'", orionldState.uriParams.type));
+  LM_TMP(("orionldUriArguments: idPattern: '%s'", orionldState.uriParams.idPattern));
+  LM_TMP(("orionldUriArguments: attrs:     '%s'", orionldState.uriParams.attrs));
 }
 
 
@@ -263,7 +299,7 @@ int orionldMhdConnectionInit
   }
 
   // 5.  Get HTTP Headers
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: to be reimplemented in C !!!
 
   // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
   ciP->servicePathV.push_back((ciP->verb == GET)? "/#" : "/");
@@ -293,7 +329,9 @@ int orionldMhdConnectionInit
   }
 
   // 13. Get URI parameters
-  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);           // FIXME: To Be Removed!
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
+  uriArgumentsPresent();
 
   // 14. Check ...
 

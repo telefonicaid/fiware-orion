@@ -1,0 +1,123 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URI params in orionldState
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# NOTE: never mind that the requests 01 and 03 fail - the URI Arg parsing is done lone before the
+#       error is discovered by the broker and does not alter the test results.
+#
+# 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
+# 02. Grep from log-file - see all four with their corresponding values
+# 03. GET Entity with 'id=' - no value for id
+# 04. Grep from log-file - see that ID is given but that its value is empty - the other three: null values
+#
+
+echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values"
+echo "==============================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?id=E1,E2,E3&type=T1,T2,T3&idPattern=E.*&attrs=A1,A2,A3"
+echo
+echo
+
+
+
+echo "02. Grep from log-file - see all four with their corresponding values"
+echo "====================================================================="
+grep "orionldUriArguments" /tmp/orionld.log | awk -Fmsg= '{ print $2 }'
+echo
+echo
+
+
+echo "03. GET Entity with 'id=' - no value for id"
+echo "==========================================="
+orionCurl --url "/ngsi-ld/v1/entities?id="
+echo
+echo
+
+
+echo "04. Grep from log-file - see that ID is given but that its value is empty - the other three: null values"
+echo "========================================================================================================"
+grep "orionldUriArguments" /tmp/orionld.log | awk -Fmsg= '{ print $2 }'
+echo
+echo
+
+
+--REGEXPECT--
+01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "id, idPattern",
+    "title": "Incompatible parameters",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Grep from log-file - see all four with their corresponding values
+=====================================================================
+orionldUriArguments: id:        'E1,E2,E3'
+orionldUriArguments: type:      'T1,T2,T3'
+orionldUriArguments: idPattern: 'E.*'
+orionldUriArguments: attrs:     'A1,A2,A3'
+
+
+03. GET Entity with 'id=' - no value for id
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "details": "entity type/id not given nor attribute list",
+    "title": "too broad query",
+    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Grep from log-file - see that ID is given but that its value is empty - the other three: null values
+========================================================================================================
+orionldUriArguments: id:        'E1,E2,E3'
+orionldUriArguments: type:      'T1,T2,T3'
+orionldUriArguments: idPattern: 'E.*'
+orionldUriArguments: attrs:     'A1,A2,A3'
+orionldUriArguments: id:        ''
+orionldUriArguments: type:      '(null)'
+orionldUriArguments: idPattern: '(null)'
+orionldUriArguments: attrs:     '(null)'
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
