@@ -12,4 +12,8 @@
 - Add: NGSIv2 forwards now work for queries and updates - for simple cases (#3068)
 - Fix: The 'Allow:' header for the service /v2/registrations had the incorrect value of "Allow: POST". The correct value is: "Allow: GET, POST"
 - Fix: incorrectly loging update subscription traces in ERROR log level (#3531)
+- Add: -dbAuthMech CLI parameter to set default MongoDB authentication mechanism (#2987)
+- Fix: set default MongoDB authentication mechanism to SCRAM-SHA-1 (old MONGODB-CR was deprecated time ago)
+- Fix: abort on startup when MongoDB authentication fails to avoid starting a useless Context Broker
+- Fix: change max -dbhost length from 64 to 256 (to cope with long replica set strings using full domain names)
 - Add: Notify only attributes that change (#3190)
