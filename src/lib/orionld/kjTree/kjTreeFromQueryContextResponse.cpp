@@ -245,7 +245,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       KjNode*           aTop     = NULL;
 
       attrName = orionldAliasLookup(orionldState.contextP, aP->name.c_str());
-
       char* valueFieldName;
       if (keyValues)
       {
@@ -287,7 +286,9 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       }
       else
       {
-        // Not keyValues - create entire attribute tree
+        //
+        // NOT keyValues - create entire attribute tree
+        //
         aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {
@@ -426,7 +427,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           }
           else
           {
-            LM_TMP(("KZ: Dealing with '%s', type '%s'", mdP->name.c_str(), valueTypeName(mdP->valueType)));
             details = NULL;
             switch (mdP->valueType)
             {
