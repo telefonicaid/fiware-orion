@@ -186,14 +186,13 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
   // Go over the entire updateP tree and replace all those nodes in sourceP
   // Also, update the modDate node to the current date/time
   //
-  KjNode* modDateP  = kjLookup(sourceP, "modDate");
-  KjNode* mdP       = kjLookup(sourceP, "md");
-  KjNode* mdNamesP  = kjLookup(sourceP, "mdNames");
+  KjNode*  modDateP  = kjLookup(sourceP, "modDate");
+  KjNode*  mdP       = kjLookup(sourceP, "md");
+  KjNode*  mdNamesP  = kjLookup(sourceP, "mdNames");
+  int      ix        = 0;
+  KjNode*  nodeP     = updateP->value.firstChildP;
 
   modDateP->value.i = time(NULL);
-
-  int      ix    = 0;
-  KjNode*  nodeP = updateP->value.firstChildP;
 
   if (mdNamesP == NULL)
   {
@@ -207,6 +206,12 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
   {
     KjNode* next = nodeP->next;
 
+    //
+    // Aware of "object" in a Relationship - needs to change name to "value"
+    //
+    if (strcmp(nodeP->name, "object") == 0)
+      nodeP->name = (char*) "value";
+
     LM_TMP(("MERGE: Checking item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
     KjNode* sameNodeInSourceP = kjLookup(sourceP, nodeP->name);
 
@@ -217,7 +222,7 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
       // NOT removing the name from "mdNames"
     }
 
-    LM_TMP(("MERGE: Adding '%s' member to mdP/mdNamesP of SOURCE", nodeP->name));
+    LM_TMP(("MERGE: Adding '%s' member to toplevel/mdP/mdNamesP of SOURCE", nodeP->name));
 
     //
     // Should the item be added to right under the attribute, or as a metadata?
@@ -316,6 +321,7 @@ void kjModDateSet(KjNode* attrP)
 
 
 
+#if 0
 // -----------------------------------------------------------------------------
 //
 // kjTreeLog - DEBUGGING FUNCTION - To Be Removed
@@ -328,6 +334,7 @@ static void kjTreeLog(const char* comment, KjNode* nodeP)
 
   LM_TMP(("MERGE: %s: %s", comment, buf));
 }
+#endif
 
 
 
@@ -430,6 +437,10 @@ static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
     {}
     else if (strcmp(propName, "value") == 0)
     {}
+    else if (strcmp(propName, "object") == 0)
+    {
+      propP->name = (char*) "value";
+    }
     else if (strcmp(propName, "md") == 0)
     {}
     else if (strcmp(propName, "mdNames") == 0)
@@ -491,7 +502,7 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
   //
   while (modAttrP != NULL)
   {
-    KjNode* next      = modAttrP->next;
+    KjNode* next = modAttrP->next;
 
     objectToValue(modAttrP);
 
@@ -515,7 +526,7 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
     {
       LM_TMP(("MERGE: Did not find it ('%s') - adding as new", modAttrP->name));
 
-      kjTreeLog("Adding attribute", modAttrP);
+      // kjTreeLog("Adding attribute", modAttrP);
 
       // Remove modAttrP from modTree and add to sourceTree
       LM_TMP(("MERGE: Remove modAttrP '%s' from modTree and add to sourceTree", modAttrP->name));
@@ -650,6 +661,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   kjModDateSet(currentEntityTreeP);
 
   // Write to database
+  // kjTreeLog("Write to database", currentEntityTreeP);
   dbEntityUpdate(entityId, currentEntityTreeP);
 
   //

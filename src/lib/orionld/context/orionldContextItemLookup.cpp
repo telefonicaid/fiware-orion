@@ -219,7 +219,11 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
       // LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
       if (strcmp(contextItemP->name, itemName) == 0)
       {
-        LM_T(LmtContextItemLookup, ("found it! '%s' -> '%s'", itemName, contextItemP->value.s));
+        if (contextItemP->type == KjString)
+          LM_T(LmtContextItemLookup, ("found it! '%s' -> '%s'", itemName, contextItemP->value.s));
+        else
+          LM_T(LmtContextItemLookup, ("found it! ('%s') it's a JSON %s'", itemName, kjValueType(contextItemP->type)));
+
         return contextItemP;
       }
     }
