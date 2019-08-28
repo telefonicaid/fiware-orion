@@ -221,7 +221,12 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
 
     //
     // Should the item be added to right under the attribute, or as a metadata?
-    // For now, ALL items are treated at metadata
+    // All items are treated at metadata except:
+    // - type
+    // - value
+    // - creDate
+    // - modDate
+    // - Those that were found in top-level of the source attribute
     //
     if (strcmp(nodeP->name, "type") == 0)
       kjChildAdd(sourceP, nodeP);
