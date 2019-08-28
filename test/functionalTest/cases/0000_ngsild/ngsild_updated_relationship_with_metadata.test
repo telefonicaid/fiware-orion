@@ -121,7 +121,7 @@ Date: REGEX(.*)
 02. GET the entity, make sure all props/rels are present
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 603
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -167,7 +167,7 @@ Date: REGEX(.*)
 04. GET the entity, make sure all metadata of 'locatedIn' are present
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 943
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)

@@ -186,14 +186,23 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
   // Go over the entire updateP tree and replace all those nodes in sourceP
   // Also, update the modDate node to the current date/time
   //
-  KjNode* modDateP = kjLookup(sourceP, "modDate");
+  KjNode* modDateP  = kjLookup(sourceP, "modDate");
+  KjNode* mdP       = kjLookup(sourceP, "md");
+  KjNode* mdNamesP  = kjLookup(sourceP, "mdNames");
 
   modDateP->value.i = time(NULL);
 
-  int ix = 0;
-  KjNode* nodeP = updateP->value.firstChildP;
+  int      ix    = 0;
+  KjNode*  nodeP = updateP->value.firstChildP;
+
+  if (mdNamesP == NULL)
+  {
+    mdNamesP = kjArray(orionldState.kjsonP, "mdNames");
+    kjChildAdd(sourceP, mdNamesP);
+  }
 
   LM_TMP(("MERGE: In kjNodeAttributeMerge for attribute '%s'", updateP->name));
+
   while (nodeP != NULL)
   {
     KjNode* next = nodeP->next;
@@ -205,10 +214,37 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
     {
       LM_TMP(("MERGE: Found '%s' member in source - removing it", sameNodeInSourceP->name));
       kjChildRemove(sourceP, sameNodeInSourceP);
+      // NOT removing the name from "mdNames"
     }
 
-    LM_TMP(("MERGE: Adding '%s' member to source", nodeP->name));
-    kjChildAdd(sourceP, nodeP);
+    LM_TMP(("MERGE: Adding '%s' member to mdP/mdNamesP of SOURCE", nodeP->name));
+
+    //
+    // Should the item be added to right under the attribute, or as a metadata?
+    // For now, ALL items are treated at metadata
+    //
+    if (strcmp(nodeP->name, "type") == 0)
+      kjChildAdd(sourceP, nodeP);
+    else if (strcmp(nodeP->name, "value") == 0)
+      kjChildAdd(sourceP, nodeP);
+    else if (strcmp(nodeP->name, "creDate") == 0)
+      kjChildAdd(sourceP, nodeP);
+    else if (strcmp(nodeP->name, "modDate") == 0)
+      kjChildAdd(sourceP, nodeP);
+    else if (sameNodeInSourceP != NULL)
+      kjChildAdd(sourceP, nodeP);
+    else
+    {
+      if (mdP == NULL)  // "md" is only created when needed whereas, "mdNames" must always be present
+      {
+        mdP = kjObject(orionldState.kjsonP, "md");
+        kjChildAdd(sourceP, mdP);
+      }
+
+      kjChildAdd(mdP, nodeP);
+      if (sameNodeInSourceP == NULL)
+        kjChildAdd(mdNamesP, kjString(orionldState.kjsonP, "", nodeP->name));
+    }
     ++ix;
     LM_TMP(("MERGE: Treated item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
 
@@ -277,17 +313,139 @@ void kjModDateSet(KjNode* attrP)
 
 // -----------------------------------------------------------------------------
 //
+// kjTreeLog - DEBUGGING FUNCTION - To Be Removed
+//
+static void kjTreeLog(const char* comment, KjNode* nodeP)
+{
+  char buf[2048];
+
+  kjRender(orionldState.kjsonP, nodeP, buf, sizeof(buf));
+
+  LM_TMP(("MERGE: %s: %s", comment, buf));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // objectToValue -
 //
 static void objectToValue(KjNode* attrP)
 {
-  if (attrP->type != KjObject)
-    return;
+  KjNode* typeNodeP = kjLookup(attrP, "type");
 
-  for (KjNode* itemP = attrP->value.firstChildP; itemP != NULL; itemP = itemP->next)
+  // If the attribute is a Relationship, then the "object" field should change name to "value"
+  if ((typeNodeP != NULL) && (strcmp(typeNodeP->value.s, "Relationship") == 0))
   {
-    if (strcmp(itemP->name, "object") == 0)
-      itemP->name = (char*) "value";
+    KjNode* objectNodeP = kjLookup(attrP, "object");
+
+    if (objectNodeP != NULL)
+    {
+      LM_TMP(("KZ: Changing 'object' for 'value' for Relationship '%s'", attrP->name));
+      objectNodeP->name = (char*) "value";
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjAttributePropertiesToMetadataVector -
+//
+// The API v1/v2 data model states that all properties of an attribute except special properties like creDate etc,
+// go in the metadata vector "md", and their names, for faster lookups go to the vector "mdNames"
+//
+// When parsed, the tree doesn't look like that, as the incoming payload doesn't - this function moves the non-special
+// properties of an attribute to the metadata vector
+//
+// The Special Properties are:
+//   o type
+//   o creDate
+//   o modDate
+//   o value
+//   o md
+//   o mdNames
+//
+// All other properties under "attribute toplevel" must be moved to under "md" and their names be included in "mdNames".
+// This is the API v1/v2 data model
+//
+static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
+{
+  KjNode* mdP      = NULL;
+  KjNode* mdNamesP = NULL;
+
+  for (KjNode* propP = attrP->value.firstChildP; propP != NULL; propP = propP->next)
+  {
+    LM_TMP(("MERGE: Looking for md/mdNames - found '%s'", propP->name));
+    if (strcmp(propP->name, "md") == 0)
+      mdP = propP;
+    else if (strcmp(propP->name, "mdNames") == 0)
+      mdNamesP = propP;
+  }
+
+  if (mdNamesP == NULL)
+  {
+    mdNamesP = kjArray(orionldState.kjsonP, "mdNames");
+    kjChildAdd(attrP, mdNamesP);
+    LM_TMP(("MERGE: Added 'mdNames'"));
+  }
+
+  //
+  // Be very careful when looping over a linked list and removing items from the list
+  //
+  // If I did simply:
+  //
+  // for (KjNode* propP = attrP->value.firstChildP; propP != NULL; propP = propP->next)
+  // {
+  // }
+  // ... it would fail, because when I remove propP from the list, and append it to some other list, I change its next-pointer
+  // So, propP->next is either set to NULL (and the loop ends prematurely) or it is set to point to some other item is some other list ...
+  //
+  // VERY DANGEROUS!!!
+  //
+  // Only way to this safely is save the next pointer in the beginning of the loop, bafore any item is removed from the list
+  //
+  KjNode* next;
+  KjNode* propP = attrP->value.firstChildP;
+
+  while (propP != NULL)
+  {
+    char* propName = propP->name;
+
+    next = propP->next;
+
+    LM_TMP(("MERGE: Should the attr-property '%s' be moved to md/mdNames?", propP->name));
+
+    if (strcmp(propName, "type") == 0)
+    {}
+    else if (strcmp(propName, "creDate") == 0)
+    {}
+    else if (strcmp(propName, "modDate") == 0)
+    {}
+    else if (strcmp(propName, "value") == 0)
+    {}
+    else if (strcmp(propName, "md") == 0)
+    {}
+    else if (strcmp(propName, "mdNames") == 0)
+    {}
+    else
+    {
+      if (mdP == NULL)  // "md" is only created when needed whereas, "mdNames" must always be present
+      {
+        mdP = kjObject(orionldState.kjsonP, "md");
+        kjChildAdd(attrP, mdP);
+        LM_TMP(("MERGE: Added 'md'"));
+      }
+
+      LM_TMP(("MERGE: Yes - '%s' is moved to md/mdNames", propP->name));
+      kjChildRemove(attrP, propP);
+      objectToValue(propP);
+      kjChildAdd(mdP, propP);
+      kjChildAdd(mdNamesP, kjString(orionldState.kjsonP, "", propP->name));
+    }
+
+    propP = next;
   }
 }
 
@@ -328,9 +486,8 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
   //
   while (modAttrP != NULL)
   {
-    KjNode* next = modAttrP->next;
+    KjNode* next      = modAttrP->next;
 
-    // If the attribute is a Relationship, then the "object" field should change name to "value"
     objectToValue(modAttrP);
 
     //
@@ -342,30 +499,23 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
     //     - add slot in "attrNames"
     //
     KjNode* sourceTreeAttrP = NULL;
+    LM_TMP(("MERGE: Looking for '%s'", modAttrP->name));
     if ((sourceTreeAttrP = kjLookup(attrsP, modAttrP->name)) != NULL)
     {
-#if 0
-      char renderBuffer[1024];
-
-      LM_TMP(("MERGE: Found attribute '%s' is source tree - merging with the new one", modAttrP->name));
-      kjRender(orionldState.kjsonP, sourceTreeAttrP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
-      LM_TMP(("MERGE: sourceTreeAttrP: '%s'", renderBuffer));
-      kjRender(orionldState.kjsonP, modAttrP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
-      LM_TMP(("MERGE: modAttrP: '%s'", renderBuffer));
-
-      LM_TMP(("MERGE: calling kjNodeAttributeMerge"));
-#endif
+      LM_TMP(("MERGE: Found it - calling kjNodeAttributeMerge"));
       kjNodeAttributeMerge(sourceTreeAttrP, modAttrP);
       kjModDateSet(sourceTreeAttrP);
     }
     else
     {
-      LM_TMP(("MERGE: Did not find attribute '%s' in source tree - adding the new one", modAttrP->name));
+      LM_TMP(("MERGE: Did not find it ('%s') - adding as new", modAttrP->name));
 
+      kjTreeLog("Adding attribute", modAttrP);
 
       // Remove modAttrP from modTree and add to sourceTree
       LM_TMP(("MERGE: Remove modAttrP '%s' from modTree and add to sourceTree", modAttrP->name));
       kjChildRemove(modTree, modAttrP);
+      kjAttributePropertiesToMetadataVector(modAttrP);
       kjChildAdd(attrsP, modAttrP);
       kjSysAttrs(modAttrP);
 
@@ -472,15 +622,6 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
     return false;
   }
 
-#if 0
-  char renderBuffer[1024];
-  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
-  LM_TMP(("MERGE: Got the entity: '%s'", renderBuffer));
-
-  kjRender(orionldState.kjsonP, orionldState.requestTree, renderBuffer, sizeof(renderBuffer));  // Outdeffed
-  LM_TMP(("MERGE: Update/noOverwrite: '%s'", renderBuffer));
-#endif
-
   // Expand attribute names
   if (expandAttrNames(orionldState.requestTree, &details) == false)
   {
@@ -497,10 +638,6 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
     return false;
   }
 
-#if 0
-  kjRender(orionldState.kjsonP, currentEntityTreeP, renderBuffer, sizeof(renderBuffer));  // Outdeffed
-  LM_TMP(("MERGE: resulting tree: '%s'", renderBuffer));
-#endif
 
   //
   // Setting the modification date of the entity
@@ -508,11 +645,6 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   kjModDateSet(currentEntityTreeP);
 
   // Write to database
-#if 0
-  char buffer[1024];
-  kjRender(orionldState.kjsonP, currentEntityTreeP, buffer, sizeof(buffer));  // Outdeffed
-  LM_TMP(("MERGE: writing to DB: %s", buffer));
-#endif
   dbEntityUpdate(entityId, currentEntityTreeP);
 
   //
