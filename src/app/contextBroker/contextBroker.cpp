@@ -130,11 +130,12 @@ static bool isFatherProcess = false;
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[64];
+char            dbHost[256];
 char            rplSet[64];
 char            dbName[64];
 char            user[64];
 char            pwd[64];
+char            authMech[64];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -194,6 +195,7 @@ bool            ngsiv1Autocast;
 #define RPLSET_DESC            "replica set"
 #define DBUSER_DESC            "database user"
 #define DBPASSWORD_DESC        "database password"
+#define DBAUTHMECH_DESC        "database authentication mechcanism (either SCRAM-SHA-1 or MONGODB-CR)"
 #define DB_DESC                "database name"
 #define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
 #define USEIPV4_DESC           "use ip v4 only"
@@ -258,6 +260,9 @@ PaArgument paArgs[] =
   { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
   { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
   { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
+
+  { "-dbAuthMech",    authMech,      "DB_AUTH_MECH",   PaString, PaOpt, _i "SCRAM-SHA-1", PaNL,   PaNL,  DBAUTHMECH_DESC    },
+
   { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
   { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
@@ -886,6 +891,11 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
+  if ((strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "MONGODB-CR", strlen("MONGODB-CR")) != 0))
+  {
+    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or MONGODB-CR"));
+  }
+
   if (useOnlyIPv6 && useOnlyIPv4)
   {
     LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
@@ -942,7 +952,7 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);

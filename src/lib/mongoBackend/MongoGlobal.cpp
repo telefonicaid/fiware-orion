@@ -207,6 +207,7 @@ void mongoInit
   std::string  dbName,
   const char*  user,
   const char*  pwd,
+  const char*  mechanism,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -216,7 +217,7 @@ void mongoInit
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mechanism, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -292,6 +293,7 @@ bool mongoStart
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
   bool         _multitenant,
   double       timeout,
   int          writeConcern,
@@ -323,6 +325,7 @@ bool mongoStart
                               rplSet,
                               username,
                               passwd,
+                              mechanism,
                               _multitenant,
                               timeout,
                               writeConcern,

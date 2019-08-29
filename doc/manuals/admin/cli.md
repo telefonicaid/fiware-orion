@@ -66,6 +66,9 @@ The list of available options is the following:
 -   **-dbpwd <pass>**. The MongoDB password to use. If your MongoDB
     doesn't use authorization then this option must be avoided. See [database
     authorization section]( database_admin.md#database-authorization).
+-   **-dbAuthMech <mechanism>**. The MongoDB authentication mechanism to use in the case
+    of providing `-dbuser` and `-dbpwd`. Alternatives are SCRAM-SHA-1 or MONGODB-CR.
+    Default (in the case of omitting this field) is SCRAM-SHA-1.
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:

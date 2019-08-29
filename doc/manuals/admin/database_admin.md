@@ -69,6 +69,7 @@ to take into account:
 
 -   If your MongoDB instance/cluster doesn't use authorization,
     then do not use the `-dbuser` and `-dbpwd` options.
+-   You can specify authentication mechanism with `-dbAuthMech`.
 -   If your MongoDB instance/cluster uses authorization , then:
     -   If you run Orion in single service/tenant mode (i.e.
         without `-multiservice`) then you are using only one database
