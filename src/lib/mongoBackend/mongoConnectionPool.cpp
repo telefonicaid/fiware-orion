@@ -140,9 +140,17 @@ static DBClientBase* mongoConnect
     //
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
-      if (((DBClientConnection*) connection)->connect(std::string(host), err))
+      try
       {
-        connected = true;
+        connected = ((DBClientConnection*) connection)->connect(std::string(host), err);
+      }
+      catch (const std::exception &e)
+      {
+        LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
+      }
+
+      if (connected)
+      {
         break;
       }
 
@@ -183,9 +191,17 @@ static DBClientBase* mongoConnect
     //
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
-      if ( ((DBClientReplicaSet*)connection)->connect())
+      try
       {
-        connected = true;
+        connected = ((DBClientReplicaSet*)connection)->connect();
+      }
+      catch (const std::exception &e)
+      {
+        LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
+      }
+
+      if (connected)
+      {
         break;
       }
 
