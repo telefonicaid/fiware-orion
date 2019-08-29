@@ -50,6 +50,7 @@ extern int mongoConnectionPoolInit
   const char* rplSet,
   const char* username,
   const char* passwd,
+  const char* mechanism,
   bool        multitenant,
   double      timeout,
   int         writeConcern,

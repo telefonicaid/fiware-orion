@@ -115,6 +115,7 @@ static DBClientBase* mongoConnect
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
   bool         multitenant,
   int          writeConcern,
   double       timeout
@@ -248,7 +249,7 @@ static DBClientBase* mongoConnect
   {
     if (strlen(username) != 0 && strlen(passwd) != 0)
     {
-      if (!connectionAuth(connection, "admin", std::string(username), std::string(passwd), &err))
+      if (!connectionAuth(connection, "admin", std::string(username), std::string(passwd), std::string(mechanism), &err))
       {
         return NULL;
       }
@@ -258,7 +259,7 @@ static DBClientBase* mongoConnect
   {
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
     {
-      if (!connectionAuth(connection, std::string(db), std::string(username), std::string(passwd), &err))
+      if (!connectionAuth(connection, std::string(db), std::string(username), std::string(passwd), std::string(mechanism), &err))
       {
         return NULL;
       }
@@ -297,6 +298,7 @@ int mongoConnectionPoolInit
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
   bool         multitenant,
   double       timeout,
   int          writeConcern,
@@ -307,7 +309,7 @@ int mongoConnectionPoolInit
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
-  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout));
+  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, multitenant, writeConcern, timeout));
   return 0;
 #else
   //
@@ -327,8 +329,10 @@ int mongoConnectionPoolInit
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     connectionPool[ix].free       = true;
-    connectionPool[ix].connection =
-        mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
+    if ((connectionPool[ix].connection =
+        mongoConnect(host, db, rplSet, username, passwd, mechanism, multitenant, writeConcern, timeout)) == NULL) {
+      return -1;
+    }
   }
 
   //
