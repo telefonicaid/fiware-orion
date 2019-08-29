@@ -1,0 +1,132 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Getting error messages from URI param queries: id, type, idPattern and attrs.
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Get error message from query by id URI param
+# 02. Get error message from query by type URI param
+# 03. Get error message from query by idPattern URI param
+# 04. Get error message from query by attrs URI param
+#
+
+echo "01. Get error message from query by id URI param"
+echo "================================================"
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?id=&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+echo "02. Get error message from query by type URI param"
+echo "=================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?type=&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+echo "03. Get error message from query by idPattern URI param"
+echo "======================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?idPattern=&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+echo "04. Get error message from query by attrs URI param"
+echo "==================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?attrs=&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Get error message from query by id URI param
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad Request",
+  "details": "id parameter must not be empty."
+}
+
+
+
+02. Get error message from query by type URI param
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad Request",
+  "details": "type parameter must not be empty."
+}
+
+
+
+03. Get error message from query by idPattern URI param
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad Request",
+  "details": "idPattern parameter must not be empty."
+}
+
+
+
+04. Get error message from query by attrs URI param
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad Request",
+  "details": "attrs parameter must not be empty."
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
