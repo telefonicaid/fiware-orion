@@ -56,11 +56,11 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
   mongo::BSONObjBuilder       bsonInExpression;
   mongo::BSONArrayBuilder     bsonArray;
 
-  if(idList == NULL)
+  if (idList == NULL)
     return false;
-  
+
   ids = stringSplit(idList, ',', idVec);
-  
+
   if (ids == 0)
     return false;
 
@@ -73,7 +73,7 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("_id", bsonInExpression.obj());
   orionldState.uriParams.id = NULL;
-  
+
   return true;
 }
 
@@ -81,25 +81,31 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
 
 // -----------------------------------------------------------------------------
 //
-// handleStringIdPattern - Function with objective of handle the value of idPattern parameter for mongo query.
+// handleStringIdPattern - handle the value of idPattern parameter for mongo query.
 //
 // The '^' indicates the results will start with some character.
 // The '$' indicates how the results must end.
-// 
+//
 static std::string handleStringIdPattern(char* idPattern)
-{ 
+{
   std::string idPatternToString(idPattern);
 
   if (idPatternToString.find(".*") == true)
   {
     idPatternToString.erase(std::remove(idPatternToString.begin(), idPatternToString.end(), '.'), idPatternToString.end());
     idPatternToString.erase(std::remove(idPatternToString.begin(), idPatternToString.end(), '*'), idPatternToString.end());
+
     return "^" + idPatternToString;
   }
-  else return "^" + idPatternToString + "$";
+
+  return "^" + idPatternToString + "$";
 }
 
-// uriParamIdPatternToFilter - Regular expression that shall be matched by entity ids satisfying the query
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamIdPatternToFilter - regular expression that shall be matched by entity ids satisfying the query
 //
 static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idPattern)
 {
@@ -224,7 +230,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 
 /* ****************************************************************************
 *
-* mongoLdRegistrationsGet - 
+* mongoLdRegistrationsGet -
 */
 bool mongoLdRegistrationsGet
 (
@@ -255,22 +261,22 @@ bool mongoLdRegistrationsGet
     return false;
   }
 
-  if (orionldState.uriParams.type != NULL && uriParamTypeToFilter(&queryBuilder, orionldState.uriParams.type) == false)
-  {    
+  if ((orionldState.uriParams.type != NULL) && (uriParamTypeToFilter(&queryBuilder, orionldState.uriParams.type) == false))
+  {
     oeP->details = "type parameter must not be empty.";
     orionldState.uriParams.type = NULL;
     return false;
   }
 
-  if (orionldState.uriParams.idPattern != NULL && uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern) == false)
-  {    
+  if ((orionldState.uriParams.idPattern != NULL) && (uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern) == false))
+  {
     oeP->details = "idPattern parameter must not be empty.";
     orionldState.uriParams.idPattern = NULL;
     return false;
   }
 
-  if (orionldState.uriParams.attrs != NULL && uriParamAttrsToFilter(&queryBuilder, orionldState.uriParams.attrs) == false)
-  {    
+  if ((orionldState.uriParams.attrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, orionldState.uriParams.attrs) == false))
+  {
     oeP->details = "attrs parameter must not be empty.";
     orionldState.uriParams.attrs = NULL;
     return false;
