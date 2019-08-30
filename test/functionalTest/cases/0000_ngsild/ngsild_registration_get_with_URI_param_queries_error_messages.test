@@ -70,14 +70,14 @@ echo
 01. Get error message from query by id URI param
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 140
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Bad Request",
-  "details": "id parameter must not be empty."
+  "details": "URI Param /id/ is empty"
 }
 
 
@@ -85,14 +85,14 @@ Date: REGEX(.*)
 02. Get error message from query by type URI param
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Bad Request",
-  "details": "type parameter must not be empty."
+  "details": "URI Param /type/ is empty"
 }
 
 
@@ -100,14 +100,14 @@ Date: REGEX(.*)
 03. Get error message from query by idPattern URI param
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 147
+Content-Length: 139
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Bad Request",
-  "details": "idPattern parameter must not be empty."
+  "details": "URI Param /idPattern/ is empty"
 }
 
 
@@ -115,14 +115,14 @@ Date: REGEX(.*)
 04. Get error message from query by attrs URI param
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 143
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Bad Request",
-  "details": "attrs parameter must not be empty."
+  "details": "URI Param /attrs/ is empty"
 }
 
 
