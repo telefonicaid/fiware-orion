@@ -209,6 +209,8 @@ void mongoInit
   const char*  user,
   const char*  pwd,
   const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -218,7 +220,7 @@ void mongoInit
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mechanism, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mechanism, authDb, dbSSL, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -295,6 +297,8 @@ bool mongoStart
   const char*  username,
   const char*  passwd,
   const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         _multitenant,
   double       timeout,
   int          writeConcern,
@@ -313,10 +317,25 @@ bool mongoStart
 
   multitenant = _multitenant;
 
-  mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
-  if (!status.isOK())
+  // We cannot move status variable declaration outside the if block. That fails at compilation time
+  bool statusOk = false;
+  std::string statusString;
+  if (dbSSL)
   {
-    LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
+    mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+  else
+  {
+    mongo::Status status = mongo::client::initialize();
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+
+  if (!statusOk)
+  {
+    LM_E(("Database Startup Error %s (cannot initialize mongo client)", statusString.c_str()));
     return false;
   }
   atexit(shutdownClient);
@@ -327,6 +346,7 @@ bool mongoStart
                               username,
                               passwd,
                               mechanism,
+                              authDb,
                               _multitenant,
                               timeout,
                               writeConcern,

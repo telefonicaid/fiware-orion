@@ -136,6 +136,8 @@ char            dbName[64];
 char            user[64];
 char            pwd[64];
 char            authMech[64];
+char            authDb[64];
+bool            dbSSL;
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -195,7 +197,9 @@ bool            ngsiv1Autocast;
 #define RPLSET_DESC            "replica set"
 #define DBUSER_DESC            "database user"
 #define DBPASSWORD_DESC        "database password"
-#define DBAUTHMECH_DESC        "database authentication mechcanism (either SCRAM-SHA-1 or MONGODB-CR)"
+#define DBAUTHMECH_DESC        "database authentication mechanism (either SCRAM-SHA-1 or MONGODB-CR)"
+#define DBAUTHDB_DESC          "database used for authentication"
+#define DBSSL_DESC             "enable SSL connection to DB"
 #define DB_DESC                "database name"
 #define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
 #define USEIPV4_DESC           "use ip v4 only"
@@ -262,6 +266,8 @@ PaArgument paArgs[] =
   { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
 
   { "-dbAuthMech",    authMech,      "DB_AUTH_MECH",   PaString, PaOpt, _i "SCRAM-SHA-1", PaNL,   PaNL,  DBAUTHMECH_DESC    },
+  { "-dbAuthDb",      authDb,        "DB_AUTH_DB",     PaString, PaOpt, _i "",            PaNL,   PaNL,  DBAUTHDB_DESC    },
+  { "-dbSSL",         &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,            false,  true,  DBSSL_DESC    },
 
   { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
@@ -952,7 +958,7 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);

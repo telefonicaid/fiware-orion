@@ -116,6 +116,7 @@ static DBClientBase* mongoConnect
   const char*  username,
   const char*  passwd,
   const char*  mechanism,
+  const char*  authDb,
   bool         multitenant,
   int          writeConcern,
   double       timeout
@@ -260,25 +261,26 @@ static DBClientBase* mongoConnect
    * using multiservice, we authenticate in the single-service database. In the case of using
    * multiservice, it isn't a default database that we know at contextBroker start time (when
    * this connection function is invoked) so we authenticate on the admin database, which provides
-   * access to any database */
-  if (multitenant)
+   * access to any database.
+   *
+   * This behaviour can be overriden by the -dbAuthDb parameter in the CLI
+   */
+
+  const char* effectiveAuthDb;
+  if (strlen(authDb) > 0)
   {
-    if (strlen(username) != 0 && strlen(passwd) != 0)
-    {
-      if (!connectionAuth(connection, "admin", std::string(username), std::string(passwd), std::string(mechanism), &err))
-      {
-        return NULL;
-      }
-    }
+    effectiveAuthDb = authDb;
   }
   else
   {
-    if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
+    effectiveAuthDb = multitenant ? "admin" : db;
+  }
+
+  if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
+  {
+    if (!connectionAuth(connection, std::string(effectiveAuthDb), std::string(username), std::string(passwd), std::string(mechanism), &err))
     {
-      if (!connectionAuth(connection, std::string(db), std::string(username), std::string(passwd), std::string(mechanism), &err))
-      {
-        return NULL;
-      }
+      return NULL;
     }
   }
 
@@ -315,6 +317,7 @@ int mongoConnectionPoolInit
   const char*  username,
   const char*  passwd,
   const char*  mechanism,
+  const char*  authDb,
   bool         multitenant,
   double       timeout,
   int          writeConcern,
@@ -325,7 +328,7 @@ int mongoConnectionPoolInit
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
-  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, multitenant, writeConcern, timeout));
+  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout));
   return 0;
 #else
   //
@@ -346,7 +349,7 @@ int mongoConnectionPoolInit
   {
     connectionPool[ix].free       = true;
     if ((connectionPool[ix].connection =
-        mongoConnect(host, db, rplSet, username, passwd, mechanism, multitenant, writeConcern, timeout)) == NULL) {
+        mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout)) == NULL) {
       return -1;
     }
   }
