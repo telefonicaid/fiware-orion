@@ -62,12 +62,12 @@ The Orion Context Broker uses a MongoDB database, whose parameters are
 provided using the command line options:
 
 * `-dbhost`
-* `-db`.
+* `-db`
 * `-dbuser`
-* `-dbpwd`,
+* `-dbpwd`
 * `-dbAuthMech`
-* `-dbAuthDb`.
-* `-dbSSL`.
+* `-dbAuthDb`
+* `-dbSSL`
 
 Note that `-dbuser`, `-dbpwd`, `-dbAuthMech` and `-dbAuthDb`.
 are only used if MongoDB runs using authentication, i.e. with `--auth`.
