@@ -162,6 +162,7 @@ bool orionldContextTreat
         {
           LM_E(("contextItemNodeTreat failed"));
           // Error payload set by contextItemNodeTreat
+          free(orionldState.contextP);
           orionldState.contextP = NULL;  // Leak?
           return false;
         }
@@ -171,6 +172,7 @@ bool orionldContextTreat
         if (orionldContextTreat(ciP, contextArrayItemP) == false)
         {
           LM_E(("Error treating context object inside array"));
+          free(orionldState.contextP);
           orionldState.contextP = NULL;  // Leak?
           orionldErrorResponseCreate(OrionldBadRequestData, "Error treating context object inside array", NULL, OrionldDetailsString);
           ciP->httpStatusCode = SccBadRequest;
@@ -180,6 +182,7 @@ bool orionldContextTreat
       else
       {
         LM_E(("Context Array Item is not a String nor an Object, but of type '%s'", kjValueType(contextArrayItemP->type)));
+        free(orionldState.contextP);
         orionldState.contextP = NULL;  // Leak?
         orionldErrorResponseCreate(OrionldBadRequestData, "Context Array Item is of an unsupported type", NULL, OrionldDetailsString);
         ciP->httpStatusCode = SccBadRequest;

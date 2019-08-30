@@ -825,7 +825,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Treat the context from the payload, if any
   //
   if ((orionldState.payloadContextNode != NULL) && (orionldContextTreat(ciP, orionldState.payloadContextNode) == false))
-      goto respond;
+    goto respond;
 
 
   // ********************************************************************************************

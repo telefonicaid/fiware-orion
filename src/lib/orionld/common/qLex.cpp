@@ -98,7 +98,7 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
     ++term;
 
   int termLen = strlen(term);
-  while (term[termLen - 1] == ' ')
+  while ((termLen >= 1) && term[termLen - 1] == ' ')
   {
     term[termLen - 1] = 0;
     --termLen;
@@ -400,8 +400,10 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
       *sP = 0;
       ++sP;
-      long long dateTime;
-      if ((start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
+      long long           dateTime;
+      unsigned long long  sLen = (unsigned long long) (sP - start - 2);
+
+      if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
         current = qDateTimePush(current, dateTime);
       else
         current = qStringPush(current, start);
