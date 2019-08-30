@@ -76,7 +76,12 @@ bool orionldGetRegistrations(ConnectionInfo *ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetCSourceRegistrations"));
 
-  mongoLdRegistrationsGet(ciP, &registrationVec, orionldState.tenant, &count, &oe);
+  if (!mongoLdRegistrationsGet(ciP, &registrationVec, orionldState.tenant, &count, &oe))
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str(), OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
 
   if ((ciP->uriParamOptions["count"]))
   {

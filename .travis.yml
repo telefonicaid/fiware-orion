@@ -14,10 +14,10 @@ env:
   matrix:
   - STAGE=compliance
   - STAGE=debian_unit
-  - STAGE=debian_functional_1_350
-  - STAGE=debian_functional_351_630
-  - STAGE=debian_functional_631_950
-  - STAGE=debian_functional_951_1300
+  - STAGE=debian_functional_1_380
+  - STAGE=debian_functional_381_600
+  - STAGE=debian_functional_601_900
+  - STAGE=debian_functional_901_1300
   - STAGE=debian_release
   - STAGE=debian_deps
 before_install:

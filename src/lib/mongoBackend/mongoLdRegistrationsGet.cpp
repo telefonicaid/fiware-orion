@@ -49,7 +49,9 @@
 //
 // uriParamIdToFilter -
 //
-static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idList)
+// It is the responsibility of the caller to make sure that 'idList' is non-NULL
+//
+static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idList, std::string* detailsP)
 {
   std::vector<std::string>    idVec;
   int                         ids;
@@ -59,13 +61,49 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
   ids = stringSplit(idList, ',', idVec);
 
   if (ids == 0)
-    return true;  // FIXME: give error?
+  {
+    *detailsP = "URI Param /id/ is empty";
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "id", OrionldDetailsString);
+    return false;
+  }
 
   for (int ix = 0; ix < ids; ix++)
+  {
+    LM_TMP(("_id: %s", idVec[ix].c_str()));
     bsonArray.append(idVec[ix]);
+  }
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("_id", bsonInExpression.obj());
+  orionldState.uriParams.id = NULL;
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamIdPatternToFilter - regular expression that shall be matched by entity ids satisfying the query
+//
+// It is the responsibility of the caller to make sure that 'idPattern' is non-NULL
+//
+static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idPattern, std::string* detailsP)
+{
+  mongo::BSONObjBuilder  bsonInExpression;
+
+  LM_TMP(("uriParamIdPatternToFilter ss: %s", idPattern));
+
+  if (idPattern[0] == 0)
+  {
+    *detailsP = "URI Param /idPattern/ is empty";
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "idPattern", OrionldDetailsString);
+    return false;
+  }
+
+  bsonInExpression.append("$regex", idPattern);
+  queryBuilderP->append("_id", bsonInExpression.obj());
+  orionldState.uriParams.idPattern = NULL;
 
   return true;
 }
@@ -76,7 +114,9 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
 //
 // uriParamTypeToFilter -
 //
-static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typeList)
+// It is the responsibility of the caller to make sure that 'typeList' is non-NULL
+//
+static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typeList, std::string* detailsP)
 {
   std::vector<std::string>    typeVec;
   int                         types;
@@ -92,7 +132,11 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   types = stringSplit(typeList, ',', typeVec);
 
   if (types == 0)
-    return true;  // FIXME: give error?
+  {
+    *detailsP = "URI Param /type/ is empty";
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "type", OrionldDetailsString);
+    return false;
+  }
 
   char typeExpanded[256];
 
@@ -119,6 +163,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("contextRegistration.entities.type", bsonInExpression.obj());
+  orionldState.uriParams.type = NULL;
 
   return true;
 }
@@ -129,7 +174,9 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
 //
 // uriParamAttrsToFilter - List of Attributes (Properties or Relationships) to be retrieved
 //
-static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* attrsList)
+// It is the responsibility of the caller to make sure that 'attrsList' is non-NULL
+//
+static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* attrsList, std::string* detailsP)
 {
   std::vector<std::string>    attrsVec;
   int                         attrs;
@@ -140,7 +187,11 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
   attrs = stringSplit(attrsList, ',', attrsVec);
 
   if (attrs == 0)
-    return true;  // FIXME: give error?
+  {
+    *detailsP = "URI Param /attrs/ is empty";
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "attrs", OrionldDetailsString);
+    return false;
+  }
 
   char attrExpanded[256];
 
@@ -167,6 +218,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 
   bsonInExpression.append("$in", bsonArray.arr());
   queryBuilderP->append("contextRegistration.attrs.name", bsonInExpression.obj());
+  orionldState.uriParams.attrs = NULL;
 
   return true;
 }
@@ -175,7 +227,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 
 /* ****************************************************************************
 *
-* mongoLdRegistrationsGet - 
+* mongoLdRegistrationsGet -
 */
 bool mongoLdRegistrationsGet
 (
@@ -186,12 +238,9 @@ bool mongoLdRegistrationsGet
   OrionError*                         oeP
 )
 {
-  bool                   reqSemTaken    = false;
-  int                    offset         = 0;
-  int                    limit          = DEFAULT_PAGINATION_LIMIT_INT;
-  char*                  uriParamId     = (ciP->uriParam["id"].empty())?    NULL  : (char*) ciP->uriParam["id"].c_str();
-  char*                  uriParamType   = (ciP->uriParam["type"].empty())?  NULL  : (char*) ciP->uriParam["type"].c_str();
-  char*                  uriParamAttrs  = (ciP->uriParam["attrs"].empty())? NULL  : (char*) ciP->uriParam["attrs"].c_str();
+  bool                   reqSemTaken        = false;
+  int                    offset             = 0;
+  int                    limit              = DEFAULT_PAGINATION_LIMIT_INT;
   std::string            err;
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
@@ -202,17 +251,21 @@ bool mongoLdRegistrationsGet
   if (ciP->uriParam[URI_PARAM_PAGINATION_OFFSET] != "")
     offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
 
-  if ((uriParamId != NULL) && (uriParamIdToFilter(&queryBuilder, uriParamId) == false))
+  if ((orionldState.uriParams.id != NULL) && uriParamIdToFilter(&queryBuilder, orionldState.uriParams.id, &oeP->details) == false)
     return false;
 
-  if ((uriParamType != NULL) && (uriParamTypeToFilter(&queryBuilder, uriParamType) == false))
+  if ((orionldState.uriParams.type != NULL) && (uriParamTypeToFilter(&queryBuilder, orionldState.uriParams.type, &oeP->details) == false))
     return false;
 
-  if ((uriParamAttrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, uriParamAttrs) == false))
+  if ((orionldState.uriParams.idPattern != NULL) && (uriParamIdPatternToFilter(&queryBuilder, orionldState.uriParams.idPattern, &oeP->details) == false))
     return false;
+
+  if ((orionldState.uriParams.attrs != NULL) && (uriParamAttrsToFilter(&queryBuilder, orionldState.uriParams.attrs, &oeP->details) == false))
+    return false;
+
 
   //
-  // FIXME: Many more URI params to be treated and added to queryBuilder
+  // FIXME: Many more URI params to be treated and added to queryBuilder - but that's for 2020 ...
   //
 
   query = queryBuilder.obj();  // Here all the filters added to queryBuilder are "merged" into 'query'
@@ -255,7 +308,7 @@ bool mongoLdRegistrationsGet
 
     if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
+     LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
