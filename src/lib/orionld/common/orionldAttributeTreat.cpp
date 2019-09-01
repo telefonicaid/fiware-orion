@@ -651,7 +651,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     //
     if (isGeoProperty == true)
     {
-      if (geoJsonCheck(ciP, valueP) == false)
+      if (geoJsonCheck(ciP, valueP, &orionldState.geoType, &orionldState.geoCoordsP) == false)
       {
         LM_E(("geoJsonCheck error for %s", caName));
         // geoJsonCheck fills in error response

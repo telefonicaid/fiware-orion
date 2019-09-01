@@ -282,7 +282,7 @@ MongoDB server version: REGEX(.*)
 		"end" : NumberLong(1861869600)
 	},
 	"location" : {
-		"type" : 5,
+		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
@@ -309,7 +309,7 @@ MongoDB server version: REGEX(.*)
 		]
 	},
 	"observationSpace" : {
-		"type" : 5,
+		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
@@ -336,7 +336,7 @@ MongoDB server version: REGEX(.*)
 		]
 	},
 	"operationSpace" : {
-		"type" : 5,
+		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
@@ -421,7 +421,7 @@ MongoDB server version: REGEX(.*)
 	],
 	"format" : "JSON",
 	"location" : {
-		"type" : 5,
+		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
@@ -448,7 +448,7 @@ MongoDB server version: REGEX(.*)
 		]
 	},
 	"observationSpace" : {
-		"type" : 5,
+		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
@@ -475,7 +475,7 @@ MongoDB server version: REGEX(.*)
 		]
 	},
 	"operationSpace" : {
-		"type" : 5,
+		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[

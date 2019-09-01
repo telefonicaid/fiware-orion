@@ -60,11 +60,12 @@ extern "C"
 //   Polygon:          closed LineString with 4+ pos     [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], ..., [ 1, 2 ] ]
 //   MultiPolygon:     an Array of Polygon               [ [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ], [ [ [ 1, 2 ], [ 1, 2 ] ], [ [ 1, 2 ], [ 1, 2 ] ], ... ], ... ]
 //
-bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP)
+bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypePP, KjNode** geoCoordsPP)
 {
   KjNode*             typeNodeP         = NULL;
   KjNode*             coordinatesNodeP  = NULL;
   OrionldGeoJsonType  geoType           = GeoJsonNoType;
+  char*               geoTypeString;
 
   if (geoLocationNodeP->type != KjObject)
   {
@@ -88,6 +89,8 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP)
         orionldErrorResponseCreate(OrionldBadRequestData, details, typeNodeP->value.s, OrionldDetailsString);
         return false;
       }
+
+      geoTypeString = typeNodeP->value.s;
     }
     else if (SCOMPARE12(nodeP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
     {
@@ -207,9 +210,10 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP)
   //
   // Keep coordsP and typeP for later use (in mongoBackend)
   //
-  orionldState.geoTypeP   = typeNodeP;
-  orionldState.geoType    = geoType;
-  orionldState.geoCoordsP = coordinatesNodeP;
+  if (geoTypePP != NULL)
+    *geoTypePP   = geoTypeString;
+  if (geoCoordsPP != NULL)
+    *geoCoordsPP = coordinatesNodeP;
 
   return true;
 }

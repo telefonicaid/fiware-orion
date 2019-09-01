@@ -117,8 +117,7 @@ typedef struct OrionldConnectionState
   ApiVersion              apiVersion;
   int                     requestNo;
   KjNode*                 locationAttributeP;  // This assumes we have only ONE Geo-Location attribute ...
-  KjNode*                 geoTypeP;
-  OrionldGeoJsonType      geoType;
+  char*                   geoType;
   KjNode*                 geoCoordsP;
   int64_t                 overriddenCreationDate;
   int64_t                 overriddenModificationDate;

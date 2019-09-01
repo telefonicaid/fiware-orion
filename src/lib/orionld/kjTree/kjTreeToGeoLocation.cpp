@@ -44,7 +44,10 @@ extern "C"
 //
 bool kjTreeToGeoLocation(ConnectionInfo* ciP, KjNode* geoLocationNodeP, OrionldGeoLocation* locationP)
 {
-  if (geoJsonCheck(ciP, geoLocationNodeP) == false)
+  char*    geoType;
+  KjNode*  geoCoordsP;
+
+  if (geoJsonCheck(ciP, geoLocationNodeP, &geoType, &geoCoordsP) == false)
   {
     LM_E(("geoJsonCheck failed"));
     // geoJsonCheck sets the Error Response
@@ -54,7 +57,8 @@ bool kjTreeToGeoLocation(ConnectionInfo* ciP, KjNode* geoLocationNodeP, OrionldG
   //
   // Now the type and cooordinates of the GeoJSON is in 'orionldState.geoTypeP' and 'orionldState.geoCoordsP'
   //
-  locationP->geoType     = orionldState.geoType;
-  locationP->coordsNodeP = orionldState.geoCoordsP;
+  locationP->geoType     = geoType;
+  locationP->coordsNodeP = geoCoordsP;
+
   return true;
 }

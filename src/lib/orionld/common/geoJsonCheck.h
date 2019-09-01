@@ -38,6 +38,6 @@ extern "C"
 //
 // geoJsonCheck - check validity of any geo-property
 //
-extern bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP);
+extern bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** geoTypePP, KjNode** geoCoordsPP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONCHECK_H_

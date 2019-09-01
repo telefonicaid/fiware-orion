@@ -40,8 +40,8 @@ extern "C"
 //
 typedef struct OrionldGeoLocation
 {
-  OrionldGeoJsonType  geoType;
-  KjNode*             coordsNodeP;
+  char*    geoType;
+  KjNode*  coordsNodeP;
 } OrionldGeoLocation;
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOLOCATION_H_
