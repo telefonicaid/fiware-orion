@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
+#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 
 
 

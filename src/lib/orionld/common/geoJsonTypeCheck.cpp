@@ -25,8 +25,8 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
 #include "orionld/common/geoJsonTypeCheck.h"                   // Own interface
 
 
@@ -37,11 +37,11 @@
 //
 bool geoJsonTypeCheck(char* typeName, OrionldGeoJsonType* typeP, char** detailsP)
 {
-  if      (SCOMPARE6(typeName, 'P', 'o', 'i', 'n', 't', 0))                                                       *typeP = GeoJsonPoint;
+  if      (SCOMPARE6(typeName,  'P', 'o', 'i', 'n', 't', 0))                                                      *typeP = GeoJsonPoint;
   else if (SCOMPARE11(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'i', 'n', 't', 0))                             *typeP = GeoJsonMultiPoint;
   else if (SCOMPARE11(typeName, 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))                             *typeP = GeoJsonLineString;
   else if (SCOMPARE16(typeName, 'M', 'u', 'l', 't', 'i', 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))    *typeP = GeoJsonLineString;
-  else if (SCOMPARE8(typeName, 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                                             *typeP = GeoJsonPolygon;
+  else if (SCOMPARE8(typeName,  'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                                            *typeP = GeoJsonPolygon;
   else if (SCOMPARE13(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'l', 'y', 'g', 'o', 'n', 0))                   *typeP = GeoJsonMultiPolygon;
   else
   {

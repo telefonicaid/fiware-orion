@@ -31,7 +31,6 @@ extern "C"
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
 
 
 
@@ -39,6 +38,6 @@ extern "C"
 //
 // geoJsonCheck - check validity of any geo-property
 //
-extern bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** detailsP);
+extern bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONCHECK_H_

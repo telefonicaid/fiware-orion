@@ -44,7 +44,97 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
+#include "orionld/kjTree/kjTreeToGeoLocation.h"                // kjTreeToGeoLocation
 #include "orionld/kjTree/kjTreeToRegistration.h"               // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjTreeToRegistrationInformation -
+//
+// FIXME: move to its own function
+//
+static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfoNodeP, ngsiv2::Registration* regP)
+{
+  for (KjNode* informationItemP = regInfoNodeP->value.firstChildP; informationItemP != NULL; informationItemP = informationItemP->next)
+  {
+    //
+    // FIXME: create a kjTree function for this:
+    //   kjTreeToInformationNode(informationItemP);
+    //
+    KjNode* entitiesP      = NULL;
+    KjNode* propertiesP    = NULL;
+    KjNode* relationshipsP = NULL;
+
+    for (KjNode* infoNodeP = informationItemP->value.firstChildP; infoNodeP != NULL; infoNodeP = infoNodeP->next)
+    {
+      if (SCOMPARE9(infoNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
+      {
+        DUPLICATE_CHECK(entitiesP, "Registration::information::entities", infoNodeP);
+        if (kjTreeToEntIdVector(ciP, infoNodeP, &regP->dataProvided.entities) == false)
+        {
+          LM_E(("kjTreeToEntIdVector failed"));
+          return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
+        }
+      }
+      else if (SCOMPARE11(infoNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
+      {
+        DUPLICATE_CHECK(propertiesP, "Registration::information::properties", infoNodeP);
+        for (KjNode* propP = infoNodeP->value.firstChildP; propP != NULL; propP = propP->next)
+        {
+          STRING_CHECK(propP, "PropertyInfo::name");
+
+          char  longName[256];
+          char* details;
+
+          if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
+            return false;
+
+          propP->value.s = longName;
+          regP->dataProvided.propertyV.push_back(propP->value.s);
+        }
+      }
+      else if (SCOMPARE14(infoNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
+      {
+        DUPLICATE_CHECK(relationshipsP, "Registration::information::relationships", infoNodeP);
+
+        for (KjNode* relP = infoNodeP->value.firstChildP; relP != NULL; relP = relP->next)
+        {
+          STRING_CHECK(relP, "RelationInfo::name");
+
+          char  longName[256];
+          char* details;
+
+          if (orionldUriExpand(orionldState.contextP, relP->value.s, longName, sizeof(longName), &details) == false)
+            return false;
+
+          relP->value.s = longName;
+          regP->dataProvided.relationshipV.push_back(relP->value.s);
+        }
+      }
+      else
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData,
+                                   "Unknown field inside Registration::information",
+                                   infoNodeP->name,
+                                   OrionldDetailsString);
+        return false;
+      }
+    }
+
+    if ((entitiesP == NULL) && (propertiesP == NULL) && (relationshipsP == NULL))
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData,
+                                 "Empty Registration::information item",
+                                 NULL,
+                                 OrionldDetailsString);
+      return false;
+    }
+  }
+
+  return true;
+}
 
 
 
@@ -120,12 +210,6 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     return false;
   }
 
-  //
-  // FIXME: add type to Registration
-  //        To be fixed when we decide to break the data model of Orion APIv2
-  // regP->type = (char*) "ContextSourceRegistration";
-  //
-
 
   //
   // Loop over the tree
@@ -152,80 +236,8 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
       ARRAY_CHECK(kNodeP, "Registration::information");
       EMPTY_ARRAY_CHECK(kNodeP, "Registration::information");
 
-      for (KjNode* informationItemP = kNodeP->value.firstChildP; informationItemP != NULL; informationItemP = informationItemP->next)
-      {
-        //
-        // FIXME: create a kjTree function for this:
-        //   kjTreeToInformationNode(informationItemP);
-        //
-        KjNode* entitiesP      = NULL;
-        KjNode* propertiesP    = NULL;
-        KjNode* relationshipsP = NULL;
-
-        for (KjNode* infoNodeP = informationItemP->value.firstChildP; infoNodeP != NULL; infoNodeP = infoNodeP->next)
-        {
-          if (SCOMPARE9(infoNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
-          {
-            DUPLICATE_CHECK(entitiesP, "Registration::information::entities", kNodeP);
-            if (kjTreeToEntIdVector(ciP, infoNodeP, &regP->dataProvided.entities) == false)
-            {
-              LM_E(("kjTreeToEntIdVector failed"));
-              return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
-            }
-          }
-          else if (SCOMPARE11(infoNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
-          {
-            DUPLICATE_CHECK(propertiesP, "Registration::information::properties", kNodeP);
-            for (KjNode* propP = infoNodeP->value.firstChildP; propP != NULL; propP = propP->next)
-            {
-              STRING_CHECK(propP, "PropertyInfo::name");
-
-              char  longName[256];
-              char* details;
-
-              if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), &details) == false)
-                return false;
-
-              propP->value.s = longName;
-              regP->dataProvided.propertyV.push_back(propP->value.s);
-            }
-          }
-          else if (SCOMPARE14(infoNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
-          {
-            DUPLICATE_CHECK(relationshipsP, "Registration::information::relationships", kNodeP);
-
-            for (KjNode* relP = infoNodeP->value.firstChildP; relP != NULL; relP = relP->next)
-            {
-               STRING_CHECK(relP, "RelationInfo::name");
-
-               char  longName[256];
-               char* details;
-               if (orionldUriExpand(orionldState.contextP, relP->value.s, longName, sizeof(longName), &details) == false)
-                 return false;
-
-               relP->value.s = longName;
-               regP->dataProvided.relationshipV.push_back(relP->value.s);
-            }
-          }
-          else
-          {
-            orionldErrorResponseCreate(OrionldBadRequestData,
-                                       "Unknown field inside Registration::information",
-                                       infoNodeP->name,
-                                       OrionldDetailsString);
-            return false;
-          }
-        }
-
-        if ((entitiesP == NULL) && (propertiesP == NULL) && (relationshipsP == NULL))
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData,
-                                     "Empty Registration::information item",
-                                     NULL,
-                                     OrionldDetailsString);
-          return false;
-        }
-      }
+      if (kjTreeToRegistrationInformation(ciP, kNodeP, regP) == false)
+        return false;
     }
     else if (SCOMPARE20(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
@@ -243,25 +255,19 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     {
       DUPLICATE_CHECK(locationP, "Registration::location", kNodeP);
       OBJECT_CHECK(locationP, "Registration::location");
-      //
-      // FIXME: kjTreeToGeoLocation(kNodeP, &regP->location);
-      //        To be fixed when we decide to break the data model of Orion APIv2
+      kjTreeToGeoLocation(ciP, kNodeP, &regP->location);
     }
     else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
       DUPLICATE_CHECK(observationSpaceP, "Registration::observationSpace", kNodeP);
       OBJECT_CHECK(observationSpaceP, "Registration::observationSpace");
-      //
-      // FIXME: kjTreeToGeoLocation(kNodeP, &regP->observationSpace);
-      //        To be fixed when we decide to break the data model of Orion APIv2
+      kjTreeToGeoLocation(ciP, kNodeP, &regP->observationSpace);
     }
     else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
       DUPLICATE_CHECK(operationSpaceP, "Registration::operationSpace", kNodeP);
       OBJECT_CHECK(operationSpaceP, "Registration::operationSpace");
-      //
-      // FIXME: kjTreeToGeoLocation(kNodeP, &regP->operationSpace);
-      //        To be fixed when we decide to break the data model of Orion APIv2
+      kjTreeToGeoLocation(ciP, kNodeP, &regP->operationSpace);
     }
     else if (SCOMPARE8(kNodeP->name, 'e', 'x', 'p', 'i', 'r', 'e', 's', 0))
     {
@@ -288,11 +294,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     }
     else
     {
-      //
-      // FIXME: Add to Property vector - To be fixed when we decide to break the data model of Orion APIv2
-      //
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration - ngsi-ld still follows Orion APIv2 data model", kNodeP->name, OrionldDetailsString);
-      return false;
+      // "property-name": value - See <Csource Property Name> in ETSI Spec
     }
   }
 

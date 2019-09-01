@@ -35,6 +35,7 @@ extern "C"
 }
 #include "common/globals.h"                                    // ApiVersion
 #include "orionld/common/QNode.h"                              // QNode
+#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 
 
@@ -115,8 +116,9 @@ typedef struct OrionldConnectionState
   bool                    contextToBeFreed;
   ApiVersion              apiVersion;
   int                     requestNo;
-  KjNode*                 locationAttributeP;
+  KjNode*                 locationAttributeP;  // This assumes we have only ONE Geo-Location attribute ...
   KjNode*                 geoTypeP;
+  OrionldGeoJsonType      geoType;
   KjNode*                 geoCoordsP;
   int64_t                 overriddenCreationDate;
   int64_t                 overriddenModificationDate;

@@ -56,6 +56,9 @@ ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), 
 #ifdef ORIONLD
   bzero(&observationInterval, sizeof(observationInterval));
   bzero(&managementInterval,  sizeof(managementInterval));
+  bzero(&location, sizeof(location));
+  bzero(&observationSpace, sizeof(observationSpace));
+  bzero(&operationSpace, sizeof(operationSpace));
 #endif
 }
 

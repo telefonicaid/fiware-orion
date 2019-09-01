@@ -198,35 +198,43 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
 
 #ifdef ORIONLD
-/* ****************************************************************************
-*
-* setObservationInterval
-*/
-static void setObservationInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setTimeInterval
+//
+static void setTimeInterval(const char* name, const OrionldTimeInterval* intervalP, mongo::BSONObjBuilder* bobP)
 {
   mongo::BSONObjBuilder intervalObj;
 
-  intervalObj.append("start", (long long) interval.start);
-  intervalObj.append("end",   (long long) interval.end);
+  intervalObj.append("start", (long long) intervalP->start);
+  intervalObj.append("end",   (long long) intervalP->end);
 
-  bobP->append("observationInterval", intervalObj.obj());
+  bobP->append(name, intervalObj.obj());
 }
 
 
 
-/* ****************************************************************************
-*
-* setManagementInterval
-*/
-static void setManagementInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+// -----------------------------------------------------------------------------
+//
+// setGetLocation - 
+//
+static void setGetLocation(const char* name, const OrionldGeoLocation* locationP, mongo::BSONObjBuilder* bobP)
 {
-  mongo::BSONObjBuilder intervalObj;
+  mongo::BSONObjBuilder  locationObj;
+  mongo::BSONArray       coordsArray;
 
-  intervalObj.append("start", (long long) interval.start);
-  intervalObj.append("end",   (long long) interval.end);
+  locationObj.append("type", locationP->geoType);
 
-  bobP->append("managementInterval", intervalObj.obj());
+  mongoCppLegacyKjTreeToBsonObj(locationP->coordsNodeP, &coordsArray);
+  locationObj.append("coordinates", coordsArray);
+
+  bobP->append(name, locationObj.obj());
 }
+
 #endif
 
 
@@ -292,13 +300,21 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
-  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
   if (regP->observationInterval.start != 0)
-    setObservationInterval(regP->observationInterval, &bob);
+    setTimeInterval("observationInterval", &regP->observationInterval, &bob);
   if (regP->managementInterval.start != 0)
-    setManagementInterval(regP->managementInterval, &bob);
+    setTimeInterval("managementInterval", &regP->managementInterval, &bob);
+
+  LM_TMP(("BOB: regP->location.coordsNodeP at %p", regP->location.coordsNodeP));
+  if (regP->location.coordsNodeP != NULL)
+    setGetLocation("location", &regP->location, &bob);
+  if (regP->observationSpace.coordsNodeP != NULL)
+    setGetLocation("observationSpace", &regP->location, &bob);
+  if (regP->operationSpace.coordsNodeP != NULL)
+    setGetLocation("operationSpace", &regP->location, &bob);
 #endif
 
   //

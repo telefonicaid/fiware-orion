@@ -94,6 +94,19 @@ bool mongoLdRegistrationGet
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
 
+    if (regP == NULL)
+    {
+      //
+      // Can't fill in the registration as no reg pointer is supplied.
+      // This is used for when we're only interested in whether a registration exists.
+      // Used by orionldPostRegistrations().
+      //
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+
+      return true;
+    }
+
     mongoSetLdRegistrationId(regP, bob);
     mongoSetLdName(regP, bob);
     mongoSetDescription(regP, bob);
