@@ -333,8 +333,8 @@ void mongoRegistrationCreate
 #ifdef ORIONLD
   int now = getCurrentTime();
 
-  setTimestamp("creDate", now, &bob);
-  setTimestamp("modDate", now, &bob);
+  setTimestamp("createdAt", now, &bob);
+  setTimestamp("modifiedAt", now, &bob);
 
   if (regP->observationInterval.start != 0)
     setTimeInterval("observationInterval", &regP->observationInterval, &bob);

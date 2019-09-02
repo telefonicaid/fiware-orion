@@ -281,8 +281,8 @@ MongoDB server version: REGEX(.*)
 		}
 	],
 	"format" : "JSON",
-	"creDate" : REGEX(.*),
-	"modDate" : REGEX(.*),
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
 		"start" : NumberLong(1546250400),
 		"end" : NumberLong(1861869600)
@@ -443,8 +443,8 @@ MongoDB server version: REGEX(.*)
 		}
 	],
 	"format" : "JSON",
-	"creDate" : REGEX(.*),
-	"modDate" : REGEX(.*),
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
 	"location" : {
 		"type" : "Polygon",
 		"coordinates" : [
