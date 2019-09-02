@@ -1,4 +1,4 @@
-# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -41,14 +41,14 @@ brokerStart CB
 # 02. See the registration in mongo
 # 03. Create R1 registration with embedded context
 # 04. See the R1 registration in mongo
-# 05. create R2 registration without @Context Attribute
+# 05. Create R2 registration without @Context Attribute
 #
 
 echo "01. Create a registration with ALL fields"
 echo "========================================="
 payload='{
   "@context": [
-	"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ],
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
   "type": "ContextSourceRegistration",
@@ -111,7 +111,15 @@ payload='{
     ]
   },
   "expires": "2028-12-31T10:00:00",
-  "endpoint": "http://my.csource.org:1026"
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -128,12 +136,12 @@ echo
 echo '03. Create R1 registration with embedded context'
 echo '================================================'
 payload='{
- "@context": {
-	"myT": "http://example.org/T1",
-        "myP1": "http://example.org/P1",
-        "myP2": "http://example.org/P2",
-        "myRel1": "http://example.org/Rel1",
-        "myRel2": "http://example.org/Rel2"
+  "@context": {
+    "myT": "http://example.org/T1",
+    "myP1": "http://example.org/P1",
+    "myP2": "http://example.org/P2",
+    "myRel1": "http://example.org/Rel1",
+    "myRel2": "http://example.org/Rel2"
   },
   "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
   "type": "ContextSourceRegistration",
@@ -151,6 +159,42 @@ payload='{
       "relationships": [ "myRel1", "myRel2" ]
     }
   ],
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
   "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
@@ -165,23 +209,23 @@ echo
 echo
 
 
-echo '05. create R2 registration without @Context Attribute'
+echo '05. Create R2 registration without @Context Attribute'
 echo '====================================================='
 payload='{
-	"id": "urn:ngsi-ld:ContextSourceRegistration:R2",
-	"type": "ContextSourceRegistration",
-	"information": [{
-			"entities": [{
-				"id": "urn:ngsi-ld:entity:E1",
-				"type": "T"
-			}],
-			"properties": ["p1", "p2"],
-			"relationships": ["rel1"]
-		}
-	],
-	"endpoint": "http://my.csource.org:1026"
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+  "type": "ContextSourceRegistration",
+  "information": [{
+      "entities": [{
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+      }],
+      "properties": ["p1", "p2"],
+      "relationships": ["rel1"]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
 }'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
 echo
 echo
 
@@ -237,6 +281,8 @@ MongoDB server version: REGEX(.*)
 		}
 	],
 	"format" : "JSON",
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
 	"observationInterval" : {
 		"start" : NumberLong(1546250400),
 		"end" : NumberLong(1861869600)
@@ -244,6 +290,100 @@ MongoDB server version: REGEX(.*)
 	"managementInterval" : {
 		"start" : NumberLong(1546250400),
 		"end" : NumberLong(1861869600)
+	},
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"properties" : {
+		"http://example.org/ngsi-ld/default/P1" : 1,
+		"http://example.org/ngsi-ld/default/P2" : "2",
+		"http://example.org/ngsi-ld/default/P3" : true,
+		"http://example.org/ngsi-ld/default/P4" : 4.5,
+		"http://example.org/ngsi-ld/default/P5" : {
+			"object" : 6
+		},
+		"http://example.org/ngsi-ld/default/P6" : [
+			7,
+			8
+		]
 	}
 }
 bye
@@ -302,23 +442,101 @@ MongoDB server version: REGEX(.*)
 			"providingApplication" : "http://my.csource.org:1026"
 		}
 	],
-	"format" : "JSON"
+	"format" : "JSON",
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	}
 }
 bye
 
 
-05. create R2 registration without @Context Attribute
+05. Create R2 registration without @Context Attribute
 =====================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 189
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R2
 Date: REGEX(.*)
 
-{
-    "details": "For application/ld+json, the @context must be present in the JSON payload",
-    "title": "@context missing in JSON payload",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
 --TEARDOWN--

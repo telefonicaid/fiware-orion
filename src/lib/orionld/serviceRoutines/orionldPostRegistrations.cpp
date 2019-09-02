@@ -53,35 +53,39 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   OrionError            oError;
   char*                 regIdP = NULL;
 
+  //
+  // Registration ID given by user? - if so, we need to check for Registration already exists
+  //
+  if (orionldState.payloadIdNode != NULL)
+  {
+    char*           regId = orionldState.payloadIdNode->value.s;
+    HttpStatusCode  statusCode;
+    char*           details;
+
+    if (mongoLdRegistrationGet(NULL, regId, orionldState.tenant, &statusCode, &details) == true)
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId, OrionldDetailsString);
+      return false;
+    }
+  }
+
+  //
+  // Fix context
+  //
   if (orionldState.contextP != NULL)
     reg.ldContext = orionldState.contextP->url;
   else
     reg.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
 
+  //
+  // Translate the incoming KjNode tree into a ngsiv2::Registration
+  //
   if (kjTreeToRegistration(ciP, &reg, &regIdP) == false)
   {
     LM_E(("kjTreeToRegistration FAILED"));
     // orionldErrorResponseCreate is invoked by kjTreeToRegistration
     return false;
   }
-
-  //
-  // Does the Registration already exist?
-  //
-  // FIXME: Create a new function that simply looks up the registration!!!
-  //        See mongoEntityExists.cpp.
-  //        That will be a lot faster than the current solution.
-  //
-
-  // FIXME - Let's skip this for now
-  // ngsiv2::Registration  registration;
-  // mongoRegistrationGet(&registration, regIdP, orionldState.tenant, ciP->servicePathV[0], &oError);
-
-  // if (!registration.id.empty())
-  // {
-  //   orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regIdP, OrionldDetailsString);
-  //   return false;
-  // }
 
 
   //

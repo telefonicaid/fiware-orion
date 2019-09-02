@@ -880,25 +880,25 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //    NO  - if the service routine explicitly has asked to not include the Link HTTP header in the response
   //
 
-  // LM_TMP(("LINK: Add Link to HTTP Header?"));
-  // LM_TMP(("LINK: contextToBeCashed:          %s", FT(contextToBeCashed)));
-  // LM_TMP(("LINK: serviceRoutineResult:       %s", FT(serviceRoutineResult)));
-  // LM_TMP(("LINK: orionldState.acceptJsonld:  %s", FT(orionldState.acceptJsonld)));
-  // LM_TMP(("LINK: orionldState.responseTree:  %p", orionldState.responseTree));
-  // LM_TMP(("LINK: orionldState.useLinkHeader: %s", FT(orionldState.useLinkHeader)));
+  LM_TMP(("LINK: Add Link to HTTP Header?"));
+  LM_TMP(("LINK: contextToBeCashed:          %s", FT(contextToBeCashed)));
+  LM_TMP(("LINK: serviceRoutineResult:       %s", FT(serviceRoutineResult)));
+  LM_TMP(("LINK: orionldState.acceptJsonld:  %s", FT(orionldState.acceptJsonld)));
+  LM_TMP(("LINK: orionldState.responseTree:  %p", orionldState.responseTree));
+  LM_TMP(("LINK: orionldState.useLinkHeader: %s", FT(orionldState.useLinkHeader)));
 
   if ((contextToBeCashed == true) && (serviceRoutineResult == true))
   {
-    // LM_TMP(("LINK: Adding Link HTTP Header: '%s'", orionldState.link));
+    LM_TMP(("LINK: Adding Link HTTP Header: '%s'", orionldState.link));
     httpHeaderLinkAdd(ciP, orionldState.link);
   }
   else if ((orionldState.acceptJsonld == false) && (orionldState.responseTree != NULL) && (orionldState.useLinkHeader == true))
   {
-    // LM_TMP(("LINK: Adding Link HTTP Header: '%s'", orionldState.link));
+    LM_TMP(("LINK: Adding Link HTTP Header: '%s'", orionldState.link));
     httpHeaderLinkAdd(ciP, orionldState.link);
   }
-  // else
-  //   LM_TMP(("LINK: No Link HTTP Header"));
+  else
+    LM_TMP(("LINK: No Link HTTP Header"));
 
   //
   // Is there a KJSON response tree to render?

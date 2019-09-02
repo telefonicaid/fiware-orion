@@ -67,7 +67,7 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
   else if (aLongitudeNodeP->type == KjInt)    *aLongP = aLongitudeNodeP->value.i;
   else
   {
-    LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(orionldState.geoTypeP->type)));
+    LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(aLongitudeNodeP->type)));
     *errorStringP = (char*) "invalid JSON type for coordinate member";
     return false;
   }
@@ -76,7 +76,7 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
   else if (aLatitudeNodeP->type == KjInt)    *aLatP = aLatitudeNodeP->value.i;
   else
   {
-    LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(orionldState.geoTypeP->type)));
+    LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(aLatitudeNodeP->type)));
     *errorStringP = (char*) "invalid JSON type for coordinate member";
     return false;
   }
@@ -92,14 +92,14 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
 //
 bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorStringP)
 {
-  if ((orionldState.geoTypeP == NULL) || (orionldState.geoCoordsP == NULL))
+  if ((orionldState.geoType == NULL) || (orionldState.geoCoordsP == NULL))
   {
-    LM_E(("fields missing in GEO attribute value: geoTypeP=%p, geoCoordsP=%p", orionldState.geoTypeP, orionldState.geoCoordsP));
+    LM_E(("fields missing in GEO attribute value: geoTypeP=%p, geoCoordsP=%p", orionldState.geoType, orionldState.geoCoordsP));
     *errorStringP = (char*) "fields missing in GEO attribute value";
     return false;
   }
 
-  if (strcmp(orionldState.geoTypeP->value.s, "Point") == 0)
+  if (strcmp(orionldState.geoType, "Point") == 0)
   {
     double  aLat;
     double  aLong;
@@ -113,7 +113,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
     geoJsonP->append("type", "Point");
     geoJsonP->append("coordinates", BSON_ARRAY(aLong << aLat));
   }
-  else if (strcmp(orionldState.geoTypeP->value.s, "Polygon") == 0)
+  else if (strcmp(orionldState.geoType, "Polygon") == 0)
   {
     //
     // In its simplest case, a polygon is a vector of vector of positio-vectors. E.g.:
@@ -178,7 +178,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
   }
   else
   {
-    LM_E(("Unrecognized geometry: '%s'", orionldState.geoTypeP->value.s));
+    LM_E(("Unrecognized geometry: '%s'", orionldState.geoType));
     *errorStringP = (char*) "Unrecognized geometry";
     return false;
   }

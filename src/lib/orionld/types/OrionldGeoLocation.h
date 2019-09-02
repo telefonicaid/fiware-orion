@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_GEOJSONCREATE_H_
-#define SRC_LIB_ORIONLD_COMMON_GEOJSONCREATE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOLOCATION_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOLOCATION_H_
 
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,22 +25,23 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // BSONObjBuilder
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// geoJsonCreate -
+// OrionldGeoLocation -
 //
-extern bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorStringP);
+typedef struct OrionldGeoLocation
+{
+  char*    geoType;
+  KjNode*  coordsNodeP;
+} OrionldGeoLocation;
 
-#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONCREATE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOLOCATION_H_

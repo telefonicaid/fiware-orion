@@ -219,6 +219,7 @@ SET (STATIC_LIBS
     ${GMOCKMAIN_LIBRARY}
     ${ORION_LIBS}
     ${COMMON_STATIC_LIBS}
+    ${ORION_LIBS}
 )
 
 # Include directories

@@ -32,6 +32,7 @@
 
 #ifdef ORIONLD
 #include "orionld/types/OrionldTimeInterval.h"
+#include "orionld/types/OrionldGeoLocation.h"
 #endif
 
 
@@ -150,6 +151,10 @@ struct Registration
   std::string           ldContext;
   OrionldTimeInterval   observationInterval;
   OrionldTimeInterval   managementInterval;
+  OrionldGeoLocation    location;
+  OrionldGeoLocation    observationSpace;
+  OrionldGeoLocation    operationSpace;
+  KjNode*               properties;
 #endif
 
   Registration();

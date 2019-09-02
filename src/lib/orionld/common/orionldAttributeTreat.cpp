@@ -651,19 +651,10 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     //
     if (isGeoProperty == true)
     {
-      char* details = (char*) "no details";
-
-      if (valueP->type != KjObject)
+      if (geoJsonCheck(ciP, valueP, &orionldState.geoType, &orionldState.geoCoordsP) == false)
       {
-        LM_E(("geo-property attribute value must be a JSON Object: %s", kNodeP->name));
-        orionldErrorResponseCreate(OrionldBadRequestData, "The value of an attribute of type GeoProperty must be a JSON Object", kNodeP->name, OrionldDetailsString);
-        return false;
-      }
-
-      if (geoJsonCheck(ciP, valueP, &details) == false)
-      {
-        LM_E(("geoJsonCheck error for %s: %s", caName, details));
-        orionldErrorResponseCreate(OrionldBadRequestData, "The value of an attribute of type GeoProperty must be valid GeoJson", details, OrionldDetailsString);
+        LM_E(("geoJsonCheck error for %s", caName));
+        // geoJsonCheck fills in error response
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;

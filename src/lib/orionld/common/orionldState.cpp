@@ -218,7 +218,7 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
 
   orionldState.errorAttributeArrayP[orionldState.errorAttributeArrayUsed] = '|';
   orionldState.errorAttributeArrayUsed += 1;
+
+  orionldState.geoType    = NULL;
+  orionldState.geoCoordsP = NULL;
 }
-
-
-

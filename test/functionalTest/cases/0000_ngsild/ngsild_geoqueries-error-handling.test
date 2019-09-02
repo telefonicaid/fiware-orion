@@ -217,13 +217,13 @@ Date: REGEX(.*)
 02. Non array 'coordinate' in payload for creation - see error
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 215
+Content-Length: 164
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "title": "not a JSON Array",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -273,13 +273,13 @@ Date: REGEX(.*)
 06. Non string 'type' in payload for creation - see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 209
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "details": "the 'type' field of a GeoJSON object must be a JSON String",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -287,13 +287,13 @@ Date: REGEX(.*)
 07. Invalid value for 'type' in payload for creation - see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 171
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "invalid GeoJSON type",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "details": "invalid string for geo type",
+    "title": "invalid GeoJSON type",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

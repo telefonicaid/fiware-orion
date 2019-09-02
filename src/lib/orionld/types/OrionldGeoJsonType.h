@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/OrionldGeoJsonType.h"                 // OrionldGeoJsonType
 
 
 
@@ -35,6 +34,7 @@
 //
 typedef enum OrionldGeoJsonType
 {
+  GeoJsonNoType,
   GeoJsonPoint,
   GeoJsonMultiPoint,
   GeoJsonLineString,

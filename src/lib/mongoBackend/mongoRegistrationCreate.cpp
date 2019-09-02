@@ -47,7 +47,7 @@
 
 /* ****************************************************************************
 *
-* setRegistrationId - 
+* setRegistrationId -
 */
 #ifdef ORIONLD
 static void setNgsildRegistrationId(mongo::BSONObjBuilder* bobP, const char* regId)
@@ -124,7 +124,7 @@ static void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder
 
 /* ****************************************************************************
 *
-* setContextRegistrationVector - 
+* setContextRegistrationVector -
 */
 static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSONObjBuilder* bobP)
 {
@@ -198,35 +198,71 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
 
 #ifdef ORIONLD
-/* ****************************************************************************
-*
-* setObservationInterval
-*/
-static void setObservationInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setTimestamp -
+//
+static void setTimestamp(const char* name, int ts, mongo::BSONObjBuilder* bobP)
 {
-  mongo::BSONObjBuilder intervalObj;
-
-  intervalObj.append("start", (long long) interval.start);
-  intervalObj.append("end",   (long long) interval.end);
-
-  bobP->append("observationInterval", intervalObj.obj());
+  bobP->append(name, ts);
 }
 
 
 
-/* ****************************************************************************
-*
-* setManagementInterval
-*/
-static void setManagementInterval(const OrionldTimeInterval& interval, mongo::BSONObjBuilder* bobP)
+// -----------------------------------------------------------------------------
+//
+// setTimeInterval
+//
+static void setTimeInterval(const char* name, const OrionldTimeInterval* intervalP, mongo::BSONObjBuilder* bobP)
 {
   mongo::BSONObjBuilder intervalObj;
 
-  intervalObj.append("start", (long long) interval.start);
-  intervalObj.append("end",   (long long) interval.end);
+  intervalObj.append("start", (long long) intervalP->start);
+  intervalObj.append("end",   (long long) intervalP->end);
 
-  bobP->append("managementInterval", intervalObj.obj());
+  bobP->append(name, intervalObj.obj());
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setGetLocation -
+//
+static void setGetLocation(const char* name, const OrionldGeoLocation* locationP, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder  locationObj;
+  mongo::BSONArray       coordsArray;
+
+  locationObj.append("type", locationP->geoType);
+
+  mongoCppLegacyKjTreeToBsonObj(locationP->coordsNodeP, &coordsArray);
+  locationObj.append("coordinates", coordsArray);
+
+  bobP->append(name, locationObj.obj());
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setProperties -
+//
+static void setProperties(const char* name, KjNode* properties, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObj propertiesObj;
+
+  LM_TMP(("BOB: Calling mongoCppLegacyKjTreeToBsonObj. bobP at %p", bobP));
+  mongoCppLegacyKjTreeToBsonObj(properties, &propertiesObj);
+  LM_TMP(("BOB: After mongoCppLegacyKjTreeToBsonObj"));
+  bobP->append(name, propertiesObj);
+  LM_TMP(("BOB: After appending propertiesObj to bobP"));
+}
+
 #endif
 
 
@@ -261,7 +297,7 @@ static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
 
 /* ****************************************************************************
 *
-* mongoRegistrationCreate - 
+* mongoRegistrationCreate -
 */
 void mongoRegistrationCreate
 (
@@ -292,13 +328,28 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
-  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
+  int now = getCurrentTime();
+
+  setTimestamp("creDate", now, &bob);
+  setTimestamp("modDate", now, &bob);
+
   if (regP->observationInterval.start != 0)
-    setObservationInterval(regP->observationInterval, &bob);
+    setTimeInterval("observationInterval", &regP->observationInterval, &bob);
   if (regP->managementInterval.start != 0)
-    setManagementInterval(regP->managementInterval, &bob);
+    setTimeInterval("managementInterval", &regP->managementInterval, &bob);
+
+  LM_TMP(("BOB: regP->location.coordsNodeP at %p", regP->location.coordsNodeP));
+  if (regP->location.coordsNodeP != NULL)
+    setGetLocation("location", &regP->location, &bob);
+  if (regP->observationSpace.coordsNodeP != NULL)
+    setGetLocation("observationSpace", &regP->location, &bob);
+  if (regP->operationSpace.coordsNodeP != NULL)
+    setGetLocation("operationSpace", &regP->location, &bob);
+  if (regP->properties != NULL)
+    setProperties("properties", regP->properties, &bob);
 #endif
 
   //

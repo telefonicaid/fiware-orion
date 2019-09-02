@@ -157,7 +157,36 @@ MongoDB server version: REGEX(.*)
 			"providingApplication" : "http://my.csource.org:1026"
 		}
 	],
-	"format" : "JSON"
+	"format" : "JSON",
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	}
 }
 bye
 
