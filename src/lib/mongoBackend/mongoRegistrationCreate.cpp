@@ -47,7 +47,7 @@
 
 /* ****************************************************************************
 *
-* setRegistrationId - 
+* setRegistrationId -
 */
 #ifdef ORIONLD
 static void setNgsildRegistrationId(mongo::BSONObjBuilder* bobP, const char* regId)
@@ -124,7 +124,7 @@ static void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder
 
 /* ****************************************************************************
 *
-* setContextRegistrationVector - 
+* setContextRegistrationVector -
 */
 static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSONObjBuilder* bobP)
 {
@@ -231,7 +231,7 @@ static void setTimeInterval(const char* name, const OrionldTimeInterval* interva
 
 // -----------------------------------------------------------------------------
 //
-// setGetLocation - 
+// setGetLocation -
 //
 static void setGetLocation(const char* name, const OrionldGeoLocation* locationP, mongo::BSONObjBuilder* bobP)
 {
@@ -297,7 +297,7 @@ static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
 
 /* ****************************************************************************
 *
-* mongoRegistrationCreate - 
+* mongoRegistrationCreate -
 */
 void mongoRegistrationCreate
 (
