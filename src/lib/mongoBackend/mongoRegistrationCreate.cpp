@@ -204,6 +204,17 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
 // -----------------------------------------------------------------------------
 //
+// setTimestamp -
+//
+static void setTimestamp(const char* name, int ts, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(name, ts);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // setTimeInterval
 //
 static void setTimeInterval(const char* name, const OrionldTimeInterval* intervalP, mongo::BSONObjBuilder* bobP)
@@ -233,6 +244,23 @@ static void setGetLocation(const char* name, const OrionldGeoLocation* locationP
   locationObj.append("coordinates", coordsArray);
 
   bobP->append(name, locationObj.obj());
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setProperties -
+//
+static void setProperties(const char* name, KjNode* properties, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObj propertiesObj;
+
+  LM_TMP(("BOB: Calling mongoCppLegacyKjTreeToBsonObj. bobP at %p", bobP));
+  mongoCppLegacyKjTreeToBsonObj(properties, &propertiesObj);
+  LM_TMP(("BOB: After mongoCppLegacyKjTreeToBsonObj"));
+  bobP->append(name, propertiesObj);
+  LM_TMP(("BOB: After appending propertiesObj to bobP"));
 }
 
 #endif
@@ -303,6 +331,11 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
+  int now = getCurrentTime();
+
+  setTimestamp("creDate", now, &bob);
+  setTimestamp("modDate", now, &bob);
+
   if (regP->observationInterval.start != 0)
     setTimeInterval("observationInterval", &regP->observationInterval, &bob);
   if (regP->managementInterval.start != 0)
@@ -315,6 +348,8 @@ void mongoRegistrationCreate
     setGetLocation("observationSpace", &regP->location, &bob);
   if (regP->operationSpace.coordsNodeP != NULL)
     setGetLocation("operationSpace", &regP->location, &bob);
+  if (regP->properties != NULL)
+    setProperties("properties", regP->properties, &bob);
 #endif
 
   //

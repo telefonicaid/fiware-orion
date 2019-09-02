@@ -129,9 +129,14 @@ void mongoCppLegacyKjTreeToBsonObj(KjNode* nodeP, void* dbDataP)
     mongo::BSONObjBuilder bob;
 
     for (KjNode* objItemP = nodeP->value.firstChildP; objItemP != NULL; objItemP = objItemP->next)
+    {
+      LM_TMP(("BOB: Adding child '%s'", objItemP->name));
       kjTreeToBsonObject(objItemP, &bob);
+    }
 
+    LM_TMP(("BOB: bsonObjP at %p", bsonObjP));
     *bsonObjP = bob.obj();
+    LM_TMP(("BOB: Still here ...", nodeP->name));
   }
   else if (nodeP->type == KjArray)
   {

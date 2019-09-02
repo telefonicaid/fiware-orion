@@ -154,6 +154,7 @@ struct Registration
   OrionldGeoLocation    location;
   OrionldGeoLocation    observationSpace;
   OrionldGeoLocation    operationSpace;
+  KjNode*               properties;
 #endif
 
   Registration();

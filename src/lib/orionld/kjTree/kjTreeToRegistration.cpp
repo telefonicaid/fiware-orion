@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjObject, kjChildRemove, kjChildAdd
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -214,8 +215,13 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   //
   // Loop over the tree
   //
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  KjNode* next;
+
+  kNodeP = orionldState.requestTree->value.firstChildP;
+  while (kNodeP != NULL)
   {
+    next = kNodeP->next;
+
     if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Registration::name", kNodeP);
@@ -295,7 +301,24 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     else
     {
       // "property-name": value - See <Csource Property Name> in ETSI Spec
+
+      if (regP->properties == NULL)
+        regP->properties = kjObject(orionldState.kjsonP, "properties");
+
+      LM_TMP(("RPROP: Removing property '%s' from request tree", kNodeP->name));
+      LM_TMP(("RPROP: Adding property '%s' to Registration::properties", kNodeP->name));
+
+      // Here, where I remove 'kNodeP' from its tree, the current loop wiould end if I used kNodeP->next (which is set to NULL
+      // when kNodeP is removed
+      // Instead I must save the kNodeP->next pointer (in the variable 'next') and use that variable instead.
+      //
+      // See kNodeP = next; at the end of the loop
+      //
+      kjChildRemove(orionldState.requestTree, kNodeP);
+      kjChildAdd(regP->properties, kNodeP);
     }
+
+    kNodeP = next;
   }
 
   return true;

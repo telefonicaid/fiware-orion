@@ -111,7 +111,15 @@ payload='{
     ]
   },
   "expires": "2028-12-31T10:00:00",
-  "endpoint": "http://my.csource.org:1026"
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -273,6 +281,8 @@ MongoDB server version: REGEX(.*)
 		}
 	],
 	"format" : "JSON",
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
 	"observationInterval" : {
 		"start" : NumberLong(1546250400),
 		"end" : NumberLong(1861869600)
@@ -361,6 +371,19 @@ MongoDB server version: REGEX(.*)
 				]
 			]
 		]
+	},
+	"properties" : {
+		"P1" : 1,
+		"P2" : "2",
+		"P3" : true,
+		"P4" : 4.5,
+		"P5" : {
+			"object" : 6
+		},
+		"P6" : [
+			7,
+			8
+		]
 	}
 }
 bye
@@ -420,6 +443,8 @@ MongoDB server version: REGEX(.*)
 		}
 	],
 	"format" : "JSON",
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
 	"location" : {
 		"type" : "Polygon",
 		"coordinates" : [
