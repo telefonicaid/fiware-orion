@@ -158,6 +158,8 @@ MongoDB server version: REGEX(.*)
 		}
 	],
 	"format" : "JSON",
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
 	"location" : {
 		"type" : "Polygon",
 		"coordinates" : [
