@@ -65,7 +65,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
   KjNode*             typeNodeP         = NULL;
   KjNode*             coordinatesNodeP  = NULL;
   OrionldGeoJsonType  geoType           = GeoJsonNoType;
-  char*               geoTypeString;
+  char*               geoTypeString     = (char*) "NoGeometry";
 
   if (geoLocationNodeP->type != KjObject)
   {
