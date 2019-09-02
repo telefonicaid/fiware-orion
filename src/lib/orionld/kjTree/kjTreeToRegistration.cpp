@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjChildRemove, kjChildAdd
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -316,6 +317,17 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
       //
       kjChildRemove(orionldState.requestTree, kNodeP);
       kjChildAdd(regP->properties, kNodeP);
+
+      //
+      // Expand the name of the property
+      //
+      char* longName = (char*) kaAlloc(&orionldState.kalloc, 256);
+      char* details;
+
+      if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, 256, &details) == false)
+        return false;
+
+      kNodeP->name = longName;
     }
 
     kNodeP = next;
