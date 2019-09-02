@@ -32,9 +32,8 @@ brokerStart CB
 
 #
 # 01. Create 5 registrations with ID urn:ngsi-ld:reg01-05
-# 02. mongo content - see 5 regs
-# 03. Get registration 02 using URI param id=urn:ngsi-ld:reg02
-# 04. Get registration 01, 03, and 05, using URI param id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05
+# 02. Get registration 02 using URI param id=urn:ngsi-ld:reg02
+# 03. Get registration 01, 03, and 05, using URI param id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05
 #
 
 echo "01. Create 5 registrations with ID urn:ngsi-ld:reg01-05"
@@ -158,21 +157,14 @@ echo
 echo
 
 
-echo "02. mongo content - see 5 regs"
-echo "=============================="
-mongoCmd2 ftest "db.registrations.find()"
-echo
-echo
-
-
-echo "03. Get registration 02 using URI param id=urn:ngsi-ld:reg02"
+echo "02. Get registration 02 using URI param id=urn:ngsi-ld:reg02"
 echo "============================================================"
 orionCurl --url "/ngsi-ld/v1/csourceRegistrations?id=urn:ngsi-ld:reg02&prettyPrint=yes&spaces=2" --noPayloadCheck
 echo
 echo
 
 
-echo "04. Get registration 01, 03, and 05, using URI param id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05"
+echo "03. Get registration 01, 03, and 05, using URI param id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05"
 echo "============================================================================================================="
 orionCurl --url "/ngsi-ld/v1/csourceRegistrations?id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05&prettyPrint=yes&spaces=2" --noPayloadCheck
 echo
@@ -217,20 +209,7 @@ Date: REGEX(.*)
 
 
 
-02. mongo content - see 5 regs
-==============================
-MongoDB shell version REGEX(.*)
-connecting to: REGEX(.*)
-MongoDB server version: REGEX(.*)
-{ "_id" : "urn:ngsi-ld:reg01", "description" : "description of reg 01", "name" : "reg_01", "servicePath" : "/", "contextRegistration" : [ { "entities" : [ { "id" : "urn:ngsi-ld:Vehicle:A456", "type" : "http://example.org/ngsi-ld/default/Vehicle" } ], "attrs" : [ { "name" : "http://example.org/ngsi-ld/default/brandName", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/speed", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/isParked", "type" : "Relationship", "isDomain" : "false" } ], "providingApplication" : "http://my.csource.org:1026" } ], "format" : "JSON" }
-{ "_id" : "urn:ngsi-ld:reg02", "description" : "description of reg 02", "name" : "reg_02", "servicePath" : "/", "contextRegistration" : [ { "entities" : [ { "id" : "urn:ngsi-ld:Vehicle:A456", "type" : "http://example.org/ngsi-ld/default/Vehicle" } ], "attrs" : [ { "name" : "http://example.org/ngsi-ld/default/brandName", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/speed", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/isParked", "type" : "Relationship", "isDomain" : "false" } ], "providingApplication" : "http://my.csource.org:1026" } ], "format" : "JSON" }
-{ "_id" : "urn:ngsi-ld:reg03", "description" : "description of reg 03", "name" : "reg_03", "servicePath" : "/", "contextRegistration" : [ { "entities" : [ { "id" : "urn:ngsi-ld:Vehicle:A456", "type" : "http://example.org/ngsi-ld/default/Vehicle" } ], "attrs" : [ { "name" : "http://example.org/ngsi-ld/default/brandName", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/speed", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/isParked", "type" : "Relationship", "isDomain" : "false" } ], "providingApplication" : "http://my.csource.org:1026" } ], "format" : "JSON" }
-{ "_id" : "urn:ngsi-ld:reg04", "description" : "description of reg 04", "name" : "reg_04", "servicePath" : "/", "contextRegistration" : [ { "entities" : [ { "id" : "urn:ngsi-ld:Vehicle:A456", "type" : "http://example.org/ngsi-ld/default/Vehicle" } ], "attrs" : [ { "name" : "http://example.org/ngsi-ld/default/brandName", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/speed", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/isParked", "type" : "Relationship", "isDomain" : "false" } ], "providingApplication" : "http://my.csource.org:1026" } ], "format" : "JSON" }
-{ "_id" : "urn:ngsi-ld:reg05", "description" : "description of reg 05", "name" : "reg_05", "servicePath" : "/", "contextRegistration" : [ { "entities" : [ { "id" : "urn:ngsi-ld:Vehicle:A456", "type" : "http://example.org/ngsi-ld/default/Vehicle" } ], "attrs" : [ { "name" : "http://example.org/ngsi-ld/default/brandName", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/speed", "type" : "Property", "isDomain" : "false" }, { "name" : "http://example.org/ngsi-ld/default/isParked", "type" : "Relationship", "isDomain" : "false" } ], "providingApplication" : "http://my.csource.org:1026" } ], "format" : "JSON" }
-bye
-
-
-03. Get registration 02 using URI param id=urn:ngsi-ld:reg02
+02. Get registration 02 using URI param id=urn:ngsi-ld:reg02
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 506
@@ -267,7 +246,7 @@ Date: REGEX(.*)
 
 
 
-04. Get registration 01, 03, and 05, using URI param id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05
+03. Get registration 01, 03, and 05, using URI param id=urn:ngsi-ld:reg01,urn:ngsi-ld:reg03,urn:ngsi-ld:reg05
 =============================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1512
