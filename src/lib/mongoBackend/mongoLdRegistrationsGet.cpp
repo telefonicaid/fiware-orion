@@ -305,14 +305,21 @@ bool mongoLdRegistrationsGet
   {
     mongo::BSONObj         bob;
     ngsiv2::Registration   reg;
+    char*                  title;
+    char*                  detail;
 
     if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
-     LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
     LM_T(LmtMongo, ("retrieved document %d: '%s'", docs, bob.toString().c_str()));
+
+    //
+    // FIXME: All these calls to mongoSet-functions is also done in mongoLdRegistrationGet().
+    //        An aux function should be created for this to avoid the copied code.
+    //
 
     mongoSetLdRegistrationId(&reg, bob);
     mongoSetLdName(&reg, bob);
@@ -331,6 +338,45 @@ bool mongoLdRegistrationsGet
     mongoSetLdManagementInterval(&reg, bob);
     mongoSetExpires(&reg, bob);
     mongoSetStatus(&reg, bob);
+
+    mongoSetLdTimestamp(&reg.createdAt, "createdAt", bob);
+    mongoSetLdTimestamp(&reg.modifiedAt, "modifiedAt", bob);
+
+    if (mongoSetLdTimeInterval(&reg.location, "location", bob, &title, &detail) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      ciP->httpStatusCode = SccReceiverInternalError;
+      return false;
+    }
+
+    if (mongoSetLdTimeInterval(&reg.observationSpace, "observationSpace", bob, &title, &detail) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      ciP->httpStatusCode = SccReceiverInternalError;
+      return false;
+    }
+
+    if (mongoSetLdTimeInterval(&reg.operationSpace, "operationSpace", bob, &title, &detail) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      ciP->httpStatusCode = SccReceiverInternalError;
+      return false;
+    }
+
+    if (mongoSetLdProperties(&reg, "properties", bob, &title, &detail) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdProperties: %s: %s)", title, detail));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      ciP->httpStatusCode = SccReceiverInternalError;
+      return false;
+    }
 
     regVecP->push_back(reg);
   }

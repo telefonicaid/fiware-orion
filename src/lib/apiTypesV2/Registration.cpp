@@ -60,6 +60,8 @@ ForwardingInformation::ForwardingInformation(): lastFailure(0), lastSuccess(0), 
   bzero(&observationSpace, sizeof(observationSpace));
   bzero(&operationSpace, sizeof(operationSpace));
   properties = NULL;
+  createdAt  = -1;
+  modifiedAt = -1;
 #endif
 }
 

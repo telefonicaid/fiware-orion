@@ -36,10 +36,6 @@ brokerStart CB
 #        ONE item in the information vector.
 #        Once this is fixed (possibly some time 2020), this test should inclide an "information" vector
 #        with more than one item.
-# FIXME: Implement the GeoJSON type for location, observationSpace and operationalSpace 
-#        in POST and GET/id Registration.
-# FIXME: For some reason, the POST Registration is not saving the "name" value in MongoDB, even if it's 
-#        included on payload. THIS TEST SHOWS THIS ERROR INTENTIONALY.
 #
 # 01. Create 1 registration with ALL fields
 # 02. Create 1 registration without name, observationInterval and managementInterval
@@ -189,7 +185,7 @@ Date: REGEX(.*)
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 521
+Content-Length: 799
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -216,6 +212,33 @@ Date: REGEX(.*)
             ]
         }
     ],
+    "location": {
+        "coordinates": [
+            [
+                [
+                    100,
+                    0
+                ],
+                [
+                    101,
+                    0
+                ],
+                [
+                    101,
+                    1
+                ],
+                [
+                    100,
+                    1
+                ],
+                [
+                    100,
+                    0
+                ]
+            ]
+        ],
+        "type": "Polygon"
+    },
     "managementInterval": {
         "end": "2028-12-31T10:00:00Z",
         "start": "2018-12-31T10:00:00Z"
@@ -224,6 +247,60 @@ Date: REGEX(.*)
     "observationInterval": {
         "end": "2028-12-31T10:00:00Z",
         "start": "2018-12-31T10:00:00Z"
+    },
+    "observationSpace": {
+        "coordinates": [
+            [
+                [
+                    200,
+                    0
+                ],
+                [
+                    201,
+                    0
+                ],
+                [
+                    201,
+                    1
+                ],
+                [
+                    200,
+                    1
+                ],
+                [
+                    200,
+                    0
+                ]
+            ]
+        ],
+        "type": "Polygon"
+    },
+    "operationSpace": {
+        "coordinates": [
+            [
+                [
+                    300,
+                    0
+                ],
+                [
+                    301,
+                    0
+                ],
+                [
+                    301,
+                    1
+                ],
+                [
+                    300,
+                    1
+                ],
+                [
+                    300,
+                    0
+                ]
+            ]
+        ],
+        "type": "Polygon"
     },
     "type": "ContextSourceRegistration"
 }

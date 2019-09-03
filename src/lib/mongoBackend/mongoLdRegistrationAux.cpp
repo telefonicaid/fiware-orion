@@ -22,21 +22,25 @@
 *
 * Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
-#include <string>                                          // std::string
-#include <vector>                                          // std::vector
+#include <string>                                                    // std::string
+#include <vector>                                                    // std::vector
 
-#include "mongo/client/dbclient.h"                         // mongo::BSONObj, mongo::BSONElement
+#include "mongo/client/dbclient.h"                                   // mongo::BSONObj, mongo::BSONElement
 
-#include "apiTypesV2/Registration.h"                       // ngsiv2::Registration
-#include "mongoBackend/dbConstants.h"                      // REG_ATTRS, ...
-#include "mongoBackend/safeMongo.h"                        // getFieldF
-#include "mongoBackend/mongoLdRegistrationAux.h"           // Own interface
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "apiTypesV2/Registration.h"                                 // ngsiv2::Registration
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
+#include "mongoBackend/dbConstants.h"                                // REG_ATTRS, ...
+#include "mongoBackend/safeMongo.h"                                  // getFieldF
+#include "mongoBackend/mongoLdRegistrationAux.h"                     // Own interface
 
 
 
 /* ****************************************************************************
 *
-* mongoSetLdPropertyV - 
+* mongoSetLdPropertyV -
 */
 void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
@@ -64,7 +68,7 @@ void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
-* mongoSetLdRelationshipV - 
+* mongoSetLdRelationshipV -
 */
 void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 {
@@ -154,3 +158,78 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
   }
 }
 
+
+
+// -----------------------------------------------------------------------------
+//
+// mongoSetLdTimestamp -
+//
+void mongoSetLdTimestamp(long long* timestampP, const char* name, const mongo::BSONObj& bobj)
+{
+  LM_TMP(("sysAttrs: name: %s", name));
+  if (bobj.hasField(name))
+  {
+    LM_TMP(("sysAttrs: %s is present in bobj", name));
+    *timestampP = getIntFieldF(bobj, name);
+    LM_TMP(("sysAttrs: %s: %llu", name, *timestampP));
+  }
+  else
+  {
+    LM_TMP(("sysAttrs: %s is NOT present in bobj", name));
+    *timestampP = -1;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongoSetLdTimeInterval -
+//
+bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, const mongo::BSONObj& bobj, char** titleP, char** detailP)
+{
+  if (bobj.hasField(name))
+  {
+    mongo::BSONObj   locBobj   = getObjectFieldF(bobj, name);
+    KjNode*          tree      = mongoCppLegacyKjTreeFromBsonObj(&locBobj, titleP, detailP);
+
+    for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      if (strcmp(nodeP->name, "type") == 0)
+        geoLocationP->geoType = nodeP->value.s;
+      else if (strcmp(nodeP->name, "coordinates") == 0)
+        geoLocationP->coordsNodeP = nodeP;
+    }
+
+    LM_TMP(("TMI: geoType:   '%s'", geoLocationP->geoType));
+
+    if (geoLocationP->coordsNodeP == NULL)
+    {
+      LM_E(("Internal Error (%s: %s)", *titleP, *detailP));
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongoSetLdProperties -
+//
+bool mongoSetLdProperties(ngsiv2::Registration* regP, const char* name, const mongo::BSONObj& bobj, char** titleP, char** detailP)
+{
+  mongo::BSONObj  propertiesObj   = getObjectFieldF(bobj, name);
+
+  regP->properties = mongoCppLegacyKjTreeFromBsonObj(&propertiesObj, titleP, detailP);
+
+  if (regP->properties == NULL)
+  {
+    LM_E(("Internal Error (%s: %s)", *titleP, *detailP));
+    return false;
+  }
+
+  return true;
+}

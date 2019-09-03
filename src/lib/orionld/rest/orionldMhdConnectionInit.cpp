@@ -174,6 +174,8 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
 //
 static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  LM_TMP(("Got URI Param: '%s' == '%s'", key, value));
+
   if (SCOMPARE3(key, 'i', 'd', 0))
     orionldState.uriParams.id = (char*) value;
   else if (SCOMPARE5(key, 't', 'y', 'p', 'e', 0))

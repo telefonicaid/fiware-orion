@@ -38,7 +38,9 @@ brokerStart CB
 # 06. GET  /ngsi-ld/v1/csourceRegistrations GET limit:5/offset:1 csourceRegistration
 # 07. GET  /ngsi-ld/v1/csourceRegistrations GET options=count csourceRegistration
 # 08. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:11 csourceRegistration
+# 09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
 #
+
 
 echo "01. GET  /ngsi-ld/v1/csourceRegistrations empty data"
 echo "===================================================="
@@ -46,87 +48,84 @@ orionCurl --url /ngsi-ld/v1/csourceRegistrations
 echo
 echo
 
+
 echo "02. POST /ngsi-ld/v1/csourceRegistrations CSR1"
 echo "=============================================="
 typeset -i csrNo;
 csrNo=1
 while [ $csrNo -le 10 ]
-	do
-	payload='{
-            "id": "urn:ngsi-ld:ContextSourceRegistration:CSR'$csrNo'",
-            "type": "ContextSourceRegistration",
-            "name": "reg_csr1a343",
-            "description": "description of '$csrNo'", 
-            "information": [
-                {
-                "entities": [
-                {
-                "id": "urn:ngsi-ld:Vehicle:'$csrNo'",
-                "type": "Vehicle"
-                }
-                ],
-                "properties": [ "brandName", "speed" ],
-                "relationships": [ "isParked" ]
-                }
-            ],
-            "observationInterval": {
-                "start": "2018-12-31T10:00:00",
-                "end": "2028-12-31T10:00:00"
-            },
-            "managementInterval": {
-                "start": "2018-12-31T10:00:00",
-                "end": "2028-12-31T10:00:00"
-            },
-            "location": {
-                "type": "Polygon",
-                "coordinates": [
-                [
-                [ 100.0, 0.0 ],
-                [ 101.0, 0.0 ],
-                [ 101.0, 1.0 ],
-                [ 100.0, 1.0 ],
-                [ 100.0, 0.0 ]
-                ]
-                ]
-            },
-            "observationSpace": {
-                "type": "Polygon",
-                "coordinates": [
-                [
-                [ 200.0, 0.0 ],
-                [ 201.0, 0.0 ],
-                [ 201.0, 1.0 ],
-                [ 200.0, 1.0 ],
-                [ 200.0, 0.0 ]
-                ]
-                ]
-            },
-            "operationSpace": {
-                "type": "Polygon",
-                "coordinates": [
-                [
-                [ 300.0, 0.0 ],
-                [ 301.0, 0.0 ],
-                [ 301.0, 1.0 ],
-                [ 300.0, 1.0 ],
-                [ 300.0, 0.0 ]
-                ]
-                ]
-            },
-            "expires": "2028-12-31T10:00:00",
-            "endpoint": "http://my.csource.org:1026"
-		}'
-		orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
-		csrNo=$csrNo+1
-	done
+do
+  payload='{
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR'$csrNo'",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of '$csrNo'", 
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:'$csrNo'",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [ "brandName", "speed" ],
+        "relationships": [ "isParked" ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00",
+      "end": "2028-12-31T10:00:00"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00",
+      "end": "2027-12-31T10:00:00"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [ 100.0, 0.0 ],
+          [ 101.0, 0.0 ],
+          [ 101.0, 1.0 ],
+          [ 100.0, 1.0 ],
+          [ 100.0, 0.0 ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [ 200.0, 0.0 ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [ 300.0, 0.0 ],
+          [ 301.0, 0.0 ],
+          [ 301.0, 1.0 ],
+          [ 300.0, 1.0 ],
+          [ 300.0, 0.0 ]
+        ]
+      ]
+    },
+    "expires": "2028-12-31T10:00:00",
+    "endpoint": "http://my.csource.org:1026",
+    "P1": '$csrNo',
+    "P2": "String-'$csrNo'"
+  }'
+  orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
+  csrNo=$csrNo+1
+done
 echo
 echo
 
+
 echo "03. GET  /ngsi-ld/v1/csourceRegistrations all data"
 echo "=================================================="
-orionCurl --url /ngsi-ld/v1/csourceRegistrations
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations?prettyPrint=yes&spaces=2&options=sysAttrs' --noPayloadCheck -H "Accept: application/ld+json"
 echo
 echo
+
 
 echo "04. GET  /ngsi-ld/v1/csourceRegistrations limit:5 csourceRegistration"
 echo "====================================================================="
@@ -134,11 +133,13 @@ orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=5' -H 'Link: <http://uri
 echo
 echo
 
+
 echo "05. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:0 csourceRegistration"
 echo "=============================================================================="
 orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=5&offset=0' -H 'Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
+
 
 echo "06. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:1 csourceRegistration"
 echo "=============================================================================="
@@ -146,15 +147,24 @@ orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=5&offset=1' -H 'Link: <h
 echo
 echo
 
+
 echo "07. GET  /ngsi-ld/v1/csourceRegistrations GET options=count csourceRegistration"
 echo "==============================================================================="
 orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=3&options=count' -H 'Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
+
 echo "08. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:11 csourceRegistration"
 echo "==================================================================================="
 orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=1&offset=11' -H 'Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs"
+echo "========================================================================================"
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=1&offset=5&options=sysAttrs&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 
@@ -228,355 +238,1017 @@ Date: REGEX(.*)
 03. GET  /ngsi-ld/v1/csourceRegistrations all data
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 5254
-Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Length: 18698
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
-    {
-        "description": "description of 1",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:1",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 1",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:1",
+            "type": "Vehicle"
+          }
         ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
     },
-    {
-        "description": "description of 10",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:10",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
     },
-    {
-        "description": "description of 2",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:2",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
     },
-    {
-        "description": "description of 3",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:3",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
     },
-    {
-        "description": "description of 4",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:4",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
     },
-    {
-        "description": "description of 5",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:5",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
+    "P1": 1,
+    "P2": "String-1"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 10",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:10",
+            "type": "Vehicle"
+          }
         ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
     },
-    {
-        "description": "description of 6",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR6",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:6",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
     },
-    {
-        "description": "description of 7",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR7",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:7",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
     },
-    {
-        "description": "description of 8",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR8",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:8",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
-        ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
     },
-    {
-        "description": "description of 9",
-        "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
-        "id": "urn:ngsi-ld:ContextSourceRegistration:CSR9",
-        "information": [
-            {
-                "entities": [
-                    {
-                        "id": "urn:ngsi-ld:Vehicle:9",
-                        "type": "Vehicle"
-                    }
-                ],
-                "properties": [
-                    "brandName",
-                    "speed"
-                ],
-                "relationships": [
-                    "isParked"
-                ]
-            }
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 10,
+    "P2": "String-10"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 2",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:2",
+            "type": "Vehicle"
+          }
         ],
-        "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "name": "reg_csr1a343",
-        "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
-        },
-        "type": "ContextSourceRegistration"
-    }
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 2,
+    "P2": "String-2"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 3",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:3",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 3,
+    "P2": "String-3"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 4",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:4",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 4,
+    "P2": "String-4"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 5",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:5",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 5,
+    "P2": "String-5"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR6",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 6",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:6",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 6,
+    "P2": "String-6"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR7",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 7",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:7",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 7,
+    "P2": "String-7"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR8",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 8",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:8",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 8,
+    "P2": "String-8"
+  },
+  {
+    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR9",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 9",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:9",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 9,
+    "P2": "String-9"
+  }
 ]
+
 
 
 04. GET  /ngsi-ld/v1/csourceRegistrations limit:5 csourceRegistration
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2629
+Content-Length: 3946
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "P1": 1,
+        "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -598,18 +1270,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 10,
+        "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -631,18 +1366,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 2,
+        "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -664,18 +1462,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 3,
+        "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -697,18 +1558,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 4,
+        "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -730,14 +1654,75 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
+        },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
         },
         "type": "ContextSourceRegistration"
     }
@@ -747,13 +1732,15 @@ Date: REGEX(.*)
 05. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:0 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2629
+Content-Length: 3946
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "P1": 1,
+        "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -775,18 +1762,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 10,
+        "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -808,18 +1858,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 2,
+        "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -841,18 +1954,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 3,
+        "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -874,18 +2050,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 4,
+        "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -907,14 +2146,75 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
+        },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
         },
         "type": "ContextSourceRegistration"
     }
@@ -924,13 +2224,15 @@ Date: REGEX(.*)
 06. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:1 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2629
+Content-Length: 3946
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "P1": 10,
+        "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -952,18 +2254,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 2,
+        "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -985,18 +2350,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 3,
+        "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -1018,18 +2446,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 4,
+        "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -1051,18 +2542,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 5,
+        "P2": "String-5",
         "description": "description of 5",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -1084,14 +2638,75 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
+        },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
         },
         "type": "ContextSourceRegistration"
     }
@@ -1101,7 +2716,7 @@ Date: REGEX(.*)
 07. GET  /ngsi-ld/v1/csourceRegistrations GET options=count csourceRegistration
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 1579
+Content-Length: 2370
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Fiware-Total-Count: 10
@@ -1109,6 +2724,8 @@ Date: REGEX(.*)
 
 [
     {
+        "P1": 1,
+        "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -1130,18 +2747,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 10,
+        "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -1163,18 +2843,81 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
         },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "type": "ContextSourceRegistration"
     },
     {
+        "P1": 2,
+        "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
         "expires": "2028-12-31T10:00:00Z",
@@ -1196,14 +2939,75 @@ Date: REGEX(.*)
                 ]
             }
         ],
+        "location": {
+            "coordinates": [
+                [
+                    [
+                        100,
+                        0
+                    ],
+                    [
+                        101,
+                        0
+                    ],
+                    [
+                        101,
+                        1
+                    ],
+                    [
+                        100,
+                        1
+                    ],
+                    [
+                        100,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        },
         "managementInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00Z",
+            "start": "2017-12-31T10:00:00Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
             "end": "2028-12-31T10:00:00Z",
             "start": "2018-12-31T10:00:00Z"
+        },
+        "observationSpace": {
+            "coordinates": [
+                200,
+                0
+            ],
+            "type": "Point"
+        },
+        "operationSpace": {
+            "coordinates": [
+                [
+                    [
+                        300,
+                        0
+                    ],
+                    [
+                        301,
+                        0
+                    ],
+                    [
+                        301,
+                        1
+                    ],
+                    [
+                        300,
+                        1
+                    ],
+                    [
+                        300,
+                        0
+                    ]
+                ]
+            ],
+            "type": "Polygon"
         },
         "type": "ContextSourceRegistration"
     }
@@ -1219,6 +3023,117 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 Date: REGEX(.*)
 
 []
+
+
+09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1759
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
+    "type": "ContextSourceRegistration",
+    "name": "reg_csr1a343",
+    "description": "description of 5",
+    "createdAt": REGEX(.*),
+    "modifiedAt": REGEX(.*),
+    "expires": "2028-12-31T10:00:00Z",
+    "endpoint": "http://my.csource.org:1026",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:5",
+            "type": "Vehicle"
+          }
+        ],
+        "properties": [
+          "brandName",
+          "speed"
+        ],
+        "relationships": [
+          "isParked"
+        ]
+      }
+    ],
+    "observationInterval": {
+      "start": "2018-12-31T10:00:00Z",
+      "end": "2028-12-31T10:00:00Z"
+    },
+    "managementInterval": {
+      "start": "2017-12-31T10:00:00Z",
+      "end": "2027-12-31T10:00:00Z"
+    },
+    "location": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            100,
+            0
+          ],
+          [
+            101,
+            0
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            100,
+            1
+          ],
+          [
+            100,
+            0
+          ]
+        ]
+      ]
+    },
+    "observationSpace": {
+      "type": "Point",
+      "coordinates": [
+        200,
+        0
+      ]
+    },
+    "operationSpace": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            300,
+            0
+          ],
+          [
+            301,
+            0
+          ],
+          [
+            301,
+            1
+          ],
+          [
+            300,
+            1
+          ],
+          [
+            300,
+            0
+          ]
+        ]
+      ]
+    },
+    "P1": 5,
+    "P2": "String-5"
+  }
+]
+
 
 
 --TEARDOWN--

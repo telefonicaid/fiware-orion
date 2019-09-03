@@ -231,9 +231,9 @@ static void setTimeInterval(const char* name, const OrionldTimeInterval* interva
 
 // -----------------------------------------------------------------------------
 //
-// setGetLocation -
+// setGeoLocation -
 //
-static void setGetLocation(const char* name, const OrionldGeoLocation* locationP, mongo::BSONObjBuilder* bobP)
+static void setGeoLocation(const char* name, const OrionldGeoLocation* locationP, mongo::BSONObjBuilder* bobP)
 {
   mongo::BSONObjBuilder  locationObj;
   mongo::BSONArray       coordsArray;
@@ -333,8 +333,8 @@ void mongoRegistrationCreate
 #ifdef ORIONLD
   int now = getCurrentTime();
 
-  setTimestamp("creDate", now, &bob);
-  setTimestamp("modDate", now, &bob);
+  setTimestamp("createdAt",  now, &bob);
+  setTimestamp("modifiedAt", now, &bob);
 
   if (regP->observationInterval.start != 0)
     setTimeInterval("observationInterval", &regP->observationInterval, &bob);
@@ -343,11 +343,11 @@ void mongoRegistrationCreate
 
   LM_TMP(("BOB: regP->location.coordsNodeP at %p", regP->location.coordsNodeP));
   if (regP->location.coordsNodeP != NULL)
-    setGetLocation("location", &regP->location, &bob);
+    setGeoLocation("location", &regP->location, &bob);
   if (regP->observationSpace.coordsNodeP != NULL)
-    setGetLocation("observationSpace", &regP->location, &bob);
+    setGeoLocation("observationSpace", &regP->observationSpace, &bob);
   if (regP->operationSpace.coordsNodeP != NULL)
-    setGetLocation("operationSpace", &regP->location, &bob);
+    setGeoLocation("operationSpace", &regP->operationSpace, &bob);
   if (regP->properties != NULL)
     setProperties("properties", regP->properties, &bob);
 #endif
