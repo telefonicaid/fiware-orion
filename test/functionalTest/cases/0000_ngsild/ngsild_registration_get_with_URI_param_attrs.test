@@ -239,6 +239,7 @@ Date: REGEX(.*)
     "type": "ContextSourceRegistration",
     "name": "reg_02",
     "description": "description of reg 02",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -255,8 +256,7 @@ Date: REGEX(.*)
           "relationship2"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   }
 ]
 
@@ -276,6 +276,7 @@ Date: REGEX(.*)
     "type": "ContextSourceRegistration",
     "name": "reg_01",
     "description": "description of reg 01",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -292,14 +293,14 @@ Date: REGEX(.*)
           "relationship1"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   },
   {
     "id": "urn:ngsi-ld:reg03",
     "type": "ContextSourceRegistration",
     "name": "reg_03",
     "description": "description of reg 03",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -316,14 +317,14 @@ Date: REGEX(.*)
           "relationship3"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   },
   {
     "id": "urn:ngsi-ld:reg05",
     "type": "ContextSourceRegistration",
     "name": "reg_05",
     "description": "description of reg 05",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -340,8 +341,7 @@ Date: REGEX(.*)
           "relationship5"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   }
 ]
 
@@ -361,6 +361,7 @@ Date: REGEX(.*)
     "type": "ContextSourceRegistration",
     "name": "reg_03",
     "description": "description of reg 03",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -377,8 +378,7 @@ Date: REGEX(.*)
           "relationship3"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   }
 ]
 
@@ -398,6 +398,7 @@ Date: REGEX(.*)
     "type": "ContextSourceRegistration",
     "name": "reg_02",
     "description": "description of reg 02",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -414,14 +415,14 @@ Date: REGEX(.*)
           "relationship2"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   },
   {
     "id": "urn:ngsi-ld:reg04",
     "type": "ContextSourceRegistration",
     "name": "reg_04",
     "description": "description of reg 04",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -438,14 +439,14 @@ Date: REGEX(.*)
           "relationship4"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   },
   {
     "id": "urn:ngsi-ld:reg05",
     "type": "ContextSourceRegistration",
     "name": "reg_05",
     "description": "description of reg 05",
+    "endpoint": "http://my.csource.org:1026",
     "information": [
       {
         "entities": [
@@ -462,8 +463,7 @@ Date: REGEX(.*)
           "relationship5"
         ]
       }
-    ],
-    "endpoint": "http://my.csource.org:1026"
+    ]
   }
 ]
 

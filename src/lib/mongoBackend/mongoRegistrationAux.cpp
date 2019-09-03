@@ -233,6 +233,3 @@ void mongoSetStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
   regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
 }
-
-
-

@@ -84,6 +84,57 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     kjChildAdd(topP, nodeP);
   }
 
+
+  //
+  // sysAttrs - createdAt and modifiedAt
+  //
+  if (ciP->uriParamOptions["sysAttrs"] == true)
+  {
+    LM_TMP(("sysAttrs: SET"));
+    LM_TMP(("sysAttrs: createdAt:  %d", registrationP->createdAt));
+    LM_TMP(("sysAttrs: modifiedAt: %d", registrationP->modifiedAt));
+
+    if (registrationP->createdAt != -1)
+    {
+      KjNode* createdAtNodeP = kjInteger(orionldState.kjsonP, "createdAt", registrationP->createdAt);
+      kjChildAdd(topP, createdAtNodeP);
+    }
+
+    if (registrationP->modifiedAt != -1)
+    {
+      KjNode* modifiedAtNodeP = kjInteger(orionldState.kjsonP, "modifiedAt", registrationP->modifiedAt);
+      kjChildAdd(topP, modifiedAtNodeP);
+    }
+  }
+  else
+    LM_TMP(("sysAttrs: NOT SET"));
+
+
+  //
+  // expires
+  //
+  if (registrationP->expires != -1)
+  {
+    char dateExp[64];
+
+    if (numberToDate((time_t) registrationP->expires, dateExp, sizeof(dateExp), &details) == false)
+    {
+      LM_E(("Error creating a stringified date for 'expires'"));
+      orionldErrorResponseCreate(OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
+      return NULL;
+    }
+    nodeP = kjString(orionldState.kjsonP, "expires", dateExp);
+    kjChildAdd(topP, nodeP);
+  }
+
+
+  //
+  // endpoint
+  //
+  nodeP = kjString(orionldState.kjsonP, "endpoint", registrationP->provider.http.url.c_str());
+  kjChildAdd(topP, nodeP);
+
+
   // information
   // FIXME: Change to accept more than one member in the future
 
@@ -96,7 +147,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
 
     objectP = kjObject(orionldState.kjsonP, NULL);
 
-    // entities
+    // information::entities
     size = registrationP->dataProvided.entities.size();
     if (size != 0)
     {
@@ -129,7 +180,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
       kjChildAdd(objectP, arrayP2);  // adding entities array to information object
     }
 
-    // properties
+    // information::properties
     size = registrationP->dataProvided.propertyV.size();
     if (size != 0)
     {
@@ -144,7 +195,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
       kjChildAdd(objectP, arrayP2);
     }
 
-    // relationships
+    // information::relationships
     size = registrationP->dataProvided.relationshipV.size();
     if (size != 0)
     {
@@ -229,33 +280,68 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   }
 
 
-  // FIXME: location
-  // FIXME: observationSpace
-  // FIXME: operationSpace
-
   //
-  // expires
+  // location
   //
-  if (registrationP->expires != -1)
+  LM_TMP(("LOC: registrationP->location.geoType == %s", registrationP->location.geoType));
+  if (registrationP->location.geoType != NULL)
   {
-    char dateExp[64];
-
-    if (numberToDate((time_t) registrationP->expires, dateExp, sizeof(dateExp), &details) == false)
-    {
-      LM_E(("Error creating a stringified date for 'expires'"));
-      orionldErrorResponseCreate(OrionldInternalError, "unable to create a stringified date", details, OrionldDetailsEntity);
-      return NULL;
-    }
-    nodeP = kjString(orionldState.kjsonP, "expires", dateExp);
-    kjChildAdd(topP, nodeP);
+    objectP = kjObject(orionldState.kjsonP, "location");
+    nodeP   = kjString(orionldState.kjsonP, "type", registrationP->location.geoType);
+    kjChildAdd(objectP, nodeP);
+    kjChildAdd(objectP, registrationP->location.coordsNodeP);
+    kjChildAdd(topP, objectP);
   }
 
 
   //
-  // endpoint
+  // observationSpace
   //
-  nodeP = kjString(orionldState.kjsonP, "endpoint", registrationP->provider.http.url.c_str());
-  kjChildAdd(topP, nodeP);
+  if (registrationP->observationSpace.geoType != NULL)
+  {
+    objectP = kjObject(orionldState.kjsonP, "observationSpace");
+    nodeP   = kjString(orionldState.kjsonP, "type", registrationP->observationSpace.geoType);
+    kjChildAdd(objectP, nodeP);
+    kjChildAdd(objectP, registrationP->observationSpace.coordsNodeP);
+    kjChildAdd(topP, objectP);
+  }
+
+
+  //
+  // operationSpace
+  //
+  if (registrationP->operationSpace.geoType != NULL)
+  {
+    objectP = kjObject(orionldState.kjsonP, "operationSpace");
+    nodeP   = kjString(orionldState.kjsonP, "type", registrationP->operationSpace.geoType);
+    kjChildAdd(objectP, nodeP);
+    kjChildAdd(objectP, registrationP->operationSpace.coordsNodeP);
+    kjChildAdd(topP, objectP);
+  }
+
+
+  //
+  // Properties
+  //
+  if (registrationP->properties != NULL)
+  {
+    //
+    // Loop over the properties to replace the expanded 'name' with its alias from the context
+    //
+    for (KjNode* nodeP = registrationP->properties->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      char* alias = orionldAliasLookup(orionldState.contextP, nodeP->name);
+
+      if (alias != NULL)
+        nodeP->name = alias;
+    }
+
+    //
+    // Incorporate the children of registrationP->properties into topP, at the end
+    //
+    topP->lastChild->next = registrationP->properties->value.firstChildP;
+    topP->lastChild       = registrationP->properties->lastChild;
+  }
 
   return topP;
 }

@@ -1,4 +1,4 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+z# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -39,9 +39,10 @@ brokerStart CB
 #
 # 01. Create a registration with ALL fields
 # 02. See the registration in mongo
-# 03. Create R1 registration with embedded context
-# 04. See the R1 registration in mongo
-# 05. Create R2 registration without @Context Attribute
+# 03. GET the registration, with sysAttrs included
+# 04. Create R1 registration with embedded context
+# 05. See the R1 registration in mongo
+# 06. Create R2 registration without @Context Attribute
 #
 
 echo "01. Create a registration with ALL fields"
@@ -71,8 +72,8 @@ payload='{
     "end": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
   },
   "location": {
     "type": "Polygon",
@@ -133,7 +134,14 @@ echo
 echo
 
 
-echo '03. Create R1 registration with embedded context'
+echo "03. GET the registration, with sysAttrs included"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341?options=sysAttrs&prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo '04. Create R1 registration with embedded context'
 echo '================================================'
 payload='{
   "@context": {
@@ -202,14 +210,14 @@ echo
 echo
 
 
-echo "04. See the R1 registration in mongo"
+echo "05. See the R1 registration in mongo"
 echo "===================================="
 mongoCmd2 ftest "db.registrations.findOne({'_id': 'urn:ngsi-ld:ContextSourceRegistration:R1'})"
 echo
 echo
 
 
-echo '05. Create R2 registration without @Context Attribute'
+echo '06. Create R2 registration without @Context Attribute'
 echo '====================================================='
 payload='{
   "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
@@ -288,8 +296,8 @@ MongoDB server version: REGEX(.*)
 		"end" : NumberLong(1861869600)
 	},
 	"managementInterval" : {
-		"start" : NumberLong(1546250400),
-		"end" : NumberLong(1861869600)
+		"start" : NumberLong(1514714400),
+		"end" : NumberLong(1830247200)
 	},
 	"location" : {
 		"type" : "Polygon",
@@ -323,23 +331,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					100,
+					200,
 					0
 				],
 				[
-					101,
+					201,
 					0
 				],
 				[
-					101,
+					201,
 					1
 				],
 				[
-					100,
+					200,
 					1
 				],
 				[
-					100,
+					200,
 					0
 				]
 			]
@@ -350,23 +358,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					100,
+					300,
 					0
 				],
 				[
-					101,
+					301,
 					0
 				],
 				[
-					101,
+					301,
 					1
 				],
 				[
-					100,
+					300,
 					1
 				],
 				[
-					100,
+					300,
 					0
 				]
 			]
@@ -389,7 +397,145 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Create R1 registration with embedded context
+03. GET the registration, with sysAttrs included
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1998
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+  "type": "ContextSourceRegistration",
+  "name": "reg_csr1a341",
+  "description": "description of reg 1",
+  "createdAt": REGEX(.*),
+  "modifiedAt": REGEX(.*),
+  "expires": "2028-12-31T10:00:00Z",
+  "endpoint": "http://my.csource.org:1026",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [
+        "brandName",
+        "speed"
+      ],
+      "relationships": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00Z",
+    "end": "2028-12-31T10:00:00Z"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00Z",
+    "end": "2027-12-31T10:00:00Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          100,
+          0
+        ],
+        [
+          101,
+          0
+        ],
+        [
+          101,
+          1
+        ],
+        [
+          100,
+          1
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          200,
+          0
+        ],
+        [
+          201,
+          0
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          200,
+          1
+        ],
+        [
+          200,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          300,
+          0
+        ],
+        [
+          301,
+          0
+        ],
+        [
+          301,
+          1
+        ],
+        [
+          300,
+          1
+        ],
+        [
+          300,
+          0
+        ]
+      ]
+    ]
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ]
+}
+
+
+
+04. Create R1 registration with embedded context
 ================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -399,7 +545,7 @@ Date: REGEX(.*)
 
 
 
-04. See the R1 registration in mongo
+05. See the R1 registration in mongo
 ====================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
@@ -477,23 +623,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					100,
+					200,
 					0
 				],
 				[
-					101,
+					201,
 					0
 				],
 				[
-					101,
+					201,
 					1
 				],
 				[
-					100,
+					200,
 					1
 				],
 				[
-					100,
+					200,
 					0
 				]
 			]
@@ -504,23 +650,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					100,
+					300,
 					0
 				],
 				[
-					101,
+					301,
 					0
 				],
 				[
-					101,
+					301,
 					1
 				],
 				[
-					100,
+					300,
 					1
 				],
 				[
-					100,
+					300,
 					0
 				]
 			]
@@ -530,7 +676,7 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-05. Create R2 registration without @Context Attribute
+06. Create R2 registration without @Context Attribute
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0

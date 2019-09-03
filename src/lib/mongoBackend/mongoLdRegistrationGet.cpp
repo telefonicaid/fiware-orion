@@ -51,34 +51,40 @@ bool mongoLdRegistrationGet
   const char*            regId,
   const char*            tenant,
   HttpStatusCode*        statusCodeP,
-  char**                 detailsP
+  char**                 detailP
 )
 {
   bool                                  reqSemTaken = false;
   std::string                           err;
   std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::BSONObj                        q = BSON("_id" << regId);
+  char*                                 title;
+  mongo::BSONObj                        query = BSON("_id" << regId);
 
   reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Registration"));
 
+
+  //
+  // Query
+  //
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), query, &cursor, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-    *detailsP    = (char*) "Internal Error during DB-query";
+    *detailP     = (char*) "Internal Error during DB-query";
     *statusCodeP = SccReceiverInternalError;
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
-  LM_TMP(("qBSON %s", q.toString().c_str()));
 
-  /* Process query result */
+  //
+  // Process Query Result
+  //
   if (moreSafe(cursor))
   {
     mongo::BSONObj bob;
@@ -86,9 +92,9 @@ bool mongoLdRegistrationGet
     if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *detailsP    = (char*) "Runtime Error (exception in nextSafe)";
+      *detailP     = (char*) "Runtime Error (exception in nextSafe)";
       *statusCodeP = SccReceiverInternalError;
       return false;
     }
@@ -125,6 +131,46 @@ bool mongoLdRegistrationGet
     mongoSetExpires(regP, bob);
     mongoSetStatus(regP, bob);
 
+    mongoSetLdTimestamp(&regP->createdAt, "createdAt", bob);
+    mongoSetLdTimestamp(&regP->modifiedAt, "modifiedAt", bob);
+
+    if (mongoSetLdTimeInterval(&regP->location, "location", bob, &title, detailP) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, *detailP));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+
+    if (mongoSetLdTimeInterval(&regP->observationSpace, "observationSpace", bob, &title, detailP) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, *detailP));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+
+    if (mongoSetLdTimeInterval(&regP->operationSpace, "operationSpace", bob, &title, detailP) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, *detailP));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+
+    if (mongoSetLdProperties(regP, "properties", bob, &title, detailP) == false)
+    {
+      LM_E(("Internal Error (mongoSetLdProperties: %s: %s)", title, *detailP));
+      releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
+      *statusCodeP = SccReceiverInternalError;
+      return false;
+    }
+
+
     if (moreSafe(cursor))
     {
       releaseMongoConnection(connection);
@@ -132,7 +178,7 @@ bool mongoLdRegistrationGet
       // Ooops, we expected only one
       LM_T(LmtMongo, ("more than one registration: '%s'", regId));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *detailsP    = (char*) "more than one registration matched";
+      *detailP    = (char*) "more than one registration matched";
       *statusCodeP = SccConflict;
       return false;
     }
@@ -142,7 +188,7 @@ bool mongoLdRegistrationGet
     releaseMongoConnection(connection);
     LM_T(LmtMongo, ("registration not found: '%s'", regId));
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-    *detailsP    = (char*) "registration not found";
+    *detailP     = (char*) "registration not found";
     *statusCodeP = SccContextElementNotFound;
     return false;
   }
