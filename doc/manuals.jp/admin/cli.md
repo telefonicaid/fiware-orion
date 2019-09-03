@@ -40,6 +40,13 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-dbAuthMech <mechanism>**. `-dbuser` と `-dbpwd` を提供する場合に使用する MongoDB
     認証メカニズム。代替手段はSCRAM-SHA-1 または MONGODB-CR です。デフォルト
     (このフィールドを省略する場合) は SCRAM-SHA-1 です
+-   **-dbAuthDb <database>** : `-dbuser` と `-dbpwd` を提供する場合に認証に使用するデータベース
+    を指定します。デフォルトは、`-multiservice` を使用しない場合の `-db` または `-multiservice`
+    を使用する場合の `"admin"` と同じです
+-   **-dbSSL** : MongoDB への接続で SSL を有効にします。MongoDB サーバまたはレプリカ・セットが
+    SSL を使用している場合は、このオプションを使用する必要があります (または、逆に、MongoDB
+    サーバまたはレプリカ・セットが SSL を使用していない場合は、このオプションを使用する必要は
+    ありません)
 -   **-dbPoolSize <size>** : データベース・コネクション・プール プールのデフォルトサイズは10接続です
 -   **-writeConcern <0|1>** : MongoDB の書き込み操作に対する確認を指定 : 確認 (1) または未確認 (0)。デフォルトは 1です
 -   **-https** : セキュアな HTTP モードで作業します (`-cert` および `-key` を参照)
