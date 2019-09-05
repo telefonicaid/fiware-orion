@@ -58,8 +58,19 @@ Orion Context Broker は、デフォルト・ポートとして TCP 1026を使�
 <a name="databases"></a>
 ## データベース
 
-Orion Context Broker は、MongoDB データベースを使用します。これは、コマンドライン・オプション `dbhost`, `-dbuser`, `-dbpwd`, `-dbAuthMech` および `-db` を使用してパラメータを提供します。MongoDB は認証つまり `--auth` を使用して実行されている場合、`-dbuser`, `-dbpwd` および `-dbAuthMech` のみ使用されます。
+Orion Context Broker は MongoDB データベースを使用します。このパラメーターは、
+コマンドライン・オプションを使用して提供されます :
 
+* `-dbhost`
+* `-db`
+* `-dbuser`
+* `-dbpwd`
+* `-dbAuthMech`
+* `-dbAuthDb`
+* `-dbSSL`
+
+`-dbuser`, `-dbpwd`, `-dbAuthMech` および `-dbAuthDb` は、MongoDB が認証を使用
+して、つまり `--auth` で実行される場合にのみ使用されることを注意して ください。
 
 mongo コンソールを使用してデータベースが動作していることを確認できます :
 
