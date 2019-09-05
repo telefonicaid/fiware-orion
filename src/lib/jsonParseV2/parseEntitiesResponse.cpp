@@ -47,7 +47,11 @@
 * parseEntitiesResponse -
 *
 * This function is used to parse the response of a forwarded query 
-* - GET /v2/entities
+* - GET /v2/entities or POST /v2/op/query (both share the same response structure)
+*
+* FIXME P5: this function has been implemented in the same style as other ones in parsing library
+* (eg. badInput alarms, precise error messages, etc.). However, it is only used to process respones
+* of forwarded request so maybe it can be simplified)
 *
 */
 bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* evP, OrionError* oeP)
