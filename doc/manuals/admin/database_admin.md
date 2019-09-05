@@ -82,6 +82,24 @@ to take into account:
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
         authorizing on `admin` DB ensures permissions in all of them.
+    -   Anyway, you can override the above default with `-dbAuthDb` and
+        specify the authentication DB you want.
+
+Let's consider the following example. If your MongoDB configuration is so you typically access to it
+using:
+
+```
+mongo "mongodb://example1.net:27017,example2.net:27017,example3.net:27017/orion?replicaSet=rs0" --ssl --authenticationDatabase admin --username orion --password orionrules
+```
+
+Then the equivalent connection in Context Broker CLI parameters will be:
+
+
+```
+-dbhost examples1.net:27017,example2.net:27017,example3.net:27017 -rplSet rs0 -dbSSL -dbAuthDb admin -dbuser orion -dbpwd orionrules
+```
+
+
      
 [Top](#top)
 

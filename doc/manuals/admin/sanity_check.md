@@ -59,8 +59,17 @@ changed using the -port command line option.
 ## Databases
 
 The Orion Context Broker uses a MongoDB database, whose parameters are
-provided using the command line options `dbhost`, `-dbuser`, `-dbpwd`,
-`-dbAuthMech` and `-db`. Note that `-dbuser`, `-dbpwd` and `-dbAuthMech`
+provided using the command line options:
+
+* `-dbhost`
+* `-db`
+* `-dbuser`
+* `-dbpwd`
+* `-dbAuthMech`
+* `-dbAuthDb`
+* `-dbSSL`
+
+Note that `-dbuser`, `-dbpwd`, `-dbAuthMech` and `-dbAuthDb`.
 are only used if MongoDB runs using authentication, i.e. with `--auth`.
 
 You can check that the database is working using the mongo console:

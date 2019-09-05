@@ -856,7 +856,7 @@ extern bool connectionAuth
   {
     std::string msg = std::string("authentication fails: db=") + db +
         ", username='" + user + "'" +
-        ", password='" + password + "'" +
+        ", password='*****'" +
         ", mechanism='" + mechanism + "'" +
         ", expection='" + e.what() + "'";
 
@@ -870,6 +870,7 @@ extern bool connectionAuth
     std::string msg = std::string("authentication fails: db=") + db +
         ", username='" + user + "'" +
         ", password='*****'" +
+        ", mechanism='" + mechanism + "'" +
         ", expection=generic";
 
     *err = "Database Startup Error (" + msg + ")";
