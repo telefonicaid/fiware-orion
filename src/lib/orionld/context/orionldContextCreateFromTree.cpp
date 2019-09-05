@@ -33,9 +33,12 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjParse.h"                                     // kjParse
 #include "kjson/kjFree.h"                                      // kjFree
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/common/orionldState.h"                       // kalloc
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL, ORIONLD_DEFAULT_URL_CONTEXT_URL
 #include "orionld/context/orionldContextCreateFromTree.h"      // Own interface
 
@@ -47,7 +50,7 @@ extern "C"
 //
 OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, OrionldContextType contextType, char** detailsPP)
 {
-  OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
+  OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
   LM_T(LmtContext, ("Creating Context '%s'", url));
 
@@ -57,7 +60,7 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, Orio
     return NULL;
   }
 
-  contextP->url        = strdup(url);
+  contextP->url        = kaStrdup(&kalloc, (char*) url);
   contextP->tree       = tree;
   contextP->type       = contextType;
   contextP->ignore     = false;  // Meaning: Core/Default URL Context inside USER contexts

@@ -83,8 +83,6 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   if (contextP->tree == NULL)
   {
     LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));
-    free(contextP->url);
-    free(contextP);
     orionldState.contextToBeFreed = false;
     ciP->httpStatusCode = SccBadRequest;
     return NULL;
@@ -99,7 +97,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   LM_T(LmtContextList, ("Context is to be inserted into the common context list, so, it needs to be cloned"));
 
   // FIXME: Don't clone if core or vocab context
-  contextP->tree = kjClone(contextP->tree);
+  contextP->tree = kjClone(contextP->tree);  // LEAK
 
   LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
 

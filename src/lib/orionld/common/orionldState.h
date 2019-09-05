@@ -149,6 +149,10 @@ typedef struct OrionldConnectionState
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;    // Used by kjTreeFromBsonObj
 
+  KjNode*                 delayedKjFreeVec[50];
+  int                     delayedKjFreeVecIndex;
+  int                     delayedKjFreeVecSize;
+
 #ifdef DB_DRIVER_MONGOC
   //
   // MongoDB stuff
@@ -219,5 +223,13 @@ extern void orionldStateRelease(void);
 // orionldStateErrorAttributeAdd -
 //
 extern void orionldStateErrorAttributeAdd(const char* attributeName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldStateDelayedKjFree -
+//
+extern void orionldStateDelayedKjFree(KjNode* tree);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDSTATE_H_

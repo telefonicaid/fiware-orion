@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Jorge Pereira
+* Author: Jorge Pereira amd Ken Zangelin
 */
 #include <string>                                              // std::string
 
@@ -59,6 +59,29 @@ extern "C"
 //
 static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfoNodeP, ngsiv2::Registration* regP)
 {
+  //
+  // For now, the information vector can only have ONE item.
+  //
+  // FIXME: To support more than one information vector item, we need to modify the data model of Orion.
+  //        When we do that, we can no longer use Orion forwarding but will need to imnplement our own -
+  //        which is not such a bad thing as Orions forwarding has major flaws
+  //
+  int items = 0;
+  for (KjNode* informationItemP = regInfoNodeP->value.firstChildP; informationItemP != NULL; informationItemP = informationItemP->next)
+    ++items;
+
+  if (items == 0)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty 'information' in Registration", NULL, OrionldDetailsString);
+    return false;
+  }
+  else if (items > 1)
+  {
+    orionldErrorResponseCreate(OrionldOperationNotSupported, "More than one item in Registration::information vector", "Not Implemented", OrionldDetailsString);
+    ciP->httpStatusCode = SccNotImplemented;
+    return false;
+  }
+
   for (KjNode* informationItemP = regInfoNodeP->value.firstChildP; informationItemP != NULL; informationItemP = informationItemP->next)
   {
     //

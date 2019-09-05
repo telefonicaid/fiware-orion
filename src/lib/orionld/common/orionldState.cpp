@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
+#include "kjson/kjFree.h"                                      // kjFree
 #include "kalloc/kaBufferInit.h"                               // kaBufferInit
 }
 
@@ -134,6 +135,10 @@ void orionldStateInit(void)
   bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
   orionldState.qNodeIx       = 0;
   orionldState.jsonBuf       = NULL;
+
+  bzero(orionldState.delayedKjFreeVec, sizeof(orionldState.delayedKjFreeVec));
+  orionldState.delayedKjFreeVecIndex = 0;
+  orionldState.delayedKjFreeVecSize = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
 }
 
 
@@ -162,11 +167,19 @@ void orionldStateRelease(void)
     orionldContextFree(orionldState.contextP);
 #endif
 
-  if (orionldState.jsonBuf != NULL)
+  //
+  // This was added to fix a leak in contextToPayload(), orionldMhdConnectionTreat.cpp, calling kjClone(). a number of times
+  // It happens for responses to GET that contain more than one item in the entity array.
+  // Each item in the entity array needs a cloned context
+  //
+  for  (int ix = 0; ix < orionldState.delayedKjFreeVecIndex; ix++)
   {
-    free(orionldState.jsonBuf);
-    orionldState.jsonBuf = NULL;
+    LM_TMP(("LEAK: In orionldStateRelease: calling kjFree for %p", orionldState.delayedKjFreeVec[ix]));
+    kjFree(orionldState.delayedKjFreeVec[ix]);
   }
+
+  if (orionldState.qMongoFilterP != NULL)
+    delete orionldState.qMongoFilterP;
 }
 
 
@@ -221,4 +234,19 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
 
   orionldState.geoType    = NULL;
   orionldState.geoCoordsP = NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldStateDelayedKjFree -
+//
+void orionldStateDelayedKjFree(KjNode* tree)
+{
+  if (orionldState.delayedKjFreeVecIndex >= orionldState.delayedKjFreeVecSize - 1)
+    LM_X(1, ("Internal Error (the size of orionldState.delayedKjFreeVec needs to be aumented)"));
+
+  orionldState.delayedKjFreeVec[orionldState.delayedKjFreeVecIndex] = tree;
+  ++orionldState.delayedKjFreeVecIndex;
 }

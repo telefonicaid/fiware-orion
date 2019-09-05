@@ -30,6 +30,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                            // KjNode
 #include "kjson/kjParse.h"                                           // kjParse
+#include "kalloc/kaStrdup.h"                                         // kaStrdup
 }
 
 #include "logMsg/logMsg.h"                                           // LM_*
@@ -58,7 +59,7 @@ KjNode* mongoCppLegacyKjTreeFromBsonObj(void* dataP, char** titleP, char** detai
   }
   else
   {
-    orionldState.jsonBuf = strdup(jsonString.c_str());
+    orionldState.jsonBuf = kaStrdup(&orionldState.kalloc, (char*) jsonString.c_str());
     treeP = kjParse(orionldState.kjsonP, orionldState.jsonBuf);
     if (treeP == NULL)
     {
