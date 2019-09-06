@@ -74,18 +74,16 @@ std::string postBatchQuery
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
 
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
-  if (ciP->httpStatusCode != SccOk)
-  {
-    parseDataP->qcr.res.release();
-    return answer;
-  }
+  // Whichever the case, 200 OK is always returned (in the case of fail with CPr 200 OK [] may be returned)
+  // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
+  // the client as errors
+  ciP->httpStatusCode = SccOk;
 
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
-    ciP->httpStatusCode = SccOk;
     answer = "[]";
   }
   else

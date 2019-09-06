@@ -212,6 +212,14 @@ def bad_response():
     r.data = '{"name":"ENTITY_NOT_FOUND","message":"The entity with the requested id [qa_name_01] was not found."}'
     return r
 
+# This response has been designed for 3068_ngsi_v2_based_forwarding/query_cpr_fail_but_local_results.test,
+# but is general enough to be used in other future cases
+@app.route("/badresponse/op/query", methods=['POST'])
+def bad_response_device_not_found():
+    r = Response(status=404)
+    r.data = '{"name":"DEVICE_NOT_FOUND","message":"No device was found with id:E."}'
+    return r
+
 # From https://stackoverflow.com/questions/14902299/json-loads-allows-duplicate-keys-in-a-dictionary-overwriting-the-first-value
 def dict_raise_on_duplicates(ordered_pairs):
     """Reject duplicate keys."""
