@@ -22,6 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -249,7 +254,7 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
     snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
 
   LM_TMP(("Q: fullPath: %s", fullPath));
-  return strdup(fullPath);
+  return kaStrdup(&orionldState.kalloc, fullPath);
 }
 
 

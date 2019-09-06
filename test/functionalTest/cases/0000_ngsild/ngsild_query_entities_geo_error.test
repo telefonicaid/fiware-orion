@@ -138,13 +138,13 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://schema.org/address",
+		"https://schema.org/address",
 		"https://uri.etsi.org/ngsi-ld/name",
 		"https://uri.fiware.org/ns/datamodels#category",
 		"location"
 	],
 	"attrs" : {
-		"http://schema=org/address" : {
+		"https://schema=org/address" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

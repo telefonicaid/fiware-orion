@@ -250,12 +250,12 @@ Date: REGEX(.*)
 07. Ugly Parse Error: @context: { 'https://...' ]
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 168
+Content-Length: 153
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Line 0, Pos 0: JSON Parse Error: no colon found after name of member",
+    "details": "JSON Parse Error: no colon found after name of member",
     "title": "JSON Parse Error",
     "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }

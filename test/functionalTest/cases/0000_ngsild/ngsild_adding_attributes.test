@@ -32,8 +32,10 @@ brokerStart CB 0-255 --prettyPrint
 
 #
 # 01. Create an entity with three attributes and @context in payload
-# 02. Add two attributes, also with @context in payload
-# 03. Get the entity and see the five attributes
+# 02. See the entity in mongodb
+# 03. Add two attributes, also with @context in payload
+# 04. See the entity in mongodb
+# 05. Get the entity and see the five attributes
 #
 
 echo "01. Create an entity with three attributes and @context in payload"
@@ -57,7 +59,14 @@ echo
 echo
 
 
-echo "02. Add two attributes, also with @context in payload"
+echo "02. See the entity in mongodb"
+echo "============================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Add two attributes, also with @context in payload"
 echo "====================================================="
 payload='{
   "stocks": {
@@ -77,7 +86,8 @@ payload='{
     }
   },
   "@context": [
-    "https://fiware.github.io/tutorials.Step-by-Step/datamodels-context.jsonld"
+    "https://fiware.github.io/tutorials.Step-by-Step/datamodels-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001/attrs --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -85,9 +95,16 @@ echo
 echo
 
 
-echo "03. Get the entity and see the five attributes"
+echo "04. See the entity in mongodb"
+echo "============================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. Get the entity and see the five attributes"
 echo "=============================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001
+orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes&spaces=2" --noPayloadCheck
 echo
 echo
 
@@ -103,7 +120,69 @@ Date: REGEX(.*)
 
 
 
-02. Add two attributes, also with @context in payload
+02. See the entity in mongodb
+=============================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Shelf:unit001",
+		"type" : "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"location",
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
+		"http://example.org/ngsi-ld/default/name"
+	],
+	"attrs" : {
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					13.3986112,
+					52.554699
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://fiware=github=io/tutorials=Step-by-Step/schema/maxCapacity" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 50,
+			"mdNames" : [ ]
+		},
+		"http://example=org/ngsi-ld/default/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Corner Unit",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"location" : {
+		"attrName" : "location",
+		"coords" : {
+			"type" : "Point",
+			"coordinates" : [
+				13.3986112,
+				52.554699
+			]
+		}
+	},
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Add two attributes, also with @context in payload
 =====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -112,52 +191,144 @@ Date: REGEX(.*)
 
 
 
-03. Get the entity and see the five attributes
+04. See the entity in mongodb
+=============================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Shelf:unit001",
+		"type" : "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"location",
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
+		"http://example.org/ngsi-ld/default/name",
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/stocks",
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn"
+	],
+	"attrs" : {
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					13.3986112,
+					52.554699
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://fiware=github=io/tutorials=Step-by-Step/schema/maxCapacity" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 50,
+			"mdNames" : [ ]
+		},
+		"http://example=org/ngsi-ld/default/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Corner Unit",
+			"mdNames" : [ ]
+		},
+		"https://fiware=github=io/tutorials=Step-by-Step/schema/stocks" : {
+			"type" : "Relationship",
+			"value" : "urn:ngsi-ld:Product:001",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		},
+		"https://fiware=github=io/tutorials=Step-by-Step/schema/locatedIn" : {
+			"type" : "Relationship",
+			"value" : "urn:ngsi-ld:Building:store001",
+			"mdNames" : [
+				"installedBy",
+				"statusOfWork"
+			],
+			"md" : {
+				"installedBy" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:Person:employee001"
+				},
+				"statusOfWork" : {
+					"type" : "Property",
+					"value" : "completed"
+				}
+			},
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"location" : {
+		"attrName" : "location",
+		"coords" : {
+			"type" : "Point",
+			"coordinates" : [
+				13.3986112,
+				52.554699
+			]
+		}
+	},
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. Get the entity and see the five attributes
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 738
+Content-Length: 943
 Content-Type: application/json
 Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
-        "installedBy": {
-            "object": "urn:ngsi-ld:Person:employee001",
-            "type": "Relationship"
-        },
-        "object": "urn:ngsi-ld:Building:store001",
-        "statusOfWork": {
-            "type": "Property",
-            "value": "completed"
-        },
-        "type": "Relationship"
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store001",
+    "installedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:employee001"
     },
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
-        "type": "Property",
-        "value": 50
-    },
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
-        "object": "urn:ngsi-ld:Product:001",
-        "type": "Relationship"
-    },
-    "id": "urn:ngsi-ld:Shelf:unit001",
-    "location": {
-        "type": "GeoProperty",
-        "value": {
-            "coordinates": [
-                13.398611,
-                52.554699
-            ],
-            "type": "Point"
-        }
-    },
-    "name": {
-        "type": "Property",
-        "value": "Corner Unit"
-    },
-    "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf"
+    "statusOfWork": {
+      "type": "Property",
+      "value": "completed"
+    }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  }
 }
+
 
 
 --TEARDOWN--

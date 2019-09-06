@@ -119,10 +119,11 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   //
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
-  ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
+  ContextElement         ce;
   EntityId*              entityIdP;
 
-  mongoRequest.contextElementVector.push_back(ceP);
+  LM_TMP(("PATCH: In orionldPatchEntity"));
+  mongoRequest.contextElementVector.push_back(&ce);
 
   entityIdP     = &mongoRequest.contextElementVector[0]->entityId;
   entityIdP->id = entityId;
@@ -132,7 +133,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     KjNode*            attrTypeNodeP = NULL;
-    ContextAttribute*  caP           = new ContextAttribute();
+    ContextAttribute*  caP           = new ContextAttribute();  // LEAK - I have tried to use stack variable "ContextAttribute ca" instead of allocating
+                                                                //        but I get problems with it. Need I delayed delete for this, I guess
 
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
@@ -158,25 +160,28 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
       if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
       {
-        delete caP;
         mongoRequest.release();
         orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
+        delete caP;
         return false;
       }
 
       caP->name = longName;
+      LM_TMP(("PATCH: Setting Attribute Long Name to '%s'", longName));
     }
 
     // NO URI Expansion for Attribute TYPE
     caP->type = attrTypeNodeP->value.s;
 
     // Add the attribute to the attr vector
-    ceP->contextAttributeVector.push_back(caP);
+    ce.contextAttributeVector.push_back(caP);
+    LM_TMP(("PATCH: Pushed Attribute with Long Name: '%s'", caP->name.c_str()));
   }
 
   //
   // Call mongoBackend - FIXME: call postUpdateContext, not mongoUpdateContext
   //
+  LM_TMP(("PATCH: Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            orionldState.tenant,

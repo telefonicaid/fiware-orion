@@ -73,6 +73,7 @@
 extern "C"
 {
 #include "kalloc/kaBufferReset.h"                           // kaBufferReset
+#include "kjson/kjFree.h"                                   // kjFree
 }
 
 #include "parseArgs/parseArgs.h"
@@ -114,6 +115,7 @@ extern "C"
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
 #include "orionld/orionldRestServices.h"
+#include "orionld/context/orionldContextList.h"             // orionldContextHead
 
 using namespace orion;
 
@@ -544,6 +546,23 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  //
+  // Free the context cache
+  //
+#if 0
+  OrionldContext* contextP = orionldContextHead;
+
+  while (contextP != NULL)
+  {
+    free(contextP->url);      // Always allocated using 'malloc' ???
+    kjFree(contextP->tree);   // Always cloned using kjClone ???
+    contextP = contextP->next;
+  }
+#endif
+
+  //
+  // Free the kalloc buffer
+  //
   kaBufferReset(&kalloc, false);
 
   if (unlink(pidPath) != 0)
@@ -553,8 +572,8 @@ void exitFunc(void)
 
   if ((orionldState.contextP != NULL) && (orionldState.contextP->temporary == true))
   {
-    free(orionldState.contextP->url);
-    free(orionldState.contextP);
+    free(orionldState.contextP->url);  // Always allocated using 'malloc' ???
+    free(orionldState.contextP);       // Always cloned using kjClone ???
     orionldState.contextP = NULL;
   }
 }

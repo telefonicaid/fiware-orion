@@ -37,9 +37,10 @@ brokerStart CB 212-249
 # 04. GET entities with	type T2, giving no context - see nothing
 #
 # 05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/datamodels#AgriProductType)
-# 06. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity
-# 07. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity
-# 08. GET entities with	type AgriProductType, giving no context - see nothing
+# 06. See entity E5 in mongo
+# 07. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity
+# 08. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity
+# 09. GET entities with	type AgriProductType, giving no context - see nothing
 #
 
 
@@ -95,22 +96,28 @@ orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Ty
 echo
 echo
 
+echo "06. See entity E5 in mongo"
+echo "=========================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "http://a.b.c/entity/E5"})'
+echo
+echo
 
-echo "06. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity"
+
+echo "07. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity"
 echo "================================================================================================================"
 orionCurl --url "/ngsi-ld/v1/entities?type=AgriProductType" -H 'Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "07. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity"
+echo "08. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity"
 echo "==================================================================================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/datamodels%23AgriProductType"
 echo
 echo
 
 
-echo "08. GET entities with	type AgriProductType, giving no context - see nothing"
+echo "09. GET entities with	type AgriProductType, giving no context - see nothing"
 echo "==========================================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=AgriProductType"
 echo
@@ -187,7 +194,37 @@ Date: REGEX(.*)
 
 
 
-06. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity
+06. See entity E5 in mongo
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E5",
+		"type" : "https://uri.fiware.org/ns/datamodels#AgriProductType",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/name"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "John 5",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+07. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity
 ================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 102
@@ -207,7 +244,7 @@ Date: REGEX(.*)
 ]
 
 
-07. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity
+08. GET entities with	type https://uri.fiware.org/ns/datamodels#AgriProductType, giving NO context - see the entity
 ===================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 168
@@ -227,7 +264,7 @@ Date: REGEX(.*)
 ]
 
 
-08. GET entities with	type AgriProductType, giving no context - see nothing
+09. GET entities with	type AgriProductType, giving no context - see nothing
 ===========================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
