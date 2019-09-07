@@ -478,8 +478,8 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
   // The data model of Orion is that all attributes go in toplevel::attrs
   // So, we need to reposition "sourceTree" so that it points to the sourceTree::atts
   //
-  KjNode* attrNamesP = kjLookup(sourceTree, (char*) "attrNames");
-  KjNode* attrsP     = kjLookup(sourceTree, (char*) "attrs");
+  KjNode* attrNamesP = kjLookup(sourceTree, "attrNames");
+  KjNode* attrsP     = kjLookup(sourceTree, "attrs");
 
   if (attrsP == NULL)
   {
@@ -504,7 +504,14 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
   {
     KjNode* next = modAttrP->next;
 
-    objectToValue(modAttrP);
+    if (modAttrP->type == KjObject)
+      objectToValue(modAttrP);
+    else
+    {
+      *titleP   = (char*) "Invalid JSON type";
+      *detailsP = (char*) "Not a JSON object";
+      return false;
+    }
 
     //
     // If "modAttrP" exists in sourceTree, then we have to remove it - to later add the one from "modTree"
