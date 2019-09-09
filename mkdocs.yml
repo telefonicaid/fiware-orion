@@ -8,7 +8,7 @@ edit_uri: edit/master/doc/manuals
 markdown_extensions: [toc,fenced_code]
 use_directory_urls: false
 theme: readthedocs
-extra_css: ["https://fiware.org/style/fiware_readthedocs.css", "https://fiware.org/style/fiware_readthedocs_core.css"]
+extra_css: ["https://www.fiware.org/style/fiware_readthedocs.css", "https://www.fiware.org/style/fiware_readthedocs_core.css"]
 google_analytics: ['UA-83236805-1', 'fiware-orion.readthedocs.io']
 pages:
   - Home: index.md
