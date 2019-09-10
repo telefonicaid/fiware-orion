@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Rigth processing of error responses from CPrs in NGSIv2 mixed with local results
+Check there is no over-querying in NGSIv2 forwarding
 
 --SHELL-INIT--
 dbInit CB
@@ -31,28 +31,13 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create E/A=1 on CB
-# 02. Register E/[A,B] on CB  with faulty (404) CPr
-# 03. POST /v2/op/query for E/[A,B] in CB and get only CB local info (E/A=1)
+# 01. Register E1/[A,B,C]
+# 02. POST /v2/op/query for E/A (result is irrelevant)
+# 03. Dump accumulator and check that E/A was forwarded (not including B or C)
 #
 
-echo "01. Create E/A=1 on CB"
-echo "======================"
-payload='{
-  "type": "T",
-  "id":   "E",
-  "A": {
-    "type": "Number",
-    "value": 1
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Register E/[A,B] on CB  with faulty (404) CPr"
-echo "================================================="
+echo "01. Register E1/[A,B,C]"
+echo "======================="
 payload='{
   "dataProvided": {
     "entities": [
@@ -61,11 +46,11 @@ payload='{
         "id": "E"
       }
     ],
-    "attrs": [ "A", "B" ]
+    "attrs": [ "A", "B", "C" ]
   },
   "provider": {
     "http": {
-      "url": "http://localhost:'${LISTENER_PORT}'/badresponse"
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
     }
   }
 }'
@@ -74,8 +59,8 @@ echo
 echo
 
 
-echo "03. POST /v2/op/query for E/A in CB and get only CB local info (E/A=1)"
-echo "======================================================================"
+echo "02. POST /v2/op/query for E/A (result is irrelevant)"
+echo "===================================================="
 payload='{
   "entities": [
     {
@@ -84,27 +69,23 @@ payload='{
     }
   ],
   "attrs": [
-    "A", "B"
+    "A"
   ]
 }'
 orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
+echo "03. Dump accumulator and check that E/A was forwarded (not including B or C)"
+echo "============================================================================"
+accumulatorDump
+echo
+echo
+
 
 --REGEXPECT--
-01. Create E/A=1 on CB
-======================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-02. Register E/[A,B] on CB  with faulty (404) CPr
-=================================================
+01. Register E1/[A,B,C]
+=======================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/registrations/REGEX([0-9a-f\-]{24})
@@ -113,25 +94,40 @@ Date: REGEX(.*)
 
 
 
-03. POST /v2/op/query for E/A in CB and get only CB local info (E/A=1)
-======================================================================
+02. POST /v2/op/query for E/A (result is irrelevant)
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "A": {
-            "metadata": {},
-            "type": "Number",
-            "value": 1
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
+[]
+
+
+03. Dump accumulator and check that E/A was forwarded (not including B or C)
+============================================================================
+POST http://localhost:REGEX(\d+)/v2/op/query
+Fiware-Servicepath: /
+Content-Length: 50
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "attrs": [
+        "A"
+    ],
+    "entities": [
+        {
+            "id": "E",
+            "type": "T"
+        }
+    ]
+}
+=======================================
 
 
 --TEARDOWN--

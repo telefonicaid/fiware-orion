@@ -356,7 +356,13 @@ extern bool entitiesQuery
 *
 * pruneContextElements -
 */
-extern void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements
+(
+  ApiVersion                           apiVersion,
+  const StringList&                    attrsV,
+  const ContextElementResponseVector&  oldCerV,
+  ContextElementResponseVector*        newCerVP
+);
 
 
 

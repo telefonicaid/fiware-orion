@@ -250,6 +250,7 @@ void QueryContextRequest::fill(BatchQuery* bqP)
   }
 
   attributeList.fill(bqP->attributeV.stringV);  // attributeV is deprecated
+  attrsList.fill(bqP->attrsV.stringV);
   metadataList.fill(bqP->metadataV.stringV);
   restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
   bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP

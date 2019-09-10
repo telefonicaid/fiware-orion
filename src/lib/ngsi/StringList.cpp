@@ -141,11 +141,12 @@ void StringList::release(void)
 *
 * lookup - 
 */
-bool StringList::lookup(const std::string& string) const
+bool StringList::lookup(const std::string& string, const std::string& wildCard) const
 {
+  bool wildCardUsed = !wildCard.empty();
   for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    if (stringV[ix] == string)
+    if ((stringV[ix] == string) || (wildCardUsed && (stringV[ix] == ALL_ATTRS)))
     {
       return true;
     }
