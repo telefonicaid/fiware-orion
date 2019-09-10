@@ -110,7 +110,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // - 3. If the list of Entity identifiers includes a URI which it is not valid, or the query or geo-query are not
   //      syntactically valid (as per the referred clauses 4.9 and 4.10) an error of type BadRequestData shall be raised.
   //
-  if ((*type == 0) && (attrs == NULL))
+  if ((*type == 0) && (attrs == NULL) && (id == NULL))
   {
     LM_W(("Bad Input (too broad query - entity type/id not given nor attribute list)"));
 

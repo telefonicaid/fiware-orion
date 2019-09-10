@@ -33,6 +33,7 @@ brokerStart CB
 #
 # 01. Create the entity urn:ngsi-ld:Store:santander:COM4111 of issue #212
 # 02. GET the entity by type - longname
+# 03. GET the entity with id as URI param
 #
 
 echo "01. Create the entity urn:ngsi-ld:Store:santander:COM4111 of issue #212"
@@ -86,6 +87,13 @@ echo
 echo
 
 
+echo "03. GET the entity with id as URI param"
+echo "======================================="
+orionCurl --url "/ngsi-ld/v1/entities?id=urn:ngsi-ld:Store:santander:COM4111"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create the entity urn:ngsi-ld:Store:santander:COM4111 of issue #212
 =======================================================================
@@ -99,6 +107,50 @@ Date: REGEX(.*)
 
 02. GET the entity by type - longname
 =====================================
+HTTP/1.1 200 OK
+Content-Length: 696
+Content-Type: application/json
+Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "https://uri.etsi.org/ngsi-ld/description": {
+            "type": "Property",
+            "value": "Cosmetica natural fabricada en Santander."
+        },
+        "https://uri.etsi.org/ngsi-ld/name": {
+            "type": "Property",
+            "value": "MARTA KAUFMANN"
+        },
+        "https://uri.synchronicity-iot.eu/ns/dataModels#currenciesAccepted": {
+            "type": "Property",
+            "value": [
+                "EUR"
+            ]
+        },
+        "https://uri.synchronicity-iot.eu/ns/dataModels#image": {
+            "type": "Property",
+            "value": "http://www.comerciosantander.com/imagenes/Comercios/124F214A-CE55-5A33-A77D-679C0F848FFC.jpg/resize/50/100/"
+        },
+        "id": "urn:ngsi-ld:Store:santander:COM4111",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.807756,
+                    43.462826
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "https://uri.synchronicity-iot.eu/ns/dataModels#Store"
+    }
+]
+
+
+03. GET the entity with id as URI param
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 696
 Content-Type: application/json
