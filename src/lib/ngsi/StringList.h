@@ -47,7 +47,7 @@ typedef struct StringList
   std::string  toJson(void);
   std::string  toString(void);
   void         release(void);
-  bool         lookup(const std::string& string) const;
+  bool         lookup(const std::string& string, const std::string& wildCard = "") const;
   void         push_back(const std::string& string);
   void         push_back_if_absent(const std::string& string);
   unsigned int size(void) const;
