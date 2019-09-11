@@ -97,7 +97,7 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
   LM_T(LmtContextList, ("Context is to be inserted into the common context list, so, it needs to be cloned"));
 
   // FIXME: Don't clone if core or vocab context
-  contextP->tree = kjClone(contextP->tree);  // LEAK
+  contextP->tree = kjClone(contextP->tree);
 
   LM_T(LmtContextList, ("Inserting context '%s' in common list", url));
 

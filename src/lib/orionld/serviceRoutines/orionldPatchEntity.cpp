@@ -121,6 +121,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   UpdateContextResponse  mongoResponse;
   ContextElement         ce;
   EntityId*              entityIdP;
+  ContextAttribute*      delayedDelete[20];  // If more attributes, then ... :(
 
   LM_TMP(("PATCH: In orionldPatchEntity"));
   mongoRequest.contextElementVector.push_back(&ce);
@@ -130,11 +131,21 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   mongoRequest.updateActionType = ActionTypeAppendStrict;
 
   // Iterate over the object, to get all attributes
+  unsigned int attrs = 0;
+
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     KjNode*            attrTypeNodeP = NULL;
-    ContextAttribute*  caP           = new ContextAttribute();  // LEAK - I have tried to use stack variable "ContextAttribute ca" instead of allocating
-                                                                //        but I get problems with it. Need I delayed delete for this, I guess
+    ContextAttribute*  caP           = new ContextAttribute();  // I have tried to use a stack variable "ContextAttribute ca" instead of allocating
+                                                                // but I get problems with it. Need a delayed delete for this.
+    delayedDelete[attrs]     = caP;
+    delayedDelete[attrs + 1] = NULL;
+    ++attrs;
+
+    if (attrs >= sizeof(delayedDelete) / sizeof(delayedDelete[0]))
+      LM_X(1, ("Need a bigger vector for delayed deletion of attributes"));
+
+    LM_TMP(("PATCH: Allocated Attribute for shortname '%s' at %p", kNodeP->name, caP));
 
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
@@ -192,6 +203,13 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
                                            ciP->httpHeaders.ngsiv2AttrsFormat,
                                            ciP->apiVersion,
                                            NGSIV2_NO_FLAVOUR);
+
+  //
+  // Delay-Delete allocated attrs
+  //
+  for (unsigned int ix = 0; ix < attrs; ix++)
+    delete delayedDelete[ix];
+
   if (ciP->httpStatusCode == SccOk)
     ciP->httpStatusCode = SccNoContent;
   else

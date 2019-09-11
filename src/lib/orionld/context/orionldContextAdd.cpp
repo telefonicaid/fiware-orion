@@ -202,7 +202,7 @@ OrionldContext* orionldContextAdd
   // - an object with key-values (a "leaf")
   // - a vector of contexts (URL strings)
   //
-  tree = kjClone(tree);  // LEAK
+  tree = kjClone(tree);
 
   if ((contextP = orionldContextAppend(url, tree, contextType, detailsPP)) == NULL)
     return NULL;

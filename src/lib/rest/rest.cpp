@@ -35,6 +35,7 @@
 extern "C"
 {
 #include "kalloc/kaBufferReset.h"                                // kaBufferReset
+#include "kjson/kjFree.h"                                        // kjFree
 }
 
 #include "logMsg/logMsg.h"
@@ -740,6 +741,9 @@ static void requestCompleted
 
 #ifdef ORIONLD
   kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
+
+  if ((orionldState.responseTree != NULL) && (orionldState.kjsonP == NULL))
+    kjFree(orionldState.responseTree);
 #endif
 
   *con_cls = NULL;
@@ -1239,6 +1243,8 @@ ConnectionInfo* connectionTreatInit
 {
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
+
+  orionldState.responseTree = NULL;
 
   *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 

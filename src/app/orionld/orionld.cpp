@@ -109,6 +109,7 @@ extern "C"
 #include "logSummary/logSummary.h"
 
 #include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
+#include "orionld/context/orionldCoreContext.h"             // orionldCoreContext, orionldDefaultUrlContext, orionldDefaultContext
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 
@@ -549,16 +550,24 @@ void exitFunc(void)
   //
   // Free the context cache
   //
-#if 0
   OrionldContext* contextP = orionldContextHead;
-
+  OrionldContext* next;
   while (contextP != NULL)
   {
-    free(contextP->url);      // Always allocated using 'malloc' ???
+    if ((contextP == &orionldCoreContext) || (contextP == &orionldDefaultUrlContext) || (contextP == &orionldDefaultContext))
+    {
+      contextP = contextP->next;
+      continue;
+    }
+
+    next = contextP->next;
+
     kjFree(contextP->tree);   // Always cloned using kjClone ???
-    contextP = contextP->next;
+    // free(contextP);  - the context is allocated using kaAlloc(&kalloc) - to free this, kaBufferReset is used (a few lines down)
+
+    contextP = next;
   }
-#endif
+
 
   //
   // Free the kalloc buffer

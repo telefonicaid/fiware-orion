@@ -36,6 +36,8 @@ extern "C"
 #include "kjson/kjClone.h"                                     // kjClone
 #include "kjson/kjFree.h"                                      // kjFree
 #include "kjson/kjBuilder.h"                                   // kjString, ...
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
 #include "common/string.h"                                     // FT
@@ -627,9 +629,9 @@ static bool contextToCache(ConnectionInfo* ciP)
     return false;
   }
 
-  OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));  // LEAK
+  OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
-  contextP->url       = strdup(orionldState.contextP->url);
+  contextP->url       = kaStrdup(&kalloc, orionldState.contextP->url);
   contextP->tree      = clonedTree;
   contextP->type      = orionldState.contextP->type;
   contextP->ignore    = orionldState.contextP->ignore;
@@ -853,7 +855,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     goto respond;  // Yes, I know, the label 'respond' comes right after ...
 
 
-
+  LM_TMP(("PATCH: After service routine - we still have to send the response"));
  respond:
   //
   // For error responses, there is ALWAYS payload, describing the error

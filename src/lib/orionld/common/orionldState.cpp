@@ -173,10 +173,7 @@ void orionldStateRelease(void)
   // Each item in the entity array needs a cloned context
   //
   for  (int ix = 0; ix < orionldState.delayedKjFreeVecIndex; ix++)
-  {
-    LM_TMP(("LEAK: In orionldStateRelease: calling kjFree for %p", orionldState.delayedKjFreeVec[ix]));
     kjFree(orionldState.delayedKjFreeVec[ix]);
-  }
 
   if (orionldState.qMongoFilterP != NULL)
     delete orionldState.qMongoFilterP;
