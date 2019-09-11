@@ -229,6 +229,8 @@ bool orionldUriExpand(OrionldContext* contextP, char* shortName, char* longName,
   char* expandedType;
   int   n;
 
+  LM_TMP(("CTX: Attempt to expand '%s'", shortName));
+
   n = uriExpansion(contextP, shortName, &expandedName, &expandedType, detailsP);
   if (n == -1)
   {

@@ -50,9 +50,11 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// OrionLdRestService -
+// Forward declarations -
 //
 struct OrionLdRestService;
+struct ConnectionInfo;
+
 
 
 // -----------------------------------------------------------------------------
@@ -97,6 +99,7 @@ typedef struct OrionldUriParams
 //
 typedef struct OrionldConnectionState
 {
+  ConnectionInfo*         ciP;
   Kjson                   kjson;
   Kjson*                  kjsonP;
   KAlloc                  kalloc;

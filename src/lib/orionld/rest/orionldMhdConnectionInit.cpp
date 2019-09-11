@@ -241,6 +241,7 @@ int orionldMhdConnectionInit
   // 1. Prepare orionldState
   //
   orionldStateInit();
+  orionldState.ciP = ciP;
 
 
   // The 'connection', as given by MHD is very important. No responses can be sent without it

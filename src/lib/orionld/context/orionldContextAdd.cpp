@@ -124,6 +124,7 @@ OrionldContext* orionldContextAdd
 
   if ((contextP = orionldContextLookup(url)) != NULL)
   {
+    LM_TMP(("CTX: Context '%s' is already present", url));
     LM_T(LmtContext, ("Looking up context '%s': already cached", url));
 
     return contextP;

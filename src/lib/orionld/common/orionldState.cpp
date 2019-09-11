@@ -34,10 +34,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
 #include "orionld/context/orionldContextFree.h"                // orionldContextFree
 #include "orionld/common/QNode.h"                              // QNode
 #include "orionld/common/orionldState.h"                       // Own interface
-#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
 
 
 
@@ -100,6 +100,7 @@ void orionldStateInit(void)
   bzero(orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer));
   kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
 
+  orionldState.ciP                         = NULL;
   orionldState.requestNo                   = requestNo;
   orionldState.tenant                      = (char*) "";
   orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
