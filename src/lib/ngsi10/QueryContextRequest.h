@@ -53,6 +53,7 @@ typedef struct QueryContextRequest
 {
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
+  StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
   Restriction       restriction;     // Optional
 
   int               restrictions;

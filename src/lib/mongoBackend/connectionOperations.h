@@ -212,6 +212,7 @@ extern bool connectionAuth
   const std::string&    db,
   const std::string&    user,
   const std::string&    password,
+  const std::string&    mechanism,
   std::string*          err
 );
 

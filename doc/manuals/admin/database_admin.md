@@ -69,6 +69,7 @@ to take into account:
 
 -   If your MongoDB instance/cluster doesn't use authorization,
     then do not use the `-dbuser` and `-dbpwd` options.
+-   You can specify authentication mechanism with `-dbAuthMech`.
 -   If your MongoDB instance/cluster uses authorization , then:
     -   If you run Orion in single service/tenant mode (i.e.
         without `-multiservice`) then you are using only one database
@@ -81,6 +82,24 @@ to take into account:
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
         authorizing on `admin` DB ensures permissions in all of them.
+    -   Anyway, you can override the above default with `-dbAuthDb` and
+        specify the authentication DB you want.
+
+Let's consider the following example. If your MongoDB configuration is so you typically access to it
+using:
+
+```
+mongo "mongodb://example1.net:27017,example2.net:27017,example3.net:27017/orion?replicaSet=rs0" --ssl --authenticationDatabase admin --username orion --password orionrules
+```
+
+Then the equivalent connection in Context Broker CLI parameters will be:
+
+
+```
+-dbhost examples1.net:27017,example2.net:27017,example3.net:27017 -rplSet rs0 -dbSSL -dbAuthDb admin -dbuser orion -dbpwd orionrules
+```
+
+
      
 [Top](#top)
 

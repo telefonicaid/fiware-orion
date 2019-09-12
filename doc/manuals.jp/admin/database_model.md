@@ -207,6 +207,8 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **entities** : エンティティの配列 (必須) です。各エンティティの JSON には、**id**, **type**, **isPattern** および **isTypePattern** が含まれています。従来の理由から、**isPattern** は `"true"` または `"false"` (テキスト) で、**isTypePattern** は `true` または `false` (ブール値) であることに注意してください
 -   **attrs** : 属性名の配列 (文字列) (オプション) です
 -   **blacklist** : `attrs` をホワイトリスト (もし `blacklist` が `false` また存在しない場合) またはブラックリスト (もし `blackslist` が `true` の場合) として解釈する必要があるかどうかを指定するブール値フィールドです
+-   **onlyChanged**: 変更された属性のみを通知に含める必要があるか (onlyChanged が true
+    の場合)、または含まないか (onlyChanged が false の場合) を指定するブール値フィールド
 -   **metadata** : メタデータ名 (文字列) の配列 (オプション) です
 -   **conditions** : 通知をトリガーする属性のリストです。
 -   **expression** : 更新が来たときに通知を送信するかどうかを評価するために使用される式です。 次のフィールドで構成されています : q, mq, georel, geometry and/or coords (オプション)

@@ -57,9 +57,25 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 MongoDB の認証は `-db, `-dbuser` と `-dbpwd` オプションで設定されます ([コマンドライン・オプションのセクション](cli.md)を参照)。考慮するいくつかの異なるケースがあります :
 
 -   MongoDB インスタンス/クラスタが認証を使用していない場合は、`-dbuser` と `-dbpwd` オプションは使用しないでください
+-  `-dbAuthMech` で認証メカニズムを指定できます
 -   MongoDB インスタンス/クラスタが認可を使用している場合は、次のようになります :
     -   Orion をシングルサービス/テナントモードで実行している場合 (つまり `-multiservice` でない場合)、1つのデータベース (-db オプションで指定されたもの) のみを使用しているので、認証は、そのデータベースで `-dbuser` と `-dbpwd` を使用して行われます
     -   Orion をマルチサービス/テナントモードで実行している場合 (つまり `-multiservice` の場合)、認証は、`admin` データベースで `-dbuser` と `-dbpwd` を使用して行われます。[このドキュメントの後半](#multiservicemultitenant-database-separation)で説明するように、マルチサービス/テナントモードでは、Orion はいくつかのデータベース (潜在的にオンザフライで作成される可能性があります) を使用します。`admin` データベース上での認証は、それらの全てで許可します
+    -   とにかく、上記のデフォルトを `-dbAuthDb` でオーバーライドして、
+        必要な認証 DB を指定できます
+
+次の例を考えてみましょう。 MongoDB の構成がそうである場合、通常は以下を使用してアクセスします :
+
+```
+mongo "mongodb://example1.net:27017,example2.net:27017,example3.net:27017/orion?replicaSet=rs0" --ssl --authenticationDatabase admin --username orion --password orionrules
+```
+
+Context Broker CLI パラメーターの同等の接続は次のようになります :
+
+
+```
+-dbhost examples1.net:27017,example2.net:27017,example3.net:27017 -rplSet rs0 -dbSSL -dbAuthDb admin -dbuser orion -dbpwd orionrules
+```
 
      
 [トップ](#top)

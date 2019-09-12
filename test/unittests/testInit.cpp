@@ -65,7 +65,7 @@ void setupDatabase(void)
     /* In fact, the mongoStart() parameters related with the pool, e.g. pool size, are irrelevant,
      * given that the connection creation is mocked under UNIT_TEST in the mongoBackend library
      */
-    mongoStart("localhost", "", "", "", "", false, 0, 10);
+    mongoStart("localhost", "", "", "", "", "", "", false, false, 0, 10);
     mongoStarted = true;
   }
 

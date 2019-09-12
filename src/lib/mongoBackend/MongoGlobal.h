@@ -75,6 +75,9 @@ void mongoInit
   std::string  dbName,
   const char*  user,
   const char*  pwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -95,6 +98,9 @@ extern bool mongoStart
   const char* rplSet,
   const char* username,
   const char* passwd,
+  const char* mechanism,
+  const char* authDb,
+  bool        dbSSL,
   bool        _multitenant,
   double      timeout,
   int         writeConcern = 1,
@@ -350,7 +356,13 @@ extern bool entitiesQuery
 *
 * pruneContextElements -
 */
-extern void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements
+(
+  ApiVersion                           apiVersion,
+  const StringList&                    attrsV,
+  const ContextElementResponseVector&  oldCerV,
+  ContextElementResponseVector*        newCerVP
+);
 
 
 

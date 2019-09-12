@@ -72,6 +72,7 @@
 *
 * USING
 */
+using mongo::client::Options;
 using mongo::DBClientBase;
 using mongo::DBClientCursor;
 using mongo::BSONObj;
@@ -207,6 +208,9 @@ void mongoInit
   std::string  dbName,
   const char*  user,
   const char*  pwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -216,7 +220,7 @@ void mongoInit
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mechanism, authDb, dbSSL, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -292,6 +296,9 @@ bool mongoStart
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         _multitenant,
   double       timeout,
   int          writeConcern,
@@ -310,10 +317,25 @@ bool mongoStart
 
   multitenant = _multitenant;
 
-  mongo::Status status = mongo::client::initialize();
-  if (!status.isOK())
+  // We cannot move status variable declaration outside the if block. That fails at compilation time
+  bool statusOk = false;
+  std::string statusString;
+  if (dbSSL)
   {
-    LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
+    mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+  else
+  {
+    mongo::Status status = mongo::client::initialize();
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+
+  if (!statusOk)
+  {
+    LM_E(("Database Startup Error %s (cannot initialize mongo client)", statusString.c_str()));
     return false;
   }
   atexit(shutdownClient);
@@ -323,6 +345,8 @@ bool mongoStart
                               rplSet,
                               username,
                               passwd,
+                              mechanism,
+                              authDb,
                               _multitenant,
                               timeout,
                               writeConcern,
@@ -1878,8 +1902,24 @@ bool entitiesQuery
 * pruneContextElements -
 *
 * Remove attributes in the vector with 'found' value is 'false'
+*
+* In the case of NGSIv2 we filter attributes with CPr not included in a list of attributes
+* passed as reference (and that comes from the original NGSIv2 query). Otherwise,
+* over-querying for attributes may occur and this could break some CPr usage cases (in particular
+* the ones with IOTAs, which may report error in the case of being asked for an attribute
+* they don't manage).
+*
+* This can be checked with cases/3068_ngsi_v2_based_forwarding/check_no_overquerying.test. If
+* you disable the attrsV processing in this function, you would see how that test fail due
+* to over-querying
 */
-void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP)
+void pruneContextElements
+(
+  ApiVersion                           apiVersion,
+  const StringList&                    attrsV,
+  const ContextElementResponseVector&  oldCerV,
+  ContextElementResponseVector*        newCerVP
+)
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
@@ -1903,7 +1943,11 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
     {
       ContextAttribute* caP = cerP->entity.attributeVector[jx];
 
-      if (caP->found)
+      // To be included, it need to be found and one of the following:
+      // - It is V1
+      // - (Not being V1) The attributes filter list is empty
+      // - (Not being V1 and not empty attributes filter) The attribute is included in the filter list (taking into account wildcard)
+      if ((caP->found) && ((apiVersion == V1) || (attrsV.size() == 0) || (attrsV.lookup(caP->name, ALL_ATTRS))))
       {
         ContextAttribute* newCaP = new ContextAttribute(caP);
         newCerP->entity.attributeVector.push_back(newCaP);
@@ -2571,7 +2615,7 @@ static bool processOnChangeConditionForSubscription
   }
 
   /* Prune "not found" CERs */
-  pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+  pruneContextElements(apiVersion, emptyList, rawCerV, &ncr.contextElementResponseVector);
 
   // Add builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
   // for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
@@ -2624,7 +2668,7 @@ static bool processOnChangeConditionForSubscription
       }
 
       /* Prune "not found" CERs */
-      pruneContextElements(rawCerV, &allCerV);
+      pruneContextElements(apiVersion, emptyList, rawCerV, &allCerV);
 
 #ifdef WORKAROUND_2994
       delayedReleaseAdd(rawCerV);

@@ -3,7 +3,7 @@
 Orion Context Broker クイックスタートガイド
 Orion Context Broker へようこそ！この簡単なガイドでは、簡単な方法で [FIWARE Lab](https://lab.fiware.org) (FIWARE Foundation が所有し、管理) の Orion Context Broker グローバルインスタンスで作業するためのいくつかの初期ステップについて説明します。
 
-Orion Context Broker は、[FIWARE NGSI バージョン2 API](http://fiware.github.io/context.Orion/api/v2/stable/) を実装しています。そのような API の良い学習リソースは、[NGSI version 2 Cookbook](http://fiware.github.io/context.Orion/api/v2/stable/cookbook/) です。
+Orion Context Broker は、[FIWARE NGSI バージョン2 API](http://fiware-ges.github.io/orion/api/v2/stable/) を実装しています。そのような API の良い学習リソースは、[NGSI version 2 Cookbook](http://fiware-ges.github.io/orion/api/v2/stable/cookbook/) です。
 
 まず、FIWARE Lab にアカウントが必要です。もし、アカウントがなければ、[次のリンク](https://account.lab.fiware.org/sign_up)で登録してください。無料ですが、有効なメールアドレスが必要です。このアカウントを使用すると、Orion への REST API コールで使用する有効な認証トークンを取得できます。そのトークンを取得するには、`token_script.sh` スクリプトを取得し、パラメータとして `orion-gi` を使用して実行します (`orion-gi` は FIWARE インフラストラクチャの Orion グローバル・インスタンスを意味します)。スクリプトで要求されたら、FIWARE Lab のユーザとパスワードを入力してください。**電子メールのドメインを含む完全なユーザ名を使用する必要があります**。例えば、電子メールが "foo@gmail.com" の場合は "foo" だけでなく、"foo@gmail.com" です :
 
@@ -18,21 +18,21 @@ Orion Context Broker は、[FIWARE NGSI バージョン2 API](http://fiware.gith
 
 取得した認証トークンが AUTH_TOKEN シェル変数にあると仮定します。次に、サンタンデールの都市センサ (特に騒音計) からリアルタイム情報を検索してみましょう :
 
-``` 
+```
 curl orion.lab.fiware.org:1026/v2/entities/urn:smartsantander:testbed:357 \
    -X GET -s -S --header 'Accept: application/json' \
    --header  "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
-``` 
+```
 
 最後の測定時間 (TimeInstant), サウンドレベル (sound), センサバッテリ充電 (batteryCharge), センサ位置 (Latitud と Longitud ... これらの最後のものはスペイン語で申し訳ありません)の JSON ドキュメントを取得します。センサは "urn:smartsantander:testbed:357" で識別されます。
 
 道路交通に関連するもう1つのセンサをクエリしましょう :
 
-``` 
+```
 curl orion.lab.fiware.org:1026/v2/entities/urn:smartsantander:testbed:3332 \
    -X GET -s -S  --header 'Accept: application/json' \
    --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
-``` 
+```
 
 "urn:smartsantander:testbed:3332" センサに関する、返された JSON のデータは次のとおりです :
 
@@ -49,7 +49,7 @@ Orion Context Broker のグローバルインスタンスは、新しいエン�
 
 次のコマンドは、Orion Context Broker に "city_location" 属性と "temperature" 属性を持つエンティティを作成します :
 
-``` 
+```
 curl orion.lab.fiware.org:1026/v2/entities -X POST -s -S \
    --header 'Content-Type: application/json' \
    --header "X-Auth-Token: $AUTH_TOKEN" -d @- <<EOF
@@ -66,15 +66,15 @@ curl orion.lab.fiware.org:1026/v2/entities -X POST -s -S \
   }
 }
 EOF
-``` 
+```
 
 エンティティが存在することを確認するには、パブリック・センサをクエリするのと同じ方法でクエリできます :
 
-``` 
+```
 curl orion.lab.fiware.org:1026/v2/entities/$ID -X GET -s -S \
     --header 'Accept: application/json'\
     --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
-``` 
+```
 もちろん、温度の変更など、属性の値を変更することもできます :
 
 ```

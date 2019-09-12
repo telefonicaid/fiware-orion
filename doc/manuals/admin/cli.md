@@ -66,6 +66,15 @@ The list of available options is the following:
 -   **-dbpwd <pass>**. The MongoDB password to use. If your MongoDB
     doesn't use authorization then this option must be avoided. See [database
     authorization section]( database_admin.md#database-authorization).
+-   **-dbAuthMech <mechanism>**. The MongoDB authentication mechanism to use in the case
+    of providing `-dbuser` and `-dbpwd`. Alternatives are SCRAM-SHA-1 or MONGODB-CR.
+    Default (in the case of omitting this field) is SCRAM-SHA-1.
+-   **-dbAuthDb <database>**. Specifies the database to use for authentication in the case
+    of providing `-dbuser` and `-dbpwd`. Default is the same as `-db` in the case of not
+    using `-multiservice` or `"admin"` in the case of using `-multiservice`.
+-   **-dbSSL**. Enable SSL in the connection to MongoDB. You have to use this option if your
+    MongoDB server or replica set is using SSL (or, the other way around, you have not to use
+    this option if your MongoDB server or replicat set is not using SSL).
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:

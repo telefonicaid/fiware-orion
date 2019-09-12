@@ -533,7 +533,7 @@ HttpStatusCode mongoQueryContext
   // FIXME: call to cerVectorPresent to be removed once forwarding works
   // cerVectorPresent("Before pruning", rawCerV);
 
-  pruneContextElements(rawCerV, &responseP->contextElementResponseVector);
+  pruneContextElements(apiVersion, requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
 
   LM_T(LmtForward, ("After pruning, we have %d elements in rawCerV", rawCerV.size()));
   LM_T(LmtForward, ("After pruning, we have %d items in qcrsP->contextElementResponseVector", responseP->contextElementResponseVector.size()));

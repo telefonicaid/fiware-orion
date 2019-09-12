@@ -74,11 +74,14 @@ bool          simulatedNotification;
 int           lsPeriod             = 0;
 bool          disableCusNotif      = false;
 
-char          dbHost[64];
+char          dbHost[256];
 char          rplSet[64];
 char          dbName[64];
 char          user[64];
 char          pwd[64];
+char          authMech[64];
+char          authDb[64];
+bool          dbSSL;
 int64_t       dbTimeout;
 int           dbPoolSize;
 int           writeConcern;
@@ -97,6 +100,9 @@ PaArgument paArgs[] =
   { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbpwd",          pwd,           "DB_PASSWORD",    PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
+  { "-dbAuthMech",     authMech,      "DB_AUTH_MECH",   PaString, PaOpt, (int64_t) "SCRAM-SHA-1", PaNL, PaNL,  "" },
+  { "-dbAuthDb",       authDb,        "DB_AUTH_DB",     PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  ""  },
+  { "-dbSSL",          &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,                  false, true,  "" },
   { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL, PaNL,  "" },
   { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaInt64,  PaOpt, 10000,                  PaNL, PaNL,  "" },
   { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,    10000, "" },
@@ -141,7 +147,7 @@ int main(int argC, char** argV)
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
   // Note that multitenancy and mutex time stats are disabled for unit test mongo init
-  mongoInit(dbHost, rplSet, dbName, user, pwd, false, dbTimeout, writeConcern, dbPoolSize, false);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   setupDatabase();

@@ -1,0 +1,136 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check there is no over-querying in NGSIv2 forwarding
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Register E1/[A,B,C]
+# 02. POST /v2/op/query for E/A (result is irrelevant)
+# 03. Dump accumulator and check that E/A was forwarded (not including B or C)
+#
+
+echo "01. Register E1/[A,B,C]"
+echo "======================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T",
+        "id": "E"
+      }
+    ],
+    "attrs": [ "A", "B", "C" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/op/query for E/A (result is irrelevant)"
+echo "===================================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E",
+      "type": "T"
+    }
+  ],
+  "attrs": [
+    "A"
+  ]
+}'
+orionCurl --url /v2/op/query --payload "$payload"
+echo
+echo
+
+echo "03. Dump accumulator and check that E/A was forwarded (not including B or C)"
+echo "============================================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1/[A,B,C]
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/op/query for E/A (result is irrelevant)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. Dump accumulator and check that E/A was forwarded (not including B or C)
+============================================================================
+POST http://localhost:REGEX(\d+)/v2/op/query
+Fiware-Servicepath: /
+Content-Length: 50
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "attrs": [
+        "A"
+    ],
+    "entities": [
+        {
+            "id": "E",
+            "type": "T"
+        }
+    ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
