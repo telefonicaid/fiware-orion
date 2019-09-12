@@ -125,8 +125,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 
     if (orionldState.payloadContextNode != NULL)
     {
-      errorTitle   = (char*) "Invalid MIME-type for @context in payload";
-      errorDetails = (char*) "For @context in payload, the MIME type must be application/ld+json";
+      errorTitle   = (char*) "Mismatch between /Content-Type/ and contents of the request payload body";
+      errorDetails = (char*) "Content-Type is application/json, yet a '@context' item was present in the payload body";
     }
   }
 
