@@ -158,28 +158,28 @@ static void prepareDatabase(bool extraEntities = false)
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "running") <<
                        "N" << BSON("type" << "T" << "value" << 27) <<
-                       "D" << BSON("type" << "T" << "value" << 1564052400))); // 2019-07-25T11:00:00Z
+                       "D" << BSON("type" << "T" << "value" << 1564052400)));  // 2019-07-25T11:00:00Z
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "shutdown") <<
                        "N" << BSON("type" << "T" << "value" << 31) <<
-                       "D" << BSON("type" << "T" << "value" << 1564056000))); // 2019-07-25T12:00:00Z
+                       "D" << BSON("type" << "T" << "value" << 1564056000)));  // 2019-07-25T12:00:00Z
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "error") <<
                        "N" << BSON("type" << "T" << "value" << 17.8) <<
-                       "D" << BSON("type" << "T" << "value" << 1564059600))); // 2019-07-25T13:00:00Z
+                       "D" << BSON("type" << "T" << "value" << 1564059600)));  // 2019-07-25T13:00:00Z
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E5" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("S" << "N" << "D") <<
                      "attrs" << BSON(
                        "S" << BSON("type" << "T" << "value" << "shutdown") <<
                        "N" << BSON("type" << "T" << "value" << 24) <<
-                       "D" << BSON("type" << "T" << "value" << 1564063200))); // 2019-07-25T14:00:00Z
+                       "D" << BSON("type" << "T" << "value" << 1564063200)));  // 2019-07-25T14:00:00Z
 
   BSONObj c1 = BSON("_id" << BSON("id" << "C1" << "type" << "T") <<
                     "attrNames" << BSON_ARRAY("colour") <<
@@ -282,19 +282,19 @@ static void prepareDatabaseAsString(void)
                      "attrNames" << BSON_ARRAY("N" << "D") <<
                      "attrs" << BSON(
                        "N" << BSON("type" << "T" << "value" << 26.5) <<
-                       "D" << BSON("type" << "T" << "value" << 1564048800))); // 2019-07-25T10:00:00Z
+                       "D" << BSON("type" << "T" << "value" << 1564048800)));  // 2019-07-25T10:00:00Z
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("N" << "D") <<
                      "attrs" << BSON(
                        "N" << BSON("type" << "T" << "value" << "31") <<
-                       "D" << BSON("type" << "T" << "value" << "2019-07-25T12:00:00Z"))); // 2019-07-25T12:00:00Z
+                       "D" << BSON("type" << "T" << "value" << "2019-07-25T12:00:00Z")));  // 2019-07-25T12:00:00Z
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
                      "attrNames" << BSON_ARRAY("N" << "D") <<
                      "attrs" << BSON(
                        "N" << BSON("type" << "T" << "value" << 31) <<
-                       "D" << BSON("type" << "T" << "value" << 1564056000))); // 2019-07-25T12:00:00Z
+                       "D" << BSON("type" << "T" << "value" << 1564056000)));  // 2019-07-25T12:00:00Z
 
   BSONObj c1 = BSON("_id" << BSON("id" << "C1" << "type" << "T") <<
                     "attrNames" << BSON_ARRAY("colour") <<
