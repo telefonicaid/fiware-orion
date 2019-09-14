@@ -87,7 +87,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
   else
-    sub.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
+    sub.ldContext = ORIONLD_CORE_CONTEXT_URL;
 
   // FIXME: attrsFormat should be set to default by constructor
   sub.attrsFormat = DEFAULT_RENDER_FORMAT;

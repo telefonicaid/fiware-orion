@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromNotification.h"             // Own interface
 
@@ -77,7 +77,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   if (mimeType == JSONLD)
   {
     if (context == NULL)
-      nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
+      nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
     else
       nodeP = kjString(orionldState.kjsonP, "@context", context);
 

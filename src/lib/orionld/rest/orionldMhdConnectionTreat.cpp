@@ -50,7 +50,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
 #include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_DEFAULT_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
 #include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
 #include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
@@ -659,7 +659,7 @@ static void contextToPayload(void)
   {
     // LM_TMP(("CTX: payloadContextNode == NULL, using Incoming Link header: '%s'", orionldState.link));
     if (orionldState.link == NULL)
-      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
+      orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
     else
       orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
   }
@@ -690,7 +690,7 @@ static void contextToPayload(void)
       if (orionldState.payloadContextNode == NULL)
       {
         if (orionldState.link == NULL)
-          contextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_DEFAULT_CONTEXT_URL);
+          contextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
         else
           contextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
       }

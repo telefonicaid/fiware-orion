@@ -39,7 +39,7 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // kalloc
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL, ORIONLD_DEFAULT_URL_CONTEXT_URL
+#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextCreateFromTree.h"      // Own interface
 
 
@@ -73,11 +73,9 @@ OrionldContext* orionldContextCreateFromTree(KjNode* tree, const char* url, Orio
   // Nothing is removed from the total context, so that the context can be retreived intact, but the
   // Core part must not be used in the lookups.
   //
-  // FIXME TPUT: A char-sum would make these comparisons faster
+  // FIXME TPUT: A char-sum would make this comparison faster
   //
-  if ((strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL)        == 0) ||
-      (strcmp(contextP->url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0) ||
-      (strcmp(contextP->url, ORIONLD_DEFAULT_CONTEXT_URL)     == 0))
+  if (strcmp(contextP->url, ORIONLD_CORE_CONTEXT_URL) == 0)
   {
     LM_T(LmtContext, ("Context '%s' is IGNORED", contextP->url));
     contextP->ignore = true;

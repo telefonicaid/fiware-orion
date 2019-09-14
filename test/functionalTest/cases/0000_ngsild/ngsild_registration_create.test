@@ -400,12 +400,12 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1998
+Content-Length: 1964
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
   "type": "ContextSourceRegistration",
   "name": "reg_csr1a341",

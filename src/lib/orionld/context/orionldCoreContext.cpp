@@ -42,22 +42,6 @@ OrionldContext orionldCoreContext;
 
 // -----------------------------------------------------------------------------
 //
-// orionldDefaultUrlContext -
-//
-OrionldContext orionldDefaultUrlContext;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldDefaultContext
-//
-OrionldContext orionldDefaultContext;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldDefaultUrl -
 //
 char* orionldDefaultUrl    = (char*) "DEFAULT URL";

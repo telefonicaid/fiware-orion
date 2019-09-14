@@ -36,7 +36,7 @@ extern "C"
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultContext
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldInternalError
 #include "orionld/common/OrionldConnection.h"                  // orionldState
@@ -461,7 +461,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     if (subscriptionP->ldContext != "")
       nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());
     else
-      nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
+      nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContext.url);
 
     kjChildAdd(topP, nodeP);
   }

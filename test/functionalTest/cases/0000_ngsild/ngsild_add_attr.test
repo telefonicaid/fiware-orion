@@ -43,7 +43,7 @@ echo "========================================="
 payload='{
   "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
   "type": "T",
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "P1": {
     "type": "Property",
     "value": 1
@@ -73,7 +73,7 @@ payload='{
     "type": "Property",
     "value": false
   },
-  "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld"
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }'
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00/attrs' --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -109,7 +109,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 117
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -136,7 +136,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 233
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

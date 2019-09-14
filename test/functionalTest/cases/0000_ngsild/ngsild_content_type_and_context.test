@@ -245,12 +245,12 @@ Date: REGEX(.*)
 08. GET Entity from step 01 - see correct URI Expansion (matching Default URL @context in payload)
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 115
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "A"
 }
@@ -261,7 +261,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -273,12 +273,12 @@ Date: REGEX(.*)
 10. GET Entity from step 05 - see P100 as long-name (P100 not present in default @context)
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 173
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "http://example.org/P100": {
         "type": "Property",
         "value": 100

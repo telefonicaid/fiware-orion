@@ -80,4 +80,6 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
 
   if (semAlreadyTaken == false)
     orionldContextListSemGive(__FILE__);
+
+  LM_T(LmtContextList, ("Done - Context '%s' inserted in the Context-Cache", contextP->url));
 }

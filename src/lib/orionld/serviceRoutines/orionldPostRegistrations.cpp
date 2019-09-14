@@ -75,7 +75,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     reg.ldContext = orionldState.contextP->url;
   else
-    reg.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
+    reg.ldContext = ORIONLD_CORE_CONTEXT_URL;
 
   //
   // Translate the incoming KjNode tree into a ngsiv2::Registration

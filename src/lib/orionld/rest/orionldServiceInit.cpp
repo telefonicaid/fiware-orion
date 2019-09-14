@@ -354,7 +354,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
   LM_T(LmtPreloadedContexts, ("Successfully parsed the preloaded JSON of context '%s'", url));
 
   //
-  // Is it any of the three special contexts?
+  // Is it the Core Context?
   //
   if (strcmp(url, ORIONLD_CORE_CONTEXT_URL) == 0)
   {
@@ -363,22 +363,6 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
     orionldCoreContext.tree   = tree;
     orionldCoreContext.ignore = true;
     orionldCoreContext.next   = NULL;
-  }
-  else if (strcmp(url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0)
-  {
-    orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
-    orionldDefaultUrlContext.url     = url;
-    orionldDefaultUrlContext.tree    = tree;
-    orionldDefaultUrlContext.ignore  = true;
-    orionldDefaultUrlContext.next    = NULL;
-  }
-  else if (strcmp(url, ORIONLD_DEFAULT_CONTEXT_URL) == 0)
-  {
-    orionldDefaultContext.type   = OrionldDefaultContext;
-    orionldDefaultContext.url    = url;
-    orionldDefaultContext.tree   = tree;
-    orionldDefaultContext.ignore = true;
-    orionldDefaultContext.next   = NULL;
   }
   else
   {
@@ -491,18 +475,6 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     orionldCoreContext.type          = OrionldCoreContext;
     orionldCoreContext.ignore        = true;
 
-    orionldDefaultUrlContext.url     = ORIONLD_DEFAULT_URL_CONTEXT_URL;
-    orionldDefaultUrlContext.next    = NULL;
-    orionldDefaultUrlContext.tree    = NULL;
-    orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
-    orionldDefaultUrlContext.ignore  = true;
-
-    orionldDefaultContext.url        = ORIONLD_DEFAULT_CONTEXT_URL;
-    orionldDefaultContext.next       = NULL;
-    orionldDefaultContext.tree       = NULL;
-    orionldDefaultContext.type       = OrionldDefaultContext;
-    orionldDefaultContext.ignore     = true;
-
     // Download the Core Context
     while ((orionldCoreContext.tree == NULL) && (retries < 5))
     {
@@ -513,95 +485,77 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
       ++retries;
       LM_E(("Error %d downloading Core Context %s: %s", retries, ORIONLD_CORE_CONTEXT_URL, details));
     }
-
-    // Download the "Default URL" context
-    retries = 0;
-    while ((orionldDefaultUrlContext.tree == NULL) && (retries < 5))
-    {
-      orionldDefaultUrlContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_URL_CONTEXT_URL, false, &details);
-      if (orionldDefaultUrlContext.tree != NULL)
-        break;
-
-      ++retries;
-      LM_E(("Error %d downloading Default URI Context %s: %s", retries, ORIONLD_DEFAULT_URL_CONTEXT_URL, details));
-    }
-
-    // Download the "Default" context
-    retries = 0;
-
-    while ((orionldDefaultContext.tree == NULL) && (retries < 5))
-    {
-      orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, false, &details);
-
-      if (orionldDefaultContext.tree != NULL)
-        break;
-
-      ++retries;
-      LM_E(("Error %d downloading Default Context %s: %s", retries, ORIONLD_DEFAULT_CONTEXT_URL, details));
-    }
   }
 
-  if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
+  if (orionldCoreContext.tree == NULL)
     LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
 
   //
-  // Setting the Core/Default contexts to be ignored in lookups
-  // This is to ignore Core/Default contexts as part of User Contexts
+  // Setting the Core Context to be ignored in lookups
+  // This is to ignore the Core context as part of User Contexts
   //
   // An alternative method would to be to not add the Core/Default context to the context cache
   // But, if we do that, then orionldContextLookup would need to do strcmp with the Core Context also
   //
   orionldCoreContext.ignore        = true;
-  orionldDefaultUrlContext.ignore  = true;
-  orionldDefaultContext.ignore     = true;
 
-#if 1
   //
-  // FIXME: Should the Core/Default context be in the Cache or not ?
+  // FIXME: Should the Core Context be in the Cache or not ?
   //
-
-  // Adding the core context to the list of contexts
   orionldContextListInsert(&orionldCoreContext, false);
 
-  // Adding the Default URL context to the list of contexts
-  orionldContextListInsert(&orionldDefaultUrlContext, false);
-
-  // Adding the Default context to the list of contexts
-  orionldContextListInsert(&orionldDefaultContext, false);
-#endif
 
   //
-  // Checking the "Default URL Context" and extracting the Default URL path.
+  // Get the hostname - needed for contexts created by the broker
   //
-  KjNode* contextNodeP = orionldDefaultUrlContext.tree->value.firstChildP;
+  gethostname(orionldHostName, sizeof(orionldHostName));
+  orionldHostNameLen = strlen(orionldHostName);
+
+
+  //
+  // Checking the Core Context and extracting the Default URL path.
+  //
+  KjNode* contextNodeP = orionldCoreContext.tree->value.firstChildP;
 
   if (contextNodeP == NULL)
-    LM_X(1, ("Invalid Default URL Context - Empty JSON object"));
+    LM_X(1, ("Invalid Core Context - Empty JSON object"));
 
   if (strcmp(contextNodeP->name, "@context") != 0)
-    LM_X(1, ("Invalid Default URL Context - first (and only) member must be called '@context'"));
+    LM_X(1, ("Invalid Core Context - first (and only) member must be called '@context'"));
 
   if (contextNodeP->type != KjObject)
-    LM_X(1, ("Invalid Default URL Context - not a JSON object"));
+    LM_X(1, ("Invalid Core Context - not a JSON object"));
 
   if (contextNodeP->next != NULL)
-    LM_X(1, ("Invalid Default URL Context - '@context' must be the only member of the toplevel object"));
+    LM_X(1, ("Invalid Core Context - '@context' must be the only member of the toplevel object"));
 
-  KjNode* vocabNodeP = contextNodeP->value.firstChildP;
+  KjNode* vocabNodeP = NULL;
+  for (KjNode* nodeP = contextNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (strcmp(nodeP->name, "@vocab") == 0)
+    {
+      vocabNodeP = nodeP;
+      break;
+    }
+  }
 
-  if (strcmp(vocabNodeP->name, "@vocab") != 0)
-    LM_X(1, ("Invalid Default URL Context - first (and only) member of '@context' must be called '@vocab' - not '%s'", vocabNodeP->name));
+  if (vocabNodeP == NULL)
+  {
+    //
+    // FIXME: Temporarily acceptingh no @vocab in Core Context
+    //
+    LM_W(("WARNING - The Core Context didn't contain any '@vocab' item - OK for now ..."));
+    orionldDefaultUrl    = (char*) "http://example.org/ngsi-ld/default/";
+    orionldDefaultUrlLen = strlen(orionldDefaultUrl);
+    return;
+  }
 
   if (vocabNodeP->type != KjString)
-    LM_X(1, ("Invalid Default URL Context - the member '@vocab' must be of 'String' type"));
+    LM_X(1, ("Invalid Core Context - the member '@vocab' must be of 'String' type"));
 
   orionldDefaultUrl    = strdup(vocabNodeP->value.s);
   orionldDefaultUrlLen = strlen(orionldDefaultUrl);
 
   if (urlCheck(orionldDefaultUrl, &details) == false)
-    LM_X(1, ("Invalid Default URL Context - the value (%s) of the only member '@vocab' must be a valid URL: %s", orionldDefaultUrl, details));
-
-  // Finally, get the hostname
-  gethostname(orionldHostName, sizeof(orionldHostName));
-  orionldHostNameLen = strlen(orionldHostName);
+    LM_X(1, ("Invalid Core Context - the value (%s) of the member '@vocab' must be a valid URL: %s", orionldDefaultUrl, details));
 }

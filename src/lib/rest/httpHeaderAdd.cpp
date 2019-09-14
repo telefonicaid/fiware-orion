@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 
 #include "rest/ConnectionInfo.h"
 #include "rest/httpHeaderAdd.h"
@@ -45,7 +45,7 @@ void httpHeaderAdd(ConnectionInfo* ciP, const char* key, const char* value)
 
 
 #ifdef ORIONLD
-#include "orionld/context/orionldCoreContext.h" // orionldDefaultContext
+#include "orionld/context/orionldCoreContext.h" // orionldCoreContext
 
 // -----------------------------------------------------------------------------
 //
@@ -78,9 +78,9 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
   if (orionldState.linkHeaderAdded == true)
     return;
 
-  // If no context URL is given, the default context is used
+  // If no context URL is given, the Core Context is used
   if (_url == NULL)
-    url = ORIONLD_DEFAULT_CONTEXT_URL;
+    url = ORIONLD_CORE_CONTEXT_URL;
   else
   {
     url = (char*) _url;

@@ -115,7 +115,7 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Test subscription 01",
-	"ldContext" : "https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"conditions" : [
 		"http://example.org/ngsi-ld/default/P2"
 	],
@@ -136,7 +136,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 444
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

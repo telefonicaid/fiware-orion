@@ -109,7 +109,7 @@ extern "C"
 #include "logSummary/logSummary.h"
 
 #include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
-#include "orionld/context/orionldCoreContext.h"             // orionldCoreContext, orionldDefaultUrlContext, orionldDefaultContext
+#include "orionld/context/orionldCoreContext.h"             // orionldCoreContext
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 
@@ -554,7 +554,7 @@ void exitFunc(void)
   OrionldContext* next;
   while (contextP != NULL)
   {
-    if ((contextP == &orionldCoreContext) || (contextP == &orionldDefaultUrlContext) || (contextP == &orionldDefaultContext))
+    if (contextP == &orionldCoreContext)
     {
       contextP = contextP->next;
       continue;
