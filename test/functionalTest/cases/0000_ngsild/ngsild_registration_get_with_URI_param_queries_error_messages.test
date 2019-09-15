@@ -70,20 +70,50 @@ echo
 01. Get error message from query by id URI param
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Bad Request",
-  "details": "URI Param /id/ is empty"
+  "detail": "URI Param /id/ is empty"
 }
 
 
 
 02. Get error message from query by type URI param
 ==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad Request",
+  "detail": "URI Param /type/ is empty"
+}
+
+
+
+03. Get error message from query by idPattern URI param
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad Request",
+  "detail": "URI Param /idPattern/ is empty"
+}
+
+
+
+04. Get error message from query by attrs URI param
+===================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 134
 Content-Type: application/json
@@ -92,37 +122,7 @@ Date: REGEX(.*)
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Bad Request",
-  "details": "URI Param /type/ is empty"
-}
-
-
-
-03. Get error message from query by idPattern URI param
-=======================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 139
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Bad Request",
-  "details": "URI Param /idPattern/ is empty"
-}
-
-
-
-04. Get error message from query by attrs URI param
-===================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 135
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-  "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Bad Request",
-  "details": "URI Param /attrs/ is empty"
+  "detail": "URI Param /attrs/ is empty"
 }
 
 

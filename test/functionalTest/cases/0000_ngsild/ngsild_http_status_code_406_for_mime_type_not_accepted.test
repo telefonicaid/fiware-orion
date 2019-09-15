@@ -54,12 +54,12 @@ echo
 01. Attempt to Create an NGSI-LD Entity with a Content-Type HTTP header of text/plain
 =====================================================================================
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 186
+Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "only application/json and application/ld+json are supported",
+    "detail": "only application/json and application/ld+json are supported",
     "title": "unsupported format of payload",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -68,14 +68,14 @@ Date: REGEX(.*)
 02. Attempt to GET an NGSI-LD Entity with an Accept HTTP header that only accepts text/plain
 ============================================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 197
+Content-Length: 196
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "invalid mime-type",
-  "details": "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'"
+  "detail": "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'"
 }
 
 

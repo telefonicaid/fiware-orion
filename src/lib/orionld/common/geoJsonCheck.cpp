@@ -70,7 +70,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
   if (geoLocationNodeP->type != KjObject)
   {
     LM_W(("Bad Input (the value of a geo-location attribute must be a JSON Object: '%s')", geoLocationNodeP->name));
-    orionldErrorResponseCreate(OrionldBadRequestData, "the value of a geo-location attribute must be a JSON Object", kjValueType(geoLocationNodeP->type), OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "the value of a geo-location attribute must be a JSON Object", kjValueType(geoLocationNodeP->type), OrionldDetailString);
     return false;
   }
 
@@ -86,7 +86,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
       if (geoJsonTypeCheck(typeNodeP->value.s, &geoType, &details) == false)
       {
         LM_W(("Bad Input (invalid type for geoJson: '%s')", typeNodeP->value.s));
-        orionldErrorResponseCreate(OrionldBadRequestData, details, typeNodeP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, details, typeNodeP->value.s, OrionldDetailString);
         return false;
       }
 
@@ -101,7 +101,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
     else
     {
       LM_W(("Bad Input (unexpected item in geo-location: '%s')", geoLocationNodeP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "unexpected item in geo-location", geoLocationNodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "unexpected item in geo-location", geoLocationNodeP->name, OrionldDetailString);
       return false;
     }
   }
@@ -112,7 +112,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "The value of an attribute of type GeoProperty must be valid GeoJson",
                                "Mandatory 'coordinates' and 'type' fields missing for a GeoJSON Property",
-                               OrionldDetailsString);
+                               OrionldDetailString);
     return false;
   }
 
@@ -122,7 +122,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "The value of an attribute of type GeoProperty must be valid GeoJson",
                                "Mandatory 'type' field missing for a GeoJSON Property",
-                               OrionldDetailsString);
+                               OrionldDetailString);
 
     return false;
   }
@@ -133,7 +133,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "The value of an attribute of type GeoProperty must be valid GeoJson",
                                "Mandatory 'coordinates' field missing for a GeoJSON Property",
-                               OrionldDetailsString);
+                               OrionldDetailString);
     return false;
   }
 
@@ -159,7 +159,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
       else
       {
         LM_W(("Bad Input (member of 'coordinates' array is not a number but of type: '%s')", kjValueType(memberP->type)));
-        orionldErrorResponseCreate(OrionldBadRequestData, "all members of 'coordinates' must be of type 'Number'", geoLocationNodeP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "all members of 'coordinates' must be of type 'Number'", geoLocationNodeP->name, OrionldDetailString);
         return false;
       }
     }
@@ -167,7 +167,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
     if ((numbers != 0) && (arrays != 0))
     {
       LM_W(("Bad Input (invalid coordinates)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "invalid value of 'coordinates'", geoLocationNodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "invalid value of 'coordinates'", geoLocationNodeP->name, OrionldDetailString);
       return false;
     }
 
@@ -177,7 +177,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "The value of an attribute of type GeoProperty must be valid GeoJson",
                                  "empty array for 'coordinates'",
-                                 OrionldDetailsString);
+                                 OrionldDetailString);
       return false;
     }
 
@@ -187,7 +187,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "The value of an attribute of type GeoProperty must be valid GeoJson",
                                  "array with only ONE member for 'coordinates'",
-                                 OrionldDetailsString);
+                                 OrionldDetailString);
       return false;
     }
     break;

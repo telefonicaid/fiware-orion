@@ -40,6 +40,6 @@ bool orionldNotImplemented(ConnectionInfo* ciP)
   ciP->httpStatusCode        = SccNotImplemented;
   orionldState.useLinkHeader = false;  // We don't want the Link header for version requests
 
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url, OrionldDetailsString);
+  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url, OrionldDetailString);
   return false;
 }

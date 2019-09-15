@@ -62,7 +62,7 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
   {
     if (entityP->type != KjObject)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL, OrionldDetailString);
       return false;
     }
 
@@ -90,20 +90,20 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown EntityInfo field", itemP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown EntityInfo field", itemP->name, OrionldDetailString);
         return false;
       }
     }
 
     if ((idP == NULL) && (idPatternP == NULL) && (typeP == NULL))
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Empty EntityInfo object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Empty EntityInfo object", NULL, OrionldDetailString);
       return false;
     }
 
     if ((idP != NULL) && (idPatternP != NULL))
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL, OrionldDetailString);
       return false;
     }
 
@@ -114,7 +114,7 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
 
       if ((urlCheck(idP, &details) == false) && (urnCheck(idP, &details) == false))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailString);
         ciP->httpStatusCode = SccBadRequest;
         return false;
       }
@@ -122,7 +122,7 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
 
     if (typeP == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in EntityInfo object", "type", OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in EntityInfo object", "type", OrionldDetailString);
       return false;
     }
 
@@ -131,7 +131,7 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
 
     if (orionldUriExpand(orionldState.contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailString);
       return false;
     }
     typeP = typeExpanded;

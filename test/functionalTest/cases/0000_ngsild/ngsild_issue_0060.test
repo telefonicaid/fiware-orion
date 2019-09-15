@@ -96,12 +96,12 @@ Date: REGEX(.*)
 02. Create the very same subscription again
 ===========================================
 HTTP/1.1 409 Conflict
-Content-Length: 167
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "urn:ngsi-ld:Subscription:testsubscription",
+    "detail": "urn:ngsi-ld:Subscription:testsubscription",
     "title": "A subscription with that ID already exists",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

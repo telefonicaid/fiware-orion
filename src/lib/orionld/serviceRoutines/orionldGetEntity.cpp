@@ -72,7 +72,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailString);
     return false;
   }
 
@@ -92,7 +92,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   if (response.errorCode.code == SccBadRequest)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", NULL, OrionldDetailString);
     return false;
   }
 
@@ -133,7 +133,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
           if (attrList == NULL)
           {
-            orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL, OrionldDetailsString);
+            orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL, OrionldDetailString);
             return false;
           }
 
@@ -147,7 +147,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailString);
         return false;
       }
     }

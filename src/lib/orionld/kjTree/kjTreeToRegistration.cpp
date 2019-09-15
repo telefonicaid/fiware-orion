@@ -72,12 +72,12 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
 
   if (items == 0)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty 'information' in Registration", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty 'information' in Registration", NULL, OrionldDetailString);
     return false;
   }
   else if (items > 1)
   {
-    orionldErrorResponseCreate(OrionldOperationNotSupported, "More than one item in Registration::information vector", "Not Implemented", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldOperationNotSupported, "More than one item in Registration::information vector", "Not Implemented", OrionldDetailString);
     ciP->httpStatusCode = SccNotImplemented;
     return false;
   }
@@ -143,7 +143,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
         orionldErrorResponseCreate(OrionldBadRequestData,
                                    "Unknown field inside Registration::information",
                                    infoNodeP->name,
-                                   OrionldDetailsString);
+                                   OrionldDetailString);
         return false;
       }
     }
@@ -153,7 +153,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "Empty Registration::information item",
                                  NULL,
-                                 OrionldDetailsString);
+                                 OrionldDetailString);
       return false;
     }
   }
@@ -198,7 +198,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if ((urlCheck((char*) regP->id.c_str(), NULL) == false) && (urnCheck((char*) regP->id.c_str(), NULL) == false))
   {
     LM_W(("Bad Input (Registration::id is not a URI)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str(), OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -219,7 +219,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Registration::type)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Registration::type", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Registration::type", OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -230,7 +230,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "Registration::type must have a value of /ContextSourceRegistration/",
                                orionldState.payloadTypeNode->value.s,
-                               OrionldDetailsString);
+                               OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }

@@ -130,12 +130,12 @@ Date: REGEX(.*)
 04. New attempt to retrieve the deleted subscription (from tenant 'openiot') - NOT FOUND
 ========================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 149
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "urn:ngsi-ld:Subscription:testsubscription",
+    "detail": "urn:ngsi-ld:Subscription:testsubscription",
     "title": "subscription not found",
     "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }

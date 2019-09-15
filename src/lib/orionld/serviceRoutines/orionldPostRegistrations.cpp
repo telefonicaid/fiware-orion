@@ -64,7 +64,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
 
     if (mongoLdRegistrationGet(NULL, regId, orionldState.tenant, &statusCode, &details) == true)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId, OrionldDetailString);
       return false;
     }
   }

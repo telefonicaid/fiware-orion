@@ -171,7 +171,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0", OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0", OrionldDetailString);
 #endif
         return MHD_YES;
       }
@@ -192,7 +192,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", OrionldDetailString);
 #endif
         return MHD_YES;
       }
@@ -208,7 +208,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000", OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000", OrionldDetailString);
 #endif
       return MHD_YES;
     }
@@ -219,7 +219,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", OrionldDetailString);
 #endif
       return MHD_YES;
     }

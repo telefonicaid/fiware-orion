@@ -60,54 +60,54 @@ static const char* errorTypeStringV[] =
 //
 // NOTE
 //   Only service routines should use this function.
-//   Lower level functions should just return the 'details' string.
+//   Lower level functions should just return the 'detail' string.
 //
 void orionldErrorResponseCreate
 (
   OrionldResponseErrorType  errorType,
   const char*               title,
-  const char*               details,
-  OrionldDetailsType        detailsType
-  )
+  const char*               detail,
+  OrionldDetailType         detailType
+)
 {
-  LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, details));
+  LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, detail));
 
   KjNode* typeP     = kjString(orionldState.kjsonP, "type",    errorTypeStringV[errorType]);
   KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
-  KjNode* detailsP;
+  KjNode* detailP;
 
-  if ((details != NULL) && (details[0] != 0))
+  if ((detail != NULL) && (detail[0] != 0))
   {
-    char*   contextDetails = NULL;
+    char*   contextDetail = NULL;
 
-    if (detailsType == OrionldDetailsString)  // no replacement as it's just a descriptive string
+    if (detailType == OrionldDetailString)  // no replacement as it's just a descriptive string
     {
-      contextDetails = (char*) details;
+      contextDetail = (char*) detail;
     }
-    else  // lookup 'details' in context
+    else  // lookup 'detail' in context
     {
-      KjNode*  nodeP = orionldContextItemLookup(orionldState.contextP, details);
-      char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
+      KjNode*  nodeP = orionldContextItemLookup(orionldState.contextP, detail);
+      char     contextDetailV[512];  // FIXME: Define a max length for a context item?
 
       if (nodeP == NULL)
       {
-        snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", orionldDefaultUrl, details);
-        contextDetails = contextDetailsV;
+        snprintf(contextDetailV, sizeof(contextDetailV), "%s%s", orionldDefaultUrl, detail);
+        contextDetail = contextDetailV;
       }
       else
       {
-        contextDetails = nodeP->value.s;
+        contextDetail = nodeP->value.s;
       }
     }
 
-    detailsP = kjString(orionldState.kjsonP, "details", contextDetails);
+    detailP = kjString(orionldState.kjsonP, "detail", contextDetail);
   }
   else
-    detailsP = kjString(orionldState.kjsonP, "details", "no details");
+    detailP = kjString(orionldState.kjsonP, "detail", "no detail");
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
   kjChildAdd(orionldState.responseTree, typeP);
   kjChildAdd(orionldState.responseTree, titleP);
-  kjChildAdd(orionldState.responseTree, detailsP);
+  kjChildAdd(orionldState.responseTree, detailP);
 }

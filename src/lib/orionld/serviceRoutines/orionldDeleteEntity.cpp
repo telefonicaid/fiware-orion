@@ -55,7 +55,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
 
   if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -75,7 +75,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   {
     OrionldResponseErrorType eType = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
 
-    orionldErrorResponseCreate(eType, parseData.upcrs.res.oe.details.c_str(), orionldState.wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(eType, parseData.upcrs.res.oe.details.c_str(), orionldState.wildcard[0], OrionldDetailString);
     ciP->httpStatusCode = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
 
     // Release allocated data

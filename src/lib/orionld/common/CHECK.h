@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldDetailsString, ...
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldDetailString, ...
 
 
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ do                                                                              
   if (pointer != NULL)                                                                                                                \
   {                                                                                                                                   \
     LM_E(("Duplicated attribute: '%s'", fieldName));                                                                                  \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);                           \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailString);                            \
     ciP->httpStatusCode = SccBadRequest;                                                                                              \
     return false;                                                                                                                     \
   }                                                                                                                                   \
@@ -56,7 +56,7 @@ do                                                                              
 {                                                                                                                                     \
   if (alreadyPresent == true)                                                                                                         \
   {                                                                                                                                   \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailsString);                           \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailString);                            \
     ciP->httpStatusCode = SccBadRequest;                                                                                              \
     return false;                                                                                                                     \
   }                                                                                                                                   \
@@ -75,7 +75,7 @@ do                                                                              
 {                                                                                                                                 \
   if (nodeP->type != KjObject)                                                                                                    \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Object", what, OrionldDetailsString);                           \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Object", what, OrionldDetailString);                            \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -92,7 +92,7 @@ do                                                                              
 {                                                                                                                                 \
   if (kNodeP->type != KjArray)                                                                                                    \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "not a JSON Array", fieldName, OrionldDetailsString);                       \
+    orionldErrorResponseCreate(OrionldBadRequestData, "not a JSON Array", fieldName, OrionldDetailString);                        \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -109,7 +109,7 @@ do                                                                              
 {                                                                                                                                 \
   if (kNodeP->value.firstChildP == NULL)                                                                                          \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", what, OrionldDetailsString);                                 \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", what, OrionldDetailString);                                  \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -126,7 +126,7 @@ do                                                                              
 {                                                                                                                                 \
   if (nodeP->type != KjObject)                                                                                                    \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name, OrionldDetailsString);      \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name, OrionldDetailString);       \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -143,7 +143,7 @@ do                                                                              
 {                                                                                                                                 \
   if (kNodeP->type != KjString)                                                                                                   \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", fieldName, OrionldDetailsString);                      \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", fieldName, OrionldDetailString);                       \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -160,7 +160,7 @@ do                                                                              
 {                                                                                                                                 \
   if (nodeP->type != KjInt)                                                                                                       \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Integer", fieldName, OrionldDetailsString);                     \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Integer", fieldName, OrionldDetailString);                      \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -177,7 +177,7 @@ do                                                                              
 {                                                                                                                                 \
   if (kNodeP->type != KjBoolean)                                                                                                  \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Boolean", fieldName, OrionldDetailsString);                     \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Boolean", fieldName, OrionldDetailString);                      \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -194,7 +194,7 @@ do                                                                              
 {                                                                                                                                 \
   if (parse8601Time(stringValue) == -1)                                                                                           \
   {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid DateTime value", fieldName, OrionldDetailsString);                 \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid DateTime value", fieldName, OrionldDetailString);                  \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -212,7 +212,7 @@ do                                                                              
   if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                                                      \
   {                                                                                                                               \
     LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                                      \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor String", what, OrionldDetailsString);                 \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor String", what, OrionldDetailString);                  \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \
@@ -230,7 +230,7 @@ do                                                                              
   if ((nodeP->type != KjArray) && (nodeP->type != KjString) && (nodeP->type != KjObject))                                         \
   {                                                                                                                               \
     LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                                      \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what, OrionldDetailsString);    \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what, OrionldDetailString);     \
     ciP->httpStatusCode = SccBadRequest;                                                                                          \
     return false;                                                                                                                 \
   }                                                                                                                               \

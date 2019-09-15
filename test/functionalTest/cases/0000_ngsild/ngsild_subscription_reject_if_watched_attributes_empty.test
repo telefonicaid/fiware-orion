@@ -93,12 +93,12 @@ echo
 01. Attempt to create a subscription with an empty watchedAttributes array - see it fail
 ========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::watchedAttributes",
+    "detail": "Subscription::watchedAttributes",
     "title": "Empty Array",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

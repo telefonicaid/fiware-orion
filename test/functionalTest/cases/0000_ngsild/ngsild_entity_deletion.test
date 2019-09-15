@@ -152,14 +152,14 @@ Date: REGEX(.*)
 05. GET the entity - see error
 ==============================
 HTTP/1.1 404 Not Found
-Content-Length: 134
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
   "title": "No context element found",
-  "details": "no details"
+  "detail": "no detail"
 }
 
 
@@ -167,12 +167,12 @@ Date: REGEX(.*)
 06. DELETE the entity - see error
 =================================
 HTTP/1.1 404 Not Found
-Content-Length: 166
+Content-Length: 165
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "urn:ngsi-ld:T:12:13:14",
+    "detail": "urn:ngsi-ld:T:12:13:14",
     "title": "The requested entity has not been found. Check type and id",
     "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }

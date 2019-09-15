@@ -115,7 +115,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   if ((urlCheck((char*) subP->id.c_str(), NULL) == false) && (urnCheck((char*) subP->id.c_str(), NULL) == false))
   {
     LM_W(("Bad Input (Subscription::id is not a URI)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", subP->id.c_str(), OrionldDetailsAttribute);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", subP->id.c_str(), OrionldDetailAttribute);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -137,7 +137,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Subscription::type)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::type", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::type", OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -145,7 +145,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   if (!SCOMPARE13(orionldState.payloadTypeNode->value.s, 'S', 'u', 'b', 's', 'c', 'r', 'i', 'p', 't', 'i', 'o', 'n', 0))
   {
     LM_W(("Bad Input (subscription type must have the value /Subscription/)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription::type", orionldState.payloadTypeNode->value.s, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription::type", orionldState.payloadTypeNode->value.s, OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -215,7 +215,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
         delete scopeP->stringFilterP;
         delete scopeP;
 
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription::q", kNodeP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription::q", kNodeP->value.s, OrionldDetailString);
         return false;
       }
 
@@ -228,7 +228,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
         delete scopeP->stringFilterP;
         delete scopeP;
 
-        orionldErrorResponseCreate(OrionldInternalError, "Internal Error", "Unable to render StringFilter", OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldInternalError, "Internal Error", "Unable to render StringFilter", OrionldDetailString);
         return false;
       }
 
@@ -298,7 +298,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Subscription", kNodeP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Subscription", kNodeP->name, OrionldDetailString);
       return false;
     }
   }
@@ -306,21 +306,21 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   if ((entitiesPresent == false) && (watchedAttributesPresent == false))
   {
     LM_E(("At least one of 'entities' and 'watchedAttributes' must be present"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "At least one of 'entities' and 'watchedAttributes' must be present", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "At least one of 'entities' and 'watchedAttributes' must be present", NULL, OrionldDetailString);
     return false;
   }
 
   if ((timeIntervalP != NULL) && (watchedAttributesPresent == true))
   {
     LM_E(("Both 'timeInterval' and 'watchedAttributes' present"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Both 'timeInterval' and 'watchedAttributes' present", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Both 'timeInterval' and 'watchedAttributes' present", NULL, OrionldDetailString);
     return false;
   }
 
   if (notificationP == NULL)
   {
     LM_E(("Notification Parameters missing in Subscription"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory Field Missing", "Subscription::notification", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory Field Missing", "Subscription::notification", OrionldDetailString);
     return false;
   }
 

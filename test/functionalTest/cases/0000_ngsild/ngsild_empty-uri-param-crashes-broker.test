@@ -82,12 +82,12 @@ Date: REGEX(.*)
 02. Query the property P100 giving an empty coords URI param, make sure the broker doesn't crash - see error
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 136
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "geometry with coordinates but without georel",
+    "detail": "geometry with coordinates but without georel",
     "title": "no georel",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

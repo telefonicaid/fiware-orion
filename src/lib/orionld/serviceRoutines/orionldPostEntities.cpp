@@ -135,13 +135,13 @@ static bool payloadCheck
   //
   if (orionldState.payloadIdNode == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory", OrionldDetailString);
     return false;
   }
 
   if (orionldState.payloadTypeNode == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity type is missing", "The type field is mandatory", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity type is missing", "The type field is mandatory", OrionldDetailString);
     return false;
   }
 
@@ -183,7 +183,7 @@ static bool payloadCheck
       // FIXME: Make sure the type is either Property or Relationship
       if (orionldValidName(kNodeP->name, &detailsP) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", detailsP, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", detailsP, OrionldDetailString);
         return false;
       }
     }
@@ -230,7 +230,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   if ((urlCheck(entityId, &details) == false) && (urnCheck(entityId, &details) == false))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN", OrionldDetailString);
     return false;
   }
 
@@ -240,7 +240,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   if (mongoEntityExists(entityId, orionldState.tenant) == true)
   {
-    orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", entityId, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", entityId, OrionldDetailString);
     ciP->httpStatusCode = SccConflict;
     return false;
   }
@@ -297,13 +297,13 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   }
   else if (expansions == -1)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid context item for 'entity type'", details, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid context item for 'entity type'", details, OrionldDetailString);
     mongoRequest.release();
     return false;
   }
   else  // expansions == 2 ... may be an incorrect context
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of context item 'entity type'", orionldState.contextP->url, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of context item 'entity type'", orionldState.contextP->url, OrionldDetailString);
     mongoRequest.release();
     return false;
   }
@@ -324,7 +324,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       // 2. Save it for future use (when creating the entity)
       if ((orionldState.overriddenCreationDate = parse8601Time(createdAtP->value.s)) == -1)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for 'createdAt' attribute", createdAtP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for 'createdAt' attribute", createdAtP->value.s, OrionldDetailString);
         mongoRequest.release();
         return false;
       }
@@ -339,7 +339,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       // 2. Save it for future use (when creating the entity)
       if ((orionldState.overriddenModificationDate = parse8601Time(modifiedAtP->value.s)) == -1)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for 'modifiedAt' attribute", modifiedAtP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for 'modifiedAt' attribute", modifiedAtP->value.s, OrionldDetailString);
         mongoRequest.release();
         return false;
       }
@@ -380,7 +380,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
           LM_E(("orionldUriExpand failed"));
           delete caP;
           mongoRequest.release();
-          orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
+          orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailAttribute);
           return false;
         }
 
@@ -414,7 +414,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (ciP->httpStatusCode != SccOk)
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", OrionldDetailString);
     return false;
   }
 

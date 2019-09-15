@@ -65,7 +65,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
       if (!urlCheck(uriP, &details) && !urnCheck(uriP, &details))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN", OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN", OrionldDetailString);
         return false;
       }
 
@@ -79,7 +79,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
       if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailString);
         return false;
       }
 
@@ -91,20 +91,20 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
         httpInfoP->mimeType = JSONLD;
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, OrionldDetailString);
         return false;
       }
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name, OrionldDetailString);
       return false;
     }
   }
 
   if (uriP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri", OrionldDetailString);
     return false;
   }
 

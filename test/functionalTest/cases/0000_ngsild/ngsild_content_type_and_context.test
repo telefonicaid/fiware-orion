@@ -171,12 +171,12 @@ Date: REGEX(.*)
 02. Content-Type: application/ld+json + no context at all - see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 189
+Content-Length: 188
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "For application/ld+json, the @context must be present in the JSON payload",
+    "detail": "For application/ld+json, the @context must be present in the JSON payload",
     "title": "@context missing in JSON payload",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -185,12 +185,12 @@ Date: REGEX(.*)
 03. Content-Type: application/json + context in payload - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 243
+Content-Length: 242
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Content-Type is application/json, yet a '@context' item was present in the payload body",
+    "detail": "Content-Type is application/json, yet a '@context' item was present in the payload body",
     "title": "Mismatch between /Content-Type/ and contents of the request payload body",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -217,12 +217,12 @@ Date: REGEX(.*)
 06. Content-Type: application/ld+json + context in HTTP Header - see error
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 189
+Content-Length: 188
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "For application/ld+json, the @context must be present in the JSON payload",
+    "detail": "For application/ld+json, the @context must be present in the JSON payload",
     "title": "@context missing in JSON payload",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -231,12 +231,12 @@ Date: REGEX(.*)
 07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 203
+Content-Length: 202
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
+    "detail": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
     "title": "@context in Link HTTP Header",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

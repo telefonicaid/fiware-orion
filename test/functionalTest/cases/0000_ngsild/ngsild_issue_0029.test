@@ -68,14 +68,14 @@ echo
 01. Attempt to add an attribute using POST and payload, but the payload is an empty object - see 400 Bad Request
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
   "title": "Empty Object",
-  "details": "{}"
+  "detail": "{}"
 }
 
 
@@ -83,14 +83,14 @@ Date: REGEX(.*)
 02. Attempt to add an attribute using POST and payload, but without payload - see 400 Bad Request
 =================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
   "title": "payload missing",
-  "details": "no details"
+  "detail": "no detail"
 }
 
 
@@ -98,14 +98,14 @@ Date: REGEX(.*)
 03. Attempt to add an attribute using POST and payload, but with empty payload ("") - see 400 Bad Request
 =========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
   "title": "payload missing",
-  "details": "no details"
+  "detail": "no detail"
 }
 
 
@@ -113,14 +113,14 @@ Date: REGEX(.*)
 04. Attempt to add an entity using POST with any URI PATH, but the payload is an empty array ([]) - see 400 Bad Request
 =======================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
   "title": "Empty Array",
-  "details": "[]"
+  "detail": "[]"
 }
 
 

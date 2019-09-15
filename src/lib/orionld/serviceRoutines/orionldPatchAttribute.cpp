@@ -46,7 +46,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0], OrionldDetailString);
     return false;
   }
 
@@ -54,7 +54,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is missing", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is missing", NULL, OrionldDetailString);
     return false;
   }
 
@@ -62,7 +62,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   if  (orionldState.requestTree->type != KjObject)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload not a JSON object", kjValueType(orionldState.requestTree->type), OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload not a JSON object", kjValueType(orionldState.requestTree->type), OrionldDetailString);
     return false;
   }
 
@@ -70,7 +70,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   if  (orionldState.requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailString);
     return false;
   }
 
@@ -78,11 +78,11 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   if (mongoAttributeExists(orionldState.wildcard[0], orionldState.wildcard[1], orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute does not exist", orionldState.wildcard[1], OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute does not exist", orionldState.wildcard[1], OrionldDetailString);
     return false;
   }
 
   ciP->httpStatusCode = SccNotImplemented;
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", orionldState.wildcard[0], OrionldDetailsString);
+  orionldErrorResponseCreate(OrionldBadRequestData, "Not implemented - PATCH /ngsi-ld/v1/entities/*/attrs", orionldState.wildcard[0], OrionldDetailString);
   return true;
 }

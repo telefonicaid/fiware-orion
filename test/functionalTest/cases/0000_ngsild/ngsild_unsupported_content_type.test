@@ -50,12 +50,12 @@ echo
 01. Attempt to send a payload with Content-Type image/gif - see error
 =====================================================================
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 186
+Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "only application/json and application/ld+json are supported",
+    "detail": "only application/json and application/ld+json are supported",
     "title": "unsupported format of payload",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

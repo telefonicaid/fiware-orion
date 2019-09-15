@@ -246,12 +246,12 @@ echo
 01. Attempt to create a @value/@type with a non-string @type - see error
 ========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 106
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@type",
+    "detail": "@type",
     "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -260,12 +260,12 @@ Date: REGEX(.*)
 02. Attempt to create a @value/@type with TWO @type items - see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 105
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@type",
+    "detail": "@type",
     "title": "Duplicated field",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -274,12 +274,12 @@ Date: REGEX(.*)
 03. Attempt to create a @value/@type with TWO @value items - see error
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 106
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@value",
+    "detail": "@value",
     "title": "Duplicated field",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -288,12 +288,12 @@ Date: REGEX(.*)
 04. Attempt to create a @value/@type with an extra unwanted non-@ item - see error
 ==================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 130
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "a",
+    "detail": "a",
     "title": "unwanted extra items in @value/@type compound",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -302,12 +302,12 @@ Date: REGEX(.*)
 05. Attempt to create a @value/@type with an extra unwanted @X item - see error
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@X",
+    "detail": "@X",
     "title": "unwanted extra items in @value/@type compound",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -316,12 +316,12 @@ Date: REGEX(.*)
 06. Attempt to create a @value/@type without @value - see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@value is mandatory",
+    "detail": "@value is mandatory",
     "title": "missing @value in @value/@type compound",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -330,12 +330,12 @@ Date: REGEX(.*)
 07. Attempt to create a @value/@type with DateTime @type and non-string @value - see error
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@value of DateTime @type",
+    "detail": "@value of DateTime @type",
     "title": "Not a JSON String",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -344,12 +344,12 @@ Date: REGEX(.*)
 08. Attempt to create a @value/@type with DateTime @type and string @value that is not a correct ISO8601 datetime - see error
 =============================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 188
+Content-Length: 187
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "https://example.org/ngsi-ld/default/value",
+    "detail": "https://example.org/ngsi-ld/default/value",
     "title": "DateTime value of @value/@type compound must be a valid ISO8601",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

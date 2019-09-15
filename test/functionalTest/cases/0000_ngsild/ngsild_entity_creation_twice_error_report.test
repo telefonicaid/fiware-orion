@@ -78,12 +78,12 @@ Date: REGEX(.*)
 02. POST /ngsi-ld/v1/entities, attempting to create the very same entity - see error
 ====================================================================================
 HTTP/1.1 409 Conflict
-Content-Length: 126
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "urn:ngsi-ld:T:12:13:14",
+    "detail": "urn:ngsi-ld:T:12:13:14",
     "title": "Entity already exists",
     "type": "http://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
 }

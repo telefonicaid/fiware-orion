@@ -79,12 +79,12 @@ echo
 01. Attempt to create a subscription with an empty entities array - see it fail
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 117
+Content-Length: 116
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::entities",
+    "detail": "Subscription::entities",
     "title": "Empty Array",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

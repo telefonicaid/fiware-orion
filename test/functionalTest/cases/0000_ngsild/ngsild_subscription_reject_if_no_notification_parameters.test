@@ -122,12 +122,12 @@ echo
 01. Attempt to create a subscription without notification parameters - see it fail
 ==================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::notification",
+    "detail": "Subscription::notification",
     "title": "Mandatory Field Missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -136,12 +136,12 @@ Date: REGEX(.*)
 02. Attempt to create a subscription with a 'notification' field that is not s JSON Object - see it fail
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 127
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::notification",
+    "detail": "Subscription::notification",
     "title": "Not a JSON Object",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

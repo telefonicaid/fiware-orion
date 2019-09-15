@@ -53,12 +53,12 @@ echo
 01. POST /ngsi-ld/v1/entities with an attribute that has an invalid type
 ========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 116
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "abcdef",
+    "detail": "abcdef",
     "title": "Invalid type for attribute",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

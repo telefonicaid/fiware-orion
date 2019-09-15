@@ -46,14 +46,14 @@ echo
 01. Attempt to GET a subscription that doesn't exist - see ResourceNotFound
 ===========================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 145
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
   "title": "subscription not found",
-  "details": "http://a.b.c/subs/sub01"
+  "detail": "http://a.b.c/subs/sub01"
 }
 
 

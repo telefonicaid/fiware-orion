@@ -78,7 +78,7 @@ bool orionldGetRegistrations(ConnectionInfo *ciP)
 
   if (!mongoLdRegistrationsGet(ciP, &registrationVec, orionldState.tenant, &count, &oe))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str(), OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str(), OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }

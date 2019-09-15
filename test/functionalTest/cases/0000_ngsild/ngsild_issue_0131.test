@@ -133,12 +133,12 @@ echo
 01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error
 =============================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 243
+Content-Length: 242
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Content-Type is application/json, yet a '@context' item was present in the payload body",
+    "detail": "Content-Type is application/json, yet a '@context' item was present in the payload body",
     "title": "Mismatch between /Content-Type/ and contents of the request payload body",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

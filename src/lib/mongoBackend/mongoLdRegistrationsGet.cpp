@@ -63,7 +63,7 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
   if (ids == 0)
   {
     *detailsP = "URI Param /id/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "id", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "id", OrionldDetailString);
     return false;
   }
 
@@ -97,7 +97,7 @@ static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char
   if (idPattern[0] == 0)
   {
     *detailsP = "URI Param /idPattern/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "idPattern", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "idPattern", OrionldDetailString);
     return false;
   }
 
@@ -134,7 +134,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
   if (types == 0)
   {
     *detailsP = "URI Param /type/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "type", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "type", OrionldDetailString);
     return false;
   }
 
@@ -153,7 +153,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
     {
       if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailString);
         return false;
       }
 
@@ -189,7 +189,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
   if (attrs == 0)
   {
     *detailsP = "URI Param /attrs/ is empty";
-    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "attrs", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "No value for URI Parameter", "attrs", OrionldDetailString);
     return false;
   }
 
@@ -208,7 +208,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
     {
       if (orionldUriExpand(orionldState.contextP, attr, attrExpanded, sizeof(attrExpanded), &details) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity attribute", details, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity attribute", details, OrionldDetailString);
         return false;
       }
 

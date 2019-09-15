@@ -117,7 +117,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "too broad query",
                                "entity type/id not given nor attribute list",
-                               OrionldDetailsString);
+                               OrionldDetailString);
 
     ciP->httpStatusCode = SccBadRequest;
     return false;
@@ -130,7 +130,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "too broad query",
                                "entity type not given nor entity id",
-                               OrionldDetailsString);
+                               OrionldDetailString);
 
     ciP->httpStatusCode = SccBadRequest;
     return false;
@@ -139,7 +139,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if ((idPattern != NULL) && (id != NULL))
   {
     LM_W(("Bad Input (both 'idPattern' and 'id' used)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible parameters", "id, idPattern", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible parameters", "id, idPattern", OrionldDetailString);
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
@@ -159,7 +159,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         (strncmp(georel, "disjoint", 8)    != 0))
     {
       LM_W(("Bad Input (invalid value for georel)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel", georel, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel", georel, OrionldDetailString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
@@ -173,7 +173,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       if ((strncmp(georelExtra, "minDistance==", 11) != 0) && (strncmp(georelExtra, "maxDistance==", 11) != 0))
       {
         LM_W(("Bad Input (invalid value for georel parameter: %s)", georelExtra));
-        orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel parameter", georel, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel parameter", georel, OrionldDetailString);
         ciP->httpStatusCode = SccBadRequest;
         return false;
       }
@@ -189,7 +189,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "no coordinates",
                                  "geometry without coordinates",
-                                 OrionldDetailsString);
+                                 OrionldDetailString);
 
       ciP->httpStatusCode = SccBadRequest;
       return false;
@@ -201,7 +201,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "no georel",
                                  "geometry with coordinates but without georel",
-                                 OrionldDetailsString);
+                                 OrionldDetailString);
 
       ciP->httpStatusCode = SccBadRequest;
       return false;
@@ -228,7 +228,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       delete scopeP;
 
       LM_E(("Geo: Scope::fill failed"));
-      orionldErrorResponseCreate(OrionldInternalError, "error filling a scope", errorString.c_str(), OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldInternalError, "error filling a scope", errorString.c_str(), OrionldDetailString);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
@@ -259,7 +259,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   if ((idVecItems > 1) && (typeVecItems > 1))
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted", OrionldDetailString);
     return false;
   }
 
@@ -271,7 +271,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     if ((urlCheck(idVector[ix], &details) == false) && (urnCheck(idVector[ix], &details) == false))
     {
       LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN", OrionldDetailString);
       return false;
     }
   }
@@ -287,7 +287,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     }
     else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), &details) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailString);
       return false;
     }
 
@@ -310,7 +310,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       // FIXME: Check for FQN HERE TOO (once it is decided by ETSI)
       if (orionldUriExpand(orionldState.contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), &details) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailString);
         return false;
       }
 
@@ -342,7 +342,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         parseData.qcr.res.attributeList.push_back(longName);
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of attribute", shortName, OrionldDetailString);
         parseData.qcr.res.release();
         return false;
       }
@@ -362,14 +362,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     if ((lexList = qLex(q, &title, &details)) == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailString);
       parseData.qcr.res.release();
       return false;
     }
 
     if ((qTree = qParse(lexList, &title, &details)) == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailString);
       parseData.qcr.res.release();
       return false;
     }
@@ -380,7 +380,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     mongo::BSONObjBuilder objBuilder;
     if (qTreeToBsonObj(qTree, &objBuilder, &title, &details) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, title, details, OrionldDetailString);
       parseData.qcr.res.release();
       return false;
     }
@@ -535,7 +535,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       delete sfP;
 
       parseData.qcr.res.release();
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error parsing q StringFilter", details.c_str(), OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error parsing q StringFilter", details.c_str(), OrionldDetailString);
       LM_E(("Error parsing q StringFilter"));
       return false;
     }
