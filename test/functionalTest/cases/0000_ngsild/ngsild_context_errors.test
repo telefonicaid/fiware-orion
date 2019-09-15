@@ -166,98 +166,98 @@ echo
 01. @context is a Boolean
 =========================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "@context",
     "title": "Not a JSON Array nor Object nor a String",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. @context is a Number
 =======================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "@context",
     "title": "Not a JSON Array nor Object nor a String",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. @context is an object and a value is NOT a string
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "a",
     "title": "Invalid key-value in @context",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. @context is an empty string
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 181
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "URL parse error - no colon found - cannot determine the protocol",
     "title": "Failure to create context from URL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 05. URL in context is an invalid URL
 ====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 181
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "URL parse error - no colon found - cannot determine the protocol",
     "title": "Failure to create context from URL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. URL in context is a valid URL but it doesn't exist
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 140
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "http://valid.url/oh/yes",
     "title": "Failure to create context from URL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. Ugly Parse Error: @context: { 'https://...' ]
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 152
+Content-Length: 153
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "JSON Parse Error: no colon found after name of member",
     "title": "JSON Parse Error",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
 

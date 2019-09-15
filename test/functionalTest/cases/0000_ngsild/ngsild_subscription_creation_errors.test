@@ -400,70 +400,70 @@ echo
 01.1. Attempt to create a subscription with an ID that is not a URI
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 155
+Content-Length: 156
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://example.org/ngsi-ld/default/sub01.1",
     "title": "Subscription::id is not a URI",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06.1. Attempt to create a subscription without ENTITIES array nor WATCHEDATTRIBUTES present
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 158
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "no detail",
     "title": "At least one of 'entities' and 'watchedAttributes' must be present",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06.2. Attempt to create a subscription with an empty ENTITIES array
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 116
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Subscription::entities",
     "title": "Empty Array",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07.1. Attempt to create a subscription with an empty WATCHEDATTRIBUTES array
 ============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Subscription::watchedAttributes",
     "title": "Empty Array",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 143
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "no detail",
     "title": "Both 'timeInterval' and 'watchedAttributes' present",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

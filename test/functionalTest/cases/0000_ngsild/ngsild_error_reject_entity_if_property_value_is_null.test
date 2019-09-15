@@ -53,14 +53,14 @@ echo
 01. POST /ngsi-ld/v1/entities with an attribute with value NULL
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 181
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://example.org/ngsi-ld/default/P1",
     "title": "Attributes with type Property cannot be given the value NULL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

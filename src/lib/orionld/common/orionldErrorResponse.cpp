@@ -44,12 +44,12 @@ extern "C"
 //
 static const char* errorTypeStringV[] =
 {
-  "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
-  "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "http://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
-  "http://uri.etsi.org/ngsi-ld/errors/OperationNotSupported",
-  "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
-  "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+  "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
+  "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
+  "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported",
+  "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
+  "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 };
 
 

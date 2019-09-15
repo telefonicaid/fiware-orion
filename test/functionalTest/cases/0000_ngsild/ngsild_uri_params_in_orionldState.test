@@ -73,14 +73,14 @@ echo
 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "id, idPattern",
     "title": "Incompatible parameters",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -95,14 +95,14 @@ orionldUriArguments: attrs:     'A1,A2,A3'
 03. GET Entity with 'id=' - no value for id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 141
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "entity type/id not given nor attribute list",
     "title": "too broad query",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

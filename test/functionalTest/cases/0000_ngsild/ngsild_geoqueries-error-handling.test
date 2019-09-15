@@ -203,154 +203,154 @@ echo
 01. 'coordinates' member missing in value of a GeoProperty - see error
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 210
+Content-Length: 211
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Mandatory 'coordinates' field missing for a GeoJSON Property",
     "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. Non array 'coordinate' in payload for creation - see error
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 163
+Content-Length: 164
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
     "title": "not a JSON Array",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. Only one 'coordinate' in payload for creation - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 194
+Content-Length: 195
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "array with only ONE member for 'coordinates'",
     "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. Zero 'coordinates' in payload for creation - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 179
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "empty array for 'coordinates'",
     "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 05. 'type' member missing in value of a GeoProperty - see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 203
+Content-Length: 204
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Mandatory 'type' field missing for a GeoJSON Property",
     "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. Non string 'type' in payload for creation - see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 158
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "the 'type' field of a GeoJSON object must be a JSON String",
     "title": "Not a JSON String",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. Invalid value for 'type' in payload for creation - see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 130
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "invalid string for geo type",
     "title": "invalid GeoJSON type",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 11. 'coordinates' missing in URI param for query - see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "geometry without coordinates",
     "title": "no coordinates",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 12. Non array 'coordinate' in URI param for query - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 139
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "invalid point in URI param /coords/",
     "title": "error filling a scope",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
 
 13. Only one coordinate in URI param for query - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 139
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "invalid point in URI param /coords/",
     "title": "error filling a scope",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
 
 14. Zero 'coordinates' in URI param for query - see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 130
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "no coordinates for geometry",
     "title": "error filling a scope",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
 

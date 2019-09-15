@@ -82,14 +82,14 @@ echo
 01. Create a registration with more than one item in information-vector - see it fail (501)
 ===========================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 159
+Content-Length: 160
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Not Implemented",
     "title": "More than one item in Registration::information vector",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 

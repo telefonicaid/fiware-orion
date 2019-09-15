@@ -49,14 +49,14 @@ echo
 01. Attempt to create an entity with application/ld+json and with no context inside payload - see error
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 188
+Content-Length: 189
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "For application/ld+json, the @context must be present in the JSON payload",
     "title": "@context missing in JSON payload",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

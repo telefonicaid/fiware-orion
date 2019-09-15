@@ -60,42 +60,42 @@ echo
 01. GET  /ngsi-ld/v1/csourceRegistrations GET limit = 0
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 151
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "must be an integer value >= 1",
     "title": "Invalid value for URI parameter /limit/",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. GET  /ngsi-ld/v1/csourceRegistrations GET limit = 1001
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 154
+Content-Length: 155
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "must be an integer value <= 1000",
     "title": "Invalid value for URI parameter /limit/",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. GET  /ngsi-ld/v1/csourceRegistrations GET limit = abc
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 151
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "must be an integer value >= 1",
     "title": "Invalid value for URI parameter /limit/",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

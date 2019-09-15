@@ -541,42 +541,42 @@ Date: REGEX(.*)
 05. Attempt to create a subscription with an ID that is not a URI - see failure
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 153
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://example.org/ngsi-ld/default/sub01",
     "title": "Subscription::id is not a URI",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 158
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "no detail",
     "title": "At least one of 'entities' and 'watchedAttributes' must be present",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 ===================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 143
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "no detail",
     "title": "Both 'timeInterval' and 'watchedAttributes' present",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

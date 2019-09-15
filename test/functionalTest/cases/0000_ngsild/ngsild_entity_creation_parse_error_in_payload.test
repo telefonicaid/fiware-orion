@@ -54,14 +54,14 @@ echo
 01. POST /ngsi-ld/v1/entities, with a parse error in the incoming payload (missing comma after 'Property')
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 149
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "JSON Parse Error: expecting comma or end of object",
     "title": "JSON Parse Error",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
 

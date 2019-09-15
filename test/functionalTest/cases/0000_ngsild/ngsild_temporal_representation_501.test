@@ -79,56 +79,56 @@ echo
 01. Get 501 for POST /ngsi-ld/v1/temporal/entities
 ==================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 127
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities",
     "title": "Not Implemented",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. Get 501 for POST /ngsi-ld/v1/temporal/entities/<EID>
 ========================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 129
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities/*",
     "title": "Not Implemented",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. Get 501 for GET /ngsi-ld/v1/temporal/entities
 =================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 127
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities",
     "title": "Not Implemented",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. Get 501 for GET /ngsi-ld/v1/temporal/entities/<EID>
 =======================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 129
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/ngsi-ld/v1/temporal/entities/*",
     "title": "Not Implemented",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

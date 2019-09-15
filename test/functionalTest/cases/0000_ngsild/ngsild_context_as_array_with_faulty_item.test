@@ -69,14 +69,14 @@ echo
 01. Create Entity with a context that is an Array with at least one item that gives an error when downloaded
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "http://example.org/cim/commonTerms.jsonld",
     "title": "Invalid context",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

@@ -114,14 +114,14 @@ Date: REGEX(.*)
 03. POST /ngsi-ld/v1/entities, creating entity E1 again - see error
 ===================================================================
 HTTP/1.1 409 Conflict
-Content-Length: 125
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "http://a.b.c/entity/E1",
     "title": "Entity already exists",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists"
 }
 
 

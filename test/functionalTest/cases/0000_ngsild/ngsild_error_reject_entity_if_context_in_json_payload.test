@@ -50,14 +50,14 @@ echo
 01. Attempt to create an entity with application/json and with context inside payload - see error
 =================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 242
+Content-Length: 243
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "Content-Type is application/json, yet a '@context' item was present in the payload body",
     "title": "Mismatch between /Content-Type/ and contents of the request payload body",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
