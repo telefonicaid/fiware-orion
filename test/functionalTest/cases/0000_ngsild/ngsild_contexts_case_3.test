@@ -125,14 +125,14 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "http://a.b.c/entity/E3",
-		"type" : "http://example.org/ngsi-ld/default/A",
+		"type" : "https://example.org/ngsi-ld/default/A",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://example.org/ngsi-ld/default/name"
+		"https://example.org/ngsi-ld/default/name"
 	],
 	"attrs" : {
-		"http://example=org/ngsi-ld/default/name" : {
+		"https://example=org/ngsi-ld/default/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

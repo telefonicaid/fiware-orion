@@ -107,7 +107,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "urn:ngsi-ld:E01",
 			"isPattern" : "false",
-			"type" : "http://example.org/ngsi-ld/default/T1",
+			"type" : "https://example.org/ngsi-ld/default/T1",
 			"isTypePattern" : false
 		}
 	],
@@ -117,10 +117,10 @@ MongoDB server version: REGEX(.*)
 	"name" : "Test subscription 01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"conditions" : [
-		"http://example.org/ngsi-ld/default/P2"
+		"https://example.org/ngsi-ld/default/P2"
 	],
 	"expression" : {
-		"q" : "http://example=org/ngsi-ld/default/P2>10",
+		"q" : "https://example=org/ngsi-ld/default/P2>10",
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",

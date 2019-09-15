@@ -116,17 +116,17 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:T_Query:EntityForQuery2345",
-		"type" : "http://example.org/ngsi-ld/default/T_Query",
+		"type" : "https://example.org/ngsi-ld/default/T_Query",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://example.org/ngsi-ld/default/P100",
-		"http://example.org/ngsi-ld/default/P1",
-		"http://example.org/ngsi-ld/default/R100",
+		"https://example.org/ngsi-ld/default/P100",
+		"https://example.org/ngsi-ld/default/P1",
+		"https://example.org/ngsi-ld/default/R100",
 		"location"
 	],
 	"attrs" : {
-		"http://example=org/ngsi-ld/default/P100" : {
+		"https://example=org/ngsi-ld/default/P100" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -150,14 +150,14 @@ MongoDB server version: REGEX(.*)
 				"P1_P1"
 			]
 		},
-		"http://example=org/ngsi-ld/default/P1" : {
+		"https://example=org/ngsi-ld/default/P1" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : 45,
 			"mdNames" : [ ]
 		},
-		"http://example=org/ngsi-ld/default/R100" : {
+		"https://example=org/ngsi-ld/default/R100" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

@@ -109,14 +109,14 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:T_Query:EntityForQuery2345",
-		"type" : "http://example.org/ngsi-ld/default/T_Query",
+		"type" : "https://example.org/ngsi-ld/default/T_Query",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://example.org/ngsi-ld/default/P100"
+		"https://example.org/ngsi-ld/default/P100"
 	],
 	"attrs" : {
-		"http://example=org/ngsi-ld/default/P100" : {
+		"https://example=org/ngsi-ld/default/P100" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

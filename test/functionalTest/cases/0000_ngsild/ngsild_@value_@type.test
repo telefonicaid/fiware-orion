@@ -344,12 +344,12 @@ Date: REGEX(.*)
 08. Attempt to create a @value/@type with DateTime @type and string @value that is not a correct ISO8601 datetime - see error
 =============================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 187
+Content-Length: 188
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/value",
+    "details": "https://example.org/ngsi-ld/default/value",
     "title": "DateTime value of @value/@type compound must be a valid ISO8601",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

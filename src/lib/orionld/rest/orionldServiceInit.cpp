@@ -545,7 +545,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     // FIXME: Temporarily acceptingh no @vocab in Core Context
     //
     LM_W(("WARNING - The Core Context didn't contain any '@vocab' item - OK for now ..."));
-    orionldDefaultUrl    = (char*) "http://example.org/ngsi-ld/default/";
+    orionldDefaultUrl    = (char*) "https://example.org/ngsi-ld/default/";
     orionldDefaultUrlLen = strlen(orionldDefaultUrl);
     return;
   }

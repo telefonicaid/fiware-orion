@@ -386,7 +386,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "urn:ngsi-ld:E01",
 			"isPattern" : "false",
-			"type" : "http://example.org/ngsi-ld/default/T1",
+			"type" : "https://example.org/ngsi-ld/default/T1",
 			"isTypePattern" : false
 		},
 		{
@@ -405,7 +405,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
-		"http://example.org/ngsi-ld/default/A3"
+		"https://example.org/ngsi-ld/default/A3"
 	],
 	"metadata" : [ ],
 	"blacklist" : false,
@@ -541,12 +541,12 @@ Date: REGEX(.*)
 05. Attempt to create a subscription with an ID that is not a URI - see failure
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 153
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/sub01",
+    "details": "https://example.org/ngsi-ld/default/sub01",
     "title": "Subscription::id is not a URI",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

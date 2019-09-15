@@ -216,7 +216,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "urn:ngsi-ld:E01",
 			"isPattern" : "false",
-			"type" : "http://example.org/ngsi-ld/default/T1",
+			"type" : "https://example.org/ngsi-ld/default/T1",
 			"isTypePattern" : false
 		},
 		{
@@ -235,7 +235,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
-		"http://example.org/ngsi-ld/default/A3"
+		"https://example.org/ngsi-ld/default/A3"
 	],
 	"metadata" : [ ],
 	"blacklist" : false,

@@ -134,7 +134,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"location",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
-		"http://example.org/ngsi-ld/default/name"
+		"https://example.org/ngsi-ld/default/name"
 	],
 	"attrs" : {
 		"location" : {
@@ -157,7 +157,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 50,
 			"mdNames" : [ ]
 		},
-		"http://example=org/ngsi-ld/default/name" : {
+		"https://example=org/ngsi-ld/default/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -205,7 +205,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"location",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
-		"http://example.org/ngsi-ld/default/name",
+		"https://example.org/ngsi-ld/default/name",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/stocks",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn"
 	],
@@ -230,7 +230,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 50,
 			"mdNames" : [ ]
 		},
-		"http://example=org/ngsi-ld/default/name" : {
+		"https://example=org/ngsi-ld/default/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

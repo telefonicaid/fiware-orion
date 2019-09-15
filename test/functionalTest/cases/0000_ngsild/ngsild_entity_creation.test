@@ -319,12 +319,12 @@ Date: REGEX(.*)
 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 169
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/name",
+    "details": "https://example.org/ngsi-ld/default/name",
     "title": "Attribute found, but the type field is missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -361,12 +361,12 @@ Date: REGEX(.*)
 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 200
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/name",
+    "details": "https://example.org/ngsi-ld/default/name",
     "title": "Attribute with type Property found, but the associated value field is missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -375,12 +375,12 @@ Date: REGEX(.*)
 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 168
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/name",
+    "details": "https://example.org/ngsi-ld/default/name",
     "title": "relationship attribute without 'object' field",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -389,12 +389,12 @@ Date: REGEX(.*)
 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 203
+Content-Length: 204
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/name",
+    "details": "https://example.org/ngsi-ld/default/name",
     "title": "Attribute with type GeoProperty found, but the associated value field is missing",
     "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

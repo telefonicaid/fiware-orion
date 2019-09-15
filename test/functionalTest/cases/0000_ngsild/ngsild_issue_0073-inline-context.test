@@ -80,7 +80,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:EntityWithPrefixExpansion",
-		"type" : "http://example.org/ngsi-ld/default/T1",
+		"type" : "https://example.org/ngsi-ld/default/T1",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
