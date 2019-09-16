@@ -127,8 +127,15 @@ bool orionldContextTreat
     if ((orionldState.contextP = orionldContextCreateFromUrl(ciP, contextNodeP->value.s, OrionldUserContext, &details)) == NULL)
     {
       LM_E(("Failed to create context from URL: %s", details));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailString);
-      ciP->httpStatusCode = SccBadRequest;
+
+      // orionldContextCreateFromUrl sets ciP->httpStatusCode
+      if (ciP->httpStatusCode == SccServiceUnavailable)
+      {
+        LM_TMP(("Setting error response to 'Unable to download context' + '%s'", contextNodeP->value.s));
+        orionldErrorResponseCreate(OrionldLdContextNotAvailable, "Unable to download context", contextNodeP->value.s, OrionldDetailString);
+      }
+      else
+        orionldErrorResponseCreate(OrionldBadRequestData, "Failure to create context from URL", details, OrionldDetailString);
       return false;
     }
 

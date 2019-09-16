@@ -37,6 +37,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/urlCheck.h"                           // urlCheck
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextList.h"                // orionldContextListSemTake/Give
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
 #include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
@@ -52,6 +53,16 @@ extern "C"
 //
 OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url, OrionldContextType contextType, char** detailsPP)
 {
+  if ((url == NULL) || (url[0] == 0))
+  {
+    LM_E(("No URL"));
+    *detailsPP = (char*) "Empty string";
+    orionldState.contextToBeFreed = false;
+    ciP->httpStatusCode           = SccBadRequest;
+
+    return NULL;
+  }
+
   OrionldContext* contextP = orionldContextLookup(url);
 
   //
@@ -79,12 +90,13 @@ OrionldContext* orionldContextCreateFromUrl(ConnectionInfo* ciP, const char* url
     return NULL;
   }
 
-  contextP->tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, detailsPP);
+  bool downloadFailed = false;
+  contextP->tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, &downloadFailed, detailsPP);
   if (contextP->tree == NULL)
   {
     LM_E(("orionldContextDownloadAndParse: %s", *detailsPP));
     orionldState.contextToBeFreed = false;
-    ciP->httpStatusCode = SccBadRequest;
+    ciP->httpStatusCode = (downloadFailed == true)? SccServiceUnavailable : SccBadRequest;
     return NULL;
   }
 

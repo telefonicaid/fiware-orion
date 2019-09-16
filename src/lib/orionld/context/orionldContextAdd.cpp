@@ -130,12 +130,14 @@ OrionldContext* orionldContextAdd
     return contextP;
   }
 
-  KjNode* tree = orionldContextDownloadAndParse(kjsonP, url, true, detailsPP);
+  bool    downloadFailed = false;
+  KjNode* tree           = orionldContextDownloadAndParse(kjsonP, url, true, &downloadFailed, detailsPP);
 
   if (tree == NULL)
   {
     // *detailsPP taken care of by orionldContextDownloadAndParse()
     LM_E(("orionldContextDownloadAndParse returned NULL"));
+    ciP->httpStatusCode = (downloadFailed == true)? SccServiceUnavailable : SccBadRequest;
     return NULL;
   }
   LM_T(LmtContext, ("tree is OK"));
@@ -269,7 +271,8 @@ OrionldContext* orionldContextAdd
     if (orionldContextLookup(url) != NULL)
       continue;
 
-    tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, detailsPP);
+    bool downloadFailed = false;
+    tree = orionldContextDownloadAndParse(orionldState.kjsonP, url, true, &downloadFailed, detailsPP);
     if (tree == NULL)
     {
       LM_T(LmtContext, ("orionldContextDownloadAndParse failed: %s", *detailsPP));
@@ -277,6 +280,7 @@ OrionldContext* orionldContextAdd
       free(contextP->url);
       free(contextP);
 
+      ciP->httpStatusCode = (downloadFailed == true)? SccServiceUnavailable : SccBadRequest;
       return NULL;
     }
     tree = kjClone(tree);

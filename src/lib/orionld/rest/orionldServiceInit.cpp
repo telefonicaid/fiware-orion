@@ -478,7 +478,9 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     // Download the Core Context
     while ((orionldCoreContext.tree == NULL) && (retries < 5))
     {
-      orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, false, &details);
+      bool downloadFailed = false;
+
+      orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, false, &downloadFailed, &details);
       if (orionldCoreContext.tree != NULL)
         break;
 
@@ -497,7 +499,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   // An alternative method would to be to not add the Core/Default context to the context cache
   // But, if we do that, then orionldContextLookup would need to do strcmp with the Core Context also
   //
-  orionldCoreContext.ignore        = true;
+  orionldCoreContext.ignore = true;
 
   //
   // FIXME: Should the Core Context be in the Cache or not ?

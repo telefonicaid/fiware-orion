@@ -59,6 +59,7 @@ OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode sc)
   case SccAttributeListRequired:          return OrionldInvalidRequest;
   case SccReceiverInternalError:          return OrionldInternalError;
   case SccNotImplemented:                 return OrionldOperationNotSupported;
+  case SccServiceUnavailable:             return OrionldInternalError;
   }
 
   return OrionldInternalError;

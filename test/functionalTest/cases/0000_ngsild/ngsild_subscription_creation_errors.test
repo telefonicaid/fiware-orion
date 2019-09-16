@@ -400,12 +400,12 @@ echo
 01.1. Attempt to create a subscription with an ID that is not a URI
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 156
+Content-Length: 165
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://example.org/ngsi-ld/default/sub01.1",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/sub01.1",
     "title": "Subscription::id is not a URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

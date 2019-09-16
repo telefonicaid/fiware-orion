@@ -136,7 +136,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "urn:ngsi-ld:E01",
 			"isPattern" : "false",
-			"type" : "https://example.org/ngsi-ld/default/T1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
 			"isTypePattern" : false
 		},
 		{
@@ -155,7 +155,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
-		"https://example.org/ngsi-ld/default/A3"
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"metadata" : [ ],
 	"blacklist" : false,

@@ -37,6 +37,6 @@ extern "C"
 //
 // orionldContextDownloadAndParse -
 //
-extern KjNode* orionldContextDownloadAndParse(Kjson* kjP, const char* url, bool useInternalBuffer, char** detailsPP);
+extern KjNode* orionldContextDownloadAndParse(Kjson* kjP, const char* url, bool useInternalBuffer, bool* downloadFailedP, char** detailsPP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTDOWNLOADANDPARSE_H_

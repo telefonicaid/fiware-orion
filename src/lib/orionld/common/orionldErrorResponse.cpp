@@ -49,7 +49,10 @@ static const char* errorTypeStringV[] =
   "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
   "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported",
   "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
-  "https://uri.etsi.org/ngsi-ld/errors/InternalError"
+  "https://uri.etsi.org/ngsi-ld/errors/InternalError",
+  "https://uri.etsi.org/ngsi-ld/errors/OrionldTooComplexQuery",
+  "https://uri.etsi.org/ngsi-ld/errors/OrionldTooManyResults",
+  "https://uri.etsi.org/ngsi-ld/errors/OrionldLdContextNotAvailable"
 };
 
 

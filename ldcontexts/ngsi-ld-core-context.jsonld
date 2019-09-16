@@ -150,9 +150,10 @@ https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
           "@container": "@list"
       },
       "objects":{
-          "@id": "https://uri.etsi.org/ngsi-ld/hasObjects",
-	  "@type": "@id",
-	  "@container": "@list"
-      }
+        "@id": "https://uri.etsi.org/ngsi-ld/hasObjects",
+        "@type": "@id",
+        "@container": "@list"
+      },
+      "@vocab": "https://uri.etsi.org/ngsi-ld/default-context/"
     }
 }

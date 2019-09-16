@@ -39,7 +39,10 @@ typedef enum OrionldResponseErrorType
   OrionldAlreadyExists,
   OrionldOperationNotSupported,
   OrionldResourceNotFound,
-  OrionldInternalError
+  OrionldInternalError,
+  OrionldTooComplexQuery,
+  OrionldTooManyResults,
+  OrionldLdContextNotAvailable
 } OrionldResponseErrorType;
 
 

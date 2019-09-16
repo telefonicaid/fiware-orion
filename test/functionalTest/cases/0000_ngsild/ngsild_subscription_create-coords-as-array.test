@@ -114,7 +114,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
-		"https://example.org/ngsi-ld/default/A3"
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"metadata" : [ ],
 	"blacklist" : false,

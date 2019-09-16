@@ -53,12 +53,12 @@ echo
 01. POST /ngsi-ld/v1/entities with a property attribute without value
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 199
+Content-Length: 208
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://example.org/ngsi-ld/default/P1",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
     "title": "Attribute with type Property found, but the associated value field is missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

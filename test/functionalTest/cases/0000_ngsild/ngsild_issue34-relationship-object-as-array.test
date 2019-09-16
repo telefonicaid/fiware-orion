@@ -83,14 +83,14 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:T:12:13:14",
-		"type" : "https://example.org/ngsi-ld/default/T",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://example.org/ngsi-ld/default/AR1"
+		"https://uri.etsi.org/ngsi-ld/default-context/AR1"
 	],
 	"attrs" : {
-		"https://example=org/ngsi-ld/default/AR1" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/AR1" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

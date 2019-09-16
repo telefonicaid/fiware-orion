@@ -110,7 +110,7 @@ payload='{
   },
   "@context": ""
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+orionCurl --url "/ngsi-ld/v1/entities?prettyPrint=yes" -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --noPayloadCheck
 echo
 echo
 
@@ -124,7 +124,7 @@ payload='{
     "type": "Property",
     "value": "John 2"
   },
-  "@context": "not an URL"
+  "@context": "This @context-value is not a URL"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
 echo
@@ -208,26 +208,27 @@ Date: REGEX(.*)
 04. @context is an empty string
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 182
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "URL parse error - no colon found - cannot determine the protocol",
-    "title": "Failure to create context from URL",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Failure to create context from URL",
+  "detail": "Empty string"
 }
+
 
 
 05. URL in context is an invalid URL
 ====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 182
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "URL parse error - no colon found - cannot determine the protocol",
+    "detail": "Not a URI",
     "title": "Failure to create context from URL",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -235,15 +236,15 @@ Date: REGEX(.*)
 
 06. URL in context is a valid URL but it doesn't exist
 ======================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 141
+HTTP/1.1 503 Service Unavailable
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "http://valid.url/oh/yes",
-    "title": "Failure to create context from URL",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OrionldLdContextNotAvailable"
 }
 
 

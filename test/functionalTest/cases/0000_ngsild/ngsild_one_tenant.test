@@ -87,7 +87,7 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:entity:E1",
-		"type" : "https://example.org/ngsi-ld/default/T1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
 		"servicePath" : "/"
 	},
 	"attrNames" : [ ],

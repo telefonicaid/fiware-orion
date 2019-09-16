@@ -66,7 +66,8 @@ bool urlParse
       protocol[toIx] = url[urlIx];
     else
     {
-      *detailsPP = (char*) "not enough room in protocol char vector";
+      LM_W(("Bad Input (not enough room in protocol char vector: url='%s')", url));
+      *detailsPP = (char*) "Not a URI";
       protocol[toIx] = 0;
       return false;
     }

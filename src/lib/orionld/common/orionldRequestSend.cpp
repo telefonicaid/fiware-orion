@@ -99,8 +99,9 @@ bool orionldRequestSend
   OrionldResponseBuffer*  rBufP,
   const char*             url,
   int                     tmoInMilliSeconds,
-  char**                  detailsPP,
-  bool*                   tryAgainP
+  char**                  detailPP,
+  bool*                   tryAgainP,
+  bool*                   downloadFailedP
 )
 {
   CURLcode             cCode;
@@ -112,9 +113,9 @@ bool orionldRequestSend
 
   *tryAgainP = false;
 
-  if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailsPP) == false)
+  if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailPP) == false)
   {
-    // urlParse sets *detailsPP
+    // urlParse sets *detailPP
 
     // This function must release the allocated respose buffer in case of errpr
     if ((rBufP->buf != NULL) && (rBufP->buf != rBufP->internalBuffer))
@@ -124,7 +125,8 @@ bool orionldRequestSend
     }
     rBufP->buf = NULL;
 
-    LM_E(("urlParse failed for url '%s': %s", url, *detailsPP));
+    LM_E(("urlParse failed for url '%s'. detail: %s", url, *detailPP));
+    *downloadFailedP = false;
     return false;
   }
 
@@ -151,7 +153,7 @@ bool orionldRequestSend
   get_curl_context(ip, &cc);
   if (cc.curl == NULL)
   {
-    *detailsPP = (char*) "Unable to obtain CURL context";
+    *detailPP = (char*) "Unable to obtain CURL context";
 
     // This function must release the allocated respose buffer in case of error
     if (rBufP->buf != rBufP->internalBuffer)
@@ -161,7 +163,8 @@ bool orionldRequestSend
     }
     rBufP->buf = NULL;
 
-    LM_E((*detailsPP));
+    LM_E(("Internal Error (Unable to obtain CURL context)"));
+    *downloadFailedP = true;
     return false;
   }
 
@@ -189,7 +192,7 @@ bool orionldRequestSend
 
   if (cCode != CURLE_OK)
   {
-    *detailsPP = (char*) url;
+    *detailPP = (char*) url;
 
     // This function must release the allocated respose buffer in case of error
     if (rBufP->buf != rBufP->internalBuffer)
@@ -205,6 +208,7 @@ bool orionldRequestSend
 
     *tryAgainP = true;  // FIXME: might depend on cCode ...
 
+    *downloadFailedP = true;
     return false;
   }
 
@@ -213,5 +217,6 @@ bool orionldRequestSend
 
   release_curl_context(&cc);
 
+  *downloadFailedP = false;
   return true;
 }

@@ -426,12 +426,12 @@ Date: REGEX(.*)
 16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
 ===========================================
 HTTP/1.1 404 Not Found
-Content-Length: 177
+Content-Length: 186
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://example.org/ngsi-ld/default/http://a.b.c/list/of/attributes/A1.xxx",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/http://a.b.c/list/of/attributes/A1.xxx",
     "title": "Attribute Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

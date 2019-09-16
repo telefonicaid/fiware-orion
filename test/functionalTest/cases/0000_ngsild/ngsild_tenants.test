@@ -241,7 +241,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "",
 			"isPattern" : "",
-			"type" : "https://example.org/ngsi-ld/default/vehicle",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/vehicle",
 			"isTypePattern" : false
 		}
 	],
@@ -288,7 +288,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "",
 			"isPattern" : "",
-			"type" : "https://example.org/ngsi-ld/default/vehicle",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/vehicle",
 			"isTypePattern" : false
 		}
 	],

@@ -74,12 +74,14 @@ static __thread OrionldResponseBuffer  httpResponse;
 //            are to survive a second call to this function.
 //
 //
-KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useInternalBuffer, char** detailsPP)
+KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useInternalBuffer, bool* downloadFailedP, char** detailsPP)
 {
   //
   // Prepare the httpResponse buffer
   //
   bool ok = false;
+
+  *downloadFailedP = false;
 
   for (int tries = 0; tries < 5; tries++)
   {
@@ -108,7 +110,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     bool tryAgain = false;
     bool reqOk;
 
-    reqOk = orionldRequestSend(&httpResponse, url, 10000, detailsPP, &tryAgain);
+    reqOk = orionldRequestSend(&httpResponse, url, 10000, detailsPP, &tryAgain, downloadFailedP);
     if (reqOk == true)
     {
       ok = true;
@@ -123,7 +125,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
 
   if (ok == false)
   {
-    LM_E(("orionldRequestSend failed"));
+    LM_E(("orionldRequestSend failed - downloadFailed set to TRUE"));
     // detailsPP filled in by orionldRequestSend
     return NULL;
   }

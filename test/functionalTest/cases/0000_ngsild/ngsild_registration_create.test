@@ -265,22 +265,22 @@ MongoDB server version: REGEX(.*)
 			"entities" : [
 				{
 					"id" : "urn:ngsi-ld:Vehicle:A456",
-					"type" : "https://example.org/ngsi-ld/default/Vehicle"
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
 				}
 			],
 			"attrs" : [
 				{
-					"name" : "https://example.org/ngsi-ld/default/brandName",
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "https://example.org/ngsi-ld/default/speed",
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
 					"type" : "Property",
 					"isDomain" : "false"
 				},
 				{
-					"name" : "https://example.org/ngsi-ld/default/isParked",
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
 					"type" : "Relationship",
 					"isDomain" : "false"
 				}
@@ -381,14 +381,14 @@ MongoDB server version: REGEX(.*)
 		]
 	},
 	"properties" : {
-		"https://example.org/ngsi-ld/default/P1" : 1,
-		"https://example.org/ngsi-ld/default/P2" : "2",
-		"https://example.org/ngsi-ld/default/P3" : true,
-		"https://example.org/ngsi-ld/default/P4" : 4.5,
-		"https://example.org/ngsi-ld/default/P5" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : true,
+		"https://uri.etsi.org/ngsi-ld/default-context/P4" : 4.5,
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
 			"object" : 6
 		},
-		"https://example.org/ngsi-ld/default/P6" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P6" : [
 			7,
 			8
 		]

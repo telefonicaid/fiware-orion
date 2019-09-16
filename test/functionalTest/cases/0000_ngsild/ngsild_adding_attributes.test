@@ -134,7 +134,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"location",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
-		"https://example.org/ngsi-ld/default/name"
+		"https://uri.etsi.org/ngsi-ld/default-context/name"
 	],
 	"attrs" : {
 		"location" : {
@@ -157,7 +157,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 50,
 			"mdNames" : [ ]
 		},
-		"https://example=org/ngsi-ld/default/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -205,7 +205,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"location",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
-		"https://example.org/ngsi-ld/default/name",
+		"https://uri.etsi.org/ngsi-ld/default-context/name",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/stocks",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn"
 	],
@@ -230,7 +230,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 50,
 			"mdNames" : [ ]
 		},
-		"https://example=org/ngsi-ld/default/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -293,10 +293,6 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:Shelf:unit001",
   "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
-  "name": {
-    "type": "Property",
-    "value": "Corner Unit"
-  },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store001",
@@ -316,6 +312,10 @@ Date: REGEX(.*)
   "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Product:001"
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
   },
   "location": {
     "type": "GeoProperty",

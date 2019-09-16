@@ -47,7 +47,6 @@ extern "C"
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
-#include "orionld/context/orionldContextTreat.h"                 // orionldContextTreat
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
 

@@ -159,21 +159,6 @@ Date: REGEX(.*)
   "type": "AgriCrop",
   "createdAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)",
   "modifiedAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)"
-  "agroVocConcept": {
-    "type": "Property",
-    "value": "http://aims.fao.org/aos/agrovoc/c_7951",
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "seeAlso": {
-    "type": "Property",
-    "value": [
-      "https://example.org/concept/wheat",
-      "https://datamodel.org/example/wheat"
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
   "alternateName": {
     "type": "Property",
     "value": "Triticum aestivum",
@@ -189,6 +174,21 @@ Date: REGEX(.*)
   "name": {
     "type": "Property",
     "value": "Wheat",
+    "createdAt": "REGEX(.*)",
+    "modifiedAt": "REGEX(.*)"
+  },
+  "agroVocConcept": {
+    "type": "Property",
+    "value": "http://aims.fao.org/aos/agrovoc/c_7951",
+    "createdAt": "REGEX(.*)",
+    "modifiedAt": "REGEX(.*)"
+  },
+  "seeAlso": {
+    "type": "Property",
+    "value": [
+      "https://example.org/concept/wheat",
+      "https://datamodel.org/example/wheat"
+    ],
     "createdAt": "REGEX(.*)",
     "modifiedAt": "REGEX(.*)"
   },
