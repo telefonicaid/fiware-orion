@@ -108,6 +108,12 @@ bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* treeP, ContextElement* 
     KjNode*           attrTypeNodeP = NULL;
     ContextAttribute* caP           = new ContextAttribute();
 
+    if (strcmp(kNodeP->name, "createdAt") == 0)
+      continue;
+
+    if (strcmp(kNodeP->name, "modifiedAt") == 0)
+      continue;
+
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
       LM_E(("orionldAttributeTreat failed"));
@@ -115,35 +121,10 @@ bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* treeP, ContextElement* 
       return false;
     }
 
-    //
-    // URI Expansion for the attribute name, except if "location", "observationSpace", or "operationSpace"
-    //
-    if (SCOMPARE9(kNodeP->name,       'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
-      caP->name = kNodeP->name;
-    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-      caP->name = kNodeP->name;
-    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-      caP->name = kNodeP->name;
+    if (attrTypeNodeP != NULL)
+      ceP->contextAttributeVector.push_back(caP);
     else
-    {
-      char  longName[256];
-      char* details;
-
-      if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
-      {
-        delete caP;
-        orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailAttribute);
-        return false;
-      }
-
-      caP->name = longName;
-    }
-
-    // NO URI Expansion for Attribute TYPE
-    caP->type = attrTypeNodeP->value.s;
-
-    // Add the attribute to the attr vector
-    ceP->contextAttributeVector.push_back(caP);
+      delete caP;
   }
 
   return true;

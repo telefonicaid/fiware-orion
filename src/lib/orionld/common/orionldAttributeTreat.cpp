@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -39,6 +40,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/common/orionldAttributeTreat.h"                // Own interface
 
 
@@ -204,7 +206,13 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
       STRING_CHECK(valueNodeP, "@value of DateTime @type");
 
       if (parse8601Time(valueNodeP->value.s) == -1)
-        ATTRIBUTE_ERROR("DateTime value of @value/@type compound must be a valid ISO8601", compoundValueP->name);
+      {
+        const char* errorString = "DateTime value of @value/@type compound must be a valid ISO8601";
+        LM_W(("Bad Input (%s - got '%s')", errorString, valueNodeP->value.s));
+        orionldErrorResponseCreate(OrionldBadRequestData, errorString, valueNodeP->value.s, OrionldDetailString);
+        ciP->httpStatusCode = SccBadRequest;
+        return false;
+      }
     }
   }
   else if (valueNodeP != NULL)
@@ -426,11 +434,37 @@ static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** title
 //
 // orionldAttributeTreat -
 //
+// NOTE
+//   Make sure that this function is not called for attributes called "createdAt" or "modifiedAt"
+//
+// FIXME: typeNodePP is currently used in orionldPatchEntity, orionldPostEntities, and orionldPostEntity as a means
+//        to decide whether or not add the attribute to the attribute vector - "bool* ignoreP" would be better
+//
+//        Current fix is thatthe three callers of this function make sure that the function is NOT CALLED if the
+//        name of the attribute is either "createdAt" or "modifiedAt" - that's why I could out-deff the initial part
+//        that checks for those two names - must faster solution
+//
 bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP)
 {
   char* caName = kNodeP->name;
 
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", kNodeP->name, kNodeP));
+
+#if 0
+  //
+  // Ignore createdAt and modifiedAt
+  //
+  if (SCOMPARE10(caName, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
+  {
+    *typeNodePP = NULL;
+    return true;
+  }
+  else if (SCOMPARE11(caName, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
+  {
+    *typeNodePP = NULL;
+    return true;
+  }
+#endif
 
   ATTRIBUTE_IS_OBJECT_CHECK(kNodeP);
 
@@ -450,18 +484,18 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   // ADVANTAGE:
   //   Just a simple integer comparison before we do the complete string-comparisom
   //
-  KjNode* typeP              = NULL;  // For ALL:            Mandatory
-  KjNode* valueP             = NULL;  // For 'Property':     Mandatory
-  KjNode* objectP            = NULL;  // For 'Relationship:  Mandatory
-  KjNode* unitCodeP          = NULL;  // For 'Property':     Optional
-  KjNode* observedAtP        = NULL;  // For ALL:            Optional
-  KjNode* observationSpaceP  = NULL;  // For 'GeoProperty':  Optional
-  KjNode* operationSpaceP    = NULL;  // For 'GeoProperty':  Optional
-  bool    isProperty         = false;
-  bool    isGeoProperty      = false;
-  bool    isTemporalProperty = false;
-  bool    isRelationship     = false;
-  KjNode* nodeP              = kNodeP->value.firstChildP;
+  KjNode*  typeP                  = NULL;  // For ALL:            Mandatory
+  KjNode*  valueP                 = NULL;  // For 'Property':     Mandatory
+  KjNode*  objectP                = NULL;  // For 'Relationship:  Mandatory
+  KjNode*  unitCodeP              = NULL;  // For 'Property':     Optional
+  KjNode*  observedAtP            = NULL;  // For ALL:            Optional
+  KjNode*  observationSpaceP      = NULL;  // For 'GeoProperty':  Optional
+  KjNode*  operationSpaceP        = NULL;  // For 'GeoProperty':  Optional
+  bool     isProperty             = false;
+  bool     isGeoProperty          = false;
+  bool     isTemporalProperty     = false;
+  bool     isRelationship         = false;
+  KjNode*  nodeP                  = kNodeP->value.firstChildP;
 
   while (nodeP != NULL)
   {
@@ -506,6 +540,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       }
 
       *typeNodePP = typeP;
+      caP->type = typeP->value.s;
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
     {
@@ -790,6 +825,33 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     else
       ATTRIBUTE_ERROR("relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)", caName);
   }
+
+
+  //
+  // Expand name of attribute
+  //
+  if ((strcmp(kNodeP->name, "location")         != 0) &&
+      (strcmp(kNodeP->name, "observationSpace") != 0) &&
+      (strcmp(kNodeP->name, "operationSpace")   != 0))
+  {
+    char*  longName = kaAlloc(&orionldState.kalloc, 512);
+    char*  detail;
+
+    LM_TMP(("EXPAND: Calling orionldUriExpand for '%s'", kNodeP->name));
+    if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, 512, &detail) == false)
+    {
+      LM_E(("EXPAND: orionldUriExpand failed for '%s': %s", kNodeP->name, detail));
+
+      orionldErrorResponseCreate(OrionldBadRequestData, detail, kNodeP->name, OrionldDetailString);
+      return false;
+    }
+
+    kNodeP->name = longName;
+    caP->name    = longName;
+    LM_TMP(("EXPAND: After orionldUriExpand, node name is: '%s'", kNodeP->name));
+  }
+  else
+    caP->name = kNodeP->name;
 
   return true;
 }

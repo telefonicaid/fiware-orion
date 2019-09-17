@@ -309,92 +309,31 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   }
 
 
-
   // Treat the entire payload
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
 
-    if (kNodeP == createdAtP)
-    {
-      // FIXME: Make sure the value is a valid timestamp?
+    if ((kNodeP == createdAtP) || (kNodeP == modifiedAtP))
+      continue;
 
-      // Ignore the 'createdAt' - See issue #43 (orionld)
-#if 0
-      // 2. Save it for future use (when creating the entity)
-      if ((orionldState.overriddenCreationDate = parse8601Time(createdAtP->value.s)) == -1)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for 'createdAt' attribute", createdAtP->value.s, OrionldDetailString);
-        mongoRequest.release();
-        return false;
-      }
-#endif
+    ContextAttribute* caP            = new ContextAttribute();
+    KjNode*           attrTypeNodeP  = NULL;
+
+    LM_TMP(("EXPAND: Treating attribute '%s'", kNodeP->name));
+    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
+    {
+      LM_TMP(("EXPAND: orionldAttributeTreat failed"));
+      LM_E(("orionldAttributeTreat failed"));
+      delete caP;
+      mongoRequest.release();
+      return false;
     }
-    else if (kNodeP == modifiedAtP)
-    {
-      // FIXME: Make sure the value is a valid timestamp?
-
-      // Ignore the 'createdAt' - See issue #43 (orionld)
-#if 0
-      // 2. Save it for future use (when creating the entity)
-      if ((orionldState.overriddenModificationDate = parse8601Time(modifiedAtP->value.s)) == -1)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for 'modifiedAt' attribute", modifiedAtP->value.s, OrionldDetailString);
-        mongoRequest.release();
-        return false;
-      }
-#endif
-    }
-    else  // Must be an attribute
-    {
-      LM_T(LmtPayloadCheck, ("Not createdAt/modifiedAt: '%s' - treating as ordinary attribute", kNodeP->name));
-
-      ContextAttribute* caP            = new ContextAttribute();
-      KjNode*           attrTypeNodeP  = NULL;
-
-      if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
-      {
-        LM_E(("orionldAttributeTreat failed"));
-        delete caP;
-        mongoRequest.release();
-        return false;
-      }
-
-
-      //
-      // URI Expansion for Attribute NAME - except if its name is one of the following three:
-      // 1. location
-      // 2. observationSpace
-      // 3. operationSpace
-      //
-      if ((strcmp(kNodeP->name, "location") == 0) || (strcmp(kNodeP->name, "observationSpace") == 0) || (strcmp(kNodeP->name, "operationSpace") == 0))
-      {
-        caP->name = kNodeP->name;
-      }
-      else
-      {
-        char longName[256];
-
-        if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
-        {
-          LM_E(("orionldUriExpand failed"));
-          delete caP;
-          mongoRequest.release();
-          orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailAttribute);
-          return false;
-        }
-
-        caP->name = longName;
-      }
-
-
-      //
-      // NO URI Expansion for Attribute TYPE
-      //
-      caP->type = attrTypeNodeP->value.s;
-
+    LM_TMP(("EXPAND: Treated attribute '%s'", caP->name.c_str()));
+    if (attrTypeNodeP != NULL)
       ceP->contextAttributeVector.push_back(caP);
-    }
+    else
+      delete caP;
   }
 
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,

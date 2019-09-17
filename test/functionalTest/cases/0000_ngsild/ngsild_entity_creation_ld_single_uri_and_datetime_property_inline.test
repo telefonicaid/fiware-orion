@@ -153,7 +153,7 @@ MongoDB server version: REGEX(.*)
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
 	"location" : {
-		"attrName" : "P2",
+		"attrName" : "http://example.org/P2",
 		"coords" : {
 			"type" : "Point",
 			"coordinates" : [

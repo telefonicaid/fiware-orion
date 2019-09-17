@@ -82,7 +82,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   //
-  // Make sure the attributes to be patched exist - FIXME: too damn slow to get an attribyte at a time - make a smarter query!
+  // Make sure the attributes to be patched exist - FIXME: too damn slow to get an attribute at a time - make a smarter query!
   //
   for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
@@ -135,6 +135,12 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
+    if (strcmp(kNodeP->name, "createdAt") == 0)
+      continue;
+
+    if (strcmp(kNodeP->name, "modifiedAt") == 0)
+      continue;
+
     KjNode*            attrTypeNodeP = NULL;
     ContextAttribute*  caP           = new ContextAttribute();  // I have tried to use a stack variable "ContextAttribute ca" instead of allocating
                                                                 // but I get problems with it. Need a delayed delete for this.
@@ -155,38 +161,10 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       return false;
     }
 
-    //
-    // URI Expansion for the attribute name, except if "location", "observationSpace", or "operationSpace"
-    //
-    if (SCOMPARE9(kNodeP->name,       'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
-      caP->name = kNodeP->name;
-    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-      caP->name = kNodeP->name;
-    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-      caP->name = kNodeP->name;
+    if (attrTypeNodeP != NULL)
+      ce.contextAttributeVector.push_back(caP);
     else
-    {
-      char  longName[256];
-      char* details;
-
-      if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
-      {
-        mongoRequest.release();
-        orionldErrorResponseCreate(OrionldBadRequestData, details, kNodeP->name, OrionldDetailAttribute);
-        delete caP;
-        return false;
-      }
-
-      caP->name = longName;
-      LM_TMP(("PATCH: Setting Attribute Long Name to '%s'", longName));
-    }
-
-    // NO URI Expansion for Attribute TYPE
-    caP->type = attrTypeNodeP->value.s;
-
-    // Add the attribute to the attr vector
-    ce.contextAttributeVector.push_back(caP);
-    LM_TMP(("PATCH: Pushed Attribute with Long Name: '%s'", caP->name.c_str()));
+      delete caP;
   }
 
   //
