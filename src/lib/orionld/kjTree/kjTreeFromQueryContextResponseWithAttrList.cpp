@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
+#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
@@ -389,6 +390,16 @@ KjNode* kjTreeFromQueryContextResponseWithAttrList(ConnectionInfo* ciP, bool one
           //
           Metadata* mdP     = aP->metadataVector[ix];
           char*     mdName  = (char*) mdP->name.c_str();
+
+          if ((strcmp(mdName, "observedAt") != 0) &&
+              (strcmp(mdName, "createdAt")  != 0) &&
+              (strcmp(mdName, "modifiedAt") != 0))
+          {
+            //
+            // Looking up short name for the sub-attribute
+            //
+            mdName = orionldAliasLookup(orionldState.contextP, mdName);
+          }
 
           if (mdP->type != "")
           {

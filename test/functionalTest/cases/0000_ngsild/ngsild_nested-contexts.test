@@ -142,13 +142,13 @@ MongoDB server version: REGEX(.*)
 				"postalCode" : "10439"
 			},
 			"md" : {
-				"verified" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/verified" : {
 					"type" : "Property",
 					"value" : true
 				}
 			},
 			"mdNames" : [
-				"verified"
+				"https://uri.etsi.org/ngsi-ld/default-context/verified"
 			]
 		},
 		"location" : {

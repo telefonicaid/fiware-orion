@@ -181,7 +181,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     Metadata*   mdP    = caP->metadataVector[ix];
     const char* mdName = mdP->name.c_str();
 
+    //
     // Special case: observedAt - stored as Number but must be served as a string ...
+    //                            also, not expanded
+    //
     if (strcmp(mdName, "observedAt") == 0)
     {
       char     date[128];
@@ -196,7 +199,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       nodeP = kjString(orionldState.kjsonP, mdName, date);
     }
     else
-      nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());
+    {
+      char* mdLongName = orionldAliasLookup(contextP, mdName);
+      nodeP = kjString(orionldState.kjsonP, mdLongName, mdP->stringValue.c_str());
+    }
 
     kjChildAdd(aTopNodeP, nodeP);
   }

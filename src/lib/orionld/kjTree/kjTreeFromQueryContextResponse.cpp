@@ -116,6 +116,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   char* details  = NULL;
   bool  sysAttrs = ciP->uriParamOptions["sysAttrs"];
 
+
   //
   // No hits when "oneHit == false" is not an error.
   // We just return an empty array
@@ -236,16 +237,15 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     //
     // FIXME: Use kjTreeFromContextAttribute() !!!
     //
-
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
       ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
       char*             attrName;
       const char*       aName    = aP->name.c_str();
       KjNode*           aTop     = NULL;
+      char*             valueFieldName;
 
       attrName = orionldAliasLookup(orionldState.contextP, aP->name.c_str());
-      char* valueFieldName;
       if (keyValues)
       {
         // If keyValues, then just the value of the attribute is to be rendered (built)
@@ -380,6 +380,16 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           //
           Metadata* mdP     = aP->metadataVector[ix];
           char*     mdName  = (char*) mdP->name.c_str();
+
+          if ((strcmp(mdName, "observedAt") != 0) &&
+              (strcmp(mdName, "createdAt")  != 0) &&
+              (strcmp(mdName, "modifiedAt") != 0))
+          {
+            //
+            // Looking up short name for the sub-attribute
+            //
+            mdName = orionldAliasLookup(orionldState.contextP, mdName);
+          }
 
           if (mdP->type != "")
           {

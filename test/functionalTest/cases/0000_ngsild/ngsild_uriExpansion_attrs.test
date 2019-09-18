@@ -114,14 +114,14 @@ MongoDB server version: REGEX(.*)
 				"unitCode" : {
 					"value" : "123"
 				},
-				"R_R" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R_R" : {
 					"type" : "Relationship",
 					"value" : "http://a.b.c/R_R"
 				}
 			},
 			"mdNames" : [
 				"unitCode",
-				"R_R"
+				"https://uri.etsi.org/ngsi-ld/default-context/R_R"
 			]
 		}
 	},

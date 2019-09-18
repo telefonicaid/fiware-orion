@@ -100,13 +100,13 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:T2:6789",
 			"md" : {
-				"R1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_P1" : {
 					"type" : "Property",
 					"value" : "V"
 				}
 			},
 			"mdNames" : [
-				"R1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_P1"
 			]
 		}
 	},

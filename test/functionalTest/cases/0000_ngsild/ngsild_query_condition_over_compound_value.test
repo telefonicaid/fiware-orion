@@ -125,13 +125,13 @@ MongoDB server version: REGEX(.*)
 				"P2" : 2
 			},
 			"md" : {
-				"P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 					"type" : "Property",
 					"value" : 2
 				}
 			},
 			"mdNames" : [
-				"P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/P1"
 			]
 		}
 	},

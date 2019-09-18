@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
@@ -45,6 +46,8 @@ extern "C"
 // - If simple attribute name - all OK
 // - If attr.b.c, then 'attr' must be extracted, expanded and then '.md.b.c' appended
 // - If attr[b.c], then 'attr' must be extracted, expanded and then '.b.c' appended
+//
+// After implementing expansion in metadata names, for attr.b.c, 'b' needs expansion also
 //
 static char* varFix(void* contextP, char* varPath, char* longName, int longNameLen, char** detailsP)
 {
@@ -242,16 +245,36 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
     ++sP;
   }
 
-  LM_TMP(("Q: longName: %s", longName));
+  LM_TMP(("Q: long attribute name: %s", longName));
+
+  //
+  // Expand mdName if present
+  //
+  char* mdLongNameP = mdNameP;
+
+  if ((mdNameP != NULL) && (strcmp(mdNameP, "observedAt") != 0))  // Don't expand "observedAt", nor ...
+  {
+    mdLongNameP  = kaAlloc(&orionldState.kalloc, 512);
+    orionldUriExpand(orionldState.contextP, mdNameP, mdLongNameP, 512, detailsP);
+
+    // Turn '.' into '=' for longName
+    char* sP = mdLongNameP;
+    while (*sP != 0)
+    {
+      if (*sP == '.')
+        *sP = '=';
+      ++sP;
+    }
+  }
 
   if (caseNo == 1)
     snprintf(fullPath, sizeof(fullPath), "attrs.%s.value", longName);
   else if (caseNo == 2)
     snprintf(fullPath, sizeof(fullPath), "attrs.%s.value.%s", longName, rest);
   else if (caseNo == 3)
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value", longName, mdNameP);
+    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value", longName, mdLongNameP);
   else
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
+    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value.%s", longName, mdLongNameP, rest);
 
   LM_TMP(("Q: fullPath: %s", fullPath));
   return kaStrdup(&orionldState.kalloc, fullPath);

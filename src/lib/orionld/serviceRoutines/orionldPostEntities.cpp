@@ -27,6 +27,7 @@
 
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 #include "kjson/kjRender.h"                                      // kjRender
@@ -215,7 +216,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 {
   OBJECT_CHECK(orionldState.requestTree, "toplevel");
 
-  char*    details;
+  char*    detail;
   KjNode*  locationP          = NULL;
   KjNode*  observationSpaceP  = NULL;
   KjNode*  operationSpaceP    = NULL;
@@ -228,7 +229,11 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   char*    entityId           = orionldState.payloadIdNode->value.s;
   char*    entityType         = orionldState.payloadTypeNode->value.s;
 
-  if ((urlCheck(entityId, &details) == false) && (urnCheck(entityId, &details) == false))
+
+  //
+  // Entity ID
+  //
+  if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN", OrionldDetailString);
     return false;
@@ -262,6 +267,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   entityIdP->creDate   = getCurrentTime();
   entityIdP->modDate   = getCurrentTime();
 
+
   //
   // Entity TYPE
   //
@@ -270,46 +276,20 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   LM_T(LmtUriExpansion, ("Looking up uri expansion for the entity type '%s'", entityType));
   LM_T(LmtUriExpansion, ("------------- uriExpansion for Entity Type starts here ------------------------------"));
 
-  char*  expandedName;
-  char*  expandedType;
+  char* expandedType = kaAlloc(&orionldState.kalloc, 512);
 
-  // FIXME: Call orionldUriExpand() - this here is a "copy" of what orionldUriExpand does
-  extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
-  int    expansions = uriExpansion(orionldState.contextP, entityType, &expandedName, &expandedType, &details);
-  LM_T(LmtUriExpansion, ("URI Expansion for type '%s': '%s'", entityType, expandedName));
-  LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
-
-  if (expansions == 0)
+  if (orionldUriExpand(orionldState.contextP, entityType, expandedType, 512, &detail) == false)
   {
-    // Expansion found in Core Context - perform no expansion
-  }
-  else if (expansions == 1)
-  {
-    // Take the long name, just ... NOT expandedType but expandedName. All good
-    entityIdP->type = expandedName;
-  }
-  else if (expansions == -2)
-  {
-    // No expansion found in Core Context, and in no other contexts either - use default URL
-    LM_T(LmtUriExpansion, ("EXPANSION: use default URL for entity type '%s'", entityType));
-    entityIdP->type = orionldDefaultUrl;
-    entityIdP->type += entityType;
-  }
-  else if (expansions == -1)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid context item for 'entity type'", details, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Error expanding 'entity type'", detail, OrionldDetailString);
     mongoRequest.release();
     return false;
   }
-  else  // expansions == 2 ... may be an incorrect context
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of context item 'entity type'", orionldState.contextP->url, OrionldDetailString);
-    mongoRequest.release();
-    return false;
-  }
+  entityIdP->type = expandedType;
 
 
-  // Treat the entire payload
+  //
+  // Attributes
+  //
   for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
@@ -336,6 +316,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       delete caP;
   }
 
+
+  //
+  // Mongo
+  //
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            orionldState.tenant,

@@ -104,7 +104,7 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : 12,
 			"md" : {
-				"M" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/M" : {
 					"type" : "Property",
 					"value" : {
 						"a" : 1,
@@ -113,7 +113,7 @@ MongoDB server version: REGEX(.*)
 				}
 			},
 			"mdNames" : [
-				"M"
+				"https://uri.etsi.org/ngsi-ld/default-context/M"
 			]
 		}
 	},

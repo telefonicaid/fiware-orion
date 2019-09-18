@@ -614,6 +614,19 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else  // Other
     {
+      //
+      // Expand sub-attribute name
+      //
+      char* expandedName = kaAlloc(&orionldState.kalloc, 512);
+      char* detail;
+
+      if (orionldUriExpand(orionldState.contextP, nodeP->name, expandedName, 512, &detail) == false)
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error expanding Attribute Name", nodeP->name, OrionldDetailString);
+        return false;
+      }
+      nodeP->name = expandedName;
+
       if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
       {
         LM_E(("Duplicated attribute property '%s' for attribute '%s'", nodeP->name, caP->name.c_str()));

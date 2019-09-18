@@ -130,19 +130,19 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1543924800
 				},
-				"P1_R1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T2:6789"
 				},
-				"P1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
 					"type" : "Property",
 					"value" : 0.79
 				}
 			},
 			"mdNames" : [
 				"observedAt",
-				"P1_R1",
-				"P1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1"
 			]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R100" : {
@@ -151,18 +151,18 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:T2:6789",
 			"md" : {
-				"R1_R1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_R1" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T3:A2345"
 				},
-				"R1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_P1" : {
 					"type" : "Property",
 					"value" : false
 				}
 			},
 			"mdNames" : [
-				"R1_R1",
-				"R1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_P1"
 			]
 		},
 		"location" : {

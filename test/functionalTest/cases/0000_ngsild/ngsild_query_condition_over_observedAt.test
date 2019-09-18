@@ -34,7 +34,7 @@ brokerStart CB 212-249
 # 01. Create an Entity urn:ngsi-ld:T_Query:EntityForQuery2345 with a relationship R100
 # 02. Get mongo content
 # 03. Query the property P100 over 'observedAt' before 2018-12-04 - see nothing
-# 04. Query the property P100 over 'observedAt' after 2018-12-04 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
+# 04. Query the property P100 over 'observedAt' after 2018-12-03 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 # 05. Query the property P100 over 'observedAt' of EXACT 2018-12-04T12:00:00.00Z - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 # 06. Query the property P100 over 'observedAt' of EXACT 2018-12-04T11:00:00.00Z - see nothing
 #
@@ -97,7 +97,7 @@ echo
 echo
 
 
-echo "04. Query the property P100 over 'observedAt' after 2018-12-04 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345"
+echo "04. Query the property P100 over 'observedAt' after 2018-12-03 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345"
 echo "=================================================================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?q=P100.observedAt>%222018-12-03%22&prettyPrint=yes&type=T_Query' --noPayloadCheck
 echo
@@ -154,19 +154,19 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1543924800
 				},
-				"P1_R1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T2:6789"
 				},
-				"P1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
 					"type" : "Property",
 					"value" : 0.79REGEX(.*)
 				}
 			},
 			"mdNames" : [
 				"observedAt",
-				"P1_R1",
-				"P1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1"
 			]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R100" : {
@@ -175,18 +175,18 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:T2:6789",
 			"md" : {
-				"R1_R1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_R1" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T3:A2345"
 				},
-				"R1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_P1" : {
 					"type" : "Property",
 					"value" : false
 				}
 			},
 			"mdNames" : [
-				"R1_R1",
-				"R1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_P1"
 			]
 		},
 		"location" : {
@@ -232,7 +232,7 @@ Date: REGEX(.*)
 
 
 
-04. Query the property P100 over 'observedAt' after 2018-12-04 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
+04. Query the property P100 over 'observedAt' after 2018-12-03 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 ==================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 807
