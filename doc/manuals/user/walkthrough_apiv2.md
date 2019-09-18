@@ -661,7 +661,8 @@ EOF
 
 Let's examine in detail the different elements included in the payload:
 
--   The `entities` and `attrs` subfields within `notifications` define the contents of the
+-   The `entities` subfield in within `subject` and `attrs` subfield within 
+    `notification` define the contents of the
     notification messages. In this example, we are specifying that the notification
     has to include the temperature attribute for entity Room1.
 -   The URL where to send notifications is defined with the
@@ -680,22 +681,22 @@ Let's examine in detail the different elements included in the payload:
     We are using a date far enough away in time (year 2040) hoping the subscription
     will not expire while you run this tutorial :).
 -   You can also have permanent subscriptions. Just omit the `expires` field.
--   The `conditions` element defines the "trigger" for the subscription. The
+-   The `condition` element defines the "trigger" for the subscription. The
     `attrs` field contains a list of attribute names. These names define the
     "triggering attributes", i.e. attributes that upon creation/change
     due to [entity creation](#entity-creation) or [update](#update-entity) trigger
     the notification.
--   The rule is that if at least one of the attributes in the `conditions.attrs`
+-   The rule is that if at least one of the attributes in the `condition.attrs`
     list changes (e.g. some kind of "OR" condition), then a notification is sent.
     For example, in this case, when Room1 pressure changes, the Room1 temperature
     value is notified, but not pressure itself. If you want pressure to be notified as well,
-    the request would need to include "pressure" within the `notifications.attrs` list
+    the request would need to include "pressure" within the `notification.attrs` list
     (or to use an empty attribute vector, which means "all
     the attributes in the entity"). Now, this example here, to be
     notified of the value of *temperature* each time the value of
     *pressure* changes may not be too useful. The example is chosen this
     way only to show the enormous flexibility of subscriptions.
--   You can leave `conditions.attrs` empty to make a notification
+-   You can leave `condition.attrs` empty to make a notification
     trigger on any entity attribute change (regardless of the name of the attribute).
 -   Notifications include the attribute values *after* processing the update operation
     triggering the notification. However, you can make Orion include also the
@@ -704,7 +705,7 @@ Let's examine in detail the different elements included in the payload:
 -   You can also set "notify all attributes except _some_" subscriptions (a kind of
     "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
     within `notifications`.
--   You can include filtering expressions in `conditions`. For example, to get notified
+-   You can include filtering expressions in `condition`. For example, to get notified
     not only if pressure changes, but if it changes within the range 700-800. This
     is an advanced topic, see the "Subscriptions" section in the
     [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
