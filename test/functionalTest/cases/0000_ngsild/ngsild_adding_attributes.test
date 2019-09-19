@@ -248,15 +248,15 @@ MongoDB server version: REGEX(.*)
 			"type" : "Relationship",
 			"value" : "urn:ngsi-ld:Building:store001",
 			"mdNames" : [
-				"installedBy",
-				"statusOfWork"
+				"https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy",
+				"https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork"
 			],
 			"md" : {
-				"installedBy" : {
+				"https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:Person:employee001"
 				},
-				"statusOfWork" : {
+				"https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork" : {
 					"type" : "Property",
 					"value" : "completed"
 				}
@@ -285,7 +285,7 @@ bye
 05. Get the entity and see the five attributes
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 943
+Content-Length: 1053
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -296,11 +296,11 @@ Date: REGEX(.*)
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store001",
-    "installedBy": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:Person:employee001"
     },
-    "statusOfWork": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
       "value": "completed"
     }

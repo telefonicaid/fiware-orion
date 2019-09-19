@@ -215,7 +215,7 @@ Date: REGEX(.*)
 04. GET the entity, make sure all metadata of 'locatedIn' are present
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 943
+Content-Length: 1053
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -226,11 +226,11 @@ Date: REGEX(.*)
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store001",
-    "installedBy": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:Person:employee001"
     },
-    "statusOfWork": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
       "value": "completed"
     }
@@ -273,7 +273,7 @@ Date: REGEX(.*)
 06. GET the entity, make sure the value of 'locatedIn' has changed
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 943
+Content-Length: 1053
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -284,11 +284,11 @@ Date: REGEX(.*)
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store002",
-    "installedBy": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:Person:employee001"
     },
-    "statusOfWork": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
       "value": "completed"
     }
@@ -331,7 +331,7 @@ Date: REGEX(.*)
 08. GET the entity, make sure all metadata of 'locatedIn' are present
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1042
+Content-Length: 1152
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -342,11 +342,11 @@ Date: REGEX(.*)
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store002",
-    "installedBy": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:Person:employee001"
     },
-    "statusOfWork": {
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
       "value": "completed"
     },

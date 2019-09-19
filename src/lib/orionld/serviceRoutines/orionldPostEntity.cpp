@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/kjRender.h"                                      // kjRender
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -49,6 +50,38 @@ extern "C"
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// dotForEq -
+//
+static void dotForEq(char* nameP)
+{
+  while (*nameP != 0)
+  {
+    if (*nameP == '.')
+      *nameP = '=';
+    ++nameP;
+  }
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// eqForDot -
+//
+static void eqForDot(char* nameP)
+{
+  while (*nameP != 0)
+  {
+    if (*nameP == '=')
+      *nameP = '.';
+    ++nameP;
+  }
+}
 
 
 
@@ -114,12 +147,14 @@ bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* treeP, ContextElement* 
     if (strcmp(kNodeP->name, "modifiedAt") == 0)
       continue;
 
+    LM_TMP(("sub-attr: calling orionldAttributeTreat for attribute '%s'", kNodeP->name));
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
     {
       LM_E(("orionldAttributeTreat failed"));
       delete caP;
       return false;
     }
+    LM_TMP(("sub-attr: after orionldAttributeTreat for attribute '%s'", caP->name.c_str()));
 
     if (attrTypeNodeP != NULL)
       ceP->contextAttributeVector.push_back(caP);
@@ -180,7 +215,7 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
     kjChildAdd(sourceP, mdNamesP);
   }
 
-  LM_TMP(("MERGE: In kjNodeAttributeMerge for attribute '%s'", updateP->name));
+  LM_TMP(("sub-attr: In kjNodeAttributeMerge for attribute '%s'", updateP->name));
 
   while (nodeP != NULL)
   {
@@ -192,17 +227,17 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
     if (strcmp(nodeP->name, "object") == 0)
       nodeP->name = (char*) "value";
 
-    LM_TMP(("MERGE: Checking item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
+    LM_TMP(("sub-attr: Checking item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
     KjNode* sameNodeInSourceP = kjLookup(sourceP, nodeP->name);
 
     if (sameNodeInSourceP != NULL)
     {
-      LM_TMP(("MERGE: Found '%s' member in source - removing it", sameNodeInSourceP->name));
+      LM_TMP(("sub-attr: Found '%s' member in source - removing it", sameNodeInSourceP->name));
       kjChildRemove(sourceP, sameNodeInSourceP);
       // NOT removing the name from "mdNames"
     }
 
-    LM_TMP(("MERGE: Adding '%s' member to toplevel/mdP/mdNamesP of SOURCE", nodeP->name));
+    LM_TMP(("sub-attr: Adding '%s' member to toplevel/mdP/mdNamesP of SOURCE", nodeP->name));
 
     //
     // Should the item be added to right under the attribute, or as a metadata?
@@ -231,12 +266,15 @@ bool kjNodeAttributeMerge(KjNode* sourceP, KjNode* updateP)
         kjChildAdd(sourceP, mdP);
       }
 
+      char* nameWithDots = kaStrdup(&orionldState.kalloc, nodeP->name);
+
+      dotForEq(nodeP->name);  // Changing DOTs for EQs for the name of the metadata
       kjChildAdd(mdP, nodeP);
       if (sameNodeInSourceP == NULL)
-        kjChildAdd(mdNamesP, kjString(orionldState.kjsonP, "", nodeP->name));
+        kjChildAdd(mdNamesP, kjString(orionldState.kjsonP, "", nameWithDots));
     }
     ++ix;
-    LM_TMP(("MERGE: Treated item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
+    LM_TMP(("sub-attr: Treated item %d of updateP: %s (next at %p)", ix, nodeP->name, nodeP->next));
 
     nodeP = next;
   }
@@ -312,7 +350,7 @@ static void kjTreeLog(const char* comment, KjNode* nodeP)
 
   kjRender(orionldState.kjsonP, nodeP, buf, sizeof(buf));
 
-  LM_TMP(("MERGE: %s: %s", comment, buf));
+  LM_TMP(("sub-attr: %s: %s", comment, buf));
 }
 #endif
 
@@ -369,7 +407,7 @@ static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
 
   for (KjNode* propP = attrP->value.firstChildP; propP != NULL; propP = propP->next)
   {
-    LM_TMP(("MERGE: Looking for md/mdNames - found '%s'", propP->name));
+    LM_TMP(("sub-attr: Looking for md/mdNames - found '%s'", propP->name));
     if (strcmp(propP->name, "md") == 0)
       mdP = propP;
     else if (strcmp(propP->name, "mdNames") == 0)
@@ -380,7 +418,7 @@ static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
   {
     mdNamesP = kjArray(orionldState.kjsonP, "mdNames");
     kjChildAdd(attrP, mdNamesP);
-    LM_TMP(("MERGE: Added 'mdNames'"));
+    LM_TMP(("sub-attr: Added 'mdNames'"));
   }
 
   //
@@ -407,7 +445,7 @@ static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
 
     next = propP->next;
 
-    LM_TMP(("MERGE: Should the attr-property '%s' be moved to md/mdNames?", propP->name));
+    LM_TMP(("sub-attr: Should the attr-property '%s' be moved to md/mdNames?", propP->name));
 
     if (strcmp(propName, "type") == 0)
     {}
@@ -431,10 +469,10 @@ static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
       {
         mdP = kjObject(orionldState.kjsonP, "md");
         kjChildAdd(attrP, mdP);
-        LM_TMP(("MERGE: Added 'md'"));
+        LM_TMP(("sub-attr: Added 'md'"));
       }
 
-      LM_TMP(("MERGE: Yes - '%s' is moved to md/mdNames", propP->name));
+      LM_TMP(("sub-attr: Yes - '%s' is moved to md/mdNames", propP->name));
       kjChildRemove(attrP, propP);
       objectToValue(propP);
       kjChildAdd(mdP, propP);
@@ -453,7 +491,7 @@ static void kjAttributePropertiesToMetadataVector(KjNode* attrP)
 //
 bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree, char** titleP, char** detailsP)
 {
-  LM_TMP(("MERGE: In kjTreeMergeAddNewAttrsOverwriteExisting"));
+  LM_TMP(("sub-attr: In kjTreeMergeAddNewAttrsOverwriteExisting"));
   //
   // The data model of Orion is that all attributes go in toplevel::attrs
   // So, we need to reposition "sourceTree" so that it points to the sourceTree::atts
@@ -502,21 +540,21 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
     //     - add slot in "attrNames"
     //
     KjNode* sourceTreeAttrP = NULL;
-    LM_TMP(("MERGE: Looking for '%s'", modAttrP->name));
+    LM_TMP(("sub-attr: Looking for '%s'", modAttrP->name));
     if ((sourceTreeAttrP = kjLookup(attrsP, modAttrP->name)) != NULL)
     {
-      LM_TMP(("MERGE: Found it - calling kjNodeAttributeMerge"));
+      LM_TMP(("sub-attr: Found it - calling kjNodeAttributeMerge"));
       kjNodeAttributeMerge(sourceTreeAttrP, modAttrP);
       kjModDateSet(sourceTreeAttrP);
     }
     else
     {
-      LM_TMP(("MERGE: Did not find it ('%s') - adding as new", modAttrP->name));
+      LM_TMP(("sub-attr: Did not find it ('%s') - adding as new", modAttrP->name));
 
       // kjTreeLog("Adding attribute", modAttrP);
 
       // Remove modAttrP from modTree and add to sourceTree
-      LM_TMP(("MERGE: Remove modAttrP '%s' from modTree and add to sourceTree", modAttrP->name));
+      LM_TMP(("sub-attr: Remove modAttrP '%s' from modTree and add to sourceTree", modAttrP->name));
       kjChildRemove(modTree, modAttrP);
       kjAttributePropertiesToMetadataVector(modAttrP);
       kjChildAdd(attrsP, modAttrP);
@@ -535,14 +573,8 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
       // The dots in the attribute name have been replaced with '='
       // We need to change that back before adding to "attrNames"
       //
-      char* cP = attrName->value.s;
+      eqForDot(attrName->value.s);
 
-      while (*cP != 0)
-      {
-        if (*cP == '=')
-          *cP = '.';
-        ++cP;
-      }
       kjChildAdd(attrNamesP, attrName);
     }
 
@@ -562,11 +594,15 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
 {
   for (KjNode* attrP = treeP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    char expanded[512];
+    char expanded[512];  // Can't use kaAlloc until I know the length of the expanded name ...
 
+    LM_TMP(("sub-attr: expanding name of attribute '%s'", attrP->name));
     if (orionldUriExpand(orionldState.contextP, attrP->name, expanded, sizeof(expanded), detailsP) == false)
       return false;
 
+    //
+    // Allocate room for the expanded attribute name
+    //
     int sLen = strlen(expanded);
 
     if ((attrP->name = kaAlloc(&orionldState.kalloc, sLen + 1)) == NULL)
@@ -575,17 +611,48 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
       return false;
     }
 
-    strcpy(attrP->name, expanded);
 
     //
-    // Any '.' must be converted into a '='
+    // Copy the expanded name into the attr name and change all '.' for a '='
     //
-    char* nameP = attrP->name;
-    while (*nameP != 0)
+    // FIXME: If I write my own function strcpyAndChangeDorForEq, I should gain some performance
+    //
+    strcpy(attrP->name, expanded);
+    dotForEq(attrP->name);
+    LM_TMP(("sub-attr: expanded name of attribute '%s'", attrP->name));
+
+    // Expand also sub-attr names
+    LM_TMP(("sub-attr: expanding name of sub-attributes of '%s'", attrP->name));
+    for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
     {
-      if (*nameP == '.')
-        *nameP = '=';
-      ++nameP;
+      if (strcmp(subAttrP->name, "type") == 0)
+        continue;
+      if (strcmp(subAttrP->name, "value") == 0)   // FIXME: Only if "Property"
+        continue;
+      if (strcmp(subAttrP->name, "object") == 0)  // FIXME: Only if "Relationship"
+        continue;
+
+      LM_TMP(("sub-attr: expanding name of sub-attribute '%s' of '%s'", subAttrP->name, attrP->name));
+      if (orionldUriExpand(orionldState.contextP, subAttrP->name, expanded, sizeof(expanded), detailsP) == false)
+        return false;
+
+      //
+      // Allocate room for the expanded attribute name
+      //
+      sLen = strlen(expanded);
+      if ((subAttrP->name = kaAlloc(&orionldState.kalloc, sLen + 1)) == NULL)
+      {
+         *detailsP = (char*) "out of memory";
+         return false;
+      }
+
+
+      //
+      // Copy the expanded name into the sub-attr name
+      //
+      strcpy(subAttrP->name, expanded);
+      // dotForEq(subAttrP->name);
+      LM_TMP(("sub-attr: expanded name of sub-attribute '%s' of '%s'", attrP->name, attrP->name));
     }
   }
 
@@ -600,7 +667,7 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
 //
 bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 {
-  LM_TMP(("MERGE: In orionldPostEntityOverwrite"));
+  LM_TMP(("sub-attr: In orionldPostEntityOverwrite"));
   //
   // Forwarding and Subscriptions will be taken care of later.
   // For now, just local updates
@@ -612,9 +679,9 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // 3. Write to mongo
   //
   char*   entityId           = orionldState.wildcard[0];
-  LM_TMP(("MERGE: Calling dbEntityLookup(%s)", entityId));
+  LM_TMP(("sub-attr: Calling dbEntityLookup(%s)", entityId));
   KjNode* currentEntityTreeP = dbEntityLookup(entityId);
-  LM_TMP(("MERGE: After dbEntityLookup(%s): %p", entityId, currentEntityTreeP));
+  LM_TMP(("sub-attr: After dbEntityLookup(%s): %p", entityId, currentEntityTreeP));
   char*   title;
   char*   details;
 
@@ -643,12 +710,11 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 
 
   //
-  // Setting the modification date of the entity
+  // Set the modification date of the entity
   //
   kjModDateSet(currentEntityTreeP);
 
   // Write to database
-  // kjTreeLog("Write to database", currentEntityTreeP);
   dbEntityUpdate(entityId, currentEntityTreeP);
 
   //
@@ -692,7 +758,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 //
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
-  LM_TMP(("MERGE: In orionldPostEntity"));
+  LM_TMP(("sub-attr: In orionldPostEntity"));
 
   // Is the payload not a JSON object?
   OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
@@ -700,6 +766,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   if (orionldState.uriParamOptions.noOverwrite == false)
     return orionldPostEntityOverwrite(ciP);
 
+  LM_TMP(("sub-attr: still in orionldPostEntity"));
   // 1. Check that the entity exists
   if (mongoEntityExists(orionldState.wildcard[0], orionldState.tenant) == false)
   {
