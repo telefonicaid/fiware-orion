@@ -181,20 +181,20 @@ extern __thread OrionldConnectionState orionldState;
 // Global state
 //
 extern char      kallocBuffer[32 * 1024];
-extern int       requestNo;  // Never mind protecting with semaphore. Just a debugging help
+extern int       requestNo;                // Never mind protecting with semaphore. Just a debugging help
 extern KAlloc    kalloc;
 extern Kjson     kjson;
 extern Kjson*    kjsonP;
 extern char*     hostname;
 extern uint16_t  portNo;
-extern char      dbName[];            // From orionld.cpp
+extern char      dbName[];                 // From orionld.cpp
 extern int       dbNameLen;
-extern char      dbUser[];            // From orionld.cpp
-extern char      dbPwd[];             // From orionld.cpp
-extern bool      multitenancy;        // From orionld.cpp
-extern char*     tenant;              // From orionld.cpp
-
-
+extern char      dbUser[];                 // From orionld.cpp
+extern char      dbPwd[];                  // From orionld.cpp
+extern bool      multitenancy;             // From orionld.cpp
+extern char*     tenant;                   // From orionld.cpp
+extern int       contextDownloadAttempts;  // From orionld.cpp
+extern int       contextDownloadTimeout;   // From orionld.cpp
 
 #ifdef DB_DRIVER_MONGOC
 //

@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/OrionldResponseBuffer.h"              // OrionldResponseBuffer
 #include "orionld/common/orionldRequestSend.h"                 // orionldRequestSend
+#include "orionld/common/orionldState.h"                       // contextDownloadAttempts, contextDownloadTimeout
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextDownloadAndParse.h"    // Own interface
 
@@ -83,7 +84,8 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
 
   *downloadFailedP = false;
 
-  for (int tries = 0; tries < 5; tries++)
+  LM_TMP(("CTX: downloading context '%s'. %d as timeout and %d attempts", url, contextDownloadTimeout, contextDownloadAttempts));
+  for (int tries = 0; tries < contextDownloadAttempts; tries++)
   {
     httpResponse.buf       = NULL;
     httpResponse.size      = 0;
@@ -110,14 +112,14 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     bool tryAgain = false;
     bool reqOk;
 
-    reqOk = orionldRequestSend(&httpResponse, url, 10000, detailsPP, &tryAgain, downloadFailedP);
+    reqOk = orionldRequestSend(&httpResponse, url, contextDownloadTimeout, detailsPP, &tryAgain, downloadFailedP);
     if (reqOk == true)
     {
       ok = true;
       break;
     }
     else
-      LM_E(("orionldRequestSend failed (try number %d out of 5): %s", tries + 1, *detailsPP));
+      LM_E(("orionldRequestSend failed (try number %d out of %d. Timeout is: %dms): %s", tries + 1, contextDownloadAttempts, contextDownloadTimeout, *detailsPP));
 
     if (tryAgain == false)
       break;

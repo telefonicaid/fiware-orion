@@ -1,0 +1,151 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+An attribute named 'name' should get a long-name in the database
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with an attribute named 'name', and two more
+# 02. Check db content, make sure 'name' is expanded
+# 03. GET entity, using URI param attrs='name' - see only the 'name' attribute
+#
+
+echo "01. Create an entity with an attribute named 'name', and two more"
+echo "================================================================="
+payload='{
+  "id": "urn:ngsi-ld:test:issue231",
+  "type": "Test",
+  "name": {
+    "type": "Property",
+    "value": 50
+  },
+  "locatedIn": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store001"
+  },
+  "stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Check db content, make sure 'name' is expanded"
+echo "=================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET entity, using URI param attrs='name' - see only the 'name' attribute"
+echo "============================================================================"
+orionCurl --url "/ngsi-ld/v1/entities?type=Test&attrs=name&options=keyValues"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with an attribute named 'name', and two more
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:issue231
+Date: REGEX(.*)
+
+
+
+02. Check db content, make sure 'name' is expanded
+==================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb://localhost:27017/ftest
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:test:issue231",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Test",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/name",
+		"https://uri.etsi.org/ngsi-ld/default-context/locatedIn",
+		"https://uri.etsi.org/ngsi-ld/default-context/stocks"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 50,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/locatedIn" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:Building:store001",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/stocks" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:Product:001",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET entity, using URI param attrs='name' - see only the 'name' attribute
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 60
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "id": "urn:ngsi-ld:test:issue231",
+        "name": 50,
+        "type": "Test"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

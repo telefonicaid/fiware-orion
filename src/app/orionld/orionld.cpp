@@ -189,7 +189,8 @@ bool            disableMetrics;
 int             reqTimeout;
 bool            insecureNotif;
 bool            ngsiv1Autocast;
-
+int             contextDownloadAttempts;
+int             contextDownloadTimeout;
 
 
 
@@ -202,6 +203,8 @@ bool            ngsiv1Autocast;
 #define LOCALHOST              _i "localhost"
 #define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
+#define CTX_TMO_DESC           "Timeout in milliseconds for downloading of contexts"
+#define CTX_ATT_DESC           "Number of attempts for downloading of contexts"
 #define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
 #define PORT_DESC              "port to receive new connections"
@@ -321,6 +324,9 @@ PaArgument paArgs[] =
   { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
 
   { "-ngsiv1Autocast", &ngsiv1Autocast, "NGSIV1_AUTOCAST", PaBool, PaOpt, false, false, true, NGSIV1_AUTOCAST },
+
+  { "-ctxTimeout",     &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,  PaOpt, 5000, 0, 20000, CTX_TMO_DESC },
+  { "-ctxAttempts",    &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,  PaOpt,    3, 0,   100, CTX_ATT_DESC },
 
   PA_END_OF_ARGS
 };

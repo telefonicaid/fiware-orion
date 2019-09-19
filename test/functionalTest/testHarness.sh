@@ -143,6 +143,7 @@ function usage()
   echo "$empty [-s (silent)]"
   echo "$empty [-ld (only ngsild tests)]"
   echo "$empty [-eb (external broker)]"
+  echo "$empty [-tk (on error, show the diff ising tkdiff)]"
   echo "$empty [--filter <test filter>]"
   echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
@@ -398,6 +399,7 @@ do
   elif [ "$1" == "-s" ];             then silent=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
+  elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
   elif [ "$1" == "--dryrun" ];       then dryrun=on;
   elif [ "$1" == "--keep" ];         then keep=on;
   elif [ "$1" == "--stopOnError" ];  then stopOnError=on;
