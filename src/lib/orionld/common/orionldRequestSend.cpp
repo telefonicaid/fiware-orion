@@ -101,7 +101,8 @@ bool orionldRequestSend
   int                     tmoInMilliSeconds,
   char**                  detailPP,
   bool*                   tryAgainP,
-  bool*                   downloadFailedP
+  bool*                   downloadFailedP,
+  const char*             acceptHeader
 )
 {
   CURLcode             cCode;
@@ -181,10 +182,13 @@ bool orionldRequestSend
   curl_easy_setopt(cc.curl, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
-#if 0
-  curl_easy_setopt(cc.curl, CURLOPT_HEADER, 1);                            // Include header in body output
-  curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);                  // Put headers in place
-#endif
+  struct curl_slist* headers = NULL;
+
+  if (acceptHeader != NULL)
+  {
+    headers = curl_slist_append(headers, acceptHeader);
+    curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
+  }
 
   LM_T(LmtRequestSend, ("Calling curl_easy_perform for GET %s", url));
   cCode = curl_easy_perform(cc.curl);
@@ -203,6 +207,9 @@ bool orionldRequestSend
 
     rBufP->buf = NULL;
 
+    if (headers != NULL)
+      curl_slist_free_all(headers);
+
     release_curl_context(&cc);
     LM_E(("curl_easy_perform error %d", cCode));
 
@@ -216,6 +223,9 @@ bool orionldRequestSend
   LM_T(LmtRequestSend, ("Got response: %s", rBufP->buf));
 
   release_curl_context(&cc);
+
+  if (headers != NULL)
+    curl_slist_free_all(headers);
 
   *downloadFailedP = false;
   return true;

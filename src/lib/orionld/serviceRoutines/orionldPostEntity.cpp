@@ -526,9 +526,21 @@ bool kjTreeMergeAddNewAttrsOverwriteExisting(KjNode* sourceTree, KjNode* modTree
       objectToValue(modAttrP);
     else
     {
-      *titleP   = (char*) "Invalid JSON type";
-      *detailsP = (char*) "Not a JSON object";
-      return false;
+      if (strcmp(modAttrP->name, "type") == 0)
+        modAttrP = next;
+      else if (strcmp(modAttrP->name, "value") == 0)
+        modAttrP = next;
+      else if (strcmp(modAttrP->name, "object") == 0)
+        modAttrP = next;
+      else
+      {
+        LM_E(("Error: attr '%s' in tree is not a JSON object", modAttrP->name));
+        *titleP   = (char*) "Invalid JSON type";
+        *detailsP = (char*) "Not a JSON object";
+        return false;
+      }
+
+      continue;
     }
 
     //
@@ -596,6 +608,18 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
   {
     char expanded[512];  // Can't use kaAlloc until I know the length of the expanded name ...
 
+    if (strcmp(attrP->name, "type") == 0)
+      continue;
+    if (strcmp(attrP->name, "value") == 0)   // FIXME: Only if "Property"
+      continue;
+    if (strcmp(attrP->name, "object") == 0)  // FIXME: Only if "Relationship"
+      continue;
+
+    //
+    // FIXME: ignore also createdAt, modifiedAt, ... ?
+    //
+
+
     LM_TMP(("sub-attr: expanding name of attribute '%s'", attrP->name));
     if (orionldUriExpand(orionldState.contextP, attrP->name, expanded, sizeof(expanded), detailsP) == false)
       return false;
@@ -623,8 +647,10 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
 
     // Expand also sub-attr names
     LM_TMP(("sub-attr: expanding name of sub-attributes of '%s'", attrP->name));
+
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
     {
+      LM_TMP(("sub-attr: %s", subAttrP->name));
       if (strcmp(subAttrP->name, "type") == 0)
         continue;
       if (strcmp(subAttrP->name, "value") == 0)   // FIXME: Only if "Property"

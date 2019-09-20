@@ -116,10 +116,8 @@ bool urlParse
   }
 
   if (url[urlIx] == 0)
-  {
-    *detailsPP = (char*) "URL parse error - no slash found after IP address";
-    return false;
-  }
+    return true;
+
   ip[toIx] = 0;
 
 
@@ -138,11 +136,10 @@ bool urlParse
     {
       portNumberString[toIx++] = url[urlIx++];
     }
+
     if (url[urlIx] == 0)
-    {
-      *detailsPP = (char*) "URL parse error - no slash found after port number";
-      return false;
-    }
+      return true;
+
     portNumberString[toIx] = 0;
     *portP = atoi(portNumberString);
   }

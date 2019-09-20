@@ -112,7 +112,7 @@ KjNode* orionldContextDownloadAndParse(Kjson* kjsonP, const char* url, bool useI
     bool tryAgain = false;
     bool reqOk;
 
-    reqOk = orionldRequestSend(&httpResponse, url, contextDownloadTimeout, detailsPP, &tryAgain, downloadFailedP);
+    reqOk = orionldRequestSend(&httpResponse, url, contextDownloadTimeout, detailsPP, &tryAgain, downloadFailedP, "Accept: application/ld+json");
     if (reqOk == true)
     {
       ok = true;

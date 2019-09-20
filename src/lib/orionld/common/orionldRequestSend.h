@@ -40,7 +40,8 @@ extern bool orionldRequestSend
   int                     tmoInMilliSeconds,
   char**                  detailsPP,
   bool*                   tryAgainP,
-  bool*                   downloadFailedP
+  bool*                   downloadFailedP,
+  const char*             acceptHeader
 );
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDREQUESTSEND_H_

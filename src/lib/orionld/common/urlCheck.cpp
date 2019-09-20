@@ -97,11 +97,8 @@ bool urlCheck(char* url, char** detailsPP)
   }
 
   if (*urlP == 0)
-  {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "URL parse error - no slash found after IP address";
-    return false;
-  }
+    return true;
+
   ip[toIx] = 0;
 
   // FIXME: Check that 'ip' is a valid IP address
@@ -131,12 +128,10 @@ bool urlCheck(char* url, char** detailsPP)
       portNumberString[toIx++] = *urlP;
       ++urlP;
     }
+
     if (*urlP == 0)
-    {
-      if (detailsPP != NULL)
-        *detailsPP = (char*) "URL parse error - no slash found after port number";
-      return false;
-    }
+      return true;
+
     portNumberString[toIx] = 0;
 
     for (char* portCharP = portNumberString; *portCharP != 0; ++portCharP)
@@ -155,6 +150,9 @@ bool urlCheck(char* url, char** detailsPP)
   //
   if (*urlP != '/')
   {
+    if (*urlP == 0)
+      return true;
+
     if (detailsPP != NULL)
       *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
     return false;
