@@ -157,7 +157,7 @@ static DBClientBase* mongoConnect
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
@@ -208,7 +208,7 @@ static DBClientBase* mongoConnect
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
