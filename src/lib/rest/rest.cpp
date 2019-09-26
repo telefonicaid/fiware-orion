@@ -62,6 +62,7 @@ extern "C"
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"
 #include "orionld/rest/orionldMhdConnectionTreat.h"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
 #endif
 
 #include "rest/Verb.h"
@@ -652,6 +653,12 @@ static void requestCompleted
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
+
+  if (orionldState.notify == true)
+  {
+    LM_TMP(("NFY: Rest request has finished - now time to send notifications"));
+    orionldNotify();
+  }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
@@ -1244,7 +1251,11 @@ ConnectionInfo* connectionTreatInit
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
 
+  //
+  // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
+  //
   orionldState.responseTree = NULL;
+  orionldState.notify       = false;
 
   *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 

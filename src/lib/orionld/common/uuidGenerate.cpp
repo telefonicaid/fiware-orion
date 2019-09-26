@@ -22,22 +22,20 @@
 *
 * Author: Ken Zangelin
 */
+#include <uuid/uuid.h>                                         // uuid_t, uuid_generate_time_safe, uuid_unparse_lower
 
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/db/dbConfiguration.h"                          // Own interface
+#include "orionld/common/uuidGenerate.h"                       // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// uuidGenerate -
 //
-DbEntityLookupFunction                    dbEntityLookup;
-DbEntityUpdateFunction                    dbEntityUpdate;
-DbDataToKjTreeFunction                    dbDataToKjTree;
-DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
+void uuidGenerate(char* buf)
+{
+  uuid_t uuid;
+
+  uuid_generate_time_safe(uuid);
+  uuid_unparse_lower(uuid, buf);
+}

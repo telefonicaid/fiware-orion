@@ -22,44 +22,43 @@
 *
 * Author: Ken Zangelin
 */
-#include <uuid/uuid.h>                                         // uuid_t, uuid_generate_time_safe, uuid_unparse_lower
-
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
-#include "kjson/kjParse.h"                                     // kjParse
-#include "kjson/kjRender.h"                                    // kjRender
-#include "kjson/kjClone.h"                                     // kjClone
-#include "kjson/kjFree.h"                                      // kjFree
-#include "kjson/kjBuilder.h"                                   // kjString, ...
-#include "kalloc/kaStrdup.h"                                   // kaStrdup
-#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBufferCreate.h"                                // kjBufferCreate
+#include "kjson/kjParse.h"                                       // kjParse
+#include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjFree.h"                                        // kjFree
+#include "kjson/kjBuilder.h"                                     // kjString, ...
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
-#include "common/string.h"                                     // FT
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
-#include "rest/restReply.h"                                    // restReply
+#include "common/string.h"                                       // FT
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd, httpHeaderLinkAdd
+#include "rest/restReply.h"                                      // restReply
 
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/linkCheck.h"                          // linkCheck
-#include "orionld/common/SCOMPARE.h"                           // SCOMPARE
-#include "orionld/common/CHECK.h"                              // CHECK
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextCreateFromUrl.h"       // orionldContextCreateFromUrl
-#include "orionld/context/orionldContextAppend.h"              // orionldContextAppend
-#include "orionld/context/orionldContextTreat.h"               // orionldContextTreat
-#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
-#include "orionld/serviceRoutines/orionldBadVerb.h"            // orionldBadVerb
-#include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
-#include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
-#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnectionTreat.h"            // Own Interface
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/linkCheck.h"                            // linkCheck
+#include "orionld/common/SCOMPARE.h"                             // SCOMPARE
+#include "orionld/common/CHECK.h"                                // CHECK
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/uuidGenerate.h"                         // uuidGenerate
+#include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldContextCreateFromUrl.h"         // orionldContextCreateFromUrl
+#include "orionld/context/orionldContextAppend.h"                // orionldContextAppend
+#include "orionld/context/orionldContextTreat.h"                 // orionldContextTreat
+#include "orionld/context/orionldContextListInsert.h"            // orionldContextListInsert
+#include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
+#include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
+#include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
+#include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
 
 
 
@@ -336,20 +335,6 @@ static void kjNodeDecouple(KjNode* nodeToDecouple, KjNode* prev, KjNode* parent)
     parent->value.firstChildP = nodeToDecouple->next;
 
   // kjTreeFirstLevelPresent("After decoupling", parent);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// uuidGenerate -
-//
-static void uuidGenerate(char* buf)
-{
-  uuid_t uuid;
-
-  uuid_generate_time_safe(uuid);
-  uuid_unparse_lower(uuid, buf);
 }
 
 

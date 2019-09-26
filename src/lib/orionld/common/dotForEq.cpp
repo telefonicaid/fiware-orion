@@ -22,22 +22,20 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/common/dotForEq.h"                             // Own Interface
 
-extern "C"
+
+
+// ----------------------------------------------------------------------------
+//
+// dotForEq -
+//
+void dotForEq(char* nameP)
 {
-#include "kjson/KjNode.h"                                        // KjNode
+  while (*nameP != 0)
+  {
+    if (*nameP == '.')
+      *nameP = '=';
+    ++nameP;
+  }
 }
-
-#include "orionld/db/dbConfiguration.h"                          // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// Function pointers for the DB interface
-//
-DbEntityLookupFunction                    dbEntityLookup;
-DbEntityUpdateFunction                    dbEntityUpdate;
-DbDataToKjTreeFunction                    dbDataToKjTree;
-DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;

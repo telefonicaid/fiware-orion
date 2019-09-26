@@ -45,22 +45,22 @@ echo
 echo "02. Create an entity - which makes the broker crash according to issue #65"
 echo "=========================================================================="
 payload='{
-   "@context": [
-            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-            "https://schema.lab.fiware.org/ld/context.jsonld"
-        ],
-    "id": "urn:ngsi-ld:Room:Room1",
-    "type": "Room",
-    "temperature": {
-        "value": 23,
-        "type": "Property",
-        "unitCode": "C"
-    },
-    "pressure": {
-        "value": 720,
-        "type": "Property",
-        "unitCode": "mm Hg"
-    }
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:Room:Room1",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Property",
+    "unitCode": "C"
+  },
+  "pressure": {
+    "value": 720,
+    "type": "Property",
+    "unitCode": "mm Hg"
+  }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"  -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
 echo

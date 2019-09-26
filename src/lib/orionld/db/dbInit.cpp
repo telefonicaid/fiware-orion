@@ -30,6 +30,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"      // mongoCppLegacyEntityLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h" // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"   // mongoCppLegacyKjTreeToBsonObj
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                              // mongocInit
 #include "orionld/mongoc/mongocEntityUpdate.h"                      // mongocEntityUpdate
@@ -52,19 +53,21 @@ void dbInit(const char* dbHost, const char* dbName)
 {
 #if DB_DRIVER_MONGO_CPP_LEGACY
 
-  dbEntityLookup   = mongoCppLegacyEntityLookup;
-  dbEntityUpdate   = mongoCppLegacyEntityUpdate;
-  dbDataToKjTree   = mongoCppLegacyKjTreeFromBsonObj;
-  dbDataFromKjTree = mongoCppLegacyKjTreeToBsonObj;
+  dbEntityLookup                           = mongoCppLegacyEntityLookup;
+  dbEntityUpdate                           = mongoCppLegacyEntityUpdate;
+  dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
+  dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
+  dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
 
   mongoCppLegacyInit(dbHost, dbName);
 
 #elif DB_DRIVER_MONGOC
 
-  dbEntityLookup   = mongocEntityLookup;
-  dbEntityUpdate   = mongocEntityUpdate;
-  dbDataToKjTree   = mongocKjTreeFromBsonObj;
-  dbDataFromKjTree = NULL;  // FIXME: Implement mongocKjTreeToBson
+  dbEntityLookup                           = mongocEntityLookup;
+  dbEntityUpdate                           = mongocEntityUpdate;
+  dbDataToKjTree                           = mongocKjTreeFromBsonObj;
+  dbDataFromKjTree                         = NULL;  // FIXME: Implement mongocKjTreeToBson
+  dbSubscriptionMatchEntityIdAndAttributes = NULL;  // FIXME: Implement mongocSubscriptionMatchEntityIdAndAttributes
 
   mongocInit(dbHost, dbName);
 

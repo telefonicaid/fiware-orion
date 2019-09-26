@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creation and DB Contebt
+Subscription Creation and DB Content
 
 --SHELL-INIT--
 export BROKER=orionld

@@ -67,7 +67,7 @@ payload='{
     "value": "Bösebrücke Einkauf"
   },
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld",
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -106,7 +106,7 @@ payload='{
     "value": "Bösebrücke Einkauf"
   },
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld",
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -124,7 +124,7 @@ echo
 
 echo "04. GET the entity, with context, see short names"
 echo "================================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -157,14 +157,14 @@ Date: REGEX(.*)
 03. GET the entity, without context, see long names
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 726
+Content-Length: 728
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:Building:store00221",
-  "type": "https://uri.fiware.org/ns/datamodels#Building",
+  "type": "https://uri.fiware.org/ns/data-models#Building",
   "https://schema.org/address": {
     "type": "Property",
     "value": {
@@ -178,7 +178,7 @@ Date: REGEX(.*)
     "type": "Property",
     "value": "Bösebrücke Einkauf"
   },
-  "https://uri.fiware.org/ns/datamodels#category": {
+  "https://uri.fiware.org/ns/data-models#category": {
     "type": "Property",
     "value": [
       "commercial"
@@ -203,7 +203,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 604
 Content-Type: application/json
-Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

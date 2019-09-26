@@ -70,7 +70,7 @@ payload='{
   },
   "@context": [
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+    "https://fiware.github.io/data-models/jsonldcontext.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -85,7 +85,7 @@ orionCurl --url '/ngsi-ld/v1/entities?type=Building&prettyPrint=yes&spaces=2' --
 -H "Cache-Control: no-cache" \
 -H "Connection: keep-alive" \
 -H "Host: localhost:1030" \
--H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
+-H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
 -H "Postman-Token: fc8edb97-40a1-4d21-9b64-b3a991800109,66e5101b-4769-49e4-8b87-04b4c8076950" \
 -H "User-Agent: PostmanRuntime/7.13.0" \
 -H "accept-encoding: gzip, deflate" \
@@ -110,7 +110,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 739
 Content-Type: application/json
-Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

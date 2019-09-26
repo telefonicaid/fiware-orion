@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONMATCHENTITYIDANDATTRIBUTES_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONMATCHENTITYIDANDATTRIBUTES_H_
+
 /*
 *
 * Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
@@ -28,16 +31,27 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/db/dbConfiguration.h"                          // Own interface
+#include "orionld/db/dbConfiguration.h"                          // DbSubscriptionMatchCallback
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// mongoCppLegacySubscriptionMatchEntityIdAndAttributes - 
 //
-DbEntityLookupFunction                    dbEntityLookup;
-DbEntityUpdateFunction                    dbEntityUpdate;
-DbDataToKjTreeFunction                    dbDataToKjTree;
-DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
+// PARAMETERS
+//   * entityId             The ID of the entity as a string
+//   * currentEntityTree    The entire Entity as it is in the database before being updated
+//   * incomingRequestTree  The incoming request, supposed to modify the current Entity
+//   * subMatchCallback     The callback function to be called for each matching subscription
+//
+extern void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
+(
+  const char*                 entityId,
+  KjNode*                     currentEntityTree,
+  KjNode*                     incomingRequestTree,
+  DbSubscriptionMatchCallback subMatchCallback
+);
+
+
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONMATCHENTITYIDANDATTRIBUTES_H_

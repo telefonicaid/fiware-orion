@@ -51,16 +51,32 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// Callback types for the DB interface
+//
+typedef bool    (*DbSubscriptionMatchCallback)(const char* entityId, KjNode* subscriptionTree, KjNode* currentEntityTree, KjNode* incomingRequestTree);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// Function pointer types for the DB interface
 //
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
 typedef bool    (*DbEntityUpdateFunction)(char* entityId, KjNode* requestTree);
 typedef KjNode* (*DbDataToKjTreeFunction)(void* dbData, char** titleP, char** detailsP);
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
+typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
 
-extern DbEntityLookupFunction   dbEntityLookup;
-extern DbEntityUpdateFunction   dbEntityUpdate;
-extern DbDataToKjTreeFunction   dbDataToKjTree;
-extern DbDataFromKjTreeFunction dbDataFromKjTree;
+
+
+// -----------------------------------------------------------------------------
+//
+// Function pointers for the DB interface
+//
+extern DbEntityLookupFunction                   dbEntityLookup;
+extern DbEntityUpdateFunction                   dbEntityUpdate;
+extern DbDataToKjTreeFunction                   dbDataToKjTree;
+extern DbDataFromKjTreeFunction                 dbDataFromKjTree;
+extern DbSubscriptionMatchEntityIdAndAttributes dbSubscriptionMatchEntityIdAndAttributes;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

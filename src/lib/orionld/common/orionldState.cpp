@@ -139,7 +139,10 @@ void orionldStateInit(void)
 
   bzero(orionldState.delayedKjFreeVec, sizeof(orionldState.delayedKjFreeVec));
   orionldState.delayedKjFreeVecIndex = 0;
-  orionldState.delayedKjFreeVecSize = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
+  orionldState.delayedKjFreeVecSize  = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
+
+  orionldState.notify              = false;
+  orionldState.notificationRecords = 0;
 }
 
 

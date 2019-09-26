@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDSERVERCONNECT_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDSERVERCONNECT_H_
+
 /*
 *
 * Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,21 +26,12 @@
 * Author: Ken Zangelin
 */
 
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/db/dbConfiguration.h"                          // Own interface
 
 
-
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// orionldServerConnect -
 //
-DbEntityLookupFunction                    dbEntityLookup;
-DbEntityUpdateFunction                    dbEntityUpdate;
-DbDataToKjTreeFunction                    dbDataToKjTree;
-DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
+extern int orionldServerConnect(char* ip, unsigned short portNo);
+
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDSERVERCONNECT_H_

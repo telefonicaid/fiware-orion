@@ -1,0 +1,450 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+First notification without mongoBackend
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create an Entity urn:test:entity:E1, with attribute A1 and A2
+# 02. Create an ngsi-ld subscription for urn:test:entity:E1 and attributes A1+A3
+# 03. Dump the accumulator to see the first notification, then reset the accumulator
+# 04. See the subscription in mongo
+# 05. Create another ngsi-ld subscription, this one for urn:test:entity:E1 and attributes A1
+# 06. Dump the accumulator to see the initial notification, then reset the accumulator
+# 07. See the second subscription in mongo
+# 08. Update urn:test:entity:E1/A1 using POST /entities/urn:test:entity:E1/attrs, without 'options=noOverwrite', i.e. no mongoBackend involved
+# 09. Dump accumulator - see two notifications
+#
+
+echo "01. Create an Entity urn:test:entity:E1, with attribute A1 and A2"
+echo "================================================================="
+payload='{
+  "id": "urn:test:entity:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": 1
+  },
+  "A2": {
+    "type": "Property",
+    "value": "ok"
+  },
+  "A3": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Create an ngsi-ld subscription for urn:test:entity:E1 and attributes A1+A3"
+echo "=============================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Sub 01",
+  "description": "receiving notifications for A1+A3 attributes of urn:test:entity:E1",
+  "entities": [
+    {
+      "id": "urn:test:entity:E1",
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["A1", "A3"],
+  "notification": {
+    "attributes": [ "A1", "A3" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 0
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "03. Dump the accumulator to see the first notification, then reset the accumulator"
+echo "=================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "http://a.b.c/subs/sub01"})'
+echo
+echo
+
+
+echo "05. Create another ngsi-ld subscription, this one for urn:test:entity:E1 and attributes A1"
+echo "=========================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub02",
+  "type": "Subscription",
+  "name": "Sub 02",
+  "description": "receiving notifications for A1 attribute of urn:test:entity:E1",
+  "entities": [
+    {
+      "id": "urn:test:entity:E1",
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["A1"],
+  "notification": {
+    "attributes": [ ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 0
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "06. Dump the accumulator to see the initial notification, then reset the accumulator"
+echo "===================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. See the second subscription in mongo"
+echo "========================================"
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "http://a.b.c/subs/sub02"})'
+echo
+echo
+
+
+echo "08. Update urn:test:entity:E1/A1 using POST /entities/urn:test:entity:E1/attrs, without 'options=noOverwrite', i.e. no mongoBackend involved"
+echo "============================================================================================================================================"
+payload={'
+  "A1": {
+    "type": "Property",
+    "value": 22
+  },
+  "A8": {
+    "type": "Property",
+    "value": 8
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:test:entity:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "09. Dump accumulator - see two notifications"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Entity urn:test:entity:E1, with attribute A1 and A2
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:test:entity:E1
+Date: REGEX(.*)
+
+
+
+02. Create an ngsi-ld subscription for urn:test:entity:E1 and attributes A1+A3
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Date: REGEX(.*)
+
+
+
+03. Dump the accumulator to see the first notification, then reset the accumulator
+==================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 350
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "A1": {
+                "type": "Property", 
+                "value": 1
+            }, 
+            "A3": {
+                "type": "Property", 
+                "value": 3
+            }, 
+            "id": "urn:test:entity:E1", 
+            "type": "T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub01", 
+    "type": "Notification"
+}
+=======================================
+
+
+04. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "http://a.b.c/subs/sub01",
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : NumberLong(0),
+	"servicePath" : "/",
+	"description" : "receiving notifications for A1+A3 attributes of urn:test:entity:E1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:test:entity:E1",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Sub 01",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"lastNotification" : REGEX(.*),
+	"count" : NumberLong(1),
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+05. Create another ngsi-ld subscription, this one for urn:test:entity:E1 and attributes A1
+==========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub02
+Date: REGEX(.*)
+
+
+
+06. Dump the accumulator to see the initial notification, then reset the accumulator
+====================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 388
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "A1": {
+                "type": "Property", 
+                "value": 1
+            }, 
+            "A2": {
+                "type": "Property", 
+                "value": "ok"
+            }, 
+            "A3": {
+                "type": "Property", 
+                "value": 3
+            }, 
+            "id": "urn:test:entity:E1", 
+            "type": "T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub02", 
+    "type": "Notification"
+}
+=======================================
+
+
+07. See the second subscription in mongo
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "http://a.b.c/subs/sub02",
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "http://REGEX(.*)/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : NumberLong(0),
+	"servicePath" : "/",
+	"description" : "receiving notifications for A1 attribute of urn:test:entity:E1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:test:entity:E1",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Sub 02",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"lastNotification" : REGEX(.*),
+	"count" : NumberLong(1),
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+08. Update urn:test:entity:E1/A1 using POST /entities/urn:test:entity:E1/attrs, without 'options=noOverwrite', i.e. no mongoBackend involved
+============================================================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. Dump accumulator - see two notifications
+============================================
+POST http://REGEX(.*)/notify
+Content-Length: 407
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "A1": {
+                "type": "Property", 
+                "value": 22
+            }, 
+            "A3": {
+                "creDate": REGEX(.*), 
+                "mdNames": [], 
+                "modDate": REGEX(.*), 
+                "type": "Property", 
+                "value": 3
+            }, 
+            "id": "urn:test:entity:E1"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub01", 
+    "type": "Notification"
+}
+=======================================
+POST http://REGEX(.*)/notify
+Content-Length: 352
+User-Agent: orionld
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "A1": {
+                "type": "Property", 
+                "value": 22
+            }, 
+            "A8": {
+                "type": "Property", 
+                "value": 8
+            }, 
+            "id": "urn:test:entity:E1"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub02", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

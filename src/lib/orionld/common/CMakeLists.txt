@@ -41,6 +41,10 @@ SET (SOURCES
     qParse.cpp
     qTreePresent.cpp
     qTreeToBsonObj.cpp
+    uuidGenerate.cpp
+    orionldServerConnect.cpp
+    dotForEq.cpp
+    eqForDot.cpp
     # qTreeToBson.cpp
 )
 

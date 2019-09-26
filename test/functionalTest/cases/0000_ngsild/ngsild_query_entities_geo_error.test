@@ -88,7 +88,7 @@ payload='{
       "coordinates": [13.3903, 52.5075]
     }
   },
-  "@context": "https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld"
+  "@context": "https://fiware.github.io/data-models/jsonldcontext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -104,14 +104,14 @@ echo
 
 echo "03. GeoQuery near. Max Distance: 1290m - see empty array"
 echo "========================================================"
-orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1290&options=keyValues" -H 'Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1290&options=keyValues" -H 'Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "04. GeoQuery near. Max Distance: 1291m - see Building:store002"
 echo "=============================================================="
-orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1291&options=keyValues" -H 'Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1291&options=keyValues" -H 'Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -134,13 +134,13 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:Building:store002",
-		"type" : "https://uri.fiware.org/ns/datamodels#Building",
+		"type" : "https://uri.fiware.org/ns/data-models#Building",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
 		"https://schema.org/address",
 		"https://uri.etsi.org/ngsi-ld/name",
-		"https://uri.fiware.org/ns/datamodels#category",
+		"https://uri.fiware.org/ns/data-models#category",
 		"location"
 	],
 	"attrs" : {
@@ -163,7 +163,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "Checkpoint Markt",
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/datamodels#category" : {
+		"https://uri=fiware=org/ns/data-models#category" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -208,7 +208,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -219,7 +219,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 296
 Content-Type: application/json
-Link: <https://schema.lab.fiware.org/ld/fiware-datamodels-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
