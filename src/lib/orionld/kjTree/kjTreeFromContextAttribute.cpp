@@ -124,6 +124,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     return NULL;
   }
 
+  bool isRelationship = false;
   if (caP->type != "")
   {
     KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", caP->type.c_str());
@@ -136,13 +137,17 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     }
 
     kjChildAdd(aTopNodeP, typeNodeP);
+    if (strcmp(typeNodeP->value.s, "Relationship") == 0)
+      isRelationship = true;
   }
 
   // Value
+  const char* valueName = (isRelationship == false)? "value" : "object";
+
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
-    nodeP = kjString(orionldState.kjsonP, "value", caP->stringValue.c_str());
+    nodeP = kjString(orionldState.kjsonP, valueName, caP->stringValue.c_str());
     ALLOCATION_CHECK(nodeP);
     break;
 
@@ -176,11 +181,13 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   kjChildAdd(aTopNodeP, nodeP);
 
   // Metadata
+  LM_TMP(("NOTIF: converting %d metadatas", caP->metadataVector.size()));
   for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)
   {
     Metadata*   mdP    = caP->metadataVector[ix];
     const char* mdName = mdP->name.c_str();
 
+    LM_TMP(("NOTIF: converting metadata '%s'", mdName));
     //
     // Special case: observedAt - stored as Number but must be served as a string ...
     //                            also, not expanded
@@ -200,8 +207,55 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     }
     else
     {
-      char* mdLongName = orionldAliasLookup(contextP, mdName);
-      nodeP = kjString(orionldState.kjsonP, mdLongName, mdP->stringValue.c_str());
+      char*   mdLongName     = orionldAliasLookup(contextP, mdName);
+      KjNode* typeNodeP      = kjString(orionldState.kjsonP, "type", mdP->type.c_str());
+      KjNode* valueNodeP     = NULL;
+
+      nodeP = kjObject(orionldState.kjsonP, mdLongName);
+
+      LM_TMP(("NOTIF: metadata '%s' is a '%s'", mdName, valueTypeName(mdP->valueType)));
+
+      kjChildAdd(nodeP, typeNodeP);
+      if (strcmp(mdP->type.c_str(), "Relationship") == 0)
+      {
+        valueNodeP = kjString(orionldState.kjsonP, "object", mdP->stringValue.c_str());
+      }
+      else if (strcmp(mdP->type.c_str(), "Property") == 0)
+      {
+        switch (mdP->valueType)
+        {
+        case orion::ValueTypeString:
+          valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
+          break;
+
+        case orion::ValueTypeNumber:
+          valueNodeP = kjFloat(orionldState.kjsonP, "value", mdP->numberValue);  // FIXME: kjInteger or kjFloat
+          break;
+
+        case orion::ValueTypeBoolean:
+          valueNodeP = kjBoolean(orionldState.kjsonP, "value", (KBool) mdP->boolValue);
+          break;
+
+        case orion::ValueTypeNull:
+          valueNodeP = kjNull(orionldState.kjsonP, "value");
+          break;
+
+        case orion::ValueTypeVector:
+        case orion::ValueTypeObject:
+          valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, detailsP);
+          break;
+
+        case orion::ValueTypeNotGiven:
+          valueNodeP = kjString(orionldState.kjsonP, "value", "UNKNOWN TYPE");
+          break;
+        }
+      }
+      else
+      {
+        valueNodeP = kjString(orionldState.kjsonP, "NonSupportedAttributeType", mdP->type.c_str());
+      }
+
+      kjChildAdd(nodeP, valueNodeP);
     }
 
     kjChildAdd(aTopNodeP, nodeP);

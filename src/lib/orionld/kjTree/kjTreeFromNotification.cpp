@@ -60,6 +60,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextLookup(context);
 
+  LM_TMP(("NOTIF: In kjTreeFromNotification"));
   // id
   strcpy(&idBuffer[25], id);
   nodeP = kjString(orionldState.kjsonP, "id", idBuffer);
@@ -111,7 +112,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   //
   // loop over ContextElements in NotifyContextRequest::contextElementResponseVector
   //
-  LM_T(LmtNotifications, ("Adding %d contextElementResponses to the Notification kjTree", (int) ncrP->contextElementResponseVector.size()));
+  LM_TMP(("NOTIF: Adding %d contextElementResponses to the Notification kjTree", (int) ncrP->contextElementResponseVector.size()));
   for (unsigned int ix = 0; ix < ncrP->contextElementResponseVector.size(); ix++)
   {
     ContextElement* ceP     = &ncrP->contextElementResponseVector[ix]->contextElement;
@@ -131,7 +132,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // Attributes
-    LM_T(LmtNotifications, ("Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));
+    LM_TMP(("NOTIF: Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
       ContextAttribute*  aP       = ceP->contextAttributeVector[aIx];
@@ -140,7 +141,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       if (SCOMPARE9(attrName, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
         continue;
 
-      LM_T(LmtNotifications, ("NOTIF: Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
+      LM_TMP(("NOTIF: Adding attribute '%s' to the Notification kjTree", ceP->contextAttributeVector[aIx]->name.c_str()));
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
       kjChildAdd(objectP, nodeP);
     }

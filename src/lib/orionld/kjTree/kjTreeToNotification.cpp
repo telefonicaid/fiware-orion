@@ -136,4 +136,3 @@ bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscript
 
   return true;
 }
-
