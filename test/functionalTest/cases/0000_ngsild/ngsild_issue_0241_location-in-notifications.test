@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notifications - response of normalized format subscription (nested JSON problem)
+Notifications - correct representation of location inside notifications
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,46 +32,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata
+# 01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with a 'location' property
 # 02. Create a subscription matching the entity
-# 03. Dump the accumulator to see the initial notification
+# 03. Dump the accumulator to see the initial notification, make sure the 'location' property is OK
 # 04. See the entity in mongo
 #
 
-echo "01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata"
-echo "================================================================================================="
+echo "01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with a 'location' property"
+echo "=========================================================================="
 payload='{
   "id": "urn:ngsi-ld:Vehicle:A4501",
   "type": "Vehicle",
-  "brandName": {
-    "type": "Property",
-    "value": "Mercedes"
-  },
-  "isParked": {
-    "type": "Relationship",
-    "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
-    "observedAt": "2018-12-04T12:00:00Z",
-    "providedBy": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:Person:Bob"
-    },
-    "subProp": {
-      "type": "Property",
-      "value": "prop-subProp"
-    }
-  },
-  "prop": {
-    "type": "Property",
-    "value": "prop with sub-prop",
-    "providedBy": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:Person:Bob2"
-    },
-    "subProp": {
-      "type": "Property",
-      "value": "prop-subProp"
-    }
-  },
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -82,9 +53,7 @@ payload='{
       ]
     }
   },
-  "@context": [
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-  ]
+  "@context": [ "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld" ]
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -116,10 +85,11 @@ echo
 echo
 
 
-echo "03. Dump the accumulator to see the initial notification"
-echo "========================================================"
+echo "03. Dump the accumulator to see the initial notification, make sure the 'location' property is OK"
+echo "================================================================================================="
 sleep 1
 accumulatorDump
+accumulatorReset
 echo
 echo
 
@@ -132,8 +102,8 @@ echo
 
 
 --REGEXPECT--
-01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata
-=================================================================================================
+01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with a 'location' property
+==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: REGEX(.*)
@@ -151,11 +121,11 @@ Date: REGEX(.*)
 
 
 
-03. Dump the accumulator to see the initial notification
-========================================================
+03. Dump the accumulator to see the initial notification, make sure the 'location' property is OK
+=================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 858
+Content-Length: 381
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -166,24 +136,7 @@ Content-Type: application/ld+json
     "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
     "data": [
         {
-            "brandName": {
-                "type": "Property", 
-                "value": "Mercedes"
-            }, 
             "id": "urn:ngsi-ld:Vehicle:A4501", 
-            "isParked": {
-                "object": "urn:ngsi-ld:OffStreetParking:Downtown1", 
-                "observedAt": "2018-12-04T12:00:00Z", 
-                "providedBy": {
-                    "object": "urn:ngsi-ld:Person:Bob", 
-                    "type": "Relationship"
-                }, 
-                "subProp": {
-                    "type": "Property", 
-                    "value": "prop-subProp"
-                }, 
-                "type": "Relationship"
-            }, 
             "location": {
                 "type": "GeoProperty", 
                 "value": {
@@ -193,18 +146,6 @@ Content-Type: application/ld+json
                     ], 
                     "type": "Point"
                 }
-            }, 
-            "prop": {
-                "providedBy": {
-                    "object": "urn:ngsi-ld:Person:Bob2", 
-                    "type": "Relationship"
-                }, 
-                "subProp": {
-                    "type": "Property", 
-                    "value": "prop-subProp"
-                }, 
-                "type": "Property", 
-                "value": "prop with sub-prop"
             }, 
             "type": "Vehicle"
         }
@@ -229,68 +170,14 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/brandName",
-		"https://uri.etsi.org/ngsi-ld/default-context/isParked",
-		"https://uri.etsi.org/ngsi-ld/default-context/prop",
 		"location"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/brandName" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "Mercedes",
-			"mdNames" : [ ]
-		},
-		"https://uri=etsi=org/ngsi-ld/default-context/isParked" : {
-			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "urn:ngsi-ld:OffStreetParking:Downtown1",
-			"md" : {
-				"observedAt" : {
-					"value" : 1543924800
-				},
-				"https://uri=etsi=org/ngsi-ld/default-context/providedBy" : {
-					"type" : "Relationship",
-					"value" : "urn:ngsi-ld:Person:Bob"
-				},
-				"https://uri=etsi=org/ngsi-ld/default-context/subProp" : {
-					"type" : "Property",
-					"value" : "prop-subProp"
-				}
-			},
-			"mdNames" : [
-				"observedAt",
-				"https://uri.etsi.org/ngsi-ld/default-context/providedBy",
-				"https://uri.etsi.org/ngsi-ld/default-context/subProp"
-			]
-		},
-		"https://uri=etsi=org/ngsi-ld/default-context/prop" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "prop with sub-prop",
-			"md" : {
-				"https://uri=etsi=org/ngsi-ld/default-context/providedBy" : {
-					"type" : "Relationship",
-					"value" : "urn:ngsi-ld:Person:Bob2"
-				},
-				"https://uri=etsi=org/ngsi-ld/default-context/subProp" : {
-					"type" : "Property",
-					"value" : "prop-subProp"
-				}
-			},
-			"mdNames" : [
-				"https://uri.etsi.org/ngsi-ld/default-context/providedBy",
-				"https://uri.etsi.org/ngsi-ld/default-context/subProp"
-			]
-		},
 		"location" : {
 			"type" : "GeoProperty",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : {
+			"value" : {	
 				"type" : "Point",
 				"coordinates" : [
 					-8.5,

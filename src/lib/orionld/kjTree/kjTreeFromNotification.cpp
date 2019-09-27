@@ -49,6 +49,39 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// debugContextElement - FIXME: Remove this function
+//
+void debugContextElement(ContextElement* ceP)
+{
+  LM_TMP(("NOTIF: Entity ID:   %s", ceP->entityId.id.c_str()));
+  LM_TMP(("NOTIF: Entity TYPE: %s", ceP->entityId.type.c_str()));
+
+  for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
+  {
+    ContextAttribute*  aP       = ceP->contextAttributeVector[aIx];
+    const char*        attrName = aP->name.c_str();
+
+    LM_TMP(("NOTIF: Attribute %d:", aIx, attrName));
+    LM_TMP(("NOTIF:   Name:        %s",   attrName));
+    LM_TMP(("NOTIF:   Type:        %s",   aP->type.c_str()));
+    LM_TMP(("NOTIF:   Value Type:  %s",   valueTypeName(aP->valueType)));
+    LM_TMP(("NOTIF:   Metadatas:   %llu", aP->metadataVector.size()));
+
+    for (unsigned int ix = 0; ix < aP->metadataVector.size(); ix++)
+    {
+      Metadata* mdP = aP->metadataVector[ix];
+
+      LM_TMP(("NOTIF:   Metadata %d:", ix));
+      LM_TMP(("NOTIF:     Name:  %s", mdP->name.c_str()));
+      LM_TMP(("NOTIF:     Type:  %s", mdP->type.c_str()));
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeFromNotification -
 //
 KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, char** detailsP)
@@ -130,6 +163,10 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
     nodeP = kjString(orionldState.kjsonP, "type", alias);
     kjChildAdd(objectP, nodeP);
+
+    // <DEBUG>
+    debugContextElement(ceP);
+    // </DEBUG>
 
     // Attributes
     LM_TMP(("NOTIF: Adding %d attributes to the Notification kjTree", (int) ceP->contextAttributeVector.size()));

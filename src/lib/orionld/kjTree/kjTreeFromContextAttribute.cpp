@@ -143,7 +143,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
   // Value
   const char* valueName = (isRelationship == false)? "value" : "object";
-
+  LM_TMP(("NOTIF: valueType of attr '%s': '%s'", caP->name.c_str(), valueTypeName(caP->valueType)));
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
@@ -169,6 +169,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
     nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, detailsP);
+    nodeP->name = (char*) "value";
     if (nodeP == NULL)
       return NULL;
     break;
@@ -180,12 +181,35 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   }
   kjChildAdd(aTopNodeP, nodeP);
 
+  bool isGeoProperty = false;
+  LM_TMP(("NOTIF: attribute type is: '%s'", caP->type.c_str()));
+  if (strcmp(caP->type.c_str(), "GeoProperty") == 0)
+  {
+    //
+    // GeoProperty attributes seem to get an extra metadata, called "location". It needs to be removed
+    //
+    LM_TMP(("NOTIF: It's a GeoProperty attribute!"));
+    isGeoProperty = true;
+  }
+
   // Metadata
-  LM_TMP(("NOTIF: converting %d metadatas", caP->metadataVector.size()));
+  LM_TMP(("NOTIF: converting %d metadata of attribute '%s' of type '%s'", caP->metadataVector.size(), caP->name.c_str(), caP->type.c_str()));
   for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)
   {
     Metadata*   mdP    = caP->metadataVector[ix];
     const char* mdName = mdP->name.c_str();
+
+    if ((isGeoProperty == true) && (strcmp(mdName, "location") == 0))
+    {
+      //
+      // FIXME
+      //   Skipping the metadata "location" for GeoProperty attributes - for now
+      //   In the future we might want to keep this metadata, but the unit must be looked over (WGS84).
+      //   What was default unit in orion v1 is not default for orionld
+      //
+      LM_TMP(("NOTIF: skipping metadata '%s'", mdName));
+      continue;
+    }
 
     LM_TMP(("NOTIF: converting metadata '%s'", mdName));
     //

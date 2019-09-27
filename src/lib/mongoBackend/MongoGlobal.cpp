@@ -1311,6 +1311,8 @@ bool entitiesQuery
   ApiVersion                       apiVersion
 )
 {
+  LM_TMP(("NOTIF: In entitiesQuery"));
+
   /* Query structure is as follows
    *
    * {
@@ -2162,6 +2164,47 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 #endif
 
 
+// -----------------------------------------------------------------------------
+//
+// FIXME: REMOVE this function - it's just debugging
+//
+static void debugContextElementResponseVector(ContextElementResponseVector* cerVectorP)
+{
+  for (unsigned int cerIx = 0; cerIx < cerVectorP->size(); cerIx++)
+  {
+    ContextElement*         ceP    = &cerVectorP->vec[cerIx]->contextElement;
+
+    LM_TMP(("NOTIF: Entity ID:     %s", ceP->entityId.id.c_str()));
+    LM_TMP(("NOTIF: Entity TYPE:   %s", ceP->entityId.type.c_str()));
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
+    {
+      ContextAttribute*  aP       = ceP->contextAttributeVector[aIx];
+      const char*        attrName = aP->name.c_str();
+
+      LM_TMP(("NOTIF: Attribute %d:", aIx, attrName));
+      LM_TMP(("NOTIF:   Name:        %s",   attrName));
+      LM_TMP(("NOTIF:   Type:        %s",   aP->type.c_str()));
+      LM_TMP(("NOTIF:   Value Type:  %s",   valueTypeName(aP->valueType)));
+      LM_TMP(("NOTIF:   Metadatas:   %llu", aP->metadataVector.size()));
+
+      for (unsigned int ix = 0; ix < aP->metadataVector.size(); ix++)
+      {
+        Metadata* mdP = aP->metadataVector[ix];
+
+        LM_TMP(("NOTIF:   Metadata %d:", ix));
+        LM_TMP(("NOTIF:     Name:  %s", mdP->name.c_str()));
+        LM_TMP(("NOTIF:     Type:  %s", mdP->type.c_str()));
+        LM_TMP(("NOTIF:     vType: %s", valueTypeName(mdP->valueType)));
+
+        if (mdP->valueType == orion::ValueTypeString)
+          LM_TMP(("NOTIF:     Value: %s", mdP->stringValue.c_str()));
+      }
+    }
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -2206,8 +2249,10 @@ static bool processOnChangeConditionForSubscription
   StringList                    emptyList;
   StringList                    metadataList;
 
+  LM_TMP(("NOTIF: In processOnChangeConditionForSubscription. blacklist: %s", FT(blacklist)));
   metadataList.fill(metadataV);
 
+  LM_TMP(("NOTIF: Calling entitiesQuery"));
   if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
@@ -2222,15 +2267,22 @@ static bool processOnChangeConditionForSubscription
     return false;
   }
 
+  // -------------------------------------------
+  // FIXME: REMOVE - this is just debugging
+  debugContextElementResponseVector(&rawCerV);
+  // -------------------------------------------
+
 #ifdef ORIONLD
   //
   // Special case: no entity/attribute found.
   //               If this happens, we'll notify with only entity info
   //
+  LM_TMP(("NOTIF: Special case: no entity/attribute found."));
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
     if (rawCerV.size() == 0)
     {
+      LM_TMP(("NOTIF: Special case: calling entitiesQuery"));
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
       {
         ncr.contextElementResponseVector.release();
@@ -2285,7 +2337,7 @@ static bool processOnChangeConditionForSubscription
        * Note that in this case we do a query for all the attributes, not restricted to attrV */
       ContextElementResponseVector  allCerV;
 
-
+      LM_TMP(("NOTIF: Calling entitiesQuery"));
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
 #ifdef WORKAROUND_2994
@@ -2312,6 +2364,7 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
+        LM_TMP(("NOTIF: Sending notification"));
         getNotifier()->sendNotifyContextRequest(&ncr,
                                                 notifyHttpInfo,
                                                 tenant,
@@ -2331,6 +2384,7 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
+      LM_TMP(("NOTIF: Sending notification"));
       getNotifier()->sendNotifyContextRequest(&ncr,
                                               notifyHttpInfo,
                                               tenant,
@@ -2379,6 +2433,7 @@ static BSONArray processConditionVector
 {
   BSONArrayBuilder conds;
 
+  LM_TMP(("NOTIF: In static processConditionVector"));
   *notificationDone = false;
 
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
@@ -2392,23 +2447,26 @@ static BSONArray processConditionVector
         conds.append(nc->condValueList[jx]);
       }
 
-      if ((status == STATUS_ACTIVE) &&
-          (processOnChangeConditionForSubscription(enV,
-                                                   attrL,
-                                                   metadataV,
-                                                   &(nc->condValueList),
-                                                   subId,
-                                                   httpInfo,
-                                                   renderFormat,
-                                                   tenant,
-                                                   xauthToken,
-                                                   servicePathV,
-                                                   resP,
-                                                   fiwareCorrelator,
-                                                   attrsOrder,
-                                                   blacklist)))
+      if (status == STATUS_ACTIVE)
       {
-        *notificationDone = true;
+        LM_TMP(("NOTIF: Calling processOnChangeConditionForSubscription"));
+        if (processOnChangeConditionForSubscription(enV,
+                                                    attrL,
+                                                    metadataV,
+                                                    &(nc->condValueList),
+                                                    subId,
+                                                    httpInfo,
+                                                    renderFormat,
+                                                    tenant,
+                                                    xauthToken,
+                                                    servicePathV,
+                                                    resP,
+                                                    fiwareCorrelator,
+                                                    attrsOrder,
+                                                    blacklist))
+        {
+          *notificationDone = true;
+        }
       }
     }
     else

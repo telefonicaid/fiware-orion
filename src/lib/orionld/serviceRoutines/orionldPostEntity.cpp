@@ -715,25 +715,17 @@ static bool subscriptionMatchCallback
 #if 0
   if (throttlingP != NULL)
   {
-    int      lastNotification  = 0;
-    KjNode*  lastFailureP      = kjLookup(subscriptionTree, "lastFailure");
-    KjNode*  lastSuccessP      = kjLookup(subscriptionTree, "lastSuccess");
+    KjNode*  lastNotificationP = kjLookup(subscriptionTree, "lastNotification");
 
-    LM_TMP(("NFY: Throttling: %llu", throttlingP->value.i));
-
-    if (lastFailureP != NULL)
-      lastNotification = lastFailureP->value.i;
-    if (lastSuccessP != NULL)
+    if (lastNotificationP != NULL)
     {
-      if (lastSuccessP->value.i > lastNotification)
-        lastNotification = lastSuccessP->value.i;
-    }
+      now = time(NULL);
 
-    now = time(NULL);
-    if (now < lastNotification + throttlingP->value.i)
-    {
-      LM_TMP(("NFY: No notification to be sent due to throttling (%d). Now: %d, lastNotification: %d", throttlingP->value.i, now, lastNotification));
-      return false;
+      if (lastNotificationP->value.i + throttlingP->value.i > now)
+      {
+        LM_TMP(("NFY: No notification to be sent due to throttling (%d). Now: %d, lastNotification: %d", throttlingP->value.i, now, lastNotification));
+        return false;
+      }
     }
   }
 #endif
