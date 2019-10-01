@@ -69,8 +69,7 @@ void orionldErrorResponseCreate
 (
   OrionldResponseErrorType  errorType,
   const char*               title,
-  const char*               detail,
-  OrionldDetailType         detailType
+  const char*               detail
 )
 {
   LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, detail));
@@ -80,31 +79,7 @@ void orionldErrorResponseCreate
   KjNode* detailP;
 
   if ((detail != NULL) && (detail[0] != 0))
-  {
-    char*   contextDetail = NULL;
-
-    if (detailType == OrionldDetailString)  // no replacement as it's just a descriptive string
-    {
-      contextDetail = (char*) detail;
-    }
-    else  // lookup 'detail' in context
-    {
-      KjNode*  nodeP = orionldContextItemLookup(orionldState.contextP, detail);
-      char     contextDetailV[512];  // FIXME: Define a max length for a context item?
-
-      if (nodeP == NULL)
-      {
-        snprintf(contextDetailV, sizeof(contextDetailV), "%s%s", orionldDefaultUrl, detail);
-        contextDetail = contextDetailV;
-      }
-      else
-      {
-        contextDetail = nodeP->value.s;
-      }
-    }
-
-    detailP = kjString(orionldState.kjsonP, "detail", contextDetail);
-  }
+    detailP = kjString(orionldState.kjsonP, "detail", detail);
   else
     detailP = kjString(orionldState.kjsonP, "detail", "no detail");
 

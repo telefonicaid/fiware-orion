@@ -49,28 +49,13 @@ typedef enum OrionldResponseErrorType
 
 // ----------------------------------------------------------------------------
 //
-// OrionldDetailType -
-//
-typedef enum OrionldDetailType
-{
-  OrionldDetailString,
-  OrionldDetailAttribute,
-  OrionldDetailEntity,
-  OrionldDetailOther
-} OrionldDetailType;
-
-
-
-// ----------------------------------------------------------------------------
-//
 // orionldErrorResponseCreate -
 //
 extern void orionldErrorResponseCreate
 (
   OrionldResponseErrorType  errorType,
   const char*               title,
-  const char*               detail,
-  OrionldDetailType         detailType
+  const char*               detail
 );
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDERRORRESPONSE_H_

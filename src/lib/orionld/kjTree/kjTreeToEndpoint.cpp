@@ -65,7 +65,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
       if (!urlCheck(uriP, &details) && !urnCheck(uriP, &details))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN", OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN");
         return false;
       }
 
@@ -79,7 +79,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
       if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType);
         return false;
       }
 
@@ -91,20 +91,20 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
         httpInfoP->mimeType = JSONLD;
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s);
         return false;
       }
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name, OrionldDetailString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name);
       return false;
     }
   }
 
   if (uriP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri", OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri");
     return false;
   }
 

@@ -54,9 +54,8 @@ void orionldContextListInsert(OrionldContext* contextP, bool semAlreadyTaken)
       (strcmp(contextP->tree->value.firstChildP->name, "@context") == 0)        &&
       (contextP->tree->value.firstChildP->type                     == KjObject))
   {
-    // LM_TMP(("KZ: -------------------- Calling orionldContextPrefixExpand -------------------------"));
+    LM_TMP(("VEX: Calling orionldContextPrefixExpand -------------------------"));
     orionldContextPrefixExpand(contextP, false);
-    // LM_TMP(("KZ: -------------------- After orionldContextPrefixExpand -------------------------"));
   }
 
   if (semAlreadyTaken == false)

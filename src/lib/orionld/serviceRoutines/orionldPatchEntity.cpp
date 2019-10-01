@@ -22,6 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
+}
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
@@ -35,6 +41,7 @@
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/context/orionldValueExpand.h"                  // orionldValueExpand
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
 
@@ -52,7 +59,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   if (mongoEntityExists(entityId, orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
     return false;
   }
 
@@ -60,7 +67,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   if (orionldState.requestTree == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is missing", NULL, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is missing", NULL);
     return false;
   }
 
@@ -69,7 +76,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   if  (orionldState.requestTree->type != KjObject)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is not a JSON object", kjValueType(orionldState.requestTree->type), OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is not a JSON object", kjValueType(orionldState.requestTree->type));
     return false;
   }
 
@@ -77,12 +84,13 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   if  (orionldState.requestTree->value.firstChildP == NULL)
   {
     ciP->httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is an empty JSON object", NULL, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is an empty JSON object", NULL);
     return false;
   }
 
   //
   // Make sure the attributes to be patched exist - FIXME: too damn slow to get an attribute at a time - make a smarter query!
+  // Also - expanding attribute values if the @context says they should be expanded
   //
   for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
@@ -94,19 +102,24 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       attrNameP = attrNodeP->name;
     else
     {
+      bool valueToBeExpanded;
+
       // Get the long name of the Context Attribute name
-      if (orionldUriExpand(orionldState.contextP, attrNodeP->name, longAttrName, sizeof(longAttrName), &details) == false)
+      if (orionldUriExpand(orionldState.contextP, attrNodeP->name, longAttrName, sizeof(longAttrName), &valueToBeExpanded, &details) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, details, attrNodeP->name, OrionldDetailAttribute);
+        orionldErrorResponseCreate(OrionldBadRequestData, details, attrNodeP->name);
         return false;
       }
-      attrNameP = longAttrName;
+      attrNameP = kaStrdup(&orionldState.kalloc, longAttrName);
+
+      if (valueToBeExpanded == true)
+        orionldValueExpand(attrNodeP);
     }
 
     if (mongoAttributeExists(entityId, attrNameP, orionldState.tenant) == false)
     {
       ciP->httpStatusCode = SccNotFound;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute does not exist", attrNameP, OrionldDetailString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute does not exist", attrNameP);
       return false;
     }
   }
@@ -193,7 +206,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   else
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
     return false;
   }
 

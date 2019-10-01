@@ -70,7 +70,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
     return NULL;
   }
 
-  LM_TMP(("CTX: Looking up '%s' in context '%s'", itemName, contextP->url));
+  LM_TMP(("VEX: Looking up '%s' in context '%s'", itemName, contextP->url));
 
   if (contextP->ignore == true)
   {
@@ -211,6 +211,7 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   //
   // If we reach this point, the context is a JSON Object
   //
+  LM_TMP(("VEX: Time to find the item in the context that is a JSON Object of key-values"));
   LM_T(LmtContextItemLookup, ("Lookup of item '%s' in JSON Object Context '%s'", itemName, contextP->url));
 
   KjNode* atContextP = contextP->tree->value.firstChildP;
@@ -235,9 +236,48 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
   LM_T(LmtContextItemLookup, ("atContextP->type == %s", kjValueType(atContextP->type)));
   if (atContextP->type == KjObject)
   {
-    LM_TMP(("CTX: @context '%s' is an object", atContextP->name));
-    LM_T(LmtContextItemLookup, ("@context '%s' is an object", atContextP->name));
+    //
+    // Might be an inline context. If so, the atContextP is already an item of the context ...
+    // FIXME: What a mess!
+    //
+    // If inline context, then chances are that the name of the first key DOES NOT start with '@'.
+    // Also, if looked up, we would not find a member called "@context".
+    //
+    if (atContextP->name[0] != '@')
+    {
+      //
+      // Assuming we're in an inline context
+      //
+      while (atContextP != NULL)
+      {
+        if (strcmp(itemName, atContextP->name) == 0)
+        {
+          if (atContextP->type == KjString)
+            LM_TMP(("VEX: Found '%s'. Long name: '%s'", itemName, atContextP->value.s));
+          else
+            LM_TMP(("VEX: Found '%s' in a context item that is an object", itemName));
 
+          return atContextP;
+        }
+
+        atContextP = atContextP->next;
+      }
+
+      LM_TMP(("VEX: '%s' not found in inline context", itemName));
+      return NULL;
+    }
+
+    LM_TMP(("VEX: @context item '%s' is an object", atContextP->name));
+    LM_T(LmtContextItemLookup, ("@context '%s' is an object", atContextP->name));
+    LM_T(LmtContextItemLookup, ("Looking for '%s', atContextP is named '%s'", itemName, atContextP->name));
+
+    if (strcmp(itemName, atContextP->name) == 0)
+    {
+      LM_TMP(("VEX: Found '%s'", itemName));
+      return atContextP;
+    }
+
+    int ix = 0;
     for (KjNode* contextItemP = atContextP->value.firstChildP; contextItemP != NULL; contextItemP = contextItemP->next)
     {
       if ((contextItemP->type != KjString) && (contextItemP->type != KjObject))
@@ -245,17 +285,19 @@ KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName)
         LM_E(("Invalid @context - items of contexts must be JSON Strings or JSON objects - not %s", kjValueType(contextItemP->type)));
         return NULL;
       }
+      LM_T(LmtContextItemLookup, ("@context '%s' item %d: name: '%s'", atContextP->name, ix, contextItemP->name));
 
       //
-      // Skip members whose value is a string that starts with "@" - they are information, not translations
+      // Skip members whose value is a string that starts with "@", except for "@type"
       //
-      if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@'))
+      LM_T(LmtContextItemLookup, ("Looking for '%s', current context item is named '%s'", itemName, contextItemP->name));
+      if ((contextItemP->type == KjString) && (contextItemP->value.s[0] == '@') && (strcmp(contextItemP->value.s, "@type") != 0))
       {
         LM_T(LmtContextItemLookup, ("Skipping '%s' with value '%s'", contextItemP->name, contextItemP->value.s));
         continue;
       }
 
-      // LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
+      LM_T(LmtContextItemLookup, ("looking for '%s', comparing with '%s'", itemName, contextItemP->name));
       if (strcmp(contextItemP->name, itemName) == 0)
       {
         if (contextItemP->type == KjString)

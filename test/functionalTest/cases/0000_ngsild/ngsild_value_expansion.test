@@ -1,0 +1,235 @@
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Expansion of values
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with inline context and attributes to be expanded (string and vector of strings)
+# 02. GET the entity and see the expanded values
+# 03. POST on the entity /attrs, adding an attribute (whose value is to be expanded)
+# 04. GET the entity and see the expanded values
+# 05. PATCH the	entity,	changing an attribute (whose value is to be expanded)
+# 06. GET the entity and see the expanded values
+# 07. Create an entity E2 with a string attribute called 'Category', and the data model context (that defines 'Category' with @type: @vocab)
+# 08. GET E2 and see the expanded value of 'Category'
+# 09. Create an entity E3 with a string-array attribute called 'Category', and the data model context (that defines 'Category' with @type: @vocab)
+# 10. GET E3 and see the expanded values of 'Category'
+# 11. Create an entity E4 with a string-array attribute called 'relationships', and the core context (that defines 'relationships' with @type: @vocab)
+# 12. GET E4 and see the expanded values of 'relationships'
+#
+
+echo "01. Create an entity with inline context and attributes to be expanded (string and vector of strings)"
+echo "====================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:test:value-expansion",
+  "type": "T",
+  "@context": {
+    "P1": {
+      "@id": "longname-for-P1",
+      "@type": "@vocab"
+    },
+    "P2": {
+      "@id": "longname-for-P2",
+      "@type": "@vocab"
+    },
+    "P3": {
+      "@id": "longname-for-P3",
+      "@type": "@vocab"
+    },
+    "shortP1": "Long value of P1",
+    "shortP2": "Long value of P2",
+    "shortP3": "Long value of P3"
+  },
+  "P1": {
+    "type": "Property",
+    "value": "shortP1"
+  },
+  "P2": {
+    "type": "Property",
+    "value": [ 0, "shortP1", 2, "shortP2", true, 5, "shortP3", 7 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the entity and see the expanded values"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:test:value-expansion
+echo
+echo
+
+
+echo "03. POST on the entity /attrs, adding an attribute (whose value is to be expanded)"
+echo "=================================================================================="
+echo
+echo
+
+
+echo "04. GET the entity and see the expanded values"
+echo "=============================================="
+echo
+echo
+
+
+echo "05. PATCH the	entity,	changing an attribute (whose value is to be expanded)"
+echo "==========================================================================="
+echo
+echo
+
+
+echo "06. GET the entity and see the expanded values"
+echo "=============================================="
+echo
+echo
+
+
+echo "07. Create an entity E2 with a string attribute called 'Category', and the data model context (that defines 'Category' with @type: @vocab)"
+echo "=========================================================================================================================================="
+echo
+echo
+
+
+echo "08. GET E2 and see the expanded value of 'Category'"
+echo "==================================================="
+echo
+echo
+
+
+echo "09. Create an entity E3 with a string-array attribute called 'Category', and the data model context (that defines 'Category' with @type: @vocab)"
+echo "================================================================================================================================================"
+echo
+echo
+
+
+echo "10. GET E3 and see the expanded values of 'Category'"
+echo "===================================================="
+echo
+echo
+
+
+echo "11. Create an entity E4 with a string-array attribute called 'relationships', and the core context (that defines 'relationships' with @type: @vocab)"
+echo "===================================================================================================================================================="
+echo
+echo
+
+
+echo "12. GET E4 and see the expanded values of 'relationships'"
+echo "========================================================="
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with inline context and attributes to be expanded (string and vector of strings)
+=====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:value-expansion
+Date: REGEX(.*)
+
+
+
+02. GET the entity and see the expanded values
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:test:value-expansion",
+    "longname-for-P1": {
+        "type": "Property",
+        "value": "Long value of P1"
+    },
+    "longname-for-P2": {
+        "type": "Property",
+        "value": [
+            0,
+            "Long value of P1",
+            2,
+            "Long value of P2",
+            true,
+            5,
+            "Long value of P3",
+            7
+        ]
+    },
+    "type": "T"
+}
+
+
+03. POST on the entity /attrs, adding an attribute (whose value is to be expanded)
+==================================================================================
+
+
+04. GET the entity and see the expanded values
+==============================================
+
+
+05. PATCH the	entity,	changing an attribute (whose value is to be expanded)
+===========================================================================
+
+
+06. GET the entity and see the expanded values
+==============================================
+
+
+07. Create an entity E2 with a string attribute called 'Category', and the data model context (that defines 'Category' with @type: @vocab)
+==========================================================================================================================================
+
+
+08. GET E2 and see the expanded value of 'Category'
+===================================================
+
+
+09. Create an entity E3 with a string-array attribute called 'Category', and the data model context (that defines 'Category' with @type: @vocab)
+================================================================================================================================================
+
+
+10. GET E3 and see the expanded values of 'Category'
+====================================================
+
+
+11. Create an entity E4 with a string-array attribute called 'relationships', and the core context (that defines 'relationships' with @type: @vocab)
+====================================================================================================================================================
+
+
+12. GET E4 and see the expanded values of 'relationships'
+=========================================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

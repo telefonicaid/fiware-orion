@@ -70,7 +70,7 @@ bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, Subscri
       }
       else
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates", OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value type (not String nor Array)", "GeoQuery::coordinates");
         return false;
       }
       LM_T(LmtGeoJson, ("coordinatesNodeP->type: %s", kjValueType(coordinatesNodeP->type)));
@@ -87,26 +87,26 @@ bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, Subscri
     }
     else
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown GeoQuery field", itemP->name, OrionldDetailString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown GeoQuery field", itemP->name);
       return false;
     }
   }
 
   if (geometryP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::geometry missing in Subscription", NULL, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::geometry missing in Subscription", NULL);
     return false;
   }
 
   if (coordinatesNodeP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::coordinates missing in Subscription", NULL, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::coordinates missing in Subscription", NULL);
     return false;
   }
 
   if (georelP == NULL)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::georel missing in Subscription", NULL, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "GeoQuery::georel missing in Subscription", NULL);
     return false;
   }
 

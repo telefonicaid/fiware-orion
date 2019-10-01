@@ -57,9 +57,9 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   else
   {
     // Get the long name of the Context Attribute name
-    if (orionldUriExpand(orionldState.contextP, orionldState.wildcard[1], longAttrName, sizeof(longAttrName), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, orionldState.wildcard[1], longAttrName, sizeof(longAttrName), NULL, &details) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, details, type, OrionldDetailAttribute);
+      orionldErrorResponseCreate(OrionldBadRequestData, details, type);
       return false;
     }
     attrNameP = longAttrName;
@@ -72,7 +72,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   if (mongoAttributeExists(orionldState.wildcard[0], attrNameP, orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", orionldState.wildcard[1], OrionldDetailAttribute);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", orionldState.wildcard[1]);
     return false;
   }
 
@@ -100,7 +100,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 
   if (ciP->httpStatusCode != SccOk)
   {
-    orionldErrorResponseCreate(httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", orionldState.wildcard[0], OrionldDetailString);
+    orionldErrorResponseCreate(httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", orionldState.wildcard[0]);
     ucr.release();
 
     return false;

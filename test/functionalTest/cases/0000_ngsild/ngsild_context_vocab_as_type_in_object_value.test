@@ -1,0 +1,109 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Context with compound value containing @type == @vocab
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# NOTE
+#  This func-test was just an experiment to make sure that a @context containing an item
+#    "xxx": { "@id": "xxx", "@type": "@vocab" }
+#  would not make the broker fail.
+#
+# In the near future, @type==@vocab will mean that the 'value' of the item ('xxx' in the example) must be
+# expanded/compressed, and this func-test will be "expanded" :) for that
+#
+# FIXME: Implement expansion/contraction for "@type": "@vocab"
+#
+#
+# 01. Create an entity with inline context containing @type==@vocab for context item 'category'
+# 02. GET the entity
+#
+
+echo "01. Create an entity with inline context containing @type==@vocab for context item 'category'"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:test:inline-context-withtype-as-vocab",
+  "type": "T",
+  "@context": {
+    "category": {
+      "@id": "urn:ngsi-ld:category",
+      "@type": "@vocab"
+    },
+    "P1": "Long value of P1"
+  },
+  "category": {
+    "type": "Property",
+    "value": "P1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. GET the entity"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:test:inline-context-withtype-as-vocab
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with inline context containing @type==@vocab for context item 'category'
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:inline-context-withtype-as-vocab
+Date: REGEX(.*)
+
+
+
+02. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 139
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:test:inline-context-withtype-as-vocab",
+    "type": "T",
+    "urn:ngsi-ld:category": {
+        "type": "Property",
+        "value": "Long value of P1"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

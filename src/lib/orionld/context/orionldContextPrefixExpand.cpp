@@ -32,6 +32,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // kalloc
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/context/orionldContextPrefixExpand.h"        // Own interface
@@ -56,9 +57,13 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
   char* colonP;
   char* rest;
 
+  // Never expand URNs
+  if (SCOMPARE4(kNodeP->value.s, 'u', 'r', 'n', ':'))
+    return;
+
   if ((colonP = strchr(kNodeP->value.s, ':')) == NULL)
     return;
-  if (colonP[1] == '/')
+  if ((colonP[1] == '/') && (colonP[2] == '/'))  // takes care of http:// and https:// and any other "xxx://"
     return;
 
   // colon found, need to replace
@@ -68,13 +73,13 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
   *colonP = 0;           // By NULLing the ':', 'alias' now is the prefix
   rest    = &colonP[1];  // rest points to what must be appended after the value of the prefix
 
-  // LM_TMP(("KZ: Trying to expand '%s' in %s:%s of context '%s'", alias, alias, rest, contextP->url));
+  LM_TMP(("VEX: Trying to expand '%s' in %s:%s of context '%s'", alias, alias, rest, contextP->url));
   // If prefix not already looked up, look it up
   if ((cachedPrefixValueP == NULL) || (strcmp(alias, cachedPrefixName) != 0))
   {
     char* details;
 
-    if (orionldUriExpand(contextP, alias, cachedPrefixValueV, sizeof(cachedPrefixValueV), &details) == true)
+    if (orionldUriExpand(contextP, alias, cachedPrefixValueV, sizeof(cachedPrefixValueV), NULL, &details) == true)
     {
       strcpy(cachedPrefixName, alias);
       cachedPrefixValueP    = cachedPrefixValueV;
@@ -146,7 +151,7 @@ void orionldContextPrefixExpand(OrionldContext* contextP, bool inlineContext)
 {
   KjNode*  tree = contextP->tree;
 
-  // LM_TMP(("KZ: In orionldContextPrefixExpand for context '%s'", contextP->url));
+  LM_TMP(("VEX: In orionldContextPrefixExpand for context '%s'", contextP->url));
 
   cachedPrefixValueP = NULL;  // Clear "cache" before lookup starts
 

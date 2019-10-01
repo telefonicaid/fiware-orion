@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDURIEXPAND_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDURIEXPAND_H_
+#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDVALUEEXPAND_H_
+#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDVALUEEXPAND_H_
 
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,22 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                  // OrionldContext
+extern "C"
+{
+#include "kjson/KjNode.h"                               // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldUriExpand -
+// orionldValueExpand -
 //
-extern bool orionldUriExpand
-(
-  OrionldContext*  contextP,
-  char*            shortName,
-  char*            longName,
-  int              longNameLen,
-  bool*            valueMayBeExpandedP,
-  char**           detailsP
-);
+extern void orionldValueExpand(KjNode* attrNodeP);
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDURIEXPAND_H_
+#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDVALUEEXPAND_H_

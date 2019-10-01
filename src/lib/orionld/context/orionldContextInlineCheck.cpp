@@ -50,7 +50,7 @@ bool orionldContextInlineCheck(ConnectionInfo* ciP, KjNode* contextObjectP)
     {
       LM_E(("The context is invalid - value of '%s' is not a String nor an Object", nodeP->name));
       orionldState.contextP = NULL;  // Leak?
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid key-value in @context", nodeP->name, OrionldDetailString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid key-value in @context", nodeP->name);
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }

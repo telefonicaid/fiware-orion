@@ -651,7 +651,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     char*  details;
     char   expanded[256];
 
-    if (orionldUriExpand(orionldState.contextP, (char*) attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, (char*) attributeName.c_str(), expanded, sizeof(expanded), NULL, &details) == false)
     {
       *errorStringP = details;
       return false;

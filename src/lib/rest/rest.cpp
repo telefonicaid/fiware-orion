@@ -172,7 +172,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0", OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0");
 #endif
         return MHD_YES;
       }
@@ -193,7 +193,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
 #endif
         return MHD_YES;
       }
@@ -209,7 +209,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000", OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
 #endif
       return MHD_YES;
     }
@@ -220,7 +220,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1", OrionldDetailString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
 #endif
       return MHD_YES;
     }

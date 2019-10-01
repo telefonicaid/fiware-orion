@@ -234,7 +234,7 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
   //
   // All OK - let's compose ...
   //
-  orionldUriExpand(orionldState.contextP, attrNameP, longName, longNameLen, detailsP);
+  orionldUriExpand(orionldState.contextP, attrNameP, longName, longNameLen, NULL, detailsP);
 
   // Turn '.' into '=' for longName
   char* sP = longName;
@@ -255,7 +255,7 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
   if ((mdNameP != NULL) && (strcmp(mdNameP, "observedAt") != 0))  // Don't expand "observedAt", nor ...
   {
     mdLongNameP  = kaAlloc(&orionldState.kalloc, 512);
-    orionldUriExpand(orionldState.contextP, mdNameP, mdLongNameP, 512, detailsP);
+    orionldUriExpand(orionldState.contextP, mdNameP, mdLongNameP, 512, NULL, detailsP);
 
     // Turn '.' into '=' for longName
     char* sP = mdLongNameP;

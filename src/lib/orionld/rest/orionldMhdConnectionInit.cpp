@@ -30,7 +30,7 @@
 
 #include "rest/Verb.h"                                         // Verb
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, OrionldDetailString, ...
+#include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
@@ -288,7 +288,7 @@ int orionldMhdConnectionInit
   if (ciP->verb == NOVERB)
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
-    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);
     ciP->httpStatusCode   = SccBadRequest;
     return MHD_YES;
   }
@@ -324,8 +324,7 @@ int orionldMhdConnectionInit
     {
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
-                                 "only application/json and application/ld+json are supported",
-                                 OrionldDetailString);
+                                 "only application/json and application/ld+json are supported");
       ciP->httpStatusCode = SccUnsupportedMediaType;
       return MHD_YES;
     }
@@ -370,7 +369,7 @@ int orionldMhdConnectionInit
   if ((ciP->verb != POST) && (ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->verb != PATCH))
   {
     LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method, OrionldDetailString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
     ciP->httpStatusCode = SccBadRequest;
   }
 

@@ -181,7 +181,7 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
       *expandedTypeP = nodeP->value.s;
       LM_T(LmtUriExpansion, ("got an object - expanded type is '%s'", nodeP->value.s));
     }
-    else
+    else if (nodeP->name[0] != '@')  // items whose name start in '@' are ignored (or treated)
     {
       *detailsPP = (char*) "Invalid context - invalid field in context item object";
       LM_E(("uriExpansion: Invalid context - invalid field in context item object: '%s'", nodeP->name));
@@ -223,15 +223,27 @@ int uriExpansion(OrionldContext* contextP, const char* name, char** expandedName
 //
 // orionldUriExpand -
 //
-bool orionldUriExpand(OrionldContext* contextP, char* shortName, char* longName, int longNameLen, char** detailsP)
+bool orionldUriExpand
+(
+  OrionldContext*  contextP,
+  char*            shortName,
+  char*            longName,
+  int              longNameLen,
+  bool*            valueMayBeExpandedP,
+  char**           detailsP
+)
 {
   char* expandedName;
   char* expandedType;
   int   n;
 
-  LM_TMP(("CTX: Attempt to expand '%s'", shortName));
+  if (valueMayBeExpandedP != NULL)
+    *valueMayBeExpandedP = false;
+
+  LM_TMP(("VEX: Attempt to expand '%s'", shortName));
 
   n = uriExpansion(contextP, shortName, &expandedName, &expandedType, detailsP);
+  LM_TMP(("VEX: uriExpansion returned %d (name: '%s',  type: '%s')", n, expandedName, expandedType));
   if (n == -1)
   {
     LM_E(("uriExpansion error: %s", *detailsP));
@@ -249,8 +261,19 @@ bool orionldUriExpand(OrionldContext* contextP, char* shortName, char* longName,
   else  // expansion found
   {
     snprintf(longName, longNameLen, "%s", expandedName);
+    LM_TMP(("VEX: longName: %s", longName));
+
+    if (n == 2)  // Both @id and @type found
+    {
+      LM_TMP(("VEX: expandedName:        '%s'", expandedName));
+      LM_TMP(("VEX: expandedType:        '%s'", expandedType));
+      LM_TMP(("VEX: valueMayBeExpandedP: %p",   valueMayBeExpandedP));
+
+      if ((valueMayBeExpandedP != NULL) && (strcmp(expandedType, "@vocab") == 0))
+        *valueMayBeExpandedP = true;
+    }
   }
 
-  LM_T(LmtUriExpansion, ("Expanded '%s' to '%s'", shortName, longName));
+  LM_TMP(("VEX: Expanded '%s' to '%s'", shortName, longName));
   return true;
 }

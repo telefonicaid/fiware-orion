@@ -25,24 +25,24 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldDetailString, ...
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 
 
 // -----------------------------------------------------------------------------
 //
 // DUPLICATE_CHECK -
 //
-#define DUPLICATE_CHECK(pointer, fieldName, value)                                                                                    \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (pointer != NULL)                                                                                                                \
-  {                                                                                                                                   \
-    LM_E(("Duplicated attribute: '%s'", fieldName));                                                                                  \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailString);                            \
-    ciP->httpStatusCode = SccBadRequest;                                                                                              \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-  pointer = value;                                                                                                                    \
+#define DUPLICATE_CHECK(pointer, fieldName, value)                                                               \
+do                                                                                                               \
+{                                                                                                                \
+  if (pointer != NULL)                                                                                           \
+  {                                                                                                              \
+    LM_E(("Duplicated attribute: '%s'", fieldName));                                                             \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName);                            \
+    ciP->httpStatusCode = SccBadRequest;                                                                         \
+    return false;                                                                                                \
+  }                                                                                                              \
+  pointer = value;                                                                                               \
 } while (0)
 
 
@@ -51,17 +51,17 @@ do                                                                              
 //
 // DUPLICATE_CHECK_WITH_PRESENCE -
 //
-#define DUPLICATE_CHECK_WITH_PRESENCE(alreadyPresent, valueHolder, fieldName, value)                                                  \
-do                                                                                                                                    \
-{                                                                                                                                     \
-  if (alreadyPresent == true)                                                                                                         \
-  {                                                                                                                                   \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName, OrionldDetailString);                            \
-    ciP->httpStatusCode = SccBadRequest;                                                                                              \
-    return false;                                                                                                                     \
-  }                                                                                                                                   \
-  valueHolder    = value;                                                                                                             \
-  alreadyPresent = true;                                                                                                              \
+#define DUPLICATE_CHECK_WITH_PRESENCE(alreadyPresent, valueHolder, fieldName, value)                             \
+do                                                                                                               \
+{                                                                                                                \
+  if (alreadyPresent == true)                                                                                    \
+  {                                                                                                              \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", fieldName);                            \
+    ciP->httpStatusCode = SccBadRequest;                                                                         \
+    return false;                                                                                                \
+  }                                                                                                              \
+  valueHolder    = value;                                                                                        \
+  alreadyPresent = true;                                                                                         \
 } while (0)
 
 
@@ -70,15 +70,15 @@ do                                                                              
 //
 // OBJECT_CHECK -
 //
-#define OBJECT_CHECK(nodeP, what)                                                                                                 \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (nodeP->type != KjObject)                                                                                                    \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Object", what, OrionldDetailString);                            \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define OBJECT_CHECK(nodeP, what)                                                                            \
+do                                                                                                           \
+{                                                                                                            \
+  if (nodeP->type != KjObject)                                                                               \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Object", what);                            \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -87,15 +87,15 @@ do                                                                              
 //
 // ARRAY_CHECK -
 //
-#define ARRAY_CHECK(kNodeP, fieldName)                                                                                            \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (kNodeP->type != KjArray)                                                                                                    \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "not a JSON Array", fieldName, OrionldDetailString);                        \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define ARRAY_CHECK(kNodeP, fieldName)                                                                       \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->type != KjArray)                                                                               \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "not a JSON Array", fieldName);                        \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -104,15 +104,15 @@ do                                                                              
 //
 // EMPTY_ARRAY_CHECK -
 //
-#define EMPTY_ARRAY_CHECK(kNodeP, what)                                                                                           \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (kNodeP->value.firstChildP == NULL)                                                                                          \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", what, OrionldDetailString);                                  \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define EMPTY_ARRAY_CHECK(kNodeP, what)                                                                      \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->value.firstChildP == NULL)                                                                     \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", what);                                  \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -121,15 +121,15 @@ do                                                                              
 //
 // ATTRIBUTE_IS_OBJECT_CHECK -
 //
-#define ATTRIBUTE_IS_OBJECT_CHECK(nodeP)                                                                                          \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (nodeP->type != KjObject)                                                                                                    \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name, OrionldDetailString);       \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define ATTRIBUTE_IS_OBJECT_CHECK(nodeP)                                                                     \
+do                                                                                                           \
+{                                                                                                            \
+  if (nodeP->type != KjObject)                                                                               \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", nodeP->name);       \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -138,15 +138,15 @@ do                                                                              
 //
 // STRING_CHECK -
 //
-#define STRING_CHECK(kNodeP, fieldName)                                                                                           \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (kNodeP->type != KjString)                                                                                                   \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", fieldName, OrionldDetailString);                       \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define STRING_CHECK(kNodeP, fieldName)                                                                      \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->type != KjString)                                                                              \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", fieldName);                       \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -155,15 +155,15 @@ do                                                                              
 //
 // INTEGER_CHECK -
 //
-#define INTEGER_CHECK(nodeP, fieldName)                                                                                           \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (nodeP->type != KjInt)                                                                                                       \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Integer", fieldName, OrionldDetailString);                      \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define INTEGER_CHECK(nodeP, fieldName)                                                                      \
+do                                                                                                           \
+{                                                                                                            \
+  if (nodeP->type != KjInt)                                                                                  \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Integer", fieldName);                      \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -172,15 +172,15 @@ do                                                                              
 //
 // BOOL_CHECK -
 //
-#define BOOL_CHECK(kNodeP, fieldName)                                                                                             \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (kNodeP->type != KjBoolean)                                                                                                  \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Boolean", fieldName, OrionldDetailString);                      \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define BOOL_CHECK(kNodeP, fieldName)                                                                        \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->type != KjBoolean)                                                                             \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Boolean", fieldName);                      \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -189,15 +189,15 @@ do                                                                              
 //
 // DATETIME_CHECK -
 //
-#define DATETIME_CHECK(stringValue, fieldName)                                                                                    \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if (parse8601Time(stringValue) == -1)                                                                                           \
-  {                                                                                                                               \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid DateTime value", fieldName, OrionldDetailString);                  \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define DATETIME_CHECK(stringValue, fieldName)                                                               \
+do                                                                                                           \
+{                                                                                                            \
+  if (parse8601Time(stringValue) == -1)                                                                      \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid DateTime value", fieldName);                  \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -206,16 +206,16 @@ do                                                                              
 //
 // ARRAY_OR_STRING_CHECK -
 //
-#define ARRAY_OR_STRING_CHECK(nodeP, what)                                                                                        \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                                                      \
-  {                                                                                                                               \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                                      \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor String", what, OrionldDetailString);                  \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define ARRAY_OR_STRING_CHECK(nodeP, what)                                                                   \
+do                                                                                                           \
+{                                                                                                            \
+  if ((nodeP->type != KjArray) && (nodeP->type != KjString))                                                 \
+  {                                                                                                          \
+    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                 \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor String", what);                  \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 
@@ -224,16 +224,16 @@ do                                                                              
 //
 // ARRAY_OR_STRING_OR_OBJECT_CHECK -
 //
-#define ARRAY_OR_STRING_OR_OBJECT_CHECK(nodeP, what)                                                                              \
-do                                                                                                                                \
-{                                                                                                                                 \
-  if ((nodeP->type != KjArray) && (nodeP->type != KjString) && (nodeP->type != KjObject))                                         \
-  {                                                                                                                               \
-    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                                      \
-    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what, OrionldDetailString);     \
-    ciP->httpStatusCode = SccBadRequest;                                                                                          \
-    return false;                                                                                                                 \
-  }                                                                                                                               \
+#define ARRAY_OR_STRING_OR_OBJECT_CHECK(nodeP, what)                                                         \
+do                                                                                                           \
+{                                                                                                            \
+  if ((nodeP->type != KjArray) && (nodeP->type != KjString) && (nodeP->type != KjObject))                    \
+  {                                                                                                          \
+    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                 \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", what);     \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
 } while (0)
 
 #endif  // SRC_LIB_ORIONLD_COMMON_CHECK_H_

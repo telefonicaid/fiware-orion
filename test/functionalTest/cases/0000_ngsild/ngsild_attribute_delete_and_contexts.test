@@ -127,12 +127,12 @@ Date: REGEX(.*)
 03. Attempt to delete P2, without context, using alias P2 => see error Not Found
 ================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 150
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+    "detail": "P2",
     "title": "Attribute Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

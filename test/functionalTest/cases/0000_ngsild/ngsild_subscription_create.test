@@ -541,12 +541,12 @@ Date: REGEX(.*)
 05. Attempt to create a subscription with an ID that is not a URI - see failure
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 163
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/sub01",
+    "detail": "sub01",
     "title": "Subscription::id is not a URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

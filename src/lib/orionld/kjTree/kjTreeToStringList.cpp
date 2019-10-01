@@ -56,9 +56,9 @@ bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::st
 
     STRING_CHECK(attributeP, "String-List item");
 
-    if (orionldUriExpand(orionldState.contextP, attributeP->value.s, expanded, sizeof(expanded), &details) == false)
+    if (orionldUriExpand(orionldState.contextP, attributeP->value.s, expanded, sizeof(expanded), NULL, &details) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details);
       delete stringListP;  // ?
       return false;
     }
