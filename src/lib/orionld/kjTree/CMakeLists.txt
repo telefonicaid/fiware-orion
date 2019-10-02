@@ -25,7 +25,6 @@ SET (SOURCES
     kjTreeFromContextAttribute.cpp
     kjTreeFromContextContextAttribute.cpp
     kjTreeFromCompoundValue.cpp
-    kjTreeFromQueryContextResponseWithAttrList.cpp
     kjTreeFromSubscription.cpp
     kjTreeFromNotification.cpp
     kjTreeFromRegistration.cpp

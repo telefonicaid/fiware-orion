@@ -24,6 +24,8 @@
 */
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 #include "kjson/kjClone.h"                                     // kjClone
@@ -49,10 +51,132 @@ extern "C"
 #include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
 #include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 #include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
+#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
 #include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// inAttrList -
+//
+static bool inAttrList(const char* attrName, char** attrListExpanded, int attrsInAttrList)
+{
+  LM_TMP(("ATTRS: Checking attribute '%s'", attrName));
+  for (int ix = 0; ix < attrsInAttrList; ix++)
+  {
+    if (strcmp(attrName, attrListExpanded[ix]) == 0)
+    {
+      LM_TMP(("ATTRS: '%s' is in the attrs list, so, must be included in the response", attrName));
+      return true;
+    }
+  }
+
+  LM_TMP(("ATTRS: '%s' is NOT in the attrs list, so, must NOT be included in the response", attrName));
+  return false;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attrListParseAndExpand -
+//
+static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpandedVecP, char* attrList)
+{
+  int   attrs = 0;
+  char* cP;
+
+  LM_TMP(("ATTRS: incoming attrList: %s", attrList));
+
+  //
+  // attrList is a comma-separated list.
+  // First we need to find out how many attributes are in the list (== number of commas + 1)
+  //
+  if (*attrList != 0)
+  {
+    cP = attrList;
+    while (*cP != 0)
+    {
+      if (*cP == ',')
+      {
+        if (cP[1] != 0)  // If the comma is the last character - then there is no no next attribute
+          ++attrs;
+      }
+
+      ++cP;
+    }
+  }
+
+  ++attrs;  // Number of attributes == number of commas + 1
+
+
+  //
+  // Allocate room for the attribute name pointers
+  //
+  char** expandedV = (char**) kaAlloc(&orionldState.kalloc, attrs * sizeof(char*));
+
+  //
+  // And, parse attrList, to make the items in the vector point to each attribute name
+  //
+
+  // The first one is given:
+  expandedV[0] = attrList;
+
+  int aIx = 1;
+  cP = attrList;
+  while (*cP != 0)
+  {
+    if (*cP == ',')
+    {
+      *cP = 0;
+
+      if (cP[1] != 0)  // If the comma is the last character - then there is no no next attribute
+      {
+        ++cP;
+        expandedV[aIx++] = cP;
+      }
+      else
+        ++cP;
+    }
+    else
+      ++cP;
+  }
+
+
+#if 0
+  // <DEBUG>
+  LM_TMP(("ATTRS: Got %d attributes in the attrs URI Param", aIx));
+  for (int ix = 0; ix < attrs; ix++)
+    LM_TMP(("ATTRS: attr %d: %s", ix, expandedV[ix]));
+  // </DEBUG>
+#endif
+
+  //
+  // Expand attribute names
+  //
+  for (int ix = 0; ix < attrs; ix++)
+  {
+    char  longName[256];
+    char* detail;
+
+    if (orionldUriExpand(orionldState.contextP, expandedV[ix], longName, 256, NULL, &detail) == true)
+    {
+      LM_TMP(("ATTRS: Expanded: %s => %s", expandedV[ix], longName));
+      expandedV[ix] = kaStrdup(&orionldState.kalloc, longName);
+    }
+    else
+      LM_TMP(("ATTRS: Not expanded: %s", expandedV[ix]));
+  }
+
+  *attrListExpandedVecP = expandedV;
+  *attrsInAttrListP     = attrs;
+
+  LM_TMP(("ATTRS: Expanded Array created (%d items)", attrs));
+}
 
 
 
@@ -111,7 +235,7 @@ bool orionldSysAttrs(ConnectionInfo* ciP, double creDate, double modDate, KjNode
 // The context for the entity is found in the context-cache.
 // If not present, it is retreived from the "@context" attribute of the entity and put in the cache
 //
-KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool keyValues, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP)
 {
   char* details  = NULL;
   bool  sysAttrs = ciP->uriParamOptions["sysAttrs"];
@@ -181,9 +305,18 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
   if (oneHit == true)
     top = root;
 
+  //
+  // Expanding attrList, if present
+  //
+  int    attrsInAttrList  = 0;
+  char** attrListExpanded = NULL;
+
+  if (attrList)
+    attrListParseAndExpand(&attrsInAttrList, &attrListExpanded, attrList);
+
   for (int ix = 0; ix < hits; ix++)
   {
-    ContextElement* ceP      = &responseP->contextElementResponseVector[ix]->contextElement;
+    ContextElement* ceP = &responseP->contextElementResponseVector[ix]->contextElement;
 
     if (oneHit == false)
     {
@@ -239,17 +372,24 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     //
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); aIx++)
     {
-      ContextAttribute* aP       = ceP->contextAttributeVector[aIx];
-      char*             attrName;
-      const char*       aName    = aP->name.c_str();
-      KjNode*           aTop     = NULL;
+      KjNode*           aTop                 = NULL;
+      ContextAttribute* aP                   = ceP->contextAttributeVector[aIx];
+      const char*       attrShortName        = aP->name.c_str();
+      char*             attrName;              // Attribute Long Name
       char*             valueFieldName;
       bool              valueMayBeContracted = false;
 
-      LM_TMP(("VAL: Treating attribute '%s'", aP->name.c_str()));
+      LM_TMP(("VAL: Treating attribute '%s'", attrShortName));
 
-      attrName = orionldAliasLookup(orionldState.contextP, aP->name.c_str(), &valueMayBeContracted);
-      LM_TMP(("VAL: Value of %s may be contracted? - %s", aP->name.c_str(), FT(valueMayBeContracted)));
+      attrName = orionldAliasLookup(orionldState.contextP, attrShortName, &valueMayBeContracted);
+
+      //
+      // If URI param attrList has been used, only matching attributes should be included in the response
+      //
+      if ((attrListExpanded != NULL) && (inAttrList(attrShortName, attrListExpanded, attrsInAttrList) == false))
+        continue;
+
+      LM_TMP(("VAL: Value of %s may be contracted? - %s", attrShortName, FT(valueMayBeContracted)));
       if (keyValues)
       {
         LM_TMP(("VAL: keyValues"));
@@ -335,7 +475,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:
-          if (SCOMPARE11(aName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+          if (SCOMPARE11(attrShortName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
           {
             char   date[128];
             char*  details;

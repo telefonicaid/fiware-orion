@@ -548,7 +548,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Transform QueryContextResponse to KJ-Tree
   //
   ciP->httpStatusCode       = SccOk;
-  orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, keyValues, &parseData.qcrs.res);
+  orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &parseData.qcrs.res);
 
   return true;
 }

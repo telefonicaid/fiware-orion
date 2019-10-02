@@ -387,6 +387,7 @@ Date: REGEX(.*)
 
 09. Dump accumulator - see two notifications
 ============================================
+#SORT_START
 POST http://REGEX(.*)/notify
 Content-Length: 407
 User-Agent: orionld
@@ -442,6 +443,7 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--
