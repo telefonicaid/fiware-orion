@@ -38,6 +38,6 @@ extern "C"
 //
 // orionldAliasLookup -
 //
-extern char* orionldAliasLookup(OrionldContext* contextP, const char* longName);
+extern char* orionldAliasLookup(OrionldContext* contextP, const char* longName, bool* valueMayBeContractedP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDALIASLOOKUP_H_

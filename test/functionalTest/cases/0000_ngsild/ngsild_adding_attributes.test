@@ -258,7 +258,7 @@ MongoDB server version: REGEX(.*)
 				},
 				"https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork" : {
 					"type" : "Property",
-					"value" : "completed"
+					"value" : "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
 				}
 			},
 			"creDate" : REGEX(.*),
@@ -285,7 +285,7 @@ bye
 05. Get the entity and see the five attributes
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 1053
+Content-Length: 1108
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -302,7 +302,7 @@ Date: REGEX(.*)
     },
     "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
-      "value": "completed"
+      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
     }
   },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {

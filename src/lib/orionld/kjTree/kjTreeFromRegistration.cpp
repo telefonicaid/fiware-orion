@@ -169,7 +169,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
           kjChildAdd(objectP2, nodeP);
         }
 
-        char* alias = orionldAliasLookup(contextP, eP->type.c_str());
+        char* alias = orionldAliasLookup(contextP, eP->type.c_str(), NULL);
 
         nodeP = kjString(orionldState.kjsonP, "type", alias);
         kjChildAdd(objectP2, nodeP);
@@ -187,7 +187,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
 
       for (unsigned int pIx = 0; pIx < size; pIx++)
       {
-        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.propertyV[pIx].c_str());
+        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.propertyV[pIx].c_str(), NULL);
         nodeP = kjString(orionldState.kjsonP, NULL, alias);
         kjChildAdd(arrayP2, nodeP);
       }
@@ -202,7 +202,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
 
       for (unsigned int rIx = 0; rIx < size; rIx++)
       {
-        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.relationshipV[rIx].c_str());
+        char* alias = orionldAliasLookup(contextP, registrationP->dataProvided.relationshipV[rIx].c_str(), NULL);
         nodeP = kjString(orionldState.kjsonP, NULL, alias);
         kjChildAdd(arrayP2, nodeP);
       }
@@ -329,7 +329,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
     //
     for (KjNode* nodeP = registrationP->properties->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
-      char* alias = orionldAliasLookup(orionldState.contextP, nodeP->name);
+      char* alias = orionldAliasLookup(orionldState.contextP, nodeP->name, NULL);
 
       if (alias != NULL)
         nodeP->name = alias;

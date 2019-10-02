@@ -37,53 +37,73 @@
 //
 // orionldAliasLookup -
 //
-char* orionldAliasLookup(OrionldContext* contextP, const char* longName)
+char* orionldAliasLookup(OrionldContext* contextP, const char* longName, bool* valueMayBeContractedP)
 {
-  LM_T(LmtAlias, ("=================== Reverse alias-search for '%s'", longName));
+  LM_T(LmtAlias, ("VAL: =================== Reverse alias-search for '%s'", longName));
+
+  if (valueMayBeContractedP != NULL)
+    *valueMayBeContractedP = false;
 
   // Is it the default URL ?
   if (orionldDefaultUrlLen != -1)
   {
     if (strncmp(longName, orionldDefaultUrl, orionldDefaultUrlLen) == 0)
     {
-      LM_T(LmtAlias, ("Default URL detected. Returning: '%s'", &longName[orionldDefaultUrlLen]));
+      LM_T(LmtAlias, ("VAL: Default URL detected. Returning: '%s'", &longName[orionldDefaultUrlLen]));
       return (char*) &longName[orionldDefaultUrlLen];
     }
   }
 
-  LM_T(LmtAlias, ("Calling orionldContextValueLookup for long-name '%s'", longName));
-  LM_T(LmtContextValueLookup, ("CTX:"));
-  LM_T(LmtContextValueLookup, ("CTX: =============================== Calling orionldContextValueLookup for '%s'", longName));
+  LM_T(LmtAlias, ("VAL: Calling orionldContextValueLookup for long-name '%s'", longName));
+  LM_T(LmtContextValueLookup, ("VAL:"));
+  LM_T(LmtContextValueLookup, ("VAL: =============================== Calling orionldContextValueLookup for '%s'", longName));
   KjNode* aliasNodeP     = orionldContextValueLookup(contextP, longName);
-  LM_T(LmtContextValueLookup, ("CTX: =================================================================================================="));
+  LM_T(LmtContextValueLookup, ("VAL: =================================================================================================="));
 
   if (aliasNodeP != NULL)
   {
     if (aliasNodeP->type == KjObject)
     {
-      LM_T(LmtAlias, ("The alias node is an object (named '%s')", aliasNodeP->name));
+      KjNode* idP = NULL;
+
+      LM_T(LmtAlias, ("VAL: The alias node is an object (named '%s')", aliasNodeP->name));
       // The @id node stores the name - look it up
-      for (KjNode* idNodeP = aliasNodeP->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
+      for (KjNode* kNodeP = aliasNodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
       {
-        if (SCOMPARE4(idNodeP->name, '@', 'i', 'd', 0))
+        if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
         {
-          LM_T(LmtContextValueLookup, ("Found the @id: '%s' (for aliasNode '%s')", idNodeP->value.s, aliasNodeP->name));
-          return aliasNodeP->name;
+          LM_T(LmtContextValueLookup, ("Found the @id: '%s' (for aliasNode '%s')", kNodeP->value.s, aliasNodeP->name));
+          idP = kNodeP;
+        }
+        else if ((valueMayBeContractedP != NULL) && (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0)))
+        {
+          LM_T(LmtContextValueLookup, ("VAL: Found the @type: '%s' (for aliasNode '%s')", kNodeP->value.s, aliasNodeP->name));
+          if (strcmp(kNodeP->value.s, "@vocab") == 0)
+          {
+            LM_TMP(("VAL: @type == @vocab - value can be contracted"));
+            *valueMayBeContractedP = true;
+          }
         }
       }
 
-      LM_T(LmtAlias, ("Error in context (@id part is missing), keeping long name '%s'", longName));
+      if (idP != NULL)
+        return aliasNodeP->name;  // All OK, as "@id" was present inside the object
+
+      //
+      // No "@id" found - alias cannot be used.
+      //
+      LM_T(LmtAlias, ("VAL: Error in context (@id part is missing), keeping long name '%s'", longName));
       return (char*) longName;
     }
     else
     {
       char* alias = aliasNodeP->name;
 
-      LM_T(LmtAlias, ("Found the alias: '%s' => '%s'", longName, alias));
+      LM_T(LmtAlias, ("VAL: Found the alias: '%s' => '%s'", longName, alias));
       return alias;
     }
   }
 
-  LM_T(LmtAlias, ("No alias found, keeping long name '%s'", longName));
+  LM_T(LmtAlias, ("VAL: No alias found, keeping long name '%s'", longName));
   return (char*) longName;
 }

@@ -90,7 +90,7 @@ static bool qAliasCompress(char* qString)
         ++eqP;
       }
 
-      alias = orionldAliasLookup(orionldState.contextP, varStart);
+      alias = orionldAliasLookup(orionldState.contextP, varStart, NULL);
 
       if (alias != NULL)
       {
@@ -235,7 +235,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
         kjChildAdd(objectP, nodeP);
       }
 
-      char* alias = orionldAliasLookup(contextP, eP->type.c_str());
+      char* alias = orionldAliasLookup(contextP, eP->type.c_str(), NULL);
 
       nodeP = kjString(orionldState.kjsonP, "type", alias);
       kjChildAdd(objectP, nodeP);
@@ -255,7 +255,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     for (ix = 0; ix < size; ix++)
     {
       char* attrName = (char*) subscriptionP->subject.condition.attributes[ix].c_str();
-      char* alias    = orionldAliasLookup(contextP, attrName);
+      char* alias    = orionldAliasLookup(contextP, attrName, NULL);
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
@@ -363,7 +363,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     for (ix = 0; ix < size; ++ix)
     {
       char* attrName = (char*) subscriptionP->notification.attributes[ix].c_str();
-      char* alias    = orionldAliasLookup(contextP, attrName);
+      char* alias    = orionldAliasLookup(contextP, attrName, NULL);
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);

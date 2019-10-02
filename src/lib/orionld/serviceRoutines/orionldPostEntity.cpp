@@ -841,7 +841,7 @@ static bool subscriptionMatchCallback
     //
     // Lookup alias for attribute name in the context
     //
-    char* alias = orionldAliasLookup(orionldState.contextP, aP->name);
+    char* alias = orionldAliasLookup(orionldState.contextP, aP->name, NULL);
 
     if (alias != NULL)
     {

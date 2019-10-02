@@ -39,6 +39,7 @@ brokerStart CB 0-255
 # 06. GET the entity, make sure the value of 'locatedIn' has changed
 # 07. Update 'locatedIn', adding another metadata
 # 08. GET the entity, make sure all metadata of 'locatedIn' are present
+# 09. GET the entity, with tutorials.Step-by-Step context - see shortnames
 #
 
 echo "01. Create an entity without relationship 'locatedIn'"
@@ -155,6 +156,13 @@ echo
 echo
 
 
+echo "09. GET the entity, with tutorials.Step-by-Step context - see shortnames"
+echo "========================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create an entity without relationship 'locatedIn'
 =====================================================
@@ -215,7 +223,7 @@ Date: REGEX(.*)
 04. GET the entity, make sure all metadata of 'locatedIn' are present
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1053
+Content-Length: 1108
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -232,7 +240,7 @@ Date: REGEX(.*)
     },
     "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
-      "value": "completed"
+      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
     }
   },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
@@ -273,7 +281,7 @@ Date: REGEX(.*)
 06. GET the entity, make sure the value of 'locatedIn' has changed
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 1053
+Content-Length: 1108
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -290,7 +298,7 @@ Date: REGEX(.*)
     },
     "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
-      "value": "completed"
+      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
     }
   },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
@@ -331,7 +339,7 @@ Date: REGEX(.*)
 08. GET the entity, make sure all metadata of 'locatedIn' are present
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1152
+Content-Length: 1207
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
@@ -348,7 +356,7 @@ Date: REGEX(.*)
     },
     "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
-      "value": "completed"
+      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
     },
     "xtraMdata": {
       "type": "Property",
@@ -360,6 +368,59 @@ Date: REGEX(.*)
     "value": 50
   },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  }
+}
+
+
+
+09. GET the entity, with tutorials.Step-by-Step context - see shortnames
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 822
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "Shelf",
+  "locatedIn": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store002",
+    "installedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:employee001"
+    },
+    "statusOfWork": {
+      "type": "Property",
+      "value": "completed"
+    },
+    "xtraMdata": {
+      "type": "Property",
+      "value": "urn:ngsi-ld:Building:store005"
+    }
+  },
+  "maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "stocks": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Product:001"
   },

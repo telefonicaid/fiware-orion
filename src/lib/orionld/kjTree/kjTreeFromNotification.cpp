@@ -160,7 +160,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // entity type - Mandatory URI
-    alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str());
+    alias = orionldAliasLookup(contextP, ceP->entityId.type.c_str(), NULL);
     nodeP = kjString(orionldState.kjsonP, "type", alias);
     kjChildAdd(objectP, nodeP);
 

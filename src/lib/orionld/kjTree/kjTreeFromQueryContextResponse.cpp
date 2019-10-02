@@ -208,7 +208,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
     {
       char* alias;
 
-      alias = orionldAliasLookup(orionldState.contextP, ceP->entityId.type.c_str());
+      alias = orionldAliasLookup(orionldState.contextP, ceP->entityId.type.c_str(), NULL);
       nodeP = kjString(orionldState.kjsonP, "type", alias);
       if (nodeP == NULL)
       {
@@ -244,16 +244,33 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
       const char*       aName    = aP->name.c_str();
       KjNode*           aTop     = NULL;
       char*             valueFieldName;
+      bool              valueMayBeContracted = false;
 
-      attrName = orionldAliasLookup(orionldState.contextP, aP->name.c_str());
+      LM_TMP(("VAL: Treating attribute '%s'", aP->name.c_str()));
+
+      attrName = orionldAliasLookup(orionldState.contextP, aP->name.c_str(), &valueMayBeContracted);
+      LM_TMP(("VAL: Value of %s may be contracted? - %s", aP->name.c_str(), FT(valueMayBeContracted)));
       if (keyValues)
       {
+        LM_TMP(("VAL: keyValues"));
         // If keyValues, then just the value of the attribute is to be rendered (built)
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:    aTop = kjFloat(orionldState.kjsonP, attrName,   aP->numberValue);          break;
         case orion::ValueTypeBoolean:   aTop = kjBoolean(orionldState.kjsonP, attrName, aP->boolValue);            break;
-        case orion::ValueTypeString:    aTop = kjString(orionldState.kjsonP, attrName,  aP->stringValue.c_str());  break;
+        case orion::ValueTypeString:
+          if (valueMayBeContracted == true)
+          {
+            char* contractedValue = orionldAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL);
+            if (contractedValue == NULL)
+              aTop = kjString(orionldState.kjsonP, attrName, contractedValue);
+            else
+              aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());
+          }
+          else
+            aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());
+          break;
+
         case orion::ValueTypeNull:      aTop = kjNull(orionldState.kjsonP, attrName);                              break;
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
@@ -261,7 +278,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
           if (aTop != NULL)
           {
-            if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, &details) == NULL)
+            if (kjTreeFromCompoundValue(aP->compoundValueP, aTop, valueMayBeContracted, &details) == NULL)
             {
               LM_E(("kjTreeFromCompoundValue: %s", details));
               orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node from a compound value", details);
@@ -289,6 +306,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
         //
         // NOT keyValues - create entire attribute tree
         //
+        LM_TMP(("VAL: Not keyValues"));
         aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {
@@ -313,7 +331,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
 
         // value
         valueFieldName = (char*) ((aP->type == "Relationship")? "object" : "value");
-
+        LM_TMP(("VAL: value type: %s", valueTypeName(aP->valueType)));
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:
@@ -335,13 +353,40 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             nodeP = kjFloat(orionldState.kjsonP, valueFieldName, aP->numberValue);
           break;
 
-        case orion::ValueTypeString:    nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());      break;
+        case orion::ValueTypeString:
+          LM_TMP(("VAL: It's a string ..."));
+
+          if (valueMayBeContracted == true)
+          {
+            LM_TMP(("VAL: ... and it may be contracted"));
+            char* contractedValue = orionldAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL);
+
+            if (contractedValue != NULL)
+            {
+              LM_TMP(("VAL: contracted value is: %s", contractedValue));
+              nodeP = kjString(orionldState.kjsonP, valueFieldName, contractedValue);
+            }
+            else
+            {
+              LM_TMP(("VAL: contracted value - not found"));
+              nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());
+            }
+          }
+          else
+          {
+            LM_TMP(("VAL: ... and it may NOT be contracted"));
+            nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());
+          }
+          break;
+
         case orion::ValueTypeBoolean:   nodeP = kjBoolean(orionldState.kjsonP, valueFieldName, (KBool) aP->boolValue);       break;
         case orion::ValueTypeNull:      nodeP = kjNull(orionldState.kjsonP, valueFieldName);                                 break;
         case orion::ValueTypeNotGiven:  nodeP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE");               break;
 
         case orion::ValueTypeVector:
+          LM_TMP(("VAL: Compound value, of Array type"));
         case orion::ValueTypeObject:
+          LM_TMP(("VAL: Compound value"));
           nodeP = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, valueFieldName) : kjObject(orionldState.kjsonP, valueFieldName);
           if (nodeP == NULL)
           {
@@ -350,7 +395,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             return NULL;
           }
 
-          if (kjTreeFromCompoundValue(aP->compoundValueP, nodeP, &details) == NULL)
+          if (kjTreeFromCompoundValue(aP->compoundValueP, nodeP, valueMayBeContracted, &details) == NULL)
           {
             LM_E(("kjTreeFromCompoundValue: %s", details));
             orionldErrorResponseCreate(OrionldInternalError, "Unable to create tree node from compound value", details);
@@ -378,8 +423,9 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
           //
           // Metadata with "type" != "" are built as Objects with type+value/object
           //
-          Metadata* mdP     = aP->metadataVector[ix];
-          char*     mdName  = (char*) mdP->name.c_str();
+          Metadata* mdP                  = aP->metadataVector[ix];
+          char*     mdName               = (char*) mdP->name.c_str();
+          bool      valueMayBeContracted = false;
 
           if ((strcmp(mdName, "observedAt") != 0) &&
               (strcmp(mdName, "createdAt")  != 0) &&
@@ -388,7 +434,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
             //
             // Looking up short name for the sub-attribute
             //
-            mdName = orionldAliasLookup(orionldState.contextP, mdName);
+            mdName = orionldAliasLookup(orionldState.contextP, mdName, &valueMayBeContracted);
           }
 
           if (mdP->type != "")
@@ -424,13 +470,26 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
                 valueP = kjFloat(orionldState.kjsonP, valueFieldName, mdP->numberValue);
               break;
 
-            case orion::ValueTypeString:   valueP = kjString(orionldState.kjsonP, valueFieldName, mdP->stringValue.c_str());     break;
+            case orion::ValueTypeString:
+              if (valueMayBeContracted == true)
+              {
+                char* contractedValue = orionldAliasLookup(orionldState.contextP, mdP->stringValue.c_str(), NULL);
+
+                if (contractedValue != NULL)
+                  valueP = kjString(orionldState.kjsonP, valueFieldName, contractedValue);
+                else
+                  valueP = kjString(orionldState.kjsonP, valueFieldName, mdP->stringValue.c_str());
+              }
+              else
+                valueP = kjString(orionldState.kjsonP, valueFieldName, mdP->stringValue.c_str());
+              break;
+
             case orion::ValueTypeBoolean:  valueP = kjBoolean(orionldState.kjsonP, valueFieldName, mdP->boolValue);              break;
             case orion::ValueTypeNull:     valueP = kjNull(orionldState.kjsonP, valueFieldName);                                 break;
             case orion::ValueTypeNotGiven: valueP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE IN MONGODB 1");  break;
 
-            case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
-            case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details); valueP->name = (char*) "value"; break;
+            case orion::ValueTypeObject:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeContracted, &details); valueP->name = (char*) "value"; break;
+            case orion::ValueTypeVector:   valueP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeContracted, &details); valueP->name = (char*) "value"; break;
             }
 
             kjChildAdd(nodeP, valueP);
@@ -459,13 +518,26 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, bool ke
                 nodeP = kjFloat(orionldState.kjsonP, mdName, mdP->numberValue);
               break;
 
-            case orion::ValueTypeString:   nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());            break;
+            case orion::ValueTypeString:
+              if (valueMayBeContracted == true)
+              {
+                char* contractedValue = orionldAliasLookup(orionldState.contextP, mdP->stringValue.c_str(), NULL);
+
+                if (contractedValue != NULL)
+                  nodeP = kjString(orionldState.kjsonP, mdName, contractedValue);
+                else
+                  nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());
+             }
+              else
+                nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());
+              break;
+
             case orion::ValueTypeBoolean:  nodeP = kjBoolean(orionldState.kjsonP, mdName, mdP->boolValue);                     break;
             case orion::ValueTypeNull:     nodeP = kjNull(orionldState.kjsonP, mdName);                                        break;
             case orion::ValueTypeNotGiven: nodeP = kjString(orionldState.kjsonP, mdName, "UNKNOWN TYPE IN MONGODB 2");         break;
 
-            case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
-            case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, &details);  nodeP->name = (char*) "value"; break;
+            case orion::ValueTypeObject:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeContracted, &details);  nodeP->name = (char*) "value"; break;
+            case orion::ValueTypeVector:   nodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeContracted, &details);  nodeP->name = (char*) "value"; break;
             }
           }
 

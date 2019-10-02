@@ -153,12 +153,15 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     }
     *attrListEnd = 0;
 
+    LM_TMP(("VAL: Calling kjTreeFromQueryContextResponseWithAttrList"));
     orionldState.responseTree = kjTreeFromQueryContextResponseWithAttrList(ciP, true, attrList, keyValues, &response);
     free(attrList);
   }
   else
+  {
+    LM_TMP(("VAL: Calling kjTreeFromQueryContextResponse"));
     orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, keyValues, &response);
-
+  }
 
   if (orionldState.responseTree == NULL)
   {

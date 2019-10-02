@@ -1,0 +1,232 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Expansion of values with context as an array of two items and in payload
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with context as an array of	two items and in payload
+# 02. Query mongo and see the expanded values
+# 03. GET the entity and see the values contracted again
+#
+
+echo "01. Create an entity with context as an array of two items and in payload"
+echo "========================================================================="
+payload='{
+    "id": "urn:ngsi-ld:Building:store007",
+    "type": "Building",
+    "category": {"type": "Property", "value": ["commercial"]},
+    "address": {
+      "type": "Property",
+      "value": {
+        "streetAddress": "Bornholmer Strasse 65",
+        "addressRegion": "Berlin",
+        "addressLocality": "Prenzlauer Berg",
+        "postalCode": "10439"
+      },
+      "verified": {"type": "Property", "value": true}
+    },
+    "location": {
+        "type": "GeoProperty",
+        "value": {"type": "Point", "coordinates": [13.3986, 52.5547]}
+    },
+    "name": {
+      "type": "Property",
+      "value": "Bosebrucke Einkauf"
+    },
+    "@context": [
+      "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Query mongo and see the expanded values"
+echo "==========================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET the entity and see the values	contracted again"
+echo "======================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store007 -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with context as an array of two items and in payload
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store007
+Date: REGEX(.*)
+
+
+
+02. Query mongo and see the expanded values
+===========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Building:store007",
+		"type" : "https://uri.fiware.org/ns/datamodels#Building",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.fiware.org/ns/datamodels#category",
+		"https://schema.org/address",
+		"location",
+		"https://uri.etsi.org/ngsi-ld/default-context/name"
+	],
+	"attrs" : {
+		"https://uri=fiware=org/ns/datamodels#category" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : [
+				"https://uri.fiware.org/ns/datamodels#commercial"
+			],
+			"mdNames" : [ ]
+		},
+		"https://schema=org/address" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"streetAddress" : "Bornholmer Strasse 65",
+				"addressRegion" : "Berlin",
+				"addressLocality" : "Prenzlauer Berg",
+				"postalCode" : "10439"
+			},
+			"md" : {
+				"https://fiware=github=io/tutorials=Step-by-Step/schema/verified" : {
+					"type" : "Property",
+					"value" : true
+				}
+			},
+			"mdNames" : [
+				"https://fiware.github.io/tutorials.Step-by-Step/schema/verified"
+			]
+		},
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					13.3986,
+					52.5547
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Bosebrucke Einkauf",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"location" : {
+		"attrName" : "location",
+		"coords" : {
+			"type" : "Point",
+			"coordinates" : [
+				13.3986,
+				52.5547
+			]
+		}
+	},
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET the entity and see the values	contracted again
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 463
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "address": {
+        "type": "Property",
+        "value": {
+            "addressLocality": "Prenzlauer Berg",
+            "addressRegion": "Berlin",
+            "postalCode": "10439",
+            "streetAddress": "Bornholmer Strasse 65"
+        },
+        "verified": {
+            "type": "Property",
+            "value": true
+        }
+    },
+    "category": {
+        "type": "Property",
+        "value": [
+            "commercial"
+        ]
+    },
+    "id": "urn:ngsi-ld:Building:store007",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.3986,
+                52.5547
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Bosebrucke Einkauf"
+    },
+    "type": "Building"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
