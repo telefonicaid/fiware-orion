@@ -38,4 +38,12 @@ extern "C"
 //
 extern void orionldValueExpand(KjNode* attrNodeP);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDirectValueExpand -
+//
+extern char* orionldDirectValueExpand(char* shortName);
+
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDVALUEEXPAND_H_

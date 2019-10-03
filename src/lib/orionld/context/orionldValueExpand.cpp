@@ -101,3 +101,26 @@ void orionldValueExpand(KjNode* attrNodeP)
   else
     LM_TMP(("VEX: No value expansion for values of type %s", kjValueType(attrNodeP->type)));
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDirectValueExpand -
+//
+char* orionldDirectValueExpand(char* shortName)
+{
+  char   longName[512];
+  char*  detail;
+
+  LM_TMP(("VEX: Expanding '%s' using @context %s", shortName, orionldState.contextP->url));
+  if (orionldUriExpand(orionldState.contextP, shortName, longName, sizeof(longName), NULL, &detail) == false)
+  {
+    LM_E(("Internal Error (orionldUriExpand failed: %s)", detail));
+    return NULL;
+  }
+  LM_TMP(("VEX: Found it! (%s)", longName));
+
+  LM_TMP(("VEX: Old value: %s", shortName));
+  return kaStrdup(&orionldState.kalloc, longName);
+}

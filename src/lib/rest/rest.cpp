@@ -327,6 +327,9 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
+#ifdef ORIONLD
+    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in URI param", key.c_str());
+#endif
     alarmMgr.badInput(clientIp, details);
     ciP->httpStatusCode = error.code;
     ciP->answer         = error.smartRender(ciP->apiVersion);

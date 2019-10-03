@@ -96,7 +96,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   EntityId*    entityIdP;
   char         typeExpanded[256];
-  char*        details;
+  char*        detail;
   char*        idVector[32];
   char*        typeVector[32];
   int          idVecItems   = (int) sizeof(idVector) / sizeof(idVector[0]);
@@ -255,6 +255,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   if ((idVecItems > 1) && (typeVecItems > 1))
   {
+    LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted");
     return false;
   }
@@ -264,7 +265,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   for (int ix = 0; ix < idVecItems; ix++)
   {
-    if ((urlCheck(idVector[ix], &details) == false) && (urnCheck(idVector[ix], &details) == false))
+    if ((urlCheck(idVector[ix], &detail) == false) && (urnCheck(idVector[ix], &detail) == false))
     {
       LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
@@ -274,16 +275,17 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (typeVecItems == 1)  // type needs to be modified according to @context
   {
-    char* details;
+    char* detail;
 
-    if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &details) == true))
+    if (((strncmp(type, "http://", 7) == 0) || (strncmp(type, "https://", 8) == 0)) && (urlCheck(type, &detail) == true))
     {
       // No expansion desired, the type is already a FQN
       strncpy(typeExpanded, type, sizeof(typeExpanded));
     }
-    else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), NULL, &details) == false)
+    else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), NULL, &detail) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details);
+      LM_E(("Internal Error (Error during URI expansion of entity type: %s)", detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", detail);
       return false;
     }
 
@@ -304,9 +306,10 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     for (int ix = 0; ix < typeVecItems; ix++)
     {
       // FIXME: Check for FQN HERE TOO (once it is decided by ETSI)
-      if (orionldUriExpand(orionldState.contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), NULL, &details) == false)
+      if (orionldUriExpand(orionldState.contextP, typeVector[ix], typeExpanded, sizeof(typeExpanded), NULL, &detail) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details);
+        LM_E(("Internal Error (Error during URI expansion of entity type; %s)", detail));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", detail);
         return false;
       }
 
@@ -323,7 +326,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if (attrs != NULL)
   {
     char  longName[256];
-    char* details;
+    char* detail;
     char* shortName;
     char* shortNameVector[32];
     int   vecItems = (int) sizeof(shortNameVector) / sizeof(shortNameVector[0]);
@@ -334,10 +337,11 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       shortName = shortNameVector[ix];
 
-      if (orionldUriExpand(orionldState.contextP, shortName, longName, sizeof(longName), NULL, &details) == true)
+      if (orionldUriExpand(orionldState.contextP, shortName, longName, sizeof(longName), NULL, &detail) == true)
         parseData.qcr.res.attributeList.push_back(longName);
       else
       {
+        LM_E(("Internal Error (Error during URI expansion of attribute '%s')", shortName));
         orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of attribute", shortName);
         parseData.qcr.res.release();
         return false;
@@ -345,27 +349,30 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     }
   }
 
+  LM_TMP(("QVAL: q == %s", q));
 #if NGSILD_Q_FILTER
   if (q != NULL)
   {
     char* title;
-    char* details;
+    char* detail;
 
     LM_TMP(("Q: got a Q-Filter: %s", q));
 
     QNode* lexList;
     QNode* qTree;
 
-    if ((lexList = qLex(q, &title, &details)) == NULL)
+    if ((lexList = qLex(q, &title, &detail)) == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details);
+      LM_W(("Bad Input (qLex: %s: %s)", title, detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
       parseData.qcr.res.release();
       return false;
     }
 
-    if ((qTree = qParse(lexList, &title, &details)) == NULL)
+    if ((qTree = qParse(lexList, &title, &detail)) == NULL)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details);
+      LM_W(("Bad Input (qParse: %s: %s)", title, detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
       parseData.qcr.res.release();
       return false;
     }
@@ -374,9 +381,10 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     LM_TMP(("Q: Calling qTreeToBsonObj"));
     mongo::BSONObjBuilder objBuilder;
-    if (qTreeToBsonObj(qTree, &objBuilder, &title, &details) == false)
+    if (qTreeToBsonObj(qTree, &objBuilder, &title, &detail) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, title, details);
+      LM_W(("Bad Input (qTreeToBsonObj: %s: %s)", title, detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
       parseData.qcr.res.release();
       return false;
     }
@@ -524,15 +532,16 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     LM_T(LmtStringFilter, ("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
 
-    std::string details;
-    if (sfP->parse(q, &details) == false)
+    std::string detail;
+    if (sfP->parse(q, &detail) == false)
     {
       delete scopeP;
       delete sfP;
 
+      LM_E(("Error parsing q StringFilter: %s", detail.c_str()));
       parseData.qcr.res.release();
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error parsing q StringFilter", details.c_str());
-      LM_E(("Error parsing q StringFilter"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error parsing q StringFilter", detail.c_str());
+
       return false;
     }
 

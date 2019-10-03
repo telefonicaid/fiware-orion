@@ -24,6 +24,7 @@
 */
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_FT
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
@@ -32,6 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldValueExpand.h"                // orionldDirectValueExpand
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/QNode.h"                              // QNode
 #include "orionld/common/qLexRender.h"                         // qLexRender - DEBUG
@@ -49,7 +51,7 @@ extern "C"
 //
 // After implementing expansion in metadata names, for attr.b.c, 'b' needs expansion also
 //
-static char* varFix(void* contextP, char* varPath, char* longName, int longNameLen, char** detailsP)
+static char* varFix(void* contextP, char* varPath, char* longName, int longNameLen, bool* valueMayBeExpandedP, char** detailsP)
 {
   char* cP            = varPath;
   char* attrNameP     = varPath;
@@ -61,6 +63,7 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
   char* rest          = NULL;
   char  fullPath[512];
 
+  *valueMayBeExpandedP = false;
 
   LM_TMP(("Q: In varFix: Var PATH == '%s'", varPath));
 
@@ -234,7 +237,7 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
   //
   // All OK - let's compose ...
   //
-  orionldUriExpand(orionldState.contextP, attrNameP, longName, longNameLen, NULL, detailsP);
+  orionldUriExpand(orionldState.contextP, attrNameP, longName, longNameLen, valueMayBeExpandedP, detailsP);
 
   // Turn '.' into '=' for longName
   char* sP = longName;
@@ -245,7 +248,7 @@ static char* varFix(void* contextP, char* varPath, char* longName, int longNameL
     ++sP;
   }
 
-  LM_TMP(("Q: long attribute name: %s", longName));
+  LM_TMP(("QVAL: long attribute name: %s (values may be expanded: %s)", longName, K_FT(*valueMayBeExpandedP)));
 
   //
   // Expand mdName if present
@@ -337,6 +340,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
   QNode*     leftP      = NULL;
   QNode*     expressionStart;
   char       longName[512];
+  bool       valueMayBeExpanded = false;
 
 #ifdef DEBUG
     qLexRender(qLexList, orionldState.qDebugBuffer, sizeof(orionldState.qDebugBuffer));
@@ -392,8 +396,8 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
       break;
 
     case QNodeVariable:
-      LM_TMP(("Q: KZ: QNodeVariable"));
-      qLexP->value.v = varFix(orionldState.contextP, qLexP->value.v, longName, sizeof(longName), detailsP);
+      LM_TMP(("QVAL: QNodeVariable"));
+      qLexP->value.v = varFix(orionldState.contextP, qLexP->value.v, longName, sizeof(longName), &valueMayBeExpanded, detailsP);
       if (qLexP->next == NULL)
       {
         if (compOpP == NULL)
@@ -403,12 +407,14 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         break;
       }
       // NO BREAK !!!
+    case QNodeStringValue:
+      if (qLexP->type == QNodeStringValue) LM_TMP(("QVAL: QNodeStringValue. valueMayBeExpanded: %s", K_FT(valueMayBeExpanded)));
     case QNodeIntegerValue:
     case QNodeFloatValue:
-    case QNodeStringValue:
     case QNodeTrueValue:
     case QNodeFalseValue:
     case QNodeRegexpValue:
+      LM_TMP(("QVAL: type == %s", qNodeType(qLexP->type)));
       if (compOpP == NULL)  // Left-Hand side
       {
         LM_TMP(("Q: Saving '%s' as left-hand-side", qNodeType(qLexP->type)));
@@ -419,7 +425,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         QNode* rangeP = NULL;
         QNode* commaP = NULL;
 
-        LM_TMP(("Q: ------------------------ Got a value for RHS: %s", qNodeType(qLexP->type)));
+        LM_TMP(("QVAL: ------------------------ Got a value for RHS, the type is %s", qNodeType(qLexP->type)));
         if ((qLexP->next != NULL) && (qLexP->next->type == QNodeRange))
         {
           QNode*    lowerLimit;
@@ -482,7 +488,18 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         else if (commaP != NULL)
           qNodeAppend(compOpP, commaP);
         else
+        {
+          LM_TMP(("QVAL: Adding qLexP, that is a '%s'", qNodeType(qLexP->type)));
+
+          if ((qLexP->type == QNodeStringValue) && (valueMayBeExpanded == true))
+          {
+            LM_TMP(("QVAL: Expanding value '%s'", qLexP->value.s));
+            qLexP->value.s = orionldDirectValueExpand(qLexP->value.s);
+            LM_TMP(("QVAL: Expanded value '%s'", qLexP->value.s));
+          }
+
           qNodeAppend(compOpP, qLexP);
+        }
 
         LM_TMP(("Q: Adding part-tree to qNodeV, on index %d", qNodeIx));
         qNodeV[qNodeIx++] = compOpP;
