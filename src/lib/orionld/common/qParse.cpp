@@ -451,7 +451,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         {
           QNodeType commaValueType  = qLexP->type;
 
-          LM_TMP(("Q: Peeked and saw a COMMA operator - eating comma-list"));
+          LM_TMP(("QVAL: Peeked and saw a COMMA operator - eating comma-list"));
 
           commaP = qLexP->next;
 
@@ -469,9 +469,30 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
               return NULL;
             }
 
+            if ((valueP->type == QNodeStringValue) && (valueMayBeExpanded == true))
+            {
+              LM_TMP(("QVAL: list item is a string, and it may be expanded: short value: '%s'", valueP->value.s));
+              valueP->value.s = orionldDirectValueExpand(valueP->value.s);
+              LM_TMP(("QVAL: expanded list item to: %s", valueP->value.s));
+            }
+
             qNodeAppend(commaP, valueP);  // OK to enlist commaP and valueP as qLexP point to after valueP
+            LM_TMP(("QVAL: Appended node of type %s", qNodeType(valueP->type)));
           }
+
+          //
+          // Appending last list item
+          //
+          LM_TMP(("QVAL: qLexP now points to a %s", qNodeType(qLexP->type)));
           QNode* valueP = qLexP;
+
+          if ((valueP->type == QNodeStringValue) && (valueMayBeExpanded == true))
+          {
+            LM_TMP(("QVAL: list item is a string, and it may be expanded: short value: '%s'", valueP->value.s));
+            valueP->value.s = orionldDirectValueExpand(valueP->value.s);
+            LM_TMP(("QVAL: expanded list item to: %s", valueP->value.s));
+          }
+
           qNodeAppend(commaP, valueP);
         }
 

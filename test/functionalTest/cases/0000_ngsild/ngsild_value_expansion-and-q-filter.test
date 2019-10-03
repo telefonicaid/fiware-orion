@@ -33,7 +33,8 @@ brokerStart CB 0-255
 #
 # 01. Create an entity E1 using the data-models context, having an attribute 'category', with value 'commercial', that will be expanded
 # 02. Query mongo and see the expanded values of category
-# 03. GET entities using data-models context and with q=category==commercial
+# 03. GET entities using data-models context and with q=category==commercial - see E1
+# 04. GET entities using data-models context and with q=category==a,b,commercial - see E1
 #
 
 echo "01. Create an entity E1 using the data-models context, having an attribute 'category', with value 'commercial', that will be expanded"
@@ -59,9 +60,17 @@ echo
 echo
 
 
-echo "03. GET entities using data-models context and with q=category==commercial"
-echo "=========================================================================="
+
+echo "03. GET entities using data-models context and with q=category==commercial - see E1"
+echo "==================================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&q=category==%22commercial%22' -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "04. GET entities using data-models context and with q=category==a,b,commercial - see E1"
+echo "======================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=category==%22a%22,%22b%22,%22commercial%22' -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -106,8 +115,28 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. GET entities using data-models context and with q=category==commercial
-==========================================================================
+03. GET entities using data-models context and with q=category==commercial - see E1
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 95
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "category": {
+            "type": "Property",
+            "value": "commercial"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    }
+]
+
+
+04. GET entities using data-models context and with q=category==a,b,commercial - see E1
+=======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 95
 Content-Type: application/json
