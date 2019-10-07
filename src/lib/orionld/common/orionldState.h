@@ -33,6 +33,7 @@ extern "C"
 #include "kjson/kjson.h"                                         // Kjson
 #include "kjson/KjNode.h"                                        // KjNode
 }
+
 #include "common/globals.h"                                      // ApiVersion
 #include "common/MimeType.h"                                     // MimeType
 #include "orionld/common/QNode.h"                                // QNode
@@ -169,7 +170,6 @@ typedef struct OrionldConnectionState
   char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;    // Used by kjTreeFromBsonObj
-
   KjNode*                 delayedKjFreeVec[50];
   int                     delayedKjFreeVecIndex;
   int                     delayedKjFreeVecSize;
@@ -217,13 +217,14 @@ extern char*     tenant;                   // From orionld.cpp
 extern int       contextDownloadAttempts;  // From orionld.cpp
 extern int       contextDownloadTimeout;   // From orionld.cpp
 
-#ifdef DB_DRIVER_MONGOC
 //
 // Variables for Mongo C Driver
 //
+#ifdef DB_DRIVER_MONGOC
 extern mongoc_collection_t*  mongoEntitiesCollectionP;
 extern mongoc_collection_t*  mongoRegistrationsCollectionP;
 #endif
+
 
 
 // -----------------------------------------------------------------------------

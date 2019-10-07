@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYUPDATE_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYUPDATE_H_
+#ifndef SRC_LIB_ORIONLD_DB_DBENTITYBATCHDELETE_H_
+#define SRC_LIB_ORIONLD_DB_DBENTITYBATCHDELETE_H_
 
 /*
 *
@@ -23,21 +23,21 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Larysse Savanna
 */
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
+#include "orionld/db/dbConfiguration.h"                          // DbEntityBatchDeleteFunction
 
 
-// -----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityUpdate -
+// dbEntityBatchDelete -
 //
-extern bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree);
+extern DbEntityBatchDeleteFunction dbEntityBatchDelete;
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYUPDATE_H_
+#endif  // SRC_LIB_ORIONLD_DB_DBENTITYBATCHDELETE_H_

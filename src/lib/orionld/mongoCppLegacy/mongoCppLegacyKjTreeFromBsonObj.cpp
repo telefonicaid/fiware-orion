@@ -45,7 +45,7 @@ extern "C"
 //
 // mongoCppLegacyKjTreeFromBsonObj -
 //
-KjNode* mongoCppLegacyKjTreeFromBsonObj(void* dataP, char** titleP, char** detailsP)
+KjNode* mongoCppLegacyKjTreeFromBsonObj(const void* dataP, char** titleP, char** detailsP)
 {
   mongo::BSONObj* bsonObjP = (mongo::BSONObj*) dataP;
   KjNode*         treeP    = NULL;

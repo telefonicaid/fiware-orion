@@ -39,10 +39,11 @@ extern "C"
 //
 // mongocKjTreeFromBson -
 //
-KjNode* mongocKjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP)
+KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
 {
-  char*    json;
-  KjNode*  treeP = NULL;
+  const bson_t*  bsonP  = (const bson_t*) dataP;
+  char*          json;
+  KjNode*        treeP = NULL;
 
   if ((json = bson_as_json(bsonP, NULL)) == NULL)
   {

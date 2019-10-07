@@ -43,16 +43,16 @@ extern "C"
 //
 // mongocEntityLookup -
 //
-KjNode* mongocEntityLookup(char* entityId)
+KjNode* mongocEntityLookup(const char* entityId)
 {    
-  char                  dbName[512];
-  bson_t                mongoFilter;
-  const bson_t*         mongoDocP;
-  mongoc_cursor_t*      mongoCursorP;
-  bson_error_t          mongoError;
-  char*                 title;
-  char*                 details;
-  KjNode*               entityNodeP = NULL;
+  char              dbName[512];
+  bson_t            mongoFilter;
+  const bson_t*     mongoDocP;
+  mongoc_cursor_t*  mongoCursorP;
+  bson_error_t      mongoError;
+  char*             title;
+  char*             details;
+  KjNode*           entityNodeP = NULL;
   
   LM_TMP(("DB: looking up entity with id: '%s'", entityId));
 
@@ -99,4 +99,3 @@ KjNode* mongocEntityLookup(char* entityId)
  
   return entityNodeP;
 }
-

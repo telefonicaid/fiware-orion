@@ -41,7 +41,7 @@ extern "C"
 //
 // mongocEntityUpdate -
 //
-bool mongocEntityUpdate(char* entityId, KjNode* requestTree)
+bool mongocEntityUpdate(const char* entityId, KjNode* requestTree)
 {
   LM_E(("mongocEntityUpdate is not implemented"));
   return false;

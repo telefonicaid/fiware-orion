@@ -90,7 +90,7 @@ payload='{
     "type": "Property",
     "value": "John 5"
   },
-  "@context": "https://fiware.github.io/data-models/jsonldcontext.jsonld"
+  "@context": "https://fiware.github.io/data-models/context.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -105,7 +105,7 @@ echo
 
 echo "07. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity"
 echo "================================================================================================================"
-orionCurl --url "/ngsi-ld/v1/entities?type=AgriProductType" -H 'Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url "/ngsi-ld/v1/entities?type=AgriProductType" -H 'Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -229,7 +229,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 102
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

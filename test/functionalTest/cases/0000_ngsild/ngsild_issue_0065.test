@@ -47,7 +47,7 @@ echo "==========================================================================
 payload='{
   "@context": [
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld"
+    "https://fiware.github.io/data-models/full-context.jsonld"
   ],
   "id": "urn:ngsi-ld:Room:Room1",
   "type": "Room",

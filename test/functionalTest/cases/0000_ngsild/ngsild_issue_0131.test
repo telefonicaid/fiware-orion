@@ -67,7 +67,7 @@ payload='{
     "value": "Bösebrücke Einkauf"
   },
   "@context": [
-    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld",
+    "https://fiware.github.io/data-models/full-context.jsonld",
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -106,7 +106,7 @@ payload='{
     "value": "Bösebrücke Einkauf"
   },
   "@context": [
-    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld",
+    "https://fiware.github.io/data-models/full-context.jsonld",
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -124,7 +124,7 @@ echo
 
 echo "04. GET the entity, with context, see short names"
 echo "================================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -203,7 +203,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 604
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

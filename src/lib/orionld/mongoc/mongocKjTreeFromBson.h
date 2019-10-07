@@ -38,6 +38,6 @@ extern "C"
 //
 // mongocKjTreeFromBson -
 //
-extern KjNode* mongocKjTreeFromBson(const bson_t* bsonP, char** titleP, char** detailsP);
+extern KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCKJTREEFROMBSON_H_

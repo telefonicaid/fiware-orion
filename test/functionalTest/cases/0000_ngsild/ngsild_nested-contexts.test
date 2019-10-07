@@ -31,13 +31,13 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create an entity using context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld
+# 01. Create an entity using context https://fiware.github.io/data-models/full-context.jsonld
 # 02. See the entity in mongo
-# 03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld
+# 03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/full-context.jsonld
 #
 
-echo "01. Create an entity using context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld"
-echo "=============================================================================================================="
+echo "01. Create an entity using context https://fiware.github.io/data-models/full-context.jsonld"
+echo "==========================================================================================="
 payload='{
   "id": "urn:ngsi-ld:Building:store001",
   "type": "Building",
@@ -70,7 +70,7 @@ payload='{
     "value": "Bosebrucke Einkauf"
   },
   "@context": [
-    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld",
+    "https://fiware.github.io/data-models/full-context.jsonld",
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -86,16 +86,16 @@ echo
 echo
 
 
-echo "03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld"
-echo "=============================================================================================================================="
-orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo "03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/full-context.jsonld"
+echo "==========================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity using context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld
-==============================================================================================================
+01. Create an entity using context https://fiware.github.io/data-models/full-context.jsonld
+===========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: REGEX(.*)
@@ -189,12 +189,12 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld
-==============================================================================================================================
+03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/full-context.jsonld
+===========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 465
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

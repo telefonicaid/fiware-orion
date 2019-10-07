@@ -247,10 +247,10 @@ SET (DYNAMIC_LIBS
     uuid
     crypto
     sasl2
-#    icuuc
-#    icudata
-#    z
-#    resolv
+    icuuc
+    icudata
+    z
+    resolv
 )
 
 #
@@ -269,7 +269,7 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
-#include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/include/libbson-1.0")
 #include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("${PROJECT_SOURCE_DIR}/..")
 

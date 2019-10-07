@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/db/dbCollectionPathGet.h"                      // Own interface
   
 
@@ -43,6 +44,7 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
   if (dbNameLen + tenantLen + collectionLen >= pathLen)
   {
     LM_E(("Internal Error (database name is too long)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "Unable to compose collection name - name too long");
     return -1;
   }
     

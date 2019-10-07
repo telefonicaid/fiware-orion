@@ -73,7 +73,7 @@ payload='{
     },
     "@context": [
         "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-        "https://fiware.github.io/data-models/jsonldcontext.jsonld"
+        "https://fiware.github.io/data-models/context.jsonld"
     ]
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -112,7 +112,7 @@ payload='{
     },
     "@context": [
       "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-      "https://fiware.github.io/data-models/jsonldcontext.jsonld"
+      "https://fiware.github.io/data-models/context.jsonld"
     ]
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -151,7 +151,7 @@ payload='{
     },
     "@context": [
       "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-      "https://fiware.github.io/data-models/jsonldcontext.jsonld"
+      "https://fiware.github.io/data-models/context.jsonld"
     ]
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -161,21 +161,21 @@ echo
 
 echo "04. GET entities with type Building, see stores 1 and 2"
 echo "======================================================="
-orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "05. GET entities with type Byggnad, see Store 3"
 echo "==============================================="
-orionCurl --url /ngsi-ld/v1/entities?type=Byggnad -H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url /ngsi-ld/v1/entities?type=Byggnad -H 'Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
-echo "06. GET Building-typed entities, using context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld"
-echo "=========================================================================================================================="
-orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo "06. GET Building-typed entities, using context https://fiware.github.io/data-models/full-context.jsonld"
+echo "======================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -216,7 +216,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 833
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -294,7 +294,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 410
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -334,12 +334,12 @@ Date: REGEX(.*)
 ]
 
 
-06. GET Building-typed entities, using context https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld
-==========================================================================================================================
+06. GET Building-typed entities, using context https://fiware.github.io/data-models/full-context.jsonld
+=======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 833
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

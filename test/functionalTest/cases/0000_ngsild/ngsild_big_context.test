@@ -61,7 +61,7 @@ payload='{
     "object": "urn:ngsi-ld:PointOfInterest:RZ:MainSquare"
   },
   "@context": [
-    "https://fiware.github.io/data-models/fiware-data-models-full-context.jsonld",
+    "https://fiware.github.io/data-models/full-context.jsonld",
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'

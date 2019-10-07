@@ -30,8 +30,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// mongoCInit -
+// mongocInit -
 //
-extern void mongoCInit(const char* dbHost, const char* dbName);
+extern void mongocInit(const char* dbHost, const char* dbName);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCINIT_H_

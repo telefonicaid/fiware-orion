@@ -28,6 +28,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyInit.h"              // mongoCppLegacyInit
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"      // mongoCppLegacyEntityUpdate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"      // mongoCppLegacyEntityLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"      // mongoCppLegacyEntityBatchDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h" // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"   // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
@@ -55,6 +56,7 @@ void dbInit(const char* dbHost, const char* dbName)
 
   dbEntityLookup                           = mongoCppLegacyEntityLookup;
   dbEntityUpdate                           = mongoCppLegacyEntityUpdate;
+  dbEntityBatchDelete                      = mongoCppLegacyEntityBatchDelete;
   dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;

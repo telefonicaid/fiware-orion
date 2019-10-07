@@ -38,6 +38,6 @@ extern "C"
 //
 // mongoCppLegacyKjTreeFromBsonObj -
 //
-extern KjNode* mongoCppLegacyKjTreeFromBsonObj(void* dataP, char** titleP, char** detailsP);
+extern KjNode* mongoCppLegacyKjTreeFromBsonObj(const void* dataP, char** titleP, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYKJTREEFROMBSONOBJ_H_

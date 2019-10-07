@@ -45,7 +45,8 @@
 //
 //  33 - 9 == 24
 //
-#define MAX_CHARS_BEFORE_WILDCARD 24
+// New request with even longer string: /ngsi-ld/v1/entityOperations/delete: 35 => 35-9 == 26
+#define MAX_CHARS_BEFORE_WILDCARD 26
 static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
 {
   // First of all, skip the first 9 characters in the URL path ("/ngsi-ld/")

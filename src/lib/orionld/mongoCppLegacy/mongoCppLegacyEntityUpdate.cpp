@@ -45,7 +45,7 @@ extern "C"
 //
 // mongoCppLegacyEntityUpdate -
 //
-bool mongoCppLegacyEntityUpdate(char* entityId, KjNode* requestTree)
+bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree)
 {
   char                   collectionPath[256];
   mongo::BSONObj         payloadAsBsonObj;

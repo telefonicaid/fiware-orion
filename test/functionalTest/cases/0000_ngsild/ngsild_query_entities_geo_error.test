@@ -88,7 +88,7 @@ payload='{
       "coordinates": [13.3903, 52.5075]
     }
   },
-  "@context": "https://fiware.github.io/data-models/jsonldcontext.jsonld"
+  "@context": "https://fiware.github.io/data-models/context.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -104,14 +104,14 @@ echo
 
 echo "03. GeoQuery near. Max Distance: 1290m - see empty array"
 echo "========================================================"
-orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1290&options=keyValues" -H 'Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1290&options=keyValues" -H 'Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
 
 echo "04. GeoQuery near. Max Distance: 1291m - see Building:store002"
 echo "=============================================================="
-orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1291&options=keyValues" -H 'Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url "/ngsi-ld/v1/entities?type=Building&geometry=Point&coordinates=\[13.3777,52.5162\]&georel=near;maxDistance==1291&options=keyValues" -H 'Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -208,7 +208,7 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -219,7 +219,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 296
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/jsonldcontext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
