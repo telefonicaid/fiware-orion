@@ -58,6 +58,8 @@ static const char* validOptions[] =
 #ifdef ORIONLD
   , OPT_SYS_ATTRS
   , OPT_NO_OVERWRITE
+  , OPT_UPDATE
+  , OPT_REPLACE
 #endif
 };
 
@@ -226,9 +228,11 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
 #ifdef ORIONLD
     if (strcmp(vec[ix].c_str(), "noOverwrite") == 0)
-    {
       orionldState.uriParamOptions.noOverwrite = true;
-    }
+    else if (strcmp(vec[ix].c_str(), "update") == 0)
+      orionldState.uriParamOptions.update = true;
+    else if (strcmp(vec[ix].c_str(), "replace") == 0)
+      orionldState.uriParamOptions.replace = true;
 #endif
   }
 

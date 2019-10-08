@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYOPERATIONSUPSERT_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYOPERATIONSUPSERT_H_
 
 /*
 *
@@ -23,22 +23,20 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Gabriel Quaresma
 */
+#include <string>
+#include <vector>
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                              // KjNode
 }
 
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
-
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldAttributeTreat -
+// mongoCppLegacyEntityOperationsUpsert -
 //
-extern bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP);
+extern bool mongoCppLegacyEntityOperationsUpsert(KjNode* entitiesArray);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYOPERATIONSUPSERT_H_

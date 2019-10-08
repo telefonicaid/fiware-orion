@@ -62,149 +62,8 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
 #include "orionld/context/orionldUserContextKeyValuesCheck.h"    // orionldUserContextKeyValuesCheck
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/common/orionldEntityPayloadCheck.h"            // orionldEntityPayloadCheck
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldValidName -
-//
-bool orionldValidName(char* name, char** detailsPP)
-{
-  if (name == NULL)
-  {
-    *detailsPP = (char*) "empty name";
-    return false;
-  }
-
-  for (; *name != 0; ++name)
-  {
-    //
-    // Valid chars:
-    //   o a-z: 97-122
-    //   o A-Z: 65-90
-    //   o 0-9: 48-57
-    //   o '_': 95
-    //
-
-    if ((*name >= 'a') && (*name <= 'z'))
-      continue;
-    if ((*name >= 'A') && (*name <= 'Z'))
-      continue;
-    if ((*name >= '0') && (*name <= '9'))
-      continue;
-    if (*name == '_')
-      continue;
-    if (*name == ':')
-      continue;
-
-    *detailsPP = (char*) "invalid character in name";
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// payloadCheck -
-//
-static bool payloadCheck
-(
-  ConnectionInfo*  ciP,
-  KjNode**         locationNodePP,
-  KjNode**         observationSpaceNodePP,
-  KjNode**         operationSpaceNodePP,
-  KjNode**         createdAtPP,
-  KjNode**         modifiedAtPP
-)
-{
-  OBJECT_CHECK(orionldState.requestTree, "toplevel");
-
-  KjNode*  kNodeP                 = orionldState.requestTree->value.firstChildP;
-  KjNode*  locationNodeP          = NULL;
-  KjNode*  observationSpaceNodeP  = NULL;
-  KjNode*  operationSpaceNodeP    = NULL;
-  KjNode*  createdAtP             = NULL;
-  KjNode*  modifiedAtP            = NULL;
-
-  //
-  // Check presence of mandatory fields
-  //
-  if (orionldState.payloadIdNode == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory");
-    return false;
-  }
-
-  if (orionldState.payloadTypeNode == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity type is missing", "The type field is mandatory");
-    return false;
-  }
-
-
-  //
-  // Check for duplicated items and that data types are correct
-  //
-  while (kNodeP != NULL)
-  {
-    char* detailsP;
-
-    if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
-    {
-      DUPLICATE_CHECK(locationNodeP, "location", kNodeP);
-      // FIXME: check validity of location - GeoProperty
-    }
-    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-    {
-      DUPLICATE_CHECK(observationSpaceNodeP, "observationSpace", kNodeP);
-      // FIXME: check validity of observationSpace - GeoProperty
-    }
-    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-    {
-      DUPLICATE_CHECK(operationSpaceNodeP, "operationSpace", kNodeP);
-      // FIXME: check validity of operationSpaceP - GeoProperty
-    }
-    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
-    {
-      DUPLICATE_CHECK(createdAtP, "createdAt", kNodeP);
-      STRING_CHECK(kNodeP, "createdAt");
-    }
-    else if (SCOMPARE11(kNodeP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
-    {
-      DUPLICATE_CHECK(modifiedAtP, "modifiedAt", kNodeP);
-      STRING_CHECK(kNodeP, "modifiedAt");
-    }
-    else  // Property/Relationshiop - must check chars in the name of the attribute
-    {
-      // FIXME: Make sure the type is either Property or Relationship
-      if (orionldValidName(kNodeP->name, &detailsP) == false)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", detailsP);
-        return false;
-      }
-    }
-
-    kNodeP = kNodeP->next;
-  }
-
-
-
-  //
-  // Prepare output
-  //
-  *locationNodePP         = locationNodeP;
-  *observationSpaceNodePP = observationSpaceNodeP;
-  *operationSpaceNodePP   = operationSpaceNodeP;
-  *createdAtPP            = createdAtP;
-  *modifiedAtPP           = modifiedAtP;
-
-  return true;
-}
 
 
 
@@ -223,7 +82,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   KjNode*  createdAtP         = NULL;
   KjNode*  modifiedAtP        = NULL;
 
-  if (payloadCheck(ciP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP) == false)
+  if (orionldEntityPayloadCheck(ciP, orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
     return false;
 
   char*    entityId           = orionldState.payloadIdNode->value.s;
@@ -299,12 +158,12 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
     ContextAttribute* caP            = new ContextAttribute();
     KjNode*           attrTypeNodeP  = NULL;
+    char*             detail         = (char*) "none";
 
-    LM_TMP(("VEX: Treating attribute '%s'", kNodeP->name));
-    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
+    LM_TMP(("EXPAND: Treating attribute '%s'", kNodeP->name));
+    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
-      LM_TMP(("EXPAND: orionldAttributeTreat failed"));
-      LM_E(("orionldAttributeTreat failed"));
+      LM_E(("orionldAttributeTreat failed: %s", detail));
       delete caP;
       mongoRequest.release();
       return false;

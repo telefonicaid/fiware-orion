@@ -66,6 +66,8 @@ struct ConnectionInfo;
 typedef struct OrionldUriParamOptions
 {
   bool noOverwrite;
+  bool update;
+  bool replace;
 } OrionldUriParamOptions;
 
 

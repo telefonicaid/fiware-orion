@@ -286,15 +286,15 @@ Date: REGEX(.*)
 08. GET E2 and see the expanded value of 'category'
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 181
+Content-Length: 183
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "https://uri.fiware.org/ns/datamodels#category": {
+    "https://uri.fiware.org/ns/data-models#category": {
         "type": "Property",
-        "value": "https://uri.fiware.org/ns/datamodels#industrial"
+        "value": "https://uri.fiware.org/ns/data-models#industrial"
     },
     "id": "urn:ngsi-ld:test:value-expansion:E2",
     "type": "T"

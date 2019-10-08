@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYPAYLOADCHECK_H_
+#define SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYPAYLOADCHECK_H_
+
 /*
 *
 * Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,26 +23,39 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Gabriel Quaresma
 */
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/db/dbConfiguration.h"                          // Own interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 
 
 
 // -----------------------------------------------------------------------------
 //
-// Function pointers for the DB interface
+// orionldValidName -
 //
-DbEntityLookupFunction                    dbEntityLookup;
-DbEntityUpdateFunction                    dbEntityUpdate;
-DbEntityBatchDeleteFunction               dbEntityBatchDelete;
-DbDataToKjTreeFunction                    dbDataToKjTree;
-DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbEntityOperationsUpsertFunction          dbEntityOperationsUpsert;
-DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
+extern bool orionldValidName(char* name, char** detailsPP);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldEntityPayloadCheck -
+//
+extern bool orionldEntityPayloadCheck
+(
+  ConnectionInfo*  ciP,
+  KjNode*          kNodeP,
+  KjNode**         locationNodePP,
+  KjNode**         observationSpaceNodePP,
+  KjNode**         operationSpaceNodePP,
+  KjNode**         createdAtPP,
+  KjNode**         modifiedAtPP,
+  bool             isBatchOperation
+);
+
+#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYPAYLOADCHECK_H_

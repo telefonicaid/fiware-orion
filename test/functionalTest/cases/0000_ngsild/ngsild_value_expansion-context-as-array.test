@@ -103,22 +103,22 @@ MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:Building:store007",
-		"type" : "https://uri.fiware.org/ns/datamodels#Building",
+		"type" : "https://uri.fiware.org/ns/data-models#Building",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.fiware.org/ns/datamodels#category",
+		"https://uri.fiware.org/ns/data-models#category",
 		"https://schema.org/address",
 		"location",
 		"https://uri.etsi.org/ngsi-ld/default-context/name"
 	],
 	"attrs" : {
-		"https://uri=fiware=org/ns/datamodels#category" : {
+		"https://uri=fiware=org/ns/data-models#category" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : [
-				"https://uri.fiware.org/ns/datamodels#commercial"
+				"https://uri.fiware.org/ns/data-models#commercial"
 			],
 			"mdNames" : [ ]
 		},

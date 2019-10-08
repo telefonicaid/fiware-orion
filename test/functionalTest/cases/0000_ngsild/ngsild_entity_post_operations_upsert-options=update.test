@@ -1,0 +1,193 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation and Retrieval
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
+# 02. GET the entities
+# 03. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
+# 04. GET all entities - see E1 as it was and E2 changed by step 3, and the new E3
+#
+
+
+echo "01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=update"
+echo "==========================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+echo "03. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=update"
+echo "======================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 03"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 03"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. GET all entities - see E1 as it was and E2 changed by step 3, and the new E3"
+echo "================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
+===========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2"
+    ]
+}
+
+
+02. GET the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 267
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 01"
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 01"
+  }
+]
+
+
+
+03. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
+
+
+04. GET all entities - see E1 as it was and E2 changed by step 3, and the new E3
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 399
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 01"
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 03"
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 03"
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

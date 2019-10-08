@@ -26,6 +26,9 @@
 * Author: Ken Zangelin
 */
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/common/urlCheck.h"                           // urlCheck
+
 
 
 // -----------------------------------------------------------------------------
@@ -236,4 +239,21 @@ do                                                                              
   }                                                                                                          \
 } while (0)
 
+
+
+// -----------------------------------------------------------------------------
+//
+// URI_CHECK -
+//
+#define URI_CHECK(kNodeP, fieldName)                                                                         \
+do                                                                                                           \
+{                                                                                                            \
+  char* detail;                                                                                              \
+  if (!urlCheck(kNodeP->value.s, &detail) && !urnCheck(kNodeP->value.s, &detail))                            \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", fieldName);                               \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
+} while (0)
 #endif  // SRC_LIB_ORIONLD_COMMON_CHECK_H_

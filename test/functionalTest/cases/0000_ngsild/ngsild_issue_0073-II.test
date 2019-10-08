@@ -35,7 +35,7 @@ brokerStart CB 0-255
 # 02. Check mongo, see the completely expanded name of attr "maxCapacity" as https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity
 # 03. Drop Database so that db.entities.findOne() can be used in Step 5
 # 04. Create another entity with same context, and with the attribute "owner", which is an object in the context ("owner": { "@id": "fiware:owner", "@type": "@id" })
-# 05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/datamodels#owner
+# 05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/data-models#owner
 #
 
 echo '01. Create an entity with schema tutorials.Step-by-Step context that has prefix expansion inside the context, and with the attribute "maxCapacity"'
@@ -84,8 +84,8 @@ echo
 echo
 
 
-echo '05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/datamodels#owner'
-echo '==============================================================================================================='
+echo '05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/data-models#owner'
+echo '================================================================================================================'
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
@@ -145,8 +145,8 @@ Date: REGEX(.*)
 
 
 
-05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/datamodels#owner
-===============================================================================================================
+05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/data-models#owner
+================================================================================================================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb://localhost:27017/ftest
 MongoDB server version: REGEX(.*)
@@ -157,10 +157,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.fiware.org/ns/datamodels#owner"
+		"https://uri.fiware.org/ns/data-models#owner"
 	],
 	"attrs" : {
-		"https://uri=fiware=org/ns/datamodels#owner" : {
+		"https://uri=fiware=org/ns/data-models#owner" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

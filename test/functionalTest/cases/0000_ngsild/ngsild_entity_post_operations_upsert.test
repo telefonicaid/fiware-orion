@@ -1,0 +1,438 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation and Retrieval
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities
+# 02. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities
+# 03. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
+# 04. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities
+#
+
+
+echo "01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities"
+echo "========================================================================"
+payload='[
+    {
+        "id": "urn:ngsi-ld:Vehicle:00001",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:00002",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:00003",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:00004",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities"
+echo "============================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "03. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities"
+echo "==============================================================================="
+payload='[
+    {
+        "id": "urn:ngsi-ld:Vehicle:00001",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:00002",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "engine": {
+            "type": "Property",
+            "value": "V8"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:00003",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        },
+        "isBlocked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:00004",
+        "type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities"
+echo "========================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:Vehicle:00001",
+        "urn:ngsi-ld:Vehicle:00002",
+        "urn:ngsi-ld:Vehicle:00003",
+        "urn:ngsi-ld:Vehicle:00004"
+    ]
+}
+
+
+02. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 2003
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:Vehicle:00001",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Vehicle:00002",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Vehicle:00003",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Vehicle:00004",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  }
+]
+
+
+
+03. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:Vehicle:00002",
+        "urn:ngsi-ld:Vehicle:00003",
+        "urn:ngsi-ld:Vehicle:00001",
+        "urn:ngsi-ld:Vehicle:00004"
+    ]
+}
+
+
+04. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 2425
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:Vehicle:00001",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Vehicle:00002",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/engine": {
+      "type": "Property",
+      "value": "V8"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Vehicle:00003",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isBlocked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Vehicle:00004",
+    "type": "Vehicle",
+    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+      "type": "Property",
+      "value": "Mercedes"
+    },
+    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+      "providedBy": {
+        "type": "Relationship",
+        "object": "urn:ngsi-ld:Person:Bob"
+      },
+      "observedAt": "2017-07-29T12:00:04Z"
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

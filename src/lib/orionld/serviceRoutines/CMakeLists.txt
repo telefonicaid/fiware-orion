@@ -45,6 +45,7 @@ SET (SOURCES
     orionldGetVersion.cpp
     orionldNotImplemented.cpp
     orionldNotify.cpp
+    orionldPostBatchUpsert.cpp
 )
 
 # Include directories

@@ -146,11 +146,19 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Empty right-hand-side for URI param", ckey);
+#endif
     }
     else if (ciP->apiVersion == ADMIN_API)
     {
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error in URI param", errorString.c_str());
+#endif
     }
 
     return MHD_YES;
@@ -232,6 +240,10 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for /details/ - accepted: /on/, /ON/, /off/, /OFF/. Default is /off/", val);
+#endif
       return MHD_YES;
     }
   }
@@ -252,8 +264,14 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
     if (uriParamOptionsParse(ciP, val) != 0)
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+
+      LM_W(("Bad Input (Invalid value for URI param /options/)"));
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /options/", val);
+#endif
     }
   }
   else if (key == URI_PARAM_TYPE)

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
 
 /*
 *
@@ -23,22 +23,16 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Gabriel Quaresma
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
-
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/ConnectionInfo.h"
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldAttributeTreat -
+// orionldNotImplemented -
 //
-extern bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP);
+extern bool orionldPostBatchUpsert(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_

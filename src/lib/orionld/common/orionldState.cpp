@@ -118,6 +118,8 @@ void orionldStateInit(void)
   orionldState.errorAttributeArrayUsed     = 0;
   orionldState.contextToBeFreed            = false;
   orionldState.uriParamOptions.noOverwrite = false;
+  orionldState.uriParamOptions.update      = false;
+  orionldState.uriParamOptions.replace     = false;
   orionldState.prettyPrintSpaces           = 2;
   orionldState.prettyPrint                 = false;
   orionldState.locationAttributeP          = NULL;

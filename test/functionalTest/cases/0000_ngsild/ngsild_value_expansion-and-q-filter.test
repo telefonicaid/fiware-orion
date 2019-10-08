@@ -97,14 +97,14 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.fiware.org/ns/datamodels#category"
+		"https://uri.fiware.org/ns/data-models#category"
 	],
 	"attrs" : {
-		"https://uri=fiware=org/ns/datamodels#category" : {
+		"https://uri=fiware=org/ns/data-models#category" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://uri.fiware.org/ns/datamodels#commercial",
+			"value" : "https://uri.fiware.org/ns/data-models#commercial",
 			"mdNames" : [ ]
 		}
 	},

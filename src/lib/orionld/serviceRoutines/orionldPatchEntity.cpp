@@ -166,10 +166,11 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     LM_TMP(("PATCH: Allocated Attribute for shortname '%s' at %p", kNodeP->name, caP));
 
-    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
+    char* detail;
+    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       mongoRequest.release();
-      LM_E(("orionldAttributeTreat failed"));
+      LM_E(("orionldAttributeTreat failed: %s", detail));
       delete caP;
       return false;
     }

@@ -184,7 +184,8 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     orionldState.uriParams.idPattern = (char*) value;
   else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
     orionldState.uriParams.attrs = (char*) value;
-
+  else if (SCOMPARE8(key, 'o', 'p', 't', 'i', 'o', 'n', 's', 0))
+    orionldState.uriParams.options = (char*) value;
   return MHD_YES;
 }
 
@@ -200,6 +201,7 @@ static void uriArgumentsPresent(void)
   LM_TMP(("orionldUriArguments: type:      '%s'", orionldState.uriParams.type));
   LM_TMP(("orionldUriArguments: idPattern: '%s'", orionldState.uriParams.idPattern));
   LM_TMP(("orionldUriArguments: attrs:     '%s'", orionldState.uriParams.attrs));
+  LM_TMP(("orionldUriArguments: options:   '%s'", orionldState.uriParams.options));
 }
 
 
