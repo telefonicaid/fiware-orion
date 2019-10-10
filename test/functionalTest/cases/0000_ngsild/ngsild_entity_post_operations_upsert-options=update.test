@@ -123,7 +123,7 @@ Date: REGEX(.*)
 02. GET the entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 267
+Content-Length: 177
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -132,12 +132,12 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:entity:E1",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 01"
+    "P1": "STEP 01"
   },
   {
     "id": "urn:ngsi-ld:entity:E2",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 01"
+    "P1": "STEP 01"
   }
 ]
 
@@ -163,7 +163,7 @@ Date: REGEX(.*)
 04. GET all entities - see E1 as it was and E2 changed by step 3, and the new E3
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 399
+Content-Length: 264
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -172,17 +172,17 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:entity:E1",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 01"
+    "P1": "STEP 01"
   },
   {
     "id": "urn:ngsi-ld:entity:E2",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 03"
+    "P1": "STEP 03"
   },
   {
     "id": "urn:ngsi-ld:entity:E3",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/P1": "STEP 03"
+    "P1": "STEP 03"
   }
 ]
 

@@ -32,9 +32,10 @@ brokerStart CB 212-249
 
 #
 # 01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities
-# 02. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities
-# 03. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
-# 04. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities
+# 02. See the entity urn:ngsi-ld:Vehicle:00001 in mongo
+# 03. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities
+# 04. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
+# 05. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities
 #
 
 
@@ -115,14 +116,21 @@ echo
 echo
 
 
-echo "02. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities"
-echo "============================================================="
+echo "02. See the entity urn:ngsi-ld:Vehicle:00001 in mongo"
+echo "====================================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:Vehicle:00001"})'
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/entities?type=Vehicle - See 4 Entities"
+echo "=========================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 
 
-echo "03. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities"
+echo "04. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities"
 echo "==============================================================================="
 payload='[
     {
@@ -212,8 +220,8 @@ echo
 echo
 
 
-echo "04. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities"
-echo "========================================================================"
+echo "05. GET /ngsi-ld/v1/entities?type=Vehicle - See changes of 2 Entities"
+echo "====================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
@@ -239,10 +247,60 @@ Date: REGEX(.*)
 }
 
 
-02. GET  /ngsi-ld/v1/entities?type=Vehicle   - See 4 Entities
-=============================================================
+02. See the entity urn:ngsi-ld:Vehicle:00001 in mongo
+=====================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Vehicle:00001",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/brandName",
+		"https://uri.etsi.org/ngsi-ld/default-context/isParked"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/brandName" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Mercedes",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/isParked" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:OffStreetParking:Downtown1",
+			"md" : {
+				"observedAt" : {
+					"value" : 1501329604
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/providedBy" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:Person:Bob"
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/providedBy"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET /ngsi-ld/v1/entities?type=Vehicle - See 4 Entities
+==========================================================
 HTTP/1.1 200 OK
-Content-Length: 2003
+Content-Length: 1643
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -251,11 +309,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00001",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -268,11 +326,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00002",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -285,11 +343,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00003",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -302,11 +360,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00004",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -320,7 +378,7 @@ Date: REGEX(.*)
 
 
 
-03. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
+04. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
 ===============================================================================
 HTTP/1.1 200 OK
 Content-Length: 137
@@ -339,10 +397,10 @@ Date: REGEX(.*)
 }
 
 
-04. GET  /ngsi-ld/v1/entities?type=Vehicle   - See changes of 2 Entities
-========================================================================
+05. GET /ngsi-ld/v1/entities?type=Vehicle - See changes of 2 Entities
+=====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2425
+Content-Length: 1975
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -351,11 +409,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00001",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -368,15 +426,15 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00002",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/engine": {
+    "engine": {
       "type": "Property",
       "value": "V8"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -389,11 +447,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00003",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isBlocked": {
+    "isBlocked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -402,7 +460,7 @@ Date: REGEX(.*)
       },
       "observedAt": "2017-07-29T12:00:04Z"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {
@@ -415,11 +473,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:Vehicle:00004",
     "type": "Vehicle",
-    "https://uri.etsi.org/ngsi-ld/default-context/brandName": {
+    "brandName": {
       "type": "Property",
       "value": "Mercedes"
     },
-    "https://uri.etsi.org/ngsi-ld/default-context/isParked": {
+    "isParked": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
       "providedBy": {

@@ -145,6 +145,7 @@ bool kjTreeToContextElementAttributes
     KjNode*            attrTypeNodeP  = NULL;
     ContextAttribute*  caP            = new ContextAttribute();
 
+    // orionldAttributeTreat treats the attribute, including expanding the attribute name and values, if applicable
     if (orionldAttributeTreat(ciP, itemP, caP, &attrTypeNodeP, detailP) == false)
     {
       LM_E(("orionldAttributeTreat failed"));
@@ -152,32 +153,6 @@ bool kjTreeToContextElementAttributes
       return false;
     }
 
-    //
-    // URI Expansion for the attribute name, except if "location", "observationSpace", or "operationSpace"
-    //
-    if (SCOMPARE9(itemP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
-      caP->name = itemP->name;
-    else if (SCOMPARE17(itemP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-      caP->name = itemP->name;
-    else if (SCOMPARE15(itemP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-      caP->name = itemP->name;
-    else
-    {
-      char  longName[256];
-      char* details;
-
-      if (orionldUriExpand(orionldState.contextP, itemP->name, longName, sizeof(longName), NULL, &details) == false)
-      {
-        LM_E(("orionldUriExpand failed"));
-        delete caP;
-        orionldErrorResponseCreate(OrionldBadRequestData, details, itemP->name);
-        return false;
-      }
-
-      caP->name = longName;
-    }
-
-    caP->type = attrTypeNodeP->value.s;
     ceP->contextAttributeVector.push_back(caP);
   }
 
@@ -227,13 +202,10 @@ static KjNode* kjStringValueLookupInArray(KjNode* stringArrayNodeP, const char* 
     for (KjNode* nodeP = stringArrayNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
       if (strcmp(value, nodeP->value.s) == 0)
-      {
-        LM_TMP(("PRESENT"));
         return nodeP;
-      }
     }
   }
-  LM_TMP(("NOT PRESENT"));
+
   return NULL;
 }
 
@@ -316,8 +288,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     //
     while (itemP != NULL)
     {
-      LM_TMP(("Batch: got item '%s'", itemP->name));
-
       if (SCOMPARE3(itemP->name, 'i', 'd', 0))
       {
         if (entityIdNodeP != NULL)
@@ -463,7 +433,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
   if (ciP->httpStatusCode == SccOk)
   {
-    LM_TMP(("Items in mongoResponse.contextElementResponseVector: %d", mongoResponse.contextElementResponseVector.size()));
     orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
@@ -475,7 +444,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       else
         entityErrorPush(errorsArrayP, entityId, mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str());
     }
-
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
     {
@@ -493,16 +461,17 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
     ciP->httpStatusCode = SccOk;
   }
-  else
+
+  mongoRequest.release();
+  mongoResponse.release();
+
+  if (ciP->httpStatusCode != SccOk)
   {
     LM_E(("mongoUpdateContext flagged an error"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
-
-  mongoRequest.release();
-  mongoResponse.release();
 
   return true;
 
