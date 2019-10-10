@@ -49,6 +49,14 @@ typedef enum OrionldResponseErrorType
 
 // ----------------------------------------------------------------------------
 //
+// orionldErrorTypeToString -
+//
+extern const char* orionldErrorTypeToString(OrionldResponseErrorType type);
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldErrorResponseCreate -
 //
 extern void orionldErrorResponseCreate

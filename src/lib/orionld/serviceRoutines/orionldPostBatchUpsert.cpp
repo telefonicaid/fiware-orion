@@ -165,11 +165,11 @@ bool kjTreeToContextElementAttributes
 //
 // entitySuccessPush -
 //
-static void entitySuccessPush(KjNode* successsArrayP, const char* entityId)
+static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 {
   KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
 
-  kjChildAdd(successsArrayP, eIdP);
+  kjChildAdd(successArrayP, eIdP);
 }
 
 
@@ -178,14 +178,44 @@ static void entitySuccessPush(KjNode* successsArrayP, const char* entityId)
 //
 // entityErrorPush -
 //
-static void entityErrorPush(KjNode* errorsArrayP, const char* entityId, const char* reason)
+// The array "errors" in BatchOperationResult is an array of BatchEntityError.
+// BatchEntityError contains a string (the entity id) and an instance of ProblemDetails.
+//
+// ProblemDetails is described in https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf
+// and contains:
+//
+// * type      (string) A URI reference that identifies the problem type
+// * title     (string) A short, human-readable summary of the problem
+// * detail    (string) A human-readable explanation specific to this occurrence of the problem
+// * status    (number) The HTTP status code
+// * instance  (string) A URI reference that identifies the specific occurrence of the problem
+//
+// Of these five items, only "type" seems to be mandatory.
+//
+// This implementation will treat "type", "title", and "status" as MANDATORY, and "detail" as OPTIONAL
+//
+static void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status)
 {
-  KjNode* objP    = kjObject(orionldState.kjsonP, NULL);
-  KjNode* eIdP    = kjString(orionldState.kjsonP, "entityId", entityId);
-  KjNode* reasonP = kjString(orionldState.kjsonP, "error",    reason);
+  KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
+  KjNode* eIdP            = kjString(orionldState.kjsonP, "entityId", entityId);
+  KjNode* problemDetailsP = kjObject(orionldState.kjsonP, "error");
+  KjNode* typeP           = kjString(orionldState.kjsonP, "type", orionldErrorTypeToString(type));
+  KjNode* titleP          = kjString(orionldState.kjsonP, "title", title);
+  KjNode* statusP         = kjInteger(orionldState.kjsonP, "status", status);
+
+  kjChildAdd(problemDetailsP, typeP);
+  kjChildAdd(problemDetailsP, titleP);
+
+  if (detail != NULL)
+  {
+    KjNode* detailP = kjString(orionldState.kjsonP, "detail", detail);
+    kjChildAdd(problemDetailsP, detailP);
+  }
+
+  kjChildAdd(problemDetailsP, statusP);
 
   kjChildAdd(objP, eIdP);
-  kjChildAdd(objP, reasonP);
+  kjChildAdd(objP, problemDetailsP);
 
   kjChildAdd(errorsArrayP, objP);
 }
@@ -316,21 +346,24 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     // Entity ID is mandatory
     if (entityIdNodeP == NULL)
     {
-      entityErrorPush(errorsArrayP, "no entity::id", "entity::id is mandatory");
+      LM_W(("Bad Input (mandatory field missing: entity::id)"));
+      entityErrorPush(errorsArrayP, "no entity::id", OrionldBadRequestData, "mandatory field missing", "entity::id", 400);
       continue;
     }
 
     // Entity ID must be a string
     if (entityIdNodeP->type != KjString)
     {
-      entityErrorPush(errorsArrayP, "Invalid type for Entity ID", kjValueType(entityIdNodeP->type));
+      LM_W(("Bad Input (entity::id not a string)"));
+      entityErrorPush(errorsArrayP, "invalid entity::id", OrionldBadRequestData, "field with invalid type", "entity::id", 400);
       continue;
     }
 
     // Entity ID must be a valid URI
     if (!urlCheck(entityIdNodeP->value.s, &detail) && !urnCheck(entityIdNodeP->value.s, &detail))
     {
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, "Not a URI");
+      LM_W(("Bad Input (entity::id is a string but not a valid URI)"));
+      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400);
       continue;
     }
 
@@ -338,7 +371,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     if (duplicatedId == true)
     {
       LM_W(("Bad Input (Duplicated entity::id)"));
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, "Duplicated entity::id in payload");
+      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Duplicated field", "entity::id", 400);
       continue;
     }
 
@@ -346,7 +379,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     // Entity TYPE is mandatory
     if (entityTypeNodeP == NULL)
     {
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, "mandatory entity::type missing in payload");
+      LM_W(("Bad Input (mandatory field missing: entity::type)"));
+      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "mandatory field missing", "entity::type", 400);
       continue;
     }
 
@@ -354,7 +388,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     if (duplicatedType == true)
     {
       LM_W(("Bad Input (Duplicated entity::type)"));
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, "Duplicated entity::type in payload");
+      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Duplicated field", "entity::type", 400);
       continue;
     }
 
@@ -362,7 +396,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     if (entityTypeNodeP->type != KjString)
     {
       LM_W(("Bad Input (entity::type not a string)"));
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, "entity::type must be a JSON string");
+      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "field with invalid type", "entity::type", 400);
       continue;
     }
 
@@ -382,7 +416,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     if (orionldUriExpand(orionldState.contextP, entityType, typeExpanded, sizeof(typeExpanded), NULL, &detail) == false)
     {
       LM_E(("orionldUriExpand failed: %s", detail));
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, detail);
+      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "unable to expand entity::type", detail, 400);
       delete ceP;
       continue;
     }
@@ -398,7 +432,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     if (kjTreeToContextElementAttributes(ciP, entityNodeP, createdAtP, modifiedAtP, ceP, &detail) == false)
     {
       LM_W(("kjTreeToContextElementAttributes flags error '%s' for entity '%s'", detail, entityId));
-      entityErrorPush(errorsArrayP, entityId, detail);
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "", detail, 400);
       delete ceP;
       continue;
     }
@@ -442,7 +476,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
         entitySuccessPush(successArrayP, entityId);
       else
-        entityErrorPush(errorsArrayP, entityId, mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str());
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "", mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(), 400);
     }
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)

@@ -518,7 +518,7 @@ echo
 01. Attempt to upsert with an entity having an id that is not a string - see error
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 106
+Content-Length: 223
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -526,8 +526,13 @@ Date: REGEX(.*)
 {
     "errors": [
         {
-            "entityId": "Invalid type for Entity ID",
-            "error": "Int"
+            "entityId": "invalid entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -539,7 +544,7 @@ Date: REGEX(.*)
 02. Attempt to upsert with an entity without ID field - see error
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 113
+Content-Length: 218
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -548,7 +553,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "no entity::id",
-            "error": "entity::id is mandatory"
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -560,7 +570,7 @@ Date: REGEX(.*)
 03. Attempt to upsert with an entity having an id with URI invalid - see error
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 201
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -569,7 +579,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "ABC_123456",
-            "error": "Not a URI"
+            "error": {
+                "detail": "ABC_123456",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -581,7 +596,7 @@ Date: REGEX(.*)
 04. Attempt to upsert with an entity having a TYPE that is not a string - see error
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 134
+Content-Length: 230
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -590,7 +605,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "urn:ngsi-ld:Vehicle:302",
-            "error": "entity::type must be a JSON string"
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -602,7 +622,7 @@ Date: REGEX(.*)
 05. Attempt to upsert with an entity without TYPE field - see error
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 200
+Content-Length: 385
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -611,11 +631,21 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "urn:ngsi-ld:Vehicle:301",
-            "error": "mandatory entity::type missing in payload"
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         },
         {
             "entityId": "urn:ngsi-ld:Vehicle:302",
-            "error": "entity::type must be a JSON string"
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": []
@@ -625,7 +655,7 @@ Date: REGEX(.*)
 06. Attempt to upsert with an entity with 2 ID fields - see error
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 134
+Content-Length: 223
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -634,7 +664,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "urn:ngsi-ld:Vehicle:301",
-            "error": "Duplicated entity::id in payload"
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "Duplicated field",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -646,7 +681,7 @@ Date: REGEX(.*)
 07. Attempt to upsert with an entity with 2 TYPE fields - see error
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 134
+Content-Length: 223
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -655,7 +690,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "urn:ngsi-ld:Vehicle:301",
-            "error": "Duplicated entity::type in payload"
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "Duplicated field",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -667,7 +707,7 @@ Date: REGEX(.*)
 08. Attempt to upsert with an entity with ID typed wrong - see error
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 113
+Content-Length: 218
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -676,7 +716,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "no entity::id",
-            "error": "entity::id is mandatory"
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [
@@ -688,7 +733,7 @@ Date: REGEX(.*)
 09. Attempt to upsert with an entity with TYPE typed wrong - see error
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 230
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -697,7 +742,12 @@ Date: REGEX(.*)
     "errors": [
         {
             "entityId": "urn:ngsi-ld:Vehicle:301",
-            "error": "mandatory entity::type missing in payload"
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
         }
     ],
     "success": [

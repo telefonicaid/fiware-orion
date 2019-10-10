@@ -59,6 +59,17 @@ static const char* errorTypeStringV[] =
 
 // ----------------------------------------------------------------------------
 //
+// orionldErrorTypeToString -
+//
+const char* orionldErrorTypeToString(OrionldResponseErrorType type)
+{
+  return errorTypeStringV[type];
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldErrorResponseCreate -
 //
 // NOTE
@@ -74,7 +85,7 @@ void orionldErrorResponseCreate
 {
   LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, detail));
 
-  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    errorTypeStringV[errorType]);
+  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    orionldErrorTypeToString(errorType));
   KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
   KjNode* detailP;
 
