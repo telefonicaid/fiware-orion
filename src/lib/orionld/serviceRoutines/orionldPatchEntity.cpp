@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
@@ -42,6 +43,7 @@ extern "C"
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/context/orionldValueExpand.h"                  // orionldValueExpand
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
 
@@ -52,16 +54,10 @@ extern "C"
 //
 bool orionldPatchEntity(ConnectionInfo* ciP)
 {
-  char* entityId = orionldState.wildcard[0];
+  char*   entityId          = orionldState.wildcard[0];
+  KjNode* currentEntityTree;
 
   LM_T(LmtServiceRoutine, ("In orionldPatchEntity"));
-
-  if (mongoEntityExists(entityId, orionldState.tenant) == false)
-  {
-    ciP->httpStatusCode = SccNotFound;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
-    return false;
-  }
 
   // Is the payload empty?
   if (orionldState.requestTree == NULL)
@@ -88,10 +84,22 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     return false;
   }
 
+  if ((currentEntityTree = dbEntityLookup(entityId)) == NULL)
+  {
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
+    return false;
+  }
+
   //
-  // Make sure the attributes to be patched exist - FIXME: too damn slow to get an attribute at a time - make a smarter query!
-  // Also - expanding attribute values if the @context says they should be expanded
+  // o Make sure the attributes to be patched exist
+  // o Expand attribute values if the @context says they should be expanded
   //
+  KjNode* attrNamesArrayP = kjLookup(currentEntityTree, "attrNames");
+
+  if (attrNamesArrayP == NULL)
+    LM_X(1, ("Something has really gone wrong - the node 'attrNames' of the entity '%s' isn't present!", entityId));
+
   for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
     char    longAttrName[256];
@@ -116,7 +124,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
         orionldValueExpand(attrNodeP);
     }
 
-    if (mongoAttributeExists(entityId, attrNameP, orionldState.tenant) == false)
+    if (kjStringValueLookupInArray(attrNamesArrayP, attrNameP) == NULL)
     {
       ciP->httpStatusCode = SccNotFound;
       orionldErrorResponseCreate(OrionldBadRequestData, "Attribute does not exist", attrNameP);

@@ -62,8 +62,8 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"                         // orionldContextPresent
 #include "orionld/context/orionldUserContextKeyValuesCheck.h"              // orionldUserContextKeyValuesCheck
 #include "orionld/context/orionldUriExpand.h"                              // orionldUriExpand
+#include "orionld/kjTree/kjStringValueLookupInArray.h"                     // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"                // Own Interface
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityOperationsUpsert.h"   // mongoCppLegacyEntityOperationsUpsert
 
 
 
@@ -83,7 +83,7 @@ void orionldPartialUpdateResponseCreateBatch(ConnectionInfo* ciP)
   // For all attrs in orionldState.responseTree, remove those that are found in orionldState.errorAttributeArrayP.
   // Remember, the format of orionldState.errorAttributeArrayP is:
   //
-  //   |attrName|attrName|attrName|...
+  //   |attrName|attrName|[attrName|]*
   //
 
   KjNode* attrNodeP = orionldState.responseTree->value.firstChildP;
@@ -218,25 +218,6 @@ static void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldR
   kjChildAdd(objP, problemDetailsP);
 
   kjChildAdd(errorsArrayP, objP);
-}
-
-
-// ----------------------------------------------------------------------------
-//
-// kjStringValueLookupInArray -
-//
-static KjNode* kjStringValueLookupInArray(KjNode* stringArrayNodeP, const char* value)
-{
-  if (stringArrayNodeP != NULL)
-  {
-    for (KjNode* nodeP = stringArrayNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-    {
-      if (strcmp(value, nodeP->value.s) == 0)
-        return nodeP;
-    }
-  }
-
-  return NULL;
 }
 
 
