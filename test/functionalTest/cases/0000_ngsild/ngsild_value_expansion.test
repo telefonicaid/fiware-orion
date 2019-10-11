@@ -35,7 +35,7 @@ brokerStart CB 0-255
 # 02. GET the entity and see the expanded values
 # 03. POST on the entity /attrs, adding an attribute (whose value is to be expanded)
 # 04. GET the entity and see the expanded values
-# 05. PATCH the	entity,	changing an attribute (whose value is to be expanded)
+# 05. PATCH the entity, changing an attribute (whose value is to be expanded)
 # 06. GET the entity and see the expanded values
 # 07. Create an entity E2 with a string attribute called 'category', and the data model context (that defines 'category' with @type: @vocab)
 # 08. GET E2 and see the expanded value of 'category'
@@ -125,7 +125,7 @@ echo
 echo
 
 
-echo "05. PATCH the	entity,	changing an attribute (whose value is to be expanded)"
+echo "05. PATCH the entity, changing an attribute (whose value is to be expanded)"
 echo "==========================================================================="
 echo
 echo
@@ -266,7 +266,7 @@ Date: REGEX(.*)
 }
 
 
-05. PATCH the	entity,	changing an attribute (whose value is to be expanded)
+05. PATCH the entity, changing an attribute (whose value is to be expanded)
 ===========================================================================
 
 

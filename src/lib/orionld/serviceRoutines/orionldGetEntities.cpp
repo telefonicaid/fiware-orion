@@ -70,6 +70,7 @@ extern "C"
 // - type
 // - typePattern - Not possible - ignored (need an exact type name to lookup alias)
 // - q
+// - attrs
 // - mq          - Not interesting for ngsi-ld
 // - geometry
 // - coordinates
