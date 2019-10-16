@@ -81,7 +81,6 @@ void* startSenderThread(void* p)
                           params->content,
                           params->fiwareCorrelator,
                           params->renderFormat,
-                          true,
                           &out,
                           &statusCode,
                           params->extraHeaders);

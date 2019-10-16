@@ -270,7 +270,6 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       payload,
                       ciP->httpHeaders.correlator,
                       "",
-                      false,
                       &out,
                       &statusCode,
                       noHeaders,

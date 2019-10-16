@@ -15,7 +15,7 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
-* Rush support (along with the related CLI parameter: `-rush`) in Orion 2.1.0.
+* Rush support (along with the related CLI parameter: `-rush`) in Orion 2.1.0 (removed in Orion 2.3.0).
 * NGSIv1 API (along with related CLI parameters: `-strictNgsiv1Ids` and `-ngsiv1Autocast`) in Orion 2.0.0.
   Use NGSIv2 API instead.
 * `attributes` field in `POST /v2/op/query` is in Orion 1.15.0. It is a combination of `attrs` (to select
@@ -81,14 +81,14 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
-| Rush (along with CLI: `-rush`)                                             | Not yet defined                           | Not yet defined                 |
 | NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | Not yet defined                           | Not yet defined                 |
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
-| `id` metadata (and associated NGSIv1 operations)                           | 2.1.0                                     | December 19th, 2018                 |
+| Rush (along with CLI: `-rush`)                                             | 2.2.0                                     | February 21st, 2019             |
+| `id` metadata (and associated NGSIv1 operations)                           | 2.1.0                                     | December 19th, 2018             |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |
 | ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |
 | CLI `--silent`                                                             | 0.28.0                                    | February 29th, 2016             |

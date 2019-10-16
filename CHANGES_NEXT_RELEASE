@@ -19,3 +19,4 @@
 - Fix: abort on startup when MongoDB authentication fails to avoid starting a useless Context Broker
 - Fix: change max -dbhost length from 64 to 256 (to cope with long replica set strings using full domain names)
 - Add: Notify only attributes that change (#3190)
+- Remove: deprecated Rush support
