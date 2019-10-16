@@ -254,7 +254,6 @@ int httpRequestSendWithCurl
    const std::string&                         content,
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
-   bool                                       useRush,
    std::string*                               outP,
    long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
@@ -359,54 +358,6 @@ int httpRequestSendWithCurl
   httpResponse         = new MemoryStruct;
   httpResponse->memory = (char*) malloc(1); // will grow as needed
   httpResponse->size   = 0; // no data at this point
-
-  //
-  // Rush
-  // Every call to httpRequestSend specifies whether RUSH should be used or not.
-  // But, this depends also on how the broker was started, so here the 'useRush'
-  // parameter is cancelled in case the broker was started without rush.
-  //
-  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
-  // after that, the host and port of rush is set as ip/port for the message, that is
-  // now sent to rush instead of to its final destination.
-  // Also, a few HTTP headers for rush must be setup.
-  //
-  if ((rushPort == 0) || (rushHost == ""))
-  {
-    useRush = false;
-  }
-
-  if (useRush)
-  {
-    char         rushHeaderPortAsString[STRING_SIZE_FOR_INT];
-    uint16_t     rushHeaderPort         = port;
-    std::string  rushHeaderIP           = ip;
-    std::string  rushHeaderValue;
-    std::string  rushHostHeaderName     = "X-relayer-host";
-    std::string  rushProtocolHeaderName = "X-relayer-protocol";
-
-    ip    = rushHost;
-    port  = rushPort;
-
-    snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
-    rushHeaderValue = rushHeaderIP + ":" + rushHeaderPortAsString;
-    LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (rushHostHeaderName + ": " + rushHeaderValue).c_str()));
-    httpHeaderAdd(&headers,
-                  rushHostHeaderName,
-                  rushHeaderValue,
-                  &outgoingMsgSize,
-                  extraHeaders,
-                  usedExtraHeaders);
-
-    if (protocol == "https://")
-    {
-      // "Switching" protocol https -> http is needed in this case, as CB->Rush request will use HTTP
-      protocol        = "http://";
-      rushHeaderValue = "https";
-      LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", (rushProtocolHeaderName + ": " + rushHeaderValue).c_str()));
-      httpHeaderAdd(&headers, rushProtocolHeaderName, rushHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
-    }
-  }
 
   snprintf(portAsString, sizeof(portAsString), "%u", port);
 
@@ -683,7 +634,6 @@ int httpRequestSend
    const std::string&                         content,
    const std::string&                         fiwareCorrelation,
    const std::string&                         ngsiv2AttrFormat,
-   bool                                       useRush,
    std::string*                               outP,
    long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
@@ -725,7 +675,6 @@ int httpRequestSend
                                      content,
                                      fiwareCorrelation,
                                      ngsiv2AttrFormat,
-                                     useRush,
                                      outP,
                                      statusCodeP,
                                      extraHeaders,

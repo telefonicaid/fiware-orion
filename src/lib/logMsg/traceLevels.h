@@ -123,7 +123,6 @@ typedef enum TraceLevels
 
   /* Others (>=230) */
   LmtCm = 230,
-  LmtRush,
   LmtSoftError,
   LmtNotImplemented,
   LmtCurlContext,

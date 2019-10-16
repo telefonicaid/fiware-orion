@@ -186,7 +186,6 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
-  // FIXME P7: Should Rush be used?
   //
   LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
@@ -206,7 +205,6 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       cleanPayload,
                       ciP->httpHeaders.correlator,
                       "",
-                      false,
                       &out,
                       &statusCode,
                       noHeaders,
