@@ -66,6 +66,15 @@ The list of available options is the following:
 -   **-dbpwd <pass>**. The MongoDB password to use. If your MongoDB
     doesn't use authorization then this option must be avoided. See [database
     authorization section]( database_admin.md#database-authorization).
+-   **-dbAuthMech <mechanism>**. The MongoDB authentication mechanism to use in the case
+    of providing `-dbuser` and `-dbpwd`. Alternatives are SCRAM-SHA-1 or MONGODB-CR.
+    Default (in the case of omitting this field) is SCRAM-SHA-1.
+-   **-dbAuthDb <database>**. Specifies the database to use for authentication in the case
+    of providing `-dbuser` and `-dbpwd`. Default is the same as `-db` in the case of not
+    using `-multiservice` or `"admin"` in the case of using `-multiservice`.
+-   **-dbSSL**. Enable SSL in the connection to MongoDB. You have to use this option if your
+    MongoDB server or replica set is using SSL (or, the other way around, you have not to use
+    this option if your MongoDB server or replicat set is not using SSL).
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:
@@ -143,6 +152,8 @@ The list of available options is the following:
 -   **-maxConnections**. Maximum number of simultaneous connections. Default value is 1020, for legacy reasons,
     while the lower limit is 1 and there is no upper limit (limited by max file descriptors of the operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
+-   **-inReqPayloadMaxSize**. Max allowed size for incoming requests payloads, in bytes. Default value is 1MB.
+-   **-outReqMsgMaxSize**. Max allowed total size for request *outgoing message*, in bytes. Default value is 8MB.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
 -   **-logSummary**. Log summary period in seconds. Defaults to 0, meaning *Log Summary is off*. Min value: 0. Max value: one month (3600 * 24 * 31 == 2678400 seconds).

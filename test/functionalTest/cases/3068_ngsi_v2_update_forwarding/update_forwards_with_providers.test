@@ -1,0 +1,415 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarded updates in pure NGSIv2 with providers
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+brokerStart CB 38,186-187,235 IPV4
+brokerStart CP1
+brokerStart CP2
+brokerStart CP3
+
+--SHELL--
+
+#
+# 01. Register entities of type T1, with ID .*, and attribute A1, for CP1
+# 02. Register entities of type T1, with ID .*, and attribute A2, for CP2
+# 03. Register entities of type T1, with ID .*, and attribute A3+A4, for CP3
+# 04. Create E4/T1 with attribute A1='untouched' in CP1
+# 05. Create E5/T1 with attribute A2='untouched' in CP2
+# 06. Create E6/T1 with attribute A3='untouched' in CP3
+# 07. Create E7/T1 with attribute A4='untouched' in CP3
+# 08. Update entities E4 of type T1, setting A1 to 'updated-4'
+# 09. Update entities E5 of type T1, setting A2 to 'updated-5'
+# 10. Update entities E6 of type T1, setting A3 to 'updated-6'
+# 11. Query CP1, see E4/A1 == 'updated-4'
+# 12. Query CP2, see E5/A2 == 'updated-5'
+# 13. Query CP3, see E6/A3 == 'updated-6' and E7/A4 == 'untouched'
+#
+# NOTE
+#   The updates of step 8-10 are done in the CB, that then forwards the update requests
+#
+
+echo "01. Register entities of type T1, with ID .*, and attribute A1, for CP1"
+echo "======================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Register entities of type T1, with ID .*, and attribute A2, for CP2"
+echo "======================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [ "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP2_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Register entities of type T1, with ID .*, and attribute A3, for CP3"
+echo "======================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [ "A3", "A4" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP3_PORT}'/v2"
+    },
+    "legacyForwarding": false
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Create E4/T1 with attribute A1='untouched' in CP1"
+echo "====================================================="
+payload='{
+  "id": "E4",
+  "type": "T1",
+  "A1": {
+    "value": "untouched"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. Create E5/T1 with attribute A2='untouched' in CP2"
+echo "====================================================="
+payload='{
+  "id": "E5",
+  "type": "T1",
+  "A2": {
+    "value": "untouched"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "06. Create E6/T1 with attribute A3='untouched' in CP3"
+echo "====================================================="
+payload='{
+  "id": "E6",
+  "type": "T1",
+  "A3": {
+    "value": "untouched"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "07. Create E7/T1 with attribute A4='untouched' in CP3"
+echo "====================================================="
+payload='{
+  "id": "E7",
+  "type": "T1",
+  "A4": {
+    "value": "untouched"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "08. Update entities E4 of type T1, setting A1 to 'updated-4'"
+echo "============================================================"
+payload='{
+  "A1": {
+    "value": "updated-4"
+  }
+}'
+orionCurl --url /v2/entities/E4/attrs?type=T1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. Update entities E5 of type T1, setting A2 to 'updated-5'"
+echo "============================================================"
+payload='{
+  "A2": {
+    "value": "updated-5"
+  }
+}'
+orionCurl --url /v2/entities/E5/attrs?type=T1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "10. Update entities E6 of type T1, setting A3 to 'updated-6'"
+echo "============================================================"
+payload='{
+  "A3": {
+    "value": "updated-6"
+  }
+}'
+orionCurl --url /v2/entities/E6/attrs?type=T1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. Query CP1, see E4/A1 == 'updated-4'"
+echo "======================================="
+orionCurl --url /v2/entities --port $CP1_PORT
+echo
+echo
+
+
+echo "12. Query CP2, see E5/A2 == 'updated-5'"
+echo "======================================="
+orionCurl --url /v2/entities --port $CP2_PORT
+echo
+echo
+
+
+echo "13. Query CP3, see E6/A3 == 'updated-6' and E7/A4 == 'untouched'"
+echo "================================================================"
+orionCurl --url /v2/entities --port $CP3_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Register entities of type T1, with ID .*, and attribute A1, for CP1
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Register entities of type T1, with ID .*, and attribute A2, for CP2
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Register entities of type T1, with ID .*, and attribute A3, for CP3
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create E4/T1 with attribute A1='untouched' in CP1
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create E5/T1 with attribute A2='untouched' in CP2
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create E6/T1 with attribute A3='untouched' in CP3
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create E7/T1 with attribute A4='untouched' in CP3
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E7?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Update entities E4 of type T1, setting A1 to 'updated-4'
+============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. Update entities E5 of type T1, setting A2 to 'updated-5'
+============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Update entities E6 of type T1, setting A3 to 'updated-6'
+============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Query CP1, see E4/A1 == 'updated-4'
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "metadata": {}, 
+            "type": "Text", 
+            "value": "updated-4"
+        }, 
+        "id": "E4", 
+        "type": "T1"
+    }
+]
+
+
+12. Query CP2, see E5/A2 == 'updated-5'
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A2": {
+            "metadata": {}, 
+            "type": "Text", 
+            "value": "updated-5"
+        }, 
+        "id": "E5", 
+        "type": "T1"
+    }
+]
+
+
+13. Query CP3, see E6/A3 == 'updated-6' and E7/A4 == 'untouched'
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 159
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "A3": {
+            "metadata": {}, 
+            "type": "Text", 
+            "value": "updated-6"
+        }, 
+        "id": "E6", 
+        "type": "T1"
+    }, 
+    {
+        "A4": {
+            "metadata": {}, 
+            "type": "Text", 
+            "value": "untouched"
+        }, 
+        "id": "E7", 
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

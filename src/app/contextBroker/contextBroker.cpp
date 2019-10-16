@@ -130,11 +130,14 @@ static bool isFatherProcess = false;
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[64];
+char            dbHost[256];
 char            rplSet[64];
 char            dbName[64];
 char            user[64];
 char            pwd[64];
+char            authMech[64];
+char            authDb[64];
+bool            dbSSL;
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -176,7 +179,6 @@ bool            ngsiv1Autocast;
 
 
 
-
 /* ****************************************************************************
 *
 * Definitions to make paArgs lines shorter ...
@@ -194,6 +196,9 @@ bool            ngsiv1Autocast;
 #define RPLSET_DESC            "replica set"
 #define DBUSER_DESC            "database user"
 #define DBPASSWORD_DESC        "database password"
+#define DBAUTHMECH_DESC        "database authentication mechanism (either SCRAM-SHA-1 or MONGODB-CR)"
+#define DBAUTHDB_DESC          "database used for authentication"
+#define DBSSL_DESC             "enable SSL connection to DB"
 #define DB_DESC                "database name"
 #define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
 #define USEIPV4_DESC           "use ip v4 only"
@@ -217,6 +222,8 @@ bool            ngsiv1Autocast;
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define IN_REQ_PAYLOAD_MAX_SIZE_DESC   "maximum size (in bytes) of the payload of incoming requests"
+#define OUT_REQ_MSG_MAX_SIZE_DESC      "maximum size (in bytes) of outgoing forward and notification request messages"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
@@ -255,6 +262,11 @@ PaArgument paArgs[] =
   { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
   { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
   { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
+
+  { "-dbAuthMech",    authMech,      "DB_AUTH_MECH",   PaString, PaOpt, _i "SCRAM-SHA-1", PaNL,   PaNL,  DBAUTHMECH_DESC    },
+  { "-dbAuthDb",      authDb,        "DB_AUTH_DB",     PaString, PaOpt, _i "",            PaNL,   PaNL,  DBAUTHDB_DESC    },
+  { "-dbSSL",         &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,            false,  true,  DBSSL_DESC    },
+
   { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
   { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
@@ -282,6 +294,9 @@ PaArgument paArgs[] =
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
+
+  { "-inReqPayloadMaxSize",  &inReqPayloadMaxSize, "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE,   0, PaNL,  IN_REQ_PAYLOAD_MAX_SIZE_DESC   },
+  { "-outReqMsgMaxSize",     &outReqMsgMaxSize,    "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,      0, PaNL,  OUT_REQ_MSG_MAX_SIZE_DESC      },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
   { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
@@ -841,6 +856,11 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
+  if ((strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "MONGODB-CR", strlen("MONGODB-CR")) != 0))
+  {
+    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or MONGODB-CR"));
+  }
+
   if (useOnlyIPv6 && useOnlyIPv4)
   {
     LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
@@ -897,7 +917,7 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);

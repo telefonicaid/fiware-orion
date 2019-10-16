@@ -15,6 +15,7 @@
 * [Ordering between different attribute value types](#ordering-between-different-attribute-value-types)
 * [Initial notifications](#initial-notifications)
 * [Oneshot Subscription](#oneshot-subscriptions)
+* [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
 * [Registrations](#registrations)
@@ -288,9 +289,20 @@ Check details in the document about [initial notifications](initial_notification
 
 Apart from the `status` values defined for subscription in the NGSIv2 specification, Orion also allows to use `oneshot`. Please find details in [the oneshot subscription document](oneshot_subscription.md)
 
+## Notify only attributes that change
+
+Orion supports an extra field `onlyChangedAttrs` (within `notification`) in subscriptions, apart of the ones described in
+the NGSIv2 specification. This field takes a `true` or `false` value (default is `false`, if the field is ommitted). If
+set to `true` then notifications associated to the subscription include only attributes that changed in the triggering
+update request, in combination with the `attrs` or `exceptAttrs` field.
+
+For instance, if `attrs` is `[A, B, C]` the default behavior  (when `onlyChangedAttrs` is `false`) and the triggering
+update modified only A, then A, B and C are notified (in other words, the triggering update doesn't matter). However,
+if `onlyChangedAttrs` is `true` and the triggering update only modified A then only A is included in the notification.
+
 [Top](#top)
 
-# `lastFailureReason` and `lastSuccessCode` subscriptions fields
+## `lastFailureReason` and `lastSuccessCode` subscriptions fields
 
 Apart from the subscription fields described in NGSIv2 specification for `GET /v2/subscriptions` and
 `GET /v2/subscriptions/subId` requests, Orion supports this two extra fields within the `notification`
@@ -334,7 +346,8 @@ for the following aspects:
 * `PATCH /v2/registration/<id>` is not implemented. Thus, registrations cannot be updated
   directly. I.e., updates must be done deleting and re-creating the registration. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
-* `idPattern` and `typePattern` are not implemented.
+* `idPattern` is supported but only for the exact regular expression `.*`
+* `typePattern` is not implemented.
 * The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
   in a 501 Not Implemented error response. Please
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
@@ -350,12 +363,15 @@ According to NGSIv2 specification:
 
 The way in which Orion implements such forwarding is as follows:
 
-Orion implements an additional field `legacyForwarding` (within `provider`) not included in NGSIv2
+* `POST /v2/op/query` for query forwarding
+* `POST /v2/op/update` for update forwarding
+
+More information on forwarding to context information sources can be found in [this specific document](context_providers.md).
+
+Orion implements an additional field `legacyForwarding` (within `provider`) not included in the NGSIv2
 specification. If the value of `legacyForwarding` is `true` then NGSIv1-based query/update will be used
-for forwarding requests associated to that registration. Although NGSIv1 is deprecated, for the time being,
-NGSIv2-based forwarding has not been defined (see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3068)
-about it) so the only valid option is to always use `"legacyForwarding": true` (otherwise a 501 Not Implemented
-error response will be the result).
+for forwarding requests associated to that registration. Although NGSIv1 is deprecated, some Context Provider may
+not have been migrated yet to NGSIv2, so this mode may prove useful.
 
 [Top](#top)
 

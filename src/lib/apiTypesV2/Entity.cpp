@@ -60,11 +60,12 @@ Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDat
 *
 * This constructor was ported from old ContextElement class
 */
-Entity::Entity(const std::string& _id, const std::string& _type, const std::string& _isPattern)
+Entity::Entity(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern)
 {
   id            = _id;
   type          = _type;
   isPattern     = _isPattern;
+  isTypePattern = _isTypePattern;
 }
 
 
@@ -137,7 +138,8 @@ void Entity::filterAndOrderAttrs
 (
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
-  std::vector<ContextAttribute*>*  orderedAttrs)
+  std::vector<ContextAttribute*>*  orderedAttrs
+)
 {
   if (blacklist)
   {
@@ -562,7 +564,6 @@ void Entity::fill
 
 
 
-
 /* ****************************************************************************
 *
 * Entity::fill -
@@ -725,7 +726,7 @@ ContextAttribute* Entity::getAttribute(const std::string& attrName)
 *
 * Entity::equal
 *
-* Same method that in EntityId class
+* Same method as in EntityId class
 */
 bool Entity::equal(Entity* eP)
 {

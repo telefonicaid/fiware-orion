@@ -2257,12 +2257,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
 
     EXPECT_EQ("Database Error (collection: utest.registrations "
-              "- query(): { query: { $or: [ { contextRegistration.entities: "
-              "{ $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
-              "{ contextRegistration.entities.id: { $in: [] } } ], "
-              "expiration: { $gt: 1360232700 }"
-              ", servicePath: { $in: [ /^/.*/, null ] } }"
-              ", orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
+              "- query(): { query: "
+              "{ $or: [ { contextRegistration.entities.id: \"E3\", contextRegistration.entities.type: \"T3\" }, "
+                       "{ contextRegistration.entities.id: \".*\", contextRegistration.entities.isPattern: \"true\", contextRegistration.entities.type: { $in: [ \"T3\" ] } }, "
+                       "{ contextRegistration.entities.id: \".*\", contextRegistration.entities.isPattern: \"true\", contextRegistration.entities.type: { $exists: false } } ], "
+              "expiration: { $gt: 1360232700 } }, "
+              "orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
     EXPECT_EQ(0, res.responseVector.size());
 
     /* Restore real DB connection */

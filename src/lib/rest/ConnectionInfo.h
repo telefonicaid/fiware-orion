@@ -120,6 +120,7 @@ public:
     port                   (0),
     ip                     (""),
     apiVersion             (V1),
+    requestType            (NoRequest),
     inCompoundValue        (false),
     compoundValueP         (NULL),
     compoundValueRoot      (NULL),

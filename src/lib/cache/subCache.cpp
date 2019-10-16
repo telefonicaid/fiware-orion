@@ -751,7 +751,8 @@ void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
-  bool                               blacklist
+  bool                               blacklist,
+  bool                               onlyChanged
 )
 {
   //
@@ -784,6 +785,7 @@ void subCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
+  cSubP->onlyChanged           = onlyChanged;
   cSubP->httpInfo              = httpInfo;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->attributes            = attributes;

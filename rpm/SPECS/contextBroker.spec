@@ -40,15 +40,18 @@ Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel
 Requires(pre): shadow-utils
 
 %description
-The Orion Context Broker is an implementation of NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
+The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE,
+providing an NGSI interface. Using this interface, clients can do several operations:
+
+* Query context information. The Orion Context Broker stores context information updated
+  from applications, so queries are resolved based on that information. Context 
+  information consists on *entities* (e.g. a car) and their *attributes* (e.g. the speed
+  or location of the car).
+* Update context information, e.g. send updates of temperature
+* Get notified when changes on context information take place (e.g. the temperature
+  has changed)
+* Register context provider applications, e.g. the provider for the temperature sensor
+  within a room
 
 %prep
 if [ -d $RPM_BUILD_ROOT/usr ]; then

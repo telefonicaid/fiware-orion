@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/JsonHelper.h"
 #include "ngsi/StringList.h"
 
 
@@ -57,6 +58,24 @@ void StringList::fill(const std::vector<std::string>& sVec)
 void StringList::fill(const std::string& commaSeparatedList)
 {
   stringSplit(commaSeparatedList, ',', stringV);
+}
+
+
+
+/* ****************************************************************************
+*
+* StringList::toJson -
+*/
+std::string StringList::toJson(void)
+{
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
+  {
+    jh.addString(stringV[ix]);
+  }
+
+  return jh.str();
 }
 
 
@@ -122,11 +141,12 @@ void StringList::release(void)
 *
 * lookup - 
 */
-bool StringList::lookup(const std::string& string) const
+bool StringList::lookup(const std::string& string, const std::string& wildCard) const
 {
+  bool wildCardUsed = !wildCard.empty();
   for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    if (stringV[ix] == string)
+    if ((stringV[ix] == string) || (wildCardUsed && (stringV[ix] == ALL_ATTRS)))
     {
       return true;
     }

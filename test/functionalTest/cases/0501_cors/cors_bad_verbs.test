@@ -100,6 +100,21 @@ orionCurl --url /v2/op/update -X BADVERB
 echo
 echo
 
+
+echo "13. Bad Verb All Registrations"
+echo "=============================="
+orionCurl --url /v2/registrations -X BADVERB
+echo
+echo
+
+
+echo "14. Bad Verb One Registration"
+echo "=============================="
+orionCurl --url /v2/registrations/r1 -X BADVERB
+echo
+echo
+
+
 --REGEXPECT--
 01. Bad Verb Entry Points
 =========================
@@ -272,6 +287,36 @@ HTTP/1.1 405 Method Not Allowed
 Content-Length: 63
 Content-Type: application/json
 Allow: POST, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+13. Bad Verb All Registrations
+==============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: POST, GET, OPTIONS
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
+
+
+14. Bad Verb One Registration
+==============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 63
+Content-Type: application/json
+Allow: GET, DELETE, OPTIONS
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

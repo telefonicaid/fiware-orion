@@ -542,8 +542,8 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long   lastFailure       = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
-  std::string lastFailureReason = getStringFieldF(subOrig, CSUB_LASTFAILUREASON);
+  long long   lastFailure       = subOrig.hasField(CSUB_LASTFAILURE)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE) : -1;
+  std::string lastFailureReason = subOrig.hasField(CSUB_LASTFAILUREASON) ? getStringFieldF(subOrig, CSUB_LASTFAILUREASON)      : "";
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -566,8 +566,8 @@ static void setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP
 */
 static void setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastSuccess     = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
-  long long lastSuccessCode = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE);
+  long long lastSuccess     = subOrig.hasField(CSUB_LASTSUCCESS)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS)     : -1;
+  long long lastSuccessCode = subOrig.hasField(CSUB_LASTSUCCESSCODE) ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE) : -1;
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -657,6 +657,27 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
 
     b->append(CSUB_BLACKLIST, bList);
     LM_T(LmtMongo, ("Subscription blacklist: %s", bList? "true" : "false"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setOnlyChanged -
+*/
+static void setOnlyChanged(const SubscriptionUpdate& subUp, const BSONObj& subOrig, BSONObjBuilder* b)
+{
+  if (subUp.onlyChangedProvided)
+  {
+    setOnlyChanged(subUp, b);
+  }
+  else
+  {
+    bool oList = subOrig.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(subOrig, CSUB_ONLYCHANGED) : false;
+
+    b->append(CSUB_ONLYCHANGED, oList);
+    LM_T(LmtMongo, ("Subscription onlyChanged: %s", oList? "true" : "false"));
   }
 }
 
@@ -916,6 +937,7 @@ std::string mongoUpdateSubscription
   setAttrs(subUp, subOrig, &b);
   setMetadata(subUp, subOrig, &b);
   setBlacklist(subUp, subOrig, &b);
+  setOnlyChanged(subUp, subOrig, &b);
 
   setCondsAndInitialNotify(subUp,
                            subOrig,

@@ -883,19 +883,19 @@ static bool deleteAttribute
 
 /* ****************************************************************************
 *
-* servicePathSubscriptionRegex -
+* servicePathSubscription -
 *
 * 1. If the incoming request is without service path, then only subscriptions without
-*    service path is a match (without or with '/#', or '/')
+*    service path is a match ('/#' or '/')
 * 2. If the incoming request has a service path, then the REGEX must be created:
 *    - Incoming: /a1/a2/a3
-*    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
+*    - [ "/#", "/a1/#", "/a1/a2/#", "/a1/a2/a3/#", "/a1/a2/a3" ]
 *
 */
-static std::string servicePathSubscriptionRegex(const std::string& servicePath, std::vector<std::string>& spathV)
+static void servicePathSubscription(const std::string& servicePath, BSONArrayBuilder* bab)
 {
-  std::string  spathRegex;
-  int          spathComponents = 0;
+  std::vector<std::string>  spathV;
+  int                       spathComponents = 0;
 
   //
   // Split Service Path in 'path components'
@@ -907,14 +907,15 @@ static std::string servicePathSubscriptionRegex(const std::string& servicePath, 
 
   if (spathComponents == 0)
   {
-    spathRegex = "^$|^\\/#$|^\\/$";
+    bab->append("/");
+    bab->append("/#");
   }
   else
   {
     //
-    // 1. Empty or '/#'
+    // 1. '/#'
     //
-    spathRegex = std::string("^$|^\\/#$");
+    bab->append("/#");
 
 
     //
@@ -922,29 +923,24 @@ static std::string servicePathSubscriptionRegex(const std::string& servicePath, 
     //
     for (int ix = 0; ix < spathComponents; ++ix)
     {
-      spathRegex += std::string("|^");
+      std::string sp;
 
       for (int cIx = 0; cIx <= ix; ++cIx)
       {
-        spathRegex += std::string("\\/") + spathV[cIx];
+        sp += std::string("/") + spathV[cIx];
       }
 
-      spathRegex += std::string("\\/#$");
+      sp += "/#";
+
+      bab->append(sp);
     }
 
 
     //
     // 3. EXACT service path
     //
-    spathRegex += std::string("|^");
-    for (int cIx = 0; cIx < spathComponents; ++cIx)
-    {
-      spathRegex += std::string("\\/") + spathV[cIx];
-    }
-    spathRegex += std::string("$");
+    bab->append(servicePath);
   }
-
-  return spathRegex;
 }
 
 
@@ -957,6 +953,7 @@ static bool addTriggeredSubscriptions_withCache
 (
   std::string                                    entityId,
   std::string                                    entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1003,8 +1000,19 @@ static bool addTriggeredSubscriptions_withCache
     //           instead of its std::vector<std::string> ... ?
     //
     StringList aList;
-
-    aList.fill(cSubP->attributes);
+    bool op = false;
+    if (cSubP->onlyChanged)
+    {
+      subToNotifyList(modifiedAttrs, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
+      if (op)
+      {
+        continue;
+      }
+    }
+    else
+    {
+      aList.fill(cSubP->attributes);
+    }
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1052,7 +1060,14 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
-    subP->blacklist = cSubP->blacklist;
+    if (cSubP->onlyChanged)
+    {
+      subP->blacklist = false;
+    }
+    else
+    {
+      subP->blacklist = cSubP->blacklist;
+    }
     subP->metadata  = cSubP->metadata;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
@@ -1121,8 +1136,7 @@ static void fill_idNPtypeNP
   const std::string&  entTypeQ,
   const std::string&  entityType,
   const std::string&  entPatternQ,
-  const std::string&  typePatternQ,
-  const BSONObj&      spBson
+  const std::string&  typePatternQ
 )
 {
   bgP->idNPtypeNP = BSON(entIdQ << entityId <<
@@ -1131,8 +1145,7 @@ static void fill_idNPtypeNP
                          entPatternQ << "false" <<
                          typePatternQ << BSON("$ne" << true) <<
                          CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                         CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
-                         CSUB_SERVICE_PATH << spBson);
+                         CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE));
 }
 
 
@@ -1147,8 +1160,7 @@ static void fill_idPtypeNP
   const std::string&  entityId,
   const std::string&  entityType,
   const std::string&  entPatternQ,
-  const std::string&  typePatternQ,
-  const BSONObj&      spBson
+  const std::string&  typePatternQ
 )
 {
   bgP->functionIdPtypeNP = std::string("function()") +
@@ -1171,7 +1183,6 @@ static void fill_idPtypeNP
   bgP->boPNP.append(typePatternQ, BSON("$ne" << true));
   bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   bgP->boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  bgP->boPNP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
 
   bgP->idPtypeNP = bgP->boPNP.obj();
@@ -1189,8 +1200,7 @@ static void fill_idNPtypeP
   const std::string&  entityId,
   const std::string&  entityType,
   const std::string&  entPatternQ,
-  const std::string&  typePatternQ,
-  const BSONObj&      spBson
+  const std::string&  typePatternQ
 )
 {
   bgP->functionIdNPtypeP = std::string("function()") +
@@ -1211,7 +1221,6 @@ static void fill_idNPtypeP
   bgP->boNPP.append(typePatternQ, true);
   bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   bgP->boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  bgP->boNPP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
 
   bgP->idNPtypeP = bgP->boNPP.obj();
@@ -1231,8 +1240,7 @@ static void fill_idPtypeP
   const std::string&  entTypeQ,
   const std::string&  entityType,
   const std::string&  entPatternQ,
-  const std::string&  typePatternQ,
-  const BSONObj&      spBson
+  const std::string&  typePatternQ
 )
 {
   bgP->functionIdPtypeP = std::string("function()") +
@@ -1253,7 +1261,6 @@ static void fill_idPtypeP
   bgP->boPP.append(typePatternQ, true);
   bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   bgP->boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
-  bgP->boPP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
 
   bgP->idPtypeP = bgP->boPP.obj();
@@ -1270,6 +1277,7 @@ static bool addTriggeredSubscriptions_noCache
 (
   const std::string&                             entityId,
   const std::string&                             entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1278,23 +1286,19 @@ static bool addTriggeredSubscriptions_noCache
 )
 {
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
-  std::vector<std::string>  spathV;
-  std::string               spathRegex      = servicePathSubscriptionRegex(servicePath, spathV);
 
-
-  //
-  // Create the REGEX for the Service Path
-  //
-  spathRegex = std::string("/") + spathRegex + "/";
-
+  BSONArrayBuilder bab;
+  servicePathSubscription(servicePath, &bab);
 
   /* Build query */
   std::string entIdQ        = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
   std::string entTypeQ      = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
   std::string entPatternQ   = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
   std::string typePatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISTYPEPATTERN;
-  std::string inRegex       = "{ $in: [ " + spathRegex + ", null ] }";
-  BSONObj     spBson        = mongo::fromjson(inRegex);
+
+  // Note that, by construction, bab.arr() has always more than one element thus we
+  // cannot avoid $in usage
+  BSONObj     spBson        = BSON("$in" << bab.arr());
 
   /* Query is an $or of 4 sub-clauses:
    *
@@ -1319,7 +1323,7 @@ static bool addTriggeredSubscriptions_noCache
    * as the former also matches documents without the typePatternQ (i.e. legacy sub documents created before the
    * isTypePattern feature was developed)
    *
-   * FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
+   * FIXME: condTypeQ and condValueQ part could be "factorized" out of the $or clause
    */
 
   //
@@ -1330,13 +1334,14 @@ static bool addTriggeredSubscriptions_noCache
   CSubQueryGroup* bgP = new CSubQueryGroup();
 
   // Populating bgP with the four clauses
-  fill_idNPtypeNP(bgP, entIdQ,   entityId,   entTypeQ,    entityType,   entPatternQ, typePatternQ, spBson);
-  fill_idPtypeP(bgP,   entIdQ,   entityId,   entTypeQ,    entityType,   entPatternQ, typePatternQ, spBson);
-  fill_idPtypeNP(bgP,  entityId, entityType, entPatternQ, typePatternQ, spBson);
-  fill_idNPtypeP(bgP,  entityId, entityType, entPatternQ, typePatternQ, spBson);
+  fill_idNPtypeNP(bgP, entIdQ,   entityId,   entTypeQ,    entityType,   entPatternQ, typePatternQ);
+  fill_idPtypeP(bgP,   entIdQ,   entityId,   entTypeQ,    entityType,   entPatternQ, typePatternQ);
+  fill_idPtypeNP(bgP,  entityId, entityType, entPatternQ, typePatternQ);
+  fill_idNPtypeP(bgP,  entityId, entityType, entPatternQ, typePatternQ);
 
   /* Composing final query */
-  bgP->query = BSON("$or" << BSON_ARRAY(bgP->idNPtypeNP << bgP->idPtypeNP << bgP->idNPtypeP << bgP->idPtypeP));
+  bgP->query = BSON("$or" << BSON_ARRAY(bgP->idNPtypeNP << bgP->idPtypeNP << bgP->idNPtypeP << bgP->idPtypeP) <<
+                    CSUB_SERVICE_PATH << spBson);
 
   std::string                    collection  = getSubscribeContextCollectionName(tenant);
   std::auto_ptr<DBClientCursor>  cursor;
@@ -1412,10 +1417,19 @@ static bool addTriggeredSubscriptions_noCache
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
+      bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
       httpInfo.fill(sub);
+
+      bool op = false;
+      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
+      if (op)
+      {
+         continue;
+      }
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
@@ -1423,9 +1437,16 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           renderFormat,
           httpInfo,
-          subToAttributeList(sub), "", "");
+          aList, "", "");
 
-      trigs->blacklist = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+      if (!onlyChanged)
+      {
+        trigs->blacklist = blacklist;
+      }
+      else
+      {
+        trigs->blacklist = false;
+      }
 
       if (sub.hasField(CSUB_METADATA))
       {
@@ -1530,6 +1551,7 @@ static bool addTriggeredSubscriptions
 (
   const std::string&                             entityId,
   const std::string&                             entityType,
+  const std::vector<std::string>&                attributes,
   const std::vector<std::string>&                modifiedAttrs,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
@@ -1541,11 +1563,11 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV);
   }
 }
 
@@ -2340,6 +2362,7 @@ static bool processContextAttributeVector
   std::string               entityDetail    = cerP->entity.toString();
   bool                      entityModified  = false;
   std::vector<std::string>  modifiedAttrs;
+  std::vector<std::string>  attributes;
 
   for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
   {
@@ -2442,6 +2465,7 @@ static bool processContextAttributeVector
     {
       modifiedAttrs.push_back(ca->name);
     }
+    attributes.push_back(ca->name);
   }
 
   /* Add triggered subscriptions */
@@ -2451,7 +2475,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -2808,7 +2832,6 @@ static void updateEntity
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
-  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
   BSONObj            idField           = getObjectFieldF(r, "_id");
 
@@ -3112,7 +3135,10 @@ static void updateEntity
   }
 
   // Service Path
-  query.append(servicePathString, fillQueryServicePath(servicePathV));
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    query.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePathV));
+  }
 
   std::string err;
   if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
@@ -3289,7 +3315,6 @@ void processContextElement
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
-  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
   EntityId           en(eP->id, eP->type);
   BSONObjBuilder     bob;
@@ -3302,7 +3327,10 @@ void processContextElement
   }
 
   // Service path
-  bob.append(servicePathString, fillQueryServicePath(servicePathV));
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    bob.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePathV));
+  }
 
   // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
   // Restriction is not a valid field in updateContext according to the NGSI specification. In the
@@ -3527,6 +3555,7 @@ void processContextElement
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
         std::vector<std::string>                       attrNames;
+        std::vector<std::string>                       attributes;
 
         for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
         {
@@ -3535,6 +3564,7 @@ void processContextElement
 
         if (!addTriggeredSubscriptions(eP->id,
                                        eP->type,
+                                       attrNames,
                                        attrNames,
                                        subsToNotify,
                                        err,

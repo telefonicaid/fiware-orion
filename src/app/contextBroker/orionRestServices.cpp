@@ -401,7 +401,7 @@ static RestService badVerbV[] =
   { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, badVerbPostOnly           },
   { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, badVerbPostOnly           },
   { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     }, badVerbGetDeleteOnly      },
-  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, badVerbPostOnly           },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, badVerbGetPostOnly        },
   { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
   { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
   { SubscribeContextAvailability,                  2, { "ngsi9",          "subscribeContextAvailability"                               }, badVerbPostOnly           },

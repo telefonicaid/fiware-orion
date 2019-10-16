@@ -221,6 +221,21 @@ void QueryContextResponse::fill(QueryContextResponse* qcrsP)
 
 /* ****************************************************************************
 *
+* QueryContextResponse::fill -
+*/
+void QueryContextResponse::fill(const Entities& entities)
+{
+  for (int eIx = 0; eIx < entities.size(); eIx++)
+  {
+    ContextElementResponse* cerP = new ContextElementResponse(entities.vec.vec[eIx]);
+    contextElementResponseVector.push_back(cerP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * QueryContextResponse::clone -
 */
 QueryContextResponse* QueryContextResponse::clone(void)

@@ -212,7 +212,7 @@ Date: REGEX(.*)
 05. GET /v2/subscriptions, see only the sub from step 04
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 427
 Content-Type: application/json 
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -229,7 +229,8 @@ Date: REGEX(.*)
             "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:1234"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "expired",
         "subject": {

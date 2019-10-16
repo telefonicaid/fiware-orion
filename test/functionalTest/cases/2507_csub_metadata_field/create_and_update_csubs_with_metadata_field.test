@@ -126,7 +126,7 @@ Date: REGEX(.*)
 02. Get subscription and see metadata: foo
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 307
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -143,7 +143,8 @@ Date: REGEX(.*)
             },
             "metadata": [
                 "foo"
-            ]
+            ],
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -173,7 +174,7 @@ Date: REGEX(.*)
 04. Get subscription and see metadata: foo
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 307
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,7 +191,8 @@ Date: REGEX(.*)
             },
             "metadata": [
                 "foo"
-            ]
+            ],
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -220,7 +222,7 @@ Date: REGEX(.*)
 06. Get subscription and see metadata: bar, ruu
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 288
+Content-Length: 313
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -238,7 +240,8 @@ Date: REGEX(.*)
             "metadata": [
                 "bar",
                 "ruu"
-            ]
+            ],
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {

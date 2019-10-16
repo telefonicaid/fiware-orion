@@ -115,6 +115,8 @@ static DBClientBase* mongoConnect
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
+  const char*  authDb,
   bool         multitenant,
   int          writeConcern,
   double       timeout
@@ -139,15 +141,23 @@ static DBClientBase* mongoConnect
     //
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
-      if (((DBClientConnection*) connection)->connect(std::string(host), err))
+      try
       {
-        connected = true;
+        connected = ((DBClientConnection*) connection)->connect(std::string(host), err);
+      }
+      catch (const std::exception &e)
+      {
+        LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
+      }
+
+      if (connected)
+      {
         break;
       }
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
@@ -182,15 +192,23 @@ static DBClientBase* mongoConnect
     //
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
-      if ( ((DBClientReplicaSet*)connection)->connect())
+      try
       {
-        connected = true;
+        connected = ((DBClientReplicaSet*)connection)->connect();
+      }
+      catch (const std::exception &e)
+      {
+        LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
+      }
+
+      if (connected)
+      {
         break;
       }
 
       if (tryNo == 0)
       {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)",
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
               retries,
               RECONNECT_DELAY));
       }
@@ -243,25 +261,26 @@ static DBClientBase* mongoConnect
    * using multiservice, we authenticate in the single-service database. In the case of using
    * multiservice, it isn't a default database that we know at contextBroker start time (when
    * this connection function is invoked) so we authenticate on the admin database, which provides
-   * access to any database */
-  if (multitenant)
+   * access to any database.
+   *
+   * This behaviour can be overriden by the -dbAuthDb parameter in the CLI
+   */
+
+  const char* effectiveAuthDb;
+  if (strlen(authDb) > 0)
   {
-    if (strlen(username) != 0 && strlen(passwd) != 0)
-    {
-      if (!connectionAuth(connection, "admin", std::string(username), std::string(passwd), &err))
-      {
-        return NULL;
-      }
-    }
+    effectiveAuthDb = authDb;
   }
   else
   {
-    if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
+    effectiveAuthDb = multitenant ? "admin" : db;
+  }
+
+  if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
+  {
+    if (!connectionAuth(connection, std::string(effectiveAuthDb), std::string(username), std::string(passwd), std::string(mechanism), &err))
     {
-      if (!connectionAuth(connection, std::string(db), std::string(username), std::string(passwd), &err))
-      {
-        return NULL;
-      }
+      return NULL;
     }
   }
 
@@ -297,6 +316,8 @@ int mongoConnectionPoolInit
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
+  const char*  authDb,
   bool         multitenant,
   double       timeout,
   int          writeConcern,
@@ -307,7 +328,7 @@ int mongoConnectionPoolInit
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
-  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout));
+  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout));
   return 0;
 #else
   //
@@ -327,8 +348,10 @@ int mongoConnectionPoolInit
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     connectionPool[ix].free       = true;
-    connectionPool[ix].connection =
-        mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
+    if ((connectionPool[ix].connection =
+        mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout)) == NULL) {
+      return -1;
+    }
   }
 
   //

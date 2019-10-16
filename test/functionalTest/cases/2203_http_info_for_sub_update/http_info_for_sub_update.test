@@ -170,7 +170,7 @@ Date: REGEX(.*)
 02. GET sub
 ===========
 HTTP/1.1 200 OK
-Content-Length: 424
+Content-Length: 449
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -192,7 +192,8 @@ Date: REGEX(.*)
                     "Q1": "${A1}"
                 },
                 "url": "http://localhost:REGEX(\d+)/notify"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -226,7 +227,7 @@ Date: REGEX(.*)
 04. GET sub - shows only that sub is OK in mongo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -248,7 +249,8 @@ Date: REGEX(.*)
                     "Q2": "${A2}"
                 },
                 "url": "http://localhost:REGEX(\d+)/notify"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {

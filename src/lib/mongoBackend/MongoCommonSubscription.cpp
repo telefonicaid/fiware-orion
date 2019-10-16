@@ -453,6 +453,20 @@ void setBlacklist(const Subscription& sub, BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setOnlyChanged -
+*/
+void setOnlyChanged(const Subscription& sub, BSONObjBuilder* b)
+{
+  bool bl = sub.notification.onlyChanged;
+
+  b->append(CSUB_ONLYCHANGED, bl);
+  LM_T(LmtMongo, ("Subscription onlyChanged: %s", bl ? "true" : "false"));
+}
+
+
+
+/* ****************************************************************************
+*
 * setMetadata -
 */
 void setMetadata(const Subscription& sub, BSONObjBuilder* b)

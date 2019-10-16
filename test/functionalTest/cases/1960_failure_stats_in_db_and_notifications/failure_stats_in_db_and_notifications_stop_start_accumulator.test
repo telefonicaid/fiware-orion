@@ -172,7 +172,7 @@ Date: REGEX(.*)
 03. GET subscription, see lastSuccess but not lastFailure and status==active
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 337
+Content-Length: 362
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,6 +189,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 1
         },
         "status": "active",
@@ -222,7 +223,7 @@ Date: REGEX(.*)
 06. GET subscription, see lastFailure GT lastSuccess and status==failed
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -241,6 +242,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 2
         },
         "status": "failed",
@@ -275,7 +277,7 @@ Date: REGEX(.*)
 09. GET subscription, see lastSuccess GT lastFailure and status==active
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -294,6 +296,7 @@ Date: REGEX(.*)
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
             "timesSent": 3
         },
         "status": "active",

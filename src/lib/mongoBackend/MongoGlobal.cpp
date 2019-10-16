@@ -72,13 +72,13 @@
 *
 * USING
 */
+using mongo::client::Options;
 using mongo::DBClientBase;
 using mongo::DBClientCursor;
 using mongo::BSONObj;
 using mongo::BSONElement;
 using mongo::BSONArrayBuilder;
 using mongo::BSONObjBuilder;
-using mongo::fromjson;
 using mongo::Query;
 using mongo::AssertionException;
 using mongo::BSONArray;
@@ -208,6 +208,9 @@ void mongoInit
   std::string  dbName,
   const char*  user,
   const char*  pwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -217,7 +220,7 @@ void mongoInit
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mechanism, authDb, dbSSL, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -293,6 +296,9 @@ bool mongoStart
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         _multitenant,
   double       timeout,
   int          writeConcern,
@@ -311,10 +317,25 @@ bool mongoStart
 
   multitenant = _multitenant;
 
-  mongo::Status status = mongo::client::initialize();
-  if (!status.isOK())
+  // We cannot move status variable declaration outside the if block. That fails at compilation time
+  bool statusOk = false;
+  std::string statusString;
+  if (dbSSL)
   {
-    LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
+    mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+  else
+  {
+    mongo::Status status = mongo::client::initialize();
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+
+  if (!statusOk)
+  {
+    LM_E(("Database Startup Error %s (cannot initialize mongo client)", statusString.c_str()));
     return false;
   }
   atexit(shutdownClient);
@@ -324,6 +345,8 @@ bool mongoStart
                               rplSet,
                               username,
                               passwd,
+                              mechanism,
+                              authDb,
                               _multitenant,
                               timeout,
                               writeConcern,
@@ -772,7 +795,16 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
 {
   for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
   {
-    if (matchEntity(&en, entityIdV[ix]))
+    if (en.isPatternIsTrue() && en.id == ".*")
+    {
+      // By the moment the only supported pattern is .*. In this case matching is
+      // based exclusively in type
+      if (en.type == entityIdV[ix]->type)
+      {
+        return true;
+      }
+    }
+    else if (matchEntity(&en, entityIdV[ix]))
     {
       return true;
     }
@@ -814,37 +846,90 @@ bool includedAttribute(const std::string& attrName, const StringList& attrsV)
 *
 * fillQueryEntity -
 */
-static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
+static void fillQueryEntity(BSONObjBuilder* bobP, const EntityId* enP)
 {
-  BSONObjBuilder     ent;
   const std::string  idString    = "_id." ENT_ENTITY_ID;
   const std::string  typeString  = "_id." ENT_ENTITY_TYPE;
 
   if (enP->isPattern == "true")
   {
-    ent.appendRegex(idString, enP->id);
+    // In the case of "universal pattern" we can avoid adding anything (simpler query)
+    if (enP->id != ".*")
+    {
+      bobP->appendRegex(idString, enP->id);
+    }
   }
   else
   {
-    ent.append(idString, enP->id);
+    bobP->append(idString, enP->id);
   }
 
   if (enP->type != "")
   {
     if (enP->isTypePattern)
     {
-      ent.appendRegex(typeString, enP->type);
+      // In the case of "universal pattern" we can avoid adding anything (simpler query)
+      if (enP->type != ".*")
+      {
+        bobP->appendRegex(typeString, enP->type);
+      }
     }
     else
     {
-      ent.append(typeString, enP->type);
+      bobP->append(typeString, enP->type);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathFilterNeeded -
+*
+*/
+bool servicePathFilterNeeded(const std::vector<std::string>& servicePath)
+{
+  // Note that by construction servicePath vector must have at least one element. Note that the
+  // case in which first element is "" is special, it means that the SP were not provided and
+  // we have to apply the default
+  if (servicePath[0] == "")
+  {
+    return false;
+  }
+
+  // If some of the elements is /# then it means that all service paths have to be taken into account
+  // so no filter has to be used
+  for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  {
+    if (servicePath[ix] == "/#")
+    {
+      return false;
     }
   }
 
-  BSONObj entObj = ent.obj();
-  baP->append(entObj);
+  return true;
+}
 
-  LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
+
+
+/* ****************************************************************************
+*
+* addServicePathInTokens -
+*
+*/
+static void addServicePathInTokens(BSONArrayBuilder* servicePathIn, const std::string& sp)
+{
+  char escapedPath[SERVICE_PATH_MAX_TOTAL * 2];
+  slashEscape(sp.c_str(), escapedPath, sizeof(escapedPath));
+
+  /* Remove '/#' and '\/#' trailing part of the string */
+  std::string path = sp.substr(0, sp.length() - 2);
+  escapedPath[strlen(escapedPath) - 3] = 0;
+
+  /* Two tokens: one for the service path itself (string match) and other for its children (as regex) */
+  servicePathIn->append(path);
+  servicePathIn->appendRegex(std::string("^") + escapedPath + "\\/.*");
 }
 
 
@@ -853,78 +938,48 @@ static void fillQueryEntity(BSONArrayBuilder* baP, const EntityId* enP)
 *
 * fillQueryServicePath -
 *
-* The regular expression for servicePath.
+* Returns the BSON element associated to the service path query. Note this function
+* is invoked only if there is need of a servicePath filter, the caller should call it
+* only if servicePathFilterNeeded() in the same servicePath vector is true. That means that
+* this fucntions can assume that:
 *
-* If the servicePath is empty, then we return all entities, no matter their servicePath. This
-* can be seen as a query on "/#" considering that entities without servicePath are implicitly
-* assigned to "/" service path.
+* - The servicePath vector has at least one not empty element
+* - The servicePath vector doesn't contain any /# element
 */
-BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
+BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath)
 {
-  /* Due to limitations in the BSONArrayBuilder class (that hopefully will be solved in legacy-1.0.0
-   * MongoDB driver) we need to compose the JSON string, then apply fromjson() function. Current
-   * implementation uses an array element for each regex tokens, but we could use only
-   * one element, concatenating all regex tokens using "|" (not sure what is more efficient from a
-   * computational point of view). However, note that we need the $in array as "null" has to be added
-   * as element in any case.
-   *
-   * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
-   *
-   */
+  BSONArrayBuilder servicePathIn;
 
-  //
-  // Note that by construction servicePath vector must have at least one element. Note that the
-  // case in which first element is "" is special, it means that the SP were not provided and
-  // we have to apply the default
-  //
-  if (servicePath[0] == "")
+  // Special case (although the most common one): only one service path
+  if (servicePath.size() == 1)
   {
-    LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
-    return fromjson("{$in: [ /^\\/.*/, null] }");
-  }
-
-  std::string  servicePathValue  = "{ $in: [ ";
-  bool         nullAdded         = false;
-
-  for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
-  {
-    //
-    // Add "null" in the following service path cases: / or /#. In order to avoid adding null
-    // several times, the nullAdded flag is used
-    //
-    if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
+    std::string sp = servicePath[0];
+    if (sp.at(sp.length() - 1) == '#')
     {
-      servicePathValue += "null, ";
-      nullAdded = true;
-    }
-
-    char path[SERVICE_PATH_MAX_TOTAL * 2];
-    slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-
-    if (path[strlen(path) - 1] == '#')
-    {
-      /* Remove '\/#' trailing part of the string */
-      int l = strlen(path);
-
-      path[l - 3] = 0;
-      servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
+      addServicePathInTokens(&servicePathIn, sp);
+      return BSON(spKey << BSON("$in" << servicePathIn.arr()));
     }
     else
     {
-      servicePathValue += std::string("/^") + path + "$/";
-    }
-
-    /* Prepare concatenation for next token in regex */
-    if (ix < servicePath.size() - 1)
-    {
-      servicePathValue += std::string(", ");
+      // Use simple matching. Avoid "$in: [ ... ]" pattern. This is the most common case
+      return BSON(spKey << servicePath[0]);
     }
   }
 
-  servicePathValue += " ] }";
-  LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
+  for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  {
+    std::string sp = servicePath[ix];
+    if (sp.at(sp.length() - 1) == '#')
+    {
+      addServicePathInTokens(&servicePathIn, sp);
+    }
+    else
+    {
+      servicePathIn.append(servicePath[ix]);
+    }
+  }
 
-  return fromjson(servicePathValue);
+  return BSON(spKey << BSON("$in" << servicePathIn.arr()));
 }
 
 
@@ -1013,12 +1068,20 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
 *
 * addFilterScope -
 */
-static void addFilterScope(const Scope* scoP, std::vector<BSONObj>* filtersP)
+static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<BSONObj>* filtersP)
 {
+  if ((apiVersion == V2) && (scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
+  {
+    // Early return to avoid _id.type: {$exits: true} in NGSIv2 case. Entity type existence filter only
+    // makes sense in NGSIv1 (and may be removed soon as NGSIv1 is deprecated functionality)
+    return;
+  }
+
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
   if (scoP->type == SCOPE_FILTER_EXISTENCE)
   {
+    // Entity type existence filter only makes sense in NGSIv1
     if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
     {
       BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
@@ -1444,7 +1507,7 @@ bool entitiesQuery
   /* Query structure is as follows
    *
    * {
-   *    "$or": [ ... ],            (always)
+   *    "$or": [ {}1 ... {}N ],    (always, optimized to just {}1 in the case of only one element)
    *    "_id.servicePath: { ... }  (always, in some cases using {$exists: false})
    *    "attrNames": { ... },      (only if attributes are used in the query)
    *    "location.coords": { ... } (only in the case of geo-queries)
@@ -1455,20 +1518,35 @@ bool entitiesQuery
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
 
-  /* Part 1: entities */
-
-  for (unsigned int ix = 0; ix < enV.size(); ++ix)
+  /* Part 1: entities - avoid $or in the case of a single element */
+  if (enV.size() == 1)
   {
-    fillQueryEntity(&orEnt, enV[ix]);
+    BSONObjBuilder bob;
+    fillQueryEntity(&bob, enV[0]);
+    BSONObj entObj = bob.obj();
+    finalQuery.appendElements(entObj);
+
+    LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
+  }
+  else
+  {
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+      BSONObjBuilder bob;
+      fillQueryEntity(&bob, enV[ix]);
+      BSONObj entObj = bob.obj();
+      orEnt.append(entObj);
+
+      LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
+    }
+    finalQuery.append("$or", orEnt.arr());
   }
 
-  /* The result of orEnt is appended to the final query */
-  finalQuery.append("$or", orEnt.arr());
-
   /* Part 2: service path */
-  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-
-  finalQuery.append(servicePathString, fillQueryServicePath(servicePath));
+  if (servicePathFilterNeeded(servicePath))
+  {
+    finalQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
+  }
 
   /* Part 3: attributes */
   BSONArrayBuilder attrs;
@@ -1512,7 +1590,7 @@ bool entitiesQuery
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
       // FIXME P5: NGSIv1 filter, probably to be removed in the future
-      addFilterScope(scopeP, &filters);
+      addFilterScope(apiVersion, scopeP, &filters);
     }
     else if (scopeP->type == FIWARE_LOCATION ||
              scopeP->type == FIWARE_LOCATION_DEPRECATED ||
@@ -1824,8 +1902,24 @@ bool entitiesQuery
 * pruneContextElements -
 *
 * Remove attributes in the vector with 'found' value is 'false'
+*
+* In the case of NGSIv2 we filter attributes with CPr not included in a list of attributes
+* passed as reference (and that comes from the original NGSIv2 query). Otherwise,
+* over-querying for attributes may occur and this could break some CPr usage cases (in particular
+* the ones with IOTAs, which may report error in the case of being asked for an attribute
+* they don't manage).
+*
+* This can be checked with cases/3068_ngsi_v2_based_forwarding/check_no_overquerying.test. If
+* you disable the attrsV processing in this function, you would see how that test fail due
+* to over-querying
 */
-void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP)
+void pruneContextElements
+(
+  ApiVersion                           apiVersion,
+  const StringList&                    attrsV,
+  const ContextElementResponseVector&  oldCerV,
+  ContextElementResponseVector*        newCerVP
+)
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
@@ -1849,7 +1943,11 @@ void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextEl
     {
       ContextAttribute* caP = cerP->entity.attributeVector[jx];
 
-      if (caP->found)
+      // To be included, it need to be found and one of the following:
+      // - It is V1
+      // - (Not being V1) The attributes filter list is empty
+      // - (Not being V1 and not empty attributes filter) The attribute is included in the filter list (taking into account wildcard)
+      if ((caP->found) && ((apiVersion == V1) || (attrsV.size() == 0) || (attrsV.lookup(caP->name, ALL_ATTRS))))
       {
         ContextAttribute* newCaP = new ContextAttribute(caP);
         newCerP->entity.attributeVector.push_back(newCaP);
@@ -1882,14 +1980,9 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id   = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = entity.hasField(REG_ENTITY_TYPE) ? getStringFieldF(entity, REG_ENTITY_TYPE) : "";
-
-  /* isPattern = true is not allowed in registrations so it is not in the
-   * document retrieved with the query; however we will set it to be formally correct
-   * with NGSI spec
-   */
-  en.isPattern = std::string("false");
+  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
+  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
+  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
   if (includedEntity(en, enV))
   {
@@ -1930,14 +2023,15 @@ static void processContextRegistrationElement
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
-  MimeType                            mimeType
+  MimeType                            mimeType,
+  ProviderFormat                      providerFormat
 )
 {
   ContextRegistrationResponse crr;
 
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
-  crr.contextRegistration.providingApplication.setMimeType(mimeType);
-
+  crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
+  LM_T(LmtForward, ("Set providerFormat to %d for CRR", providerFormat));
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
@@ -1978,6 +2072,7 @@ static void processContextRegistrationElement
     ContextRegistrationResponse* crrP = new ContextRegistrationResponse();
 
     crrP->contextRegistration = crr.contextRegistration;
+    crrP->providerFormat      = providerFormat;
 
     crrV->push_back(crrP);
   }
@@ -2007,49 +2102,74 @@ bool registrationsQuery
   long long*                          countP
 )
 {
+  // query structure:
+  //
+  // NOTE: 'cr' is and abreviation of 'contextRegistration'
+  //
+  // {
+  //   $or: [
+  //          { cr.entities.id: E1,cr.entities.type: T1} }, ...,         (isPattern = false, with type)
+  //          { cr.entities.id: E2 }, ...                                (isPattern = false, no type)
+  //          { cr.entities.id: /E.*3/, crs.entities.type: T3 } }, ...,  (isPattern = true, with type)
+  //          { cr.entities.id: /E.*4/, }, ...,                          (isPattern = true, no type)
+  //
+  //          (next two ones are for "universal pattern" registrations)
+  //
+  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$in: [T1, T3, ...} },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$exists: false } },
+  //   ],
+  //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
+  //   servicePath: ... ,
+  //   expiration: { $gt: ... }
+  // }
+  //
+  // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
+  // universal pattern) so we cannot avoid to use this operator.
+  //
+  // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
+  // but this would need a data model migration in DB
+
   /* Build query based on arguments */
-  // FIXME P2: this implementation needs to be refactored for cleanup
-  std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
-  std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
-  std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
-  std::string       contextRegistrationAttrsNames   = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
+  std::string       crEntitiesId      = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
+  std::string       crEntitiesType    = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
+  std::string       crEntitiesPattern = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ISPATTERN;
+  std::string       crAttrsNames      = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
   BSONArrayBuilder  entityOr;
-  BSONArrayBuilder  entitiesWithType;
-  BSONArrayBuilder  entitiesWithoutType;
+  BSONArrayBuilder  types;
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* en = enV[ix];
+    BSONObjBuilder b;
 
     if (isTrue(en->isPattern))
     {
-      BSONObjBuilder b;
-
-      b.appendRegex(contextRegistrationEntitiesId, en->id);
-      if (en->type != "")
-      {
-        b.append(contextRegistrationEntitiesType, en->type);
-      }
-      entityOr.append(b.obj());
+      b.appendRegex(crEntitiesId, en->id);
     }
     else  /* isPattern = false */
     {
-      if (en->type == "")
-      {
-        entitiesWithoutType.append(en->id);
-        LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
-      }
-      else
-      {
-        /* We have detected that sometimes mongo stores { id: ..., type ...} and others { type: ..., id: ...},
-           so we have to take both them into account
-        */
-        entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
-        entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
-        LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
-      }
+      b.append(crEntitiesId, en->id);
     }
+
+    if (en->type != "")
+    {
+      b.append(crEntitiesType, en->type);
+      // FIXME P3: this way of accumulating types in the BSONBuilder doesn't avoid duplication. It doesn't
+      // hurt too much, but it would be better to use a std::map to ensure uniqueness
+      types.append(en->type);
+    }
+    entityOr.append(b.obj());
   }
+
+  // '.*' pattern match every other pattern and every not pattern entity. We add a query checking only the types
+  // and the case of no type
+  entityOr.append(BSON(crEntitiesId      << ".*" <<
+                       crEntitiesPattern << "true" <<
+                       crEntitiesType    << BSON("$in" << types.arr())));
+
+  entityOr.append(BSON(crEntitiesId      << ".*" <<
+                       crEntitiesPattern << "true" <<
+                       crEntitiesType    << BSON("$exists" << false)));
 
   BSONArrayBuilder attrs;
 
@@ -2061,31 +2181,24 @@ bool registrationsQuery
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
 
-  entityOr.append(BSON(contextRegistrationEntities << BSON("$in" << entitiesWithType.arr())));
-  entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" <<entitiesWithoutType.arr())));
-
   BSONObjBuilder queryBuilder;
 
-  /* The $or clause could be omitted if it contains only one element, but we can assume that
-   * it has no impact on MongoDB query optimizer
-   */
   queryBuilder.append("$or", entityOr.arr());
   queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
   if (attrs.arrSize() > 0)
   {
-    /* If we don't do this checking, the {$in: [] } in the attribute name part will
-     * make the query fail
-     */
-    queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
+    /* If we don't do this check, the {$in: [] } of the attribute name part makes the query fail */
+    queryBuilder.append(crAttrsNames, BSON("$in" << attrs.arr()));
   }
 
   //
   // 'And-in' the service path
   //
-  const std::string  servicePathString = REG_SERVICE_PATH;
-
-  queryBuilder.append(servicePathString, fillQueryServicePath(servicePathV));
+  if (servicePathFilterNeeded(servicePathV))
+  {
+    queryBuilder.appendElements(fillQueryServicePath(REG_SERVICE_PATH, servicePathV));
+  }
 
 
   //
@@ -2124,14 +2237,19 @@ bool registrationsQuery
       continue;
     }
     docs++;
+
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    LM_T(LmtForward, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+    std::string               format                    = getStringFieldF(r, REG_FORMAT);
+    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType);
+      LM_T(LmtForward, ("Processing ContextRegistrationElement. providerFormat == '%s' (%d)", format.c_str(), providerFormat));
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -2234,6 +2352,154 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
   }
 
   return enV;
+}
+
+
+
+/* ****************************************************************************
+*
+* getCommonAttributes -
+*/
+static void getCommonAttributes
+(
+  const bool                        type,
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  if (type)
+  {
+    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    {
+      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      {
+        if (fVector[cavOc] == sVector[avOc])
+        {
+          resultVector.push_back(fVector[cavOc]);
+        }
+      }
+    }
+  }
+  else
+  {
+    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    {
+      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      {
+        if (fVector[cavOc] != sVector[avOc])
+        {
+          resultVector.push_back(fVector[cavOc]);
+        }
+      }
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* subToNotifyList -
+*/
+void subToNotifyList
+(
+  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  conditionVector,
+  const std::vector<std::string>&  notificationVector,
+  const std::vector<std::string>&  entityAttrsVector,
+  StringList&                      attrL,
+  const bool&                      blacklist,
+  bool&                            op
+)
+{
+    std::vector<std::string>  condAttrs;
+    std::vector<std::string>  notifyAttrs;
+
+    if (!blacklist)
+    {
+      if (conditionVector.size() == 0 && notificationVector.size() == 0)
+      {
+        attrL.fill(modifiedAttrs);
+      }
+      else if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      {
+        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      else if (conditionVector.size() != 0 && notificationVector.size() == 0)
+      {
+        getCommonAttributes(true, modifiedAttrs, entityAttrsVector, notifyAttrs);
+      }
+      else
+      {
+        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      if (notifyAttrs.size() == 0 && (conditionVector.size() != 0 || notificationVector.size() != 0))
+      {
+        op = true;
+      }
+      attrL.fill(notifyAttrs);
+    }
+    else if (blacklist)
+    {
+      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      {
+        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      else
+      {
+        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
+        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+      }
+
+      if (notifyAttrs.size() == 0)
+      {
+        op = true;
+      }
+      attrL.fill(notifyAttrs);
+    }
+}
+
+
+
+/* ****************************************************************************
+*
+* subToAttributeList -
+*
+* Extract the attribute list from a BSON document (in the format of the csubs/casub
+* collection)
+*/
+StringList subToAttributeList
+(
+  const BSONObj&                  sub,
+  const bool&                     onlyChanged,
+  const bool&                     blacklist,
+  const std::vector<std::string>  modifiedAttrs,
+  const std::vector<std::string>  attributes,
+  bool&                           op
+)
+{
+  if (!onlyChanged)
+  {
+    return subToAttributeList(sub);
+  }
+  StringList                attrL;
+  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<std::string>          conditionAttrs;
+  std::vector<std::string>          notificationAttrs;
+  for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
+  {
+    std::string subAttr = subAttrs[ix].String();
+    notificationAttrs.push_back(subAttr);
+  }
+  for (unsigned int ix = 0; ix < condAttrs.size() ; ++ix)
+  {
+    std::string subAttr = condAttrs[ix].String();
+    conditionAttrs.push_back(subAttr);
+  }
+  subToNotifyList(modifiedAttrs, conditionAttrs, notificationAttrs, attributes, attrL, blacklist, op);
+  return attrL;
 }
 
 
@@ -2349,7 +2615,7 @@ static bool processOnChangeConditionForSubscription
   }
 
   /* Prune "not found" CERs */
-  pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+  pruneContextElements(apiVersion, emptyList, rawCerV, &ncr.contextElementResponseVector);
 
   // Add builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
   // for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
@@ -2402,7 +2668,7 @@ static bool processOnChangeConditionForSubscription
       }
 
       /* Prune "not found" CERs */
-      pruneContextElements(rawCerV, &allCerV);
+      pruneContextElements(apiVersion, emptyList, rawCerV, &allCerV);
 
 #ifdef WORKAROUND_2994
       delayedReleaseAdd(rawCerV);
@@ -2765,10 +3031,11 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     }
 
     /* Search for some CPr in crrV */
-    std::string  perEntPa;
-    std::string  perAttrPa;
-    MimeType     perEntPaMimeType  = NOMIMETYPE;
-    MimeType     perAttrPaMimeType = NOMIMETYPE;
+    std::string     perEntPa;
+    std::string     perAttrPa;
+    MimeType        perEntPaMimeType  = NOMIMETYPE;
+    MimeType        perAttrPaMimeType = NOMIMETYPE;
+    ProviderFormat  providerFormat;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
@@ -2776,11 +3043,12 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
                          &perEntPa,
                          &perEntPaMimeType,
                          &perAttrPa,
-                         &perAttrPaMimeType);
+                         &perAttrPaMimeType,
+                         &providerFormat);
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
-    ca->providingApplication.setMimeType(perAttrPa == "" ? perEntPaMimeType : perAttrPaMimeType);
+    ca->providingApplication.setProviderFormat(providerFormat);
     ca->found = (ca->providingApplication.get() != "");
   }
 }
@@ -2816,7 +3084,7 @@ bool someContextElementNotFound(const ContextElementResponse& cer)
 *
 * cprLookupByAttribute -
 *
-* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
+* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned -
 * the "general" one at entity level or the "specific" one at attribute level
 */
 void cprLookupByAttribute
@@ -2827,7 +3095,8 @@ void cprLookupByAttribute
   std::string*                              perEntPa,
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
-  MimeType*                                 perAttrPaMimeType
+  MimeType*                                 perAttrPaMimeType,
+  ProviderFormat*                           providerFormatP
 )
 {
   *perEntPa  = "";
@@ -2842,7 +3111,17 @@ void cprLookupByAttribute
     {
       EntityId* regEn = crr->contextRegistration.entityIdVector[enIx];
 
-      if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      if (regEn->isPatternIsTrue() && regEn->id == ".*")
+      {
+        // By the moment the only supported pattern is .*. In this case matching is
+        // based exclusively in type
+        if (regEn->type != en.type && regEn->type != "")
+        {
+          /* No match (keep searching the CRR) */
+          continue;
+        }
+      }
+      else if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
         /* No match (keep searching the CRR) */
         continue;
@@ -2852,9 +3131,9 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *perEntPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
+        *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
 
-        break; /* enIx */
+        break;  /* enIx */
       }
 
       /* Is there a matching entity or the absence of attributes? */
@@ -2863,9 +3142,9 @@ void cprLookupByAttribute
         std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector[attrIx]->name;
         if (regAttrName == attrName)
         {
-          /* We cannot "improve" this result keep searching in CRR vector, so we return */
+          /* We cannot "improve" this result by keep searching the CRR vector, so we return */
           *perAttrPa         = crr->contextRegistration.providingApplication.get();
-          *perAttrPaMimeType = crr->contextRegistration.providingApplication.getMimeType();
+          *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
 
           return;
         }

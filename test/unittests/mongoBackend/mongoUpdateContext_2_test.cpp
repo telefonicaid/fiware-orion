@@ -2012,7 +2012,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3033,7 +3033,7 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", V2);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -3262,8 +3262,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
 
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", "
-              "_id.servicePath: { $in: [ /^/.*/, null ] } },"
+              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\" },"
               "{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", mdNames: [], "
               "modDate: 1360232700 }, modDate: 1360232700, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
@@ -3327,7 +3326,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $in: [ /^/.*/, null ] } } "
+              "- query(): { _id.id: \"E1\", _id.type: \"T1\" } "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */

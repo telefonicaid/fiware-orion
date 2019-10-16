@@ -75,6 +75,9 @@ void mongoInit
   std::string  dbName,
   const char*  user,
   const char*  pwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         dbSSL,
   bool         mtenant,
   int64_t      timeout,
   int          writeConcern,
@@ -95,6 +98,9 @@ extern bool mongoStart
   const char* rplSet,
   const char* username,
   const char* passwd,
+  const char* mechanism,
+  const char* authDb,
+  bool        dbSSL,
   bool        _multitenant,
   double      timeout,
   int         writeConcern = 1,
@@ -350,7 +356,13 @@ extern bool entitiesQuery
 *
 * pruneContextElements -
 */
-extern void pruneContextElements(const ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements
+(
+  ApiVersion                           apiVersion,
+  const StringList&                    attrsV,
+  const ContextElementResponseVector&  oldCerV,
+  ContextElementResponseVector*        newCerVP
+);
 
 
 
@@ -390,6 +402,41 @@ extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std:
 * collection)
 */
 extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
+
+
+
+/* ****************************************************************************
+*
+* subToNotifyList -
+*/
+void subToNotifyList
+(
+  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  conditionVector,
+  const std::vector<std::string>&  notificationVector,
+  const std::vector<std::string>&  entityAttrsVector,
+  StringList&                      attrL,
+  const bool&                      blacklist,
+  bool&                            op
+);
+
+
+
+/* ****************************************************************************
+*
+* subToAttributeList -
+*
+* Extract the attribute list from a BSON document (in the format of the csubs collection)
+*/
+extern StringList subToAttributeList
+(
+  const mongo::BSONObj&           attrL,
+  const bool&                     onlyChanged,
+  const bool&                     blacklist,
+  const std::vector<std::string>  modifiedAttrs,
+  const std::vector<std::string>  attributes,
+  bool&                           op
+);
 
 
 
@@ -471,9 +518,18 @@ extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscri
 
 /* ****************************************************************************
 *
+* servicePathFilterNeeded -
+*
+*/
+bool servicePathFilterNeeded(const std::vector<std::string>& servicePath);
+
+
+
+/* ****************************************************************************
+*
 * fillQueryServicePath -
 */
-extern mongo::BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+extern mongo::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
 
 
 
@@ -505,7 +561,8 @@ extern void cprLookupByAttribute
   std::string*                             perEntPa,
   MimeType*                                perEntPaMimeType,
   std::string*                             perAttrPa,
-  MimeType*                                perAttrPaMimeType
+  MimeType*                                perAttrPaMimeType,
+  ProviderFormat*                           providerFormatP
 );
 
 

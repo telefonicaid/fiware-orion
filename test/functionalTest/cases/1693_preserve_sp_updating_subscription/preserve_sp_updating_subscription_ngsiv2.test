@@ -146,7 +146,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 292
+Content-Length: 317
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -162,7 +162,8 @@ Date: REGEX(.*)
             "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:1234"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -194,7 +195,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,7 +211,8 @@ Date: REGEX(.*)
             "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:5678"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
@@ -253,7 +255,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -269,7 +271,8 @@ Date: REGEX(.*)
             "attrsFormat": "normalized",
             "http": {
                 "url": "http://localhost:9999"
-            }
+            },
+            "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {

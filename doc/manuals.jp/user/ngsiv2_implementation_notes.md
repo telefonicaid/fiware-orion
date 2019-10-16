@@ -15,6 +15,7 @@
 * [異なる属性型間の順序付け](#ordering-between-different-attribute-value-types)
 * [初期通知](#initial-notifications)
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
+* [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
@@ -251,6 +252,21 @@ Orionは、NGSIv2 仕様のサブスクリプション用に定義された `sta
 
 [トップ](#top)
 
+<a name="notify-only-attributes-that-change"></a>
+## 変更された属性のみを通知
+
+Orion は、NGSIv2 仕様で説明されているものとは別に、サブスクリプションの中で追加のフィールド `onlyChangedAttrs`
+(`notification` 内に) をサポートしています。 このフィールドは `true` または `false` の値を取ります
+(フィールドが省略された場合、デフォルトは `false` です)。 `true` に設定されている場合、サブスクリプションに
+関連した通知は `attrs` または `exceptAttrs` フィールドと組み合わせて、トリガーしている更新リクエストで
+変更された属性のみを含みます。
+
+例えば、`attrs` が `[A、B、C]` のデフォルトの振る舞い (`onlyChangedAttrs` が `false` の場合) とトリガー更新が
+A のみを修正した場合、A, B, C が通知されます(つまり、トリガー更新は関係ありません)。 しかし、`onlyChangedAttrs`
+が `true` でトリガー更新が A のみを修正した場合、通知には A のみが含まれます。
+
+[トップ](#top)
+
 <a name="lastfailurereason-and-lastsuccesscode-subscriptions-fields"></a>
 ## `lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド
 
@@ -297,7 +313,8 @@ NGSIv2 仕様に含まれるものに対する追加の URI パラメータ・�
 Orion は、次の点を除いて、NGSIv2 仕様に記載されているレジストレーション管理を実装しています。
 
 * `PATCH /v2/registration/<id>` は実装されていません。したがって、レジストレーションを直接更新することはできません。つまり、レジストレーションを削除して再作成する必要があります。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3007)についてはこちらをご覧ください
-* `idPattern` および `typePattern` は実装されていません。
+* `idPattern` はサポートされています
+* `typePattern` は実装されていません
 * 唯一の有効な `supportedForwardingMode` は `all` です。他の値を使用しようとすると、501 Not Implemented エラー応答で終了します。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3106) についてはこちらをご覧ください
 * `dataProvided` 内での `expression` フィールドはサポートされていません。フィールドは単に無視されます。これについては [この issue](https://github.com/telefonicaid/fiware-orion/issues/3107) を見てください。
 * `status` での `inactive` 値はサポートされていません。つまり、フィールドは正しく格納され/取得されますが、値が `inactive` の場合でもレジストレーションは常にアクティブです。これについては、[この issue](https://github.com/telefonicaid/fiware-orion/issues/3108) を見てください
@@ -306,9 +323,14 @@ NGSIv2 仕様によると :
 
 > NGSIv2 サーバ実装は、コンテキスト情報ソースへのクエリまたは更新転送を実装することができます
 
-Orion がこのような転送を実装する方法は次のとおりです。
+Orion がこのような転送を実装する方法は次のとおりです :
 
-Orion は、NGSIv2 仕様に含まれていない追加フィールド `legacyForwarding` を `provider` に実装しています。`legacyForwarding` の値が `true` の場合、そのレジストレーションに関連する転送リクエストに、NGSIv1 ベースのクエリ/更新が使用されます。NGSIv1 は推奨されていませんが、当面は、NGSIv2 ベースの転送が定義されていないため、([この issue](https://github.com/telefonicaid/fiware-orion/issues/3068) を参照)、唯一有効なオプションは常に `"legacyForwarding": true` を使用することです。そうでなければ、結果は、501 Not Implemented エラーのレスポンスになります。
+* `POST /v2/op/query` クエリ転送のため
+* `POST /v2/op/update` 更新転送のため
+
+コンテキスト情報ソースへの転送に関するより多くの情報は、この[ドキュメント](context_providers.md)にあります。
+
+Orion は NGSIv2 仕様に含まれていない追加フィールド (`provider` 内の) `legacyForwarding`を実装しています。`legacyForwarding` の値が `true` の場合、NGSIv1 ベースのクエリ/更新はそのレジストレーションに関連したリクエストを転送するために使用されます。NGSIv1 は廃止予定ですが、一部のコンテキスト・プロバイダはまだ NGSIv2 に移行されていない可能性があるため、このモードは便利です。
 
 [Top](#top)
 

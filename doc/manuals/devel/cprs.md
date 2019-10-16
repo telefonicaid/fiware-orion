@@ -4,7 +4,7 @@
 * [Forwarding of query requests](#forwarding-of-query-requests)
 * [A Caveat about shadowing of entities](#a-caveat-about-shadowing-entities)
 
-The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations (NGSI9) and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
+The Orion Context Broker, as explained in [the User & Programmers Manual](../user/context_providers.md), supports the concept of Context Providers. In short, when for an update/query, an entity/attribute is not found, Orion checks its list of registrations and if found in that list it means that the entity is registered to a Context Provider. So, a request is forwarded to that Context Provider. The IP, port and path of the Context Provider is found in the field `providingApplication` of the `struct ContextRegistration` that is part of the registration request `RegisterContextRequest`.
 
 ## Forwarding of update requests
 
@@ -31,7 +31,7 @@ Note that an update request with multiple context elements (and with `updateActi
 
 _FW-01: Forward an update to Context Providers_
 
-Note that there are a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
+Note that there is a number of service routines that end up calling `postUpdateContext()` (see detail in [the service routines mapping document](ServiceRoutines.txt)).
 
 * All attributes in the incoming payload are marked as **Not Found** (step 1).
 * [**mongoBackend** library](sourceCode.md#srclibmongobackend) processes the request (see diagrams [MB-01](mongoBackend.md#flow-mb-01) or [MB-02](mongoBackend.md#flow-mb-02)) and marks all attributes in the requests in one of three possible ways (step 2):
@@ -40,8 +40,8 @@ Note that there are a number of service routines that end up calling `postUpdate
     * Found in Local Context Broker
     * Found in Remote Context Provider
 
-* The attributes that are found in a remote context provider need to be forwarded. The local attributes are simply updates non-found attributes are marked as such in the response.
-* A new vector of `ContextElementResponse` is created and filled in with all those attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
+* The attributes that are found in a remote context provider need to be forwarded. The local attributes are simple updates while non-found attributes are marked as such in the response.
+* A new vector of `ContextElementResponse` is created and filled in with all the attributes that are to be forwarded (step 3). These responses are then added to the response vector that was output from **mongoBackend**. If no attribute is "found", then the `ContextElementResponse` is prepared with a 404 Not Found.
 * Internal loop (step 4): `mongoUpdateContext()` doesn't fill in the values of the attributes, as this is not part of the normal response but, to forward an update request, the value of the attributes must be present. This loop fills in the values of all attributes that are to be forwarded.
 * Internal Loop (step 5): Create `UpdateContextRequest` objects, one per context provider, and fill in these objects with the attributes that are to be forwarded.
 * Each request is sent to its corresponding Context Provider, containing all attributes (step 3). See details in diagram [FW-02](#flow-fw-02).
@@ -53,7 +53,7 @@ Note that there are a number of service routines that end up calling `postUpdate
 _FW-02: `updateForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1)
-* As forwards are done as REST requests, we need to render the object to text (JSON) to be able to send the REST request to the Context Provider (step 2).
+* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v1/updateContext`. In the case of NGSIv2,  `POST /v2/op/updated` is used.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3), that in its turn uses [libcurl](https://curl.haxx.se/libcurl/) (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `UpdateContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
@@ -62,7 +62,7 @@ _FW-02: `updateForward()` function detail_
 ## Forwarding of query requests
 
 Just like updates, also queries are forwarded to Context Providers.
-All attributes in a query request that are not found locally are searched in the list of registration and if found, a request is forwarded to the corresponding context provider. As for forwarding of update requests, the query request can be split into N forwards and the response to the initial request isn't sent until all responses to the forwarded requests have been received and merged into the final response.
+All attributes in a query request that are not found locally are searched in the list of registrations and if found, a request is forwarded to the corresponding context provider. As for forwarding of update requests, the query request can be split into N forwards and the response to the initial request isn't sent until all responses to the forwarded requests have been received and merged into the final response.
 
 <a name="flow-fw-03"></a>
 ![Forward a query to Context Providers](images/Flow-FW-03.png)
@@ -89,21 +89,21 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 _FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
-* As forwards are done as REST requests, we need to render the object to text to be able to send the REST request to the Context Provider (step 2).
+* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v1/queryContext`. In the case of NGSIv2, `POST /v2/op/query` is used.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
 * The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
 
 ## A Caveat about shadowing of entities
-The Context Provider mechanism is implemented using standard NGSI9 requests and this might lead to unwanted situations.
+The Context Provider mechanism is implemented using standard registration requests and this might lead to unwanted situations.
 We feel it is important to at least be aware of this potential "shadowing" problem.  
 
 Imagine the following scenario:
 
 * We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
-  An NGSI9 registration about E1/A1 of CP1 is sent to the Context Broker.
+  A registration about E1/A1 of CP1 is sent to the Context Broker.
 * A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result.
 * Now, a request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
-* And the3 problems: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
+* And the problem: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
 
 E1/A1 on Context Provider CP1 can no longer be seen via the Context Broker as it has been shadowed.
 

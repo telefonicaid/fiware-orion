@@ -89,7 +89,13 @@ echo
 
 echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
-grep "Peer certificate cannot be authenticated" /tmp/contextBroker.log | grep "notification failure" | awk -F 'notification failure for queue worker: ' '{print $2}'
+
+LINE1=$(grep "Peer certificate cannot be authenticated" /tmp/contextBroker.log | grep "notification failure" | awk -F 'notification failure for queue worker: ' '{print $2}')
+LINE2=$(grep "Peer certificate cannot be authenticated" /tmp/contextBroker.log | grep "notification failure" | awk -F 'notification failure for sender-thread: ' '{print $2}')
+
+# Depending CB_THREADPOOL=ON|OFF, either LINE1 or LINE2 has the text we are looking for but not both at the same time
+echo $LINE1$LINE2
+
 echo
 echo
 

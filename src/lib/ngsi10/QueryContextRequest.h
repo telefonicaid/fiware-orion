@@ -35,6 +35,8 @@
 
 
 
+
+
 /* ****************************************************************************
 *
 * Forward types - instead of including in header file ...
@@ -51,17 +53,20 @@ typedef struct QueryContextRequest
 {
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
+  StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
   Restriction       restriction;     // Optional
 
   int               restrictions;
   StringList        metadataList;     // From URI param 'metadata'
   std::string       contextProvider;  // Not part of the payload - used internally only
+  ProviderFormat    providerFormat;   // Not part of the payload - used internally only
 
   QueryContextRequest();
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& attributeList);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList&  attributeList, ProviderFormat _providerFormat);
 
   std::string   toJsonV1(void);
+  std::string   toJson(void);
   std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);

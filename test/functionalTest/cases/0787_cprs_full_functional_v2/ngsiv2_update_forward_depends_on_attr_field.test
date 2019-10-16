@@ -578,13 +578,13 @@ Date: REGEX(.*)
 09. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7 in CB
 ===============================================
 HTTP/1.1 404 Not Found
-Content-Length: 92
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Attributes that were not updated: { E1-T1 : [A7] }",
+    "description": "Some of the following attributes were not updated: { E1-T1 : [A7] }",
     "error": "PartialUpdate"
 }
 

@@ -229,7 +229,6 @@ ContextAttribute::ContextAttribute()
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -306,7 +305,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   modDate = caP->modDate;
 
   providingApplication.set(caP->providingApplication.get());
-  providingApplication.setMimeType(caP->providingApplication.getMimeType());
+  providingApplication.setProviderFormat(caP->providingApplication.getProviderFormat());
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
                   compoundValueP,
@@ -385,7 +384,6 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -425,7 +423,6 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -464,7 +461,6 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -503,7 +499,6 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 
@@ -538,7 +533,6 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
 }
 
 

@@ -211,3 +211,21 @@ void ContextElementResponseVector::fill(ContextElementResponseVector& cerV)
     push_back(cerP);
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponseVector::fill -
+*/
+void ContextElementResponseVector::fill(EntityVector& erV, HttpStatusCode sc)
+{
+  for (unsigned int ix = 0; ix < erV.size(); ++ix)
+  {
+    ContextElementResponse* cerP = new ContextElementResponse(erV[ix]);
+
+    cerP->statusCode.fill(sc, erV[ix]->id);
+
+    push_back(cerP);
+  }
+}

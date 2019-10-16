@@ -374,7 +374,7 @@ Date: REGEX(.*)
 11. Wait for a while and check timesSent:1 for all the subscriptions in each CB
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 516
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -394,6 +394,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 204,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -413,7 +414,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 516
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -433,6 +434,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 204,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
@@ -452,7 +454,7 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 516
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -472,6 +474,7 @@ Date: REGEX(.*)
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 204,
+        "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",

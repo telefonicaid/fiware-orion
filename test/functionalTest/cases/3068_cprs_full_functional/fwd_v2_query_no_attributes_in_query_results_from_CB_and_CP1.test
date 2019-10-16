@@ -1,0 +1,288 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Query With Empty Attribute Vector, Results From CB and CP1 (NGSIv2 forwarding)
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+# Based in the test with same name (without fwd_v2 prefix in the file name) in cases/0787_cprs_full_functional,
+# which used NGSIv1 registrations
+#
+# 01. Update/APPEND E1/T1/A1+A2 in CB
+# 02. Update/APPEND E1/T1/A3+A4+A5 in CP1
+# 03. Register E1/T1/A1+A2-CP1 in CB
+# 04. Query E1/T1/{} in CB
+#
+
+echo "01. Update/APPEND E1/T1/A1+A2 in CB"
+echo "==================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "A1 in CB"
+        },
+        {
+          "name": "A2",
+          "type": "string",
+          "value": "A2 in CB"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "02. Update/APPEND E1/T1/A3+A4+A5 in CP1"
+echo "======================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A3",
+          "type": "string",
+          "value": "A3 in CP1"
+        },
+        {
+          "name": "A4",
+          "type": "string",
+          "value": "A4 in CP1"
+        },
+        {
+          "name": "A5",
+          "type": "string",
+          "value": "A5 in CP1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Register E1/T1/A3+A4+A5-CP1 in CB"
+echo "====================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "id": "E1"
+      }
+    ],
+    "attrs": [ "A3", "A4", "A5" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Query E1/T1/{} in CB"
+echo "========================"
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Update/APPEND E1/T1/A1+A2 in CB
+===================================
+HTTP/1.1 200 OK
+Content-Length: 230
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Update/APPEND E1/T1/A3+A4+A5 in CP1
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 271
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Register E1/T1/A3+A4+A5-CP1 in CB
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Query E1/T1/{} in CB
+========================
+HTTP/1.1 200 OK
+Content-Length: 396
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "A1 in CB"
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 in CB"
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": "A3 in CP1"
+                    }, 
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": "A4 in CP1"
+                    }, 
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": "A5 in CP1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
