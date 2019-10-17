@@ -127,8 +127,6 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     return false;
   }
 
-  LM_T(LmtForward, ("*** Provider Format: %d", upcrP->providerFormat));
-
   //
   // 2. Render the string of the request we want to forward
   //
@@ -232,7 +230,6 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   if (upcrP->providerFormat == PfJson)
   {
-    LM_T(LmtForward, ("upcrP->providerFormat == PfJson"));
     //
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
@@ -266,9 +263,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
     parseData.upcrs.res.errorCode.fill(SccOk);
 
-    LM_T(LmtForward, ("Parsing Response of Forwarded Request: '%s'", cleanPayload));
     s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
-    LM_T(LmtForward, ("Parse Result: %s", s.c_str()));
 
     if (s != "OK")
     {
@@ -309,18 +304,15 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   }
   else  // NGSIv2
   {
-    LM_T(LmtForward, ("upcrP->providerFormat == V2. out: '%s'", out.c_str()));
     // NGSIv2 forward - no payload to be received
 
     if (statusCode == SccNoContent)
     {
-      LM_T(LmtForward, ("Found '204 No Content'"));
       upcrsP->fill(upcrP, SccOk);
       return true;
     }
     if (statusCode == SccContextElementNotFound)
     {
-      LM_T(LmtForward, ("Found '404 Not Found'"));
       upcrsP->fill(upcrP, SccContextElementNotFound);
       return true;
     }
@@ -592,7 +584,6 @@ std::string postUpdateContext
   // If there is nothing to forward, just return the result
   //
   bool forwarding = forwardsPending(upcrsP);
-  LM_T(LmtForward, ("forwardsPending returned %s", FT(forwarding)));
   if (forwarding == false)
   {
     TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
@@ -760,7 +751,6 @@ std::string postUpdateContext
   //
   if (ciP->apiVersion == V2)
   {
-    LM_T(LmtForward, ("ciP->apiVersion == V2"));
     //
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
@@ -769,7 +759,6 @@ std::string postUpdateContext
     std::string failing = "";
     unsigned int failures  = 0;
 
-    LM_T(LmtForward, ("Going over a contextElementResponseVector of %d items", response.contextElementResponseVector.size()));
     for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
     {
       ContextElementResponse* cerP = response.contextElementResponseVector[ix];
@@ -820,7 +809,6 @@ std::string postUpdateContext
   }
   else  // v1
   {
-    LM_T(LmtForward, ("ciP->apiVersion != V2"));
     // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
     // We render in the v1 case only
     TIMED_RENDER(answer = response.toJsonV1(asJsonObject));

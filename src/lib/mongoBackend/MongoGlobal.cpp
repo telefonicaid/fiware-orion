@@ -2031,7 +2031,7 @@ static void processContextRegistrationElement
 
   crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
-  LM_T(LmtForward, ("Set providerFormat to %d for CRR", providerFormat));
+
   std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
@@ -2239,7 +2239,6 @@ bool registrationsQuery
     docs++;
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    LM_T(LmtForward, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
@@ -2248,7 +2247,6 @@ bool registrationsQuery
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      LM_T(LmtForward, ("Processing ContextRegistrationElement. providerFormat == '%s' (%d)", format.c_str(), providerFormat));
       processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
     }
 
