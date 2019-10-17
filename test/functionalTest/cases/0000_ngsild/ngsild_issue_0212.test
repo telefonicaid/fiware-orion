@@ -71,7 +71,7 @@ payload='{
     ]
   },
   "@context": [
-    "https://gitlab.com/synchronicity-iot/synchronicity-data-models/raw/master/synchronicity-data-models-context.jsonld",
+    "https://gitlab.com/synchronicity-iot/synchronicity-data-models/raw/master/context.jsonld",
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -82,7 +82,7 @@ echo
 
 echo "02. GET the entity by type - longname"
 echo "====================================="
-orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.synchronicity-iot.eu/ns/dataModels%23Store"
+orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.synchronicity-iot.eu/ns/data-models%23Store"
 echo
 echo
 
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 02. GET the entity by type - longname
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 696
+Content-Length: 699
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -123,13 +123,13 @@ Date: REGEX(.*)
             "type": "Property",
             "value": "MARTA KAUFMANN"
         },
-        "https://uri.synchronicity-iot.eu/ns/dataModels#currenciesAccepted": {
+        "https://uri.synchronicity-iot.eu/ns/data-models#currenciesAccepted": {
             "type": "Property",
             "value": [
                 "EUR"
             ]
         },
-        "https://uri.synchronicity-iot.eu/ns/dataModels#image": {
+        "https://uri.synchronicity-iot.eu/ns/data-models#image": {
             "type": "Property",
             "value": "http://www.comerciosantander.com/imagenes/Comercios/124F214A-CE55-5A33-A77D-679C0F848FFC.jpg/resize/50/100/"
         },
@@ -144,7 +144,7 @@ Date: REGEX(.*)
                 "type": "Point"
             }
         },
-        "type": "https://uri.synchronicity-iot.eu/ns/dataModels#Store"
+        "type": "https://uri.synchronicity-iot.eu/ns/data-models#Store"
     }
 ]
 
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 03. GET the entity with id as URI param
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 696
+Content-Length: 699
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -167,13 +167,13 @@ Date: REGEX(.*)
             "type": "Property",
             "value": "MARTA KAUFMANN"
         },
-        "https://uri.synchronicity-iot.eu/ns/dataModels#currenciesAccepted": {
+        "https://uri.synchronicity-iot.eu/ns/data-models#currenciesAccepted": {
             "type": "Property",
             "value": [
                 "EUR"
             ]
         },
-        "https://uri.synchronicity-iot.eu/ns/dataModels#image": {
+        "https://uri.synchronicity-iot.eu/ns/data-models#image": {
             "type": "Property",
             "value": "http://www.comerciosantander.com/imagenes/Comercios/124F214A-CE55-5A33-A77D-679C0F848FFC.jpg/resize/50/100/"
         },
@@ -188,7 +188,7 @@ Date: REGEX(.*)
                 "type": "Point"
             }
         },
-        "type": "https://uri.synchronicity-iot.eu/ns/dataModels#Store"
+        "type": "https://uri.synchronicity-iot.eu/ns/data-models#Store"
     }
 ]
 
