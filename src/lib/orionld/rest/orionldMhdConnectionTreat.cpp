@@ -47,7 +47,7 @@ extern "C"
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldEntityPayloadCheck.h"            // orionldValidName  - FIXME: Own file for "orionldValidName()"!
 #include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
@@ -530,7 +530,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     char uuid[37];
 
     uuidGenerate(uuid);
-    snprintf(orionldState.linkBuffer, sizeof(orionldState.linkBuffer), "http://%s:%d/ngsi-ld/contexts/%s", hostname, portNo, uuid);
+    snprintf(orionldState.linkBuffer, sizeof(orionldState.linkBuffer), "http://%s:%d/ngsi-ld/contexts/%s", orionldHostName, portNo, uuid);
     orionldState.link = orionldState.linkBuffer;
   }
 

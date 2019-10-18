@@ -31,15 +31,6 @@
 
 // -----------------------------------------------------------------------------
 //
-// orionldHostName
-//
-extern char orionldHostName[1024];
-extern int  orionldHostNameLen;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldRestServiceV -
 //
 extern OrionLdRestServiceVector orionldRestServiceV[9];

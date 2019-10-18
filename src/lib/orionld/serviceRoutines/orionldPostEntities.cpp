@@ -53,14 +53,6 @@ extern "C"
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
-#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
-#include "orionld/context/orionldContextAdd.h"                   // Add a context to the context list
-#include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"            // orionldContextItemLookup
-#include "orionld/context/orionldContextList.h"                  // orionldContextHead, orionldContextTail
-#include "orionld/context/orionldContextListInsert.h"            // orionldContextListInsert
-#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
-#include "orionld/context/orionldUserContextKeyValuesCheck.h"    // orionldUserContextKeyValuesCheck
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/common/orionldEntityPayloadCheck.h"            // orionldEntityPayloadCheck
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface

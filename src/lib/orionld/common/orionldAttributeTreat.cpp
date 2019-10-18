@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
 #include "orionld/context/orionldValueExpand.h"                  // orionldValueExpand
 #include "orionld/common/orionldAttributeTreat.h"                // Own interface
@@ -453,6 +454,9 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
   *detailP = (char*) "unknown error";
 
+  if (orionldState.contextP == NULL)
+    orionldState.contextP = &orionldCoreContext;
+
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", caName, kNodeP));
 
 #if 0
@@ -495,7 +499,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     LM_TMP(("VEX: Calling orionldUriExpand for node '%s' is of type '%s'", kNodeP->name, kjValueType(kNodeP->type)));
     if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, 512, &valueMayBeExpanded, &detail) == false)
     {
-      LM_E(("VEX: orionldUriExpand failed for '%s': %s", kNodeP->name, detail));
+      LM_E(("orionldUriExpand failed for '%s': %s", kNodeP->name, detail));
       *detailP = (char*) "orionldUriExpand failed";
       orionldErrorResponseCreate(OrionldBadRequestData, detail, kNodeP->name);
       return false;

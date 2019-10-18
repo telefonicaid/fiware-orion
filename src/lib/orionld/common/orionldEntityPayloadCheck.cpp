@@ -216,7 +216,7 @@ bool orionldEntityPayloadCheck
     if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
     {
       DUPLICATE_CHECK(locationNodeP, "location", kNodeP);
-      // FIXME: check validity of location - GeoProperty
+      // FIXME: check validity of location - GeoProperty - Issue #256
     }
     else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {

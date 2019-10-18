@@ -108,7 +108,7 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
+#include "orionld/common/orionldState.h"                    // orionldState, kalloc, ...
 #include "orionld/context/orionldCoreContext.h"             // orionldCoreContext
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
@@ -906,11 +906,17 @@ int main(int argC, char* argV[])
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
 
+  //
+  // Set portNo
+  //
+  portNo = port;
+
 
   //
-  // Setting global variables from the arguments
+  // Set global variables from the arguments
   //
   dbNameLen = strlen(dbName);
+
 
   //
   // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
@@ -969,17 +975,6 @@ int main(int argC, char* argV[])
     daemonize();
   }
 
-  //
-  // Get host name
-  //
-  char hname[128];
-  gethostname(hname, sizeof(hname));
-  hostname = hname;
-
-  //
-  // Set portNo
-  //
-  portNo = port;
 
   if ((s = pidFile(false)) != 0)
   {
@@ -998,16 +993,12 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  IpVersion    ipVersion        = IPDUAL;
+  IpVersion ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
-  {
     ipVersion = IPV4;
-  }
   else if (useOnlyIPv6)
-  {
     ipVersion = IPV6;
-  }
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
@@ -1071,6 +1062,10 @@ int main(int argC, char* argV[])
   //
   // Actually, another interesting usage is that a functional test case could create a context before starting the broker and
   // use that conext during the test.
+  //
+
+  //
+  // Initialize orionld
   //
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 

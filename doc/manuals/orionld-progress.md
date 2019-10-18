@@ -168,8 +168,22 @@
 ### Still Missing
   * Use the new Query Filter for subscriptions.
 
+## Merging in Telefonica's Orion repo
+  The idea is to implement plug-ins for Orion and add the LD part as a plug-in.
+  The advantages with this idea are many and important:
+  - The FIWARE Foundation keeps the IP of orionld
+  - The	FIWARE Foundation has FULL control of the source code, without depending on Telefonica
+  - The FIWARE Foundation can make new releases of the lug-in whenever necessary
+  - etc.
 
+### Time Estimation
+  What needs to be done:
 
+* Merge the newest orion repo into the orionld repo (2 months)
+* Implement plug-ins for Orion (2 months)
+* Convert the current orionld implementation into a plug-in library (2 months)
+  
+  
 ## Services
 ### POST /ngsi-ld/v1/entities
   The entity creation service is 100% implemented.
@@ -202,6 +216,7 @@
   
 #### Still Missing
   * URI param 'csf'
+  * URI param 'geoproperty'
 
 
 

@@ -61,6 +61,7 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
   if (SCOMPARE4(kNodeP->value.s, 'u', 'r', 'n', ':'))
     return;
 
+  // Never expand anything xxx://
   if ((colonP = strchr(kNodeP->value.s, ':')) == NULL)
     return;
   if ((colonP[1] == '/') && (colonP[2] == '/'))  // takes care of http:// and https:// and any other "xxx://"

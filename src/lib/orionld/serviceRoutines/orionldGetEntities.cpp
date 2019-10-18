@@ -283,11 +283,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       // No expansion desired, the type is already a FQN
       strncpy(typeExpanded, type, sizeof(typeExpanded));
     }
-    else if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), NULL, &detail) == false)
+    else
     {
-      LM_E(("Internal Error (Error during URI expansion of entity type: %s)", detail));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", detail);
-      return false;
+      if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), NULL, &detail) == false)
+      {
+        LM_E(("Internal Error (Error during URI expansion of entity type: %s)", detail));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", detail);
+        return false;
+      }
     }
 
     type          = typeExpanded;

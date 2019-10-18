@@ -62,5 +62,4 @@ typedef struct OrionldContext
   struct OrionldContext*  next;
 } OrionldContext;
 
-
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXT_H_

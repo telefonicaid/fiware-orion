@@ -68,8 +68,9 @@ KAlloc          kalloc;
 Kjson           kjson;
 Kjson*          kjsonP;
 uint16_t        portNo                   = 0;
-char*           hostname                 = (char*) "localhost";
 int             dbNameLen;
+char            orionldHostName[128];
+int             orionldHostNameLen       = -1;
 
 
 //
@@ -138,15 +139,15 @@ void orionldStateInit(void)
   //            bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
   //
   bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
-  orionldState.qNodeIx       = 0;
-  orionldState.jsonBuf       = NULL;
+  orionldState.qNodeIx               = 0;
+  orionldState.jsonBuf               = NULL;
 
   bzero(orionldState.delayedKjFreeVec, sizeof(orionldState.delayedKjFreeVec));
   orionldState.delayedKjFreeVecIndex = 0;
   orionldState.delayedKjFreeVecSize  = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
 
-  orionldState.notify              = false;
-  orionldState.notificationRecords = 0;
+  orionldState.notify                = false;
+  orionldState.notificationRecords   = 0;
 }
 
 
