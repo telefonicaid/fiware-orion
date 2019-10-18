@@ -58,11 +58,7 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
 {
   rapidjson::Document  document;
 
-  LM_T(LmtForward, ("parsing forwarded response: %s", payload));
-
   document.Parse(payload);
-
-  LM_T(LmtForward, ("parsed forwarded response"));
 
   if (document.HasParseError())
   {
