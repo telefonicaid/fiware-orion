@@ -134,7 +134,7 @@ The list of available options is the following:
     the subscriptions cache in [this document](perf_tuning.md#subscription-cache)).
 -   **-noCache**. Disables the context subscription cache, so subscriptions searches are
     always done in DB (not recommended but useful for debugging).
--   **-notificationMode** *(Experimental option)*. Allows to select notification mode, either:
+-   **-notificationMode**. Allows to select notification mode, either:
     `transient`, `permanent` or `threadpool:q:n`. Default mode is `transient`.
     * In transient mode, connections are closed by the CB right after sending the notification.
     * In permanent connection mode, a permanent connection is created the first time a notification
