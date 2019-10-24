@@ -74,7 +74,7 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-reqMutexPolicy <all|none|write|read>** : 内部 mutex ポリシーを指定します。詳細については、[パフォーマンス・チューニング](perf_tuning.md#mutex-policy-impact-on-performance)のドキュメントを参照してください。
 -   **-subCacheIval** : サブスクリプション・キャッシュの更新の呼び出し間隔 (秒単位)。ゼロ値は "リフレッシュしない" を意味します。デフォルト値は60秒で、mono-CB 配置に適しています。([このドキュメント](perf_tuning.md#subscription-cache)のサブスクリプション・キャッシュの詳細を参照してください
 -   **-noCache** : コンテキスト・サブスクリプション・キャッシュを無効にするので、サブスクリプション検索は常に DB で行われます。推奨されませんが、デバッグには便利です
--   **-notificationMode** *(実験的オプション)* : 通知モードを選択することができます。`transient`, `permanent` または `threadpool:q:n`。デフォルトモードは `transient` です
+-   **-notificationMode** : 通知モードを選択することができます。`transient`, `permanent` または `threadpool:q:n`。デフォルトモードは `transient` です
     * transient モードでは、通知を送信した直後に接続は CB によって閉じられます
     * permanent 接続モードでは、通知が指定された URL パスに初めて送信されたときに、永続的な接続が作成されます (受信者が永続的な接続をサポートしている場合)。同じ URL パスへの通知が行われると、接続が再利用され、HTTP 接続時間が保存されます
     * threadpool モードでは、通知は `q` と `n` のサイズのキューにエンキューされます。スレッドがキューからの通知を取ると、非同期に発信リクエストを行います。このモードを使用する場合は、[スレッド・モデルのセクション](perf_tuning.md#orion)を参照してください
