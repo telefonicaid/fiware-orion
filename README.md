@@ -31,3 +31,24 @@ For full Orion documentation, please check Orion's [README.md](https://github.co
 
 The current state of the implementation is found [here](doc/manuals/orionld-progress.md).
 
+## External Libraries
+The LD part of orionld depend on the following external libraries:
+* microhttpd
+* mongo client library (C++ Legacy driver)
+* libcurl
+* kbase
+* klog
+* kalloc
+* kjson
+
+The "heart" of the linked-data extension of orionld is the _kjson_ library.
+kjson takes care of the parsing of incoming JSON and transforms the textual input as a tree of KjNode structs.
+In the case of entities, the tree is basically a linked list of attributes (id and type are some kind of attributes of the entity, right?)
+that can have children, the metadata. In NGSI-LD the metadata takes another name, namely Property-of-Property, or Property-of-Relationhsip, or ...
+
+But, trees based on the KjNode structure isn't just for the incoming payload, but also for:
+* outgoing payload
+* context cache
+* intermediate storage format for DB abstaction layer
+* etc.
+
