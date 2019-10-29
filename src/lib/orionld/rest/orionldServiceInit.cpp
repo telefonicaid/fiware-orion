@@ -37,6 +37,7 @@
 
 extern "C"
 {
+#include "kalloc/kaInit.h"                                     // kaInit
 #include "kalloc/kaBufferInit.h"                               // kaBufferInit
 #include "kjson/kjInit.h"                                      // kjInit
 #include "kjson/kjBufferCreate.h"                              // kjBufferCreate
@@ -410,12 +411,17 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   }
 
   //
+  // Initialize the KALLOC library
+  //
+  kaInit(libLogFunction);
+  kaBufferInit(&kalloc, kallocBuffer, sizeof(kallocBuffer), 32 * 1024, NULL, "Global KAlloc buffer");
+
+  //
   // Initialize the KSON library
   //
   kjInit(libLogFunction);
 
   // Set up the global kjson instance with preallocated kalloc buffer
-  kaBufferInit(&kalloc, kallocBuffer, sizeof(kallocBuffer), 2 * 1024, NULL, "Global KAlloc buffer");
   kjsonP = kjBufferCreate(&kjson, &kalloc);
 
 

@@ -101,7 +101,7 @@ void orionldStateInit(void)
   // Creating kjson environment for KJson parse and render
   //
   bzero(orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer));
-  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
+  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 16 * 1024, NULL, "Thread KAlloc buffer");
 
   orionldState.ciP                         = NULL;
   orionldState.requestNo                   = requestNo;
