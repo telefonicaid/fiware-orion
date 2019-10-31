@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextList.h"                // orionldContextHead
 #include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/context/orionldContextValueLookup.h"         // Own interface
 
 
@@ -105,7 +106,7 @@ static KjNode* orionldContextValueLookupInObject(KjNode* contextP, const char* v
       }
       else
       {
-        LM_E(("Invalid @context - items of contexts must be JSON Strings or jSOn objects - not %s", kjValueType(contextItemP->type)));
+        LM_E(("Invalid @context - items of contexts must be JSON Strings or JSON objects - not %s", kjValueType(contextItemP->type)));
         return NULL;
       }
     }
@@ -173,7 +174,7 @@ static KjNode* orionldContextValueLookupInArray(KjNode* contextVector, const cha
 KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
 {
   if (contextP == NULL)
-    return NULL;
+    contextP = &orionldCoreContext;
 
   LM_T(LmtContextValueLookup, ("Looking up '%s' in context '%s' (which is of type '%s')", value, contextP->url, kjValueType(contextP->tree->type)));
 
@@ -184,6 +185,6 @@ KjNode* orionldContextValueLookup(OrionldContext* contextP, const char* value)
   else if (contextP->tree->type == KjObject)
     return orionldContextValueLookupInObject(contextP->tree, value);
 
-  LM_E(("Error: contexts must be either a String, an Object ot an Array"));
+  LM_E(("Error: contexts must be either a String, an Object or an Array"));
   return NULL;
 }

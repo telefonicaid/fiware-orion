@@ -157,7 +157,7 @@ Date: REGEX(.*)
 03. GET the entity, without context, see long names
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 766
+Content-Length: 737
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -174,7 +174,7 @@ Date: REGEX(.*)
       "postalCode": "10439"
     }
   },
-  "https://uri.etsi.org/ngsi-ld/name": {
+  "name": {
     "type": "Property",
     "value": "Bösebrücke Einkauf"
   },

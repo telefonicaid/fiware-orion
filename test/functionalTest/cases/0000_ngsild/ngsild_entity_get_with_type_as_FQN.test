@@ -247,18 +247,18 @@ Date: REGEX(.*)
 08. GET entities with	type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity
 ====================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 169
+Content-Length: 140
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
-        "https://uri.etsi.org/ngsi-ld/name": {
+        "id": "http://a.b.c/entity/E5",
+        "name": {
             "type": "Property",
             "value": "John 5"
         },
-        "id": "http://a.b.c/entity/E5",
         "type": "https://uri.fiware.org/ns/data-models#AgriProductType"
     }
 ]
