@@ -176,6 +176,29 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Nov 05 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.3.0-1
+- Add: basic NGSIv2 queries and updates forwarding (#3068)
+- Add: idPattern '.*' support in in NGSIv2 registrations (#3458)
+- Add: Notify only attributes that change (#3190)
+- Add: CLI option -inReqPayloadMaxSize to let users decide the maximum allowed size of incoming request payloads (#3492)
+- Add: CLI option -outReqMsgMaxSize to let users decide the maximum allowed total size of any outgoing request message (for forwards and notifications) (#3492)
+- Add: -dbAuthMech CLI parameter to set MongoDB authentication mechanism (#2987)
+- Add: -dbAuthDb CLI parameter to set MongoDB authentication database
+- Add: -dbSSL to enable SSL in the connection to DB (#3524)
+- Fix: The 'Allow:' header for the service /v2/registrations had the incorrect value of "Allow: POST". The correct value is: "Allow: GET, POST"
+- Fix: incorrectly loging update subscription traces in ERROR log level (#3531)
+- Fix: set default MongoDB authentication mechanism to SCRAM-SHA-1 (old MONGODB-CR was deprecated time ago)
+- Fix: abort on startup when MongoDB authentication fails to avoid starting a useless Context Broker
+- Fix: change max -dbhost length from 64 to 256 (to cope with long replica set strings using full domain names)
+- Hardening: avoid regex when possible in servicePath token in DB queries (#3505)
+- Hardening: avoid $in vectors with only one element in servicePath token in DB queries (#3505)
+- Hardening: avoid mono-item $or array in entity query (#3505)
+- Hardening: avoid unneeded _id.type: {$exists: true} in entity queries that already include _id.type (#3505)
+- Hardening: avoid _id.id: /.*/ and _id.type: /.*/ in entity queries, as removing the token has the same effect (#3505)
+- Hardening: avoid unneeded {$exists: true} and mono-item arrays (as much as posible) in attribute queries (#3505)
+- Remove: support to entities without service path in DB (no one of so ancient data model should remain today)
+- Remove: deprecated Rush support
+
 * Thu Feb 21 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.2.0-1
 - Add: skipInitialNotification URI param option to make initial notification in subscriptions configurable (#920)
 - Add: forcedUpdate URI param option to always trigger notifications, no matter if actual update or not (#3389)
