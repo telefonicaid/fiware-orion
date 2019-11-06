@@ -124,8 +124,8 @@ command:
 ```
 
 Note this script requires Flask version 1.0.2 and pyOpenSSL version 19.0.0, which can be installed using
-`pip install Flask==1.0.2` and `pip install pyOpenSSL==19.0.0`. In case of conflict with your 
-base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
+`pip install Flask==1.0.2` and `pip install pyOpenSSL==19.0.0`. In addition, it is recommended to use
+Python 2.7. In case of conflict with your base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
 
 [Top](#top)
 
