@@ -85,16 +85,7 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues in MB-12
 * [MB-18: mongoRegisterContext](mongoBackend.md#flow-mb-18)
 	* Continues from RQ-02
-	* Continues in MD-04
 * [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19)
-	* Continues from RQ-02
-* [MB-20: mongoSubscribeContextAvailability](mongoBackend.md#flow-mb-20)
-	* Continues from RQ-02
-	* Continues in MD-04
-* [MB-21: mongoUpdateContextAvailabilitySubscription](mongoBackend.md#flow-mb-21)
-	* Continues from RQ-02
-	* Continues in MD-04 
-* [MB-22: mongoUnsubscribeContextAvailability](mongoBackend.md#flow-mb-22)
 	* Continues from RQ-02
 * [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
 	* Continues from RQ-02
@@ -114,16 +105,11 @@ Related to mongoBackend logic (MB and MD prefixes):
 * [MD-03: `processConditionVector()` function detail](mongoBackend.md#flow-md-03)
 	* Continues from MB-11 or MB-12
 	* Continues in NF-01 or NF-03
-* [MD-04: `processAvailabilitySubscription()` function detail](mongoBackend.md#flow-md-04)
-	* Continues from MB-18, MB-20 or MB-21
-	* Continues in NF-02
 
 Related to notifications (NF prefix):
 
 * [NF-01: Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01)
 	* Continues from MD-01 or MD-03
-* [NF-02: Notification on entity-attribute registration/update](sourceCode.md#flow-nf-02)
-	* Continues from MD-04
 * [NF-03: Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03)
 	* Continues from MD-01 or MD-03
 

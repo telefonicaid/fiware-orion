@@ -233,12 +233,6 @@ class NotifierMock : public Notifier
                                               bool                             blacklist,
                                               const std::vector<std::string>&  metadataFilter));
 
-    MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest*  ncar,
-                                                            const std::string&                 url,
-                                                            const std::string&                 tenant,
-                                                            const std::string&                 fiwareCorrelator,
-                                                            RenderFormat                       renderFormat));
-
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
     void parent_sendNotifyContextRequest(NotifyContextRequest&            ncr,
                                          const ngsiv2::HttpInfo&          httpInfo,
@@ -261,14 +255,6 @@ class NotifierMock : public Notifier
                                          metadataFilter);
     }
 
-    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest*  ncar,
-                                                     const std::string&                 url,
-                                                     const std::string&                 tenant,
-                                                     const std::string&                 fiwareCorrelator,
-                                                     RenderFormat                       renderFormat)
-    {
-      Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, renderFormat);
-    }
 };
 
 

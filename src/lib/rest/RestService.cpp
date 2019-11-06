@@ -375,14 +375,6 @@ static void scopeFilter
   {
     restrictionP = &parseDataP->dcar.res.restriction;
   }
-  else if (ciP->restServiceP->request == SubscribeContextAvailability)
-  {
-    restrictionP = &parseDataP->scar.res.restriction;
-  }
-  else if (ciP->restServiceP->request == UpdateContextAvailabilitySubscription)
-  {
-    restrictionP = &parseDataP->ucas.res.restriction;
-  }
   else if (ciP->restServiceP->request == QueryContext)
   {
     restrictionP = &parseDataP->qcr.res.restriction;

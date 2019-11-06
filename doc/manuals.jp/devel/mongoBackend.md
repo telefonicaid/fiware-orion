@@ -12,10 +12,7 @@
 	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
 	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
 	* [`mongoRegisterContext` (SR) および `mongoNotifyContextAvailability` (SR)](#mongoregistercontext-sr-and-mongonotifycontextavailability-sr)
-	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)
-	* [`mongoSubscribeContextAvailability` (SR)](#mongosubscribecontextavailability-sr)
-	* [`mongoUpdateContextAvailabilitySubscription` (SR)](#mongoupdatecontextavailabilitysubscription-sr)
-	* [`mongoUnsubscribeContextAvailability` (SR)](#mongounsubscribecontextavailability-sr)
+	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)	
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
 	* [`mongoRegistrationDelete` (SR2)](#mongoregistrationdelete-sr2) 
@@ -27,7 +24,6 @@
 	* [`entitiesQuery()`](#entitiesquery)
 	* [`registrationsQuery()`](#registrationsquery) 
 	* [`processConditionVector()`](#processconditionvector)
-	* [`processAvailabilitySubscription()`](#processavailabilitysubscription)
 
 <a name="introduction"></a>
 ## イントロダクション
@@ -512,7 +508,6 @@ _MB-18: mongoRegisterContext_
 * `processRegisterContext()` がレジストレーションを処理するために呼び出されます (ステップ5)
 * リクエストの各レジストレーションに対して、`addTriggeredSubscriptions()` が呼び出されます (ステップ6)。この関数は  `registrationOperations` モジュールで `collectionQuery()` を順番に使用して、レジストレーションがサブスクリプションをトリガするかどうかをチェックします (ステップ7と8)。`subsToNotify` マップは、トリガーされたサブスクリプションを格納するために使用されます
 * `registration` ドキュメントは、データベースで作成または更新されます。そうするために、`upsert` パラメータを `true` に設定する `connectionOperations` モジュールの `collectionUpdate()` が使われます (ステップ9と10)
-* トリガされたサブスクリプションを処理するために `processSubscriptions()` が呼び出されます (ステップ11)。 `subsToNotify` マップは `processAvailabilitySubscription()` によって個々に処理するために反復されます (ステップ12)。このプロセスは、図 [MD-04](#flow-md-04) に記載されています
 * ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ13)
 
 [Top](#top)
@@ -533,69 +528,6 @@ _MB-19: mongoDiscoverContextAvailability_
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (読み取りモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * 実行フローは `processDiscoverContextAvailability()` に渡されます (ステップ3)
 * レジストレーション検索は `registrationQuery()` を使って行います (ステップ4)。この関数はデータベースからレジストレーションを取り出すために `collectionRangedQuery()` を使います (ステップ5と6)
-* ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ7)
-
-[Top](#top)
-
-<a name="mongosubscribecontextavailability-sr"></a>
-#### `mongoSubscribeContextAvailability` (SR)
-
-`mongoSubscribeContextAvailability` は、コンテキスト・アベイラビリティ・サブスクリプションの作成ロジックをカプセル化します。
-
-ヘッダ・ファイルには、`SubscribeContextAvailabilityRequest` オブジェクトを入力パラメータとして使用し、`SubscribeContextAvailabilityResponse` を出力パラメータとして使用する `mongoSubscribeContextAvailability()` という関数だけが含まれています。その作業は、[管理ドキュメントのデータベース・モデルの一部として記述されている](../admin/ database_model.md#casubs-collection)データベースの `casubs` コレクションで新しいコンテキスト・アベイラビリティ・サブスクリプションを作成することです。
-
-<a name="flow-mb-20"></a>
-![mongoSubscribeContextAvailability](../../manuals/devel/images/Flow-MB-20.png)
-
-_MB-20: mongoSubscribeContextAvailability_
-
-* `mongoSubscribeContextAvailability()` は、サービス・ルーチンから呼び出されます (ステップ1)
-* `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* コンテキスト・アベイラビリティ・サブスクリプションのドキュメントがデータベースに作成されます。そうするために、 `connectionOperations` モジュールの `collectionInsert()` が使われます (ステップ3と4)
-* この作成の結果、通知が発生する可能性があります。これは、図 [MD-04](sourceCode.md#flow-md-04) で説明されている  `processAvailabilitySubscription()` によって行われます (ステップ5)
-* リクエスト・セマフォがステップ2で取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ6)
-
-[Top](#top)
-
-<a name="mongoupdatecontextavailabilitysubscription-sr"></a>
-#### `mongoUpdateContextAvailabilitySubscription` (SR)
-
-`mongoUpdateContextAvailabilitySubscription` は、更新コンテキストのアベイラビリティ・サブスクリプションのオペレーションのロジックをカプセル化します。
-
-ヘッダ・ファイルには、`UpdateContextAvailabilitySubscriptionRequest` オブジェクトを入力パラメータとして使用し、`UpdateContextAvailabilitySubscriptionResponse` を出力パラメータとして使用する `mongoUpdateContextAvailabilitySubscription()` という関数だけが含まれています。 その作業は、[管理ドキュメントのデータベース・モデルの一部として記述されている](../admin/ database_model.md#casubs-collection)データベース内の `casubs`コレクションで対応するコンテキスト・アベイラビリティ・サブスクリプションを更新することです。
-
-<a name="flow-mb-21"></a>
-![mongoUpdateContextAvailabilitySubscription](../../manuals/devel/images/Flow-MB-21.png)
-
-_MB-21: mongoUpdateContextAvailabilitySubscription_
-
-* `mongoUpdateContextAvailabilitySubscription()` は、サービス・ルーチンから呼び出されます (ステップ1)
-* `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* 更新するコンテキスト・アベイラビリティ・サブスクリプションのドキュメントは、`connectionOperations` モジュールの `collectionFindOne()` によってデータベースから取り出されます (ステップ3と4)
-* コンテキスト・アベイラビリティ・サブスクリプションのドキュメントは、データベース内で更新されます。そうするために、 `connectionOperations` モジュールの `collectionUpdate()` が使われます (ステップ5と6)
-* このアップデートの結果、通知が発生する可能性があります。 これは図 [MD-04](#flow-md-04) で説明されている、`processAvailabilitySubscription()` によって行われます (ステップ7)
-* リクエスト・セマフォがステップ2で取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ8)
-
-[Top](#top)
-
-<a name="mongounsubscribecontextavailability-sr"></a>
-#### `mongoUnsubscribeContextAvailability` (SR)
-
-`mongoUnsubscribeContextAvailability` は、 コンテキスト・アベイラビリティのサブスクリプション解除のオペレーションのロジックをカプセル化します。
-
-ヘッダ・ファイルには、`UnsubscribeContextAvailabilityRequest` オブジェクトを入力パラメータとして使用し、`UnsubscribeContextAvailabilityResponse` を出力パラメータとして使用する `mongoUnsubscribeContextAvailability()` という名前の関数のみが含まれています。
-
-その作業は、`casubs` コレクションのサブスクリプションに関連するドキュメントをデータベースから削除することです。
-
-<a name="flow-mb-22"></a>
-![mongoUnsubscribeContextAvailability](../../manuals/devel/images/Flow-MB-22.png)
-
-_MB-21: mongoUnsubscribeContextAvailability_
-
-* `mongoUnsubscribeContextAvailability()` は、サービス・ルーチンから呼び出されます (ステップ1)
-* `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* サブスクリプションは、`connectionOperations` モジュールの `collectionFindOne()` を使ってデータベースから取得します (ステップ3と4)
-* サブスクリプションは `connectionOperations` モジュールの `collectionRemove()` を使ってデータベースから削除されます (ステップ5と6)
 * ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ7)
 
 [Top](#top)
@@ -766,7 +698,6 @@ typedef struct MongoConnection
 これはいくつかの関数によって使用されます : 
 
 * `mongoDiscoverContextAvailability()` (`mongoDiscoverContextAvailability`モジュール内で) ディスカバリー・オペレーションの "コア" として使用します
-* `processAvailabilitySubscription()` (`MongoGlobal` モジュールの一部でもある) コンテキスト・アベイラビリティ通知をトリガするレジストレーションを検出するために使用します
 * `mongoQueryContext` モジュールの `mongoQueryContext()`, クエリの転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
 * `MongoCommonUpdate` モジュールの `searchContextProviders()`, 更新の転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
 
@@ -792,27 +723,5 @@ _MD-03: `processConditionVector()` 機能の詳細_
 	   * 通知を実際に送信するために `Notify` オブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリから) を使用して通知が送信されます (ステップ11)。詳細は図 [NF-01](sourceCode.md#flow-nf-01) または [NF-03](sourceCode.md#flow-nf-03) に記載されています。特定の属性の条件の場合、前のチェックがOKだった場合にのみ通知が送信されます。すべての属性通知 (空の状態) の場合、通知は常に送信されます。
 
 `processOnChangeConditionForSubscription()` には初期以外の通知用の `processOnChangeConditionForUpdateContext()` という名前の "兄弟 "関数があることに注意してください。図 [MD-01](#flow-md-01) を参照してください。
-
-[Top](#top)
-
-<a name="processavailabilitysubscription"></a>
-#### `processAvailabilitySubscription()`
-
-`processOnChangeConditionForSubscription()` と `processOnChangeConditionForUpdateContext()` と同様に、この関数はコンテキスト・アベイラビリティ通知を効果的に作成する関数です。
-
-次から呼ばれます : 
-
-* コンテキスト・アベイラビリティの作成/更新ロジック。したがって、一致するすべてのコンテキスト・レジストレーションの初期通知が送信されます
-* 新しい、または更新された、コンテキスト・レジストレーションがアベイラビリティ・サブスクリプションと一致したとき、オペレーションのロジックをレジストレーションします
-
-<a name="flow-md-04"></a>
-![`processAvailabilitySubscription()` function detail](../../manuals/devel/images/Flow-MD-04.png)
-
-_MD-04: `processAvailabilitySubscription()` 機能の詳細_
-
-* `processAvailabilitySubscription()` (ステップ1)。図 [MB-18](#flow-mb-18), [MB-20](#flow-mb-20), [MB-21](#flow-mb-21) を参照してください
-* `registrationsQuery()` (ステップ2) を使用して、レジストレーションがサブスクリプションと一致するかどうかを確認します。この関数は、connectionOperations` モジュール内で  `collectionRangeQuery()` を使って、データベースをチェックインします (ステップ3と4)
-* レジストレーションが一致した場合、プロセスは続行されます。アベイラビリティ通知は、`Notifier` オブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリから) を使用して送信されます (ステップ5)。これに関する詳細は図 [NF-02](sourceCode.md#flow-nf-02) にあります
-* 最後に、`mongoUpdateCasubNewNotification()` を呼び出すことによって、最後の通知とカウント統計が更新されます (ステップ6)。 この関数は、`connectionOperations` モジュールで `collectionUpdate()` を使用して、データベース内の対応するコンテキスト・アベイラビリティ・サブスクリプションのドキュメントを更新します (ステップ7と8)
 
 [Top](#top)

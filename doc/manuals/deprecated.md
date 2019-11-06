@@ -18,6 +18,8 @@ A list of deprecated features and the version in which they were deprecated foll
 * Rush support (along with the related CLI parameter: `-rush`) in Orion 2.1.0 (removed in Orion 2.3.0).
 * NGSIv1 API (along with related CLI parameters: `-strictNgsiv1Ids` and `-ngsiv1Autocast`) in Orion 2.0.0.
   Use NGSIv2 API instead.
+    * Context availability subscriptions (AKA NGSI9 subscriptions), as part of NGSIv1, in Orion 2.2.0
+      (removed in Orion 2.4.0)
 * `attributes` field in `POST /v2/op/query` is in Orion 1.15.0. It is a combination of `attrs` (to select
   which attributes to include in the response to the query) and unary attribute filter in `q` within
   `expression` (to return only entities which have these attributes). Use them instead.
@@ -87,6 +89,7 @@ The following table provides information about the last Orion version supporting
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
+| NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.3.0                                     | November 5th, 2019              |
 | Rush (along with CLI: `-rush`)                                             | 2.2.0                                     | February 21st, 2019             |
 | `id` metadata (and associated NGSIv1 operations)                           | 2.1.0                                     | December 19th, 2018             |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |

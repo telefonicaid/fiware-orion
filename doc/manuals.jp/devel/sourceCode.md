@@ -245,14 +245,6 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 * `RegisterContextResponse`
 * `DiscoverContextAvailabilityRequest`
 * `DiscoverContextAvailabilityResponse`
-* `SubscribeContextAvailabilityRequest`
-* `SubscribeContextAvailabilityResponse`
-* `UnsubscribeContextAvailabilityRequest`
-* `UnsubscribeContextAvailabilityResponse`
-* `UpdateContextAvailabilitySubscriptionRequest`
-* `UpdateContextAvailabilitySubscriptionResponse`
-* `NotifyContextAvailabilityRequest` (Orionから送信された、発信者からの通知リクエスト)
-* `NotifyContextAvailabilityResponse` (サブスクライバーからの着信レスポンス)
 
 [**ngsi** ライブラリ](#methods-and-hierarchy)のメソッドと階層の説明を参照してください。
 
@@ -408,21 +400,6 @@ _NF-03: スレッド・プールによるエンティティ属性の更新/作�
 * スレッド・プール内のワーカー・スレッドの1つがメッセージキューから項目をポップします (ステップ3)。これは、通知キュー・セマフォを使用してキューへのアクセスを同期させる `SyncQOverflow::pop()` を使用して行われます
 * ワーカー・スレッドは、ポップされたキュー・アイテムの `SenderThreadParam` ベクトルをループし、ベクトルの `SenderThreadParams` アイテムごとに1つの通知を送信します (ステップ4,5,6)。通知の受信者からのレスポンスは (タイムアウトとともに) 待機され、すべての通知はシリアル化された方法で行われます
 * その後、ワーカー・スレッドはスリープして、キュー内の新しい項目を処理する必要があるときに起きるのを待っています
-
-### コンテキスト・アベイラビリティ通知
-
-<a name="flow-nf-02"></a>
-![Notification on entity-attribute availability Registration/Update](../../manuals/devel/images/Flow-NF-02.png)
-
-_NF-02: エンティティ属性のアベイラビリティに関する通知のレジストレーション/更新_
-
-* IP, ポート, パスを第2パラメータ (url) の値からメソッド `sendNotifyContextAvailabilityRequest()` に抽出します (ステップ1)
-* `SenderThreadParams` のインスタンスを作成し、それを通知のためのデータで埋めます (ステップ2)。次に、`SenderThreadParams` のベクトルを作成し、インスタンスをベクトルにプッシュします。これは、`sendNotifyContextAvailabilityRequest()` と `sendNotifyContextRequest()` の間で共有される`startSenderThread()` によって期待される入力です。`sendNotifyContextAvailabilityRequest()` の場合、ベクトルは常に1つの項目しか含みません
-* `pthread_create()` が呼び出され、通知を送信し、結果を待たずに新しいスレッドを作成します (ステップ3)。コントロールは mongoBackend に返されます
-* `pthread_create()` は、`startSenderThread()` を起点とする新しいスレッドを生成します (ステップ4)
-* `startSenderThread()` は、ベクトル内の `SenderThreadParams` 項目で記述された通知を送信します (ステップ5,6,7)。通知の受信者からのレスポンスは待機されます。タイムアウトはあります
-
-[トップ](#top)
 
 <a name="srclibalarmmgr"></a>
 ## src/lib/alarmMgr/

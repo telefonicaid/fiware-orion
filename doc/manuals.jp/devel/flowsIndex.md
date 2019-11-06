@@ -88,14 +88,6 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
     * MD-04 に続きます
 * [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19)
     * RQ-02 からの続きです
-* [MB-20: mongoSubscribeContextAvailability](mongoBackend.md#flow-mb-20)
-    * RQ-02 からの続きです
-    * MD-04 に続きます
-* [MB-21: mongoUpdateContextAvailabilitySubscription](mongoBackend.md#flow-mb-21)
-    * RQ-02 からの続きです
-    * MD-04 に続きます
-* [MB-22: mongoUnsubscribeContextAvailability](mongoBackend.md#flow-mb-22)
-    * RQ-02 からの続きです
 * [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
     * RQ-02 からの続きです
 * [MB-24: mongoRegistrationsGet](mongoBackend.md#flow-mb-24)
@@ -114,16 +106,11 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
 * [MD-03: `processConditionVector()` function detail](mongoBackend.md#flow-md-03)
     * MB-11 または MB-12 からの続きです
     * NF-01 または NF-03 に続きます
-* [MD-04: `processAvailabilitySubscription()` function detail](mongoBackend.md#flow-md-04)
-    * MB-18、MB-20またはMB-21 からの続きです
-    * NF-02 に続きます
 
 通知に関連する図 (NF prefix): 
 
 * [NF-01: スレッド・プールを使用しないエンティティ属性の更新/作成に関する通知](sourceCode.md#flow-nf-01)
     * MD-01 または MD-03 からの続きです
-* [NF-02: エンティティ属性レジストレーション/更新通知](sourceCode.md#flow-nf-02)
-    * MD-04 からの続きです
 * [NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する通知](sourceCode.md#flow-nf-03)
     * MD-01 または MD-03 からの続きです
 

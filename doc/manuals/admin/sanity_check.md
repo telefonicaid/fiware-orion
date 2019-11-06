@@ -90,7 +90,6 @@ given moment.
 > db.registrations.count()
 > db.entities.count()
 > db.csubs.count()
-> db.casubs.count()
 ```
 
 [Top](#top)

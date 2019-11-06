@@ -82,7 +82,6 @@ int noOfEntityByIdAttributeByName                        = -1;
 int noOfContextEntityTypes                               = -1;
 int noOfContextEntityTypeAttributeContainer              = -1;
 int noOfContextEntityTypeAttribute                       = -1;
-int noOfNgsi9SubscriptionsConvOp                         = -1;
 
 int noOfIndividualContextEntity                          = -1;
 int noOfIndividualContextEntityAttributes                = -1;
@@ -114,9 +113,6 @@ int noOfStatisticsRequests                               = -1;
 int noOfInvalidRequests                                  = -1;
 int noOfRegisterResponses                                = -1;
 
-int noOfRtSubscribeContextAvailabilityResponse           = -1;
-int noOfRtUpdateContextAvailabilitySubscriptionResponse  = -1;
-int noOfRtUnsubscribeContextAvailabilityResponse         = -1;
 int noOfRtUnsubscribeContextResponse                     = -1;
 int noOfRtSubscribeResponse                              = -1;
 int noOfRtSubscribeError                                 = -1;
@@ -298,10 +294,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case NoRequest:                                        break;
   case RegisterContext:                                  ++noOfRegistrations; break;
   case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
-  case SubscribeContextAvailability:                     ++noOfAvailabilitySubscriptions; break;
-  case UpdateContextAvailabilitySubscription:            ++noOfAvailabilitySubscriptionUpdates; break;
-  case UnsubscribeContextAvailability:                   ++noOfAvailabilityUnsubscriptions; break;
-  case NotifyContextAvailability:                        ++noOfAvailabilityNotificationsReceived; break;
 
   case QueryContext:                                     ++noOfQueries; break;
   case SubscribeContext:                                 ++noOfSubscriptions; break;
@@ -323,7 +315,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case IndividualContextEntityAttributes:                ++noOfIndividualContextEntityAttributes; break;
   case AttributeValueInstance:                           ++noOfAttributeValueInstance; break;
   case IndividualContextEntityAttribute:                 ++noOfIndividualContextEntityAttribute; break;
-  case Ngsi9SubscriptionsConvOp:                         ++noOfNgsi9SubscriptionsConvOp; break;
 
   case UpdateContextElement:                             ++noOfUpdateContextElement; break;
   case AppendContextElement:                             ++noOfAppendContextElement; break;
@@ -352,9 +343,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType)
   case InvalidRequest:                                   ++noOfInvalidRequests; break;
   case RegisterResponse:                                 ++noOfRegisterResponses; break;
 
-  case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
-  case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;
-  case RtUnsubscribeContextAvailabilityResponse:         ++noOfRtUnsubscribeContextAvailabilityResponse; break;
   case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
   case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
   case RtSubscribeError:                                 ++noOfRtSubscribeError; break;

@@ -35,7 +35,6 @@
 #define COL_ENTITIES       "entities"
 #define COL_REGISTRATIONS  "registrations"
 #define COL_CSUBS          "csubs"
-#define COL_CASUBS         "casubs"
 
 
 

@@ -11,11 +11,8 @@
 	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2)
 	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
 	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
-	* [`mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR)](#mongoregistercontext-sr-and-mongonotifycontextavailability-sr)
+        * [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
 	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)
-	* [`mongoSubscribeContextAvailability` (SR)](#mongosubscribecontextavailability-sr)
-	* [`mongoUpdateContextAvailabilitySubscription` (SR)](#mongoupdatecontextavailabilitysubscription-sr)
-	* [`mongoUnsubscribeContextAvailability` (SR)](#mongounsubscribecontextavailability-sr)
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
 * [Connection pool management](#connection-pool-management)
@@ -26,7 +23,6 @@
 	* [`entitiesQuery()`](#entitiesquery)
 	* [`registrationsQuery()`](#registrationsquery) 
 	* [`processConditionVector()`](#processconditionvector)
-	* [`processAvailabilitySubscription()`](#processavailabilitysubscription)
 
 ## Introduction
 
@@ -56,7 +52,7 @@ These modules implement the different Context Broker requests. They are called d
 
 This section also describes the `MongoCommonRegister` and `MongoCommonUpdate` modules which provide common functionality highly coupled with several other request processing modules. In particular:
 
-* `MongoCommonRegister` provides common functionality for the `mongoRegisterContext` and `mongoNotifyContextAvailability` modules.
+* `MongoCommonRegister` provides common functionality for the `mongoRegisterContext` modules.
 * `MongoCommonUpdate` provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
 
 [Top](#top)
@@ -482,22 +478,21 @@ _MB-17: mongoUpdateContextSubscription_
 
 [Top](#top)
 
-#### `mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR) 
+#### `mongoRegisterContext` (SR)
 
-The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of `mongoRegisterContext()` defined in its header file) while the `mongoNotifyContextAvailability` module provides the entry point for the context availability notification processing logic (by means of `mongoNotifyContextAvailability()` in its header file). However, given that a context availability notification is processed in the same way as a register context, both `mongoRegisterContext()` and `mongoNotifyContextAvailability()` are at the end basically wrappers for `processRegisterContext()` (single external function in the `MongoCommonRegister` module), which does the work consisting in creating a new registration or updating an existing one in the `registrations` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#registrations-collection)).
+The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of `mongoRegisterContext()` defined in its header file).
 
 <a name="flow-mb-18"></a>
 ![mongoRegisterContext](images/Flow-MB-18.png)
 
 _MB-18: mongoRegisterContext_
 
-* `mongoRegisterContext()` or `mongoNotifyContextAvailability` is invoked from a service routine (step 1).
+* `mongoRegisterContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * In the case of `mongoRegisterContext()` if a registration id was provided in the request, it indicates a registration *update*. Thus, the `registrations` document is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
 * `processRegisterContext()` is called to process the registration (step 5).
 * For each registration in the request, `addTriggeredSubscriptions()` is called (step 6). This function in sequence uses `collectionQuery()` in the `connectionOperations` module in order to check whether the registration triggers a subscription or not (steps 7 and 8). The `subsToNotify` map is used to store the triggered subscriptions.
 * The `registration` document is created or updated in the database. In order to do so, `collectionUpdate()` in the `connectionOperations` module is used, setting the `upsert` parameter to `true` (steps 9 and 10).
-* `processSubscriptions()` is called in order to process triggered subscriptions (step 11). The `subsToNotify` map is iterated over in order to process each one individually, by `processAvailabilitySubscription()` (step 12). This process is described in the [diagram MD-04](#flow-md-04).
 * If the request semaphore was taken in step 2, then it is released before returning (step 13).  
 
 [Top](#top)
@@ -518,66 +513,6 @@ _MB-19: mongoDiscoverContextAvailability_
 * Execution flow passes to `processDiscoverContextAvailability()` (step 3)
 * Registration search is done using `registrationQuery()` (steps 4). This function in sequence uses `collectionRangedQuery()` in order to retrieve registrations from the database (steps 5 and 6).
 * If the request semaphore was taken in step 2, then it is released before returning (step 7).  
-
-[Top](#top)
-
-#### `mongoSubscribeContextAvailability` (SR)
-
-`mongoSubscribeContextAvailability` encapsulates the context availability subscription creation logic.
-
-The header file contains only a function named `mongoSubscribeContextAvailability()` which uses a `SubscribeContextAvailabilityRequest` object as input parameter and a `SubscribeContextAvailabilityResponse` as output parameter. Its work is to create a new context availability subscription in the `casubs` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection)).
-
-<a name="flow-mb-20"></a>
-![mongoSubscribeContextAvailability](images/Flow-MB-20.png)
-
-_MB-20: mongoSubscribeContextAvailability_
-
-* `mongoSubscribeContextAvailability()` is invoked from a service routine (step 1).
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* The context availability subscription document is created in the database. In order to do so, `collectionInsert()` in the `connectionOperations` module is used (steps 3 and 4).
-* Notifications may be triggered as a result of this creation. This is done by `processAvailabilitySubscription()` (step 5), which is described in diagram [MD-04](sourceCode.md#flow-md-04).
-* If the request semaphore was taken in step 2, then it is released before returning (step 6). 
-
-[Top](#top)
-
-#### `mongoUpdateContextAvailabilitySubscription` (SR)
-
-`mongoUpdateContextAvailabilitySubscription` encapsulates the update context availability subscription operation logic.
-
-The header file contains only a function named `mongoUpdateContextAvailabilitySubscription()` which uses an `UpdateContextAvailabilitySubscriptionRequest` object as input parameter and an `UpdateContextAvailabilitySubscriptionResponse` as output parameter. Its work is to update the corresponding context availability subscription in the `casubs` collection in the database ([described as part of the database model in the administration documentation](../admin/database_model.md#casubs-collection)).
-
-<a name="flow-mb-21"></a>
-![mongoUpdateContextAvailabilitySubscription](images/Flow-MB-21.png)
-
-_MB-21: mongoUpdateContextAvailabilitySubscription_
-
-* `mongoUpdateContextAvailabilitySubscription()` is invoked from a service routine (step 1).
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* The context availability subscription document to update is retrieved from the database, by the means of `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
-* The context availability subscription document is updated in the database. In order to do so, `collectionUpdate()` in the `connectionOperations` module is used (steps 5 and 6).
-* Notifications may be triggered as a result of this update. This is done by `processAvailabilitySubscription()` (step 7), which is described in diagram [MD-04](#flow-md-04).
-* If the request semaphore was taken in step 2, then it is released before returning (step 8). 
-
-[Top](#top)
-
-#### `mongoUnsubscribeContextAvailability` (SR)
-
-`mongoUnsubscribeContextAvailability` encapsulates the logic for unsubscribe context availability operation.
-
-The header file contains only a function named `mongoUnsubscribeContextAvailability()` which uses an `UnsubscribeContextAvailabilityRequest` object as input parameter and an `UnsubscribeContextAvailabilityResponse` as output parameter.
-
-Its work is to remove from the database the document associated to the subscription in the `casubs` collection.
-
-<a name="flow-mb-22"></a>
-![mongoUnsubscribeContextAvailability](images/Flow-MB-22.png)
-
-_MB-21: mongoUnsubscribeContextAvailability_
-
-* `mongoUnsubscribeContextAvailability()` is invoked from a service routine (step 1).
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* The subscription is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
-* The subscription is removed from the database using `collectionRemove()` in the `connectionOperations` module (steps 5 and 6).
-* If the request semaphore was taken in step 2, then it is released before returning (step 7). 
 
 [Top](#top)
 
@@ -738,7 +673,6 @@ This function basically searches for existing registrations in the (`registratio
 It is used by several functions:
 
 * `mongoDiscoverContextAvailability()` (in the `mongoDiscoverContextAvailability` module), as "core" of the discovery operation.
-* `processAvailabilitySubscription()` (also part of the `MongoGlobal` module) in order to detect registrations that triggers context availability notifications.
 * `mongoQueryContext()` in the `mongoQueryContext` module, in order to locate Context Providers for forwarding of the query. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 * `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers for forwarding of the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 
@@ -763,26 +697,6 @@ _MD-03: `processConditionVector()` function detail_
 	   * Notifications are sent (step 11) using the `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library) in order to actually send the notification (step 3). The detail is provided in diagrams [NF-01](sourceCode.md#flow-nf-01) or [NF-03](sourceCode.md#flow-nf-03). In the case of conditions for particular attributes, notifications are sent only if the previous check was ok. In the case of all-attributes notifications (i.e. empty condition) notifications are always sent.
 
 Note that `processOnChangeConditionForSubscription()` has a "sibling" function named `processOnChangeConditionForUpdateContext()` for non-initial notifications (see diagram [MD-01](#flow-md-01)).
-
-[Top](#top)
-
-#### `processAvailabilitySubscription()`
-
-Similar to  `processOnChangeConditionForSubscription()` and   `processOnChangeConditionForUpdateContext()` this function is the one that effectively composes context availability notifications.
-
-It is called from:
-* Context availability creation/update logic, so an initial notification for all matching context registrations is sent.
-* Register operation logic, when a new (or updated) context registration matches an availability subscription.
-
-<a name="flow-md-04"></a>
-![`processAvailabilitySubscription()` function detail](images/Flow-MD-04.png)
-
-_MD-04: `processAvailabilitySubscription()` function detail_
-
-* `processAvailabilitySubscription()` is invoked (step 1). See diagrams [MB-18](#flow-mb-18), [MB-20](#flow-mb-20) and [MB-21](#flow-mb-21).
-* Check if any registration matches the subscription, using `registrationsQuery()` (step 2). This function uses `collectionRangeQuery()` in the `connectionOperations` module to check in the database (steps 3 and 4).
-* In case any registration matches, the process continues. Availability notifications are sent (step 5) using a `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library). Details on this are found in diagram [NF-02](sourceCode.md#flow-nf-02).
-* Finally, last notification and count statistics are updated, by calling `mongoUpdateCasubNewNotification()` (step 6). This function uses `collectionUpdate()` in the `connectionOperations` module to update the corresponding context availability subscription document in the database (steps 7 and 8).
 
 [Top](#top)
 

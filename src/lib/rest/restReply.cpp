@@ -33,10 +33,6 @@
 
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi9/RegisterContextResponse.h"
-#include "ngsi9/SubscribeContextAvailabilityResponse.h"
-#include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
-#include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
-#include "ngsi9/NotifyContextAvailabilityResponse.h"
 
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/SubscribeContextResponse.h"
@@ -180,26 +176,6 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     DiscoverContextAvailabilityResponse dcar(errorCode);
     *outStringP = dcar.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == SubscribeContextAvailability)
-  {
-    SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-    *outStringP = scar.toJsonV1();
-  }
-  else if ((ciP->restServiceP->request == UpdateContextAvailabilitySubscription) || (ciP->restServiceP->request == Ngsi9SubscriptionsConvOp))
-  {
-    UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-    *outStringP = ucas.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == UnsubscribeContextAvailability)
-  {
-    UnsubscribeContextAvailabilityResponse ucar(errorCode);
-    *outStringP = ucar.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == NotifyContextAvailability)
-  {
-    NotifyContextAvailabilityResponse ncar(errorCode);
-    *outStringP = ncar.toJsonV1();
   }
   else if (ciP->restServiceP->request == QueryContext)
   {
