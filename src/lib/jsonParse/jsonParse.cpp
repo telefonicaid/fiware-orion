@@ -546,3 +546,27 @@ std::string jsonParse
 
   return "OK";
 }
+
+
+
+/* ****************************************************************************
+*
+* safeValue -
+*
+* If the string passed as argument has \0, truncates to the first \0. Not doing
+* so can cause problems when that value is used as field in mongo backend.
+*
+*/
+std::string safeValue(const std::string& s)
+{
+  unsigned int pos = s.find('\0');
+  if (pos != std::string::npos)
+  {
+     return s.substr(0, pos);
+  }
+  else
+  {
+    return s;
+  }
+
+}
