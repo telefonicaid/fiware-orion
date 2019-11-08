@@ -92,9 +92,9 @@ broker を再起動するには、*root* として実行するか、`sudo` コ�
 
 このスクリプトには Flask version 1.0.2 と pyOpenSSL version 19.0.0 が必要です。
 これらは `pip install Flask==1.0.2` と `pip install pyOpenSSL==19.0.0` を使って
-インストールできます。ベースのオペレーティングシステムの Python インストールと
-競合する場合は、[virtualenv](https://virtualenv.pypa.io/en/latest/) を使用する
-ことをお勧めします。
+インストールできます。さらに、Python 2.7 を使用することをお勧めします。
+ベースのオペレーティング・システムの Python インストールと競合する場合は、
+[virtualenv](https://virtualenv.pypa.io/en/latest/) を使用することをお勧めします。
 
 [トップ](#top)
 
