@@ -87,7 +87,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
-  reqData->upcar.metadataP->name = value;
+  reqData->upcar.metadataP->name = safeValue(value);
   return "OK";
 }
 

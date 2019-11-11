@@ -61,7 +61,7 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 static std::string contextAttributeName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an attribute name: %s", value.c_str()));
-  reqData->acer.attributeP->name = value;
+  reqData->acer.attributeP->name = safeValue(value);
   return "OK";
 }
 
@@ -116,7 +116,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
-  reqData->acer.metadataP->name = value;
+  reqData->acer.metadataP->name = safeValue(value);
   return "OK";
 }
 

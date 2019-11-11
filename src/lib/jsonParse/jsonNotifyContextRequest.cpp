@@ -34,6 +34,7 @@
 #include "ngsi/Metadata.h"
 
 #include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonParse.h"
 #include "parse/nullTreat.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
 
@@ -148,7 +149,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 static std::string attributeName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute name: '%s'", value.c_str()));
-  parseDataP->ncr.attributeP->name = value;
+  parseDataP->ncr.attributeP->name = safeValue(value);
   return "OK";
 }
 
@@ -243,7 +244,7 @@ static std::string attributeMetadata(const std::string& path, const std::string&
 static std::string attributeMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata name: '%s'", value.c_str()));
-  parseDataP->ncr.attributeMetadataP->name = value;
+  parseDataP->ncr.attributeMetadataP->name = safeValue(value);
   return "OK";
 }
 

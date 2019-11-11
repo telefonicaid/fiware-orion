@@ -33,6 +33,7 @@
 #include "jsonParse/JsonNode.h"
 #include "parse/nullTreat.h"
 #include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
+#include "jsonParse/jsonParse.h"
 
 #include "rest/ConnectionInfo.h"
 
@@ -148,7 +149,7 @@ static std::string attributeName(const std::string& path, const std::string& val
 {
   LM_T(LmtParse, ("got an attributeName: '%s'", value.c_str()));
 
-  parseDataP->ncar.craP->name = value;
+  parseDataP->ncar.craP->name = safeValue(value);
   return "OK";
 }
 
