@@ -515,6 +515,7 @@ std::string postUpdateContext
 
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
+  bool flowControl  = ciP->uriParamOptions[OPT_FLOW_CONTROL];
   //
   // 01. Check service-path consistency
   //
@@ -567,7 +568,8 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
                                                   forcedUpdate,
                                                   ciP->apiVersion,
-                                                  ngsiV2Flavour));
+                                                  ngsiV2Flavour,
+                                                  flowControl));
 
   if (ciP->httpStatusCode != SccCreated)
   {

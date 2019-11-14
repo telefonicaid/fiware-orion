@@ -113,6 +113,7 @@
 * Values for the URI param 'options'
 */
 #define OPT_COUNT                       "count"
+#define OPT_FLOW_CONTROL                "flowControl"
 #define OPT_APPEND                      "append"
 #define OPT_NORMALIZED                  "normalized"
 #define OPT_VALUES                      "values"
@@ -206,6 +207,7 @@ extern int                statisticsTime;
 extern OrionExitFunction  orionExitFunction;
 extern unsigned           cprForwardLimit;
 extern char               notificationMode[];
+extern char               notifFlowControl[];
 extern bool               noCache;
 extern bool               simulatedNotification;
 
@@ -222,6 +224,10 @@ extern bool               ngsiv1Autocast;
 extern unsigned long long inReqPayloadMaxSize;
 extern unsigned long long outReqMsgMaxSize;
 
+extern bool               fcEnabled;
+extern double             fcGauge;
+extern unsigned long      fcStepDelay;
+extern unsigned long      fcMaxInterval;
 
 
 /* ****************************************************************************

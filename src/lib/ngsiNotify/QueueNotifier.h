@@ -61,6 +61,7 @@ public:
                                 bool                             blacklist,
                                 const std::vector<std::string>&  metadataFilter);
   int start();
+  size_t queueSize();
 
 private:
  SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;

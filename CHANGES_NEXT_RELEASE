@@ -1,1 +1,2 @@
+- Add: notification flow control on update (#3568)
 - Fix: crash when using null character in some NGSIv1 operations

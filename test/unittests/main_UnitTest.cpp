@@ -70,6 +70,7 @@ bool          insecureNotif         = false;
 bool          ngsiv1Autocast        = false;
 char          fwdHost[64];
 char          notificationMode[64];
+char          notifFlowControl[64];
 bool          simulatedNotification;
 int           lsPeriod             = 0;
 bool          disableCusNotif      = false;
@@ -87,6 +88,11 @@ int           dbPoolSize;
 int           writeConcern;
 char          gtest_filter[1024];
 char          gtest_output[1024];
+
+bool            fcEnabled      = false;
+double          fcGauge        = 0;
+unsigned long   fcStepDelay    = 0;
+unsigned long   fcMaxInterval  = 0;
 
 
 

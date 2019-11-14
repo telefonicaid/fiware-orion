@@ -38,9 +38,49 @@
 #include "ngsi/NotifyCondition.h"
 #include "rest/HttpStatusCode.h"
 
+#include "ngsiNotify/QueueNotifier.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/mongoUpdateContext.h"
+
+
+
+/* ****************************************************************************
+*
+* flowControlAlgorithm -
+*/
+static void flowControlAlgorithm(unsigned int q0, unsigned int notifSent)
+{
+  unsigned int pass = 0;
+  unsigned int accumulatedDelay = 0;
+
+  // target may range from q0 (for fcGauge = 1) to q0 + notifSent (for fcGauge = 0)
+  unsigned int target = q0 + (1 - fcGauge) * notifSent;
+  LM_T(LmtNotifier, ("flow control target is %d", target));
+
+  // get current size of the queue
+  unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize();
+  LM_T(LmtNotifier, ("flow control pass %d, delay %d, notificationq queue size is: %d",
+                     pass, accumulatedDelay, qi));
+
+  while (qi > target)
+  {
+    pass++;
+    usleep(fcStepDelay * 1000);
+    accumulatedDelay += fcStepDelay;
+
+    unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize();
+    LM_T(LmtNotifier, ("flow control pass %d, delay %d, notificationq queue size is: %d",
+                       pass, accumulatedDelay, qi));
+
+    if (accumulatedDelay > fcMaxInterval)
+    {
+      LM_T(LmtNotifier, ("flow control algorithm interrupted due to maxInterval"));
+      break;
+    }
+  }
+}
 
 
 
@@ -60,12 +100,22 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate,
   ApiVersion                            apiVersion,
-  Ngsiv2Flavour                         ngsiv2Flavour
+  Ngsiv2Flavour                         ngsiv2Flavour,
+  bool                                  flowControl
 )
 {
   bool reqSemTaken;
 
   reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
+
+  // Initial size of notification queue (could be used by flow control algorithm)
+  unsigned int q0 = 0;
+  if (strcmp(notificationMode, "threadpool") == 0)
+  {
+    q0 = ((QueueNotifier*) getNotifier())->queueSize();
+    LM_T(LmtNotifier, ("notificationq queue size before processing update: %d", q0));
+  }
+  unsigned int notifSent = 0;
 
   /* Check that the service path vector has only one element, returning error otherwise */
   if (servicePathV.size() > 1)
@@ -84,19 +134,21 @@ HttpStatusCode mongoUpdateContext
     /* Process each ContextElement */
     for (unsigned int ix = 0; ix < requestP->entityVector.size(); ++ix)
     {
-      processContextElement(requestP->entityVector[ix],
-                            responseP,
-                            requestP->updateActionType,
-                            tenant,
-                            servicePathV,
-                            uriParams,
-                            xauthToken,
-                            fiwareCorrelator,
-                            ngsiV2AttrsFormat,
-                            forcedUpdate,
-                            apiVersion,
-                            ngsiv2Flavour);
+      notifSent += processContextElement(requestP->entityVector[ix],
+                                         responseP,
+                                         requestP->updateActionType,
+                                         tenant,
+                                         servicePathV,
+                                         uriParams,
+                                         xauthToken,
+                                         fiwareCorrelator,
+                                         ngsiV2AttrsFormat,
+                                         forcedUpdate,
+                                         apiVersion,
+                                         ngsiv2Flavour);
     }
+
+    LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));
 
     /* Note that although individual processContextElements() invocations return ConnectionError, this
        error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
@@ -106,5 +158,13 @@ HttpStatusCode mongoUpdateContext
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+
+  if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
+  {
+    LM_T(LmtNotifier, ("start notification flow control algorithm"));
+    flowControlAlgorithm(q0, notifSent);
+    LM_T(LmtNotifier, ("end notification flow control algorithm"));
+  }
+
   return SccOk;
 }
