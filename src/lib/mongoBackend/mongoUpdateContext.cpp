@@ -48,9 +48,9 @@
 
 /* ****************************************************************************
 *
-* flowControlAlgorithm -
+* flowControlAwait -
 */
-static void flowControlAlgorithm(unsigned int q0, unsigned int notifSent)
+static void flowControlAwait(unsigned int q0, unsigned int notifSent)
 {
   unsigned int pass = 0;
   unsigned int accumulatedDelay = 0;
@@ -59,10 +59,16 @@ static void flowControlAlgorithm(unsigned int q0, unsigned int notifSent)
   unsigned int target = q0 + (1 - fcGauge) * notifSent;
   LM_T(LmtNotifier, ("flow control target is %d", target));
 
+#ifdef UNIT_TEST
+  // not used in test (and the QueueNotifier class cause build problems)
+  unsigned int qi = 0;
+#else
   // get current size of the queue
   unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize();
-  LM_T(LmtNotifier, ("flow control pass %d, delay %d, notificationq queue size is: %d",
+#endif
+  LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                      pass, accumulatedDelay, qi));
+
 
   while (qi > target)
   {
@@ -70,8 +76,10 @@ static void flowControlAlgorithm(unsigned int q0, unsigned int notifSent)
     usleep(fcStepDelay * 1000);
     accumulatedDelay += fcStepDelay;
 
-    unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize();
-    LM_T(LmtNotifier, ("flow control pass %d, delay %d, notificationq queue size is: %d",
+#ifndef UNIT_TEST
+    qi = ((QueueNotifier*) getNotifier())->queueSize();
+#endif
+    LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                        pass, accumulatedDelay, qi));
 
     if (accumulatedDelay > fcMaxInterval)
@@ -112,7 +120,9 @@ HttpStatusCode mongoUpdateContext
   unsigned int q0 = 0;
   if (strcmp(notificationMode, "threadpool") == 0)
   {
+#ifndef UNIT_TEST
     q0 = ((QueueNotifier*) getNotifier())->queueSize();
+#endif
     LM_T(LmtNotifier, ("notificationq queue size before processing update: %d", q0));
   }
   unsigned int notifSent = 0;
@@ -162,7 +172,7 @@ HttpStatusCode mongoUpdateContext
   if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
   {
     LM_T(LmtNotifier, ("start notification flow control algorithm"));
-    flowControlAlgorithm(q0, notifSent);
+    flowControlAwait(q0, notifSent);
     LM_T(LmtNotifier, ("end notification flow control algorithm"));
   }
 
