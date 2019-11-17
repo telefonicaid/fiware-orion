@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
 #include "orionld/common/dotForEq.h"                             // Own Interface
 
 
@@ -32,10 +35,14 @@
 //
 void dotForEq(char* nameP)
 {
+  char* start = nameP;
+
+  LM_TMP(("EQDOT: In: '%s'", nameP));
   while (*nameP != 0)
   {
     if (*nameP == '.')
       *nameP = '=';
     ++nameP;
   }
+  LM_TMP(("EQDOT: Out: '%s'", start));
 }

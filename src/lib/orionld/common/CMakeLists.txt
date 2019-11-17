@@ -46,6 +46,7 @@ SET (SOURCES
     orionldServerConnect.cpp
     dotForEq.cpp
     eqForDot.cpp
+    OrionldProblemDetails.cpp
     # qTreeToBson.cpp
 )
 

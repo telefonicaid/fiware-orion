@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToStringList.h"                 // Own interface
 
 
@@ -47,25 +47,15 @@ extern "C"
 //
 bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::string>* stringListP)
 {
-  KjNode* attributeP;
-
-  for (attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
+  for (KjNode* attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
   {
-    char  expanded[256];
-    char* details;
+    char*   expanded;
 
     STRING_CHECK(attributeP, "String-List item");
-
-    if (orionldUriExpand(orionldState.contextP, attributeP->value.s, expanded, sizeof(expanded), NULL, &details) == false)
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details);
-      delete stringListP;  // ?
-      return false;
-    }
-
+    expanded = orionldContextItemExpand(orionldState.contextP, attributeP->value.s, NULL, true, NULL);
+    LM_TMP(("SLIST: Called orionldContextItemExpand for '%s' -> '%s'", attributeP->value.s, expanded));
     stringListP->push_back(expanded);
   }
 
   return true;
 }
-

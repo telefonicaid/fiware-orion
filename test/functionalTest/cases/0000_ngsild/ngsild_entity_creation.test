@@ -296,7 +296,7 @@ Date: REGEX(.*)
 ======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E6
 Date: REGEX(.*)
 
@@ -305,13 +305,13 @@ Date: REGEX(.*)
 07. POST /ngsi-ld/v1/entities, with invalid URL for a context - see error
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "no detail",
-    "title": "Context Array Item is of an unsupported type",
+    "detail": "Int",
+    "title": "Invalid @context - invalid type for @context array item",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -319,12 +319,12 @@ Date: REGEX(.*)
 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 179
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/name",
+    "detail": "name",
     "title": "Attribute found, but the type field is missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -361,12 +361,12 @@ Date: REGEX(.*)
 11. POST /ngsi-ld/v1/entities, with a Property without a 'value'
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 210
+Content-Length: 165
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/name",
+    "detail": "name",
     "title": "Attribute with type Property found, but the associated value field is missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -389,12 +389,12 @@ Date: REGEX(.*)
 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 213
+Content-Length: 168
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/name",
+    "detail": "name",
     "title": "Attribute with type GeoProperty found, but the associated value field is missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

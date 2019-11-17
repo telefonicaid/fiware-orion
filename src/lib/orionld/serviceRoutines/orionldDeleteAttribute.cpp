@@ -34,8 +34,8 @@
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
-#include "orionld/common/OrionldConnection.h"                    // orionldState
-#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
 
 
@@ -46,29 +46,21 @@
 //
 bool orionldDeleteAttribute(ConnectionInfo* ciP)
 {
-  char*   type = (char*) ((ciP->uriParam["type"] != "")? ciP->uriParam["type"].c_str() : NULL);
-  char    longAttrName[256];
   char*   attrNameP;
-  char*   details;
-  Entity  entity;
 
   if ((strncmp(orionldState.wildcard[1], "http://", 7) == 0) || (strncmp(orionldState.wildcard[1], "https://", 8) == 0))
     attrNameP = orionldState.wildcard[1];
   else
-  {
-    // Get the long name of the Context Attribute name
-    if (orionldUriExpand(orionldState.contextP, orionldState.wildcard[1], longAttrName, sizeof(longAttrName), NULL, &details) == false)
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, details, type);
-      return false;
-    }
-    attrNameP = longAttrName;
-  }
+    attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.wildcard[1], NULL, true, NULL);
 
-  // Create and fill in attribute and entity
-  entity.id = orionldState.wildcard[0];
-
+  //
   // Does the attribute to be deleted even exist?
+  //
+
+  //
+  // FIXME: Extra call to mongo - can this be avoided?
+  //        By looking at the error code from the delete operation in mongo ...
+  //
   if (mongoAttributeExists(orionldState.wildcard[0], attrNameP, orionldState.tenant) == false)
   {
     ciP->httpStatusCode = SccContextElementNotFound;
@@ -76,8 +68,11 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     return false;
   }
 
-  ContextAttribute* caP = new ContextAttribute;
+  // Create and fill in attribute and entity
+  ContextAttribute*  caP = new ContextAttribute;
+  Entity             entity;
 
+  entity.id = orionldState.wildcard[0];
   caP->name = attrNameP;
   entity.attributeVector.push_back(caP);
 

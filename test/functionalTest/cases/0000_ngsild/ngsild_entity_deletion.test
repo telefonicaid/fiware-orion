@@ -99,6 +99,7 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
 Date: REGEX(.*)
 
@@ -129,12 +130,12 @@ bye
 03. GET the entity
 ==================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 141
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T"
 }
@@ -145,6 +146,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 

@@ -33,7 +33,6 @@
 #include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                           // SCOMPARE
-#include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
 #include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
 
@@ -225,8 +224,6 @@ int orionldMhdConnectionInit
   // This call to LM_TMP should not be removed. Only commented out
   //
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
-  orionldContextListPresent();
-
 
   //
   // 1. Prepare connectionInfo

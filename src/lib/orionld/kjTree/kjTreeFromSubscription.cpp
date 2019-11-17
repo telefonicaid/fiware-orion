@@ -24,23 +24,24 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
-#include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjParse.h"                                       // kjParse
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/Subscription.h"                           // Subscription
-#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
-#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
-#include "orionld/common/numberToDate.h"                       // numberToDate
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldInternalError
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/kjTree/kjTreeFromSubscription.h"             // Own interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "apiTypesV2/Subscription.h"                             // Subscription
+#include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeFromSubscription.h"               // Own interface
 
 
 
@@ -90,7 +91,7 @@ static bool qAliasCompress(char* qString)
         ++eqP;
       }
 
-      alias = orionldAliasLookup(orionldState.contextP, varStart, NULL);
+      alias = orionldContextItemAliasLookup(orionldState.contextP, varStart, NULL, NULL);
 
       if (alias != NULL)
       {
@@ -184,7 +185,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   bool             watchedAttributesPresent = false;
   unsigned int     size;
   unsigned int     ix;
-  OrionldContext*  contextP = orionldContextLookup(subscriptionP->ldContext.c_str());
+  OrionldContext*  contextP = orionldContextCacheLookup(subscriptionP->ldContext.c_str());
 
   // id
   nodeP = kjString(orionldState.kjsonP, "id", subscriptionP->id.c_str());
@@ -235,7 +236,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
         kjChildAdd(objectP, nodeP);
       }
 
-      char* alias = orionldAliasLookup(contextP, eP->type.c_str(), NULL);
+      char* alias = orionldContextItemAliasLookup(contextP, eP->type.c_str(), NULL, NULL);
 
       nodeP = kjString(orionldState.kjsonP, "type", alias);
       kjChildAdd(objectP, nodeP);
@@ -255,7 +256,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     for (ix = 0; ix < size; ix++)
     {
       char* attrName = (char*) subscriptionP->subject.condition.attributes[ix].c_str();
-      char* alias    = orionldAliasLookup(contextP, attrName, NULL);
+      char* alias    = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
@@ -363,7 +364,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     for (ix = 0; ix < size; ++ix)
     {
       char* attrName = (char*) subscriptionP->notification.attributes[ix].c_str();
-      char* alias    = orionldAliasLookup(contextP, attrName, NULL);
+      char* alias    = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
@@ -461,7 +462,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     if (subscriptionP->ldContext != "")
       nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());
     else
-      nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContext.url);
+      nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContextP->url);
 
     kjChildAdd(topP, nodeP);
   }

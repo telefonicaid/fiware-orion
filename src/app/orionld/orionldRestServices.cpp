@@ -42,6 +42,7 @@
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"
 #include "orionld/serviceRoutines/orionldGetContext.h"
+#include "orionld/serviceRoutines/orionldGetContexts.h"
 #include "orionld/serviceRoutines/orionldGetVersion.h"
 #include "orionld/serviceRoutines/orionldNotImplemented.h"
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"
@@ -63,7 +64,8 @@ static OrionLdRestServiceSimplified getServices[] =
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration    },
   { "/ngsi-ld/v1/csourceRegistrations",    orionldGetRegistrations   },
-  { "/ngsi-ld/contexts/*",                 orionldGetContext         },
+  { "/ngsi-ld/ex/v1/contexts/*",           orionldGetContext         },
+  { "/ngsi-ld/ex/v1/contexts",             orionldGetContexts        },
   { "/ngsi-ld/ex/v1/version",              orionldGetVersion         },
   { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented     }
@@ -123,7 +125,7 @@ static OrionLdRestServiceSimplified deleteServices[] =
 //
 OrionLdRestServiceSimplifiedVector restServiceVV[] =
 {
-  { getServices,    10 },
+  { getServices,    11 },
   { NULL,           0  },
   { postServices,   8  },
   { deleteServices, 4  },

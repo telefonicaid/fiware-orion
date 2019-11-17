@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,39 +27,58 @@
 */
 extern "C"
 {
-#include "kjson/kjson.h"
+#include "khash/khash.h"                           // KHashTable
+#include "kjson/KjNode.h"                          // KjNode
 }
 
 
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// OrionldContextType
+// OrionldContextHashTables -
 //
-typedef enum OrionldContextType
+typedef struct OrionldContextHashTables
 {
-  OrionldNoContext = 0,
-  OrionldCoreContext,
-  OrionldDefaultUrlContext,
-  OrionldDefaultContext,
-  OrionldUserContext
-} OrionldContextType;
+  KHashTable*  nameHashTable;
+  KHashTable*  valueHashTable;
+} OrionldContextHashTables;
+
+
+
+struct OrionldContext;
+typedef struct OrionldContextArray
+{
+  int                     items;
+  struct OrionldContext** vector;
+} OrionldContextArray;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldContextValue
+//
+typedef union OrionldContextInfo
+{
+  OrionldContextHashTables  hash;
+  OrionldContextArray       array;
+} OrionldContextInfo;
 
 
 
 // ----------------------------------------------------------------------------
 //
-// OrionldContext
+// OrionldContext -
+//
+// The context is either an array of contexts or "the real thing" - a list of key-values in
+// a hash-list
 //
 typedef struct OrionldContext
 {
-  char*                   url;
-  char*                   name;
-  KjNode*                 tree;
-  OrionldContextType      type;
-  bool                    ignore;     // Core/Default URL Context inside USER contexts
-  bool                    temporary;  // true by default, false when inserted in context list
-  struct OrionldContext*  next;
+  char*               url;
+  char*               id;         // For contexts that were created by the broker itself
+  KjNode*             tree;
+  bool                keyValues;
+  OrionldContextInfo  context;
 } OrionldContext;
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXT_H_

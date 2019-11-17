@@ -185,6 +185,7 @@ echo
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg01
 Date: REGEX(.*)
 
@@ -192,6 +193,7 @@ Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:pattern:reg02
 Date: REGEX(.*)
 
@@ -199,6 +201,7 @@ Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:pattern:reg03
 Date: REGEX(.*)
 
@@ -206,6 +209,7 @@ Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg04
 Date: REGEX(.*)
 
@@ -213,6 +217,7 @@ Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg05
 Date: REGEX(.*)
 

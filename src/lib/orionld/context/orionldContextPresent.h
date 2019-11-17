@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,15 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
-#include "orionld/context/OrionldContext.h"
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldContextPresent -
+// orionldContextPresentPresent -
 //
-extern void orionldContextPresent(OrionldContext* contextP);
+extern void orionldContextPresent(const char* prefix, OrionldContext* contextP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPRESENT_H_

@@ -30,9 +30,7 @@
 #include "rest/ConnectionInfo.h"
 
 #ifdef ORIONLD
-#include "orionld/context/orionldCoreContext.h"
-#include "orionld/context/orionldContextFree.h"
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                    // orionldState
 #endif
 
 

@@ -630,6 +630,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   {
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
+    LM_TMP(("CTX: Got context in HTTP Link Header: %s. orionldState.linkHttpHeaderPresent == %s", orionldState.link, FT(orionldState.linkHttpHeaderPresent)));
   }
 #endif
   else

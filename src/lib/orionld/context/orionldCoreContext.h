@@ -46,7 +46,7 @@ extern "C"
 //
 // orionldCoreContext
 //
-extern OrionldContext orionldCoreContext;
+extern OrionldContext* orionldCoreContextP;
 
 
 

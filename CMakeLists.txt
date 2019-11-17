@@ -233,6 +233,7 @@ SET (COMMON_STATIC_LIBS
 #    mongoc-static-1.0.a
 #    bson-static-1.0.a
     kjson.a
+    khash.a
     kalloc.a
     kbase.a
 )
@@ -287,6 +288,7 @@ link_directories("/usr/lib/x86_64-linux-gnu")
 link_directories("${PROJECT_SOURCE_DIR}/../kjson")
 link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
+link_directories("${PROJECT_SOURCE_DIR}/../khash")
 
 #
 # Enabling test harness

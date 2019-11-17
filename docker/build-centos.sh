@@ -112,12 +112,12 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 ldconfig
 
 echo "Builder: installing k tools"
-for kproj in kbase klog kalloc kjson
+for kproj in kbase klog kalloc kjson khash
 do
     git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/${kproj}.git ${ROOT}/$kproj
 done
 
-for kproj in kbase klog kalloc kjson
+for kproj in kbase klog kalloc kjson khash
 do
     cd ${ROOT}/$kproj
     git checkout release/0.2

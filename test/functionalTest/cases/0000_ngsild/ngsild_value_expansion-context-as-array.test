@@ -89,7 +89,7 @@ echo
 =========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store007
 Date: REGEX(.*)
 
@@ -110,7 +110,7 @@ MongoDB server version: REGEX(.*)
 		"https://uri.fiware.org/ns/data-models#category",
 		"https://schema.org/address",
 		"location",
-		"https://uri.etsi.org/ngsi-ld/default-context/name"
+		"https://uri.etsi.org/ngsi-ld/name"
 	],
 	"attrs" : {
 		"https://uri=fiware=org/ns/data-models#category" : {
@@ -155,7 +155,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [ ]
 		},
-		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

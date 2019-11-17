@@ -35,7 +35,6 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 
@@ -62,18 +61,15 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
   DbSubscriptionMatchCallback subMatchCallback
 )
 {
-  char    collectionPath[256];
+  char                   collectionPath[256];
+  mongo::BSONObjBuilder  filter;
 
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "csubs");
-  LM_TMP(("NFY: Subscription Collection Path: %s", collectionPath));
 
   //
   // 1. Entity ID, which in this case is FIXED
   //
-  mongo::BSONObjBuilder  filter;
-
   filter.append("entities.id", entityId);
-  LM_TMP(("NFY: Adding entity ID '%s' to the query filter", entityId));
 
 
   //
@@ -84,18 +80,10 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 
   for (KjNode* attrNodeP = incomingRequestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
-    char* attrNameWithDots = kaStrdup(&orionldState.kalloc, attrNodeP->name);
-
-    attrArray.append(attrNameWithDots);
-
-    //
-    // Now that the attribute name has been used in "attrNames", we can safely change the dots for EQ-signs
-    //
-    dotForEq(attrNodeP->name);
+    attrArray.append(attrNodeP->name);
   }
 
   inForAttrNames.append("$in", attrArray.arr());
-
   filter.append("conditions", inForAttrNames.obj());
 
 
@@ -103,6 +91,7 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
   // status - must be "active"
   //
   filter.append("status", "active");
+
 
   // "expiration" - later
   // "q" - later
@@ -132,15 +121,16 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 
     bsonObj = cursorP->nextSafe();
 
-    // LM_TMP(("NFY: query result: '%s'", bsonObj.toString().c_str()));
-
     subscriptionTree = mongoCppLegacyKjTreeFromBsonObj(&bsonObj, &title, &detail);
     if (subscriptionTree == NULL)
     {
-      LM_E(("Unable to create KjNode tree from mongo::BSONObj '%s'", bsonObj.toString().c_str()));
+      LM_E(("Internal Error (unable to create KjNode tree from mongo::BSONObj '%s')", bsonObj.toString().c_str()));
       continue;
     }
 
+    //
+    // Found a matching subscription - now the caller of this function can do whatever he/she needs to do with it
+    //
     subMatchCallback(entityId, subscriptionTree, currentEntityTree, incomingRequestTree);
 
     //
@@ -148,12 +138,6 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
     //
     ++niIx;
     if (niIx >= 100)
-    {
-      LM_W(("Too many notifications - breaking loop at 100"));
       break;
-    }
   }
 }
-
-
-

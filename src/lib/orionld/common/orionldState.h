@@ -38,6 +38,8 @@ extern "C"
 #include "common/MimeType.h"                                     // MimeType
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
+#include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
+#include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
@@ -132,15 +134,13 @@ typedef struct OrionldConnectionState
   char*                   tenant;
   bool                    linkHttpHeaderPresent;
   char*                   link;
-  char                    linkBuffer[1024];
   bool                    linkHeaderAdded;
-  bool                    useLinkHeader;
-  OrionldContext          inlineContext;
+  bool                    noLinkHeader;
   OrionldContext*         contextP;
   bool                    contextToBeFreed;
   ApiVersion              apiVersion;
   int                     requestNo;
-  KjNode*                 locationAttributeP;  // This assumes we have only ONE Geo-Location attribute ...
+  KjNode*                 locationAttributeP;           // This assumes we have only ONE Geo-Location attribute ...
   char*                   geoType;
   KjNode*                 geoCoordsP;
   int64_t                 overriddenCreationDate;
@@ -178,6 +178,8 @@ typedef struct OrionldConnectionState
   int                     notificationRecords;
   OrionldNotificationInfo notificationInfo[100];
   bool                    notify;
+  OrionldPrefixCache      prefixCache;
+  OrionldResponseBuffer   httpResponse;
 
 #ifdef DB_DRIVER_MONGOC
   //

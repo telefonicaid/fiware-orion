@@ -38,6 +38,6 @@ extern "C"
 //
 // kjTreeFromCompoundValue -
 //
-extern KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, bool valueMayBeContracted, char** detailsP);
+extern KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, bool valueMayBeCompacted, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMCOMPOUNDVALUE_H_

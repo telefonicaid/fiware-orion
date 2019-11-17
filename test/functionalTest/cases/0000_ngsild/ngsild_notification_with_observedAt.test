@@ -58,7 +58,7 @@ payload='{
       "object": "urn:ngsi-ld:Person:Bob"
      }
   },
-  "@context": ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+  "@context": [ "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld" ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
 echo
@@ -134,7 +134,7 @@ echo
 ===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4568
 Date: REGEX(.*)
 
@@ -171,6 +171,7 @@ Date: REGEX(.*)
 =============================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
 Date: REGEX(.*)
 
@@ -220,6 +221,7 @@ Content-Type: application/ld+json
 ================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:02
 Date: REGEX(.*)
 

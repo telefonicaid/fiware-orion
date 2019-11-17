@@ -24,86 +24,55 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                       // kalloc
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
-#include "orionld/context/orionldContextPrefixExpand.h"        // Own interface
-
-
-
-__thread char     cachedPrefixName[128];
-__thread char     cachedPrefixValueV[256];
-__thread char*    cachedPrefixValueP = NULL;
-__thread int      cachedPrefixValueLen;
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldContextPrefixExpand.h"          // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// prefixExpand -
+// prefixCacheLookup -
 //
-// FIXME: the kaAlloc instance to use (global or thread allocation) should be a parameter to this function
-//
-static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
+static const char* prefixCacheLookup(const char* str)
 {
-  char* colonP;
-  char* rest;
-
-  // Never expand URNs
-  if (SCOMPARE4(kNodeP->value.s, 'u', 'r', 'n', ':'))
-    return;
-
-  // Never expand anything xxx://
-  if ((colonP = strchr(kNodeP->value.s, ':')) == NULL)
-    return;
-  if ((colonP[1] == '/') && (colonP[2] == '/'))  // takes care of http:// and https:// and any other "xxx://"
-    return;
-
-  // colon found, need to replace
-  bool  keepShortName = false;
-  char* alias         = kNodeP->value.s;
-
-  *colonP = 0;           // By NULLing the ':', 'alias' now is the prefix
-  rest    = &colonP[1];  // rest points to what must be appended after the value of the prefix
-
-  LM_TMP(("VEX: Trying to expand '%s' in %s:%s of context '%s'", alias, alias, rest, contextP->url));
-  // If prefix not already looked up, look it up
-  if ((cachedPrefixValueP == NULL) || (strcmp(alias, cachedPrefixName) != 0))
+  for (int ix = 0; ix < orionldState.prefixCache.items; ix++)
   {
-    char* details;
-
-    if (orionldUriExpand(contextP, alias, cachedPrefixValueV, sizeof(cachedPrefixValueV), NULL, &details) == true)
-    {
-      strcpy(cachedPrefixName, alias);
-      cachedPrefixValueP    = cachedPrefixValueV;
-      cachedPrefixValueLen  = strlen(cachedPrefixValueV);
-    }
-    else
-      keepShortName = true;
+    if (strcmp(orionldState.prefixCache.cache[ix].prefix, str) == 0)
+      return orionldState.prefixCache.cache[ix].expanded;
   }
 
-  if (keepShortName == true)
-  {
-    // No match - re-establish the destroyed ':' and do no more - we keep the original name "xxx:yyy"
-    *colonP = ':';
-    // LM_TMP(("Keeping short name '%s'", kNodeP->value.s));
-  }
-  else
-  {
-    int sLen = strlen(rest) + cachedPrefixValueLen + 1;  // + 1 for 0-termination
+  return NULL;
+}
 
-    kNodeP->value.s = kaAlloc(&kalloc, sLen + 1);
-    snprintf(kNodeP->value.s, sLen, "%s%s", cachedPrefixValueP, rest);
-    // LM_TMP(("KZ: Expanded value to '%s' (cachedPrefixValueP: '%s', rest: '%s')", kNodeP->value.s, rest));
-  }
+
+
+// -----------------------------------------------------------------------------
+//
+// prefixCacheInsert -
+//
+// If the cache is full, then we reuse the oldest
+//
+static void prefixCacheInsert(const char* prefix, const char* expansion)
+{
+  int                     index = orionldState.prefixCache.index % ORIONLD_PREFIX_CACHE_SIZE;
+  OrionldPrefixCacheItem* itemP = &orionldState.prefixCache.cache[index];
+
+  itemP->prefix   = (char*) prefix;
+  itemP->expanded = (char*) expansion;
+
+  ++orionldState.prefixCache.index;
+
+  if (orionldState.prefixCache.items < ORIONLD_PREFIX_CACHE_SIZE)
+    ++orionldState.prefixCache.items;
 }
 
 
@@ -112,63 +81,73 @@ static void prefixExpand(OrionldContext* contextP, KjNode* kNodeP)
 //
 // orionldContextPrefixExpand -
 //
-// The value of 'contextP' points to the linked list of key-values of the @context.
-// This function goes through all key-values and looks up/replaces any prefixes.
+// This function looks for a ':' inside 'name' and if found, treats what's before the ':' as a prefix.
+// This prefix is looked up in the context and if found, the name is expanded, replacing the prefix (and the colon)
+// with the value of the context item found in the lookup.
 //
-// It is the responsibility of the caller to make sure that the context 'contextP' refers to
-// a context of this type:
+// NOTE
+//   * URIs contain ':' but we don't want to expand 'urn', not' http', etc.
+//     So, if 'name' starts with 'urn:', or if "://" is found in 'name, then no prefix expansion is performed.
 //
-//   { "@context": { "key": "value, "key": "value", "key": { "@id": "", "@type": "" }, ... } }
+//   * Normally, just a few prefixes are used, so a "prefix cache" of 10 values is maintained.
+//     This cache is local to the thread, so no semaphores are needed
 //
-//
-// INLINE contexts comes one layer lower: { "key": "value, "key": "value", "key": { "@id": "", "@type": "" }, ... }
-// So, inline contexts sets the second parameter to false and does not follew the rule of { "@context": ... }
-//
-// Now, what is to be expanded are the values of the context. E.g.:
-//
-// {
-//   "@context": {
-//     "fiware":   "https://uri.fiware.org/ns/datamodels#",
-//     "tutorial": "https://fiware.github.io/tutorials.Step-by-Step/schema/",
-//     "xsd":      "http://www.w3.org/2001/XMLSchema#",
-
-//     ...,
-//     "description": "fiware:description",
-//     "maxCapacity":  {
-//       "@id": "tutorial:maxCapacity",
-//       "@type": "xsd:integer",
-//     }
-//   }
-// }
-//
-// Expansions for this example:
-//   1. "fiware:description"   -> "https://uri.fiware.org/ns/datamodels#description"
-//   2. "tutorial:maxCapacity" -> "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity"
-//   3. "xsd:integer"          -> "http://www.w3.org/2001/XMLSchema#integer"
-//
-// FIXME: the kaAlloc instance to use (global or thread allocation) should be a parameter to this function
-//
-void orionldContextPrefixExpand(OrionldContext* contextP, bool inlineContext)
+char* orionldContextPrefixExpand(OrionldContext* contextP, const char* str, char* colonP)
 {
-  KjNode*  tree = contextP->tree;
+  char* prefix;
+  char* rest;
+  char* prefixExpansion;
 
-  LM_TMP(("VEX: In orionldContextPrefixExpand for context '%s'", contextP->url));
+  // Never expand URNs
+  if (SCOMPARE4(str, 'u', 'r', 'n', ':'))
+    return (char*) str;
 
-  cachedPrefixValueP = NULL;  // Clear "cache" before lookup starts
+  // Never expand anything xxx://
+  if ((colonP[1] == '/') && (colonP[2] == '/'))  // takes care of http:// and https:// and any other "xxx://"
+    return (char*) str;
 
-  KjNode* firstChildP = (inlineContext == false)? tree->value.firstChildP->value.firstChildP : tree->value.firstChildP;
+  //
+  // "Valid" colon found - need to replace a prefix
+  //
+  // At this point, 'colonP' points to the ':'
+  // The simple parse of 'str' is done, now extract the two parts: 'prefix' and 'rest'
+  //
+  *colonP = 0;
+  prefix  = (char*) str;
+  rest    = &colonP[1];
 
-  for (KjNode* kNodeP = firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  // Is the prefix in the cache?
+  prefixExpansion = (char*) prefixCacheLookup(str);
+
+  // If not, look it up in the context and add it to the cache
+  if (prefixExpansion == NULL)
   {
-    if (kNodeP->type == KjString)
-      prefixExpand(contextP, kNodeP);
-    else if (kNodeP->type == KjObject)
+    prefixExpansion = (char*) orionldContextItemExpand(contextP, prefix, NULL, false, NULL);
+    if (prefixExpansion != NULL)
+      prefixCacheInsert(prefix, prefixExpansion);
+    else
     {
-      for (KjNode* objectNodeP = kNodeP->value.firstChildP; objectNodeP != NULL; objectNodeP = objectNodeP->next)
-      {
-        if (objectNodeP->type == KjString)
-          prefixExpand(contextP, objectNodeP);
-      }
+      //
+      // Prefix not found anywhere
+      // Fix the broken 'str' (the colon has been nulled out) and return it
+      //
+      *colonP = ':';
+      return (char*) str;
     }
   }
+
+  // Compose the new string
+  int    expandedStringLen = strlen(prefixExpansion) + strlen(rest) + 1;
+  char*  expandedString    = (char*) kaAlloc(&orionldState.kalloc, expandedStringLen);
+
+  snprintf(expandedString, expandedStringLen, "%s%s", prefixExpansion, rest);
+
+
+  //
+  // Before returning - fix the broken 'str' (the colon has been nulled out)
+  //
+  *colonP = ':';
+
+  return expandedString;
 }
+

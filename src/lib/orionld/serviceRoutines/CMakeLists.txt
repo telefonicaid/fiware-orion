@@ -42,6 +42,7 @@ SET (SOURCES
     orionldPatchRegistration.cpp
     orionldBadVerb.cpp
     orionldGetContext.cpp
+    orionldGetContexts.cpp
     orionldGetVersion.cpp
     orionldNotImplemented.cpp
     orionldNotify.cpp

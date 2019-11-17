@@ -37,12 +37,13 @@ extern "C"
 #include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
 #include "mongoBackend/mongoAttributeExists.h"                   // mongoAttributeExists
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
+
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
-#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
-#include "orionld/context/orionldValueExpand.h"                  // orionldValueExpand
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
@@ -102,26 +103,18 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
   for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
   {
-    char    longAttrName[256];
-    char*   attrNameP;
-    char*   details;
+    char* attrNameP;
 
     if ((strncmp(attrNodeP->name, "http://", 7) == 0) || (strncmp(attrNodeP->name, "https://", 8) == 0))
       attrNameP = attrNodeP->name;
     else
     {
-      bool valueToBeExpanded;
+      bool valueToBeExpanded = false;
 
-      // Get the long name of the Context Attribute name
-      if (orionldUriExpand(orionldState.contextP, attrNodeP->name, longAttrName, sizeof(longAttrName), &valueToBeExpanded, &details) == false)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, details, attrNodeP->name);
-        return false;
-      }
-      attrNameP = kaStrdup(&orionldState.kalloc, longAttrName);
+      attrNameP = orionldContextItemExpand(orionldState.contextP, attrNodeP->name, &valueToBeExpanded, true, NULL);
 
       if (valueToBeExpanded == true)
-        orionldValueExpand(attrNodeP);
+        orionldContextValueExpand(attrNodeP);
     }
 
     if (kjStringValueLookupInArray(attrNamesArrayP, attrNameP) == NULL)

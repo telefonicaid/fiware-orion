@@ -208,14 +208,14 @@ Date: REGEX(.*)
 04. @context is an empty string
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 144
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "title": "Failure to create context from URL",
-  "detail": "Empty string"
+  "title": "Invalid @context",
+  "detail": "Empty @context"
 }
 
 
@@ -223,13 +223,13 @@ Date: REGEX(.*)
 05. URL in context is an invalid URL
 ====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 127
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Not a URI",
-    "title": "Failure to create context from URL",
+    "detail": "Not a URL",
+    "title": "Invalid @context",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -237,14 +237,14 @@ Date: REGEX(.*)
 06. URL in context is a valid URL but it doesn't exist
 ======================================================
 HTTP/1.1 503 Service Unavailable
-Content-Length: 147
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "http://valid.url/oh/yes",
     "title": "Unable to download context",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OrionldLdContextNotAvailable"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
 }
 
 

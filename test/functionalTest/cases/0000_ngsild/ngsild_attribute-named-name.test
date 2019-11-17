@@ -78,6 +78,7 @@ echo
 =================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:issue231
 Date: REGEX(.*)
 
@@ -95,12 +96,12 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/name",
+		"https://uri.etsi.org/ngsi-ld/name",
 		"https://uri.etsi.org/ngsi-ld/default-context/locatedIn",
 		"https://uri.etsi.org/ngsi-ld/default-context/stocks"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

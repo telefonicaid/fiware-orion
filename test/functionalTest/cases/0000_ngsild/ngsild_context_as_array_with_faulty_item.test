@@ -68,15 +68,15 @@ echo
 --REGEXPECT--
 01. Create Entity with a context that is an Array with at least one item that gives an error when downloaded
 ============================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 140
+HTTP/1.1 503 Service Unavailable
+Content-Length: 158
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "http://example.org/cim/commonTerms.jsonld",
-    "title": "Invalid context",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
 }
 
 

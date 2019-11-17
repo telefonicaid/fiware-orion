@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // Own interface
 
 
@@ -126,22 +126,12 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
       return false;
     }
 
-    char  typeExpanded[256];
-    char* details;
-
-    if (orionldUriExpand(orionldState.contextP, typeP, typeExpanded, sizeof(typeExpanded), NULL, &details) == false)
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details);
-      return false;
-    }
-    typeP = typeExpanded;
-
     ngsiv2::EntID entityInfo;
 
     if (idP)        entityInfo.id        = idP;
     if (idPatternP) entityInfo.idPattern = idPatternP;
-    if (typeP)      entityInfo.type      = typeP;
 
+    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, NULL, true, NULL);
     entitiesP->push_back(entityInfo);
   }
 

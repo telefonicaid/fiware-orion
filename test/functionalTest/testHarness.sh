@@ -24,6 +24,8 @@
 #
 date
 export BROKER=${BROKER:-orionld}
+export ORIONLD_SUPPRESS_LOG_FILE_OUTPUT=${ORIONLD_SUPPRESS_LOG_FILE_OUTPUT:-NO}
+
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 
@@ -234,7 +236,7 @@ function exitFunction()
           echo
 
           cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-          if [ -s /tmp/orionld.err-warn.log ]
+          if [ "$ORIONLD_SUPPRESS_LOG_FILE_OUTPUT" != "YES" ] && [ -s /tmp/orionld.err-warn.log ]
           then
               echo "Errors and warnings from the orionld log file"
               echo "-------------------------------------------------"

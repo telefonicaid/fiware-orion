@@ -21,28 +21,32 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldContextList.cpp
-    orionldContextAdd.cpp
-    orionldContextCreateFromTree.cpp
-    orionldContextCreateFromUrl.cpp
-    orionldContextListInsert.cpp
-    orionldContextLookup.cpp
-    orionldContextItemLookup.cpp
-    orionldContextFree.cpp
-    orionldContextFreeAll.cpp
-    orionldContextDownloadAndParse.cpp
     orionldCoreContext.cpp
+    orionldContextCreate.cpp
+    orionldContextInit.cpp
+    orionldContextCache.cpp
     orionldContextPresent.cpp
-    orionldContextValueLookup.cpp
-    orionldContextAppend.cpp
-    orionldContextListPresent.cpp
-    orionldUserContextKeyValuesCheck.cpp
-    orionldContextTreat.cpp
-    orionldUriExpand.cpp
-    orionldAliasLookup.cpp
-    orionldContextInlineCheck.cpp
+    orionldContextTreePresent.cpp
+    orionldContextHashTablesFill.cpp
+    orionldContextDownload.cpp
+    orionldContextItemAliasLookup.cpp
+    orionldContextItemValueLookup.cpp
     orionldContextPrefixExpand.cpp
-    orionldValueExpand.cpp
+    orionldContextItemLookup.cpp
+    orionldContextValueExpand.cpp
+    orionldContextItemExpand.cpp
+    orionldContextFromBuffer.cpp
+    orionldContextFromUrl.cpp
+    orionldContextSimplify.cpp
+    orionldContextFromTree.cpp
+    orionldContextFromObject.cpp
+    orionldContextCacheInsert.cpp
+    orionldContextUrlGenerate.cpp
+    orionldContextFromArray.cpp
+    orionldContextCacheInit.cpp
+    orionldContextCacheLookup.cpp
+    orionldContextCachePresent.cpp
+    orionldContextCacheGet.cpp
 )
 
 # Include directories

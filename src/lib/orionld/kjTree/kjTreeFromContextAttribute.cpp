@@ -36,12 +36,9 @@ extern "C"
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
-#include "orionld/context/orionldContextValueLookup.h"         // orionldContextValueLookup
-#include "orionld/context/orionldContextCreateFromTree.h"      // orionldContextCreateFromTree
-#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInsert
-#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // Own interface
 
@@ -66,8 +63,8 @@ extern "C"
 //
 KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, char** detailsP)
 {
-  bool     valueMayBeContracted;
-  char*    nameAlias = orionldAliasLookup(contextP, caP->name.c_str(), &valueMayBeContracted);
+  bool     valueMayBeCompacted;
+  char*    nameAlias = orionldContextItemAliasLookup(contextP, caP->name.c_str(), &valueMayBeCompacted, NULL);
   KjNode*  nodeP     = NULL;
 
   if (nameAlias == NULL)
@@ -82,12 +79,12 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     switch (caP->valueType)
     {
     case orion::ValueTypeString:
-      if (valueMayBeContracted == true)
+      if (valueMayBeCompacted == true)
       {
-        char* contractedValue = orionldAliasLookup(contextP, caP->stringValue.c_str(), NULL);
+        char* compactedValue = orionldContextItemAliasLookup(contextP, caP->stringValue.c_str(), NULL, NULL);
 
-        if (contractedValue != NULL)
-          nodeP = kjString(orionldState.kjsonP, nameAlias, contractedValue);
+        if (compactedValue != NULL)
+          nodeP = kjString(orionldState.kjsonP, nameAlias, compactedValue);
         else
           nodeP = kjString(orionldState.kjsonP, nameAlias, caP->stringValue.c_str());
       }
@@ -113,7 +110,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
-      nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, valueMayBeContracted, detailsP);
+      nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, valueMayBeCompacted, detailsP);
       if (nodeP == NULL)
         return NULL;
       break;
@@ -179,7 +176,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
-    nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, valueMayBeContracted, detailsP);
+    nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, valueMayBeCompacted, detailsP);
     nodeP->name = (char*) "value";
     if (nodeP == NULL)
       return NULL;
@@ -242,8 +239,8 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     }
     else
     {
-      bool    valueMayBeContracted;
-      char*   mdLongName     = orionldAliasLookup(contextP, mdName, &valueMayBeContracted);
+      bool    valueMayBeCompacted;
+      char*   mdLongName     = orionldContextItemAliasLookup(contextP, mdName, &valueMayBeCompacted, NULL);
       KjNode* typeNodeP      = kjString(orionldState.kjsonP, "type", mdP->type.c_str());
       KjNode* valueNodeP     = NULL;
 
@@ -261,12 +258,12 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
         switch (mdP->valueType)
         {
         case orion::ValueTypeString:
-          if (valueMayBeContracted == true)
+          if (valueMayBeCompacted == true)
           {
-            char* contractedValue = orionldAliasLookup(contextP, mdP->stringValue.c_str(), NULL);
+            char* compactedValue = orionldContextItemAliasLookup(contextP, mdP->stringValue.c_str(), NULL, NULL);
 
-            if (contractedValue != NULL)
-              valueNodeP = kjString(orionldState.kjsonP, "value", contractedValue);
+            if (compactedValue != NULL)
+              valueNodeP = kjString(orionldState.kjsonP, "value", compactedValue);
             else
               valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
           }
@@ -288,7 +285,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
-          valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeContracted, detailsP);
+          valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeCompacted, detailsP);
           break;
 
         case orion::ValueTypeNotGiven:

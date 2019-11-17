@@ -1,0 +1,130 @@
+/*
+*
+* Copyright 2019 FIWARE Foundation e.V.
+*
+* This file is part of Orion-LD Context Broker.
+*
+* Orion-LD Context Broker is free software: you can redistribute it and/or
+* modify it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+* General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+*
+* For those usages not covered by this license please contact with
+* orionld at fiware dot org
+*
+* Author: Ken Zangelin
+*/
+#include <string.h>                                              // strcmp
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/common/orionldState.h"                         // kalloc, orionldState
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldContextCreate.h"                // orionldContextCreate
+#include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
+#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
+#include "orionld/context/orionldContextCache.h"                 // ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE
+#include "orionld/context/orionldContextCachePresent.h"          // orionldContextCachePresent
+#include "orionld/context/orionldContextHashTablesFill.h"        // orionldContextHashTablesFill
+#include "orionld/context/orionldContextFromObject.h"            // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// hashCode -
+//
+int hashCode(const char* name)
+{
+  int code = 0;
+
+  while (*name != 0)
+  {
+    code += *name;
+    ++name;
+  }
+
+  return code;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// nameCompareFunction -
+//
+static int nameCompareFunction(const char* name, void* itemP)
+{
+  OrionldContextItem* cItemP = (OrionldContextItem*) itemP;
+
+  return strcmp(name, cItemP->name);
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// valueCompareFunction -
+//
+static int valueCompareFunction(const char* longname, void* itemP)
+{
+  OrionldContextItem* cItemP = (OrionldContextItem*) itemP;
+
+  return strcmp(longname, cItemP->id);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldContextFromObject -
+//
+// If the context object 'contextObjectP' is part of an array, then it's a local context and
+// it is not served.
+// Served contexts need to be cloned so that they can be copied back to the caller (GET /ngsi-ld/ex/contexts/xxx).
+// For example, the URL "http:/x.y.z/contexts/context1.jsonld" was downloaded and its content is a key-value object.
+//
+OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP)
+{
+  char*           id = NULL;
+  OrionldContext* contextP;
+
+  LM_TMP(("CTX: Creating hash tables for context '%s'", url));
+
+  if (url == NULL)
+    url  = orionldContextUrlGenerate(&id);
+
+  LM_TMP(("CTX: Calling orionldContextCreate. url: '%s' (at %p)", url, url));
+  contextP = orionldContextCreate(url, id, contextObjectP, true, toBeCloned);
+  orionldContextCacheInsert(contextP);
+
+  contextP->context.hash.nameHashTable  = khashTableCreate(&kalloc, hashCode, nameCompareFunction,  ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);
+  contextP->context.hash.valueHashTable = khashTableCreate(&kalloc, hashCode, valueCompareFunction, ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);
+
+  if (orionldContextHashTablesFill(contextP, contextObjectP, pdP) == false)
+  {
+    // orionldContextHashTablesFill fills in pdP
+    return NULL;
+  }
+
+  orionldContextCachePresent("CTX", "After orionldContextFromObject");
+
+  return contextP;
+}
+

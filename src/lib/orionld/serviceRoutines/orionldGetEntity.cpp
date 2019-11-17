@@ -35,11 +35,9 @@ extern "C"
 
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/context/orionldContextAdd.h"                 // Add a context to the context list
-#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // Own Interface
 
 

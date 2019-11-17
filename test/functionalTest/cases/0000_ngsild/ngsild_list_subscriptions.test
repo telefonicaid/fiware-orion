@@ -131,251 +131,301 @@ echo
 =============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0001
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0002
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0003
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0004
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0005
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0006
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0007
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0008
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0009
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0010
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0011
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0012
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0013
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0014
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0015
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0016
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0017
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0018
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0019
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0020
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0021
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0022
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0023
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0024
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0025
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0026
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0027
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0028
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0029
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0030
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0031
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0032
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0033
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0034
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0035
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0036
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0037
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0038
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0039
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0040
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0041
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0042
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0043
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0044
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0045
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0046
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0047
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0048
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0049
 Date: REGEX(.*)
 
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:sub0050
 Date: REGEX(.*)
 

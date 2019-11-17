@@ -32,11 +32,9 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
-#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
-#include "orionld/kjTree/kjTreeFromContextContextAttribute.h"    // kjTreeFromContextContextAttribute
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
 #include "orionld/serviceRoutines/orionldGetContext.h"           // Own Interface
 
 
@@ -47,59 +45,15 @@ extern "C"
 //
 bool orionldGetContext(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldGetContext - looking up context '%s'", orionldState.wildcard[0]));
+  OrionldContext* contextP    = orionldContextCacheLookup(orionldState.wildcard[0]);
 
-  OrionldContext* contextP    = orionldContextLookup(orionldState.wildcard[0]);
-  KjNode*         contextTree = NULL;
+  orionldState.noLinkHeader = true;  // We don't want the Link header for context requests
 
-  orionldState.useLinkHeader = false;  // We don't want the Link header for context requests
-
-  if (contextP != NULL)
+  if (contextP == NULL)
   {
-    contextTree = contextP->tree;
-  }
-  else
-  {
-    // OK, might be an entity context then ...
-
-    QueryContextRequest   request;
-    EntityId              entityId(orionldState.wildcard[0], "", "false", false);
-    QueryContextResponse  response;
-
-    request.entityIdVector.push_back(&entityId);
-
-    ciP->httpStatusCode = mongoQueryContext(&request,
-                                            &response,
-                                            orionldState.tenant,
-                                            ciP->servicePathV,
-                                            ciP->uriParam,
-                                            ciP->uriParamOptions,
-                                            NULL,
-                                            ciP->apiVersion);
-
-    if (response.errorCode.code == SccBadRequest)
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", NULL);
-      return false;
-    }
-    else if (response.contextElementResponseVector.size() > 0)
-    {
-      ContextAttribute* contextAttributeP = response.contextElementResponseVector[0]->contextElement.contextAttributeVector.lookup("@context");
-
-      if (contextAttributeP != NULL)
-      {
-        char* details;
-
-        contextTree = kjTreeFromContextContextAttribute(ciP, contextAttributeP, &details);
-      }
-    }
-
-    if (contextTree == NULL)
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0]);
-      ciP->httpStatusCode = SccContextElementNotFound;
-      return false;
-    }
+    orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0]);
+    ciP->httpStatusCode = SccContextElementNotFound;
+    return false;
   }
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, "@context");
@@ -107,12 +61,13 @@ bool orionldGetContext(ConnectionInfo* ciP)
 
   if (orionldState.responseTree == NULL)
   {
+    LM_E(("Internal Error (out of memory)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "kjObject failed", "out of memory?");
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
 
-  orionldState.responseTree->value.firstChildP = contextTree;
+  orionldState.responseTree->value.firstChildP = contextP->tree;
 
   return true;
 }

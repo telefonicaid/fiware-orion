@@ -159,6 +159,8 @@ void orionldNotify(void)
   int   payloadLen              = 10000;
   char* payload                 = (char*) malloc(payloadLen + 1);
 
+  LM_TMP(("NFY: Notifying ..."));
+
   if (payload == NULL)
     LM_X(1, ("Unable to allocate room for notification!"));
 
@@ -195,6 +197,14 @@ void orionldNotify(void)
     KjNode*                   notificationTree;
     char                      notificationId[64];
 
+    // <DEBUG>
+    extern void treePresent(const char* prefix, const char* title, KjNode* treeP);
+    LM_TMP(("MERGE: attrsForNotification for subscription %s", niP->subscriptionId));
+    LM_TMP(("MERGE: ============================================================"));
+    treePresent("MERGE", "attrsForNotification in orionldNotify", niP->attrsForNotification);
+    LM_TMP(("MERGE: ============================================================"));
+    // </DEBUG>
+
     notificationTree = kjObject(orionldState.kjsonP, NULL);
 
     strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId));
@@ -202,9 +212,11 @@ void orionldNotify(void)
 
     ipPortAndRest(niP->reference, &ip, &port, &rest);
     snprintf(requestHeader, sizeof(requestHeader), "POST %s HTTP/1.1\r\n", rest);
+    LM_TMP(("NFY: requestHeader: '%s'", requestHeader));
 
     if (niP->mimeType == JSONLD)
     {
+      LM_TMP(("NFY: Mime Type is JSONLD"));
       //
       // For better tput, I could maintain not one ioVec but TWO.
       // One for "application/json" and another one for "application/ld+json"
@@ -216,15 +228,19 @@ void orionldNotify(void)
       ioVec[2].iov_base = contentTypeHeaderJsonLd;
       ioVec[2].iov_len  = 35;
 
+      LM_TMP(("NFY: Mime Type is JSONLD"));
+
       // Add @context to payload
-      if (orionldState.contextP == NULL)
+      if ((orionldState.contextP == NULL) || (orionldState.contextP == orionldCoreContextP))
       {
-        // Core Context
-        KjNode* contextNodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
-        kjChildAdd(notificationTree, contextNodeP);
+        orionldState.contextP = orionldCoreContextP;
+        KjNode* contextStringNodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+        kjChildAdd(notificationTree, contextStringNodeP);
       }
-      else
+      else if (orionldState.contextP->tree != NULL)
         kjChildAdd(notificationTree, orionldState.contextP->tree);
+      else
+        LM_E(("Internal Error (context has no tree ...)"));
     }
     else
     {
@@ -246,6 +262,7 @@ void orionldNotify(void)
       ioVec[3].iov_len  = strlen(orionldState.contextP->url);
     }
 
+    LM_TMP(("NFY: Fixing payload"));
     //
     // Fix payload
     //
@@ -270,14 +287,9 @@ void orionldNotify(void)
     kjChildAdd(notificationTree, subscriptionIdNodeP);
     kjChildAdd(notificationTree, notifiedAtNodeP);
     kjChildAdd(notificationTree, dataNodeP);
-
     kjChildAdd(dataNodeP, niP->attrsForNotification);
 
-    // LM_TMP(("NFY: Notification %d - calling kjRender to render payload body", ix));
     kjRender(orionldState.kjsonP, notificationTree, payload, payloadLen);
-    // payload = (char*) "No Payload!";
-    // LM_TMP(("NFY: Notification %d - after rendering payload body", ix));
-    // LM_TMP(("NFY: payload: %s", payload));
 
     int sizeLeftForLen = 16;  // sizeof(contentLenHeader) - 16
     contentLength = strlen(payload);
@@ -290,6 +302,7 @@ void orionldNotify(void)
     //
     // Data ready to send
     //
+    LM_TMP(("NFY: Connecting to notification-recipient at %s:d", ip, port));
     niP->fd = orionldServerConnect(ip, port);
 
     if (niP->fd == -1)

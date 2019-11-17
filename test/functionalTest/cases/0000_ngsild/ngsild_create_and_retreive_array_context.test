@@ -42,19 +42,19 @@ payload='{
   "id": "http://a.b.c/E1",
   "type": "A",
   "@context": [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
-contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $6}' | awk -F\> '{ print $1 }')
+contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $8}' | awk -F\> '{ print $1 }')
 echo
 echo
 
 
 echo "02. GET the context"
 echo "==================="
-orionCurl --url /ngsi-ld/contexts/$contextId
+orionCurl --url /ngsi-ld/ex/v1/contexts/$contextId
 echo
 echo
 
@@ -64,7 +64,7 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/contexts/.*)
+Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/E1
 Date: REGEX(.*)
 
@@ -73,13 +73,13 @@ Date: REGEX(.*)
 02. GET the context
 ===================
 HTTP/1.1 200 OK
-Content-Length: 150
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "@context": [
-        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
         "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
     ]
 }

@@ -31,8 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
-#include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // Own interface
 
@@ -50,9 +48,9 @@ static const char* errorTypeStringV[] =
   "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported",
   "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
   "https://uri.etsi.org/ngsi-ld/errors/InternalError",
-  "https://uri.etsi.org/ngsi-ld/errors/OrionldTooComplexQuery",
-  "https://uri.etsi.org/ngsi-ld/errors/OrionldTooManyResults",
-  "https://uri.etsi.org/ngsi-ld/errors/OrionldLdContextNotAvailable"
+  "https://uri.etsi.org/ngsi-ld/errors/TooComplexQuery",
+  "https://uri.etsi.org/ngsi-ld/errors/TooManyResults",
+  "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
 };
 
 

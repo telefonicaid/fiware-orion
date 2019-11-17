@@ -34,8 +34,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
 #include "mongoBackend/safeMongo.h"                            // moreSafe
 #include "mongoBackend/connectionOperations.h"                 // collectionRangedQuery
@@ -138,8 +137,6 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
     return false;
   }
 
-  char typeExpanded[256];
-
   for (int ix = 0; ix < types; ix++)
   {
     char* type = (char*) typeVec[ix].c_str();
@@ -151,12 +148,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
     }
     else
     {
-      if (orionldUriExpand(orionldState.contextP, type, typeExpanded, sizeof(typeExpanded), NULL, &details) == false)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity type", details);
-        return false;
-      }
-
+      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, NULL, true, NULL);
       bsonArray.append(typeExpanded);
     }
   }
@@ -193,8 +185,6 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
     return false;
   }
 
-  char attrExpanded[256];
-
   for (int ix = 0; ix < attrs; ix++)
   {
     char* attr = (char*) attrsVec[ix].c_str();
@@ -206,12 +196,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
     }
     else
     {
-      if (orionldUriExpand(orionldState.contextP, attr, attrExpanded, sizeof(attrExpanded), NULL, &details) == false)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error during URI expansion of entity attribute", details);
-        return false;
-      }
-
+      char* attrExpanded = orionldContextItemExpand(orionldState.contextP, attr, NULL, true, NULL);
       bsonArray.append(attrExpanded);
     }
   }

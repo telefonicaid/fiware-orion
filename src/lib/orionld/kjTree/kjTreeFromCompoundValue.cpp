@@ -31,7 +31,7 @@ extern "C"
 
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
 #include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
+#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // Own interface
 
 
@@ -40,18 +40,18 @@ extern "C"
 //
 // kjTreeFromCompoundValue2
 //
-static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNode* compoundP, bool valueMayBeContracted, char** detailsP)
+static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNode* compoundP, bool valueMayBeCompacted, char** detailsP)
 {
   KjNode*       nodeP = NULL;
   char*         name  = (char*) compoundP->name.c_str();
   unsigned int  size;
-  char*         contractedValue;
+  char*         compactedValue;
 
   switch (compoundP->valueType)
   {
   case orion::ValueTypeString:
-    if ((valueMayBeContracted == true) && ((contractedValue = orionldAliasLookup(orionldState.contextP, compoundP->stringValue.c_str(), NULL)) != NULL))
-      nodeP = kjString(orionldState.kjsonP, name, contractedValue);
+    if ((valueMayBeCompacted == true) && ((compactedValue = orionldContextItemAliasLookup(orionldState.contextP, compoundP->stringValue.c_str(), NULL, NULL)) != NULL))
+      nodeP = kjString(orionldState.kjsonP, name, compactedValue);
     else
       nodeP = kjString(orionldState.kjsonP, name, compoundP->stringValue.c_str());
     kjChildAdd(parentP, nodeP);
@@ -82,7 +82,7 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
     size = compoundP->childV.size();
     for (unsigned int ix = 0; ix < size; ++ix)
     {
-      KjNode* itemP = kjTreeFromCompoundValue2(nodeP, compoundP->childV[ix], valueMayBeContracted, detailsP);
+      KjNode* itemP = kjTreeFromCompoundValue2(nodeP, compoundP->childV[ix], valueMayBeCompacted, detailsP);
 
       if (itemP == NULL)
         return NULL;
@@ -109,7 +109,7 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
 //
 // kjTreeFromCompoundValue -
 //
-KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, bool valueMayBeContracted, char** detailsP)
+KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, bool valueMayBeCompacted, char** detailsP)
 {
   KjNode* topNodeP = containerP;
 
@@ -135,7 +135,7 @@ KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* con
   unsigned int size = compoundP->childV.size();
   for (unsigned int ix = 0; ix < size; ++ix)
   {
-    KjNode* nodeP = kjTreeFromCompoundValue2(topNodeP, compoundP->childV[ix], valueMayBeContracted, detailsP);
+    KjNode* nodeP = kjTreeFromCompoundValue2(topNodeP, compoundP->childV[ix], valueMayBeCompacted, detailsP);
     if (nodeP == NULL)
     {
       kjFree(topNodeP);

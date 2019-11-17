@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,36 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                               // KjNode
-}
-
-#include "orionld/context/OrionldContext.h"
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldContextItemLookup -
+// orionldContextItemLookup - lookup an item in a context
 //
-extern KjNode* orionldContextItemLookup(OrionldContext* contextP, const char* itemName);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextItemLookup -
-//
-extern KjNode* orionldContextItemLookup(char* contextUrl, const char* itemName);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldContextItemLookup -
-//
-extern KjNode* orionldContextItemLookup(KjNode* contextVector, const char* itemName);
-
+extern OrionldContextItem* orionldContextItemLookup(OrionldContext* contextP, const char* name, bool* valueMayBeCompactedP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTITEMLOOKUP_H_

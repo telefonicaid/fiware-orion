@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,21 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
-
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/context/orionldCoreContext.h"                // Own interface
+#include "orionld/context/OrionldContext.h"                  // OrionldContext
+#include "orionld/context/orionldCoreContext.h"              // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldCoreContext -
+// orionldCoreContextP -
 //
-OrionldContext orionldCoreContext;
+OrionldContext* orionldCoreContextP = (OrionldContext*) 0;
 
 
 
@@ -44,5 +39,12 @@ OrionldContext orionldCoreContext;
 //
 // orionldDefaultUrl -
 //
-char* orionldDefaultUrl    = (char*) "DEFAULT URL";
-int   orionldDefaultUrlLen = -1;
+char* orionldDefaultUrl;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDefaultUrlLen -
+//
+int orionldDefaultUrlLen;

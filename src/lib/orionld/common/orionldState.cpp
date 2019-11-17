@@ -35,7 +35,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
-#include "orionld/context/orionldContextFree.h"                // orionldContextFree
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
 #include "orionld/common/QNode.h"                              // QNode
 #include "orionld/common/orionldState.h"                       // Own interface
 
@@ -109,7 +109,7 @@ void orionldStateInit(void)
   orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.linkHttpHeaderPresent       = false;
   orionldState.link                        = NULL;
-  orionldState.useLinkHeader               = true;  // Service routines can set this value to 'false' to avoid having the Link HTTP Header in its output
+  orionldState.noLinkHeader                = false;  // Service routines can set this value to 'true' to avoid having the Link HTTP Header in its output
   orionldState.entityCreated               = false;
   orionldState.entityId                    = NULL;
   orionldState.linkHeaderAdded             = false;
@@ -124,7 +124,7 @@ void orionldStateInit(void)
   orionldState.prettyPrintSpaces           = 2;
   orionldState.prettyPrint                 = false;
   orionldState.locationAttributeP          = NULL;
-  orionldState.contextP                    = NULL;
+  orionldState.contextP                    = orionldCoreContextP;
   orionldState.payloadContextNode          = NULL;
   orionldState.payloadIdNode               = NULL;
   orionldState.payloadTypeNode             = NULL;
@@ -148,6 +148,9 @@ void orionldStateInit(void)
 
   orionldState.notify                = false;
   orionldState.notificationRecords   = 0;
+
+  orionldState.prefixCache.index     = 0;
+  orionldState.prefixCache.items     = 0;
 }
 
 
@@ -169,12 +172,6 @@ void orionldStateRelease(void)
     free(orionldState.errorAttributeArrayP);
     orionldState.errorAttributeArrayP = NULL;
   }
-
-#if 0
-  // This part crashes the broker in a few functests ...
-  if ((orionldState.contextP != NULL) && (orionldState.contextToBeFreed == true))
-    orionldContextFree(orionldState.contextP);
-#endif
 
   //
   // This was added to fix a leak in contextToPayload(), orionldMhdConnectionTreat.cpp, calling kjClone(). a number of times

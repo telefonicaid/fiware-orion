@@ -52,7 +52,7 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 //
 // qDateTimePush -
 //
-static QNode* qDateTimePush(QNode* prev, long long dateTime)
+static QNode* qDateTimePush(QNode* prev, int64_t dateTime)
 {
   QNode* qNodeP = qNode(QNodeIntegerValue);
 
@@ -167,7 +167,7 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
 
     if (type == QNodeIntegerValue)
     {
-      long long dTime;
+      int64_t dTime;
 
       if (dateTime == true)
       {
@@ -400,8 +400,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
       *sP = 0;
       ++sP;
-      long long           dateTime;
-      unsigned long long  sLen = (unsigned long long) (sP - start - 2);
+      int64_t   dateTime;
+      uint64_t  sLen = (uint64_t) (sP - start - 2);
 
       if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
         current = qDateTimePush(current, dateTime);

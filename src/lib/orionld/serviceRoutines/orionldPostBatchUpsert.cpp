@@ -54,14 +54,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                                   // orionldState
 #include "orionld/common/orionldAttributeTreat.h"                          // orionldAttributeTreat
 #include "orionld/context/orionldCoreContext.h"                            // orionldDefaultUrl, orionldCoreContext
-#include "orionld/context/orionldContextAdd.h"                             // Add a context to the context list
-#include "orionld/context/orionldContextLookup.h"                          // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"                      // orionldContextItemLookup
-#include "orionld/context/orionldContextList.h"                            // orionldContextHead, orionldContextTail
-#include "orionld/context/orionldContextListInsert.h"                      // orionldContextListInsert
-#include "orionld/context/orionldContextPresent.h"                         // orionldContextPresent
-#include "orionld/context/orionldUserContextKeyValuesCheck.h"              // orionldUserContextKeyValuesCheck
-#include "orionld/context/orionldUriExpand.h"                              // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"                      // orionldContextItemExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"                     // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"                // Own Interface
 
@@ -389,26 +382,11 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     char*            entityType  = entityTypeNodeP->value.s;
     ContextElement*  ceP         = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
     EntityId*        entityIdP   = &ceP->entityId;
-    char             typeExpanded[256];
 
     mongoRequest.updateActionType = ActionTypeAppendStrict;
     entityIdP->id                 = entityId;
-
-    if (orionldUriExpand(orionldState.contextP, entityType, typeExpanded, sizeof(typeExpanded), NULL, &detail) == false)
-    {
-      LM_E(("orionldUriExpand failed: %s", detail));
-      entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "unable to expand entity::type", detail, 400);
-      delete ceP;
-      continue;
-    }
-
-    entityIdP->type      = typeExpanded;
-    entityIdP->isPattern = "false";
-
-#if 0
-    entityIdP->creDate   = getCurrentTime();  // FIXME: Only if newly created. I think mongoBackend takes care of this - so, outdeffed
-    entityIdP->modDate   = getCurrentTime();
-#endif
+    entityIdP->type               = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
+    entityIdP->isPattern          = "false";
 
     if (kjTreeToContextElementAttributes(ciP, entityNodeP, createdAtP, modifiedAtP, ceP, &detail) == false)
     {

@@ -151,6 +151,7 @@ echo
 ============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 Date: REGEX(.*)
 
@@ -160,6 +161,7 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
 Date: REGEX(.*)
 
@@ -201,6 +203,7 @@ Date: REGEX(.*)
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
 Date: REGEX(.*)
 
@@ -210,6 +213,7 @@ Date: REGEX(.*)
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S2
 Date: REGEX(.*)
 
@@ -248,7 +252,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [ ],
 	"metadata" : [ ],
 	"blacklist" : false,
-	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",
@@ -295,7 +299,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [ ],
 	"metadata" : [ ],
 	"blacklist" : false,
-	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",

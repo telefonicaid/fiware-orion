@@ -69,7 +69,7 @@ echo
 
 echo "02. GET the entity, make sure all props/rels are present"
 echo "========================================================"
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix # -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
 echo
 echo
 
@@ -101,7 +101,6 @@ echo
 
 echo "04. GET the entity, make sure all metadata of 'locatedIn' are present"
 echo "====================================================================="
-# -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
 echo
 echo
@@ -168,7 +167,7 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001
 Date: REGEX(.*)
 
@@ -179,7 +178,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 603
 Content-Type: application/json
-Link: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -215,7 +214,7 @@ Date: REGEX(.*)
 ===================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 
@@ -225,7 +224,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1108
 Content-Type: application/json
-Link: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -273,7 +272,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 
@@ -283,7 +282,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1108
 Content-Type: application/json
-Link: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -331,7 +330,7 @@ Date: REGEX(.*)
 ===============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 
@@ -341,7 +340,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1207
 Content-Type: application/json
-Link: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -394,7 +393,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 822
 Content-Type: application/json
-Link: REGEX(.*)
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

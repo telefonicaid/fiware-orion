@@ -186,6 +186,7 @@ echo
 =================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:test:entity:E1
 Date: REGEX(.*)
 
@@ -195,6 +196,7 @@ Date: REGEX(.*)
 ==============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
 Date: REGEX(.*)
 
@@ -288,6 +290,7 @@ bye
 ==========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub02
 Date: REGEX(.*)
 
@@ -381,13 +384,13 @@ bye
 ============================================================================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 
 
 09. Dump accumulator - see two notifications
 ============================================
-#SORT_START
 POST http://REGEX(.*)/notify
 Content-Length: 407
 User-Agent: orionld
@@ -443,7 +446,6 @@ Content-Type: application/ld+json
     "type": "Notification"
 }
 =======================================
-#SORT_END
 
 
 --TEARDOWN--

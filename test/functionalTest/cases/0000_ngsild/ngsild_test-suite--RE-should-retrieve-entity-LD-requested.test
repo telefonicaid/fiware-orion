@@ -84,6 +84,7 @@ echo
 =====================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:00:00:00
 Date: REGEX(.*)
 
@@ -92,12 +93,12 @@ Date: REGEX(.*)
 02. GET entity, accepting application/ld+json, and with same context as the entity creation
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 639
+Content-Length: 635
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "id": "urn:ngsi-ld:T:00:00:00",
   "type": "T",
   "P1": {

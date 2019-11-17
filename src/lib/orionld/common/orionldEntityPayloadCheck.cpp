@@ -45,6 +45,7 @@ extern "C"
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
@@ -52,14 +53,6 @@ extern "C"
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
-#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
-#include "orionld/context/orionldContextAdd.h"                   // Add a context to the context list
-#include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"            // orionldContextItemLookup
-#include "orionld/context/orionldContextList.h"                  // orionldContextHead, orionldContextTail
-#include "orionld/context/orionldContextListInsert.h"            // orionldContextListInsert
-#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
-#include "orionld/context/orionldUserContextKeyValuesCheck.h"    // orionldUserContextKeyValuesCheck
 #include "orionld/common/orionldEntityPayloadCheck.h"            // Own interface
 
 
@@ -240,7 +233,11 @@ bool orionldEntityPayloadCheck
     }
     else  // Property/Relationshiop - must check chars in the name of the attribute
     {
-      LM_TMP(("Name: %s | Value: %s", kNodeP->name, kNodeP->value.s));
+      if (kNodeP->type == KjString)
+        LM_TMP(("Name: %s | Value: %s", kNodeP->name, kNodeP->value.s));
+      else
+        LM_TMP(("Name: %s | Type: %s", kNodeP->name, kjValueType(kNodeP->type)));
+
       if (strcmp(kNodeP->name, "@context") != 0)
       {
         if (orionldValidName(kNodeP->name, &detailsP) == false)

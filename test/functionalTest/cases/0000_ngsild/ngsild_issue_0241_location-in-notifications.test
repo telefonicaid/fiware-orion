@@ -106,7 +106,7 @@ echo
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
+Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4501
 Date: REGEX(.*)
 
@@ -116,6 +116,7 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
 Date: REGEX(.*)
 
@@ -177,7 +178,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "GeoProperty",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : {	
+			"value" : {
 				"type" : "Point",
 				"coordinates" : [
 					-8.5,

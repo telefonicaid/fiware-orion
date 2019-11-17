@@ -1,0 +1,363 @@
+# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Alternative Context implementation - inline context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# The idea of this test is to make sure the expansions are done from the correct context.
+# An entity is created with a simple inline key-values context, containing:
+#   - 'name'  (that also is part of the Core Context
+#   - 'name2' (that only exists in the inline context
+#
+# The entity has three attributes:
+#   - 'name'  - that should be expanded according to the Core Context as it overrides the inline context.
+#   - 'name2' - that should be expanded according to the inline context as it figures there but not in the Core Context.
+#   - 'name3' - that should be expanded according to the Default URL as name3 doesn't exist in any of the contexts of the request.
+#
+# After creation, we look at the mongo content and make sure all three long names for name, name2, and name3 are correct
+# The third part is to GET the entity, without any context (i.e. the Core Context) and we should see name (expanded by Core context)
+# and 'name3' (expanded by Default URL) as short names, while 'name2' should come back as longname as 'name2' would need the inline context of the creation
+# in order to be compacted.
+#
+# The fourth and last part is to issue another GET but this time using the inline context of the creation (Step 01).
+# This time we should see all three attributes in compact form.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# After this, the exact same test is performed, but with a slightly more complex inline context.
+# This inline context is an array of a string (a URL, pointing to a context), and the same inline context as when creating entity E1:
+#
+# "@context": [
+#   "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+#   {
+#     "A": "http://from.inline.context2/types/A",
+#     "name": "http://from.inline.context2/attributes/name",
+#     "name2": "http://from.inline.context2/attributes/name2"
+#   }
+# ]
+#
+# Steps 5-8 should behave exactly as steps 1-4
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# 
+# Now we create an entity E3, that has the same context as Step 2, but we add an attribute (one that is matched in https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld).
+#
+# This is the context https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld:
+#
+#   "@context": [
+#     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+#     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+#   ]
+#
+# The Core Context will be removed from the vector and we pick the name "" from NGSI-LD_TestSuite/ldContext/testContext.jsonld.
+#
+# Thus, E3 will have the following attributes:
+# 
+#   - 'name'  - that should be expanded according to the Core Context as it overrides the inline context.
+#   - 'name2' - that should be expanded according to the inline context as it figures there but not in the Core Context.
+#   - 'name3' - that should be expanded according to the Default URL as name3 doesn't exist in any of the contexts of the request.
+#   - 'P1'    - that should be expanded according to the context "NGSI-LD_TestSuite/ldContext/testContext.jsonld": http://example.org/P1
+#
+# After creation, we see the mongo content and this time we do three GET requests:
+# - without context                                   - see name and name3 compacted 
+# - with the context of Step 01                       - See name, name2, and name3 compacted. Not P1
+# - with the creation context of Step 9 (creating E3) - see all four attribute names compacted
+#
+# ======================================================================================================================================
+#
+# 01. Create entity E1 with a simple key-value inline context
+# 02. See E1 in mongo - name expanded by Core Context, name2 by inline context, name3 by Default URL
+# 03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1
+# 04. Get E1 with the context of the entity creation in Step 01 - see all three attributes in compact form
+#
+# 05. Create entity E2 with a context that is an array of a string and an inline context (same as in Step 01)
+# 06. See E2 in mongo
+# 07. Get E2 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1
+# 08. Get E2 with the context of the entity creation in Step 05 - see all three attributes in compact form
+#
+
+echo "01. Create entity E1 with a simple key-value inline context"
+echo "==========================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "name2": {
+    "type": "Property",
+    "value": "name2 is part of the inline context"
+  },
+  "name3": {
+    "type": "Property",
+    "value": "name3 is not in any context - default URL from @vocab"
+  },  
+  "@context": {
+    "A": "http://from.inline.context/types/A",
+    "name": "http://from.inline.context/attributes/name",
+    "name2": "http://from.inline.context/attributes/name2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $8}' | awk -F\> '{ print $1 }')
+echo
+echo
+
+
+
+echo "02. See E1 in mongo"
+echo "==================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "http://a.b.c/entity/E1"})'
+echo
+echo
+
+
+echo "03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1"
+echo "======================================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=2'
+echo
+echo
+
+
+echo "04. Get E1 with the context of the entity creation in Step 01 - see all three attributes in compact form"
+echo "========================================================================================================"
+HOST=$(hostname)
+orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=2' -H 'Link: <http://'$HOST:$CB_PORT'/ngsi-ld/ex/v1/contexts/'$contextId'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix
+echo
+echo
+
+
+echo "05. Create entity E2 with a context that is an array of a string and an inline context (same as in Step 01)"
+echo "==========================================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "name is part of the Core context"
+  },
+  "name2": {
+    "type": "Property",
+    "value": "name2 is part of the inline context"
+  },
+  "name3": {
+    "type": "Property",
+    "value": "name3 is not in any context - default URL from @vocab"
+  },  
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+    {
+      "A": "http://from.inline.context2/types/A",
+      "name": "http://from.inline.context2/attributes/name",
+      "name2": "http://from.inline.context2/attributes/name2"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"  --linkHeaderFix
+echo
+echo
+
+
+echo "06. See E2 in mongo"
+echo "==================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "http://a.b.c/entity/E2"})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with a simple key-value inline context
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E1",
+		"type" : "http://from.inline.context/types/A",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/name",
+		"http://from.inline.context/attributes/name2",
+		"https://uri.etsi.org/ngsi-ld/default-context/name3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "John 2",
+			"mdNames" : [ ]
+		},
+		"http://from=inline=context/attributes/name2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "name2 is part of the inline context",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/name3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "name3 is not in any context - default URL from @vocab",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1
+======================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 390
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "http://from.inline.context/attributes/name2": {
+        "type": "Property",
+        "value": "name2 is part of the inline context"
+    },
+    "id": "http://a.b.c/entity/E1",
+    "name": {
+        "type": "Property",
+        "value": "John 2"
+    },
+    "name3": {
+        "type": "Property",
+        "value": "name3 is not in any context - default URL from @vocab"
+    },
+    "type": "http://from.inline.context/types/A"
+}
+
+
+04. Get E1 with the context of the entity creation in Step 01 - see all three attributes in compact form
+========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 319
+Content-Type: application/json
+Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
+Date: REGEX(.*)
+
+{
+    "id": "http://a.b.c/entity/E1",
+    "name": {
+        "type": "Property",
+        "value": "John 2"
+    },
+    "name2": {
+        "type": "Property",
+        "value": "name2 is part of the inline context"
+    },
+    "name3": {
+        "type": "Property",
+        "value": "name3 is not in any context - default URL from @vocab"
+    },
+    "type": "A"
+}
+
+
+05. Create entity E2 with a context that is an array of a string and an inline context (same as in Step 01)
+===========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+Date: REGEX(.*)
+
+
+
+06. See E2 in mongo
+===================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "http://a.b.c/entity/E2",
+		"type" : "http://from.inline.context2/types/A",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/name",
+		"http://from.inline.context2/attributes/name2",
+		"https://uri.etsi.org/ngsi-ld/default-context/name3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "name is part of the Core context",
+			"mdNames" : [ ]
+		},
+		"http://from=inline=context2/attributes/name2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "name2 is part of the inline context",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/name3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "name3 is not in any context - default URL from @vocab",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -122,7 +122,7 @@ payload='{
   },
   "P6": [ 7, 8 ]
 }'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -205,7 +205,7 @@ payload='{
   },
   "endpoint": "http://my.csource.org:1026"
 }'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -243,7 +243,7 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341
 Date: REGEX(.*)
 
@@ -539,7 +539,7 @@ Date: REGEX(.*)
 ================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
+Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
 Date: REGEX(.*)
 
@@ -680,6 +680,7 @@ bye
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R2
 Date: REGEX(.*)
 

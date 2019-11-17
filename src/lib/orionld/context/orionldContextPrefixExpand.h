@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                  // OrionldContext
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 
@@ -33,6 +33,17 @@
 //
 // orionldContextPrefixExpand -
 //
-extern void orionldContextPrefixExpand(OrionldContext* contextP, bool inlineContext);
+// This function looks for a ':' inside 'name' and if found, treats what's before the ':' as a prefix.
+// This prefix is looked up in the context and if found, the name is expanded, replacing the prefix (and the colon)
+// with the value of the context item found in the lookup.
+//
+// NOTE
+//   * URIs contain ':' but we don't want to expand 'urn', not' http', etc.
+//     So, if 'name' starts with 'urn:', or if "://" is found in 'name, then no prefix expansion is performed.
+//
+//   * Normally, just a few prefixes are used, so a "prefix cache" of 10 values is maintained.
+//     This cache is local to the thread, so no semaphores are needed
+//
+extern char* orionldContextPrefixExpand(OrionldContext* contextP, const char* str, char* colonP);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTPREFIXEXPAND_H_

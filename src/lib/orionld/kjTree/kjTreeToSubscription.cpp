@@ -192,6 +192,12 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
         LM_E(("kjTreeToStringList failed"));
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToStringList
       }
+
+      // <DEBUG>
+      int ix = 0;
+      for (KjNode* stringP = watchedAttributesP->value.firstChildP; stringP != NULL; stringP = stringP->next)
+        LM_TMP(("SLIST: string item %d: '%s'", ix++, stringP->value.s));
+      // </DEBUG>
     }
     else if (SCOMPARE13(kNodeP->name, 't', 'i', 'm', 'e', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {

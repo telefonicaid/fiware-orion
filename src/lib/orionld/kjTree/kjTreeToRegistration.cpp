@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
@@ -109,13 +109,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
         {
           STRING_CHECK(propP, "PropertyInfo::name");
 
-          char  longName[256];
-          char* details;
-
-          if (orionldUriExpand(orionldState.contextP, propP->value.s, longName, sizeof(longName), NULL, &details) == false)
-            return false;
-
-          propP->value.s = longName;
+          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, NULL, true, NULL);
           regP->dataProvided.propertyV.push_back(propP->value.s);
         }
       }
@@ -127,13 +121,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
         {
           STRING_CHECK(relP, "RelationInfo::name");
 
-          char  longName[256];
-          char* details;
-
-          if (orionldUriExpand(orionldState.contextP, relP->value.s, longName, sizeof(longName), NULL, &details) == false)
-            return false;
-
-          relP->value.s = longName;
+          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, NULL, true, NULL);
           regP->dataProvided.relationshipV.push_back(relP->value.s);
         }
       }
@@ -340,13 +328,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
       //
       // Expand the name of the property
       //
-      char* longName = (char*) kaAlloc(&orionldState.kalloc, 256);
-      char* details;
-
-      if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, 256, NULL, &details) == false)
-        return false;
-
-      kNodeP->name = longName;
+      kNodeP->name = orionldContextItemExpand(orionldState.contextP, kNodeP->name, NULL, true, NULL);
     }
 
     kNodeP = next;
