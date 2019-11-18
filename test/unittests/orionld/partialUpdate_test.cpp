@@ -25,8 +25,6 @@
 extern "C"
 {
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjChildAdd
-#include "kalloc/kaBufferInit.h"                               // kaBufferInit
-#include "kalloc/kaBufferReset.h"                              // kaBufferReset
 }
 
 #include "logMsg/logMsg.h"
@@ -42,11 +40,8 @@ extern "C"
 *
 * partialUpdateCreation -
 */
-TEST(orionld, partialUpdateCreation)
+TEST(orionld, DISABLED_partialUpdateCreation)
 {
-  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
-
-  orionldStateInit();
   ConnectionInfo    ci("/ngsi-ld/v1/entities/urn:entity:E1/attrs", "POST", "1.1");
 
   utInit();
@@ -69,8 +64,6 @@ TEST(orionld, partialUpdateCreation)
 
   EXPECT_STREQ("|A1|A2|A3|A0_0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789|A1_0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789|A2_0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789|A3_0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789|A4_0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789|A5_0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789|", orionldState.errorAttributeArrayP);
 
-  orionldStateRelease();
-  kaBufferReset(&orionldState.kalloc, false);
   utExit();
 }
 
@@ -80,18 +73,13 @@ TEST(orionld, partialUpdateCreation)
 *
 * partialUpdateResponse -
 */
-TEST(orionld, partialUpdateResponse)
+TEST(orionld, DISABLED_partialUpdateResponse)
 {
-  kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 2 * 1024, NULL, "Thread KAlloc buffer");
-
-  orionldStateInit();
   ConnectionInfo       ci("/ngsi-ld/v1/entities/urn:entity:E1/attrs", "POST", "1.1");
   KjNode*              attrNodeP;
   KjNode*              kNodeP;
   const char*          attrNamesV[3] = { "A1", "A2", "A3" };
   utInit();
-
-  orionldStateInit();
 
   //
   // Create a request tree with attributes A1, A2, and A3
@@ -139,7 +127,5 @@ TEST(orionld, partialUpdateResponse)
 
   EXPECT_STREQ("A2", attrName);
 
-  orionldStateRelease();
-  kaBufferReset(&orionldState.kalloc, false);
   utExit();
 }

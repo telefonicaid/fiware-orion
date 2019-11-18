@@ -52,12 +52,7 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
       rBufP->buf  = (char*) malloc(rBufP->size + bytesToCopy + xtraBytes);
 
       if (rBufP->buf == NULL)
-        LM_X(1, ("Out of memory"));
-
-      //
-      // Save pointer to allocated buffer for later call to free()
-      //
-      orionldState.httpReqBuffer = rBufP->buf;
+        LM_X(1, ("Runtime Error (out of memory)"));
 
       rBufP->size = rBufP->size + bytesToCopy + xtraBytes;
 
@@ -70,14 +65,15 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
     {
       rBufP->buf = (char*) realloc(rBufP->buf, rBufP->size + bytesToCopy + xtraBytes);
       rBufP->size = rBufP->size + bytesToCopy + xtraBytes;
-      orionldState.httpReqBuffer = rBufP->buf;
     }
 
     if (rBufP->buf == NULL)
-    {
-      LM_E(("Runtime Error (out of memory)"));
-      return 0;
-    }
+      LM_X(1, ("Runtime Error (out of memory)"));
+
+    //
+    // Save pointer to allocated buffer for later call to free()
+    //
+    orionldState.delayedFreePointer = rBufP->buf;
   }
 
   memcpy(&rBufP->buf[rBufP->used], contents, bytesToCopy);
@@ -112,6 +108,12 @@ bool orionldRequestSend
   uint16_t             port    = 0;
   char*                urlPath = NULL;
 
+  if (orionldState.delayedFreePointer != NULL)
+  {
+    orionldStateDelayedFreeEnqueue(orionldState.delayedFreePointer);
+    orionldState.delayedFreePointer = NULL;
+  }
+
   *tryAgainP = false;
 
   LM_TMP(("CURL: url:      %s", url));
@@ -119,16 +121,9 @@ bool orionldRequestSend
   if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailPP) == false)
   {
     // urlParse sets *detailPP
-
-    // This function must release the allocated respose buffer in case of errpr
-    if ((rBufP->buf != NULL) && (rBufP->buf != rBufP->internalBuffer))
-    {
-      free(rBufP->buf);
-      orionldState.httpReqBuffer = NULL;
-    }
-    rBufP->buf = NULL;
-
     LM_E(("urlParse failed for url '%s'. detail: %s", url, *detailPP));
+
+    rBufP->buf       = NULL;
     *downloadFailedP = false;
     return false;
   }
@@ -148,10 +143,7 @@ bool orionldRequestSend
     if (rBufP == NULL)
       LM_X(1, ("Out of memory"));
 
-    //
-    // Save pointer to allocated buffer for later call to free()
-    //
-    orionldState.httpReqBuffer = rBufP->buf;
+    orionldState.delayedFreePointer = rBufP->buf;  // Saved the pointer to be freed once the request thread ends
   }
 
   LM_T(LmtRequestSend, ("protocol: %s", protocol));
@@ -161,17 +153,10 @@ bool orionldRequestSend
   get_curl_context(ip, &cc);
   if (cc.curl == NULL)
   {
-    *detailPP = (char*) "Unable to obtain CURL context";
-
-    // This function must release the allocated respose buffer in case of error
-    if (rBufP->buf != rBufP->internalBuffer)
-    {
-      free(rBufP->buf);
-      orionldState.httpReqBuffer = NULL;
-    }
-    rBufP->buf = NULL;
-
     LM_E(("Internal Error (Unable to obtain CURL context)"));
+
+    *detailPP        = (char*) "Unable to obtain CURL context";
+    rBufP->buf       = NULL;
     *downloadFailedP = true;
     return false;
   }
@@ -204,15 +189,7 @@ bool orionldRequestSend
   if (cCode != CURLE_OK)
   {
     LM_E(("Internal Error (curl_easy_perform returned error code %d)", cCode));
-    *detailPP = (char*) url;
-
-    // This function must release the allocated respose buffer in case of error
-    if (rBufP->buf != rBufP->internalBuffer)
-    {
-      free(rBufP->buf);
-      orionldState.httpReqBuffer = NULL;
-    }
-
+    *detailPP  = (char*) url;
     rBufP->buf = NULL;
 
     if (headers != NULL)

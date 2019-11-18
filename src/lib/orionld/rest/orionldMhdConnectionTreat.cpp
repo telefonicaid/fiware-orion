@@ -609,7 +609,7 @@ static void contextToPayload(void)
       {
         contextNode = kjClone(orionldState.payloadContextNode);
 
-        orionldStateDelayedKjFree(contextNode);
+        orionldStateDelayedKjFreeEnqueue(contextNode);
       }
 
       if (contextNode == NULL)

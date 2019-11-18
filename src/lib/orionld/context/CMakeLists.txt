@@ -47,6 +47,7 @@ SET (SOURCES
     orionldContextCacheLookup.cpp
     orionldContextCachePresent.cpp
     orionldContextCacheGet.cpp
+    orionldContextCacheRelease.cpp
 )
 
 # Include directories

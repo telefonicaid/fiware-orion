@@ -147,7 +147,6 @@ typedef struct OrionldConnectionState
   int64_t                 overriddenModificationDate;
   bool                    entityCreated;                // If an entity is created, if complex context, it must be stored
   char*                   entityId;
-  char*                   httpReqBuffer;
   OrionldUriParamOptions  uriParamOptions;
   OrionldUriParams        uriParams;
   char*                   errorAttributeArrayP;
@@ -172,9 +171,27 @@ typedef struct OrionldConnectionState
   char                    qDebugBuffer[24 * 1024];
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;    // Used by kjTreeFromBsonObj
+
+  //
+  // Array of KjNode trees that are to freed when the request thread ends
+  //
   KjNode*                 delayedKjFreeVec[50];
   int                     delayedKjFreeVecIndex;
   int                     delayedKjFreeVecSize;
+
+  //
+  // Array of allocated buffers that are to freed when the request thread ends
+  //
+  //
+  void*                   delayedFreeVec[50];
+  int                     delayedFreeVecIndex;
+  int                     delayedFreeVecSize;
+
+  //
+  // Special "delayed free" field for orionldRequestSend that does reallocs and it's simpler this way
+  //
+  void*                   delayedFreePointer;
+
   int                     notificationRecords;
   OrionldNotificationInfo notificationInfo[100];
   bool                    notify;
@@ -261,8 +278,24 @@ extern void orionldStateErrorAttributeAdd(const char* attributeName);
 
 // -----------------------------------------------------------------------------
 //
-// orionldStateDelayedKjFree -
+// orionldStateDelayedKjFreeEnqueue -
 //
-extern void orionldStateDelayedKjFree(KjNode* tree);
+extern void orionldStateDelayedKjFreeEnqueue(KjNode* tree);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldStateDelayedFreeEnqueue -
+//
+extern void orionldStateDelayedFreeEnqueue(void* allocatedBuffer);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldStateDelayedFreeCancel -
+//
+extern void orionldStateDelayedFreeCancel(void* allocatedBuffer);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDSTATE_H_

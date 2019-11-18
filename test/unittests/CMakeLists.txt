@@ -239,6 +239,8 @@ link_directories("/usr/lib/x86_64-linux-gnu")
 link_directories("${PROJECT_SOURCE_DIR}/../kjson")
 link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
+link_directories("${PROJECT_SOURCE_DIR}/../khash")
+link_directories("${PROJECT_SOURCE_DIR}/../klog")
 
 
 

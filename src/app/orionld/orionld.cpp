@@ -108,7 +108,8 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/common/orionldState.h"                    // orionldState, kalloc, ...
+#include "orionld/common/orionldState.h"                    // orionldStateRelease, kalloc, ...
+#include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 
@@ -521,6 +522,13 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
+  orionldStateRelease();
+
+  //
+  // Contexts that have been cloned must be freed
+  //
+  orionldContextCacheRelease();
+
   exit(code);
 }
 
@@ -565,15 +573,6 @@ void exitFunc(void)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
-
-#if 0
-  if (orionldState.contextP != NULL)
-  {
-    free(orionldState.contextP->url);  // Always allocated using 'malloc' ???
-    free(orionldState.contextP);       // Always cloned using kjClone ???
-    orionldState.contextP = NULL;
-  }
-#endif
 }
 
 

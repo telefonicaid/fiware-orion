@@ -275,6 +275,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);
 
+  orionldStateInit();
 
   //
   // Initialize the @context handling

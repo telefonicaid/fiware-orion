@@ -113,7 +113,6 @@ void orionldStateInit(void)
   orionldState.entityCreated               = false;
   orionldState.entityId                    = NULL;
   orionldState.linkHeaderAdded             = false;
-  orionldState.httpReqBuffer               = NULL;
   orionldState.errorAttributeArrayP        = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize     = sizeof(orionldState.errorAttributeArray);
   orionldState.errorAttributeArrayUsed     = 0;
@@ -146,6 +145,12 @@ void orionldStateInit(void)
   orionldState.delayedKjFreeVecIndex = 0;
   orionldState.delayedKjFreeVecSize  = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
 
+  bzero(orionldState.delayedFreeVec, sizeof(orionldState.delayedFreeVec));
+  orionldState.delayedFreeVecIndex   = 0;
+  orionldState.delayedFreeVecSize    = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
+
+  orionldState.delayedFreePointer    = NULL;
+
   orionldState.notify                = false;
   orionldState.notificationRecords   = 0;
 
@@ -161,12 +166,6 @@ void orionldStateInit(void)
 //
 void orionldStateRelease(void)
 {
-  if (orionldState.httpReqBuffer != NULL)
-  {
-    free(orionldState.httpReqBuffer);
-    orionldState.httpReqBuffer = NULL;
-  }
-
   if (orionldState.errorAttributeArrayP != orionldState.errorAttributeArray)
   {
     free(orionldState.errorAttributeArrayP);
@@ -179,7 +178,32 @@ void orionldStateRelease(void)
   // Each item in the entity array needs a cloned context
   //
   for  (int ix = 0; ix < orionldState.delayedKjFreeVecIndex; ix++)
-    kjFree(orionldState.delayedKjFreeVec[ix]);
+  {
+    if (orionldState.delayedKjFreeVec[ix] != NULL)
+    {
+      kjFree(orionldState.delayedKjFreeVec[ix]);
+      orionldState.delayedKjFreeVec[ix] = NULL;
+    }
+  }
+
+
+  //
+  // Not only KjNode trees may need delayed calls to free - normal allocated buffers may need it as well
+  //
+  for  (int ix = 0; ix < orionldState.delayedFreeVecIndex; ix++)
+  {
+    if (orionldState.delayedFreeVec[ix] != NULL)
+    {
+      free(orionldState.delayedFreeVec[ix]);
+      orionldState.delayedFreeVec[ix] = NULL;
+    }
+  }
+
+  if (orionldState.delayedFreePointer != NULL)
+  {
+    free(orionldState.delayedFreePointer);
+    orionldState.delayedFreePointer = NULL;
+  }
 
   if (orionldState.qMongoFilterP != NULL)
     delete orionldState.qMongoFilterP;
@@ -243,13 +267,49 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
 
 // -----------------------------------------------------------------------------
 //
-// orionldStateDelayedKjFree -
+// orionldStateDelayedKjFreeEnqueue -
 //
-void orionldStateDelayedKjFree(KjNode* tree)
+void orionldStateDelayedKjFreeEnqueue(KjNode* tree)
 {
   if (orionldState.delayedKjFreeVecIndex >= orionldState.delayedKjFreeVecSize - 1)
-    LM_X(1, ("Internal Error (the size of orionldState.delayedKjFreeVec needs to be aumented)"));
+    LM_X(1, ("Internal Error (the size of orionldState.delayedKjFreeVec needs to be augmented)"));
 
   orionldState.delayedKjFreeVec[orionldState.delayedKjFreeVecIndex] = tree;
   ++orionldState.delayedKjFreeVecIndex;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldStateDelayedFreeEnqueue -
+//
+void orionldStateDelayedFreeEnqueue(void* allocatedBuffer)
+{
+  if (orionldState.delayedFreeVecIndex >= orionldState.delayedFreeVecSize - 1)
+    LM_X(1, ("DFREE: Internal Error (the size of orionldState.delayedFreeVec needs to be augmented (delayedFreeVecIndex=%d, delayedFreeVecSize=%d))",
+             orionldState.delayedFreeVecIndex, orionldState.delayedFreeVecSize));
+
+  orionldState.delayedFreeVec[orionldState.delayedFreeVecIndex] = allocatedBuffer;
+  ++orionldState.delayedFreeVecIndex;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldStateDelayedFreeCancel -
+//
+void orionldStateDelayedFreeCancel(void* allocatedBuffer)
+{
+  for (int ix = 0; ix < orionldState.delayedFreeVecIndex; ix++)
+  {
+    if (orionldState.delayedFreeVec[orionldState.delayedFreeVecIndex] == allocatedBuffer)
+    {
+      orionldState.delayedFreeVec[orionldState.delayedFreeVecIndex] = NULL;
+      return;
+    }
+  }
+
+  LM_E(("DFREE: Internal Error (buffer programmed for delayed free not found (%p))", allocatedBuffer));
 }

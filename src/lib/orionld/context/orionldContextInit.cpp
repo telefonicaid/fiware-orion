@@ -249,10 +249,10 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
   LM_TMP(("CTX: Initializing ALT Context list"));
   orionldContextCacheInit();
 
-  char* cacheContextDir = getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY");
   bool  gotCoreContext  = false;
 
 #if DEBUG
+  char* cacheContextDir = getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY");
   if (cacheContextDir != NULL)
   {
     LM_TMP(("CTX: Getting initial contexts from '%s'", cacheContextDir));
