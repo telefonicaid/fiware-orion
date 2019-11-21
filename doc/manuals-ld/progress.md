@@ -98,17 +98,8 @@
   Attribute values (only string values or string values inside arrays) are expanded if the @context says that they should be.
   The mechanism for attribute values expansion is that the @type of the @context object has the value "@vocab".
   Prefix-expansion is handled as well.
-
-  What is missing is:
-
-    1. The newest decision in ETSI, about continuing the search of hits of an expansion/contraction until the end, and use the
-       very LAST hit - this is how JSON-LD works and NGSi-LD will work like this as well.
-    2. Store all key-values of the contexts as hash-tables to make lookups more efficient.
-
-  The implementation of @context handling has become a bit of a patchwork (it's very complex) and the idea is to implement the two missing features
-  in a complete rewrite of the @context handling functionality.
-
-  This rewrite will be started after the Berlin summit in October 2019.
+  As of November 18 2019, the @context handling has been completely rewritten and now follows the new way of working as demanded by
+  the ETSI spec of NGSI-LD.
 
 ## Notifications
   As most services reuse old orion code (mongoBackend), notifications, come for free.
@@ -168,7 +159,7 @@
 ### Still Missing
   * Use the new Query Filter for subscriptions.
 
-## Merging in Telefonica's Orion repo
+## Merging Orion-LD functionality into Telefonica's Orion repository
   The idea is to implement plug-ins for Orion and add the LD part as a plug-in.
   The advantages with this idea are many and important:
   - The FIWARE Foundation keeps the IP of orionld
@@ -179,11 +170,16 @@
 ### Time Estimation
   What needs to be done:
 
-* Merge the newest orion repo into the orionld repo (2 months)
-* Implement plug-ins for Orion (2 months)
-* Convert the current orionld implementation into a plug-in library (2 months)
+  * Merge the newest orion repo into the orionld repo (2 months)
+  * Implement plug-ins for Orion (2 months)
+  * Convert the current orionld implementation into a plug-in library (2 months)
   
-  
+## datasetId
+  Nothing has been done regarding *datasetId*.
+
+### Still Missing
+  * All of it
+
 ## Services
 ### POST /ngsi-ld/v1/entities
   The entity creation service is 100% implemented.
