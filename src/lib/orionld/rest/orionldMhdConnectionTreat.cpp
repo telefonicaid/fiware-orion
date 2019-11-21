@@ -156,11 +156,12 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
   float weight_application_json     = 0;
   float weight_application_jsonld   = 0;
 
-  LM_T(LmtAccept, ("ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
-  LM_T(LmtAccept, ("ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
+  LM_TMP(("LINKH: ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
+  LM_TMP(("LINKH: ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
 
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
+    LM_TMP(("LINKH: no Accepot header - setting orionldState.acceptJson to TRUE and orionldState.acceptJsonld to FALSE"));
     orionldState.acceptJson   = true;   // Default Accepted MIME-type is application/json
     orionldState.acceptJsonld = false;
     ciP->outMimeType          = JSON;
@@ -729,7 +730,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (acceptHeaderExtractAndCheck(ciP) == false)
     goto respond;
 
-
   //
   // 07. Check the @context in HTTP Header, if present
   //
@@ -825,12 +825,22 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false))
   {
-    LM_TMP(("LINK: orionldState.link == '%s' (contextP at %p, Core Context at %p)", orionldState.link, orionldState.contextP, orionldCoreContextP));
-    LM_TMP(("LINK: orionldState.contextP->url: '%s'", orionldState.contextP->url));
+    LM_TMP(("LINKH: orionldState.acceptJson:   %s", FT(orionldState.acceptJson)));
+    LM_TMP(("LINKH: orionldState.acceptJsonld: %s", FT(orionldState.acceptJsonld)));
+    LM_TMP(("LINKH: orionldState.link == '%s' (contextP at %p, Core Context at %p)", orionldState.link, orionldState.contextP, orionldCoreContextP));
+    LM_TMP(("LINKH: orionldState.contextP->url: '%s'", orionldState.contextP->url));
     if (orionldState.acceptJsonld == false)
+    {
+      LM_TMP(("LINKH: Adding httpHeaderLin as orionldState.acceptJsonld == false"));
       httpHeaderLinkAdd(ciP, orionldState.link);
+    }
     else if (orionldState.responseTree == NULL)
+    {
+      LM_TMP(("LINKH: Adding httpHeaderLin as orionldState.responseTree == NULL"));
       httpHeaderLinkAdd(ciP, orionldState.link);
+    }
+    else
+      LM_TMP(("LINKH: NOT Adding httpHeaderLink"));
   }
 
 
@@ -849,8 +859,15 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (addContext)
     {
       if ((orionldState.acceptJsonld == true) && (ciP->httpStatusCode < 300))
+      {
+        LM_TMP(("LINKH: Calling contextToPayload"));
         contextToPayload();
+      }
+      else
+        LM_TMP(("LINKH: NOT Calling contextToPayload"));
     }
+    else
+      LM_TMP(("LINKH: NOT Calling contextToPayload"));
 
 
     //
@@ -873,9 +890,15 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
 
   if (orionldState.responsePayload != NULL)
+  {
+    LM_TMP(("LINKH: Calling restReply with payload"));
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
+  }
   else
+  {
+    LM_TMP(("LINKH: Calling restReply without payload"));
     restReply(ciP, "");
+  }
 
 
   //

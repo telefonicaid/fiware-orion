@@ -83,6 +83,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   ++replyIx;
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answerLen, ciP->httpStatusCode));
   LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
+  LM_TMP(("CLEN: answerLen: %d", answerLen));
 
   response = MHD_create_response_from_buffer(answerLen, (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
@@ -113,8 +114,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
+  LM_TMP(("LINKH: %d HTTP headers", ciP->httpHeader.size()));
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
   {
+    LM_TMP(("LINKH: Adding HTTP Header '%s' == %s", ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str()));
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 

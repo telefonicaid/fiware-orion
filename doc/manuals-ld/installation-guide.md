@@ -18,7 +18,6 @@ While Orion-LD works just fine also in CentOS, Debian, etc, or, other versions o
 ## Installation
 
 ### Docker Images
-
 Docker images for Ubuntu and CentOS are produced for each Pull Request merged into the `develop` branch.
 To create and run the Orion-LD Docker image, it is necessary to have [Docker](https://www.docker.com/).
 and [Docker Compose](https://docs.docker.com/compose) installed. A sample `docker-compose.yml` can be found below:
@@ -68,7 +67,7 @@ A public image is also available on [Docker Hub](https://hub.docker.com/r/fiware
 First thing to do is to install the operating system.
 In order to write this guide, Ubuntu 18.04.3 LTS (Desktop image) was downloaded from [here](http://releases.ubuntu.com/18.04/), and installed as a virtual machine under VMWare.
 
-#### Install dependencies packages
+#### Installation of dependency packages
 
 To be installed via package manager:
 * boost (plenty of libraries)
@@ -94,8 +93,9 @@ Libraries that aren't built from source code:
 
 ```bash
 sudo aptitude install libssl1.0-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
-    libgcrypt-dev uuid-dev libboost-dev libboost-regex-dev libboost-thread-dev \
-    libboost-filesystem-dev
+                      libgcrypt-dev uuid-dev libboost-dev libboost-regex-dev libboost-thread-dev \
+                      libboost-filesystem-dev
+
 ```
 
 #### Download and build dependency libraries from source code
@@ -132,7 +132,7 @@ To download, build and install:
 
 ```bash
 sudo mkdir /opt/mongoclient
-sudo chown $USER:$GROUP /opt/mongoclient  (*)
+sudo chown $USER:$GROUP /opt/mongoclient  # (1)
 cd /opt/mongoclient
 wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
 tar xfvz legacy-1.1.2.tar.gz
@@ -140,18 +140,16 @@ cd mongo-cxx-driver-legacy-1.1.2
 scons --disable-warnings-as-errors --ssl --use-sasl-client
 sudo scons install --prefix=/usr/local --disable-warnings-as-errors --ssl --use-sasl-client
 ```
+(1) To make you the owner of a file, you need to state your username and group.
+    The env var **USER** already exists, but if you want to cut 'n paste this "sudo chown" command, you'll need to create the env var **GROUP**, to reflect your group. In my case, I do this:
+```bash
+export GROUP=kz
+```
 
-> To make you the owner of a file, you need to state your username and group.
->      The env var USER already exists, but if you want to cut 'n paste this "sudo chown" command, you'll 
-> need to create the `env var GROUP`, to reflect your group. In my case, I do the following:
->```
->export GROUP=kz
->```
->
->After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header 
->directory *mongo* under `/usr/local/include/`.
+After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header directory *mongo* under `/usr/local/include/`.
 
 ##### libmicrohttpd
+
 *libmicrohttpd* is the library that takes care of incoming connections and http/https.
 We use an older version of it, soon to be repaced by the latest release.
 This is how you install libmicrohttpd from source code:
@@ -198,6 +196,7 @@ make install
 ```
 
 ##### klog
+
 *klog* is a library for logging, used by the rest of the "K-libs".
 To download, build and install:
 
@@ -218,7 +217,6 @@ The portions cannot be freed, only the *big* buffers allocated via `malloc` and 
 For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view.
 
 To download, build and install:
-
 ```bash
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
@@ -227,14 +225,13 @@ git checkout release/0.2
 make install
 ```
 
-##### kjson  - ToDo: Move kjson/kjLog.h to klog
+##### kjson
 
 *kjson* is a JSON parser that builds a simple-to-use KjNode tree from the textual JSON input.
 It is very easy to use (linked lists) and many times faster than rapidjson, which APIv2 uses.
 The new implementation for NGSI-LD uses `kjson` instead of rapidjson.
 
 To download, build and install:
-
 ```bash
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
@@ -248,7 +245,6 @@ make install
 *khash* is a library that provides a hash table implementation. This hash table is used for the Context Cache of Orion-LD.
 
 To download, build and install:
-
 ```bash
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
@@ -270,11 +266,9 @@ make install
 
 At the end of `make install`, the makefile wants to copy the executable (orionld) to /usr/bin, and more files under /usr.
 As the compilation hasn't been (and shouldn't be) run as root (sudo), these copies will fail.
-
 So, you have two options here:
 
 &nbsp;1.  Create the files by hand, using `sudo` and then set yourself as owner of the files:
-
 ```bash
 sudo touch /usr/bin/orionld
 sudo chown $USER:$GROUP /usr/bin/orionld
@@ -289,11 +283,11 @@ sudo chown $USER:$GROUP /etc/default/orionld
 Personally I prefer option 1. I really dislike to use `sudo`.
 
 You now have *orionld*, the NGSI-LD Context Broker compiled, installed and ready to work!
+
 Except, of course, you need to install the MongoDB server as well.
 So far, we have only installed the mongo client library, so that *orionld* can speak to the MongoDB server.
 
 #### Install the MongoDB server
-
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
 For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
 The version 4.0 is recommended, but both older and newer should work just fine.
@@ -318,7 +312,6 @@ sudo apt-get install -y mongodb-org
 For more detail on the installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
 
 ### Sanity check
-
 Now that you have everything installed the broker should work.
 To make sure, let's start it and run a few simple commands against it.
 First, make sure the MongoDB server is running:
@@ -342,14 +335,12 @@ sudo service mongod start
 You might want to look in the MongoDB documentation on how to make it start automatically on boot.
 
 Let's start the broker in foreground, in a separate window:
-
 ```bash
 orionld -fg
 ```
 
 In another window, we send curl commands to the broker.
 First we need to install curl though :):
-
 ```bash
 sudo aptitude install curl
 curl localhost:1026/ngsi-ld/ex/v1/version
