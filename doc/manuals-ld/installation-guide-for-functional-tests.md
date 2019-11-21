@@ -66,7 +66,8 @@ FYI: after following myself the instructions in the installation guides, the fol
 * 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test
 
 Hmmm, something about https seems to be missing in the instructions ...
-Looking closer at the errors, it is clear that it is the accumulator sacript that is having problems (the accumulator log-file says: **AttributeError: 'Context' object has no attribute 'wrap_socket'**).
+
+Looking closer at the errors, it seems clear that it is the accumulator script that is having problems (the accumulator log-file says: **AttributeError: 'Context' object has no attribute 'wrap_socket'**).
 I will have to look into this, but for now, I simply do this:
 
 ```bash
