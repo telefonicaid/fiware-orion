@@ -292,7 +292,7 @@ If using a docker image, the MongoDB server comes as part of the docker, but if 
 For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
-This is an what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Ubuntu 18.04:
+This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Ubuntu 18.04:
 
 ```bash
 # Import the MongoDB public GPG Key
@@ -312,7 +312,8 @@ sudo apt-get install -y mongodb-org
 For more detail on the installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
 
 ### Sanity check
-Now that you have everything installed the broker should work.
+
+Now that you have everything installed, the broker should work.
 To make sure, let's start it and run a few simple commands against it.
 First, make sure the MongoDB server is running:
 
@@ -529,3 +530,8 @@ and no HTTP Link header would be present.
 
 That's all for the installation guide.
 Now please continue to learn about Orion-LD with the (Getting Started Guide)[doc/manuals-ld/getting-started-guide.md].
+
+If you feel like running tests, to **really** make sure your Orion-LD Context Broker is working correctly,
+please follow the instructions in the [Installation Guide for Functional Tests](doc/manuals-ld/installation-guide-for-functional-tests.md).
+
+And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](doc/manuals-ld/installation-guide-for-unit-tests.md).
