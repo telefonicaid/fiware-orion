@@ -156,19 +156,12 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
   float weight_application_json     = 0;
   float weight_application_jsonld   = 0;
 
-  LM_TMP(("LINKH: ciP->httpHeaders.accept == %s", ciP->httpHeaders.accept.c_str()));
-  LM_TMP(("LINKH: ciP->httpHeaders.acceptHeaderV.size() == %d", ciP->httpHeaders.acceptHeaderV.size()));
-
   if (ciP->httpHeaders.acceptHeaderV.size() == 0)
   {
-    LM_TMP(("LINKH: no Accepot header - setting orionldState.acceptJson to TRUE and orionldState.acceptJsonld to FALSE"));
     orionldState.acceptJson   = true;   // Default Accepted MIME-type is application/json
     orionldState.acceptJsonld = false;
     ciP->outMimeType          = JSON;
   }
-
-  // LM_TMP(("LINK: Before: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
-  // LM_TMP(("LINK: Before: acceptJson:   %s", FT(orionldState.acceptJson)));
 
   for (unsigned int ix = 0; ix < ciP->httpHeaders.acceptHeaderV.size(); ix++)
   {
@@ -199,9 +192,6 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
         orionldState.acceptJsonld = true;
         orionldState.acceptJson   = true;
       }
-
-      // LM_TMP(("LINK: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
-      // LM_TMP(("LINK: acceptJson:   %s", FT(orionldState.acceptJson)));
     }
     else if (SCOMPARE4(mediaRange, '*', '/', '*', 0))
     {
@@ -210,9 +200,6 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
       LM_T(LmtAccept, ("*/* - both json and jsonld OK"));
     }
   }
-
-  // LM_TMP(("LINK: acceptJsonld: %s", FT(orionldState.acceptJsonld)));
-  // LM_TMP(("LINK: acceptJson:   %s", FT(orionldState.acceptJson)));
 
   if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false))
   {
@@ -389,7 +376,6 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
           return false;
         }
         orionldState.payloadContextNode = attrNodeP;
-        // LM_TMP(("CTX: Found @context in payload: %p, orionldState.payloadContextNode"));
         LM_T(LmtContext, ("Found @context in the payload (%p)", orionldState.payloadContextNode));
 
         attrNodeP = orionldState.payloadContextNode->next;
@@ -540,7 +526,6 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   char*                  url = kaStrdup(&kalloc, orionldState.link);
   OrionldProblemDetails  pd;
 
-  LM_TMP(("CTX: Context from HTTP Link header: %s - calling orionldContextFromUrl", url));
   orionldState.contextP = orionldContextFromUrl(url, &pd);
   if (orionldState.contextP == NULL)
   {
@@ -551,7 +536,6 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   }
   orionldContextCachePresent("NCTX", "After creating context from HTTP Link header");
   orionldState.link = orionldState.contextP->url;
-  LM_TMP(("CTX: orionldState.link is: %s", orionldState.link));
 #endif
   return true;
 }
@@ -564,12 +548,10 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
 //
 static void contextToPayload(void)
 {
-  // LM_TMP(("CTX: Accepts JSON-LD, Service Routine OK - adding context to payload"));
   // If no contest node exists, create it with the default context
 
   if (orionldState.payloadContextNode == NULL)
   {
-    // LM_TMP(("CTX: payloadContextNode == NULL, using Incoming Link header: '%s'", orionldState.link));
     if (orionldState.link == NULL)
       orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
     else
@@ -589,7 +571,6 @@ static void contextToPayload(void)
   //
   if (orionldState.responseTree->type == KjObject)
   {
-    // LM_TMP(("CTX: Adding orionldState.payloadContextNode to payload"));
     orionldState.payloadContextNode->next = orionldState.responseTree->value.firstChildP;
     orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
   }
@@ -684,8 +665,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
 
-  LM_TMP(("CTX: orionldState.linkHttpHeaderPresent == %s", FT(orionldState.linkHttpHeaderPresent)));
-
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
   LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, orionldState.verbString, orionldState.urlPath, ciP->payload));
 
@@ -735,7 +714,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // NOTE: orionldState.link is set by httpHeaderGet() in rest.cpp, called by orionldMhdConnectionInit()
   //
-  LM_TMP(("CTX: orionldState.linkHttpHeaderPresent == %s", FT(orionldState.linkHttpHeaderPresent)));
   if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck(ciP) == false))
     goto respond;
 
@@ -746,7 +724,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     OrionldProblemDetails pd = { OrionldBadRequestData, (char*) "naught", (char*) "naught", 0 };
 
-    LM_TMP(("CTX: Context from payload. Type: %s", kjValueType(orionldState.payloadContextNode->type)));
     orionldState.contextP = orionldContextFromTree(NULL, true, orionldState.payloadContextNode, &pd);
 
     if (pd.status == 200)  // got an array with only Core Context
@@ -766,7 +743,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     orionldState.contextP = orionldCoreContextP;
 
   orionldState.link = orionldState.contextP->url;
-  LM_TMP(("CTX: orionldState.link is: %s", orionldState.link));
 
   // ********************************************************************************************
   //
@@ -778,7 +754,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
   LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
 
-  LM_TMP(("ALT: contextToBeCashed==%s", FT(contextToBeCashed)));
   //
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
   // the HTTP status code defaults to 400
@@ -825,22 +800,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false))
   {
-    LM_TMP(("LINKH: orionldState.acceptJson:   %s", FT(orionldState.acceptJson)));
-    LM_TMP(("LINKH: orionldState.acceptJsonld: %s", FT(orionldState.acceptJsonld)));
-    LM_TMP(("LINKH: orionldState.link == '%s' (contextP at %p, Core Context at %p)", orionldState.link, orionldState.contextP, orionldCoreContextP));
-    LM_TMP(("LINKH: orionldState.contextP->url: '%s'", orionldState.contextP->url));
     if (orionldState.acceptJsonld == false)
-    {
-      LM_TMP(("LINKH: Adding httpHeaderLin as orionldState.acceptJsonld == false"));
       httpHeaderLinkAdd(ciP, orionldState.link);
-    }
     else if (orionldState.responseTree == NULL)
-    {
-      LM_TMP(("LINKH: Adding httpHeaderLin as orionldState.responseTree == NULL"));
       httpHeaderLinkAdd(ciP, orionldState.link);
-    }
-    else
-      LM_TMP(("LINKH: NOT Adding httpHeaderLink"));
   }
 
 
@@ -859,15 +822,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (addContext)
     {
       if ((orionldState.acceptJsonld == true) && (ciP->httpStatusCode < 300))
-      {
-        LM_TMP(("LINKH: Calling contextToPayload"));
         contextToPayload();
-      }
-      else
-        LM_TMP(("LINKH: NOT Calling contextToPayload"));
     }
-    else
-      LM_TMP(("LINKH: NOT Calling contextToPayload"));
 
 
     //
@@ -890,15 +846,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
 
   if (orionldState.responsePayload != NULL)
-  {
-    LM_TMP(("LINKH: Calling restReply with payload"));
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
-  }
   else
-  {
-    LM_TMP(("LINKH: Calling restReply without payload"));
     restReply(ciP, "");
-  }
 
 
   //
