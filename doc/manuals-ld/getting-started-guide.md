@@ -3,9 +3,11 @@
 Welcome to the Quick Start Guide to Orion-LD, the NGSI-LD context broker!
 
 This guide is a walk-through of the most common characteristics of Orion-LD, with plenty of examples.
-It would be a good idea to have an instance of Orion-LD that you can start and restart for this exercise.
+It's imperative to have a running instance of Orion-LD and MongoDB to play with for this exercise.
 
-We will learn about contexts, and how to:
+The first thing to do is to thoroughly read [this quick guide to the @context](doc/manuals-ld/the-context.md)
+
+Apart from learning about the context, we will look at how to:
 - Use `curl` to send HTTP requests to Orion-LD
 - Use the `mongo` command tool to inspect the contents of the database
 - Create entities with contexts
@@ -13,58 +15,462 @@ We will learn about contexts, and how to:
 - Filtering of the results - get only the entities that match your criteria
 - Subscriptions and Notifications
 
-## Contexts
-A _context_, in its simplest form, is nothing but a list of key-values:
-
-```json
-"@context": {
-  "P1": "https://a.b.c/attributes/P1",
-  "P2": "https://a.b.c/attributes/P2",
-  "P3": "https://a.b.c/attributes/P3",
-  ...
-}
-```
-The key (e.g. "P1") is an alias for the longer name ("https://a.b.c/attributes/P1" for the key "P1").
-That's all there is to it, just a way of avoiding to write really long strings and also, importantly, a freedom for the user to
-defines his/her own aliases for the longnames.
-
-When is this useful?
-To write shortnames instead of longnames, the advantage is clear.
-
-But, what about the "freedom for the user to defines his/her own aliases"?
-Nothing like an example to illustrate this:
-
-```
-I am a father to my children and a husband to my wife, a son to my parents and a grandson to my grandparents. Etc.
-
-The way I see my three children is that the are my children.
-The way my three children see eachother is that the other two are their siblings.
-
-The way I see my mother is that she's my mother.
-The way my wife sees my mother is that she's her mother-in-law.
-```
-Same human beings, different viewpoints.
-That's pretty much what a context is, a viewpoint
-
-What is expanded, with the help of the context, inside the payload data is:
-* The Entity Type
-* The Property Names
-* The Relationship Names
-
-However, contexts can be a little more complex, where the value is an object instead of just a string:
-```json
-"@context": {
-  "P1": {
-    "@id": "https://a.b.c/attributes/P1",
-    "@type": "vocab"
-  },
-  ...
-```
-
-If an alias has a complex value in the @context, and that complex value contains a member "@type" that equals "@vocab",
-then also the value of that attribute (an attribute is a Property or a Relationship) is expanded according to the context.
-But, only if found inside that very same context. If not found, the value is untouched.
-
-If you want to learn more about contexts, please refer to documentation on JSON-LD. There is plenty out there ...
 
 ## Creation of Entities
+Now that we know how the context works, let's get our hands dirty and create an entity or five!
+Start three terminal windows:
+* broker
+* mongo
+* curl
+
+In the **broker terminal**, start the Orion-LD context broker, and start it in the foreground (the `-fg` option):
+```bash
+orionld -fg
+```
+
+In the **mongo terminal**, first make sure that mongo is running. If not - start it.
+The terminal will be used later to look at the contents of the database.
+
+In the **curl terminal** we will issue HTTP requests to the broker.
+
+The first example will not supply and user context => only the Core Context will be applied.
+
+Let's create an entity with two attributes:
+* status (is part of the Core Context)
+* state  (is **not** part of the Core Context)
+
+We will be using `curl` which you have already installed if you have followed the [installation guide](doc/manuals-ld/installation-guide.md).
+If not, make sure you have `curl` installed before proceeding.
+
+Here goes:
+
+### Entity Creation Example 1 - without context
+```bash
+payload={'
+  "id": "urn:entities:E1",
+  "type": "T",
+  "status": {
+    "type": "Property",
+    "value": "OK"
+  },
+  "state": {
+    "type": "Property",
+    "value": "OK"
+  }
+}'
+curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: application/json"
+```
+
+A few notes about the payload:
+* The entity `"id"` field **must** be a URI.
+* The entity `"type"` field is **mandatory**.
+* Attributes must be JSON Objects, and they **must** have a "type", whose value **must** be any of:
+  * Property
+  * Relationship
+  * GeoProperty
+* Attributes that are of type *Property* **must** have a "value" field
+* Attributes that are of type *Relationship* **must** have an "object" field and the value of that field **must** he a URI.
+
+After issuing this command, the broker responds with a **201 Created** (which you won't see unless you ask `curl` to show the HTTP headers)
+and we can now look inside the mongo database to see what exactly has been stored:
+
+```bash
+mongo orion
+> db.entities.findOne()
+{
+	"_id" : {
+		"id" : "urn:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+	},
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/status" : {
+			"type" : "Property",
+			"value" : "OK",
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/state" : {
+			"type" : "Property",
+			"value" : "OK",
+		}
+	}
+}
+```
+
+The aim of this guide is not to teach about the data model or Orion/Orion-LD, so lots of stuff from the mongo output has been cut out to save lines.
+What we will concentrate on here is the expansion of the entity type and the two attributes "state" and "status".
+[ If you issue this command yourselves, you will see more fields, especially "creDate/modDate" that are timestamps to store creation date and last modification date. ]
+
+The entity type was "T".
+"T" is not part of the core context, and no user context has been supplied, so, "T" wasn't found.
+What happens if a term is not found?  Correct! It is expanded according to the "@vocab" key of the core context.
+
+The same has happened to the property "state".
+
+"status" on the other hand is part of the core context, and it has been expanded accordingly.
+
+But look at the expansions of the properties.
+They aren't as the core context defines them!!!
+All dots have been replaced with '=' !!!
+This is part of the data model. Dots can't be part of any attribute name in the database as that would complicate filtering over subattributes.
+We have to look at things in advance here, to understand that.
+There is a mechanism to filter on properties-of-properties and the dot '.' is used as separator.
+Imagine you have an entity with a Property "P1" with a sub-property "P11" with the value 127.
+This is how you find that entity:
+```bash
+GET /ngsi-ld/v1/entities?q=P1.P11==127
+```
+
+Now, if the dot '.' were to be allowed as part of the property name inside the database, thisd would be really difficult to implement, boarderline impossible.
+So, we made the decision to use replace all dots with '=' before storing in the database.
+We picked '=' as it's a forbidden character for attribute names and can't be used anyway.
+
+By the way, the "P1.P11" in the q-expression would be expanded to something like "https://uri=etsi=org/ngsi-ld/default-context/P1.https://uri=etsi=org/ngsi-ld/default-context/P11",
+if the Core context were used. And yes, it looks ugly, but it works :)
+
+### Entity Creation Example 1 - with user context in payload
+Now let's play a little with expansion, by using our own context that tries to overload the Core context (which is not possible, as you will see).
+We will create our own context, defining:
+* status (that is also part of the Core context and thus cannot ve overloaded)
+* state  (that is *not* part of the Core context, only our user-defined context)
+```bash
+payload='{
+  "@context": {
+    "status": "http://a.b.c/attrs/status",
+    "state":  "http://a.b.c/attrs/state"
+  },
+  "id": "urn:entities:E2",
+  "type": "T",
+  "status": {
+    "type": "Property",
+    "value": "From Core Context"
+  },
+  "state": {
+    "type": "Property",
+    "value": "From User Context"
+  },
+  "state2": {
+    "type": "Property",
+    "value": "From Default URL"
+  }
+}'
+curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: application/ld+json"
+```
+
+Note that the Content-Type is now `application/ld+json`, as the payload data carries a context.
+The values of the properties tell you pretty much alreadyh what is going to happen.
+However, let's take a look at the database content after issuing this request:
+```bash
+mongo orion
+> db.entities.findOne({"_id.id": "urn:entities:E2"})
+```
+
+This is the trimmed mongo output:
+```
+{
+	"_id" : {
+		"id" : "urn:entities:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+	},
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/status" : {
+			"type" : "Property",
+			"value" : "From Core Context",
+		},
+		"http://a=b=c/attrs/state" : {
+			"type" : "Property",
+			"value" : "From User Context",
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/state2" : {
+			"type" : "Property",
+			"value" : "From Default URL",
+		}
+	}
+}
+```
+
+As you expected and as you can see:
+* "status" has been expanded according to the Core context - defining it in the user context was useless
+* "state" has been expanded according to the user context
+* "T" and "state2" have been expanded according to the default URL (@vocab item in the core context)
+
+
+### Entity Retrieval Example 1 - without context
+We have created two entities, with a mix of contexts being used to expand the attribute names.
+Let's retrieve the entities and see what exact attribute names we get.
+No context will be used (== the Core context will be used):
+```bash
+curl localhost:1026/ngsi-ld/v1/entities?type=T
+```
+
+Note that you could alse type in the long name of the entity type:
+```bash
+curl localhost:1026/ngsi-ld/v1/entities?type=https://uri.etsi.org/ngsi-ld/default-context/T
+```
+
+That would be useful in case you look for entities whose types have been expanded with some other context.
+Instead of passing in the entire context, you only pass the fully qualified name (FQN) of the type.
+
+The output from the retieval command is as follows:
+```
+[{"@context":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld","id":"urn:entities:E1","type":"T","state":{"type":"Property","value":"OK"},"status":{"type":"Property","value":"OK"}},{"@context":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld","id":"urn:entities:E2","type":"T","http://a.b.c/attrs/state":{"type":"Property","value":"From User Context"},"state2":{"type":"Property","value":"From Default URL"},"status":{"type":"Property","value":"From Core Context"}}]
+```
+
+That's not very readable, is it?
+
+Luckily, Orion-LD supports pretty printing and we'll issue the command like this instead:
+```bash
+curl 'localhost:1026/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2'
+```
+
+This is the "new" output:
+```json
+[
+  {
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "urn:entities:E1",
+    "type": "T",
+    "state": {
+      "type": "Property",
+      "value": "OK"
+    },
+    "status": {
+      "type": "Property",
+      "value": "OK"
+    }
+  },
+  {
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "urn:entities:E2",
+    "type": "T",
+    "http://a.b.c/attrs/state": {
+      "type": "Property",
+      "value": "From User Context"
+    },
+    "state2": {
+      "type": "Property",
+      "value": "From Default URL"
+    },
+    "status": {
+      "type": "Property",
+      "value": "From Core Context"
+    }
+  }
+]
+```
+That's more like it!
+
+Two entities are found, as we filtered over entity type "T" and both our entities were created with that type.
+The entities come with the context in the payload ... Why?
+Well, curl adds an "Accept: */*" if no Accept header is stated on the command line, so, Orion-LD receives "Accept: */*" which means
+that **any** MIME format is accepted and thus, **application/ld+json** is picked.
+
+To inhibit this behaviour of `curl`, give it an Accept header, for example **application/json**:
+```bash
+curl 'localhost:1026/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2' -H "Accept: application/json"
+```
+
+If you try this command you will see the entities without the "@context" member.
+
+You can also ask `curl` to not add any Accept header at all, by giving it an empty Accept header:
+```bash
+curl 'localhost:1026/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2' -H "Accept:"
+```
+
+Orion-LD responds with **application/json** if no Accept header is given.
+
+Back on track ...
+The entity "urn:entities:E1" was created without any context, i.e. the Core Context, but when creating "urn:entities:E2" we gave a context.
+So, why do both entities come back with the Core context???
+
+Simple. The context of the **GET request** was the core context, and that is what has been used to assemble the response.
+Each request uses the current context, the context used when issuing the request. Never mind what was used before.
+After all, a context is nothing but a collection of aliases.
+The real names and values are the longnames, which is what is stored in the database.
+
+Now, what is important here is to look at the attribute names.
+We have two entities, one with two attributes and one with three
+* urn:entities:E1 (created with Core Context):
+  * state
+  * status
+* urn:entities:E2 (created with user context):
+  * state
+  * state2
+  * status
+
+As you can see from the oresponse of the GET request, only "state" of "urn:entities:E2" is returned as a long name.
+Why is that?
+Well, when the GET request processed what was found in the database, trying to match long names to short names,
+only the Core context was used, as that's what was used in the GET request.
+
+The entity urn:entities:E1 was created using the that same context, so its "state" attribute was expanded using the Default URL.
+The broker is intelligent enough to see that, and is able to compact "https://uri.etsi.org/ngsi-ld/default-context/state" to "state" (same same with entity type "T").
+The "state" attribute of entity urn:entities:E2 on the other hand was expanded using the user context of that request, to "http://a.b.c/attrs/state" and that
+is not found anywhere in the core context that the GET request used. So, impossible to compact, the long name is returned.
+
+"status" for both entities was expanded using the Core context and thus always found for compaction.
+"state2" was expanded using the default URL and thus always found for compaction.
+
+It's tricky, I know.
+Please read through this example again, if needed, until it is 100% clear.
+
+### Entity Retrieval Example 2 - with context
+I said earlier that a context only lives within its own request.
+This is true. Otherwise I wouldn't have said it! :)
+However, requests with inline contexts that is not just a simple string, or that can't be reduced (more about that later)
+to a simple string are saved by Orion-LD. Saved to later be served, if asked.
+
+The context used in a request is normally returned in the response, and most often in the Link HTTP header.
+For example, the response to a creation of an entity has no payload data, so the context is returned in the HTTP Link header.
+The reason for this is for eventual proxy servers to be aware of the context used.
+
+So, if an entity creation is issued with an inline context, like the one in "Entity Creation Example 1", how can the
+broker return that complex context in the Link header?
+Remember that the Link header must be a string that is a URL.
+
+What Orion-LD does is that it creates a new context.
+A context cache is already maintained inside the broker, to avoid to download the very same context over and over again. That would be silly!
+So, in this situation, the incoming complex context is created inside the broker's context cache and it is given a name.
+The full URL to reach this context is then included in the HTTP headers of the response, in the Link header, of course.
+
+The context can later be retrieved with the following command:
+```bash
+GET /ngsi-ld/ex/v1/contexts<context-id>
+```
+
+So, let's try this, using the option `--dumpHeaders` of `curl` so that we save the HTTP headers - that's where we'll find the URL to retrieve the context later:
+```bash
+payload='{
+  "@context": {
+    "P1": "http://a.b.c/attrs/P1",
+    "P2":  "http://a.b.c/attrs/P2"
+  },
+  "id": "urn:entities:E3",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "P1 - from user context"
+  },
+  "P2": {
+    "type": "Property",
+    "value": "P2 - from user context"
+  },
+  "P3": {
+    "type": "Property",
+    "value": "P2 - from Default URL"
+  }  
+}'
+curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: application/ld+json" --dump-header /tmp/httpHeaders
+```
+
+Now check out the HTTP headers:
+```bash
+cat /tmp/httpHeaders
+HTTP/1.1 201 Created
+Connection: Keep-Alive
+Content-Length: 0
+Link: <http://xps:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:entities:E3
+Date: Fri, 22 Nov 2019 13:04:23 GMT
+```
+Especially, check out the **Link** header:
+```
+cat /tmp/httpHeaders | grep ^Link
+Link: <http://xps:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+```
+
+You will get a different ID (the ID in this example happens to be `9ad26df4-0d28-11ea-98e1-9cb6d0961dcd`), and a different hostname (mine is: `xps`,
+but the rest will be the same, and you **will** be able to retrieve the context with a command similar to this
+(change `9ad26df4-0d28-11ea-98e1-9cb6d0961dcd` for the ID you got previously):
+```bash
+curl localhost:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd
+```
+
+Not only can you retrieve the context, but you can also use it in subsequent requests, for example a GET request.
+
+So, let's retrieve the entity urn:entities:E3 to see the attribute names with and without the context used during creation.
+
+Without context (expect long names):
+```bash
+curl localhost:1026/ngsi-ld/v1/entities/urn:entities:E3?prettyPrint=yes
+```
+Here's the response:
+```json
+{
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "id": "urn:entities:E3",
+  "type": "T",
+  "http://a.b.c/attrs/P1": {
+    "type": "Property",
+    "value": "P1 - from user context"
+  },
+  "http://a.b.c/attrs/P2": {
+    "type": "Property",
+    "value": "P2 - from user context"
+  },
+  "P3": {
+    "type": "Property",
+    "value": "P2 - from Default URL"
+  }
+}
+```
+
+[ Don't get confused by seeing the @context member in the payload - remember that curl adds "Accept: */*" and that the broker decides to respond with "application/ld+json" ]
+
+With the context used during creation (expect short names) - change hostname 'xps' and context ID '9ad26df4-0d28-11ea-98e1-9cb6d0961dcd' to your own values:
+```bash
+curl 'xps:1026/ngsi-ld/v1/entities/urn:entities:E3?prettyPrint=yes' -H 'Link: <http://localhost:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd>;rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+```
+Here's the response:
+```json
+{
+  "@context": "http://xps:1026/ngsi-ld/ex/v1/contexts/9ad26df4-0d28-11ea-98e1-9cb6d0961dcd",
+  "id": "urn:entities:E3",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "P1 - from user context"
+  },
+  "P2": {
+    "type": "Property",
+    "value": "P2 - from user context"
+  },
+  "P3": {
+    "type": "Property",
+    "value": "P2 - from Default URL"
+  }
+}
+```
+
+
+
+### Reducing of a context
+As explained, any NGSI-LD broker has the Core Context "omnipresent". No way to get rid of it. No way to override it.
+Also, no meaning whatsoever to send it as part of the user context.
+However, it seems to be common pravtice to include it, normally to have the request compatible to JSON-LD.
+Let me just sat one thing:
+**NGSI-LD is not JSON-LD**
+It is similar, as similar as possible, but NGSI-LD has a default context, namely the Core context and there is no need to feed the broker with it.
+Doing that is just a waste of time.
+So, what Orion-LD doe sto minimize the waste of time is the following:
+* If the user provided context is a simple string and the value of that string is the URL of the Core Context - then the request is treated as if it didn't have any user-provided context.
+  The alternative would be to lookup inside the user context (that is the core context) and then lookup in the core context only to override what was just found.
+  - TWO lookups in the Core context ... bad idea
+* If the user provided context is an array containing a string whose value is the core context, then that item is REMOVED from the array.
+* If the user provided context is an array **with only one item**, then instead of an array, the user-context is treated as that sole item (which could be a string or an object.
+
+Especially note that the following user context:
+```json
+  "@context": [
+    "any URL",
+    "URL to core context"
+  ]
+```
+will be transformed into this:
+```json
+  "@context": "any URL"
+```
+
+It's obvious that this transformation makes for a faster lookup, right?
+
+
+## Subscriptions and Notifications
+To Be Continued
