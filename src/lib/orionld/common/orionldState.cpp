@@ -116,7 +116,6 @@ void orionldStateInit(void)
   orionldState.errorAttributeArrayP        = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize     = sizeof(orionldState.errorAttributeArray);
   orionldState.errorAttributeArrayUsed     = 0;
-  orionldState.contextToBeFreed            = false;
   orionldState.uriParamOptions.noOverwrite = false;
   orionldState.uriParamOptions.update      = false;
   orionldState.uriParamOptions.replace     = false;
@@ -156,6 +155,8 @@ void orionldStateInit(void)
 
   orionldState.prefixCache.index     = 0;
   orionldState.prefixCache.items     = 0;
+
+  orionldState.creDatesP             = NULL;
 }
 
 

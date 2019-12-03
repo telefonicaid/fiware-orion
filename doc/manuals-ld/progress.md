@@ -438,23 +438,19 @@
 
 
 ### POST /ngsi-ld/v1/entityOperations/upsert
-  The "Batch Upsert" service has been implemented for the "update" case.
-  The "replace" case is under development and assumed to be finished during October 2019.
-
-  As mongoBackend is used, we get notifications for free.
-  To get also forwarding for free, we'd need to use the APIv1 service function "postUpdateContext()", which would be easy enough to do.
-  However, V1 forwarding isn't too interesting - see "Forwarding".
+  The "Batch Upsert" service is 100% implemented.
+  Not very tested though.
 
 #### Still Missing
-  * The "replace" case
+  Nothing that we know of
 
 #### URI Parameters
-  None
+  options=replace
 
 
 
 ### POST /ngsi-ld/v1//ngsi-ld/v1/entityOperations/create
-  Gabriel will implement this service in November 2019
+  Gabriel will implement this service in January 2020
 
 #### Still Missing
   * All of it
@@ -465,7 +461,7 @@
 
 
 ### POST /ngsi-ld/v1//ngsi-ld/v1/entityOperations/update
-  Gabriel will implement this service in December 2019
+  Gabriel will implement this service in February 2020
 
 #### Still Missing
   * All	of it

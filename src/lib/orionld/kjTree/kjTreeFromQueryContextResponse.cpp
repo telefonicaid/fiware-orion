@@ -146,9 +146,7 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
   //
   for (int ix = 0; ix < attrs; ix++)
   {
-    LM_TMP(("BUG: Calling orionldContextItemExpand for '%s'", expandedV[ix]));
     expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], NULL, true, NULL);
-    LM_TMP(("BUG: orionldContextItemExpand returned '%s'", expandedV[ix]));
   }
 
   *attrListExpandedVecP = expandedV;
@@ -357,9 +355,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
       char*             valueFieldName;
       bool              valueMayBeCompacted  = false;
 
-      LM_TMP(("BUG: Treating attribute '%s'", attrShortName));
       attrName = orionldContextItemAliasLookup(orionldState.contextP, attrShortName, &valueMayBeCompacted, NULL);
-      LM_TMP(("BUG: Got alias '%s' for '%s' via context '%s'", orionldState.contextP->url, attrShortName, attrName));
 
       //
       // If URI param attrList has been used, only matching attributes should be included in the response
@@ -424,7 +420,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         //
         // NOT keyValues - create entire attribute tree
         //
-        LM_TMP(("BUG: Not keyValues. attribute: '%s'", attrName));
         aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {

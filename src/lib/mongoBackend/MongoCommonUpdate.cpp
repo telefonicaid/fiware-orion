@@ -54,6 +54,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode, kjValueType
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -867,6 +868,7 @@ static bool appendAttribute
 
   /* 4. Dates */
   int now = getCurrentTime();
+
   ab.append(ENT_ATTRS_CREATION_DATE, now);
   ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
@@ -2452,6 +2454,7 @@ static void updateAttrInNotifyCer
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
   int now = getCurrentTime();
+
   caP->creDate = now;
   caP->modDate = now;
 
@@ -2578,7 +2581,6 @@ static bool updateContextAttributeItem
 /* ****************************************************************************
 *
 * appendContextAttributeItem -
-*
 */
 static bool appendContextAttributeItem
 (
@@ -2906,18 +2908,6 @@ static bool processContextAttributeVector
     return false;
   }
 
-#if 0
-  if (!entityModified)
-  {
-    /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
-     * do a 'continue' without setting it.
-     */
-
-    // FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
-
-    cerP->statusCode.fill(SccOk);
-  }
-#endif
 
   /* If the status code was not touched (filled with an error), then set it with Ok */
   if (cerP->statusCode.code == SccNone)
@@ -3067,19 +3057,20 @@ static bool createEntity
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
 
 #ifdef ORIONLD
-  if (orionldState.overriddenCreationDate != 0)
-    insertedDoc.append(ENT_CREATION_DATE, (long long) orionldState.overriddenCreationDate);
+  KjNode* savedCreDateP;
+
+  if ((orionldState.creDatesP != NULL) && ((savedCreDateP = kjLookup(orionldState.creDatesP, eP->id.c_str())) != NULL))
+  {
+    eP->creDate = (double) savedCreDateP->value.i;
+    insertedDoc.append(ENT_CREATION_DATE, eP->creDate);
+  }
   else
     insertedDoc.append(ENT_CREATION_DATE, now);
-
-  if (orionldState.overriddenModificationDate != 0)
-    insertedDoc.append(ENT_MODIFICATION_DATE, (long long) orionldState.overriddenModificationDate);
-  else
-    insertedDoc.append(ENT_MODIFICATION_DATE, now);
 #else
   insertedDoc.append(ENT_CREATION_DATE, now);
-  insertedDoc.append(ENT_MODIFICATION_DATE, now);
 #endif
+
+  insertedDoc.append(ENT_MODIFICATION_DATE, now);
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
@@ -4034,7 +4025,7 @@ void processContextElement
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
-        // Set creaDate and modDate times
+        // Set creDate and modDate times
         notifyCerP->contextElement.entityId.creDate = now;
         notifyCerP->contextElement.entityId.modDate = now;
 

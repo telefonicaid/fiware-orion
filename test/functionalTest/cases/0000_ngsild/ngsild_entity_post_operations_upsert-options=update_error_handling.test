@@ -38,8 +38,6 @@ brokerStart CB 0-255
 # 05. Attempt to upsert with an entity without TYPE field - see error
 # 06. Attempt to upsert with an entity with 2 ID fields - see error
 # 07. Attempt to upsert with an entity with 2 TYPE fields - see error
-# 08. Attempt to upsert with an entity with ID typed wrong - see error
-# 09. Attempt to upsert with an entity with TYPE typed wrong - see error
 # 10. Attempt to upsert with an empty array - see error
 # 11. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 entities
 # 12. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 same entities from step 11
@@ -185,7 +183,7 @@ echo "05. Attempt to upsert with an entity without TYPE field - see error"
 echo "==================================================================="
 payload='[
   {
-    "id": "urn:ngsi-ld:Vehicle:301",
+    "id": "urn:ngsi-ld:Vehicle:309",
     "brandName": {
       "type": "Property",
       "value": "Mercedes"
@@ -276,74 +274,6 @@ payload='[
     "brandName": {
       "type": "Property",
       "value": "Caloi"
-    }
-  }
-]'
-orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=update' --payload "$payload"
-echo
-echo
-
-
-echo "08. Attempt to upsert with an entity with ID typed wrong - see error"
-echo "===================================================================="
-payload='[
-  {
-    "idwrong": "urn:ngsi-ld:Vehicle:301",
-    "type": "Vehicle",
-    "brandName": {
-      "type": "Property",
-      "value": "Mercedes"
-    },
-    "isParked": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
-      "observedAt": "2017-07-29T12:00:04Z",
-      "providedBy": {
-        "type": "Relationship",
-        "object": "urn:ngsi-ld:Person:Bob"
-      }
-    }
-  },
-  {
-    "id": "urn:ngsi-ld:Vehicle:302",
-    "type": "Vehicle",
-    "brandName": {
-      "type": "Property",
-      "value": "Mercedes"
-    }
-  }
-]'
-orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=update' --payload "$payload"
-echo
-echo
-
-
-echo "09. Attempt to upsert with an entity with TYPE typed wrong - see error"
-echo "======================================================================"
-payload='[
-  {
-    "id": "urn:ngsi-ld:Vehicle:301",
-    "typewrong": "Vehicle",
-    "brandName": {
-      "type": "Property",
-      "value": "Mercedes"
-    },
-    "isParked": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
-      "observedAt": "2017-07-29T12:00:04Z",
-      "providedBy": {
-        "type": "Relationship",
-        "object": "urn:ngsi-ld:Person:Bob"
-      }
-    }
-  },
-  {
-    "id": "urn:ngsi-ld:Vehicle:302",
-    "type": "Vehicle",
-    "brandName": {
-      "type": "Property",
-      "value": "Mercedes"
     }
   }
 ]'
@@ -622,7 +552,7 @@ Date: REGEX(.*)
 05. Attempt to upsert with an entity without TYPE field - see error
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 385
+Content-Length: 403
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -630,20 +560,20 @@ Date: REGEX(.*)
 {
     "errors": [
         {
-            "entityId": "urn:ngsi-ld:Vehicle:301",
-            "error": {
-                "detail": "entity::type",
-                "status": 400,
-                "title": "mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
             "entityId": "urn:ngsi-ld:Vehicle:302",
             "error": {
                 "detail": "entity::type",
                 "status": 400,
                 "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:309",
+            "error": {
+                "detail": "Mandatory field entity::type is missing",
+                "status": 400,
+                "title": "Invalid Entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -700,58 +630,6 @@ Date: REGEX(.*)
     ],
     "success": [
         "urn:ngsi-ld:Bicycle:502"
-    ]
-}
-
-
-08. Attempt to upsert with an entity with ID typed wrong - see error
-====================================================================
-HTTP/1.1 200 OK
-Content-Length: 218
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "errors": [
-        {
-            "entityId": "no entity::id",
-            "error": {
-                "detail": "entity::id",
-                "status": 400,
-                "title": "mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        }
-    ],
-    "success": [
-        "urn:ngsi-ld:Vehicle:302"
-    ]
-}
-
-
-09. Attempt to upsert with an entity with TYPE typed wrong - see error
-======================================================================
-HTTP/1.1 200 OK
-Content-Length: 230
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "errors": [
-        {
-            "entityId": "urn:ngsi-ld:Vehicle:301",
-            "error": {
-                "detail": "entity::type",
-                "status": 400,
-                "title": "mandatory field missing",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        }
-    ],
-    "success": [
-        "urn:ngsi-ld:Vehicle:302"
     ]
 }
 

@@ -47,7 +47,7 @@ extern "C"
 // mongoCppLegacyEntityBatchDelete -
 //
 bool mongoCppLegacyEntityBatchDelete(KjNode* entityIdsArray)
-{              
+{
   char collectionPath[256];
 
   if (dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities") == -1)
@@ -55,8 +55,6 @@ bool mongoCppLegacyEntityBatchDelete(KjNode* entityIdsArray)
     LM_E(("Internal Error (dbCollectionPathGet returned -1)"));
     return false;
   }
-
-  LM_TMP(("LARYSSE DB: Collection Path: %s", collectionPath));
 
   mongo::DBClientBase*         connectionP  = getMongoConnection();
   mongo::BulkOperationBuilder  bulk         = connectionP->initializeUnorderedBulkOp(collectionPath);
@@ -73,6 +71,6 @@ bool mongoCppLegacyEntityBatchDelete(KjNode* entityIdsArray)
 
   bulk.execute(&writeConcern, &writeResults);
   releaseMongoConnection(connectionP);
-  
+
   return true;
 }

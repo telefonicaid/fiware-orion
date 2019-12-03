@@ -1,0 +1,236 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch upsert/replace two entities with different creation dates
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E1
+# 02. Sleep 2 secs
+# 03. Create entity E2
+# 04. Get the creDates of E1 and E2
+# 05. Sleep 2 secs
+# 06. Replace E1 and E2 using batch upsert with options=replace
+# 07. Get the creDates of E1 and E2 and make sure they are as in step 4
+#
+
+echo "01. Create entity E1"
+echo "===================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=replace" --payload "$payload"
+echo
+echo
+
+
+echo "02. Sleep 2 secs"
+echo "================"
+sleep 2
+echo "Slept 2 seconds"
+echo
+echo
+
+
+echo "03. Create entity E2"
+echo "===================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 03"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=replace" --payload "$payload"
+echo
+echo
+
+
+echo "04. Get the creDates of E1 and E2"
+echo "================================="
+E1_T4_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})' | grep '^	"creDate"')
+E2_T4_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})' | grep '^	"creDate"')
+echo E1 T4 $E1_T4_creDate
+echo E2 T4 $E2_T4_creDate
+echo
+echo
+
+
+echo "05. Sleep 2 secs"
+echo "================"
+sleep 2
+echo "Slept 2 seconds"
+echo
+echo
+
+
+echo "06. Replace E1 and E2 using batch upsert with options=replace"
+echo "============================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 05"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 05"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=replace" --payload "$payload"
+echo
+echo
+
+
+echo "07. Get the creDates of E1 and E2 and make sure they are as in step 4"
+echo "====================================================================="
+E1_T6_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})' | grep '^	"creDate"')
+E2_T6_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})' | grep '^	"creDate"')
+echo E1 T4 $E1_T4_creDate
+echo E2 T4 $E2_T4_creDate
+echo E1 T6 $E1_T6_creDate
+echo E2 T6 $E2_T6_creDate
+
+if [ "$E1_T6_creDate" != "$E1_T4_creDate" ]
+then
+  echo "E1::creDate has changed!!"
+  echo $E1_T4_creDate
+  echo $E1_T6_creDate
+else
+  echo "E1::creDate is OK"
+fi
+
+if [ "$E2_T6_creDate" != "$E2_T4_creDate" ]
+then
+  echo "E2::creDate has changed!!!"
+  echo $E2_T4_creDate
+  echo $E2_T6_creDate
+else
+  echo "E2::creDate is OK"
+fi
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1
+====================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1"
+    ]
+}
+
+
+02. Sleep 2 secs
+================
+Slept 2 seconds
+
+
+03. Create entity E2
+====================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E2"
+    ]
+}
+
+
+04. Get the creDates of E1 and E2
+=================================
+E1 T4 "creDate" : REGEX(.*)
+E2 T4 "creDate" : REGEX(.*)
+
+
+05. Sleep 2 secs
+================
+Slept 2 seconds
+
+
+06. Replace E1 and E2 using batch upsert with options=replace
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2"
+    ]
+}
+
+
+07. Get the creDates of E1 and E2 and make sure they are as in step 4
+=====================================================================
+E1 T4 "creDate" : REGEX(.*)
+E2 T4 "creDate" : REGEX(.*)
+E1 T6 "creDate" : REGEX(.*)
+E2 T6 "creDate" : REGEX(.*)
+E1::creDate is OK
+E2::creDate is OK
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

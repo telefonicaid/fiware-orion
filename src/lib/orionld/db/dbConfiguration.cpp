@@ -37,9 +37,31 @@ extern "C"
 // Function pointers for the DB interface
 //
 DbEntityLookupFunction                    dbEntityLookup;
+DbEntityLookupManyFunction                dbEntityLookupMany;
+DbEntityUpdateAttributeFunction           dbEntityUpdateAttribute;                          
 DbEntityUpdateFunction                    dbEntityUpdate;
 DbEntityBatchDeleteFunction               dbEntityBatchDelete;
 DbDataToKjTreeFunction                    dbDataToKjTree;
 DbDataFromKjTreeFunction                  dbDataFromKjTree;
 DbEntityOperationsUpsertFunction          dbEntityOperationsUpsert;
 DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
+DbQueryEntitiesAsKjTree                   dbQueryEntitiesAsKjTree;  // FIXME: Name must change - what does it to really?
+
+//
+// FIXME
+//   About DbQueryEntitiesAsKjTree:
+//   First of all, a KjNode-tree is used as neutral format in all DB functions that need it.
+//   So, KjTree should never be part of the name - not necessary
+//
+//   Then, we already have a function called dbEntityLookup, and another one called dbEntityLookupMany.
+//   dbQueryEntitiesAsKjTree ... with "correct" nomenclatura would be called "dbEntitesLookup", which is the same as dbEntityLookupMany.
+//
+//   So, what does this function do, that dbEntityLookupMany does not?
+//   The answer to that question should answer the question about "what is a good name for this function".
+//
+//   And, the name for the function should be like this:  DbEntityLookupXxxFunction
+//   Xxx describing the particularies with the function.
+//   We might have to rename dbEntityLookupMany - which would not be a problem.
+//
+//   A good name for dbQueryEntitiesAsKjTree would be dbEntityListLookupWithIdTypeCreDate
+//

@@ -320,7 +320,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": REGEX(.*)
     }
   },
   {
@@ -337,7 +337,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": REGEX(.*)
     }
   },
   {
@@ -354,7 +354,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": REGEX(.*)
     }
   },
   {
@@ -371,7 +371,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": REGEX(.*)
     }
   }
 ]
@@ -389,9 +389,9 @@ Date: REGEX(.*)
 {
     "errors": [],
     "success": [
+        "urn:ngsi-ld:Vehicle:00001",
         "urn:ngsi-ld:Vehicle:00002",
         "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00001",
         "urn:ngsi-ld:Vehicle:00004"
     ]
 }
