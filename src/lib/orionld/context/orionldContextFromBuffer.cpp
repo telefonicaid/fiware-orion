@@ -47,13 +47,11 @@ extern "C"
 //
 OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblemDetails* pdP)
 {
-  LM_TMP(("CTX: preparing context (%s) from buffer", url));
-
   KjNode* tree = kjParse(kjsonP, buffer);
 
   if (tree == NULL)
   {
-    LM_E(("CTX: kjParse error"));
+    LM_E(("parse error"));
     pdP->type   = OrionldBadRequestData;
     pdP->title  = (char*) "Parse Error";
     pdP->detail = kjsonP->errorString;
@@ -65,7 +63,7 @@ OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblem
   KjNode* contextNodeP = kjLookup(tree, "@context");
   if (contextNodeP == NULL)
   {
-    LM_E(("CTX: No @context field in the context"));
+    LM_E(("No @context field in the context"));
     pdP->type   = OrionldBadRequestData;
     pdP->title  = (char*) "Invalid context";
     pdP->detail = (char*) "No @context field";

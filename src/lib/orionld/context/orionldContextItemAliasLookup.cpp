@@ -49,8 +49,6 @@ char* orionldContextItemAliasLookup
 {
   OrionldContextItem* contextItemP;
 
-  LM_TMP(("ALIAS: looking for long-name (in values) '%s'", longName));
-
   // 0. Set output values to false/NULL
   if (valueMayBeCompactedP != NULL)
     *valueMayBeCompactedP = false;
@@ -60,36 +58,19 @@ char* orionldContextItemAliasLookup
 
 
   // 1. Is it the default URL?
-  LM_TMP(("ALIAS: looking for long-name '%s' - is it the default URL (%s)?", longName, orionldDefaultUrl));
   if (strncmp(longName, orionldDefaultUrl, orionldDefaultUrlLen) == 0)
-  {
-    LM_TMP(("ALIAS: looking for long-name '%s' - it was the default URL - returning shortname '%s'", longName, &longName[orionldDefaultUrlLen]));
     return (char*) &longName[orionldDefaultUrlLen];
-  }
 
   // 2. Found in Core Context?
-  LM_TMP(("ALIAS: looking for long-name '%s' in the core context '%s'", longName, orionldCoreContextP->url));
   contextItemP = orionldContextItemValueLookup(orionldCoreContextP, longName);
-  if (contextItemP != NULL)
-    LM_TMP(("ALIAS: looking for long-name '%s' - found in the Core Context (shortname: %s)", longName, contextItemP->name));
 
   // 3. If not, look in the provided context, unless it's the Core Context
   if ((contextItemP == NULL) && (contextP != orionldCoreContextP))
-  {
-    LM_TMP(("ALIAS: looking for long-name '%s' in user provided context '%s'", longName, contextP->url));
     contextItemP = orionldContextItemValueLookup(contextP, longName);
-    if (contextItemP != NULL)
-      LM_TMP(("ALIAS: looking for long-name '%s' - found in user provided context '%s' (shortname: %s)", longName, contextP->url, contextItemP->name));
-  }
 
   // 4. If not found anywhere - return the long name
   if (contextItemP == NULL)
-  {
-    LM_TMP(("ALIAS: looking for long-name '%s' - NOT FOUND - returning the long name", longName));
     return (char*) longName;
-  }
-
-  LM_TMP(("ALIAS: looking for long-name '%s' - FOUND - returning the shortname '%s'", longName, contextItemP->name));
 
   // 5. Can the value be compacted?
   if ((valueMayBeCompactedP != NULL) && (contextItemP->type != NULL))

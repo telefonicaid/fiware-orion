@@ -43,8 +43,6 @@ extern "C"
 //
 OrionldContext* orionldContextCreate(const char* url, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
 {
-  LM_TMP(("CTX: Creating empty context object"));
-
   OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
   if (contextP == NULL)

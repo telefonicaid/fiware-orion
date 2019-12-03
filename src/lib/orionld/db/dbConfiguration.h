@@ -62,12 +62,10 @@ typedef bool    (*DbSubscriptionMatchCallback)(const char* entityId, KjNode* sub
 //
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
 typedef KjNode* (*DbEntityLookupManyFunction)(KjNode* requestTree);
-typedef bool    (*DbEntityUpdateAttributeFunction)(const char* entityId, KjNode* attributeNode);
 typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestTree);
 typedef bool    (*DbEntityBatchDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, char** detailsP);
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
-typedef bool    (*DbEntityOperationsUpsertFunction)(KjNode* requestTree);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
 typedef KjNode* (*DbQueryEntitiesAsKjTree)(KjNode* entityIdsArray);
 
@@ -79,13 +77,11 @@ typedef KjNode* (*DbQueryEntitiesAsKjTree)(KjNode* entityIdsArray);
 //
 extern DbEntityLookupFunction                   dbEntityLookup;
 extern DbEntityLookupManyFunction               dbEntityLookupMany;
-extern DbEntityUpdateAttributeFunction          dbEntityUpdateAttribute;
 extern DbEntityUpdateFunction                   dbEntityUpdate;
 extern DbEntityBatchDeleteFunction              dbEntityBatchDelete;
 extern DbDataToKjTreeFunction                   dbDataToKjTree;
 extern DbDataFromKjTreeFunction                 dbDataFromKjTree;
 extern DbSubscriptionMatchEntityIdAndAttributes dbSubscriptionMatchEntityIdAndAttributes;
-extern DbEntityOperationsUpsertFunction         dbEntityOperationsUpsert;
 extern DbQueryEntitiesAsKjTree                  dbQueryEntitiesAsKjTree;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

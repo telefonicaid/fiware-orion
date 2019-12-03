@@ -54,14 +54,6 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// NGSILD_Q_FILTER - use the new Q-filter for NGSI-LD
-//
-#define NGSILD_Q_FILTER   1
-
-
-
-// ----------------------------------------------------------------------------
-//
 // orionldGetEntities -
 //
 // URI params:
@@ -327,14 +319,10 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     }
   }
 
-#if NGSILD_Q_FILTER
   if (q != NULL)
   {
-    char* title;
-    char* detail;
-
-    LM_TMP(("Q: got a Q-Filter: %s", q));
-
+    char*  title;
+    char*  detail;
     QNode* lexList;
     QNode* qTree;
 
@@ -354,9 +342,13 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       return false;
     }
 
+
+    //
+    // FIXME: this part about Q-Filter depends on the database and must be moved to
+    //        the DB layer
+    //
     orionldState.qMongoFilterP = new mongo::BSONObj;
 
-    LM_TMP(("Q: Calling qTreeToBsonObj"));
     mongo::BSONObjBuilder objBuilder;
     if (qTreeToBsonObj(qTree, &objBuilder, &title, &detail) == false)
     {
@@ -366,165 +358,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       return false;
     }
 
-#if 0
-    LM_TMP(("Q: Setting qMongoFilterP: %s (DESTRUCTIVE!!!)", objBuilder.obj().toString().c_str()));
-#else
-    LM_TMP(("Q: Setting qMongoFilterP"));
-#endif
-
     *orionldState.qMongoFilterP = objBuilder.obj();
   }
-
-#else
-
-  if (q != NULL)  // Old APIv2 StringFilter
-  {
-    //
-    // ngsi-ld doesn't support metadata which orion APIv1 and v2 does.
-    // However, for simplicity, the metadata vector is used for properties of an attribute.
-    // As metadata "isn't supported", the mq filter isn't supported, but as attribute properties are stored as metadata,
-    // we need to use the mq mechanism internally, if a property of a property is in the left hand side of a q filter item.
-    //
-    // So, the entire StringFilter is considered a MQ filter, but if the left hand side is just an attribute name (the metadata part is empty)
-    // then we must turn the parsed filter into a Q filter instead.
-    //
-    // The problem with this approach us that we can't reach inside compound valus of a Property,
-    // For example, consider the following entity:
-    // {
-    //   "id": "http:...",
-    //   "type": "",
-    //   "P1": {
-    //     "type": "Property",
-    //     "value": { "P2": 13 },
-    //     "P2": {
-    //       "type": "Property",
-    //       "value": 12
-    //     }
-    //   },
-    //   ...
-    // }
-    //
-    // And this StringFilter;    ?q=P1.P2==13.
-    //
-    // Which "P2" is the 'P1.P2==13' referring to?
-    // Well, as the string filter is always MQ filters if "complex" (left hand side contains a dot),
-    // it refers to the Property P2, NOT the field P2 inside the compound value of P1.
-    //
-    // One way of fixing this problem (in orion the problem was fixed by separation q and mq filters, q operating on compound values and
-    // mq oprating on metadata) is to add the "value" keyword as part of the left hand side:  "?q=P1.value.P2==13".
-    // This filter would refer to the P2 of the compound value of P1.
-    // The implementation would have to remove the "value" keyword and change from MQ to Q filter, but it would work.
-    //
-    // FIXME: Need to do this with each q-item. Not only the first one
-    //
-    LM_T(LmtStringFilter, ("Q: q == '%s'", q));
-
-    char* qP = q;
-    while (*qP != 0)
-    {
-      char c = *qP;
-
-      if ((c == '=') || (c == '>') || (c == '<') || (c == '!') || (c == '~'))
-        break;
-      if (c == '.')
-        break;
-      if (c == '[')
-        break;
-
-      ++qP;
-    }
-
-    //
-    // If qP points to a '.', then it's a "metadata path" and a change to MQ filter must be done.
-    // If qP points to a '[', then it's a "compound path" and the '[]' must be removed
-    //
-    StringFilterType filterType = SftQ;
-
-    if (*qP == '.')
-    {
-      LM_T(LmtStringFilter, ("Q: Found a DOT in the Q - changing to MQ: '%s'", qP));
-      filterType = SftMq;
-    }
-    else if (*qP == '[')
-    {
-      qP = q;
-
-      LM_T(LmtStringFilter, ("Q: Found a [ in the Q: '%s'", qP));
-      //
-      // Copy char by char, replacing '[' for '.' and ']' for nothing ...
-      // ... until reaching the operator.
-      // The operator and all that comes after is simply copied
-      //
-      char* toP = q;
-
-      LM_T(LmtStringFilter, ("Q: Compound Q: '%s'", q));
-      while (*qP != 0)
-      {
-        char c = *qP;
-
-        if ((c == '=') || (c == '>') || (c == '<') || (c == '!') || (c == '~'))
-        {
-          // Just copy the rest of chars
-          LM_T(LmtStringFilter, ("Q: Found operator - rest: %s", qP));
-          while (*qP != 0)
-          {
-            *toP = *qP;
-            ++toP;
-            ++qP;
-          }
-          *toP = 0;
-          LM_T(LmtStringFilter, ("Q: Transformation Done: %s", toP));
-          break;
-        }
-        else if (c == '[')  // Replace [ for .
-        {
-          *toP = '.';
-          ++toP;
-          ++qP;
-        }
-        else if (c == ']')  // Skip ]
-        {
-          ++qP;
-        }
-        else
-        {
-          *toP = *qP;
-          ++toP;
-          ++qP;
-        }
-      }
-
-      // The resulting string is shorter than the original string - DON'T FORGET to terminate !!!
-      *qP = 0;
-      LM_T(LmtStringFilter, ("Q: Compound Q Transformed: '%s'", q));
-    }
-
-    Scope*        scopeP = new Scope((filterType == SftMq)? SCOPE_TYPE_SIMPLE_QUERY_MD : SCOPE_TYPE_SIMPLE_QUERY, q);
-    StringFilter* sfP    = new StringFilter(filterType);
-
-    if (filterType == SftMq)
-      scopeP->mdStringFilterP = sfP;
-    else
-      scopeP->stringFilterP = sfP;
-
-    LM_T(LmtStringFilter, ("Q: Created %s StringFilter of q: '%s'", (filterType == SftMq)? "MQ" : "Q", q));
-
-    std::string detail;
-    if (sfP->parse(q, &detail) == false)
-    {
-      delete scopeP;
-      delete sfP;
-
-      LM_E(("Error parsing q StringFilter: %s", detail.c_str()));
-      parseData.qcr.res.release();
-      orionldErrorResponseCreate(OrionldBadRequestData, "Error parsing q StringFilter", detail.c_str());
-
-      return false;
-    }
-
-    parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
-  }
-#endif
 
   // Call standard op postQueryContext
   std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
@@ -534,8 +369,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Transform QueryContextResponse to KJ-Tree
   //
   ciP->httpStatusCode       = SccOk;
-
-  LM_TMP(("CATEGORY: Calling kjTreeFromQueryContextResponse"));
   orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &parseData.qcrs.res);
 
   return true;

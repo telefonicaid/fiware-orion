@@ -35,14 +35,10 @@
 //
 void dotForEq(char* nameP)
 {
-  char* start = nameP;
-
-  LM_TMP(("EQDOT: In: '%s'", nameP));
   while (*nameP != 0)
   {
     if (*nameP == '.')
       *nameP = '=';
     ++nameP;
   }
-  LM_TMP(("EQDOT: Out: '%s'", start));
 }

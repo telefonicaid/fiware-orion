@@ -134,7 +134,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
-    LM_TMP(("EXPAND: Treating attribute '%s'", kNodeP->name));
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       LM_E(("orionldAttributeTreat failed: %s", detail));
@@ -142,7 +141,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       mongoRequest.release();
       return false;
     }
-    LM_TMP(("EXPAND: Treated attribute '%s'", caP->name.c_str()));
+
     if (attrTypeNodeP != NULL)
       ceP->contextAttributeVector.push_back(caP);
     else
@@ -153,7 +152,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   // Mongo
   //
-  LM_TMP(("VEX: Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            orionldState.tenant,

@@ -51,7 +51,6 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
   KjNode* kjTree = NULL;
 
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-  LM_TMP(("DB: Collection Path: %s", collectionPath));
 
 
   //
@@ -70,22 +69,13 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
 
   while (cursorP->more())
   {
-    mongo::BSONObj  bsonObj;
+    mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
 
-    bsonObj = cursorP->nextSafe();
-
-    LM_TMP(("MERGE: Creating a kjTree from BSONObj '%s'", bsonObj.toString().c_str()));
     kjTree = dbDataToKjTree(&bsonObj, &title, &details);
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
-
-#if 0
-    char tmpBuffer[2048];
-    kjRender(orionldState.kjsonP, kjTree, tmpBuffer, sizeof(tmpBuffer));
-    LM_TMP(("MERGE: json III: %s", tmpBuffer));
-#endif
   }
 
   releaseMongoConnection(connectionP);

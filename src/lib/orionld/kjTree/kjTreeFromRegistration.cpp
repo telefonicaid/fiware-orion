@@ -90,10 +90,6 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   //
   if (ciP->uriParamOptions["sysAttrs"] == true)
   {
-    LM_TMP(("sysAttrs: SET"));
-    LM_TMP(("sysAttrs: createdAt:  %d", registrationP->createdAt));
-    LM_TMP(("sysAttrs: modifiedAt: %d", registrationP->modifiedAt));
-
     if (registrationP->createdAt != -1)
     {
       KjNode* createdAtNodeP = kjInteger(orionldState.kjsonP, "createdAt", registrationP->createdAt);
@@ -106,8 +102,6 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
       kjChildAdd(topP, modifiedAtNodeP);
     }
   }
-  else
-    LM_TMP(("sysAttrs: NOT SET"));
 
 
   //
@@ -283,7 +277,6 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   //
   // location
   //
-  LM_TMP(("LOC: registrationP->location.geoType == %s", registrationP->location.geoType));
   if (registrationP->location.geoType != NULL)
   {
     objectP = kjObject(orionldState.kjsonP, "location");

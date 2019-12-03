@@ -70,9 +70,6 @@ char* orionldContextItemExpand
   OrionldContextItem* contextItemP;
   char*               colonP;
 
-  LM_TMP(("EXPAND:"));
-  LM_TMP(("EXPAND: looking for '%s' in context %s", shortName, contextP? contextP->url : "Core Context"));
-
   if (valueMayBeExpandedP != NULL)
     *valueMayBeExpandedP = false;
 
@@ -80,24 +77,14 @@ char* orionldContextItemExpand
     contextP = orionldCoreContextP;
 
   if ((colonP = strchr((char*) shortName, ':')) != NULL)
-  {
-    char* longName = orionldContextPrefixExpand(contextP, shortName, colonP);
-    LM_TMP(("EXPAND: '%s' -> '%s'", shortName, longName));
-    return longName;
-  }
+    return orionldContextPrefixExpand(contextP, shortName, colonP);
 
   // 1. Lookup in Core Context
   contextItemP = orionldContextItemLookup(orionldCoreContextP, shortName, NULL);
-  if (contextItemP != NULL)
-    LM_TMP(("EXPAND: Found '%s' -> '%s' in Core Context", shortName, contextItemP->id));
 
   // 2. Lookup in given context (unless it's the Core Context)
   if ((contextItemP == NULL) && (contextP != orionldCoreContextP))
-  {
     contextItemP = orionldContextItemLookup(contextP, shortName, NULL);
-    if (contextItemP != NULL)
-      LM_TMP(("EXPAND: Found '%s' -> '%s' in User Context: '%s'", shortName, contextItemP->id, contextP->url));
-  }
 
   // 3. Use the Default URL (or not!)
   if (contextItemP == NULL)
@@ -113,11 +100,10 @@ char* orionldContextItemExpand
       if (contextItemPP != NULL)
         *contextItemPP = NULL;
 
-      LM_TMP(("EXPAND: Found '%s' -> '%s' via Default URL", shortName, longName));
       return longName;
     }
-    else
-      return NULL;
+
+    return NULL;
   }
 
   // 4. Save the pointer to the context item

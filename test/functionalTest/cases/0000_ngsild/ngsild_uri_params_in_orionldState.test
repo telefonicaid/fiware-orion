@@ -26,7 +26,7 @@ URI params in orionldState
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+brokerStart CB 31
 
 --SHELL--
 

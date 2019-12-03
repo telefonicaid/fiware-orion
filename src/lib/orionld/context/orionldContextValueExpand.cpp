@@ -56,34 +56,19 @@ static void valueExpand(KjNode* nodeP)
 //
 void orionldContextValueExpand(KjNode* attrNodeP)
 {
-  LM_TMP(("VEX: In orionldContextValueExpand for attribute '%s'", attrNodeP->name));
-
   KjNode* valueNodeP = kjLookup(attrNodeP, "value");
 
-  LM_TMP(("VEX: Expanding value of attribute '%s'?", attrNodeP->name));
-
   if (valueNodeP == NULL)
-  {
-    LM_TMP(("VEX: No value expansion for %s at no @type was found in @context", attrNodeP->name));
     return;
-  }
-  else if (valueNodeP->type == KjArray)
+
+  if (valueNodeP->type == KjArray)
   {
-    LM_TMP(("VEX: Expanding values of array attribute '%s'", attrNodeP->name));
     for (KjNode* nodeP = valueNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
       if (nodeP->type == KjString)
-      {
-        LM_TMP(("VEX: Expanding Array Item String value of attribute '%s'", attrNodeP->name));
         valueExpand(nodeP);
-      }
     }
   }
   else if (valueNodeP->type == KjString)
-  {
-    LM_TMP(("VEX: Expanding String value of attribute '%s'", attrNodeP->name));
     valueExpand(valueNodeP);
-  }
-  else
-    LM_TMP(("VEX: No value expansion for values of type %s", kjValueType(attrNodeP->type)));
 }

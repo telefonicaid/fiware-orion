@@ -52,7 +52,6 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldEntityPayloadCheck.h"            // orionldValidName  - FIXME: Own file for "orionldValidName()"!
 #include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextCachePresent.h"          // orionldContextCachePresent
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
@@ -509,14 +508,6 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
     return false;
   }
 
-#ifdef OLD_CONTEXT_ALGORITHM
-  if ((orionldState.contextP = orionldContextFromUrl(ciP, orionldState.link, OrionldUserContext, &details)) == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Failure to create context from URL", details);
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-#else
   //
   // The HTTP headers live in the thread. Once the thread dies, the mempry is freed.
   // When calling orionldContextFromUrl, the URL must be properly allocated.
@@ -534,9 +525,9 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
     ciP->httpStatusCode = (HttpStatusCode) pd.status;  // FIXME: Stop using ciP->httpStatusCode!!!
     return false;
   }
-  orionldContextCachePresent("NCTX", "After creating context from HTTP Link header");
+
   orionldState.link = orionldState.contextP->url;
-#endif
+
   return true;
 }
 
@@ -666,7 +657,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   bool     serviceRoutineResult = false;
 
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
-  LM_TMP(("----------------------- Treating NGSI-LD request %03d: %s %s: %s --------------------------", requestNo, orionldState.verbString, orionldState.urlPath, ciP->payload));
 
   //
   // 01. Predetected Error?
@@ -750,7 +740,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   LM_T(LmtServiceRoutine, ("Calling Service Routine %s (context at %p)", orionldState.serviceP->url, orionldState.contextP));
 
-  orionldContextCachePresent("BUG", "Before calling service routine");
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
   LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
 

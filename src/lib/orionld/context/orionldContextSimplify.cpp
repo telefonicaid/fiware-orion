@@ -51,8 +51,6 @@ extern "C"
 //
 KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
 {
-  LM_TMP(("CTX: Simplifying context tree"));
-
   if (contextTreeP->type != KjArray)
     return contextTreeP;
 
@@ -64,10 +62,7 @@ KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
     KjNode* next = nodeP->next;
 
     if ((nodeP->type == KjString) && (strcmp(nodeP->value.s, ORIONLD_CORE_CONTEXT_URL) == 0))
-    {
-      LM_TMP(("CTX: Removed Core Context from Array"));
       kjChildRemove(contextTreeP, nodeP);
-    }
     else
       ++itemsInArray;
 
@@ -78,15 +73,9 @@ KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
     *itemsInArrayP = itemsInArray;
 
   if (itemsInArray == 0)
-  {
-    LM_TMP(("CTX: array resulted EMPTY - returning NULL"));
     return NULL;
-  }
   else if (itemsInArray == 1)
-  {
-    LM_TMP(("CTX: array with only one item. Type is: %s", kjValueType(contextTreeP->type)));
     return contextTreeP->value.firstChildP;
-  }
 
   return contextTreeP;
 }

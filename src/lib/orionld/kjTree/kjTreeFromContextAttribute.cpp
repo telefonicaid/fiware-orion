@@ -151,7 +151,6 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
   // Value
   const char* valueName = (isRelationship == false)? "value" : "object";
-  LM_TMP(("NOTIF: valueType of attr '%s': '%s'", caP->name.c_str(), valueTypeName(caP->valueType)));
   switch (caP->valueType)
   {
   case orion::ValueTypeString:
@@ -190,18 +189,15 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   kjChildAdd(aTopNodeP, nodeP);
 
   bool isGeoProperty = false;
-  LM_TMP(("NOTIF: attribute type is: '%s'", caP->type.c_str()));
   if (strcmp(caP->type.c_str(), "GeoProperty") == 0)
   {
     //
     // GeoProperty attributes seem to get an extra metadata, called "location". It needs to be removed
     //
-    LM_TMP(("NOTIF: It's a GeoProperty attribute!"));
     isGeoProperty = true;
   }
 
   // Metadata
-  LM_TMP(("NOTIF: converting %d metadata of attribute '%s' of type '%s'", caP->metadataVector.size(), caP->name.c_str(), caP->type.c_str()));
   for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)
   {
     Metadata*   mdP    = caP->metadataVector[ix];
@@ -215,11 +211,9 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       //   In the future we might want to keep this metadata, but the unit must be looked over (WGS84).
       //   What was default unit in orion v1 is not default for orionld
       //
-      LM_TMP(("NOTIF: skipping metadata '%s'", mdName));
       continue;
     }
 
-    LM_TMP(("NOTIF: converting metadata '%s'", mdName));
     //
     // Special case: observedAt - stored as Number but must be served as a string ...
     //                            also, not expanded
@@ -245,8 +239,6 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       KjNode* valueNodeP     = NULL;
 
       nodeP = kjObject(orionldState.kjsonP, mdLongName);
-
-      LM_TMP(("NOTIF: metadata '%s' is a '%s'", mdName, valueTypeName(mdP->valueType)));
 
       kjChildAdd(nodeP, typeNodeP);
       if (strcmp(mdP->type.c_str(), "Relationship") == 0)

@@ -91,14 +91,11 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   //
   // Create the Registration
   //
-  LM_TMP(("REG: regIdP == %s", regIdP));
-  LM_TMP(("Translated the KTree to a Registration - now calling mongoRegistrationCreate"));
   mongoRegistrationCreate(&reg,
                           orionldState.tenant,
                           ciP->servicePathV[0],
                           &regId,
                           &oError);
-  LM_TMP(("REG: regId == %s", regId.c_str()));
 
   // FIXME: Check oError for failure!
   ciP->httpStatusCode = SccCreated;

@@ -80,7 +80,6 @@ HttpStatusCode mongoUpdateContext
   }
   else
   {
-    LM_TMP(("contextElementVector Size: %d", requestP->contextElementVector.size()));
     /* Process each ContextElement */
     for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
     {

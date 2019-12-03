@@ -73,11 +73,6 @@ static bool qNodeVariableChars(char* s, char** titleP, char** detailsP)
 //
 bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
 {
-#ifdef DEBUG
-  qLexRender(qLexP, orionldState.qDebugBuffer, sizeof(orionldState.qDebugBuffer));
-  LM_TMP(("Q: KZ: Parsing LEX list: %s", orionldState.qDebugBuffer));
-#endif
-
   //
   // The first token must be;
   // - a start parenthesis     (as in q=(!P1&A>12)|(A<4)
@@ -94,32 +89,17 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
   int level = 0;
 
   //
-  // To be able to check the validity of tokens prev and next
-  // we need a dummy-start-token for the first token in the list (that has no prev).
-  // This dummy token is set to a '('.
-  //
   // The first token must be QNodeOpen, QNodeVariable, or QNodeNotExists and all three
   // are OK with a preceding '('
   //
-  QNode  dummyStart;
-  QNode* prevNodeP = &dummyStart;
-
-  dummyStart.type = QNodeOpen;
-
   for (QNode* qnP = qLexP; qnP != NULL; qnP = qnP->next)
   {
-    LM_TMP(("Q: Checking %s token", qNodeType(qnP->type)));
     //
     // Check the next-coming token
     //
     if (qnP->next != NULL)
     {
       QNodeType nextType = qnP->next->type;
-
-      LM_TMP(("Q: ------------------------------"));
-      LM_TMP(("Q: Prev type:    %s", qNodeType(prevNodeP->type)));
-      LM_TMP(("Q: Current type: %s", qNodeType(qnP->type)));
-      LM_TMP(("Q: Next type:    %s", qNodeType(qnP->next->type)));
 
       if (qnP->type == QNodeOpen)
       {
@@ -224,16 +204,6 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
       }
       else if (qnP->type == QNodeRegexpValue)
       {
-#if DEBUG
-          qLexRender(qnP, orionldState.qDebugBuffer, sizeof(orionldState.qDebugBuffer));
-          LM_TMP(("Q: On QNodeRegexpValue: %s", orionldState.qDebugBuffer));
-          qLexRender(qLexP, orionldState.qDebugBuffer, sizeof(orionldState.qDebugBuffer));
-          LM_TMP(("Q: Entire qLex list: %s", orionldState.qDebugBuffer));
-          LM_TMP(("Q: nextType  == %s", qNodeType(nextType)));
-          LM_TMP(("Q: this type == %s", qNodeType(qnP->type)));
-          LM_TMP(("Q: prev type == %s", qNodeType(prevNodeP->type)));
-#endif
-
         if ((nextType != QNodeClose) &&
             (nextType != QNodeAnd)   &&
             (nextType != QNodeOr))
@@ -254,8 +224,6 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
       else if ((qnP->type == QNodeFloatValue) || (qnP->type == QNodeIntegerValue))
       {
       }
-
-      prevNodeP = qnP;
     }
     else  // qnP->next == NULL)
     {
@@ -264,7 +232,6 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
       //
       if (qnP->type == QNodeClose)
       {
-        LM_TMP(("Q: On CLOSE: level is %d", level));
         if (level != 1)
         {
           *titleP = (char*) "ngsi-ld query language: mismatched parenthesis";
@@ -285,14 +252,8 @@ bool qLexCheck(QNode* qLexP, char** titleP, char** detailsP)
       }
       else if (level != 0)
       {
-        LM_TMP(("Q: LAST token: level is %d", level));
-        *titleP = (char*) "ngsi-ld query language: mismatched parenthesis";
-
-        if (level > 1)
-          *detailsP = (char*) "Excess of START Tokens '('";
-        else
-          *detailsP = (char*) "Excess of END Tokens ')'";
-
+        *titleP   = (char*) "ngsi-ld query language: mismatched parenthesis";
+        *detailsP = (level > 1)? (char*) "Excess of START Tokens '('" : (char*) "Excess of END Tokens ')'";
         return false;
       }
       else if (qnP->type == QNodeVariable)

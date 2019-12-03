@@ -53,7 +53,6 @@ bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::st
 
     STRING_CHECK(attributeP, "String-List item");
     expanded = orionldContextItemExpand(orionldState.contextP, attributeP->value.s, NULL, true, NULL);
-    LM_TMP(("SLIST: Called orionldContextItemExpand for '%s' -> '%s'", attributeP->value.s, expanded));
     stringListP->push_back(expanded);
   }
 

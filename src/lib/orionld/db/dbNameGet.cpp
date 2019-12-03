@@ -43,7 +43,6 @@ int dbNameGet(char* path, int pathLen)
 
   if ((multitenancy == true) && (orionldState.tenant != NULL))
   {
-    LM_TMP(("DB: tenant: %s", orionldState.tenant));
     path[used] = '-';
     ++used;
     strncat(&path[used], orionldState.tenant, pathLen - used);
@@ -56,6 +55,5 @@ int dbNameGet(char* path, int pathLen)
     return -1;
   }
 
-  LM_TMP(("DB: database name: %s", path));
   return 0;
 }

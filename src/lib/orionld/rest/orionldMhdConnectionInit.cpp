@@ -173,8 +173,6 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
 //
 static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
-  LM_TMP(("Got URI Param: '%s' == '%s'", key, value));
-
   if (SCOMPARE3(key, 'i', 'd', 0))
     orionldState.uriParams.id = (char*) value;
   else if (SCOMPARE5(key, 't', 'y', 'p', 'e', 0))
@@ -192,15 +190,15 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
 // -----------------------------------------------------------------------------
 //
-// uriArgumentsPresent - temp - FIXME: TO BE REMOVED
+// uriArgumentsPresent - necessary for functest "ngsild_uri_params_in_orionldState.test"
 //
 static void uriArgumentsPresent(void)
 {
-  LM_TMP(("orionldUriArguments: id:        '%s'", orionldState.uriParams.id));
-  LM_TMP(("orionldUriArguments: type:      '%s'", orionldState.uriParams.type));
-  LM_TMP(("orionldUriArguments: idPattern: '%s'", orionldState.uriParams.idPattern));
-  LM_TMP(("orionldUriArguments: attrs:     '%s'", orionldState.uriParams.attrs));
-  LM_TMP(("orionldUriArguments: options:   '%s'", orionldState.uriParams.options));
+  LM_T(LmtUriParams, ("orionldUriArguments: id:        '%s'", orionldState.uriParams.id));
+  LM_T(LmtUriParams, ("orionldUriArguments: type:      '%s'", orionldState.uriParams.type));
+  LM_T(LmtUriParams, ("orionldUriArguments: idPattern: '%s'", orionldState.uriParams.idPattern));
+  LM_T(LmtUriParams, ("orionldUriArguments: attrs:     '%s'", orionldState.uriParams.attrs));
+  LM_T(LmtUriParams, ("orionldUriArguments: options:   '%s'", orionldState.uriParams.options));
 }
 
 
@@ -332,7 +330,9 @@ int orionldMhdConnectionInit
   // 13. Get URI parameters
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);           // FIXME: To Be Removed!
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
-  uriArgumentsPresent();
+
+  if (lmTraceIsSet(LmtUriParams))
+    uriArgumentsPresent();
 
   // 14. Check ...
 

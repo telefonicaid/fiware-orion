@@ -38,12 +38,10 @@ extern "C"
 //
 DbEntityLookupFunction                    dbEntityLookup;
 DbEntityLookupManyFunction                dbEntityLookupMany;
-DbEntityUpdateAttributeFunction           dbEntityUpdateAttribute;                          
 DbEntityUpdateFunction                    dbEntityUpdate;
 DbEntityBatchDeleteFunction               dbEntityBatchDelete;
 DbDataToKjTreeFunction                    dbDataToKjTree;
 DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbEntityOperationsUpsertFunction          dbEntityOperationsUpsert;
 DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
 DbQueryEntitiesAsKjTree                   dbQueryEntitiesAsKjTree;  // FIXME: Name must change - what does it to really?
 
@@ -59,7 +57,7 @@ DbQueryEntitiesAsKjTree                   dbQueryEntitiesAsKjTree;  // FIXME: Na
 //   So, what does this function do, that dbEntityLookupMany does not?
 //   The answer to that question should answer the question about "what is a good name for this function".
 //
-//   And, the name for the function should be like this:  DbEntityLookupXxxFunction
+//   And, the name for the function should be like this:  dbEntityLookupXxxFunction
 //   Xxx describing the particularies with the function.
 //   We might have to rename dbEntityLookupMany - which would not be a problem.
 //

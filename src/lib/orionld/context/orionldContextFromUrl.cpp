@@ -42,8 +42,6 @@ OrionldContext* orionldContextFromUrl(char* url, OrionldProblemDetails* pdP)
 {
   OrionldContext* contextP = orionldContextCacheLookup(url);
 
-  LM_TMP(("CTX: Getting context from a URL: '%s'", url));
-
   if (contextP != NULL)
     return contextP;
 

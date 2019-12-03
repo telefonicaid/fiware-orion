@@ -52,8 +52,6 @@ extern "C"
 //
 bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
 {
-  LM_TMP(("LARYSSE: Payload is a JSON %s", kjValueType(orionldState.requestTree->type)));
-
   if (orionldState.requestTree->type != KjArray)
   {
     LM_W(("Bad Input (Payload must be a JSON Array)"));
@@ -85,7 +83,8 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
       return false;
     }
   }
-/*
+
+#if 0
   if (mongoCppLegacyQueryEntitiesAsKjTree(orionldState.requestTree) == NULL)
   {
     LM_E(("mongoCppLegacyQueryEntitiesAsKjTree returned NULL"));
@@ -94,7 +93,8 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
       orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyQueryEntitiesAsKjTree");
     return false;
   }
-*/
+#endif
+
   if (mongoCppLegacyEntityBatchDelete(orionldState.requestTree) == false)
   {
     LM_E(("mongoCppLegacyEntityBatchDelete returned false"));

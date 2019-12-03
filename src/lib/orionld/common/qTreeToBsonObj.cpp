@@ -33,6 +33,20 @@
 #include "orionld/common/qTreeToBsonObj.h"                     // Own interface
 
 
+//
+// FIXME: This entire function depends on Mongo C++ Legacy Client and must be moved to
+//        src/lib/orionld/mongoCppLegacy/mongoCppLegacyQtreeToDbObject.h/cpp.
+//
+//        To be DB-agnostic, its signature could be like this:
+//
+//          void* mongoCppLegacyQtreeToDbObject(QNode* treeP, char** titleP, char** detailsP)
+//          {
+//            mongo::BSONObjBuilder* objBuilderP = kaAlloc();
+//            ...
+//            return (void*) objBuilderP;
+//          }
+//
+
 
 // ----------------------------------------------------------------------------
 //
@@ -40,8 +54,6 @@
 //
 bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** titleP, char** detailsP)
 {
-  LM_TMP(("Q: Got a tree of type %s", qNodeType(treeP->type)));
-
   if (treeP->type == QNodeOr)
   {
     // { "%or": [ { }, { }, ... { } ] }
@@ -80,8 +92,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     QNode*                 rightP = leftP->next;
     mongo::BSONObjBuilder  matchObj;
 
-    LM_TMP(("Q: Creating REGEX-Object"));
-
     matchObj.append("$regex", rightP->value.s);
     topBsonObjP->append(leftP->value.v, matchObj.obj());
   }
@@ -90,7 +100,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     QNode* leftP  = treeP->value.children;
     QNode* rightP = leftP->next;
 
-    LM_TMP(("Q: Creating EQ-Object"));
     if (rightP->type == QNodeIntegerValue)
       topBsonObjP->append(leftP->value.v, rightP->value.i);
     else if (rightP->type == QNodeFloatValue)
@@ -142,8 +151,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
       inObj.append("$in", listArr.arr());
       topBsonObjP->append(leftP->value.v, inObj.obj());
     }
-
-    // LM_TMP(("Q: Added EQ-Object to top-level object: %s (DESTRUCTIVE)", topBsonObjP->obj().toString().c_str()));
   }
   else if (treeP->type == QNodeNE)
   {
@@ -179,7 +186,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
 
     if (rightP->type == QNodeRange)
     {
-      LM_TMP(("Q: != Range"));
       //
       // A1=12..24:
       // { "A1": { "$exists": true } }, { "$or": [ { "A1": { "$lt" 12 } }, { "A1": { "$gt", 24 } } ] }
@@ -192,26 +198,18 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
       QNode*                   lowerLimitNodeP = rightP->value.children;
       QNode*                   upperLimitNodeP = lowerLimitNodeP->next;
 
-      LM_TMP(("Q: leftP  is of type:          %s", qNodeType(leftP->type)));
-      LM_TMP(("Q: rightP is of type:          %s", qNodeType(rightP->type)));
-      LM_TMP(("Q: lowerLimitNodeP is of type: %s", qNodeType(lowerLimitNodeP->type)));
-      LM_TMP(("Q: upperLimitNodeP is of type: %s", qNodeType(upperLimitNodeP->type)));
-
       if (lowerLimitNodeP->type == QNodeIntegerValue)
       {
-        LM_TMP(("Q: Range is INTEGER"));
         lowerLimitObj.append("$lt", lowerLimitNodeP->value.i);
         upperLimitObj.append("$gt", upperLimitNodeP->value.i);
       }
       else if (lowerLimitNodeP->type == QNodeFloatValue)
       {
-        LM_TMP(("Q: Range is FLOAT"));
         lowerLimitObj.append("$lt", lowerLimitNodeP->value.f);
         upperLimitObj.append("$gt", upperLimitNodeP->value.f);
       }
       else if (lowerLimitNodeP->type == QNodeStringValue)
       {
-        LM_TMP(("Q: Range is STRING"));
         lowerLimitObj.append("$lt", lowerLimitNodeP->value.s);
         upperLimitObj.append("$gt", upperLimitNodeP->value.s);
       }
@@ -225,8 +223,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     }
     else if (rightP->type == QNodeComma)
     {
-      LM_TMP(("Q: != CommaList"));
-
       mongo::BSONArrayBuilder  ninVec;
       mongo::BSONObjBuilder    ninObj;
 
@@ -264,8 +260,6 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
       mongo::BSONObjBuilder  notObj;
       mongo::BSONObjBuilder  matchObj;
 
-      LM_TMP(("Q: Creating REGEX-Object"));
-
       matchObj.append("$regex", rightP->value.s);
       notObj.append("$not", matchObj.obj());
       topBsonObjP->append(leftP->value.v, notObj.obj());
@@ -283,22 +277,18 @@ bool qTreeToBsonObj(QNode* treeP, mongo::BSONObjBuilder* topBsonObjP, char** tit
     else if (treeP->type == QNodeLT)  op = (char*) "$lt";
     else if (treeP->type == QNodeLE)  op = (char*) "$lte";
 
-    LM_TMP(("Q: Creating GT-Object"));
     if      (rightP->type == QNodeIntegerValue)  gtObj.append(op, rightP->value.i);
     else if (rightP->type == QNodeFloatValue)    gtObj.append(op, rightP->value.f);
     else if (rightP->type == QNodeStringValue)   gtObj.append(op, rightP->value.s);
     else if (rightP->type == QNodeTrueValue)     gtObj.append(op, true);
     else if (rightP->type == QNodeFalseValue)    gtObj.append(op, false);
 
-    LM_TMP(("Q: Adding GT-Object to top-level object: var: '%s'", leftP->value.v));
     topBsonObjP->append(leftP->value.v, gtObj.obj());
-    LM_TMP(("Q: Added GT-Object to top-level object"));
   }
   else
   {
     // ERROR
   }
 
-  LM_TMP(("Q: Done"));
   return true;
 }

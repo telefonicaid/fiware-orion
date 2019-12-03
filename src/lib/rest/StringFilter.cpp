@@ -657,7 +657,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     expanded = kaStrdup(&orionldState.kalloc, expanded);
 
     char* cP = expanded;
-    LM_TMP(("EQDOT: %s->%s", attributeName.c_str(), expanded));
+
     while (*cP != 0)
     {
       if (*cP == '.')
@@ -666,7 +666,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     }
 
     attributeName = expanded;
-    LM_TMP(("EQDOT: attributeName: '%s'", attributeName.c_str()));
   }
 
 #endif

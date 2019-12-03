@@ -1104,15 +1104,13 @@ int main(int argC, char* argV[])
                           NULL);
   }
 
-  // orionldServiceInitPresent();
-
   LM_I(("Startup completed"));
   if (simulatedNotification)
   {
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_F(("Initialization Ready - Accepting Requests on Port %d", port));
+  LM_TMP(("Initialization ready - accepting requests on port %d", port));
 
   while (1)
   {

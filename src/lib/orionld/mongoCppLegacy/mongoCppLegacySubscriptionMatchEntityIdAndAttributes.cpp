@@ -105,9 +105,6 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
 
-  // Debugging - see the query
-  LM_TMP(("NFY: filter: %s", query.toString().c_str()));
-
   cursorP = connectionP->query(collectionPath, query);
 
   int niIx = 0;

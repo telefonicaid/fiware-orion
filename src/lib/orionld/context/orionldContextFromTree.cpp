@@ -47,15 +47,11 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
 {
   int itemsInArray;
 
-  LM_TMP(("CTX: Creating context from Tree. url: %s (at %p) - tree of type %s", url, url, kjValueType(contextTreeP->type)));
-
   if (contextTreeP->type == KjArray)
   {
     contextTreeP = orionldContextSimplify(contextTreeP, &itemsInArray);
     if (contextTreeP == NULL)
     {
-      LM_TMP(("CTX: got an array with only Core Context ..."));
-
       pdP->type   = OrionldBadRequestData;
       pdP->title  = (char*) "Empty @context";
       pdP->detail = (char*) "got an array with only Core Context";
@@ -77,6 +73,6 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
   pdP->detail = (char*) kjValueType(contextTreeP->type);
   pdP->status = 400;
 
-  LM_E(("CTX: %s: %s", pdP->title, pdP->detail));
+  LM_E(("%s: %s", pdP->title, pdP->detail));
   return NULL;
 }

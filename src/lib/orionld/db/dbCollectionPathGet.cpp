@@ -50,10 +50,6 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
     
   strcpy(path, dbName);
 
-  LM_TMP(("DB: dbName:     '%s'", dbName));
-  LM_TMP(("DB: tenant:     '%s'", (orionldState.tenant != NULL)? orionldState.tenant: "NULL"));
-  LM_TMP(("DB: collection: '%s'", collection));
-
   if (tenantLen != 0)
   {
     path[dbNameLen] = '-';
@@ -62,8 +58,6 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
 
   path[dbNameLen + tenantLen] = '.';
   strcpy(&path[dbNameLen + tenantLen + 1], collection);
-
-  LM_TMP(("DB: collection path: %s", path));
 
   return 0;
 }

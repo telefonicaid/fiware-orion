@@ -72,7 +72,6 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
 
   *downloadFailedP = false;
 
-  LM_TMP(("CTX: Downloading context '%s'", url));
   for (int tries = 0; tries < contextDownloadAttempts; tries++)
   {
     orionldState.httpResponse.buf       = NULL;  // orionldRequestSend allocates
@@ -90,14 +89,13 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     if (reqOk == true)
       break;
 
-    LM_E(("CTX: orionldRequestSend failed (try number %d out of %d. Timeout is: %dms): %s", tries + 1, contextDownloadAttempts, contextDownloadTimeout, pdP->detail));
+    LM_E(("orionldRequestSend failed (try number %d out of %d. Timeout is: %dms): %s", tries + 1, contextDownloadAttempts, contextDownloadTimeout, pdP->detail));
     if (tryAgain == false)
       break;
   }
 
   if (reqOk == false)
   {
-    LM_TMP(("CTX: Download of '%s' failed", url));
     pdP->type   = OrionldLdContextNotAvailable;
     pdP->title  = (char*) "Unable to download context";
     pdP->detail = (char*) url;

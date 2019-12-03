@@ -54,42 +54,33 @@ KjNode* mongocEntityLookup(const char* entityId)
   char*             details;
   KjNode*           entityNodeP = NULL;
   
-  LM_TMP(("DB: looking up entity with id: '%s'", entityId));
-
-  LM_TMP(("DB: Composing collection name"));
   if (dbNameGet(dbName, sizeof(dbName)) == -1)
     return NULL;
-  LM_TMP(("DB: database name: %s", dbName));
 
   //
   // Create the filter for the query
   //
-  LM_TMP(("DB: Calling bson_append_utf8"));
   bson_append_utf8(&mongoFilter, "_id.id", 3, entityId, -1);
-  LM_TMP(("DB: After bson_append_utf8"));
 
   //
   // Run the query
   //
   // semTake(&mongoEntitiesSem);
-  LM_TMP(("DB: Calling mongoc_client_command_simple"));
   if ((mongoCursorP = mongoc_collection_find_with_opts(mongoEntitiesCollectionP, &mongoFilter, NULL, NULL)) == NULL)
   {
-    LM_E(("mongoc_collection_find_with_opts ERROR"));
+    LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
     return NULL;
   }
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    LM_TMP(("DB: After mongoc_cursor_next - calling dbDataToKjTree"));
     entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);
-    LM_TMP(("DB: back from dbDataToKjTree, entityNodeP at %p", entityNodeP));
     break;  // Just using the first one - should be no more than one!
   }
 
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
   {
-    LM_W(("DB Error (%s)", mongoError.message));
+    LM_E(("Internal Error (DB Error '%s')", mongoError.message));
     return NULL;
   }
 

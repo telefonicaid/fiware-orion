@@ -137,7 +137,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   EntityId*              entityIdP;
   ContextAttribute*      delayedDelete[20];  // If more attributes, then ... :(
 
-  LM_TMP(("PATCH: In orionldPatchEntity"));
   mongoRequest.contextElementVector.push_back(&ce);
 
   entityIdP     = &mongoRequest.contextElementVector[0]->entityId;
@@ -165,8 +164,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     if (attrs >= sizeof(delayedDelete) / sizeof(delayedDelete[0]))
       LM_X(1, ("Need a bigger vector for delayed deletion of attributes"));
 
-    LM_TMP(("PATCH: Allocated Attribute for shortname '%s' at %p", kNodeP->name, caP));
-
     char* detail;
     if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
@@ -185,7 +182,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   //
   // Call mongoBackend - FIXME: call postUpdateContext, not mongoUpdateContext
   //
-  LM_TMP(("PATCH: Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
                                            orionldState.tenant,

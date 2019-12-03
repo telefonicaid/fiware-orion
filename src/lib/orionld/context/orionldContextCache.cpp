@@ -23,15 +23,8 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                              // NULL
-#include <semaphore.h>                                           // sem_t, sem_init, sem_wait, sem_post
 
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
-#include "orionld/context/orionldContextItemLookup.h"            // OrionldContextItemLookup
 #include "orionld/context/orionldContextCache.h"                 // Own interface
 
 
@@ -45,19 +38,3 @@ OrionldContext*   orionldContextCacheArray[100];  // When 100 is not enough, a r
 OrionldContext**  orionldContextCache         = orionldContextCacheArray;
 int               orionldContextCacheSlots    = 100;
 int               orionldContextCacheSlotIx   = 0;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// debugHashValue - FIXME move to own module (debug lib?)
-//
-void debugHashValue(const char* prefix, const char* name)
-{
-  OrionldContextItem* cItemP = orionldContextItemLookup(orionldState.contextP, name, NULL);
-
-  if (cItemP == NULL)
-    LM_TMP(("%s: '%s' not found", prefix, name));
-  else
-    LM_TMP(("%s: '%s' == '%s' (OrionldContextItem::id at %p)", prefix, name, cItemP->id, cItemP->id));
-}

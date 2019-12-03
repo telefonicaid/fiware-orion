@@ -68,7 +68,6 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
 
   for (int ix = 0; ix < ids; ix++)
   {
-    LM_TMP(("_id: %s", idVec[ix].c_str()));
     bsonArray.append(idVec[ix]);
   }
 
@@ -90,8 +89,6 @@ static bool uriParamIdToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idLis
 static bool uriParamIdPatternToFilter(mongo::BSONObjBuilder* queryBuilderP, char* idPattern, std::string* detailsP)
 {
   mongo::BSONObjBuilder  bsonInExpression;
-
-  LM_TMP(("uriParamIdPatternToFilter ss: %s", idPattern));
 
   if (idPattern[0] == 0)
   {
@@ -255,8 +252,6 @@ bool mongoLdRegistrationsGet
 
   query = queryBuilder.obj();  // Here all the filters added to queryBuilder are "merged" into 'query'
   query.sort(BSON("_id" << 1));
-
-  // LM_TMP(("KZ: query: %s", query.toString().c_str()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   reqSemTake(__FUNCTION__, "Mongo GET Registrations", SemReadOp, &reqSemTaken);

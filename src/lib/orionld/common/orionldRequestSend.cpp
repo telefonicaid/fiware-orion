@@ -116,8 +116,6 @@ bool orionldRequestSend
 
   *tryAgainP = false;
 
-  LM_TMP(("CURL: url:      %s", url));
-
   if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailPP) == false)
   {
     // urlParse sets *detailPP
@@ -127,11 +125,6 @@ bool orionldRequestSend
     *downloadFailedP = false;
     return false;
   }
-
-  LM_TMP(("CURL: protocol: %s", protocol));
-  LM_TMP(("CURL: port:     %d", port));
-  LM_TMP(("CURL: ip:       %s", ip));
-  LM_TMP(("CURL: urlPath:  %s", urlPath));
 
   if (rBufP->buf == NULL)
   {

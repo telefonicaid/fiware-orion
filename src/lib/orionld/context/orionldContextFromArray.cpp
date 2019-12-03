@@ -53,8 +53,6 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
   char*           id = NULL;
   OrionldContext* contextP;
 
-  LM_TMP(("CTX: Creating array for context '%s'", url));
-
   if (url == NULL)
     url = orionldContextUrlGenerate(&id);
 
@@ -74,24 +72,19 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
   //
   int slot = itemsInArray - 1;  // NOTE: Insertion starts at the end of the array - the array is sorted backwards
 
-  LM_TMP(("CTX: ================================ orionldContextFromArray Start =================================================================================="));
-  LM_TMP(("CTX: Starting with slot %d. array at %p", slot, contextArrayP));
   for (KjNode* arrayItemP = contextArrayP->value.firstChildP; arrayItemP != NULL; arrayItemP = arrayItemP->next)
   {
     OrionldContext* childContextP;
 
-    LM_TMP(("CTX: current slot: %d, item type is: '%s'", slot, kjValueType(arrayItemP->type)));
-
     if (arrayItemP->type == KjString)
     {
-      LM_TMP(("CTX: current slot: %d, KjString: %s", slot, arrayItemP->value.s));
       childContextP = orionldContextCacheLookup(arrayItemP->value.s);
       if (childContextP == NULL)
         childContextP = orionldContextFromUrl(arrayItemP->value.s, pdP);
       if (childContextP == NULL)
       {
         // orionldContextFromUrl fills in pdP
-        LM_E(("CTX: orionldContextFromUrl: %s: %s", pdP->title, pdP->detail));
+        LM_E(("orionldContextFromUrl: %s: %s", pdP->title, pdP->detail));
         return NULL;
       }
     }
@@ -108,7 +101,7 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
     }
     else
     {
-      LM_E(("CTX: invalid type of @context array item: %s", kjValueType(arrayItemP->type)));
+      LM_E(("invalid type of @context array item: %s", kjValueType(arrayItemP->type)));
       pdP->type   = OrionldBadRequestData;
       pdP->title  = (char*) "Invalid @context - invalid type for @context array item";
       pdP->detail = (char*) kjValueType(arrayItemP->type);
@@ -121,7 +114,5 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
     --slot;
   }
 
-  LM_TMP(("CTX: ===================================== orionldContextFromArray End ==============================================================================="));
-  orionldContextCachePresent("CTX", "After orionldContextFromArray");
   return contextP;
 }

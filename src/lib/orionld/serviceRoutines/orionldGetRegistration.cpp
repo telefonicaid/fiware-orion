@@ -45,7 +45,6 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
   char*                 details;
 
   LM_T(LmtServiceRoutine, ("In orionldGetRegistration (%s)", orionldState.wildcard[0]));
-  LM_TMP(("TENANT: %s", orionldState.tenant));
 
   if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
   {

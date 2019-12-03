@@ -125,22 +125,17 @@ void mongoCppLegacyKjTreeToBsonObj(KjNode* nodeP, void* dbDataP)
 
   if (nodeP->type == KjObject)
   {
-    LM_TMP(("BOB: %s is an OBJECT", nodeP->name));
     mongo::BSONObjBuilder bob;
 
     for (KjNode* objItemP = nodeP->value.firstChildP; objItemP != NULL; objItemP = objItemP->next)
     {
-      LM_TMP(("BOB: Adding child '%s'", objItemP->name));
       kjTreeToBsonObject(objItemP, &bob);
     }
 
-    LM_TMP(("BOB: bsonObjP at %p", bsonObjP));
     *bsonObjP = bob.obj();
-    LM_TMP(("BOB: Still here ...", nodeP->name));
   }
   else if (nodeP->type == KjArray)
   {
-    LM_TMP(("BOB: %s is an ARRAY", nodeP->name));
     mongo::BSONArrayBuilder bab;
 
     for (KjNode* arrayItemP = nodeP->value.firstChildP; arrayItemP != NULL; arrayItemP = arrayItemP->next)
@@ -152,9 +147,7 @@ void mongoCppLegacyKjTreeToBsonObj(KjNode* nodeP, void* dbDataP)
   {
     mongo::BSONObjBuilder bob;
 
-    LM_TMP(("BOB: %s is neither a KjObject nor a KjArray - creating mongo::BSONObjBuilder and calling kjTreeToBsonObject", nodeP->name));
     kjTreeToBsonObject(nodeP, &bob);
-    LM_TMP(("BOB: converting the mongo::BSONObjBuilder into a mongo::BSONObj"));
     *bsonObjP = bob.obj();
   }
 }

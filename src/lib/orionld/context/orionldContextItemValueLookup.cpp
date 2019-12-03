@@ -40,26 +40,14 @@ OrionldContextItem* orionldContextItemValueLookup(OrionldContext* contextP, cons
 {
   OrionldContextItem* itemP = NULL;
 
-  LM_TMP(("ALIAS: Looking for value '%s' in context '%s'", longname, contextP->url));
-
   if (contextP->keyValues == true)
-  {
-    LM_TMP(("ALIAS: Context is an Object (Hashed key-values): calling khashItemLookup"));
     itemP = (OrionldContextItem*) khashItemLookup(contextP->context.hash.valueHashTable, longname);
-    if (itemP != NULL)
-      LM_TMP(("ALIAS: Found %s: %s", longname, itemP->name));
-  }
   else
   {
-    LM_TMP(("ALIAS: Context is an Array"));
     for (int ix = 0; ix < contextP->context.array.items; ++ix)
     {
-      LM_TMP(("ALIAS: Recursive call to orionldContextItemValueLookup for context '%s'", contextP->context.array.vector[ix]->url));
       if ((itemP = orionldContextItemValueLookup(contextP->context.array.vector[ix], longname)) != NULL)
-      {
-        LM_TMP(("ALIAS: Found %s: %s", longname, itemP->name));
         break;
-      }
     }
   }
 

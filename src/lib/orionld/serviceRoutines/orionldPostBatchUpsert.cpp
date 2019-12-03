@@ -64,7 +64,6 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"          // orionldUriExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
-#include "orionld/db/dbEntityUpdateAttribute.h"                // dbEntityUpdateAttribute
 
 
 

@@ -630,7 +630,6 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   {
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
-    LM_TMP(("CTX: Got context in HTTP Link Header: %s. orionldState.linkHttpHeaderPresent == %s", orionldState.link, FT(orionldState.linkHttpHeaderPresent)));
   }
 #endif
   else
@@ -677,10 +676,7 @@ static void requestCompleted
   struct timespec  reqEndTime;
 
   if (orionldState.notify == true)
-  {
-    LM_TMP(("NFY: Rest request has finished - now time to send notifications"));
     orionldNotify();
-  }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {

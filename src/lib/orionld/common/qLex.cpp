@@ -73,7 +73,6 @@ static QNode* qRegexpPush(QNode* prev, char* regexpValue)
 {
   QNode* qNodeP = qNode(QNodeRegexpValue);
 
-  LM_TMP(("Q: Pushing REGEX: %s", regexpValue));
   qNodeP->value.re = regexpValue;
 
   prev->next = qNodeP;
@@ -89,8 +88,6 @@ static QNode* qRegexpPush(QNode* prev, char* regexpValue)
 //
 static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
 {
-  LM_TMP(("Q: TERM: '%s'", term));
-
   //
   // Trim the term
   //
@@ -162,30 +159,19 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
         type = QNodeVariable;
     }
 
-    LM_TMP(("Q: Pushing term: '%s' of type %s", term, qNodeType(type)));
     QNode* qNodeP = qNode(type);
 
     if (type == QNodeIntegerValue)
     {
       int64_t dTime;
 
-      if (dateTime == true)
-      {
-        if ((dTime = parse8601Time(term)) == -1)
-        {
-          LM_TMP(("Q: Seemed like a DateTime but parse8601Time said NO"));
-          dateTime = false;
-        }
-      }
+      if ((dateTime == true) && ((dTime = parse8601Time(term)) == -1))
+        dateTime = false;
+
       if (dateTime == false)
-      {
         qNodeP->value.i = strtoul(term, NULL, 10);
-      }
       else
-      {
-        LM_TMP(("Q: Pushing term '%s': the type is finally a DateTime", term));
         qNodeP->value.i = dTime;
-      }
     }
     else if (type == QNodeFloatValue)
       qNodeP->value.f = strtod(term, NULL);
@@ -207,9 +193,8 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
 //
 static QNode* qOpPush(QNode* prev, QNodeType type)
 {
-  LM_TMP(("Q: Pushing OP %s", qNodeType(type)));
-
   QNode* qNodeP = qNode(type);
+
   prev->next = qNodeP;
   return qNodeP;
 }
@@ -228,26 +213,17 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
   char*  stringStart = s;
   int    level       = 0;
 
-  LM_TMP(("Q: Lexing '%s'", sP));
-
   *titleP = NULL;
 
   while (1)
   {
     QNodeType type;
 
-    if (*sP != 0)
-      LM_TMP(("Q: Current character: '%c'", *sP));
-    else
-      LM_TMP(("Q: Current character: ZERO!!! - end of string"));
-
     if (*sP == ' ')
     {
       ++sP;
     }
-    else
-
-    if ((*sP == '<') || (*sP == '>'))
+    else if ((*sP == '<') || (*sP == '>'))
     {
       if (sP[1] == '=')
       {
@@ -337,7 +313,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
       *sP = 0;
       ++sP;
-      LM_TMP(("Q: KZ: type: %s", qNodeType(type)));
+
       current = qTermPush(current, stringStart, titleP, detailsP);
       current = qOpPush(current, type);
       stringStart = sP;
@@ -361,7 +337,6 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       current->value.level = level;
       ++level;
       stringStart = sP;
-      // LM_TMP(("Q: stringStart set to '%s'", stringStart));
     }
     else if (*sP == ')')
     {
@@ -373,7 +348,6 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       --level;
       current->value.level = level;
       stringStart = sP;
-      // LM_TMP(("Q: stringStart set to '%s'", stringStart));
     }
     else if (*sP == 0)
     {
@@ -418,9 +392,6 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
 
       sP = &sP[3];  // step over RE(
 
-      // LM_TMP(("Q: RE:Init: *sP  == %c (%d)", *sP, *sP));
-      // LM_TMP(("Q: RE:Init: prev == %c (%d)", prev, prev));
-
       //
       // Find closing ')', counting all '(', ')'
       // Skipping of course escaped parenthesis - "\(", "\)"
@@ -431,27 +402,16 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
         if (prev != '\\')
         {
           if (*sP == ')')
-          {
             --level;
-            // LM_TMP(("Q: RE:Loop: found ')': new level: %d", level));
-          }
           else if (*sP == '(')
-          {
             ++level;
-            // LM_TMP(("Q: RE:Loop: found '(': new level: %d", level));
-          }
         }
 
         if (level == 0)
           break;
         prev = *sP;
         ++sP;
-
-        // LM_TMP(("Q: RE:Loop: *sP=%c, prev=%c: level == %d", *sP, prev, level));
       }
-
-      // LM_TMP(("Q: RE:Found: *sP  == %c (%d)", *sP, *sP));
-      // LM_TMP(("Q: RE:Found: prev == %c (%d)", prev, prev));
 
       if (*sP == 0)
       {

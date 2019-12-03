@@ -70,7 +70,5 @@ int orionldServerConnect(char* ip, uint16_t portNo)
     LM_E(("Unable to connect to host/port: %s:%d", ip, portNo));
   }
 
-  LM_TMP(("NFY: Connected to server %s:%d", ip, portNo));
-
   return fd;
 }

@@ -78,7 +78,6 @@ void httpHeaderLinkAdd(ConnectionInfo* ciP, const char* _url)
   if (orionldState.linkHeaderAdded == true)
     return;
 
-  LM_TMP(("LINK: _url: %s", _url));
   // If no context URL is given, the Core Context is used
   if (_url == NULL)
     url = ORIONLD_CORE_CONTEXT_URL;

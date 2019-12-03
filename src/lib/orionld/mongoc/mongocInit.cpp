@@ -40,7 +40,6 @@ void mongocInit(const char* dbHost, const char* dbName)
   bson_error_t mongoError;
   char         mongoUri[512];
 
-  LM_TMP(("DB: initializing database"));
   snprintf(mongoUri, sizeof(mongoUri), "mongodb://%s", dbHost);
 
   //
@@ -51,7 +50,6 @@ void mongocInit(const char* dbHost, const char* dbName)
   //
   // Safely create a MongoDB URI object from the given string
   //
-  LM_TMP(("DB: Mongo URI: '%s'", mongoUri));
   orionldState.mongoUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
   if (orionldState.mongoUri == NULL)
     LM_X(1, ("mongoc_uri_new_with_error(%s): %s", orionldState.mongoUri, mongoError.message));
@@ -59,11 +57,9 @@ void mongocInit(const char* dbHost, const char* dbName)
   //
   // Create a new client instance
   //
-  LM_TMP(("DB: Creating a new client instance"));
   orionldState.mongoClient = mongoc_client_new_from_uri(orionldState.mongoUri);
   if (orionldState.mongoClient == NULL)
     LM_X(1, ("mongoc_client_new_from_uri failed"));
-  LM_TMP(("DB: Got a new client instance"));
 
   //
   // Register the application name (to get tracking possibilities in the profile logs on the server)
@@ -83,10 +79,8 @@ void mongocInit(const char* dbHost, const char* dbName)
   mongoEntitiesCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "entities");
   if (mongoEntitiesCollectionP == NULL)
     LM_X(1, ("mongoc_client_get_collection(%s, 'entities') failed", dbName));
-  LM_TMP(("DB: entities collection handle OK!"));
 
   mongoRegistrationsCollectionP = mongoc_client_get_collection(orionldState.mongoClient, dbName, "registrations");
   if (mongoRegistrationsCollectionP == NULL)
     LM_X(1, ("mongoc_client_get_collection(%s, 'regiatrations') failed", dbName));
-  LM_TMP(("DB: registrations collection handle OK"));
 }

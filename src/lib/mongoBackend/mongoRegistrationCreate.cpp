@@ -140,7 +140,6 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
     {
       if (eP->id != "")
       {
-        LM_TMP(("KZ: reg entity id == '%s'", eP->id.c_str()));
         if (eP->type == "")
           entities.append(BSON(REG_ENTITY_ID << eP->id));
         else
@@ -148,7 +147,6 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
       }
       else if (eP->idPattern != "")
       {
-        LM_TMP(("KZ: reg entity idPattern == '%s'", eP->idPattern.c_str()));
         if (eP->type == "")
           entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
         else
@@ -256,11 +254,8 @@ static void setProperties(const char* name, KjNode* properties, mongo::BSONObjBu
 {
   mongo::BSONObj propertiesObj;
 
-  LM_TMP(("BOB: Calling mongoCppLegacyKjTreeToBsonObj. bobP at %p", bobP));
   mongoCppLegacyKjTreeToBsonObj(properties, &propertiesObj);
-  LM_TMP(("BOB: After mongoCppLegacyKjTreeToBsonObj"));
   bobP->append(name, propertiesObj);
-  LM_TMP(("BOB: After appending propertiesObj to bobP"));
 }
 
 #endif
@@ -341,7 +336,6 @@ void mongoRegistrationCreate
   if (regP->managementInterval.start != 0)
     setTimeInterval("managementInterval", &regP->managementInterval, &bob);
 
-  LM_TMP(("BOB: regP->location.coordsNodeP at %p", regP->location.coordsNodeP));
   if (regP->location.coordsNodeP != NULL)
     setGeoLocation("location", &regP->location, &bob);
   if (regP->observationSpace.coordsNodeP != NULL)

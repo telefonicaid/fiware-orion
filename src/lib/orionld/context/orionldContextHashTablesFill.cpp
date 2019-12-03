@@ -121,9 +121,6 @@ bool orionldContextHashTablesFill(OrionldContext* contextP, KjNode* keyValueTree
         hashItemP->id = orionldContextPrefixExpand(contextP, hashItemP->id, colonP);
 
       hashItemP->id = kaStrdup(&kalloc, hashItemP->id);
-      LM_TMP(("HASH: %s -> %s", hashItemP->name, hashItemP->id));
-
-      LM_TMP(("HASHEXPAND: Inserting '%s' in the valueHashTable", hashItemP->id));
       khashItemAdd(valueHashTableP, hashItemP->id, hashItemP);
 
       itemP = itemP->next;

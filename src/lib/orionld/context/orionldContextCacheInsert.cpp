@@ -66,9 +66,4 @@ void orionldContextCacheInsert(OrionldContext* contextP)
   ++orionldContextCacheSlotIx;
 
   sem_post(&orionldContextCacheSem);
-
-  if (contextP->keyValues)
-    LM_TMP(("CTX: Inserted key-value context '%s' in context-cache - nameHashTable at %p", contextP->url, contextP->context.hash.nameHashTable));
-  else
-    LM_TMP(("CTX: Inserted array context '%s' in context-cache - %d array items", contextP->url, contextP->context.array.items));
 }

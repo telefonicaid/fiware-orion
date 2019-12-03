@@ -38,8 +38,6 @@
 //
 bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
 {
-  LM_TMP(("Q: Got a tree of type %s", qNodeType(treeP->type)));
-
   if (treeP->type == QNodeOr)
   {
     // { "%or": [ { }, { }, ... { } ] }
@@ -76,9 +74,6 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
     int          opLen  = (treeP->type == QNodeGT)?     3 : 4;
     bson_t       gtBson;
 
-    LM_TMP(("Q: GT: left is of type %s", qNodeType(leftP->type)));
-    LM_TMP(("Q: GT: right is of type %s", qNodeType(rightP->type)));
-
     bson_init(&gtBson);
 
     bson_append_document_begin(bsonP, leftP->value.v, -1, &gtBson);
@@ -105,9 +100,6 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
     int          opLen  = (treeP->type == QNodeLT)?     3 : 4;
     bson_t       ltBson;
 
-    LM_TMP(("Q: LT: left is of type %s", qNodeType(leftP->type)));
-    LM_TMP(("Q: LT: right is of type %s", qNodeType(rightP->type)));
-
     bson_init(&ltBson);
 
     bson_append_document_begin(bsonP, leftP->value.v, -1, &ltBson);
@@ -130,9 +122,6 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
   {
     QNode* leftP  = treeP->value.children;
     QNode* rightP = leftP->next;
-
-    LM_TMP(("Q: EQ: left is of type %s", qNodeType(leftP->type)));
-    LM_TMP(("Q: EQ: right is of type %s", qNodeType(rightP->type)));
 
     if (rightP->type == QNodeStringValue)
       bson_append_utf8(bsonP, leftP->value.v, -1, rightP->value.s, -1);
@@ -228,90 +217,11 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
     if (b == false)
       return false;
   }
-#if 0
-  {
-    QNode* leftP  = treeP->value.children;
-    QNode* rightP = leftP->next;
-
-    LM_TMP(("Q: EQ: left is of type %s", qNodeType(leftP->type)));
-    LM_TMP(("Q: EQ: right is of type %s", qNodeType(rightP->type)));
-
-    if (rightP->type == QNodeStringValue)
-    {
-      bson_t notBson;
-      bson_init(&notBson);
-      bson_append_document_begin(bsonP, leftP->value.v, -1, &notBson);
-      bson_append_utf8(&notBson, "$ne", 3, rightP->value.s, -1);
-      bson_append_document_end(bsonP, &notBson);
-    }
-    else if (rightP->type == QNodeIntegerValue)
-    {
-      bson_t notBson;
-      bson_init(&notBson);
-      bson_append_document_begin(bsonP, leftP->value.v, -1, &notBson);
-      bson_append_int64(&notBson, "$ne", 3, rightP->value.i);
-      bson_append_document_end(bsonP, &notBson);
-    }
-    else if (rightP->type == QNodeFloatValue)
-    {
-      bson_t notBson;
-      bson_init(&notBson);
-      bson_append_document_begin(bsonP, leftP->value.v, -1, &notBson);
-      bson_append_double(&notBson, "$ne", 3, rightP->value.f);
-      bson_append_document_end(bsonP, &notBson);
-    }
-    else if (rightP->type == QNodeRange)
-    {
-      //
-      // P1 != 12..15:
-      //
-      // { "$or": [ { "P1": { "$gt": 15 } }, { "P1": { "$lt": 12 } } ] }
-      //
-      QNode* lowerLimitNodeP = rightP->value.children;
-      QNode* upperLimitNodeP = lowerLimitNodeP->next;
-      bson_t orBson;
-      bson_t gtBson;
-      bson_t ltBson;
-
-      bson_init(&orBson);
-      bson_init(&gtBson);
-      bson_init(&ltBson);
-
-      if (lowerLimitNodeP->type == QNodeIntegerValue)
-      {
-        bson_append_array_begin(bsonP, leftP->value.v, -1, &orBson);
-
-        bson_append_document_begin(&orBson, "", 0, &gtBson);
-        bson_append_int64(&gtBson, "$gt", 4, upperLimitNodeP->value.i);
-        bson_append_document_end(&orBson, &gtBson);
-
-        bson_append_document_begin(&orBson, "", 0, &ltBson);
-        bson_append_int64(&ltBson, "$lt", 4, lowerLimitNodeP->value.i);
-        bson_append_document_end(&orBson, &ltBson);
-
-        bson_append_array_end(bsonP, &orBson);
-      }
-      else if (lowerLimitNodeP->type == QNodeFloatValue)
-      {
-      }
-      else if (lowerLimitNodeP->type == QNodeStringValue)
-      {
-      }
-    }
-    else
-    {
-      *titleP   = (char*) "ngsi-ld query language: not implemented - token type in NEQ comparison";
-      *detailsP = (char*) qNodeType(rightP->type);
-      return false;
-    }
-  }
-#endif
   else if (treeP->type == QNodeExists)
   {
     QNode* leftP  = treeP->value.children;
     bson_t existsBson;
 
-    LM_TMP(("Q: KZ: exists TRUE"));
     bson_init(&existsBson);
     bson_append_document_begin(bsonP, leftP->value.v, -1, &existsBson);
     bson_append_bool(&existsBson, "$exists", 7, true);
@@ -322,7 +232,6 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
     QNode* leftP  = treeP->value.children;
     bson_t notExistsBson;
 
-    LM_TMP(("Q: KZ: exists FALSE"));
     bson_init(&notExistsBson);
     bson_append_document_begin(bsonP, leftP->value.v, -1, &notExistsBson);
     bson_append_bool(&notExistsBson, "$exists", 7, false);

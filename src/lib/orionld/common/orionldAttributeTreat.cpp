@@ -495,9 +495,6 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     char*  longName;
     bool   valueMayBeExpanded  = false;
 
-    LM_TMP(("VEX: ------------------------------------------------------------------------------------------"));
-    LM_TMP(("VEX: Calling orionldUriExpand for node '%s' is of type '%s'", kNodeP->name, kjValueType(kNodeP->type)));
-
     longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, NULL);
 
     if (valueMayBeExpanded)
@@ -538,7 +535,6 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   bool     isRelationship         = false;
   KjNode*  nodeP                  = kNodeP->value.firstChildP;
 
-  LM_TMP(("VEX: treating attribute '%s'", kNodeP->name));
   while (nodeP != NULL)
   {
     LM_T(LmtPayloadCheck, ("Treating part '%s' of attribute '%s'", nodeP->name, kNodeP->name));
@@ -686,14 +682,12 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     }
     else  // Other
     {
-      LM_TMP(("VEX: Other: %s", nodeP->name));
       //
       // Expand sub-attribute name
       //
       bool  valueMayBeExpanded  = false;
 
       nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, &valueMayBeExpanded, true, NULL);
-      LM_TMP(("VEX: valueMayBeExpanded: %s", FT(valueMayBeExpanded)));
 
       if (valueMayBeExpanded == true)
         orionldContextValueExpand(nodeP);

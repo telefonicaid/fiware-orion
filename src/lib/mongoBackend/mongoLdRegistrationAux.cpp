@@ -166,18 +166,10 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
 //
 void mongoSetLdTimestamp(long long* timestampP, const char* name, const mongo::BSONObj& bobj)
 {
-  LM_TMP(("sysAttrs: name: %s", name));
   if (bobj.hasField(name))
-  {
-    LM_TMP(("sysAttrs: %s is present in bobj", name));
     *timestampP = getIntFieldF(bobj, name);
-    LM_TMP(("sysAttrs: %s: %llu", name, *timestampP));
-  }
   else
-  {
-    LM_TMP(("sysAttrs: %s is NOT present in bobj", name));
     *timestampP = -1;
-  }
 }
 
 
@@ -200,8 +192,6 @@ bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, 
       else if (strcmp(nodeP->name, "coordinates") == 0)
         geoLocationP->coordsNodeP = nodeP;
     }
-
-    LM_TMP(("TMI: geoType:   '%s'", geoLocationP->geoType));
 
     if (geoLocationP->coordsNodeP == NULL)
     {
