@@ -2,19 +2,27 @@
 
 Welcome to the Quick Start Guide to Orion-LD, the NGSI-LD context broker!
 
-This guide is a walk-through of the most common characteristics of Orion-LD, with plenty of examples.
+This guide is a brief guide to the most common characteristics of Orion-LD, with examples.
 It's imperative to have a running instance of Orion-LD and MongoDB to play with for this exercise.
 
-The first thing to do is to thoroughly read [this quick guide to the @context](doc/manuals-ld/the-context.md)
+Orion-LD is an enhanced [Orion](https://github.com/telefonicaid/fiware-orion) and implements (apart from what Orion offers) the NGSI-LD API.
+The NGSI-LD API is specified [here](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf) and while it's a pretty extensive
+document, anybody that is really going to work with NGSI-LD should definitely read this document. And use it as a reference, of course.
 
-Apart from learning about the context, we will look at how to:
+The first thing to do is to thoroughly read [this quick guide to the @context](doc/manuals-ld/the-context.md).
+There are also a number of tutorials about NGSi-LD:
+* [tutorial X](http://xxx)   - JASON!
+* [tutorial Y](http://xxx)   - JASON!
+
+
+Apart from learning about the context, this quick-start guide will show how to:
 - Use `curl` to send HTTP requests to Orion-LD
 - Use the `mongo` command tool to inspect the contents of the database
 - Create entities with contexts
 - Retrieve entities with different contexts - to see "different results" for the very same entity retrieval !!!
-- Filtering of the results - get only the entities that match your criteria
-- Subscriptions and Notifications
+- Filter the results - get only the entities that match your specific criteria
 
+More information about the context will be provided as well, as this is crucial knowledge to work with Orion-LD.
 
 ## Creation of Entities
 Now that we know how the context works, let's get our hands dirty and create an entity or five!
@@ -63,15 +71,16 @@ curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: applicat
 
 A few notes about the payload:
 * The entity `"id"` field **must** be a URI.
-* The entity `"type"` field is **mandatory**.
+* The entity `"type"` field is **mandatory** - will be expanded.
 * Attributes must be JSON Objects, and they **must** have a "type", whose value **must** be any of:
-  * Property
-  * Relationship
-  * GeoProperty
+    * Property
+    * Relationship
+    * GeoProperty
+  The attribute names will be expanded.
 * Attributes that are of type *Property* **must** have a "value" field
 * Attributes that are of type *Relationship* **must** have an "object" field and the value of that field **must** he a URI.
 
-After issuing this command, the broker responds with a **201 Created** (which you won't see unless you ask `curl` to show the HTTP headers)
+After issuing this command, the broker responds with a **201 Created** (which you won't see unless you ask `curl` to show the HTTP headers - how to do this is explained later)
 and we can now look inside the mongo database to see what exactly has been stored:
 
 ```bash
@@ -100,18 +109,20 @@ What we will concentrate on here is the expansion of the entity type and the two
 [ If you issue this command yourselves, you will see more fields, especially "creDate/modDate" that are timestamps to store creation date and last modification date. ]
 
 The entity type was "T".
-"T" is not part of the core context, and no user context has been supplied, so, "T" wasn't found.
-What happens if a term is not found?  Correct! It is expanded according to the "@vocab" key of the core context.
+"T" is not part of the core context, and no user context has been supplied, so, "T" hasn't been found in the context.
+What happens if a term to be expanded is not found in the context?  
+It is expanded according to the value of the "@vocab" key of the core context.
 
 The same has happened to the property "state".
 
-"status" on the other hand is part of the core context, and it has been expanded accordingly.
+"status" on the other hand is part of the core context, and it has been expanded according the core context.
 
 But look at the expansions of the properties.
 They aren't as the core context defines them!!!
 All dots have been replaced with '=' !!!
-This is part of the data model. Dots can't be part of any attribute name in the database as that would complicate filtering over subattributes.
-We have to look at things in advance here, to understand that.
+
+This is part of the data model. Dots can't be part of any attribute name in the database as that would complicate filtering over sub-attributes.
+We have to look at things in advance here, to understand this.
 There is a mechanism to filter on properties-of-properties and the dot '.' is used as separator.
 Imagine you have an entity with a Property "P1" with a sub-property "P11" with the value 127.
 This is how you find that entity:
@@ -126,11 +137,17 @@ We picked '=' as it's a forbidden character for attribute names and can't be use
 By the way, the "P1.P11" in the q-expression would be expanded to something like "https://uri=etsi=org/ngsi-ld/default-context/P1.https://uri=etsi=org/ngsi-ld/default-context/P11",
 if the Core context were used. And yes, it looks ugly, but it works :)
 
-### Entity Creation Example 1 - with user context in payload
-Now let's play a little with expansion, by using our own context that tries to overload the Core context (which is not possible, as you will see).
+### Entity Creation Example 2 - with a user context in the payload
+Now let's play a little with expansions, by using our own context that tries to overload the Core context (which is not possible, as you will see).
 We will create our own context, defining:
-* status (that is also part of the Core context and thus cannot ve overloaded)
-* state  (that is *not* part of the Core context, only our user-defined context)
+* status (that is part of the Core context and thus cannot ve overloaded)
+* state  (that is *not* part of the Core context)
+
+The entity to be created will contain three attribute, one for each type of expansion:
+* status (expanded according to the core context)
+* state  (expanded according to the user context)
+* state2 (expanded according to the default URL)
+
 ```bash
 payload='{
   "@context": {
@@ -156,8 +173,7 @@ curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: applicat
 ```
 
 Note that the Content-Type is now `application/ld+json`, as the payload data carries a context.
-The values of the properties tell you pretty much alreadyh what is going to happen.
-However, let's take a look at the database content after issuing this request:
+Let's see the database content after issuing this request:
 ```bash
 mongo orion
 > db.entities.findOne({"_id.id": "urn:entities:E2"})
@@ -190,12 +206,13 @@ This is the trimmed mongo output:
 As you expected and as you can see:
 * "status" has been expanded according to the Core context - defining it in the user context was useless
 * "state" has been expanded according to the user context
-* "T" and "state2" have been expanded according to the default URL (@vocab item in the core context)
+* "T" and "state2" have both been expanded according to the default URL (the value of the @vocab item of the core context)
 
-
-### Entity Retrieval Example 1 - without context
+## Retrieval of Entities
 We have created two entities, with a mix of contexts being used to expand the attribute names.
 Let's retrieve the entities and see what exact attribute names we get.
+
+### Entity Retrieval Example 1 - without context
 No context will be used (== the Core context will be used):
 ```bash
 curl localhost:1026/ngsi-ld/v1/entities?type=T
@@ -207,7 +224,7 @@ curl localhost:1026/ngsi-ld/v1/entities?type=https://uri.etsi.org/ngsi-ld/defaul
 ```
 
 That would be useful in case you look for entities whose types have been expanded with some other context.
-Instead of passing in the entire context, you only pass the fully qualified name (FQN) of the type.
+Instead of passing in the entire context, you only pass the fully qualified name (FQN) of the *type*.
 
 The output from the retieval command is as follows:
 ```
@@ -268,21 +285,26 @@ To inhibit this behaviour of `curl`, give it an Accept header, for example **app
 curl 'localhost:1026/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2' -H "Accept: application/json"
 ```
 
-If you try this command you will see the entities without the "@context" member.
+If you try this command you will see the entities without the "@context" member (the context is returned in the HTTP header "Link" instead).
 
 You can also ask `curl` to not add any Accept header at all, by giving it an empty Accept header:
 ```bash
 curl 'localhost:1026/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2' -H "Accept:"
 ```
 
-Orion-LD responds with **application/json** if no Accept header is given.
+Orion-LD responds with mime-type *application/json* if no Accept header is given.
+Orion-LD responds with mime-type *application/json* whenever possible (for example, for accept header `*/*` or `application/*`.
 
 Back on track ...
 The entity "urn:entities:E1" was created without any context, i.e. the Core Context, but when creating "urn:entities:E2" we gave a context.
 So, why do both entities come back with the Core context???
 
 Simple. The context of the **GET request** was the core context, and that is what has been used to assemble the response.
-Each request uses the current context, the context used when issuing the request. Never mind what was used before.
+
+This is important:
+
+**Each request uses the current context, the context used when issuing the request. Never mind what context was used before.**
+
 After all, a context is nothing but a collection of aliases.
 The real names and values are the longnames, which is what is stored in the database.
 
@@ -296,7 +318,7 @@ We have two entities, one with two attributes and one with three
   * state2
   * status
 
-As you can see from the oresponse of the GET request, only "state" of "urn:entities:E2" is returned as a long name.
+As you can see from the response of the GET request, only "state" of "urn:entities:E2" is returned as a long name.
 Why is that?
 Well, when the GET request processed what was found in the database, trying to match long names to short names,
 only the Core context was used, as that's what was used in the GET request.
@@ -313,7 +335,7 @@ It's tricky, I know.
 Please read through this example again, if needed, until it is 100% clear.
 
 ### Entity Retrieval Example 2 - with context
-I said earlier that a context only lives within its own request.
+We said earlier that a context only lives within its own request.
 This is true. Otherwise I wouldn't have said it! :)
 However, requests with inline contexts that is not just a simple string, or that can't be reduced (more about that later)
 to a simple string are saved by Orion-LD. Saved to later be served, if asked.
@@ -336,7 +358,7 @@ The context can later be retrieved with the following command:
 GET /ngsi-ld/ex/v1/contexts<context-id>
 ```
 
-So, let's try this, using the option `--dumpHeaders` of `curl` so that we save the HTTP headers - that's where we'll find the URL to retrieve the context later:
+So, let's try this, using the option `--dump-header` of `curl` so that we save the HTTP headers - that's where we'll find the URL to retrieve the context later:
 ```bash
 payload='{
   "@context": {
@@ -471,6 +493,71 @@ will be transformed into this:
 
 It's obvious that this transformation makes for a faster lookup, right?
 
+## Filtering results
+The NGSI-LD API does not allow for a `GET /ngsi-ld/v1/entities` to be issued without any restraining.
+One of the following URI parameters must be present for the request to be allowed:
+* ?type=<TYPE>
+* ?attrs=<A1,A2,...An>
+* ?id=<ID1, ID2, ... IDn>
+* ?q=<Q-Filter>
 
-## Subscriptions and Notifications
-To Be Continued
+This is to avoid *too many* entities to be returned by the broker (flooding the user).
+Personally, I don't agree to all this.
+To avoid flooding, an NGSI-LD broker implements _pagination_.
+
+### Pagination
+Using pagination, you can tell the broker to return the entities from a start index and you define the number of entities to be returned.
+This is done using two URI parameters:
+* offset
+* limit
+
+The default values of these two are:
+* offset = 0
+* limit  = 20
+
+I.e., return the entities from the beginning, and a maximum of 20 entities.
+To really prevent flooding, the URI parameter 'limit' isn't allowed a value over 1000.
+
+Pagination isn't trivial, as new entities may very well be created between retievals.
+Fortunately, there is a trivial fix to this problem - the entities are sorted by age.
+So, if new entities come in, they are added to the "end of the list".
+
+Pagination example to retrieve entities 12-52:
+```
+curl localhost:1026/ngsi-ld/v1/entities?type=T&offset=12&limit=40
+```
+
+Note the `type=T` ... as I said earlier, some limitation of the total number of entities is required by the NGSI-LD spec.
+
+### Filtering by Entity Type
+This is already mentioned in examples, but, using the URI parameter *type*, you can tell the broker to return only entities of a specific entity type:
+```
+curl localhost:1026/ngsi-ld/v1/entities?type=T
+```
+Also mentioned is that you can supply the fully qualified name of the type:
+```
+curl localhost:1026/ngsi-ld/v1/entities?type=http:/www.mypage.org/entityTypes/T
+```
+The advantage with this is that you no longer need to supply the context (which would otherwise be necessary to expand T to http:/www.mypage.org/entityTypes/T)
+
+### Restricting attributes
+Perhaps an entity you are interested in has plenty of attributes and you only want to see attributes A1 and A6.
+There is a URI parameter to do this. It is called `attrs` and it is a list of attribute names:
+```
+curl localhost:1026/ngsi-ld/v1/entities?attrs=A1,A6
+```
+
+### Query Language
+The URI parameter `q` is a very powerful tool for filtering results.
+You can for example query for entities that have:
+* an attribute called X  (?q=X)
+* no attribute called X (?q=!X)
+* an attribute X that is equal to 50 (?q=X==50)
+* an attribute X that is equal to some of the values in a list (?q=X==50,60,70,114)
+* an attribute X that has a value inside a range (?q=X==50..74)
+
+All these examples are with Integers, but you can also use Booleans and Strings.
+You can also query over subattributes, or conditions inside the values of compound values (a compound value for an attribute is a valkue that is either an Array of an Object).
+You can also combine query-conditions using AND and OR and ...
+
+Please take a look at the [ETSI NGSi-LD specification](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf) for a full explication of all this.
