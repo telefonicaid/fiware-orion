@@ -2766,8 +2766,12 @@ LmStatus lmReopen(int index)
 
   while (true)
   {
-    char* line = (char*) calloc(1, LINE_MAX);
     int   len;
+    char* line = (char*) calloc(1, LINE_MAX);
+    if (line == NULL)
+    {
+      break;
+    }
 
     if (fgets(line, LINE_MAX, fP) == NULL)
     {
@@ -2870,8 +2874,13 @@ int64_t lmLogLineGet
   char**    allP
 )
 {
+  char* line = (char*) calloc(1, LINE_MAX);
+  if (line == NULL)
+  {
+    return 0;
+  }
+
   static FILE*  fP     = NULL;
-  char*         line   = (char*) calloc(1, LINE_MAX);
   char*         lineP  = line;
   char*         delimiter;
   int64_t       ret;
