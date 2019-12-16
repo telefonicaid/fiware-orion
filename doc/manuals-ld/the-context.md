@@ -1,4 +1,4 @@
-# Contexts
+# A Guide to The Context
 A _context_, in its simplest form, is nothing but a list of key-values:
 
 ```json

@@ -27,6 +27,8 @@ Examples of NGSI-LD can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD
 See also the [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json)
 
 Documentation:
+* [Guide to NGSI-LD entities and attributes](doc/manuals-ld/entities-and-attributes.md)
+* [Guide to the context](doc/manuals-ld/the-context.md)
 * [Installation Guide](doc/manuals-ld/installation-guide.md)
 * [Quick Start Guide](doc/manuals-ld/quick-start-guide.md)
 * [The current state of the implementation](doc/manuals-ld/progress.md).

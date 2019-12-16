@@ -10,7 +10,7 @@ The NGSI-LD API is specified [here](https://www.etsi.org/deliver/etsi_gs/CIM/001
 document, anybody that is really going to work with NGSI-LD should definitely read this document. And use it as a reference, of course.
 
 The first thing to do is to thoroughly read [this quick guide to the @context](doc/manuals-ld/the-context.md).
-There are also a number of tutorials about NGSi-LD:
+There are also a number of tutorials about NGSI-LD:
 * [tutorial X](http://xxx)   - JASON!
 * [tutorial Y](http://xxx)   - JASON!
 
