@@ -27,6 +27,7 @@ extern "C"
 #include "kjson/KjNode.h"                                               // KjNode
 #include "kjson/kjBuilder.h"                                            // kjString, kjObject, ...
 #include "kjson/kjRender.h"                                             // kjRender
+#include "kjson/kjLookup.h"                                             // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                              // LM_*
@@ -35,13 +36,13 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                         // ConnectionInfo
 #include "ngsi10/UpdateContextRequest.h"                                 // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                                // UpdateContextResponse
+
+#include "orionld/common/SCOMPARE.h"                                     // SCOMPAREx
 #include "orionld/common/urlCheck.h"                                     // urlCheck
 #include "orionld/common/urnCheck.h"                                     // urnCheck
 #include "orionld/common/orionldState.h"                                 // orionldState
 #include "orionld/common/orionldErrorResponse.h"                         // orionldErrorResponseCreate
-#include "orionld/db/dbEntityBatchDelete.h"                              // dbEntityBatchDelete.h
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"      // mongoCppLegacyEntityBatchDelete
-#include "orionld/mongoCppLegacy/mongoCppLegacyQueryEntitiesAsKjTree.h"  // mongoCppLegacyQueryEntitiesAsKjTree
+#include "orionld/db/dbConfiguration.h"                                  // dbEntityBatchDelete, dbEntityListLookupWithIdTypeCreDate
 #include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"      // Own interface
 
 
@@ -50,8 +51,16 @@ extern "C"
 //
 // orionldPostBatchDeleteEntities -
 //
+// This function receives an array of entity ids as parameter and performs the batch delete operation.
+// It will remove a set of entities from the database.
+//
 bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
 {
+  KjNode* success  = kjArray(orionldState.kjsonP, "S");
+  KjNode* errors   = kjArray(orionldState.kjsonP, "E");
+  KjNode* errorObj;
+  KjNode* nodeP;
+
   if (orionldState.requestTree->type != KjArray)
   {
     LM_W(("Bad Input (Payload must be a JSON Array)"));
@@ -61,7 +70,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
   }
 
   //
-  // Making sure all items of the array are stringa and valid URIs
+  // Make sure all array items are strings and valid URIs
   //
   for (KjNode* idNodeP = orionldState.requestTree->value.firstChildP; idNodeP != NULL; idNodeP = idNodeP->next)
   {
@@ -84,27 +93,92 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
     }
   }
 
-#if 0
-  if (mongoCppLegacyQueryEntitiesAsKjTree(orionldState.requestTree) == NULL)
+  #if 0
+    if (mongoCppLegacyEntityListLookupWithIdTypeCreDate(orionldState.requestTree) == NULL)
+    {
+      LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
+      ciP->httpStatusCode = SccBadRequest;
+      if (orionldState.responseTree == NULL)
+        orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL");
+      return false;
+    }
+  #endif
+
+  //
+  // First get the entities from database to check if they exist
+  //
+  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree);
+  if (dbEntities == NULL)
   {
-    LM_E(("mongoCppLegacyQueryEntitiesAsKjTree returned NULL"));
+    LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
     ciP->httpStatusCode = SccBadRequest;
-    if (orionldState.responseTree == NULL)
-      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyQueryEntitiesAsKjTree");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entities not found", "Entities were not found in database.");
     return false;
   }
-#endif
 
-  if (mongoCppLegacyEntityBatchDelete(orionldState.requestTree) == false)
+  //
+  // Now loop in the array of entities from database and compare each id with the id from requestTree
+  //
+  KjNode* reqEntityId = orionldState.requestTree->value.firstChildP;
+  while (reqEntityId != NULL)
   {
-    LM_E(("mongoCppLegacyEntityBatchDelete returned false"));
+    KjNode*  next     = reqEntityId->next;
+    bool     idExists = false;
+
+    for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
+    {
+      KjNode* dbEntityId  = kjLookup(dbEntity, "id");
+
+      if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
+      {
+        idExists = true;
+        break;  // Found - no need to keep searching.
+      }
+    }
+
+    if (idExists == false)
+    {
+      // Entity not found. Reporting error.
+
+      // entityId field
+      errorObj = kjObject(orionldState.kjsonP, NULL);
+      nodeP    = kjString(orionldState.kjsonP, "entityId", reqEntityId->value.s);
+      kjChildAdd(errorObj, nodeP);
+
+      // error field
+      nodeP    = kjString(orionldState.kjsonP, "error", "Entity not found in database.");
+      kjChildAdd(errorObj, nodeP);
+      kjChildAdd(errors, errorObj);
+
+      // Remove id not found from payload
+      kjChildRemove(orionldState.requestTree, reqEntityId);
+    }
+    else
+      kjChildAdd(success, reqEntityId);
+
+    reqEntityId = next;
+  }
+
+
+  //
+  // Call batch delete function
+  //
+  if (dbEntityBatchDelete(orionldState.requestTree) == false)
+  {
+    LM_E(("dbEntityBatchDelete returned false"));
     ciP->httpStatusCode = SccBadRequest;
     if (orionldState.responseTree == NULL)
-      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntityBatchDelete");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntityBatchDelete");
     return false;
   }
   else
+  {
+    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+
+    kjChildAdd(orionldState.responseTree, success);
+    kjChildAdd(orionldState.responseTree, errors);
     ciP->httpStatusCode = SccOk;
+  }
 
   return true;
 }

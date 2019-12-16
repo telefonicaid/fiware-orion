@@ -616,7 +616,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // if (replace)
   // {
   //   01. Create "idArray" from the "incomingTree", with error handling
-  //   02. Get "idTypeAndCredateFromDb" by calling dbQueryEntitiesAsKjTree(idArray);
+  //   02. Get "idTypeAndCredateFromDb" by calling dbEntityListLookupWithIdTypeCreDate(idArray);
   //   03. Creation Date from DB entities, and type-check
   //       - Make sure that no entity in the incomingTree contains a "type" != type in db for that entity
   //       - Add creDate from DB to incomingTree
@@ -674,7 +674,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //     whose Entity::Id is part of the array "idArray".
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
-  KjNode* idTypeAndCreDateFromDb = dbQueryEntitiesAsKjTree(idArray);
+  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
 
   //
   // 03. Creation Date from DB entities, and type-check

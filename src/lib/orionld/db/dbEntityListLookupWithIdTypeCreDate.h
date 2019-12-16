@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBQUERYENTITIESASKJTREE_H
-#define SRC_LIB_ORIONLD_DB_DBQUERYENTITIESASKJTREE_H
+#ifndef SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H
+#define SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H
 
 /*
 *
@@ -30,14 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/db/dbConfiguration.h"                          // DbQueryEntitiesAsKjTree
+#include "orionld/db/dbConfiguration.h"                          // dbEntityListLookupWithIdTypeCreDate
 
 
 
 // ----------------------------------------------------------------------------
 //
-// DbQueryEntitiesAsKjTree -
+// dbEntityListLookupWithIdTypeCreDate -
 //
-extern DbQueryEntitiesAsKjTree dbQueryEntitiesAsKjTree;
+extern dbEntityListLookupWithIdTypeCreDate dbEntityListLookupWithIdTypeCreDate;
 
-#endif  // SRC_LIB_ORIONLD_DB_DBQUERYENTITIESASKJTREE_H
+#endif  // SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H

@@ -38,6 +38,8 @@ brokerStart CB 212-249
 # 05. Get all entities - see E1-E4
 # 06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete
 # 07. Get all entities - see E4
+# 08. Remove entities E10 and E11 that do not exist in database. - see error
+# 09. Remove entities E4 (exists in database) and E5 (does not exist in database) 
 #
 
 echo "01. POST /ngsi-ld/v1/entityOperations/delete, with a JSON object as payload - see error"
@@ -140,6 +142,28 @@ echo
 echo "07. Get all entities - see E4"
 echo "================================"
 orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&type=T"
+echo
+echo
+
+
+echo "08. Remove entities that do not exist in the database. - see error"
+echo "=================================================================="
+payload='[
+  "urn:ngsi-ld:entity:E10",
+  "urn:ngsi-ld:entity:E11"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "09. Remove entities E4 (exists in database) and E5 (does not exist in database)"
+echo "==============================================================================="
+payload='[
+  "urn:ngsi-ld:entity:E4",
+  "urn:ngsi-ld:entity:E5"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload" -H "Accept: application/ld+json" --linkHeaderFix
 echo
 echo
 
@@ -250,10 +274,18 @@ Date: REGEX(.*)
 06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Length: 86
+Content-Type: application/ld+json
 Date: REGEX(.*)
 
+{
+    "E": [],
+    "S": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
 
 
 07. Get all entities - see E4
@@ -271,6 +303,40 @@ Date: REGEX(.*)
         "type": "T"
     }
 ]
+
+
+08. Remove entities that do not exist in the database. - see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entities were not found in database.",
+    "title": "Entities not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Remove entities E4 (exists in database) and E5 (does not exist in database)
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 114
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "E": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E5",
+            "error": "Entity not found in database."
+        }
+    ],
+    "S": [
+        "urn:ngsi-ld:entity:E4"
+    ]
+}
 
 
 --TEARDOWN--

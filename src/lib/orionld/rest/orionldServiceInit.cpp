@@ -23,17 +23,17 @@
 * Author: Ken Zangelin
 */
 #ifdef DEBUG
-#include <sys/types.h>                                         // DIR, dirent
-#include <fcntl.h>                                             // O_RDONLY
-#include <dirent.h>                                            // opendir(), readdir(), closedir()
-#include <sys/stat.h>                                          // statbuf
-#include <unistd.h>                                            // stat()
+#include <sys/types.h>                                              // DIR, dirent
+#include <fcntl.h>                                                  // O_RDONLY
+#include <dirent.h>                                                 // opendir(), readdir(), closedir()
+#include <sys/stat.h>                                               // statbuf
+#include <unistd.h>                                                 // stat()
 #endif
 
 #include <microhttpd.h>
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                          // LM_*
+#include "logMsg/traceLevels.h"                                     // Lmt*
 
 extern "C"
 {
@@ -44,19 +44,20 @@ extern "C"
 #include "kjson/kjParse.h"                                     // kjParse
 }
 
-#include "orionld/common/OrionldConnection.h"                  // Global vars: orionldState, kjson, kalloc, kallocBuffer, ...
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextInit.h"                // orionldContextInit
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
-#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
-#include "orionld/serviceRoutines/orionldPostEntities.h"       // orionldPostEntities
-#include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
-#include "orionld/serviceRoutines/orionldGetSubscriptions.h"   // orionldGetSubscriptions
-#include "orionld/serviceRoutines/orionldGetSubscription.h"    // orionldGetSubscription
-#include "orionld/serviceRoutines/orionldPostRegistrations.h"  // orionldPostRegistrations
-#include "orionld/serviceRoutines/orionldGetVersion.h"         // orionldGetVersion
-#include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
+#include "orionld/common/OrionldConnection.h"                        // Global vars: orionldState, kjson, kalloc, kallocBuffer, ...
+#include "orionld/common/urlCheck.h"                                 // urlCheck
+#include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldContextInit.h"                      // orionldContextInit
+#include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
+#include "orionld/rest/temporaryErrorPayloads.h"                     // Temporary Error Payloads
+#include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"        // orionldPostSubscriptions
+#include "orionld/serviceRoutines/orionldGetSubscriptions.h"         // orionldGetSubscriptions
+#include "orionld/serviceRoutines/orionldGetSubscription.h"          // orionldGetSubscription
+#include "orionld/serviceRoutines/orionldPostRegistrations.h"        // orionldPostRegistrations
+#include "orionld/serviceRoutines/orionldGetVersion.h"               // orionldGetVersion
+#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
+#include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
 
 
@@ -204,6 +205,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldGetSubscription)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
   {
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }

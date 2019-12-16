@@ -67,7 +67,7 @@ typedef bool    (*DbEntityBatchDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, char** detailsP);
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
-typedef KjNode* (*DbQueryEntitiesAsKjTree)(KjNode* entityIdsArray);
+typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray);
 
 
 
@@ -82,6 +82,6 @@ extern DbEntityBatchDeleteFunction              dbEntityBatchDelete;
 extern DbDataToKjTreeFunction                   dbDataToKjTree;
 extern DbDataFromKjTreeFunction                 dbDataFromKjTree;
 extern DbSubscriptionMatchEntityIdAndAttributes dbSubscriptionMatchEntityIdAndAttributes;
-extern DbQueryEntitiesAsKjTree                  dbQueryEntitiesAsKjTree;
+extern DbEntityListLookupWithIdTypeCreDate      dbEntityListLookupWithIdTypeCreDate;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

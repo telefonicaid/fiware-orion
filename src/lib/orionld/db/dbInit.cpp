@@ -33,7 +33,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"          // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"        // mongoCppLegacyEntityBatchDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
-#include "orionld/mongoCppLegacy/mongoCppLegacyQueryEntitiesAsKjTree.h"    // mongoCppLegacyQueryEntitiesAsKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"        // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -63,7 +63,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityBatchDelete                      = mongoCppLegacyEntityBatchDelete;
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
-  dbQueryEntitiesAsKjTree                  = mongoCppLegacyQueryEntitiesAsKjTree;
+  dbEntityListLookupWithIdTypeCreDate      = mongoCppLegacyEntityListLookupWithIdTypeCreDate;
 
   mongoCppLegacyInit(dbHost, dbName);
 

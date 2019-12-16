@@ -28,7 +28,7 @@ SET (SOURCES
     mongoCppLegacyKjTreeFromBsonObj.cpp
     mongoCppLegacyKjTreeToBsonObj.cpp
     mongoCppLegacySubscriptionMatchEntityIdAndAttributes.cpp
-    mongoCppLegacyQueryEntitiesAsKjTree.cpp
+    mongoCppLegacyEntityListLookupWithIdTypeCreDate.cpp
 )
 
 # Include directories

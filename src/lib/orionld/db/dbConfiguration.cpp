@@ -43,7 +43,7 @@ DbEntityBatchDeleteFunction               dbEntityBatchDelete;
 DbDataToKjTreeFunction                    dbDataToKjTree;
 DbDataFromKjTreeFunction                  dbDataFromKjTree;
 DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
-DbQueryEntitiesAsKjTree                   dbQueryEntitiesAsKjTree;  // FIXME: Name must change - what does it to really?
+DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;  // FIXME: Name must change - what does it to really?
 
 //
 // FIXME

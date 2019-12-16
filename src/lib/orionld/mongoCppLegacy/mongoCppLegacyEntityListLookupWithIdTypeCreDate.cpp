@@ -38,13 +38,14 @@ extern "C"
 #include "mongoBackend/safeMongo.h"                                      // getStringFieldF, ...
 #include "orionld/common/orionldState.h"                                 // orionldState, dbName, mongoEntitiesCollectionP
 #include "orionld/db/dbCollectionPathGet.h"                              // dbCollectionPathGet
-#include "orionld/mongoCppLegacy/mongoCppLegacyQueryEntitiesAsKjTree.h"  // Own interface
+#include "orionld/db/dbConfiguration.h"                                  // dbDataToKjTree, dbDataFromKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyQueryEntitiesAsKjTree -
+// mongoCppLegacyEntityListLookupWithIdTypeCreDate -
 //
 // This function extracts (from mongo) the entities whose ID are in the vector 'entityIdsArray'.
 // Instead of returning the complete information of the entities, only three fields are returned per entity, namely:
@@ -52,9 +53,9 @@ extern "C"
 //   * Entity Type
 //   * Entity Creation Date
 //
-// FIXME: This function should be called mongoCppLegacyEntityListLookupWithIdTypeCreDate()
+// 
 //
-KjNode* mongoCppLegacyQueryEntitiesAsKjTree(KjNode* entityIdsArray)
+KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
 {
   char collectionPath[256];
 
@@ -91,7 +92,7 @@ KjNode* mongoCppLegacyQueryEntitiesAsKjTree(KjNode* entityIdsArray)
 
 
   KjNode*  entitiesArray = NULL;
-  int      entities     = 0;
+  int      entities      = 0;
 
   while (moreSafe(cursorP))
   {
