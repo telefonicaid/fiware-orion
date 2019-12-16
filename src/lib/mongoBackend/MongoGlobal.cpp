@@ -500,7 +500,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
   if (!result.hasField("databases"))
   {
-    LM_E(("Runtime Error (no 'databases'' field in %s)", result.toString().c_str()));
+    LM_E(("Runtime Error (no 'databases' field in %s)", result.toString().c_str()));
     return false;
   }
 
