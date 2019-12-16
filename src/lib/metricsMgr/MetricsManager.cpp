@@ -184,6 +184,14 @@ bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::stri
   }
 
   char* spath  = strdup(spathIn.c_str());
+  if (spath == NULL)
+  {
+    // strdup could return NULL if we run of of memory. Very unlikely, but
+    // theoretically possible (and static code analysis tools complaint about it ;)
+    LM_E(("Runtime Error (strdup returns NULL)"));
+    *subServiceP = "";
+    return true;
+  }
   char* toFree = spath;
 
   if (subServiceValid(spath) == false)

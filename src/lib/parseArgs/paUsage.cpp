@@ -251,6 +251,14 @@ void paUsage(void)
   LM_T(LmtPaUsage, ("presenting usage"));
 
   spacePad = (char*) strdup(progName);
+  if (spacePad == NULL)
+  {
+    // strdup could return NULL if we run of of memory. Very unlikely, but
+    // theoretically possible (and static code analysis tools complaint about it ;)
+    printf("FATAL ERROR: strdup returns NULL");
+    exit(1);
+  }
+
   memset(spacePad, 0x20202020, strlen(spacePad));  /* replace progName */
 
   if (paUsageProgName != NULL)
@@ -357,6 +365,14 @@ void paExtendedUsage(void)
 
   snprintf(progNAME, sizeof(progNAME), "Extended Usage: %s ", progName);
   spacePad = (char*) strdup(progNAME);
+  spacePad = (char*) strdup(progName);
+  if (spacePad == NULL)
+  {
+    // strdup could return NULL if we run of of memory. Very unlikely, but
+    // theoretically possible (and static code analysis tools complaint about it ;)
+    printf("FATAL ERROR: strdup returns NULL");
+    exit(1);
+  }
   memset(spacePad, 0x20202020, strlen(spacePad));  /* replace progNAME */
 
   PA_M(("-------------- Preparing list for Extended usage -----------------"));

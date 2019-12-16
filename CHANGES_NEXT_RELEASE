@@ -1,1 +1,2 @@
 - Fix: crash when using null character in some NGSIv1 operations
+- Hardening: NULL control in some strdup and calloc cases (very unlikely, but theoretically possible)
