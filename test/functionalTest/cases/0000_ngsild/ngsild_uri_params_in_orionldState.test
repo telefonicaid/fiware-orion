@@ -96,12 +96,12 @@ orionldUriArguments: options:   '(null)'
 03. GET Entity with 'id=' - no value for id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 183
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entity type/id not given nor attribute list",
+    "detail": "need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
     "title": "too broad query",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

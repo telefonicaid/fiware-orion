@@ -59,11 +59,11 @@ extern "C"
 // URI params:
 // - id
 // - idPattern
-// - type
-// - typePattern - Not possible - ignored (need an exact type name to lookup alias)
+// - type         (can't point to NULL as its converted to a std::string)
+// - typePattern  (not possible - ignored (need an exact type name to lookup alias))
 // - q
 // - attrs
-// - mq          - Not interesting for ngsi-ld
+// - mq          - Not used in ngsi-ld. []/. is used instead of q/mq
 // - geometry
 // - coordinates
 // - georel
@@ -85,48 +85,29 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   char*        idString       = (id != NULL)? id      : idPattern;
   const char*  isIdPattern    = (id != NULL)? "false" : "true";
-  bool         isTypePattern  = (*type != 0)? false : true;
-
+  bool         isTypePattern  = (*type != 0)? false   : true;
   EntityId*    entityIdP;
-  char*        typeExpanded = NULL;
+  char*        typeExpanded   = NULL;
   char*        detail;
-  char*        idVector[32];
-  char*        typeVector[32];
-  int          idVecItems   = (int) sizeof(idVector) / sizeof(idVector[0]);
-  int          typeVecItems = (int) sizeof(typeVector) / sizeof(typeVector[0]);
-  bool         keyValues    = ciP->uriParamOptions[OPT_KEY_VALUES];
+  char*        idVector[32];    // Is 32 a good limit?
+  char*        typeVector[32];  // Is 32 a good limit?
+  int          idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
+  int          typeVecItems   = (int) sizeof(typeVector) / sizeof(typeVector[0]);
+  bool         keyValues      = ciP->uriParamOptions[OPT_KEY_VALUES];
 
-  //
-  // Preconditions
-  // - 1. If neither Entity types nor Attribute names are provided, an error of type BadRequestData shall be raised.
-  // - 2. If an Entity type or Entity id is not provided then an error of type BadRequestData shall be raised.
-  // - 3. If the list of Entity identifiers includes a URI which it is not valid, or the query or geo-query are not
-  //      syntactically valid (as per the referred clauses 4.9 and 4.10) an error of type BadRequestData shall be raised.
-  //
-  if ((*type == 0) && (attrs == NULL) && (id == NULL))
+  if ((id == NULL) && (idPattern == NULL) && (*type == 0) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
   {
-    LM_W(("Bad Input (too broad query - entity type/id not given nor attribute list)"));
+    LM_W(("Bad Input (too broad query - need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter"));
 
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "too broad query",
-                               "entity type/id not given nor attribute list");
+                               "need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter");
 
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
-  if ((*type == 0) && (idPattern == NULL) && (id == NULL))
-  {
-    LM_W(("Bad Input (too broad query - entity type not given nor entity id)"));
-
-    orionldErrorResponseCreate(OrionldBadRequestData,
-                               "too broad query",
-                               "entity type not given nor entity id");
-
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
+  LM_TMP(("URIP: NOT too broad query"));
   if ((idPattern != NULL) && (id != NULL))
   {
     LM_W(("Bad Input (both 'idPattern' and 'id' used)"));
@@ -184,7 +165,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       ciP->httpStatusCode = SccBadRequest;
       return false;
     }
-    else if (georel == NULL)
+
+    if (georel == NULL)
     {
       LM_W(("Bad Input (georel missing)"));
 
