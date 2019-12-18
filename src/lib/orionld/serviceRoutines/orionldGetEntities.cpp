@@ -36,7 +36,6 @@ extern "C"
 
 #include "serviceRoutines/postQueryContext.h"                  // V1 service routine that does the whole work ...
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck

@@ -72,26 +72,25 @@ bool orionldValidName(char* name, char** detailsPP)
   for (; *name != 0; ++name)
   {
     //
-    // Valid chars:
-    //   o a-z: 97-122
-    //   o A-Z: 65-90
-    //   o 0-9: 48-57
-    //   o '_': 95
+    // Invalid chars:
+    //   '=',
+    //   '[',
+    //   ']',
+    //   '&',
+    //   '?',
+    //   '"',
+    //   ''',
+    //   '\b',
+    //   '\t',
+    //   '\n', and
+    //   '#'
     //
-
-    if ((*name >= 'a') && (*name <= 'z'))
-      continue;
-    if ((*name >= 'A') && (*name <= 'Z'))
-      continue;
-    if ((*name >= '0') && (*name <= '9'))
-      continue;
-    if (*name == '_')
-      continue;
-    if (*name == ':')
-      continue;
-
-    *detailsPP = (char*) "invalid character in name";
-    return false;
+    if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#'))
+    {
+      *detailsPP = (char*) "invalid character in name";
+      return false;
+    }
   }
 
   return true;

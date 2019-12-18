@@ -464,7 +464,7 @@ bool StringFilterItem::valueGet
   {
     if (forbiddenChars(s, ""))
     {
-      LM_E(("forbidden characters in String Filter"));
+      LM_E(("forbidden characters in String Filter '%s'", s));
       *errorStringP = std::string("forbidden characters in String Filter");
       return false;
     }
