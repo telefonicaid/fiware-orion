@@ -119,16 +119,20 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
 #ifdef ORIONLD
   //
-  // FIXME: Check whether idField is an OID before calling OID
-  //        Should check whether the subscription was created with NGSI-LD or not
-  //        I can always check idField.toString().c_str() ...
+  // Make sure 'idField' is an OID before calling OID.
+  // Subs created with NGSI-LD aren't OIDs, so ...
+  // Using idField.OID() on a sub-id that isn't an OID gets an exception and the broker crashes.
   //
-  if (orionldState.apiVersion == NGSI_LD_V1)
-    cSubP->subscriptionId        = strdup(idField.toString().c_str());
+  char oid[128];
+
+  strncpy(oid, idField.toString().c_str(), sizeof(oid));
+
+  if (strncmp(oid, "_id: ObjectId('", 15) == 0)
+    cSubP->subscriptionId  = strdup(idField.OID().toString().c_str());
   else
-    cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
+    cSubP->subscriptionId  = strdup(idField.toString().c_str());
 #else
-  cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
+  cSubP->subscriptionId    = strdup(idField.OID().toString().c_str());
 #endif
 
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
