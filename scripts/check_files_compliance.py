@@ -68,7 +68,9 @@ header2.append('\s*$')
 header2.append('\s*For those usages not covered by this license please contact with$')
 header2.append('\s*orionld at fiware dot org$')
 
-verbose = True
+verbose    = True
+is_orionld = False
+
 
 # check_file returns an error string in the case of error or empty string if everything goes ok
 def check_file(file):
@@ -248,20 +250,36 @@ for root, dirs, files in os.walk(dir):
             bad += 1
             continue
 
+        error = ''
         filename = os.path.join(root, file)
-        error = check_file(filename)
-        if len(error) > 0:
-            error2 = check_file_orionld(filename)
-            if len(error2) > 0:
-                print filename + ': ' + error
-                bad += 1
-            else:
-                good += 1
+
+        if os.path.islink(filename):
+            continue
+
+        if 'src/app/orionld/' in filename:
+            is_orionld = True
+        elif 'src/lib/orionld/' in filename:
+            is_orionld = True
+        elif 'test/functionalTest/cases/0000_ngsild' in filename:
+            is_orionld = True
+        elif 'test/unittests/orionld' in filename:
+            is_orionld = True
         else:
-            # DEBUG
-            # print filename + ': OK'
+            is_orionld = False
+
+        if is_orionld:
+            error = check_file_orionld(filename)
+        else:
+            error = check_file(filename)
+
+        if len(error) > 0:
+            print filename + ': ' + error
+            bad += 1
+        else:
             good += 1
 
+# src/lib/orionld/
+# src/app/orionld
 print '--------------'
 print 'Summary:'
 print '   good:    {good}'.format(good=str(good))
