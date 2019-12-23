@@ -71,9 +71,9 @@ Ubuntu 18.04 LTS is the officially supported distribution, but Orion-LD potentia
 To install Orion-LD from source code, please follow the instructions for your selected distribution.
 
 Installation guides for different distributions:
-* (Ubuntu 18.04.3 LTS)[doc/manuals-ld/installation-guide-ubuntu-18.04.3.md] - the Official Distribution
-* (CentOS 7)[doc/manuals-ld/installation-guide-centos7.md]
-* (Debian 10)[doc/manuals-ld/installation-guide-debian10.md]
+* [Ubuntu 18.04.3 LTS](doc/manuals-ld/installation-guide-ubuntu-18.04.3.md) - the Official Distribution
+* [CentOS 7](doc/manuals-ld/installation-guide-centos7.md)
+* [Debian 10](doc/manuals-ld/installation-guide-debian10.md)
 
 
 ### Sanity check
