@@ -1,4 +1,4 @@
-# Installation Guide for the Orion-LD Functional Test Suite
+# Installation Guide for the Orion-LD Functional Test Suite on Ubuntu 18.04.3
 
 The functional test suite for Orion-LD, found in the Orion-LD repository, under `test/functionalTests`, needs some installation in order to work.
 Especially, a python script (`scripts/accumulator-server.py`) is used as receptor of notifications to exercise that part and a few packages need to be installed 

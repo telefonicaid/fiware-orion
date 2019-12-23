@@ -297,6 +297,10 @@ That's all for the installation guide.
 Now please continue to learn about Orion-LD with the (Getting Started Guide)[getting-started-guide.md].
 
 If you feel like running tests, to **really** make sure your Orion-LD Context Broker is working correctly,
-please follow the instructions in the [Installation Guide for Functional Tests](installation-guide-for-functional-tests.md).
+please follow the instructions in your respective Installation Guide for Functional Tests:
+* [Ubuntu 18.04.3](installation-guide-functional-tests-ubuntu18.04.3.md)
+* [CentOS 7](installation-guide-functional-tests-centos7.md)
+* [Debian 10](installation-guide-functional-tests-debian10.md)
+
 
 And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).
