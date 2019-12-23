@@ -16,7 +16,7 @@ make
 sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
 ```
 
-After this, the broker must be comnpiled, as the unit test is an executable that links to the broker code:
+After this, the broker must be compiled, as the unit test is an executable that links to the broker code:
 
 ```bash
 cd ~/git/context.Orion-LD
@@ -34,7 +34,7 @@ That executes the entire unit test suite.
 Especially interesting might be to run the suite inside `gdb`. In case of a crash inside the test suite, that's the way to go:
 
 ```bash
-# gdb should be installed by default, but if not:
+# gdb should be installed by default, but if not (if on Ubuntu/Debian):
 sudo aptitude install gdb
 
 gdb ./BUILD_UNITTEST/test/unittests/unitTest

@@ -213,7 +213,7 @@ If you look closer at the data in mongo, you will see that the entity type and t
 Actually it is - this is the way it should be, it's an essential part of NGSI-LD-
 In a few words, the context has been used to expand the entity type and the attribute name.
 How the context works is fully explained in documents and tutorials on NGSI-LD.
-I'd propose to start with the [Getting Started with Orion-LD Guide](doc/manuals-ld/getting-started-guide.md)
+I'd propose to start with the [Getting Started with Orion-LD Guide](getting-started-guide.md)
  
 Now, before we end, let's ask _the broker_ to give us the entity, instead of just peeking inside the database:
 
@@ -294,9 +294,9 @@ then the response would be like this:
 and no HTTP Link header would be present.
 
 That's all for the installation guide.
-Now please continue to learn about Orion-LD with the (Getting Started Guide)[doc/manuals-ld/getting-started-guide.md].
+Now please continue to learn about Orion-LD with the (Getting Started Guide)[getting-started-guide.md].
 
 If you feel like running tests, to **really** make sure your Orion-LD Context Broker is working correctly,
-please follow the instructions in the [Installation Guide for Functional Tests](doc/manuals-ld/installation-guide-for-functional-tests.md).
+please follow the instructions in the [Installation Guide for Functional Tests](installation-guide-for-functional-tests.md).
 
-And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](doc/manuals-ld/installation-guide-for-unit-tests.md).
+And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).
