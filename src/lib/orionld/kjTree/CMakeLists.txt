@@ -38,6 +38,9 @@ SET (SOURCES
     kjTreeToTimeInterval.cpp
     kjTreeToGeoLocation.cpp
     kjStringValueLookupInArray.cpp
+    kjTreeToUpdateContextRequest.cpp
+    kjTreeToEntity.cpp
+    kjTreeToMetadata.cpp
 )
 
 # Include directories

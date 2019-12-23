@@ -525,7 +525,7 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
       else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
       else   if (*eP == ':')
       {
-        if (orionldState.apiVersion != NGSI_LD_V1)
+        if ((orionldState.apiVersion != NGSI_LD_V1) && (eP[1] != '/') && (eP[2] != '/'))  // Don't if xxx://
         {
           *rhsP = &eP[1];
           op = SfopEquals;

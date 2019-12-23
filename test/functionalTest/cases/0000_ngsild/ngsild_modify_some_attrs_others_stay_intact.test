@@ -292,20 +292,13 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/P2",
 		"https://uri.etsi.org/ngsi-ld/default-context/P3",
 		"https://uri.etsi.org/ngsi-ld/default-context/P4",
-		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+		"https://uri.etsi.org/ngsi-ld/default-context/P5",
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"mdNames" : [ ],
-			"type" : "Property",
-			"value" : 2
-		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
@@ -336,6 +329,13 @@ MongoDB server version: REGEX(.*)
 			"value" : {
 				"name" : "P5"
 			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 2,
 			"mdNames" : [ ]
 		}
 	},

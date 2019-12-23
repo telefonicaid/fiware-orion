@@ -217,28 +217,11 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"md" : {
-				"observedAt" : {
-					"value" : 1543924800
-				},
-				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
-					"type" : "Relationship",
-					"value" : "urn:ngsi-ld:T2:6789"
-				},
-				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
-					"type" : "Property",
-					"value" : 0.79
-				}
-			},
-			"mdNames" : [
-				"observedAt",
-				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1",
-				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1"
-			],
-			"type" : "Property",
-			"value" : "Hola"
+			"value" : "Hola",
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -251,7 +234,7 @@ bye
 06. Get the entity to see the new value of P1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 311
+Content-Length: 111
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -261,16 +244,7 @@ Date: REGEX(.*)
   "type": "T",
   "P1": {
     "type": "Property",
-    "value": "Hola",
-    "P1_P1": {
-      "type": "Property",
-      "value": 0.79
-    },
-    "P1_R1": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:T2:6789"
-    },
-    "observedAt": "2018-12-04T12:00:00Z"
+    "value": "Hola"
   }
 }
 

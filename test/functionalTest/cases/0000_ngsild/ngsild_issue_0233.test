@@ -33,15 +33,8 @@ brokerStart CB
 #
 # 01. Create an entity with all four combinations of sub-attrs: { Prop/Prop, Prop/Rel, Rel/Prop, Rel/Rel }
 # 02. See mongo content, make sure all sub-attrs are expanded
-# 03. Adding a Prop/Prop using POST /entities/<EID>/attrs
-# 04. See mongo content, make sure Prop/Prop2 is expanded
-#
-#
-#
-#
-#
-#
-#
+# 03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs
+# 04. See mongo content, make sure Prop2/Prop2 is expanded
 #
 
 echo "01. Create an entity with all four combinations of sub-attrs: { Prop/Prop, Prop/Rel, Rel/Prop, Rel/Rel }"
@@ -86,15 +79,15 @@ echo
 echo
 
 
-echo "03. Adding a Prop/Prop using POST /entities/<EID>/attrs"
-echo "======================================================="
+echo "03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs"
+echo "========================================================="
 payload='{
-  "Prop": {
+  "Prop2": {
     "type": "Property",
     "value": "Property with Property as sub-attr",
     "Prop2": {
       "type": "Property",
-      "value": "sub-attr Prop/Prop2"
+      "value": "sub-attr Prop2/Prop2"
     }
   }
 }'
@@ -103,8 +96,8 @@ echo
 echo
 
 
-echo "04. See mongo content, make sure Prop/Prop2 is expanded"
-echo "======================================================="
+echo "04. See mongo content, make sure Prop2/Prop2 is expanded"
+echo "========================================================"
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
@@ -185,8 +178,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Adding a Prop/Prop using POST /entities/<EID>/attrs
-=======================================================
+03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs
+=========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -194,8 +187,8 @@ Date: REGEX(.*)
 
 
 
-04. See mongo content, make sure Prop/Prop2 is expanded
-=======================================================
+04. See mongo content, make sure Prop2/Prop2 is expanded
+========================================================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb://localhost:27017/ftest
 MongoDB server version: REGEX(.*)
@@ -207,12 +200,15 @@ MongoDB server version: REGEX(.*)
 	},
 	"attrNames" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/Prop",
-		"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+		"https://uri.etsi.org/ngsi-ld/default-context/Rel",
+		"https://uri.etsi.org/ngsi-ld/default-context/Prop2"
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
+			"value" : "Property with Property as sub-attr",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
 					"type" : "Property",
@@ -221,19 +217,12 @@ MongoDB server version: REGEX(.*)
 				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
 					"type" : "Relationship",
 					"value" : "http://a.b.c/x.jsonld"
-				},
-				"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
-					"type" : "Property",
-					"value" : "sub-attr Prop/Prop2"
 				}
 			},
 			"mdNames" : [
-				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
-				"https://uri.etsi.org/ngsi-ld/default-context/Rel",
-				"https://uri.etsi.org/ngsi-ld/default-context/Prop2"
-			],
-			"type" : "Property",
-			"value" : "Property with Property as sub-attr"
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop",
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel"
+			]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
 			"type" : "Relationship",
@@ -251,8 +240,23 @@ MongoDB server version: REGEX(.*)
 				}
 			},
 			"mdNames" : [
-				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
-				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop",
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Property with Property as sub-attr",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
+					"type" : "Property",
+					"value" : "sub-attr Prop2/Prop2"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop2"
 			]
 		}
 	},

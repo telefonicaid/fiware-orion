@@ -38,7 +38,7 @@ brokerStart CB 0-255
 # 05. Update 'locatedIn', changing its value
 # 06. GET the entity, make sure the value of 'locatedIn' has changed
 # 07. Update 'locatedIn', adding another metadata
-# 08. GET the entity, make sure all metadata of 'locatedIn' are present
+# 08. GET the entity, make sure only new metadata of 'locatedIn' are present
 # 09. GET the entity, with tutorials.Step-by-Step context - see shortnames
 #
 
@@ -110,6 +110,7 @@ echo "05. Update 'locatedIn', changing its value"
 echo "=========================================="
 payload='{
   "locatedIn" : {
+    "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store002"
   },
   "@context": [
@@ -133,6 +134,8 @@ echo "07. Update 'locatedIn', adding another metadata"
 echo "==============================================="
 payload='{
   "locatedIn" : {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store002",
     "xtraMdata": {
       "type": "Property",
       "value": "urn:ngsi-ld:Building:store005"
@@ -148,8 +151,8 @@ echo
 echo
 
 
-echo "08. GET the entity, make sure all metadata of 'locatedIn' are present"
-echo "====================================================================="
+echo "08. GET the entity, make sure only new metadata of 'locatedIn' are present"
+echo "=========================================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
 echo
 echo
@@ -280,7 +283,7 @@ Date: REGEX(.*)
 06. GET the entity, make sure the value of 'locatedIn' has changed
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 1108
+Content-Length: 754
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -290,15 +293,7 @@ Date: REGEX(.*)
   "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
-    "object": "urn:ngsi-ld:Building:store002",
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:Person:employee001"
-    },
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
-      "type": "Property",
-      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
-    }
+    "object": "urn:ngsi-ld:Building:store002"
   },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
     "type": "Property",
@@ -335,10 +330,10 @@ Date: REGEX(.*)
 
 
 
-08. GET the entity, make sure all metadata of 'locatedIn' are present
-=====================================================================
+08. GET the entity, make sure only new metadata of 'locatedIn' are present
+==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1207
+Content-Length: 853
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -349,14 +344,6 @@ Date: REGEX(.*)
   "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store002",
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:Person:employee001"
-    },
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
-      "type": "Property",
-      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
-    },
     "xtraMdata": {
       "type": "Property",
       "value": "urn:ngsi-ld:Building:store005"
@@ -391,7 +378,7 @@ Date: REGEX(.*)
 09. GET the entity, with tutorials.Step-by-Step context - see shortnames
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 822
+Content-Length: 633
 Content-Type: application/json
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -402,14 +389,6 @@ Date: REGEX(.*)
   "locatedIn": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:Building:store002",
-    "installedBy": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:Person:employee001"
-    },
-    "statusOfWork": {
-      "type": "Property",
-      "value": "completed"
-    },
     "xtraMdata": {
       "type": "Property",
       "value": "urn:ngsi-ld:Building:store005"

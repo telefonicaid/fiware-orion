@@ -244,7 +244,7 @@ Date: REGEX(.*)
 04. GET the entity and see the expanded values
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 292
+Content-Length: 300
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -258,10 +258,14 @@ Date: REGEX(.*)
     "longname-for-P2": {
         "type": "Property",
         "value": [
+            0,
             "Long value of P1",
+            2,
             "Long value of P2",
             true,
-            "Long value of P3"
+            5,
+            "Long value of P3",
+            7
         ]
     },
     "longname-for-P3": {

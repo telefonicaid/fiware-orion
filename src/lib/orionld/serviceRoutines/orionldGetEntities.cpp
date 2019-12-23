@@ -106,7 +106,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_TMP(("URIP: NOT too broad query"));
   if ((idPattern != NULL) && (id != NULL))
   {
     LM_W(("Bad Input (both 'idPattern' and 'id' used)"));

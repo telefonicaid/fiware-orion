@@ -57,7 +57,7 @@ If in the Link header, its syntax is a bit complex:
 Link: <URL-to-context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 ```
 
-If instead in the payload it can be of three different JSON types:
+If instead the context is put in the payload, it can be of three different JSON types:
 * String (the value is a URL to the context)
 * Array (each item in the array is either a string or an object - contexts on their own)
 * Object (a key-value list - a context!)

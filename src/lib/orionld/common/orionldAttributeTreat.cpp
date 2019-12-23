@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
+#include "kbase/kMacros.h"                                       // K_FT
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
@@ -36,9 +37,6 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "common/string.h"                                       // FT
 
-#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/common/geoJsonCheck.h"                         // geoJsonCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -46,7 +44,11 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
-#include "orionld/common/orionldAttributeTreat.h"                // Own interface
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
+#include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
+#include "orionld/common/orionldAttributeTreat.h"                // Own interface  - FIXME: Move to kjTree/kjTreeTocontextAttribute.h/cpp
 
 
 
@@ -308,7 +310,7 @@ static bool metadataValueSet(ConnectionInfo* ciP, Metadata* mdP, KjNode* valueNo
 //
 // metadataAdd -
 //
-static bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName)
+bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName)
 {
   LM_T(LmtMetadata, ("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), caName));
 
@@ -447,7 +449,7 @@ static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** title
 //
 //        Current fix is that the three callers of this function make sure that the function is NOT CALLED if the
 //        name of the attribute is either "createdAt" or "modifiedAt" - that's why I could out-deff the initial part
-//        that checks for those two names - must faster solution
+//        that checks for those two names - faster solution.
 //
 bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
 {
@@ -459,22 +461,6 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
     orionldState.contextP = orionldCoreContextP;
 
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", caName, kNodeP));
-
-#if 0
-  //
-  // Ignore createdAt and modifiedAt
-  //
-  if (SCOMPARE10(caName, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
-  {
-    *typeNodePP = NULL;
-    return true;
-  }
-  else if (SCOMPARE11(caName, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
-  {
-    *typeNodePP = NULL;
-    return true;
-  }
-#endif
 
   if (kNodeP->type != KjObject)
   {
@@ -529,6 +515,8 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   KjNode*  observedAtP            = NULL;  // For ALL:            Optional
   KjNode*  observationSpaceP      = NULL;  // For 'GeoProperty':  Optional
   KjNode*  operationSpaceP        = NULL;  // For 'GeoProperty':  Optional
+  KjNode*  creDateP               = NULL;
+  KjNode*  modDateP               = NULL;
   bool     isProperty             = false;
   bool     isGeoProperty          = false;
   bool     isTemporalProperty     = false;
@@ -564,7 +552,6 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
         ciP->httpStatusCode = SccBadRequest;
         return false;
       }
-
 
       if (SCOMPARE9(nodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
       {
@@ -680,33 +667,31 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
         return false;
       }
     }
+    else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
+    {
+      DUPLICATE_CHECK(creDateP, "creDate", nodeP);
+      caP->creDate = nodeP->value.f;
+    }
+    else if (SCOMPARE8(nodeP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
+    {
+      DUPLICATE_CHECK(modDateP, "modDate", nodeP);
+      caP->modDate = nodeP->value.f;
+    }
+    else if (SCOMPARE8(nodeP->name, 'm', 'd', 'N', 'a', 'm', 'e', 's', 0))
+    {
+    }
+    else if (SCOMPARE3(nodeP->name, 'm', 'd', 0))
+    {
+      for (KjNode* mdP = nodeP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+      {
+        if (kjTreeToMetadata(ciP, caP, mdP, caName, detailP) == false)
+          return false;
+      }
+    }
     else  // Other
     {
-      //
-      // Expand sub-attribute name
-      //
-      bool  valueMayBeExpanded  = false;
-
-      nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, &valueMayBeExpanded, true, NULL);
-
-      if (valueMayBeExpanded == true)
-        orionldContextValueExpand(nodeP);
-
-      if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
-      {
-        LM_E(("Duplicated attribute property '%s' for attribute '%s'", nodeP->name, caP->name.c_str()));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated attribute property", nodeP->name);
-        *detailP = (char*) "Duplicated attribute property";
+      if (kjTreeToMetadata(ciP, caP, nodeP, caName, detailP) == false)
         return false;
-      }
-
-      if (metadataAdd(ciP, caP, nodeP, caName) == false)
-      {
-        LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        *detailP = (char*) "Error adding metadata to attribute";
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to an attribute", nodeP->name);
-        return false;
-      }
     }
 
     nodeP = nodeP->next;

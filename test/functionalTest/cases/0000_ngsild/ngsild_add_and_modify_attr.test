@@ -173,22 +173,18 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
-#SORT_START
 			"type" : "Property",
 			"creDate" : REGEX(.*)
 			"modDate" : REGEX(.*)
 			"value" : "new"REGEX(.*)
 			"mdNames" : [ ]REGEX(.*)
-#SORT_END
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
-#SORT_START
 			"type" : "Property",
 			"creDate" : REGEX(.*)
 			"modDate" : REGEX(.*)
 			"value" : true,
 			"mdNames" : [ ]REGEX(.*)
-#SORT_END
 		}
 	},
 	"creDate" : REGEX(.*),

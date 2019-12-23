@@ -27,14 +27,14 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjRender.h"                                      // kjRender - TMP
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"   // Own interface
@@ -67,6 +67,9 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
 
   cursorP = connectionP->query(collectionPath, query);
 
+  //
+  // FIXME: Should not be a while-loop! Only ONE entity!!
+  //
   while (cursorP->more())
   {
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
@@ -79,6 +82,46 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
   }
 
   releaseMongoConnection(connectionP);
+
   // semGive()
+
+  //
+  // Change "value" to "object" for all attributes that are "Relationship".
+  // Note that the "object" field of a Relationship is stored in the database under the field "value".
+  // That fact is fixed here, by renaming the "value" to "object" for attr with type == Relationship.
+  // This depends on the database model and thus should be fixed in the database layer.
+  //
+  if (kjTree != NULL)
+  {
+    KjNode* attrArrayP = kjLookup(kjTree, "attrs");
+    if (attrArrayP != NULL)
+    {
+      for (KjNode* attrP = attrArrayP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+        KjNode* typeP = kjLookup(attrP, "type");
+        KjNode* mdsP  = kjLookup(attrP, "md");
+
+        if ((typeP != NULL) && (strcmp(typeP->value.s, "Relationship") == 0))
+        {
+          KjNode* valueP = kjLookup(attrP, "value");
+
+          valueP->name = (char*) "object";
+        }
+
+        if (mdsP != NULL)
+        {
+          for (KjNode* mdP = mdsP->value.firstChildP; mdP != NULL; mdP = mdP->next)
+          {
+            KjNode* typeP = kjLookup(mdP, "type");
+            if ((typeP != NULL) && (strcmp(typeP->value.s, "Relationship") == 0))
+            {
+              KjNode* valueP = kjLookup(mdP, "value");
+              valueP->name = (char*) "object";
+            }
+          }
+        }
+      }
+    }
+  }
   return  kjTree;
 }

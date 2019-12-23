@@ -22,33 +22,31 @@
 *
 * Author: Gabriel Quaresma and Ken Zangelin
 */
-#include <vector>                             // std::vector
-
 extern "C"
 {
-#include "kbase/kMacros.h"                    // K_FT
-#include "kjson/KjNode.h"                     // KjNode
-#include "kjson/kjBuilder.h"                  // kjString, kjObject, ...
-#include "kjson/kjLookup.h"                   // kjLookup
-#include "kjson/kjRender.h"                   // kjRender
+#include "kbase/kMacros.h"                                     // K_FT
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
-#include "logMsg/logMsg.h"                    // LM_*
-#include "logMsg/traceLevels.h"               // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "common/globals.h"                   // parse8601Time
-#include "rest/ConnectionInfo.h"              // ConnectionInfo
-#include "rest/httpHeaderAdd.h"               // httpHeaderLocationAdd
-#include "orionTypes/OrionValueType.h"        // orion::ValueType
-#include "orionTypes/UpdateActionType.h"      // ActionType
-#include "parse/CompoundValueNode.h"          // CompoundValueNode
-#include "ngsi/ContextAttribute.h"            // ContextAttribute
-#include "ngsi10/UpdateContextRequest.h"      // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"     // UpdateContextResponse
-#include "mongoBackend/mongoEntityExists.h"   // mongoEntityExists
-#include "mongoBackend/mongoUpdateContext.h"  // mongoUpdateContext
-#include "rest/uriParamNames.h"               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
-#include "mongoBackend/MongoGlobal.h"         // getMongoConnection()
+#include "common/globals.h"                                    // parse8601Time
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
+#include "orionTypes/OrionValueType.h"                         // orion::ValueType
+#include "orionTypes/UpdateActionType.h"                       // ActionType
+#include "parse/CompoundValueNode.h"                           // CompoundValueNode
+#include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
+#include "mongoBackend/mongoEntityExists.h"                    // mongoEntityExists
+#include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
+#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "mongoBackend/MongoGlobal.h"                          // getMongoConnection()
 
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
@@ -57,12 +55,12 @@ extern "C"
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldAttributeTreat.h"              // orionldAttributeTreat
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"          // orionldUriExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
+#include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
 
 
@@ -87,14 +85,14 @@ extern "C"
 //
 // This implementation will treat "type", "title", and "status" as MANDATORY, and "detail" as OPTIONAL
 //
-static void entityErrorPush(KjNode *errorsArrayP, const char *entityId, OrionldResponseErrorType type, const char *title, const char *detail, int status)
+static void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status)
 {
-  KjNode *objP            = kjObject(orionldState.kjsonP, NULL);
-  KjNode *eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);
-  KjNode *problemDetailsP = kjObject(orionldState.kjsonP,  "error");
-  KjNode *typeP           = kjString(orionldState.kjsonP,  "type",     orionldErrorTypeToString(type));
-  KjNode *titleP          = kjString(orionldState.kjsonP,  "title",    title);
-  KjNode *statusP         = kjInteger(orionldState.kjsonP, "status",   status);
+  KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
+  KjNode* eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);
+  KjNode* problemDetailsP = kjObject(orionldState.kjsonP,  "error");
+  KjNode* typeP           = kjString(orionldState.kjsonP,  "type",     orionldErrorTypeToString(type));
+  KjNode* titleP          = kjString(orionldState.kjsonP,  "title",    title);
+  KjNode* statusP         = kjInteger(orionldState.kjsonP, "status",   status);
 
   kjChildAdd(problemDetailsP, typeP);
   kjChildAdd(problemDetailsP, titleP);
@@ -119,46 +117,11 @@ static void entityErrorPush(KjNode *errorsArrayP, const char *entityId, OrionldR
 //
 // entityIdPush - add ID to array
 //
-static void entityIdPush(KjNode *entityIdsArrayP, const char *entityId)
+static void entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
 {
   KjNode* idNodeP = kjString(orionldState.kjsonP, NULL, entityId);
 
   kjChildAdd(entityIdsArrayP, idNodeP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityFieldsExtractSimple -
-//
-// This function is a simpler varianmt of 'entityFieldsExtract'.
-// No need to check for duplicates, already done.
-// We only need to lookup id and type and remove them
-//
-static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, char** entityTypeP)
-{
-  KjNode*  itemP = entityNodeP->value.firstChildP;
-
-  while (itemP != NULL)
-  {
-    KjNode* next = itemP->next;
-
-    if (SCOMPARE3(itemP->name, 'i', 'd', 0))
-    {
-      *entityIdP = itemP->value.s;
-      kjChildRemove(entityNodeP, itemP);
-    }
-    else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
-    {
-      *entityTypeP = itemP->value.s;
-      kjChildRemove(entityNodeP, itemP);
-    }
-
-    itemP = next;
-  }
-
-  return true;
 }
 
 
@@ -336,140 +299,13 @@ static bool entityIdAndTypeGet(KjNode* entityNodeP, char** idP, char** typeP, Kj
 
 
 
-// -----------------------------------------------------------------------------
-//
-// kjTreeToContextElementAttributes -
-//
-// NOTE: "id" and "type" of the entity must be removed from the tree before this function is called
-//
-static bool kjTreeToContextElementAttributes
-(
-  ConnectionInfo*  ciP,
-  KjNode*          entityNodeP,
-  KjNode*          createdAtP,
-  KjNode*          modifiedAtP,
-  ContextElement*  ceP,
-  char**           titleP,
-  char**           detailP
-)
-{
-  // Iterate over the items of the entity
-  for (KjNode *itemP = entityNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
-  {
-    if (createdAtP != NULL)
-    {
-      if (itemP == createdAtP)
-        continue;
-    }
-    else if (SCOMPARE8(itemP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
-      continue;
-
-    if (modifiedAtP != NULL)
-    {
-      if (itemP == modifiedAtP)
-        continue;
-    }
-    else if (SCOMPARE8(itemP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
-      continue;
-
-    // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate'
-    if (itemP->type != KjObject)
-    {
-      LM_E(("UPSERT: item '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
-      *titleP  = (char*) "invalid entity";
-      *detailP = (char*) "attribute must be a JSON object";
-
-      return false;
-    }
-
-    KjNode*           attrTypeNodeP = NULL;
-    ContextAttribute* caP           = new ContextAttribute();
-
-    // orionldAttributeTreat treats the attribute, including expanding the attribute name and values, if applicable
-    if (orionldAttributeTreat(ciP, itemP, caP, &attrTypeNodeP, detailP) == false)
-    {
-      LM_E(("orionldAttributeTreat failed"));
-      delete caP;
-      return false;
-    }
-
-    ceP->contextAttributeVector.push_back(caP);
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjTreeToUpdateContextRequest -
-//
-static void kjTreeToUpdateContextRequest(ConnectionInfo* ciP, UpdateContextRequest* ucrP, KjNode* treeP, KjNode* errorsArrayP)
-{
-  KjNode* next;
-  KjNode* entityP = treeP->value.firstChildP;
-
-  while (entityP != NULL)
-  {
-    next = entityP->next;
-
-    if (entityP->type != KjObject)
-    {
-      // Is this even possible???
-      LM_E(("Entity not a JSON object!"));
-      entityErrorPush(errorsArrayP, "No Entity ID", OrionldBadRequestData, "Entity must be a JSON Object", kjValueType(entityP->type), 400);
-      entityP = next;
-      continue;
-    }
-
-    char*  title;
-    char*  detail;
-    char*  entityId   = NULL;
-    char*  entityType = NULL;
-    char*  entityTypeExpanded;
-
-    entityFieldsExtractSimple(entityP, &entityId, &entityType);
-
-    entityTypeExpanded = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
-    if (entityTypeExpanded == NULL)
-    {
-      LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "unable to expand entity::type", detail, 400);
-      entityP = next;
-      continue;
-    }
-
-    ContextElement* ceP        = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
-    EntityId*       entityIdP  = &ceP->entityId;
-
-    entityIdP->id        = entityId;
-    entityIdP->type      = entityTypeExpanded;
-    entityIdP->isPattern = "false";
-
-    if (kjTreeToContextElementAttributes(ciP, entityP, NULL, NULL, ceP, &title, &detail) == false)
-    {
-      LM_W(("kjTreeToContextElementAttributes flags error '%s: %s' for entity '%s'", title, detail, entityId));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, title, detail, 400);
-      delete ceP;
-      entityP = next;
-      continue;
-    }
-
-    ucrP->contextElementVector.push_back(ceP);
-    entityP = next;
-  }
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // entitySuccessPush -
 //
-static void entitySuccessPush(KjNode *successArrayP, const char *entityId)
+static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 {
-  KjNode *eIdP = kjString(orionldState.kjsonP, "id", entityId);
+  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
 
   kjChildAdd(successArrayP, eIdP);
 }
@@ -836,7 +672,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
     {
-      const char *entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
+      const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
       if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
         entitySuccessPush(successArrayP, entityId);
@@ -851,7 +687,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
     {
-      const char *entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
+      const char* entityId = mongoRequest.contextElementVector.vec[ix]->entityId.id.c_str();
 
       if (kjStringValueLookupInArray(successArrayP, entityId) == NULL)
         entitySuccessPush(successArrayP, entityId);

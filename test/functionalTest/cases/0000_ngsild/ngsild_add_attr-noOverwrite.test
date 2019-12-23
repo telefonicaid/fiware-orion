@@ -57,6 +57,12 @@ echo
 echo
 
 
+echo "00. See entity in mongo"
+echo "======================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
 
 echo "02. Attempt to ADD the attribute P2=22 with noOverwrite set"
 echo "==========================================================="
@@ -107,6 +113,44 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00
 Date: REGEX(.*)
 
+
+
+00. See entity in mongo
+=======================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:2018-11-22T10:00:00",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 11,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
 
 
 02. Attempt to ADD the attribute P2=22 with noOverwrite set
