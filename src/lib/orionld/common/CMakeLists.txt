@@ -33,7 +33,6 @@ SET (SOURCES
     geoJsonCreate.cpp
     numberToDate.cpp
     orionldState.cpp
-    orionldAttributeTreat.cpp
     QNode.cpp
     qLex.cpp
     qLexCheck.cpp

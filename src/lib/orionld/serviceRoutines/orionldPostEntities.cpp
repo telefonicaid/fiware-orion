@@ -52,9 +52,9 @@ extern "C"
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/common/orionldEntityPayloadCheck.h"            // orionldEntityPayloadCheck
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
 
 
@@ -134,9 +134,9 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
-    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
-      LM_E(("orionldAttributeTreat failed: %s", detail));
+      LM_E(("kjTreeToContextAttribute failed: %s", detail));
       delete caP;
       mongoRequest.release();
       return false;

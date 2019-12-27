@@ -42,7 +42,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// metadataAdd - from orionldAttributeTreat.cpp - needs its own module under orionld/common
+// metadataAdd - from kjTreeToContextAttribute.cpp - needs its own module under orionld/common
 //
 extern bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName);
 

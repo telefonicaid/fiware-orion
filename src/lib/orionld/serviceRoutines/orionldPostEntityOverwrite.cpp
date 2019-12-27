@@ -45,9 +45,9 @@ bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* requestTreeP, ContextEl
 
 
     char* detail;
-    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
-      LM_E(("orionldAttributeTreat failed: %s", detail));
+      LM_E(("kjTreeToContextAttribute failed: %s", detail));
       delete caP;
       return false;
     }

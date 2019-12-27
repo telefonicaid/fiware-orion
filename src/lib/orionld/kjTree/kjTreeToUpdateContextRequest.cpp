@@ -34,8 +34,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // Own interface
 
 
@@ -156,10 +156,10 @@ static bool kjTreeToContextElementAttributes
     KjNode*           attrTypeNodeP = NULL;
     ContextAttribute* caP           = new ContextAttribute();
 
-    // orionldAttributeTreat treats the attribute, including expanding the attribute name and values, if applicable
-    if (orionldAttributeTreat(ciP, itemP, caP, &attrTypeNodeP, detailP) == false)
+    // kjTreeToContextAttribute treats the attribute, including expanding the attribute name and values, if applicable
+    if (kjTreeToContextAttribute(ciP, itemP, caP, &attrTypeNodeP, detailP) == false)
     {
-      LM_E(("orionldAttributeTreat failed"));
+      LM_E(("kjTreeToContextAttribute failed"));
       delete caP;
       return false;
     }

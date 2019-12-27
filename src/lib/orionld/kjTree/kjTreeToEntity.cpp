@@ -31,8 +31,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
-#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjTreeToEntity.h"                       // kjTreeToEntity
 
 
@@ -77,14 +77,12 @@ bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP)
 
         caP->name = aP->name;
         //
-        // Here, as the data comes from the DB, no expansion is necessary - orionldAttributeTreat should have a parameter for that
+        // Here, as the data comes from the DB, no expansion is necessary - kjTreeToContextAttribute should have a parameter for that
         //
-        // orionldAttributeTreat should be called kjTreeToContextAttribute and moved to kjTree library
-        //
-        if (orionldAttributeTreat(orionldState.ciP, aP, caP, &typeNodeP, &detail) == false)
+        if (kjTreeToContextAttribute(orionldState.ciP, aP, caP, &typeNodeP, &detail) == false)
         {
           delete caP;
-          LM_E(("Internal Error (orionldAttributeTreat: %s)", detail));
+          LM_E(("Internal Error (kjTreeToContextAttribute: %s)", detail));
           return false;
         }
 

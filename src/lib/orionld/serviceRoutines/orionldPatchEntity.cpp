@@ -41,9 +41,9 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
@@ -165,10 +165,10 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       LM_X(1, ("Need a bigger vector for delayed deletion of attributes"));
 
     char* detail;
-    if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       mongoRequest.release();
-      LM_E(("orionldAttributeTreat failed: %s", detail));
+      LM_E(("kjTreeToContextAttribute failed: %s", detail));
       delete caP;
       return false;
     }

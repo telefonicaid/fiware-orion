@@ -24,31 +24,26 @@
 */
 extern "C"
 {
-#include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
-#include "kbase/kMacros.h"                                       // K_FT
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "common/string.h"                                       // FT
-
-#include "orionld/common/geoJsonCheck.h"                         // geoJsonCheck
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/geoJsonCheck.h"                         // geoJsonCheck
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
-#include "orionld/common/orionldAttributeTreat.h"                // Own interface  - FIXME: Move to kjTree/kjTreeTocontextAttribute.h/cpp
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // Own interface
 
 
 
@@ -439,7 +434,7 @@ static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** title
 
 // -----------------------------------------------------------------------------
 //
-// orionldAttributeTreat -
+// kjTreeToContextAttribute -
 //
 // NOTE
 //   Make sure that this function is not called for attributes called "createdAt" or "modifiedAt"
@@ -451,7 +446,9 @@ static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** title
 //        name of the attribute is either "createdAt" or "modifiedAt" - that's why I could out-deff the initial part
 //        that checks for those two names - faster solution.
 //
-bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
+// FIXME: This function is TOO LONG - try to split up
+//
+bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
 {
   char* caName = kNodeP->name;
 
@@ -474,9 +471,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
   //
   // Expand name of attribute
   //
-  if ((strcmp(kNodeP->name, "location")         != 0) &&
-      (strcmp(kNodeP->name, "observationSpace") != 0) &&
-      (strcmp(kNodeP->name, "operationSpace")   != 0))
+  if ((strcmp(kNodeP->name, "location") != 0) && (strcmp(kNodeP->name, "observationSpace") != 0) && (strcmp(kNodeP->name, "operationSpace") != 0))
   {
     char*  longName;
     bool   valueMayBeExpanded  = false;
@@ -494,19 +489,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
 
   //
   // For performance issues, all predefined names should have their char-sum precalculated
-  //
-  // E.g.:
-  // const int TYPE_CHARSUM = 't' + 'y' + 'p' + 'e'
-  //
-  // int nodeNameCharsum = 0;
-  // for (char* nodeNameP = nodeP->name; *nodeNameP != 0; ++nodeNameP)
-  //   nodeNameCharsum += *nodeNameP;
-  //
-  // if ((nodeNameCharsum == TYPE_CHARSUM) && (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0)))
-  // { ... }
-  //
-  // ADVANTAGE:
-  //   Just a simple integer comparison before we do the complete string-comparisom
+  // Advantage: just a simple integer comparison before we do the complete string-comparisom
   //
   KjNode*  typeP                  = NULL;  // For ALL:            Mandatory
   KjNode*  valueP                 = NULL;  // For 'Property':     Mandatory
@@ -580,7 +563,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       {
         isProperty         = true;
         isTemporalProperty = true;
-        // FIXME: Give error - users can't create TemporalProperties
+        // FIXME: Give error - users can't create TemporalProperties (unless it's "observedAt")
       }
       else
       {
@@ -591,7 +574,7 @@ bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute
       }
 
       *typeNodePP = typeP;
-      caP->type = typeP->value.s;
+      caP->type   = typeP->value.s;
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
     {

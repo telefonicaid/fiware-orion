@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOCONTEXTATTRIBUTE_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREETOCONTEXTATTRIBUTE_H_
 
 /*
 *
@@ -30,15 +30,15 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldAttributeTreat -
+// kjTreeToContextAttribute -
 //
-extern bool orionldAttributeTreat(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP);
+extern bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDATTRIBUTETREAT_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOCONTEXTATTRIBUTE_H_
