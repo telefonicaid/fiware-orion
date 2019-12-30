@@ -29,6 +29,7 @@ If you don't have a running Orion-LD to play with, please follow the instruction
 
 This document will go into more detail on pretty much everything about the Orion-LD context broker:
 * ProblemDetails to describe errors
+* Contexts
 * Creation of Entities
 * Modification of Entities and Attributes
 * Deletion of Entities and Attributes
@@ -46,7 +47,11 @@ This document will go into more detail on pretty much everything about the Orion
 * Notifications
 * Creation of Registrations
 * Modification of Registrations
+* Querying for Registrations
+* Retrieval of a Specific Registration
 * Deletion of Registrations
+* Subscription to Registrations
+* Temporal Representation
 * Geolocation
 * Query Filter
 
@@ -61,15 +66,16 @@ Orion-LD uses part of _ProblemDetails_, namely:
 * detail
 * status (sometimes)
 
-## Creation of Entities
-Entities can be created in three different ways:
-* `POST /ngsi-ld/v1/entities` (to create a single entity)
-* `POST /ngsi-ld/v1/entityOperations/create` (to create more than one entity in one go)
-* `POST /ngsi-ld/v1/entityOperations/upsert` (to both create and modify entities with one single request)
+## Contexts
+Contexts is a way to use shortnames instead of longnames in the payload and in URI parameters, for attribute names and entity types.
+It is also a way for the user to use its own aliases (shortnames) for attribute names and entity types.
 
-### Contexts
-If a context is desired for the creation, it can be put either in the payload, as part of the entity, a "special attribute",
+The context is thoroughly explained in the [guide to the Context](doc/manuals-ld/the-context.md).
+
+### In the Request
+If a context is desired for a service, it can be put either in the payload, as part of the entity/subscription/registration, like a "special attribute",
 or in the HTTP header "Link".
+Especially the services that have no request payload data, like GET services will have to use the "Link" HTTP header.
 
 If in the Link header, its syntax is a bit complex:
 ```
@@ -84,7 +90,21 @@ If instead the context is put in the payload, the context can be of three differ
 * Array (each item in the array is either a string or an object - contexts on their own)
 * Object (a key-value list - an "inline" context!)
 
-This is all explained in the [guide to the Context](doc/manuals-ld/the-context.md).
+### In the response
+The `Accept` HTTP header tells the broker where to put the context in the response.
+If `Accept: application/json` then the context is put in the Link HTTP header of the response,
+if `Accept: application/ld+json`, then the context is put in the payload data.
+
+As the context in the response will *always* be the very same context of the request, be careful with services
+that return arrays of entities/subscriptions/registrations. If application/ld+json is used for such a service, then the
+context will be copied in each and every item (entity/subscription/registration) is the response payload data.
+Just sayin'.
+
+## Creation of Entities
+Entities can be created in three different ways:
+* `POST /ngsi-ld/v1/entities` (to create a single entity)
+* `POST /ngsi-ld/v1/entityOperations/create` (to create more than one entity in one go)
+* `POST /ngsi-ld/v1/entityOperations/upsert` (to both create and modify entities with one single request)
 
 ### POST /ngsi-ld/v1/entities
 The service `POST /ngsi-ld/v1/entities` is used for creation of a single entity.
@@ -195,7 +215,7 @@ There are no URI parameters for this request. All necessary information resides 
 
 #### Response HTTP Status Code
 201 Created      - all entities were successfully created. No response payload data supplied.
-207 Multi Status - some entities were	successfully created, others weren't. Details of each error in the response payload data.
+207 Multi Status - some entities were successfully created, others weren't. Details of each error in the response payload data.
 400 Bad Request  - none of the entities in the request payload data were created. Details of each error in the response payload data.
 
 #### Response HTTP Headers
@@ -392,7 +412,7 @@ Just like `POST` for the same resource.
 No HTTP headers relevant to NGSI-LD are present in the response.
 
 #### Response Payload Data
-Just like `POST` for	the same resource.
+Just like `POST` for the same resource.
 
 #### Pointers to the ETSI NGSI-LD documentation
 * 5.2.5   - The NGSI-LD Property Data Type
@@ -585,7 +605,7 @@ This concept is called _Pagination_ and it's a mechanism for Orion-LD to protect
 The services that use pagination are:
 * GET /ngsi-ld/v1/entities
 * GET /ngsi-ld/v1/subscriptions
-* GET /ngsi-ld/v1/registrations
+* GET /ngsi-ld/v1/csourceRegistrations
 * GET /ngsi-ld/v1/csourceSubscriptions  # Not implemented in alpha 1
 * GET /ngsi-ld/v1/temporal/entities     # Not implemented in alpha 1
 
@@ -626,7 +646,7 @@ There is no payload data for this service.
 * georel      - geo relationship (near, within, etc)
 * geometry    - geometry (point, circle, polygon, ...)
 * coordinates - coordinates array, serialized as a string
-* geoproperty - not implemented	in Alpha 1 - only "location" can be used as geo attribute
+* geoproperty - not implemented in Alpha 1 - only "location" can be used as geo attribute
 * limit       - maximum number of entities to be returned
 * offset      - the index of the first entity
 
@@ -698,11 +718,12 @@ The response payload data is a JSON object describing the entity in question:
 NGSI-LD forwarding is still to be specified.
 Please see chapter `Forwarding of Creation/Modification of Entities/Attributes` for more information.
 
-## Creation of Subscriptions
+## Subscriptions
 Subscriptions are used to obtain notifications whenever entities/attributes are updated/created, instead of using polling.
 It's much more efficient to subscribe than to continuously query and investigate the response. Like interrupts vs polling.
 Subscriptions are like interrupts. Whenever some criteria (defined by the subscription) is fulfilled, a notification is launched (much like an interrupt).
 
+## Creation of Subscriptions
 ### POST /ngsi-ld/v1/subscriptions
 Subscriptions are created using the service `POST /ngsi-ld/v1/subscriptions`.
 
@@ -730,8 +751,8 @@ A subscription with ALL the field scould look like this:
   "watchedAttributes": [ "attr1", "attr2", ..., "attrN" ],
   "timeInterval": Number,  # Not Implemented in Alpha 1
   "q": "Query Filter",
-  "geoQ": {},  # Not Implemented in	Alpha 1
-  "csf": "",   # Not Implemented in	Alpha 1
+  "geoQ": {},  # Not Implemented in Alpha 1
+  "csf": "",   # Not Implemented in Alpha 1
   "isActive": true/false,
   "notification": {
     "attributes": [ "attr1", "attr2", ..., "attrN" ],
@@ -911,7 +932,7 @@ There are no URI Parameters for this service.
 #### Response HTTP Status Code
 * 204 No Content
 * 400 Bad Request - the subscription ID of the URI PATH is not a valid ID (not a URI)
-* 404 Not Found - the subscription ID	of the URI PATH is not found among the subscriptions.
+* 404 Not Found   - the subscription ID of the URI PATH is not found among the subscriptions.
 
 #### Response HTTP Headers
 No HTTP headers relevant to NGSI-LD are present in the response.
@@ -932,7 +953,7 @@ There can of course be more than *one* hit is the list of subscriptions and thus
 ### Notification Context
 The context of the notification is the context that was used when creating the subscription.
 If the subscription that triggered the notification was created with `endpoint::accept` equal to *application/ld+json*, then the context is sent as part of
-the payload data. If instead `endpoint::accept`	is equal to *application/json*, then the context is sent as a Link HTTP header.
+the payload data. If instead `endpoint::accept` is equal to *application/json*, then the context is sent as a Link HTTP header.
 
 ### Notification HTTP Headers
 * Link (in case endpoint::accept == *application/json*)
@@ -957,41 +978,199 @@ The payload data of a notification contains information of the triggering subscr
 Note that the number of attributes of the entities can be limited by specifying a list of "interesting" attributes in the field `notification::attributes` when
 creating the subscription.
 
+
+## Registrations
+Context Source Providers can be "mini brokers" that implement only a small part of the NGSI-LD API.
+Typically a Context Provider isn't contacted directly by clients but instead it registers its entities in a broker and
+the broker will later contact the Context Provider when necessary.
+The registration is the way for a Context Provider to inform the broker of what entities is has knowledge.
+
 ## Creation of Registrations
-### POST /ngsi-ld/v1/registrations
+### POST /ngsi-ld/v1/csourceRegistrations
+
 #### Request Payload Data
+The payload data at creating a registration looks like this:
+{
+  "id": "URI",  # if not given the system assigns an ID for the registration
+  "type": "ContextSourceRegistration",  # MANDATORY
+  "name": "Name of the registration",
+  "description": "Description of the registration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "URI",         // Optional
+          "idPattern": "REGEX" // Optional
+          "type": "TYPE"       // MANDATORY
+        },
+        {
+          ...
+        }
+      ],
+      "properties": [
+        "Property 1",
+        "Property 2",
+        ...
+        "Property N"
+      ]
+      "relationships": [
+        "Relationship 1",
+        "Relationship 2",
+        ...
+        "Relationship N"
+      ]
+    },
+    {
+      ...
+    }
+  ],
+  "observationInterval": {
+    "start": "ISO 8601 DateTime",
+    "end": "ISO 8601 DateTime"
+  },
+  "managementInterval": {
+    "start": "ISO 8601 DateTime",
+    "end": "ISO 8601 DateTime"
+  },
+  "location": { GeoLocation },
+  "observationSpace": { GeoLocation },
+  "operationSpace": { GeoLocation },
+  "expires": "ISO 8601 DateTime",
+  "endpoint": "URI",
+  "Property 1": <JSON Value>,
+  "Property 2": <JSON Value>,
+  ...
+  "Property N": <JSON Value>,
+}
+
+NOTE: In Alpha 1, the `information` array must have only one item.
+      This is due to the data model or Orion, which Orion-LD follows.
+
+Only three fields are mandatory:
+* type
+* information
+* endpoint
+
 #### Request URI Parameters
+There are no URI Parameters for this service.
+
 #### Response HTTP Status Code
+* 201 Created
+* 400 Bad Request
+* 409 Already Exists
+* 422 Unprocessable Entity (Unprocessable Context Source Registration)
+
 #### Response HTTP Headers
+* Location (if the creation went well)
+
 #### Response Payload Data
+No payload data if all OK. If not OK, _ProblemDetails_.
+
 #### Pointers to the ETSI NGSI-LD documentation
+* 4.7 Geospatial Properties 
+* 5.2.9 CsourceRegistration 
+* 5.2.10 RegistrationInfo 
+* 5.2.11 TimeInterval
+* 5.9.2 Register Context Source
+* 6.8.3.1 POST /ngsi-ld/v1/csourceRegistrations
 
 ## Modification of Registrations
-### PATCH /ngsi-ld/v1/registrations/{registrationId}
+### PATCH /ngsi-ld/v1/csourceRegistrations/{registrationId}
 NOT IMPLEMENTED IN ALPHA RELEASE 1
 
-## Retrieval of Registrations
-### GET /ngsi-ld/v1/registrations
+## Querying for Registrations
+
+### GET /ngsi-ld/v1/csourceRegistrations
+
 #### Request Payload Data
+There is no payload data for this service.
+
 #### Request URI Parameters
-* limit       - maximum number of subscriptions to be returned
-* offset      - the index of the first subscription
+* limit        - Maximum number of subscriptions to be returned
+* offset       - The index of the first subscription
+* id           - Comma separated list of entity identificators
+* type         - Comma separated list of entity types
+* idPattern    - REGEX to match entity id
+* attrs        - Comma separated list of attribute names
+* q            - Query Filter (Not Implemented in Alpha 1)
+* csf          - Context Source Filter (Not Implemented in Alpha 1)
+* georel       - Geo relationship (Not Implemented in Alpha 1)
+* geometry     - Geometry (point, circle, polygon, ...) (Not Implemented in Alpha 1)
+* coordinates  - Coordinates array, serialized as a string (Not Implemented in Alpha 1)
+* geoproperty  - Which attribute to use as Geo-Attribute (Not implemented in Alpha 1)
+* timeproperty - Not implemented in Alpha 1
+* timerel      - Not implemented in Alpha 1
+* time         - Not implemented in Alpha 1
+* endTime      - Not implemented in Alpha 1
 
 #### Response HTTP Status Code
+* 200 OK
+* 400 Bad Request
+
 #### Response HTTP Headers
+* Link
+
 #### Response Payload Data
+The response payload data is an array of Context Source Registrations:
+```json
+{
+  < Registration 1>,
+  < Registration 2>,
+  ...
+  < Registration N>
+}
+```
+
 #### Pointers to the ETSI NGSI-LD documentation
-### GET /ngsi-ld/v1/registrations/{registrationId}
+* 5.2.9   - CsourceRegistration 
+* 5.2.10  - RegistrationInfo 
+* 5.2.11  - TimeInterval
+* 5.9.2   - Register Context Source
+* 6.8.3.2 - GET /ngsi-ld/v1/csourceRegistrations
+
+## Retrieval of a Specific Registration
+### GET /ngsi-ld/v1/csourceRegistrations/{registrationId}
+This service lets a user retrievel a specific context source registration.
+The Registration Identifier must be known though.
+
 #### Request Payload Data
+There is no payload data for this service.
+
 #### Request URI Parameters
+There are no URI Parameters for this service.
+
 #### Response HTTP Status Code
+* 200 OK
+* 400 Bad Request - the registration id in the URL PATH is not a valid URI
+* 404 Not Found   - there is no reguistration with an ID as the one specified in the URL	PATH 
+
 #### Response HTTP Headers
+* Link
+
 #### Response Payload Data
+The entite registration, as a JSON object, e.g.:
+```json
+```
+
 #### Pointers to the ETSI NGSI-LD documentation
+* 5.2.9   - CsourceRegistration 
+* 5.2.10  - RegistrationInfo 
+* 5.2.11  - TimeInterval
+* 5.10.1  - Retrieve Context Source Registration
+* 6.9.3.1 - GET /ngsi-ld/v1/csourceRegistrations/{registrationId}
 
 ## Deletion of Registrations
-### DELETE /ngsi-ld/v1/registrations/{registrationId}
+### DELETE /ngsi-ld/v1/csourceRegistrations/{registrationId}
 NOT IMPLEMENTED IN ALPHA RELEASE 1
+
+## Subscription to Registrations
+Not Implemented in Alpha 1
+
+## Temporal Representation
+Temporal Representation in FIWARE is taken care of by other GEs, such as Cygnus, and will not be implemented in Orion-LD.
+
+## Security
+Apart from forbidden characters, all security concerns are taken care of by other GEs, such as PEP, KeyRock, etc and will not be implemented in Orion-LD.
 
 ## Geolocation
 TBD
