@@ -28,22 +28,38 @@ Also, to be able to play with your own Orion-LD broker while reading this docume
 If you don't have a running Orion-LD to play with, please follow the instructions in the [Orion-LD Installation Guide](doc/manuals-ld/installation-guide.md).
 
 This document will go into more detail on pretty much everything about the Orion-LD context broker:
+* ProblemDetails to describe errors
 * Creation of Entities
 * Modification of Entities and Attributes
 * Deletion of Entities and Attributes
 * Forwarding of Creation/Modification of Entities/Attributes
 * System Attributes
+* Pagination
 * Querying for Entities
-* Retrieval of Entities
+* Retrieval of a Specific Entity
 * Forwarding of Query Requests
 * Creation of Subscriptions
-* Modification of Subscription 
+* Modification of a Subscription
+* Querying for Subscriptions
+* Retrieval of a Specific Subscription
 * Deletion of Subscription
 * Notifications
 * Creation of Registrations
 * Modification of Registrations
 * Deletion of Registrations
 * Geolocation
+* Query Filter
+
+## ProblemDetails to describe errors
+**ProblemDetails** is a standard way of specifying errors in HTTP API responses and the NGSi-LD specifies this to be used in a variety of responses.
+[Here](https://lurumad.github.io/problem-details-an-standard-way-for-specifying-errors-in-http-api-responses-asp.net-core) is a tutorial on _ProblemDetails_
+and [here](https://tools.ietf.org/html/rfc7807) is the RFC.
+
+Orion-LD uses part of _ProblemDetails_, namely:
+* type
+* title
+* detail
+* status (sometimes)
 
 ## Creation of Entities
 Entities can be created in three different ways:
@@ -109,7 +125,7 @@ As all the information of the entity to create resides in the payload data, ther
 * Location - to inform the creator of where the created entity resides.
 * Link     - to echo back to the creator the context that was used during modification of the entities.
 
-Well, the issuer of the request already knows the context that was used, as he/she provided it!
+About `Link`, the issuer of the request already knows the context that was used, as he/she provided it!
 However, a gateway between the issuer and the broker may need to have this information as well, that's why the context is echoed back.
 
 Below, a typical response to a `POST /ngsi-ld/v1/entities` request:
@@ -125,7 +141,7 @@ when creating the entity was `https://fiware.github.io/NGSI-LD_TestSuite/ldConte
 
 #### Response Payload Data
 In case of success, there is no payload data in the response.
-In case of an error, the payload data describes the error.
+In case of an error, a _ProblemDetails_ in the the payload data describes the error. 
 
 An example of a response payload data for an invalid JSON syntax in the request payload data:
 ```text
@@ -142,7 +158,7 @@ Date: REGEX(.*)
 ```
 
 #### Pointers to the ETSI NGSI-LD documentation
-The latest version of the NGSI-LD API definition (as of December 2019) is found [here](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf).
+The latest version (1.2.1) of the NGSI-LD API definition (as of December 2019) is found [here](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.02.01_60/gs_CIM009v010201p.pdf).
 Some chapters of interest in said document for `POST /ngsi-ld/v1/entities` are:
 * 5.2.4   - The NGSI-LD Entity Data Type
 * 5.2.5   - The NGSI-LD Property Data Type
@@ -310,7 +326,7 @@ The syntaxis for attributes is described in the [introduction to NGSI-LD entitie
 * 404 Not Found - if the entity id of the URL path doesn't get a hit for an entity in the database
 
 #### Response HTTP Headers
-No HTTP headers relevant for NGSI-LD are present in the response.
+No HTTP headers relevant to NGSI-LD are present in the response.
 
 #### Response Payload Data
 If all went well, no payload data is returned, just the `204 No Content`.
@@ -373,7 +389,7 @@ There are no URI parameters for this request. All necessary information resides 
 Just like `POST` for the same resource.
 
 #### Response HTTP Headers
-No HTTP headers relevant for NGSI-LD are present in the response.
+No HTTP headers relevant to NGSI-LD are present in the response.
 
 #### Response Payload Data
 Just like `POST` for	the same resource.
@@ -411,7 +427,7 @@ There are no URI parameters for this request. All necessary information resides 
 * 404 Not Found   - if the entity or the attribute specified in the URL does not exist
 
 #### Response HTTP Headers
-No HTTP headers relevant for NGSI-LD are present in the response.
+No HTTP headers relevant to NGSI-LD are present in the response.
 
 #### Response Payload Data
 If all went well, no payload data is returned, just the `204 No Content`.
@@ -464,7 +480,7 @@ This service has no URI parameters.
 * 400 Bad Request - if the request or its content is somehow incorrect, e.g. JSON parse error
 
 #### Response HTTP Headers
-No HTTP headers relevant for NGSI-LD are present in the response.
+No HTTP headers relevant to NGSI-LD are present in the response.
 
 #### Response Payload Data
 See the corresponding section for `POST /ngsi-ld/v1/entityOperations/create`
@@ -561,29 +577,352 @@ A user can ask the broker to include these special attributes in queries though,
 GET /ngsi-ld/v1/entities?options=sysAttrs&type=T
 ```
 
+## Pagination
+To avoid returning thousands of items (entities, subscriptions, registrations), Orion-LD establishes a maximum number of items to return.
+If there are more items to be returned, then the client will have to query again, and again until the client has retrieved all of the items.
+This concept is called _Pagination_ and it's a mechanism for Orion-LD to protect itself against flooding.
+
+The services that use pagination are:
+* GET /ngsi-ld/v1/entities
+* GET /ngsi-ld/v1/subscriptions
+* GET /ngsi-ld/v1/registrations
+* GET /ngsi-ld/v1/csourceSubscriptions  # Not implemented in alpha 1
+* GET /ngsi-ld/v1/temporal/entities     # Not implemented in alpha 1
+
+The number of items and the index of the first item for pagination are defined by two URI parameters:
+* limit=X   # X is the number of items
+* offset=Y  # Y is the offset of the first item
+
+The default values for these two are:
+* limit:  20
+* offset: 0
+
+Orion-LD implements a maximum limit of 1000. If a request tries to set `limit` above 1000, an error is returned.
+In Alpha 1, Orion-LD reuses the pagination of Orion. 
+Please see the documentation of pagination of [Orion](https://github.com/telefonicaid/fiware-orion) for more info.
+
 ## Querying for Entities
 
 ### GET /ngsi-ld/v1/entities
+The `GET /ngsi-ld/v1/entities` service returns an array of entities matching the characteristics specified as URI parameters.
+Pagination is used as to limit the number of entities returned.
+Also, one of the following URI paramaters *must* be present, to narrow down the number of matching entities:
+* type
+* attrs
+* q
+This is what the ETSI NGSi-LD specification version 1.2.1 saya, at least.
+Hopefully, this restriction will be removed in version 1.3.1.
 
-## Retrieval of Entities
+#### Request Payload Data
+There is no payload data for this service.
+
+#### Request URI Parameters
+* id          - list of entity ids to be retrieved (comma-separated list of URIs)
+* type        - list of entity types to be retrieved (comma-separated list of types)
+* idPattern   - regular expression to be matched by entity ids
+* attrs       - list of attributes (only those attributes are returned and only entities with any of the attrs match)
+* q           - query string - see separate chapter on 'q'
+* csf         - not implemented in Alpha 1
+* georel      - geo relationship (near, within, etc)
+* geometry    - geometry (point, circle, polygon, ...)
+* coordinates - coordinates array, serialized as a string
+* geoproperty - not implemented	in Alpha 1 - only "location" can be used as geo attribute
+* limit       - maximum number of entities to be returned
+* offset      - the index of the first entity
+
+For all geofencing URI params (last four), please refer to the separate chapter on Gellocation
+
+#### Response HTTP Status Code
+* 200 OK
+* 400 Bad Request
+
+#### Response HTTP Headers
+* Link - to echo back to the context (if Accept: application/json)
+
+#### Response Payload Data
+The response payload data is a JSON array of the matching entities:
+```json
+[
+  { Entity 1 },
+  { Entity 2 },
+  ...
+  { Entity N }
+]
+```
+
+#### Pointers to the ETSI NGSI-LD documentation
+* 5.2.4     - The NGSI-LD Entity Data Type
+* 5.2.5     - The NGSI-LD Property Data Type
+* 5.2.6     - The NGSI-LD Relationship Data Type
+* 5.2.7     - The NGSI-LD GeoProperty Data Type
+* 5.7.2     - Query Entities 
+* 6.6.4.3.2 - GET /ngsi-ld/v1/entities
+
+## Retrieval of a Specific Entity
+To retrieve a specific entity, one needs to know its _Entity ID_.
+
 ### GET /ngsi-ld/v1/entities/{entityId}
+The `GET /ngsi-ld/v1/entities/{entityId}` service returns the entity with ID `entityId`, possible filtered by the URI parameter `attrs`, to only return a specific set of attributes.
+
+#### Request Payload Data
+There is no payload data for this service.
+
+#### Request URI Parameters
+* attrs       - list of attributes (only those attributes are returned)
+
+#### Response HTTP Status Code
+* 200 OK
+* 400 Bad Request - if the entity ID of the URL PATH is not a valid URI
+* 404 Not Found   - if the entity ID of the URL PATH does not specify an existing entity
+
+#### Response HTTP Headers
+* Link - to echo back to the context (if Accept: application/json)
+
+#### Response Payload Data
+The response payload data is a JSON object describing the entity in question:
+```json
+{
+  <Entity>
+}
+```
+
+#### Pointers to the ETSI NGSI-LD documentation
+* 5.2.4   - The NGSI-LD Entity Data Type
+* 5.2.5   - The NGSI-LD Property Data Type
+* 5.2.6   - The NGSI-LD Relationship Data Type
+* 5.2.7   - The NGSI-LD GeoProperty Data Type
+* 5.7.1   - Retrieve Entity
+* 6.5.3.1 - GET /ngsi-ld/v1/entities/{entityId}
 
 ## Forwarding of Query Requests
 NGSI-LD forwarding is still to be specified.
 Please see chapter `Forwarding of Creation/Modification of Entities/Attributes` for more information.
 
 ## Creation of Subscriptions
+Subscriptions are used to obtain notifications whenever entities/attributes are updated/created, instead of using polling.
+It's much more efficient to subscribe than to continuously query and investigate the response. Like interrupts vs polling.
+Subscriptions are like interrupts. Whenever some criteria (defined by the subscription) is fulfilled, a notification is launched (much like an interrupt).
+
 ### POST /ngsi-ld/v1/subscriptions
+Subscriptions are created using the service `POST /ngsi-ld/v1/subscriptions`.
 
-## Modification of Subscription
+#### Request Payload Data
+A subscription with ALL the field scould look like this:
+```json
+{
+  "id": "URI",  # if not given,  it will be assigned during subscription process and returned to client
+  "type": "Subscription",
+  "name": "Name of the subscription",
+  "description": "Description of the subscription",
+  "entities": [
+    {
+      "id": "entity id",     # Optional, takes precedence over idPattern
+      "idPattern": "REGEX",  # Optional
+      "type": "entity type"  # Mandatory
+    }
+    {
+      "id": "entity id",     # Optional, takes precedence over idPattern
+      "idPattern": "REGEX",  # Optional
+      "type": "entity type"  # Mandatory
+    },
+    ...
+  ],
+  "watchedAttributes": [ "attr1", "attr2", ..., "attrN" ],
+  "timeInterval": Number,  # Not Implemented in Alpha 1
+  "q": "Query Filter",
+  "geoQ": {},  # Not Implemented in	Alpha 1
+  "csf": "",   # Not Implemented in	Alpha 1
+  "isActive": true/false,
+  "notification": {
+    "attributes": [ "attr1", "attr2", ..., "attrN" ],
+    "format": "keyValues" / "normalized",
+    "endpoint": {
+      "uri": "URI which conveys the endpoint which will receive the notification",
+      "accept": "application/json" / "application/ld+json"
+    },
+    "status": "ok" / "failed"
+  },
+  "expires": "ISO 8601 String",
+  "throttling": Number,  # Minimal period of time in seconds which shall elapse between two consecutive notifications
+  "temporalQ": # Not Implemented in Alpha 1,
+  "status": "active"/"paused"/"expired"  # Read-only - not to be given at creation time
+}
+
+```
+Lots of things to say about this structure. All is already said the the ETSI specification. No need to repeat it here.
+Please refer to page 46, Table 5.2.12-1 of the ETSI spec version 1.2.1.
+
+The only mandatory fields are: "type" and "notification".
+Also, either "entities" or "watchedAttributes" *must* be present (both of them at the same time is OK too).
+
+NOTE that the `q` query filter for subscriptions uses the Orion NGSIv2 `q` for subscriptions in Alpha 1.
+The new NGSi-LD `q` Query Filter has been implemented but is in use only for Queries of Entities in Alpha 1.
+
+#### Request URI Parameters
+This service has no URI Parameters.
+
+#### Response HTTP Status Code
+* 201 Created
+* 400 Bad Request - in case the request or its content is incorrect
+* 409 Already Exists - if the provided subscription id is the id of an already existing subscription
+
+#### Response HTTP Headers
+No HTTP headers relevant to NGSI-LD are present in the response.
+
+#### Response Payload Data
+If all is OK, a `201 Created` is returned and no payload data is present in the response.
+On error, the typical `ProblemDetails` structure is returned.
+
+#### Pointers to the ETSI NGSI-LD documentation
+* 5.2.8    - EntityInfo
+* 5.2.12   - Subscription
+* 5.2.14   - NotificationParams
+* 5.8.1    - Create Subscription 
+* 6.10.3.1 - POST /ngsi-ld/v1/subscriptions
+
+## Modification of a Subscription
 ### PATCH /ngsi-ld/v1/subscriptions/{subscriptionId}
+Not Implemented in Alpha 1
 
-## Retrieval of Subscription
+## Querying for Subscriptions
 ### GET /ngsi-ld/v1/subscriptions
-### GET /ngsi-ld/v1/subscriptions/{subscriptionId}
+The service `GET /ngsi-ld/v1/subscriptions` lets a user query subscriptions.
+The response is an array of subscriptions that match the query criteria.
 
-## Deletion of Subscription
+#### Request Payload Data
+There is no payload data for this service.
+
+#### Request URI Parameters
+* limit       - maximum number of subscriptions to be returned
+* offset      - the index of the first subscription
+
+#### Response HTTP Status Code
+* 200 OK
+* 400 Bad Request - only way to get here is by setting the `limit` too high
+
+#### Response HTTP Headers
+* Link
+#### Response Payload Data
+In case of "200 OK", the response payload data is an array of subscriptions:
+```json
+[
+  { Subscription 1 },
+  { Subscription 2 },
+  ...
+  { Subscription N }
+]
+```
+
+In case of "400 Bad Request", the typical _ProblemDetails_ structure is returned.
+
+#### Pointers to the ETSI NGSI-LD documentation
+* 5.2.8    - EntityInfo
+* 5.2.12   - Subscription
+* 5.2.14   - NotificationParams
+* 5.8.4    - Query Subscriptions 
+* 6.10.3.2 - GET /ngsi-ld/v1/subscriptions
+
+## Retrieval of a Specific Subscription
+### GET /ngsi-ld/v1/subscriptions/{subscriptionId}
+This service returns the full information of the subscription whose _Subscription ID_ is exactly the same as the last item of the URL PATH.
+
+#### Request Payload Data
+There is no payload data for this service.
+
+#### Request URI Parameters
+There are no URI Parameters for this service.
+
+#### Response HTTP Status Code
+* 200 OK
+* 400 Bad Request - the _subscriptionId_ in the URL PATH is not a valid URL
+* 404 Not Found   - the subscription specified in the URL PATH does not exist
+
+#### Response HTTP Headers
+* Link
+
+#### Response Payload Data
+In case of "200 OK", the response payload data is the entire subscription. E.g.:
+```json
+{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near"
+  },
+  "isActive": false,
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5,
+  "status": "paused"
+}
+```
+
+On error, the typical _ProblemDetails_ is returned.
+
+#### Pointers to the ETSI NGSI-LD documentation
+* 5.2.8    - EntityInfo
+* 5.2.12   - Subscription
+* 5.2.14   - NotificationParams
+* 5.8.3    - Retrieve Subscription
+* 6.11.3.1 - GET /ngsi-ld/v1/subscriptions/{subscriptionId}
+
+## Deletion of a Specific Subscription
 ### DELETE /ngsi-ld/v1/subscriptions/{subscriptionId}
+To delete a specific subscription, use the service `DELETE /ngsi-ld/v1/subscriptions/{subscriptionId}`.
+
+#### Request Payload Data
+There is no payload data for this service.
+
+#### Request URI Parameters
+There are no URI Parameters for this service.
+
+#### Response HTTP Status Code
+* 204 No Content
+* 400 Bad Request - the subscription ID of the URI PATH is not a valid ID (not a URI)
+* 404 Not Found - the subscription ID	of the URI PATH is not found among the subscriptions.
+
+#### Response HTTP Headers
+No HTTP headers relevant to NGSI-LD are present in the response.
+
+#### Response Payload Data
+No payload data if all OK. If not OK, _ProblemDetails_.
+
+#### Pointers to the ETSI NGSI-LD documentation
+* 5.8.5    - Delete Subscription
+* 6.11.3.3 - DELETE /ngsi-ld/v1/subscriptions/{subscriptionId}
+
 
 ## Notifications
 When an update/creation of an entity/attribute gets a hit in the list of subscriptions, a *notification* request is sent to the
@@ -620,6 +959,12 @@ creating the subscription.
 
 ## Creation of Registrations
 ### POST /ngsi-ld/v1/registrations
+#### Request Payload Data
+#### Request URI Parameters
+#### Response HTTP Status Code
+#### Response HTTP Headers
+#### Response Payload Data
+#### Pointers to the ETSI NGSI-LD documentation
 
 ## Modification of Registrations
 ### PATCH /ngsi-ld/v1/registrations/{registrationId}
@@ -627,11 +972,29 @@ NOT IMPLEMENTED IN ALPHA RELEASE 1
 
 ## Retrieval of Registrations
 ### GET /ngsi-ld/v1/registrations
+#### Request Payload Data
+#### Request URI Parameters
+* limit       - maximum number of subscriptions to be returned
+* offset      - the index of the first subscription
+
+#### Response HTTP Status Code
+#### Response HTTP Headers
+#### Response Payload Data
+#### Pointers to the ETSI NGSI-LD documentation
 ### GET /ngsi-ld/v1/registrations/{registrationId}
+#### Request Payload Data
+#### Request URI Parameters
+#### Response HTTP Status Code
+#### Response HTTP Headers
+#### Response Payload Data
+#### Pointers to the ETSI NGSI-LD documentation
 
 ## Deletion of Registrations
 ### DELETE /ngsi-ld/v1/registrations/{registrationId}
 NOT IMPLEMENTED IN ALPHA RELEASE 1
 
 ## Geolocation
+TBD
+
+## Query Filter
 TBD
