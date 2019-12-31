@@ -56,8 +56,8 @@ extern "C"
 //
 bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
 {
-  KjNode* success  = kjArray(orionldState.kjsonP, "S");
-  KjNode* errors   = kjArray(orionldState.kjsonP, "E");
+  KjNode* success  = kjArray(orionldState.kjsonP, "success");
+  KjNode* errors   = kjArray(orionldState.kjsonP, "errors");
   KjNode* errorObj;
   KjNode* nodeP;
 

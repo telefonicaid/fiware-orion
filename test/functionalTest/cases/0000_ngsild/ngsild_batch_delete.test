@@ -274,13 +274,13 @@ Date: REGEX(.*)
 06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 97
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "E": [],
-    "S": [
+    "errors": [],
+    "success": [
         "urn:ngsi-ld:entity:E1",
         "urn:ngsi-ld:entity:E2",
         "urn:ngsi-ld:entity:E3"
@@ -322,18 +322,18 @@ Date: REGEX(.*)
 09. Remove entities E4 (exists in database) and E5 (does not exist in database)
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 114
+Content-Length: 125
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "E": [
+    "errors": [
         {
             "entityId": "urn:ngsi-ld:entity:E5",
             "error": "Entity not found in database."
         }
     ],
-    "S": [
+    "success": [
         "urn:ngsi-ld:entity:E4"
     ]
 }
