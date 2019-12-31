@@ -52,6 +52,8 @@ static bool qNodeVariableChars(char* s, char** titleP, char** detailsP)
     {}
     else if (*s == '.')
     {}
+    else if (*s == ':')
+    {}
     else
     {
       *titleP = (char*) "ngsi-ld query language: invalid character in variable name";

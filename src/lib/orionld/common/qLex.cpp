@@ -448,6 +448,8 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       {}
       else if (*sP == '-')
       {}
+      else if (*sP == ':')
+      {}
       else
       {
         *titleP = (char*) "ngsi-ld query language: invalid character";
