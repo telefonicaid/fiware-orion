@@ -37,7 +37,7 @@
 #include "mongoBackend/connectionOperations.h"                 // collectionQuery
 #include "mongoBackend/dbConstants.h"                          // REG_*
 #include "mongoBackend/safeMongo.h"                            // moreSafe
-#include "mongoBackend/mongoLdRegistrationAux.h"               // mongoSetLd*
+#include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLd*
 #include "mongoBackend/mongoRegistrationAux.h"                 // Own interface
 
 

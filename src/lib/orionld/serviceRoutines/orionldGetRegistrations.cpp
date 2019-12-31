@@ -38,7 +38,7 @@ extern "C"
 #include "common/string.h"                                    // toString
 #include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "rest/ConnectionInfo.h"                              // ConnectionInfo
-#include "mongoBackend/mongoLdRegistrationsGet.h"             // mongoLdRegistrationsGet
+#include "orionld/mongoBackend/mongoLdRegistrationsGet.h"     // mongoLdRegistrationsGet
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldErrorResponse.h"              // orionldErrorResponseCreate
 #include "orionld/kjTree/kjTreeFromRegistration.h"            // kjTreeFromRegistration

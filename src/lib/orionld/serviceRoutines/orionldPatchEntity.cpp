@@ -34,8 +34,6 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/HttpStatusCode.h"                                 // SccNotFound
-#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
-#include "mongoBackend/mongoAttributeExists.h"                   // mongoAttributeExists
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -45,6 +43,7 @@ extern "C"
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 
 

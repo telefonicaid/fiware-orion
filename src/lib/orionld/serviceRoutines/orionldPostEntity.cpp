@@ -42,7 +42,6 @@ extern "C"
 
 #include "common/MimeType.h"                                     // MimeType
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
-#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo

@@ -184,6 +184,7 @@ SET (ORION_LIBS
 #    orionld_mongoc
     orionld_mongoCppLegacy
     orionld_db
+    orionld_mongoBackend
 
     serviceRoutines
     serviceRoutinesV2
@@ -199,8 +200,9 @@ SET (ORION_LIBS
     ngsi
     cache
     mongoBackend
-    orionld_common      # mongoBackend calls geoJsonCreate from orionld_common
-    orionld_context     # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
+    orionld_common       # mongoBackend calls geoJsonCreate from orionld_common
+    orionld_context      # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
+    orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     parse
     apiTypesV2
     orionTypes
@@ -328,6 +330,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/context)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
+  ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
 #  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)

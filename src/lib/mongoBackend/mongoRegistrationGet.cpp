@@ -44,7 +44,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationAux.h"                 // mongoSetXxx
-#include "mongoBackend/mongoLdRegistrationAux.h"               // mongoSetLdXxx
+#include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLdXxx
 #include "mongoBackend/mongoRegistrationGet.h"                 // Own interface
 
 

@@ -43,7 +43,6 @@ SET (SOURCES
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
-    mongoRegistrationGet.cpp
     mongoRegistrationCreate.cpp
     mongoRegistrationDelete.cpp
     connectionOperations.cpp
@@ -53,12 +52,8 @@ SET (SOURCES
     location.cpp
     compoundValueBson.cpp
     dateExpiration.cpp
-    mongoEntityExists.cpp
-    mongoAttributeExists.cpp
+    mongoRegistrationGet.cpp
     mongoRegistrationAux.cpp
-    mongoLdRegistrationAux.cpp
-    mongoLdRegistrationGet.cpp
-    mongoLdRegistrationsGet.cpp
 )
 
 SET (HEADERS
@@ -85,7 +80,6 @@ SET (HEADERS
     TriggeredSubscription.h
     mongoConnectionPool.h
     mongoGetSubscriptions.h
-    mongoRegistrationGet.h
     mongoRegistrationCreate.h
     mongoRegistrationDelete.h
     connectionOperations.h
@@ -96,8 +90,6 @@ SET (HEADERS
     location.h
     compoundValueBson.h
     dateExpiration.h
-    mongoEntityExists.h
-    mongoAttributeExists.h
 )
 
 

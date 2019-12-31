@@ -29,13 +29,13 @@
 #include "rest/HttpStatusCode.h"                                 // SccContextElementNotFound
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
-#include "mongoBackend/mongoAttributeExists.h"                   // mongoAttributeExists
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
 
 

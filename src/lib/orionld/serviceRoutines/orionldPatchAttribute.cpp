@@ -27,10 +27,10 @@
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/HttpStatusCode.h"                                 // SccNotFound
-#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
-#include "mongoBackend/mongoAttributeExists.h"                   // mongoAttributeExists
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
+#include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own Interface
 
 

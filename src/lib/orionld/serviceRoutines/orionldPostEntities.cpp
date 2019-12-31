@@ -42,7 +42,6 @@ extern "C"
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
-#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
@@ -55,6 +54,7 @@ extern "C"
 #include "orionld/common/orionldEntityPayloadCheck.h"            // orionldEntityPayloadCheck
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
+#include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
 
 
