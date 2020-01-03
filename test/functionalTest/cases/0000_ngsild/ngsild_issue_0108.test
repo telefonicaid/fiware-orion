@@ -34,8 +34,8 @@ brokerStart CB
 # 01. Create an entity urn:ngsi-ld:T:001, with an attr P1 without context
 # 02. Update the attribute P1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs
 # 03. GET the entity to see the patched attribute P1
-# 04. Attempt to PATCH P1 and P2 (that doesn't exist) - see error
-# 05. Get the entity and make sure P1 is still 'Ciao' and that the property P2 does not exist"
+# 04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is silently ignored
+# 05. Get the entity and make sure P1 has changed to 'Goodbye' and that the property P2 does not exist"
 #
 
 echo "01. Create an entity urn:ngsi-ld:T:001, with an attr P1 without context"
@@ -73,12 +73,12 @@ echo
 echo
 
 
-echo "04. Attempt to PATCH P1 and P2 (that doesn't exist) - see error"
-echo "==============================================================="
+echo "04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is silently ignored"
+echo "====================================================================================="
 payload='{
   "P1": {
     "type": "Property",
-    "value": "Will fail"
+    "value": "Goodbye"
   },
   "P2": {
     "type": "Property",
@@ -90,8 +90,8 @@ echo
 echo
 
 
-echo "05. Get the entity and make sure P1 is still 'Ciao' and that the property P2 does not exist"
-echo "==========================================================================================="
+echo "05. Get the entity and make sure P1 has changed to 'Goodbye' and that the property P2 does not exist"
+echo "===================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:001
 echo
 echo
@@ -135,24 +135,19 @@ Date: REGEX(.*)
 }
 
 
-04. Attempt to PATCH P1 and P2 (that doesn't exist) - see error
-===============================================================
-HTTP/1.1 404 Not Found
-Content-Length: 155
-Content-Type: application/json
+04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is silently ignored
+=====================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P2",
-    "title": "Attribute does not exist",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
-05. Get the entity and make sure P1 is still 'Ciao' and that the property P2 does not exist
-===========================================================================================
+05. Get the entity and make sure P1 has changed to 'Goodbye' and that the property P2 does not exist
+====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 77
+Content-Length: 80
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -160,7 +155,7 @@ Date: REGEX(.*)
 {
     "P1": {
         "type": "Property",
-        "value": "Ciao"
+        "value": "Goodbye"
     },
     "id": "urn:ngsi-ld:T:001",
     "type": "T"

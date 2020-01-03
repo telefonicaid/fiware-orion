@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjBuilder.h"                                     // kjChildRemove
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
@@ -51,6 +52,16 @@ extern "C"
 // ----------------------------------------------------------------------------
 //
 // orionldPatchEntity -
+//
+// The input payload in an array of attributes.
+// Those attributes that don't exist already in the entity are ignored,
+// the rest of attributes replace the old attribute.
+//
+// Extract from ETSI NGSI-LD spec:
+//   For each of the Attributes included in the Fragment, if the target Entity includes a matching one (considering
+//   term expansion rules as mandated by clause 5.5.7), then replace it by the one included by the Fragment. If the
+//   Attribute includes a datasetId, only an Attribute instance with the same datasetId is replaced.
+//   In all other cases, the Attribute shall be ignored.
 //
 bool orionldPatchEntity(ConnectionInfo* ciP)
 {
@@ -92,7 +103,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   //
-  // o Make sure the attributes to be patched exist
+  // o Make sure the attributes to be patched exist. If not - ignore!
   // o Expand attribute values if the @context says they should be expanded
   //
   KjNode* attrNamesArrayP = kjLookup(currentEntityTree, "attrNames");
@@ -100,28 +111,36 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   if (attrNamesArrayP == NULL)
     LM_X(1, ("Something has really gone wrong - the node 'attrNames' of the entity '%s' isn't present!", entityId));
 
-  for (KjNode* attrNodeP = orionldState.requestTree->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
+  KjNode* attrNodeP = orionldState.requestTree->value.firstChildP;
+  KjNode* next;
+  while (attrNodeP != NULL)
   {
-    char* attrNameP;
+    char* attrName;
+
+    next = attrNodeP->next;
 
     if ((strncmp(attrNodeP->name, "http://", 7) == 0) || (strncmp(attrNodeP->name, "https://", 8) == 0))
-      attrNameP = attrNodeP->name;
+      attrName = attrNodeP->name;
     else
     {
       bool valueToBeExpanded = false;
 
-      attrNameP = orionldContextItemExpand(orionldState.contextP, attrNodeP->name, &valueToBeExpanded, true, NULL);
+      attrName = orionldContextItemExpand(orionldState.contextP, attrNodeP->name, &valueToBeExpanded, true, NULL);
 
       if (valueToBeExpanded == true)
         orionldContextValueExpand(attrNodeP);
     }
 
-    if (kjStringValueLookupInArray(attrNamesArrayP, attrNameP) == NULL)
+    if (kjStringValueLookupInArray(attrNamesArrayP, attrName) == NULL)
     {
-      ciP->httpStatusCode = SccNotFound;
-      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute does not exist", attrNameP);
-      return false;
+      //
+      // Non-found attributes are ignored - see ETSI NGSi-LD spec, chapter 5.6.2.4:
+      //    "In all other cases, the Attribute shall be ignored"
+      //
+      kjChildRemove(orionldState.requestTree, attrNodeP);
     }
+
+    attrNodeP = next;
   }
 
 

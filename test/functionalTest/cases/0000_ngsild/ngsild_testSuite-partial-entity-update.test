@@ -1,0 +1,139 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSi-LD Test Suite - Partial Entity Attribute Update
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Create an entity E1
+# 02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'
+# 03. Get the entity to see that the update was correctly performed
+#
+
+echo "01. Create an entity E1"
+echo "======================="
+payload='{
+  "id": "urn:ngsi-ld:Entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 12,
+    "observedAt": "2018-12-04T12:00:00.00Z",
+    "P1_R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T2:6789"
+    },
+    "P1_P1": {
+      "type": "Property",
+      "value": 0.79
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'"
+echo "==============================================================================================="
+payload='{
+  "P1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:T2:6789"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-8.01, 40.01]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entities:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. Get the entity to see that the update was correctly performed"
+echo "================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1
+=======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entities:E1
+Date: REGEX(.*)
+
+
+
+02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'
+===============================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+
+
+03. Get the entity to see that the update was correctly performed
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 243
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "P1_P1": {
+            "type": "Property",
+            "value": 0.79
+        },
+        "P1_R1": {
+            "object": "urn:ngsi-ld:T2:6789",
+            "type": "Relationship"
+        },
+        "object": "urn:ngsi-ld:T2:6789",
+        "observedAt": "2018-12-04T12:00:00Z",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:Entities:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
