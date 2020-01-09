@@ -1,0 +1,315 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI-LD Test Suite Case 079
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt
+# 02. See E1 in the database
+# 03. Append to E1 two attributes: R1 and location
+# 05. GET E1 - see the three attributes
+#
+
+echo "01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt"
+echo "===================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 12,
+    "observedAt": "2018-12-04T12:00:00Z",
+    "P1_R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T2:6789"
+    },
+    "P1_P1": {
+      "type": "Property",
+      "value": 0.79
+    }
+  },
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. See E1 in the database"
+echo "=========================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Append to E1 two attributes: R1 and location"
+echo "================================================"
+payload='{
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:T2:6789",
+    "R1_R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T3:A2345"
+    },
+    "R1_P1": {
+      "type": "Property",
+      "value": false
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-8.01, 40.01]
+    }
+  },
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. See E1 in the database"
+echo "=========================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. GET E1 - see the three attributes"
+echo "====================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?prettyPrint=yes'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"md" : {
+				"observedAt" : {
+					"value" : 1543924800
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:T2:6789"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"type" : "Property",
+					"value" : 0.79
+				}
+			},
+			"mdNames" : [
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Append to E1 two attributes: R1 and location
+================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+
+
+04. See E1 in the database
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1",
+		"https://uri.etsi.org/ngsi-ld/location"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/observedAt" : {
+					"value" : 1543924800
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:T2:6789"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
+					"type" : "Property",
+					"value" : 0.79
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/observedAt",
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1",
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:T2:6789",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_R1" : {
+					"type" : "Relationship",
+					"value" : "urn:ngsi-ld:T3:A2345"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_P1" : {
+					"type" : "Property",
+					"value" : false
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_P1"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					-8.01,
+					40.01
+				]
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. GET E1 - see the three attributes
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 699
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "P1_P1": {
+            "type": "Property",
+            "value": 0.79
+        },
+        "P1_R1": {
+            "object": "urn:ngsi-ld:T2:6789",
+            "type": "Relationship"
+        },
+        "observedAt": "2018-12-04T12:00:00Z",
+        "type": "Property",
+        "value": 12
+    },
+    "R1": {
+        "R1_P1": {
+            "type": "Property",
+            "value": false
+        },
+        "R1_R1": {
+            "object": "urn:ngsi-ld:T3:A2345",
+            "type": "Relationship"
+        },
+        "object": "urn:ngsi-ld:T2:6789",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                -8.01,
+                40.01
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

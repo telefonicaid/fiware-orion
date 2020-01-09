@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -42,6 +43,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // Own interface
 
@@ -312,13 +314,30 @@ bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char
   KjNode*   typeNodeP       = NULL;
   KjNode*   valueNodeP      = NULL;
   KjNode*   objectNodeP     = NULL;
+  KjNode*   observedAtP     = NULL;
   bool      isProperty      = false;
   bool      isRelationship  = false;
+  char*     shortName       = orionldContextItemAliasLookup(orionldState.contextP, nodeP->name, NULL, NULL);
 
-  if (nodeP->type == KjObject)
+  //
+  // FIXME: 'observedAt' is an API observed word and should NEVER be expanded!
+  //
+
+  LM_T(LmtMetadata, ("'%s' ALIAS: '%s'", nodeP->name, shortName));
+
+  if (SCOMPARE11(shortName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
   {
+    isProperty  = true;
+    observedAtP = nodeP;
+    valueNodeP  = nodeP;
+  }
+  else if (nodeP->type == KjObject)
+  {
+    LM_T(LmtMetadata, ("'%s' is an Object", nodeP->name));
     for (KjNode* kNodeP = nodeP->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
     {
+      LM_T(LmtMetadata, ("Treating sub-attr '%s' of '%s'", kNodeP->name, shortName));
+
       if (SCOMPARE5(kNodeP->name, 't', 'y', 'p', 'e', 0))
       {
         DUPLICATE_CHECK(typeNodeP, "metadata type", kNodeP);
@@ -349,7 +368,7 @@ bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char
       }
     }
 
-    if (typeNodeP == NULL)
+    if ((typeNodeP == NULL) && (observedAtP == NULL))  // "obserfvedAt" is a special metadata that has no type, just a value.
     {
       LM_E(("No type for metadata '%s'", nodeP->name));
       orionldErrorResponseCreate(OrionldBadRequestData, "The type field is missing for a metadata", nodeP->name);
@@ -389,7 +408,23 @@ bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char
   if (typeNodeP != NULL)  // Only if the metadata is a JSON Object
     mdP->type = typeNodeP->value.s;
 
-  if (isProperty == true)
+  if (observedAtP != NULL)
+  {
+    mdP->valueType   = orion::ValueTypeNumber;
+
+    if (observedAtP->type == KjObject)
+    {
+      // Lookup member "value"
+      KjNode* valueP = kjLookup(observedAtP, "value");
+      if (valueP != NULL)
+        mdP->numberValue = valueP->value.i;
+      else
+        mdP->numberValue = 0;
+    }
+    else
+      mdP->numberValue = observedAtP->value.i;
+  }
+  else if (isProperty == true)
   {
     if (metadataValueSet(ciP, mdP, valueNodeP) == false)
     {
