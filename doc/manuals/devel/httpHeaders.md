@@ -1,28 +1,28 @@
 # <a name="top"></a>List of HTTP Headers used by Orion
 
-1)  [Accept](#1-accept--)        
-2)  [Content-Length](#2-content-length-)         
-3)  [Content-Type](#3-content-type-)
-4)  [Connection]()                
-5)  [Expect](#5-expect-)                                                                                
+1)  [Accept](#1-accept)        
+2)  [Content-Length](#2-content-length)         
+3)  [Content-Type](#3-content-type)
+4)  [Connection](#4-connection)                
+5)  [Expect](#5-expect)                                                                                
 6)  [Host](#6-host)                        	                                                      
 7)  [Origin](#7-origin)                                                       
-8)  [User-Agent](#8-user-agent-)              
+8)  [User-Agent](#8-user-agent)              
 9)  [X-Forwarded-For](#9-x-forwarded-for)                                                               
-10) [X-Real-IP](#10-x-real-ip-)
+10) [X-Real-IP](#10-x-real-ip)
 
-11) [Access-Control-Allow-Origin](#11--access-control-allow-origin-)
-12) [Access-Control-Allow-Headers](#12-access-control-allow-headers-)                                                                   
-13) [Access-Control-Allow-Methods](#13-access-control-allow-methods-)
-14) [Access-Control-Max-Age](#14-access-control-max-age-)                                 
-15) [Access-Control-Expose-Headers](#15-access-control-expose-headers-)
-16) [Allow](#16-allow-)                                                                                    
-17) [Location](#17-location-)                                                 
-18) [Ngsiv2-AttrsFormat](#18-ngsiv2-attrsformat-)                                    
-19) [Fiware-Service](#19-fiware-service-)
-20) [Fiware-Servicepath](#20-fiware-servicepath-)
-21) [Fiware-Total-Count](#21-fiware-total-count-)
-22) [Fiware-Correlator](#22-fiware-correlator-)                                     
+11) [Access-Control-Allow-Origin](#11--access-control-allow-origin)
+12) [Access-Control-Allow-Headers](#12-access-control-allow-headers)                                                                   
+13) [Access-Control-Allow-Methods](#13-access-control-allow-methods)
+14) [Access-Control-Max-Age](#14-access-control-max-age)                                 
+15) [Access-Control-Expose-Headers](#15-access-control-expose-headers)
+16) [Allow](#16-allow)                                                                                    
+17) [Location](#17-location)                                                 
+18) [Ngsiv2-AttrsFormat](#18-ngsiv2-attrsformat)                                    
+19) [Fiware-Service](#19-fiware-service)
+20) [Fiware-Servicepath](#20-fiware-servicepath)
+21) [Fiware-Total-Count](#21-fiware-total-count)
+22) [Fiware-Correlator](#22-fiware-correlator)                                     
 
 23) [X-Auth-Token](#23-x-auth-token)
 
@@ -32,7 +32,7 @@
 
 
 
-## 1. Accept  : 
+## 1. Accept
 
 Accept HTTP Header is used in requests. 
 Accept HTTP Header is used with the request URL for accepting the response in well defined JSON format. 
@@ -48,7 +48,7 @@ than those will get a `406 Not Acceptable` error.
 
 [Top](#top)
 
-## 2. Content-Length :
+## 2. Content-Length
 
 This header is used by both requests and responses.
 Content-length HTTP header is a mandatory header in Orion responses.
@@ -60,7 +60,7 @@ This is due to the way the underlying HTTP library (microhttpd) works.
 
 [Top](#top)
  
-## 3. Content-Type : 
+## 3. Content-Type 
 
 It is used to send the requests in well defined JSON format.
 
@@ -72,7 +72,7 @@ Specifically, if the resulting URL after applying the template is malformed, the
 
 [Top](#top)
  
-## 4. Connection :
+## 4. Connection
  
  This Header is used by both requests and responses.
  It is used as Control options for the current connection and list of hop-by-hop response fields.
@@ -81,7 +81,7 @@ Specifically, if the resulting URL after applying the template is malformed, the
     	
 [Top](#top)	
   
-## 5. Expect :
+## 5. Expect
 
 Expect HTTP Header is used in requests.
 It Indicates that behaviour of particular server are required by the client.
@@ -91,7 +91,7 @@ It is typically used when sending a large request body. We expect the server to 
 	
 [Top](#top)	
 	
-## 6. Host:
+## 6. Host
 
 This HTTP Header is used in Orion responses.
 When we make any request then the corresponding Notification will come on accumulator server, this header gives the port number of accumulator server. 	
@@ -100,7 +100,7 @@ When we make any request then the corresponding Notification will come on accumu
 		
 [Top](#top)
 
-## 7. Origin:
+## 7. Origin
 
 Origin is used as request HTTP Header in Orion. 
 It initiates a request for cross-origin resource sharing (asks server for Access-Control- response fields).
@@ -109,7 +109,7 @@ It initiates a request for cross-origin resource sharing (asks server for Access
 		
 [Top](#top)	
   
-## 8. User-Agent : 
+## 8. User-Agent
 
 User-Agent HTTP Header is used by both requests and responses.
 It describes which version of Orion we are using along with its transfer library and version.
@@ -120,7 +120,7 @@ It gives the string that identifies the user agent.
 
 [Top](#top)		
 		
-## 9. X-Forwarded-For:
+## 9. X-Forwarded-For
 
 It is a request HTTP Header in Orion.
 Source IP of the HTTP request associated to the transaction, except if the request includes X-Forwarded-For header which overrides the former IP.
@@ -131,7 +131,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
 [Top](#top) 
 	
-## 10. X-Real-IP :
+## 10. X-Real-IP
 
 Source IP of the HTTP request associated to the transaction, except if the request includes X-Real-IP which overrides X-Forwarded-For and source IP.
 X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
@@ -139,7 +139,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
 [Top](#top)
 
-## 11.  Access-Control-Allow-Origin :
+## 11.  Access-Control-Allow-Origin
 
 It is an optional Header used in Orion responses.  
 If the CORS mode is enabled, Origin header is present in the request and its value matches Orion's allowed origin, then this header 
@@ -158,11 +158,11 @@ If -corsOrigin is set to `__ALL`:
 [Top](#top)
 
 
-## 12. Access-Control-Allow-Headers :
+## 12. Access-Control-Allow-Headers
 
 It is a response HTTP Header in Orion.
 This header should be present in Orion's response for every OPTIONS request made to /v2 resources. Orion allows a specific 
-set of headers in CORS requests and these are defined in lib/rest/HttpHeaders.h.
+set of headers in CORS requests and these are defined in `lib/rest/HttpHeaders.h`.
 	
 Orion's response to a valid OPTIONS request would include the header and value below:
 
@@ -171,7 +171,7 @@ Orion's response to a valid OPTIONS request would include the header and value b
 [Top](#top)		
 		
 		
-## 13. Access-Control-Allow-Methods :
+## 13. Access-Control-Allow-Methods
 
 It is a response HTTP Header in Orion.
 This header should be present in Orion's response for every OPTIONS request made to `/v2` resources. Each resource has its
@@ -180,7 +180,7 @@ own set of allowed methods and the header value is set by the options Only servi
 [Top](#top)
 
 									  
-## 14. Access-Control-Max-Age :
+## 14. Access-Control-Max-Age
 
 It is a response HTTP Header in Orion.
 This header should be present in Orion's response for every OPTIONS request made to `/v2` resources. The user is free to set a value for the maximum time (in seconds), a client is allowed to cache a preflight request made to Orion.
@@ -196,10 +196,10 @@ If -corsMaxAge is not set on startup, it will default to `86400` (24 hours) and 
 [Top](#top)
 
 
-## 15. Access-Control-Expose-Headers :
+## 15. Access-Control-Expose-Headers
 
 It is a response HTTP Header in Orion.
-This header should be present in Orion's responses for every request made with a valid Origin value. Orion allows a specific set of response headers to be accessed by the user agent (i.e. browser) in CORS requests and these are defined in lib/rest/HttpHeaders.h
+This header should be present in Orion's responses for every request made with a valid Origin value. Orion allows a specific set of response headers to be accessed by the user agent (i.e. browser) in CORS requests and these are defined in `lib/rest/HttpHeaders.h`
 
 Orion's response to a valid CORS request would include the header and value below:
 	
@@ -208,7 +208,7 @@ Orion's response to a valid CORS request would include the header and value belo
 [Top](#top)
 
 
-## 16. Allow :
+## 16. Allow
 
 Allow HTTP Header is used in response notification.
 It notifies that which methods are allowed by the specified Host/resource.
@@ -218,7 +218,7 @@ It notifies that which methods are allowed by the specified Host/resource.
 [Top](#top)
 		
     
-## 17. Location :
+## 17. Location
 
 Location is used as a HTTP response Header in Orion.
 Response  contains a Location header which holds the subscription ID: a 24 digit hexadecimal number used for updating and cancelling the subscription.
@@ -237,7 +237,7 @@ And the response that we will get:
 [Top](#top)
 
 
-## 18. Ngsiv2-AttrsFormat :
+## 18. Ngsiv2-AttrsFormat
 
 It is a response HTTP header in Orion.
 Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the	associated subscription, 
@@ -252,7 +252,7 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsform
 [Top](#top)	
 
 
-## 19. Fiware-Service :
+## 19. Fiware-Service
 
 Fiware-Service is an optional header used in requests.
 When `-multiservice` is used Orion includes the `Fiware-Service` header in the notifyContextRequest and notifyContextAvailability request messages associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present).
@@ -277,7 +277,7 @@ When `-multiservice` is used Orion includes the `Fiware-Service` header in the n
 [Top](#top)
 
 
-## 20. Fiware-Servicepath :
+## 20. Fiware-Servicepath
 
 Fiware-ServicePath is an optional header used in requests.
 Fiware-ServicePath header is included in notification requests sent by Orion.
@@ -310,7 +310,7 @@ Fiware-Service and Fiware-ServicePath are set at entity creation time using HTTP
 [Top](#top)
  
  
-## 21. Fiware-Total-Count :
+## 21. Fiware-Total-Count
 
 It is an optional header used in responses.
 NGSIv2 implements a pagination mechanism in order to help clients to retrieve large sets of resources. This mechanism works for all listing operations in the API (e.g. `GET /v2/entities`, `GET /v2/subscriptions`, `POST /v2/op/query`, etc.).
@@ -326,7 +326,7 @@ iii) count (as option), if activated then a Fiware-Total-Count header is added t
 [Top](#top)
 
 
-## 22. Fiware-Correlator :
+## 22. Fiware-Correlator
 
 Fiware-Correlator is a response HTTP Header.
 Fiware-Correlator is used as HTTP header in forwarding messages, notifications and responses.
@@ -341,7 +341,7 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlato
 [Top](#top)
 	
 
-## 23. X-Auth-Token:
+## 23. X-Auth-Token
 
 X-Auth-Token is an optional HTTP Header used in requests.
 It is used as a Access-Control HTTP Header.	
