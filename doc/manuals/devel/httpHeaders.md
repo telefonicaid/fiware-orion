@@ -1,4 +1,4 @@
-# <a name="top"></a>List of HTTP Headers used by Orion
+# <a name="top"></a>This document describes all the headers used by Orion, as defined in src/lib/rest/HttpHeaders.h file.
 
 1)  [Accept](#1-accept)        
 2)  [Content-Length](#2-content-length)         
@@ -28,17 +28,17 @@
 
 
 
-# HTTP Headers used by Orion with their Description:
+# HTTP headers used by Orion with their description
 
 
 
 ## 1. Accept
 
-Accept HTTP Header is used in requests. 
-Accept HTTP Header is used with the request URL for accepting the response in well defined JSON format. 
+Accept HTTP header is used in requests. 
+Accept HTTP header is used in the request to specify which MIME type the client accepts. Typically its value is `application/json` (for JSON MIME type) although some operations in the NGSIv2 API also allow `text/plain`. 
 For example in request URL if we use:
 	
-    curl ... 'Accept: application/json'
+    curl ... -H 'Accept: application/json'
 		 
 On this request we'll get the response data in well defined JSON format.
 
@@ -52,9 +52,9 @@ than those will get a `406 Not Acceptable` error.
 
 This header is used by both requests and responses.
 Content-length HTTP header is a mandatory header in Orion responses.
-it defines the length of the request and response body in octets (8-bit bytes).
+It defines the length of the request and response body in bytes.
 Orion Context Broker expects always a Content-Length header in all client requests, otherwise the client will receive a `411 Length Required` response. 
-This is due to the way the underlying HTTP library (microhttpd) works.
+This is due to the way the underlying HTTP library (libmicrohttpd) works.
 	
     Content-Length: 34	
 
@@ -62,20 +62,18 @@ This is due to the way the underlying HTTP library (microhttpd) works.
  
 ## 3. Content-Type 
 
-It is used to send the requests in well defined JSON format.
+It is used to specify the MIME type of the request or response. Typically its value is `application/json` (for JSON MIME type) although some operations in the NGSIv2 API also allow `text/plain`.
 
-    curl ... 'Content-Type: application/json'
+    curl ... -H 'Content-Type: application/json'
 
 This request will send data in well defined JSON format.
-
-Specifically, if the resulting URL after applying the template is malformed, then no notification is sent.
 
 [Top](#top)
  
 ## 4. Connection
  
- This Header is used by both requests and responses.
- It is used as Control options for the current connection and list of hop-by-hop response fields.
+ This header is used by both requests and responses.
+ Orion is not currently doing anything with this header (apart from checking if its value is `close` to print a log trace).
 	
     Connection: Keep-Alive
     	
@@ -83,7 +81,7 @@ Specifically, if the resulting URL after applying the template is malformed, the
   
 ## 5. Expect
 
-Expect HTTP Header is used in requests.
+Expect HTTP header is used in requests.
 It Indicates that behaviour of particular server are required by the client.
 It is typically used when sending a large request body. We expect the server to return back `100 Continue` HTTP status if it can handle the request, or `417 Expectation Failed` if not.
 
@@ -93,7 +91,7 @@ It is typically used when sending a large request body. We expect the server to 
 	
 ## 6. Host
 
-This HTTP Header is used in Orion responses.
+This HTTP header is used in Orion responses.
 When we make any request then the corresponding Notification will come on accumulator server, this header gives the port number of accumulator server. 	
 	
     Host: localhost:1028
@@ -102,7 +100,7 @@ When we make any request then the corresponding Notification will come on accumu
 
 ## 7. Origin
 
-Origin is used as request HTTP Header in Orion. 
+Origin is used as request HTTP header in Orion. 
 It initiates a request for cross-origin resource sharing (asks server for Access-Control- response fields).
 	
     Origin: http://www.example-social-network.com
@@ -111,7 +109,7 @@ It initiates a request for cross-origin resource sharing (asks server for Access
   
 ## 8. User-Agent
 
-User-Agent HTTP Header is used by both requests and responses.
+User-Agent HTTP header is used by both requests and responses.
 It describes which version of Orion we are using along with its transfer library and version.
 It gives the string that identifies the user agent.
 
@@ -122,7 +120,7 @@ It gives the string that identifies the user agent.
 		
 ## 9. X-Forwarded-For
 
-It is a request HTTP Header in Orion.
+It is a request HTTP header in Orion.
 Source IP of the HTTP request associated to the transaction, except if the request includes X-Forwarded-For header which overrides the former IP.
 X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
 X-Real-IP takes preference over X-Forwarded-For, if both appear.
@@ -141,7 +139,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 
 ## 11.  Access-Control-Allow-Origin
 
-It is an optional Header used in Orion responses.  
+It is an optional header used in Orion responses.  
 If the CORS mode is enabled, Origin header is present in the request and its value matches Orion's allowed origin, then this header 
 will always be added to the response.  
 Please note that if the above condition is not true and Access-Control-Allow-Origin header is not added to the response,
@@ -160,7 +158,7 @@ If -corsOrigin is set to `__ALL`:
 
 ## 12. Access-Control-Allow-Headers
 
-It is a response HTTP Header in Orion.
+It is a response HTTP header in Orion.
 This header should be present in Orion's response for every OPTIONS request made to /v2 resources. Orion allows a specific 
 set of headers in CORS requests and these are defined in `lib/rest/HttpHeaders.h`.
 	
@@ -173,7 +171,7 @@ Orion's response to a valid OPTIONS request would include the header and value b
 		
 ## 13. Access-Control-Allow-Methods
 
-It is a response HTTP Header in Orion.
+It is a response HTTP header in Orion.
 This header should be present in Orion's response for every OPTIONS request made to `/v2` resources. Each resource has its
 own set of allowed methods and the header value is set by the options Only service routines in `lib/serviceRoutinesV2`.
 
@@ -182,7 +180,7 @@ own set of allowed methods and the header value is set by the options Only servi
 									  
 ## 14. Access-Control-Max-Age
 
-It is a response HTTP Header in Orion.
+It is a response HTTP header in Orion.
 This header should be present in Orion's response for every OPTIONS request made to `/v2` resources. The user is free to set a value for the maximum time (in seconds), a client is allowed to cache a preflight request made to Orion.
 
 If -corsMaxAge is set to a specific value, 600 in this case, Orion's response to a valid OPTIONS request would include the header and value below:
@@ -198,7 +196,7 @@ If -corsMaxAge is not set on startup, it will default to `86400` (24 hours) and 
 
 ## 15. Access-Control-Expose-Headers
 
-It is a response HTTP Header in Orion.
+It is a response HTTP header in Orion.
 This header should be present in Orion's responses for every request made with a valid Origin value. Orion allows a specific set of response headers to be accessed by the user agent (i.e. browser) in CORS requests and these are defined in `lib/rest/HttpHeaders.h`
 
 Orion's response to a valid CORS request would include the header and value below:
@@ -210,7 +208,7 @@ Orion's response to a valid CORS request would include the header and value belo
 
 ## 16. Allow
 
-Allow HTTP Header is used in response notification.
+Allow HTTP header is used in response notification.
 It notifies that which methods are allowed by the specified Host/resource.
 
     Allow: GET
@@ -220,7 +218,7 @@ It notifies that which methods are allowed by the specified Host/resource.
     
 ## 17. Location
 
-Location is used as a HTTP response Header in Orion.
+Location is used as a HTTP response header in Orion.
 Response  contains a Location header which holds the subscription ID: a 24 digit hexadecimal number used for updating and cancelling the subscription.
 we will use -v in request to get the Location header in the response.
 	
@@ -240,7 +238,7 @@ And the response that we will get:
 ## 18. Ngsiv2-AttrsFormat
 
 It is a response HTTP header in Orion.
-Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the	associated subscription, 
+Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the associated subscription, 
 so that notification receivers are aware of the format without needing to process the notification payload.
 Note that if a custom payload is used for the notification then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.	
@@ -328,7 +326,7 @@ iii) count (as option), if activated then a Fiware-Total-Count header is added t
 
 ## 22. Fiware-Correlator
 
-Fiware-Correlator is a response HTTP Header.
+Fiware-Correlator is a response HTTP header.
 Fiware-Correlator is used as HTTP header in forwarding messages, notifications and responses.
 This correlator id is either transferred from an incoming request, or, if the incoming request doesn't carry any HTTP header Fiware-Correlator, the correlator is generated by the Orion context broker and then used in the log file. 
 It Can be either `N/A` or it is a string in the UUID format.
@@ -343,8 +341,8 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlato
 
 ## 23. X-Auth-Token
 
-X-Auth-Token is an optional HTTP Header used in requests.
-It is used as a Access-Control HTTP Header.	
+X-Auth-Token is an optional HTTP header used in requests.
+It is used as a Access-Control HTTP header.	
 This header is used to provide security to Orion and it is frequently used in FIWARE-CEPHEUS(i.e. an another component used in fiware).
 X-Auth-Token forwarded in ngsi10 notifications.
 	
