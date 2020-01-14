@@ -87,7 +87,7 @@ In the case of Orion, that limit is one (1) attribute.
 
 [Top](#top)
 
-# Supported GeoJSON types in `geo:json` attributes
+## Supported GeoJSON types in `geo:json` attributes
 
 NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
 `geo:json` attributes. However, the current implementation in Orion (based in the MongoDB capabilities)
