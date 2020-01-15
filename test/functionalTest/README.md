@@ -12,7 +12,7 @@ We recommend to use Python [virtualenv](https://virtualenv.pypa.io/en/latest) to
 
 ```
 pip install virtualenv  # if you don't have virtualenv itself previously installed
-virtualenv /path/to/ft_env
+virtualenv --python=/usr/bin/python2 /path/to/ft_env
 ```
 
 Then activate the virtual env:

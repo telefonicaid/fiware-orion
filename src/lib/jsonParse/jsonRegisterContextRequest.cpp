@@ -34,6 +34,7 @@
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonParse.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
@@ -153,7 +154,7 @@ static std::string crAttribute(const std::string& path, const std::string& value
 */
 static std::string craName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->rcr.attributeP->name = value;
+  reqDataP->rcr.attributeP->name = safeValue(value);
   LM_T(LmtParse, ("Set 'name' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->name.c_str()));
 
   return "OK";

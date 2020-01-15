@@ -5,6 +5,7 @@
 * [Option to disable custom notifications](#option-to-disable-custom-notifications)
 * [Non-modifiable headers in custom notifications](#non-modifiable-headers-in-custom-notifications)
 * [Limit to attributes for entity location](#limit-to-attributes-for-entity-location)
+* [Supported GeoJSON types in `geo:json` attributes](#supported-geojson-types-in-geojson-attributes)
 * [Legacy attribute format in notifications](#legacy-attribute-format-in-notifications)
 * [Datetime support](#datetime-support)
 * [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
@@ -85,6 +86,29 @@ From "Geospatial properties of entities" section at NGSIv2 specification:
 In the case of Orion, that limit is one (1) attribute.
 
 [Top](#top)
+
+## Supported GeoJSON types in `geo:json` attributes
+
+NGSIv2 specification doesn't specify any limitation in the possible GeoJSON types to be used for
+`geo:json` attributes. However, the current implementation in Orion (based in the MongoDB capabilities)
+introduces some limitations.
+
+We have successfully tested the following types:
+
+* Point
+* MultiPoint
+* LineString
+* MultiLineString
+* Polygon
+* MultiPolygon
+
+On the contrary, the following types doesn't work (you will get a "Database Error" if you try to use them):
+
+* Feature
+* GeometryCollection
+* FeatureCollection
+
+More information on the tests conducted can be found [here](https://github.com/telefonicaid/fiware-orion/issues/3586).
 
 ## Legacy attribute format in notifications
 

@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonParse.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Metadata.h"
@@ -126,7 +127,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 */
 static std::string attributeName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  reqDataP->upcr.attributeP->name = value;
+  reqDataP->upcr.attributeP->name = safeValue(value);
   LM_T(LmtParse, ("Set 'name' to '%s' for a contextElement Attribute", reqDataP->upcr.attributeP->name.c_str()));
 
   return "OK";
@@ -189,7 +190,7 @@ static std::string metadata(const std::string& path, const std::string& value, P
 static std::string metadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
-  reqDataP->upcr.contextMetadataP->name = value;
+  reqDataP->upcr.contextMetadataP->name = safeValue(value);
 
   return "OK";
 }
