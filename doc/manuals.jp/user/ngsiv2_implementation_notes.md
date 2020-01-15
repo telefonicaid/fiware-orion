@@ -5,6 +5,7 @@
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
 * [エンティティ・ロケーションの属性に制限](#limit-to-attributes-for-entity-location)
+* [`geo:json` 属性でサポートされる GeoJSON タイプ](#supported-geojson-types-in-geojson-attributes)
 * [通知の従来の属性フォーマット](#legacy-attribute-format-in-notifications)
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
@@ -74,6 +75,33 @@ NGSIv2 仕様の "エンティティの地理空間プロパティ" のセクシ
 > クライアントアプリケーションは、(適切な NGSI アトリビュート型を提供することによって) ジオスペース・プロパティを伝えるエンティティ属性を定義する責任があります。通常これは `location` という名前のついたエンティティ属性ですが、エンティティに複数の地理空間属性が含まれているユース・ケースはありません。たとえば、異なる粒度レベルで指定された場所、または異なる精度で異なる場所の方法によって提供された場所です。それにもかかわらず、空間特性には、バックエンド・データベースによって課せられたリソースの制約下にある特別なインデックスが必要であることは注目に値します。したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性があります。これらの状況で推奨される HTTP ステータス・コードは `413` です。リクエスト・エンティティが大きすぎます。また、レスポンス・ペイロードで報告されたエラーは、`NoResourcesAvailable` である必要があります。
 
 Orion の場合、その制限は1つの属性です。
+
+[トップ](#top)
+
+<a name="supported-geojson-types-in-geojson-attributes"></a>
+
+## `geo:json` 属性でサポートされる GeoJSON タイプ
+
+NGSIv2 仕様では、`geo:json` 属性に使用される可能性のある GeoJSON タイプに制限を設定していません。
+ただし、現在の Orion の実装 (MongoDB の機能に基づく) にはいくつかの制限があります。
+
+次のタイプのテストに成功しました :
+
+* Point
+* MultiPoint
+* LineString
+* MultiLineString
+* Polygon
+* MultiPolygon
+
+その一方で、次のタイプは機能しません (使用しようとすると "Database Error" が発生します) :
+
+* Feature
+* GeometryCollection
+* FeatureCollection
+
+実施されたテストの詳細については、
+[こちら](https://github.com/telefonicaid/fiware-orion/issues/3586)をご覧ください。
 
 [トップ](#top)
 
