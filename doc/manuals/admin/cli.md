@@ -116,7 +116,7 @@ The list of available options is the following:
 -   **-pidpath <pid_file>**. Specifies the file to store the PID of the
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
-    for forwarding messages and for notifications. Default timeout (if nothing is specified)
+    for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
     is 5 seconds.
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
