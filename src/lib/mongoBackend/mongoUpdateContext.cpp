@@ -69,7 +69,13 @@ static void flowControlAwait(unsigned int q0, unsigned int notifSent)
   LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                      pass, accumulatedDelay, qi));
 
-
+  // FIXME P4: we should check in each pass that the connection with the client is still
+  // active or break in negative case. Not sure how to do this... we have a
+  // ciP->connection object (a MDH_Connection) which hopefully could be used to check
+  // this. However libmicrohttpd library documentation is not very clear on this.
+  // Maybe the MHD_get_connection_info() function can be used for this.
+  // This is not a big issue as it's unrare the client cuts the connection (thus the P4)
+  // but it may happen...
   while (qi > target)
   {
     pass++;
@@ -123,7 +129,7 @@ HttpStatusCode mongoUpdateContext
 #ifndef UNIT_TEST
     q0 = ((QueueNotifier*) getNotifier())->queueSize();
 #endif
-    LM_T(LmtNotifier, ("notificationq queue size before processing update: %d", q0));
+    LM_T(LmtNotifier, ("notification queue size before processing update: %d", q0));
   }
   unsigned int notifSent = 0;
 
