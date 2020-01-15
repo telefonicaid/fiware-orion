@@ -498,6 +498,12 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
     return false;
   }
 
+  if (!result.hasField("databases"))
+  {
+    LM_E(("Runtime Error (no 'databases' field in %s)", result.toString().c_str()));
+    return false;
+  }
+
   std::vector<BSONElement> databases = getFieldF(result, "databases").Array();
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {

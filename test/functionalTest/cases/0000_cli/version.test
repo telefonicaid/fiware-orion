@@ -31,7 +31,7 @@ contextBroker --version
 
 --REGEXPECT--
 REGEX(\d+\.\d+\.\d+.* \(git version: .*\))
-Copyright 2013-2019 Telefonica Investigacion y Desarrollo, S.A.U
+Copyright 2013-2020 Telefonica Investigacion y Desarrollo, S.A.U
 Orion Context Broker is free software: you can redistribute it and/or
 modify it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the

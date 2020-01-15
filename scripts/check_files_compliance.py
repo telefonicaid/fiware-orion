@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
