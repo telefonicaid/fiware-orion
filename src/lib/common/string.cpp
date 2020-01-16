@@ -755,6 +755,29 @@ double atoF(const char* string, std::string* errorMsg)
 
 /* ****************************************************************************
 *
+* atoUL -
+*/
+unsigned long atoUL(const char* string, std::string* errorMsg)
+{
+  // Initially I tryed with stroul() but it doesn't worked... so I'm using strol() plus
+  // explicity checking for positive number
+  char *ptr;
+  long value = strtol (string, &ptr, 0);
+  if (string == ptr)
+  {
+    *errorMsg = "parsing error";
+  }
+  if (value < 0)
+  {
+    *errorMsg = "negative number";
+  }
+  return (unsigned long) value;
+}
+
+
+
+/* ****************************************************************************
+*
 * strToLower - 
 */
 char* strToLower(char* to, const char* from, int toSize)

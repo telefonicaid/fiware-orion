@@ -128,6 +128,15 @@ extern double atoF(const char* string, std::string* errorMsg);
 
 
 
+
+/* ****************************************************************************
+*
+* atoUL -
+*/
+extern unsigned long atoUL(const char* string, std::string* errorMsg);
+
+
+
 /* ****************************************************************************
 *
 * strToLower - 

@@ -1,3 +1,4 @@
+- Add: notification flow control on update (#3568)
 - Fix: crash when using null character in some NGSIv1 operations
 - Hardening: NULL control in some strdup and calloc cases (very unlikely, but theoretically possible) (#3578)
 - Hardening: avoid crash in the unlikely case MongoDB get databases operations fails in csubs cache refresh logic (#3456, partly)
