@@ -2342,6 +2342,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 
     /* Release mock */
     delete connectionMock;
+    delete cursorMockCAsub;
 
     /* check collection has not been touched */
     EXPECT_EQ(0, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
