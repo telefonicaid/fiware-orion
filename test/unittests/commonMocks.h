@@ -254,7 +254,6 @@ class NotifierMock : public Notifier
                                          blacklist,
                                          metadataFilter);
     }
-
 };
 
 
