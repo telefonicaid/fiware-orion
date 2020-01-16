@@ -269,7 +269,7 @@ if they arrive too close in time. If your use case doesn't support losing notifi
 
 In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
-values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
+values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
 
 [Top](#top)
@@ -349,7 +349,7 @@ As extra URI param option to the ones included in the NGSIv2 specification, Orio
 than can be used to specify that an update operation have to use flow control, which can improve performance
 and avoid saturacion in high-load scenarios. This only works if the ContextBroker has been started using
 the [`-notifFlowControl` parameter](../admin/cli.md), otherwise is ignored. The flow control mechanism
-is explained in [this section in the documentation](../adminperf_tuning.md#updates-flow-control-mechanism).
+is explained in [this section in the documentation](../admin/perf_tuning.md#updates-flow-control-mechanism).
 
 The following requests can use the flowControl URI param option:
 
