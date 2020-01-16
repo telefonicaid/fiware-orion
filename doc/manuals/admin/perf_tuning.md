@@ -145,20 +145,20 @@ to the update and applies a flow control mechanism, which works as follows:
    before starting to process the update, `gauge` is a value from 0 to 1 defined globally for
    Orion at startup time and `notifSent` are the notifications triggered by the update and
    added to the notification queue. Note these special cases:
-       * If gauge is 1 (aggressive flow control), then `target = q0`. That is, the target
-         is that queue gets the same size it has before starting to process the update. This is the
-         recommended configuration for gauge.
-       * If gauge is 0 (permissive flow control), then `target = q0 + notifSent`. That is, the
-         target is that queue has the same size it has before starting to process the update. If
-         no concurrent updates occur, this means that flow control mechanism has reached the
-         target even before starting.
+     * If gauge is 1 (aggressive flow control), then `target = q0`. That is, the target
+       is that queue gets the same size it has before starting to process the update. This is the
+       recommended configuration for gauge.
+     * If gauge is 0 (permissive flow control), then `target = q0 + notifSent`. That is, the
+       target is that queue has the same size it has before starting to process the update. If
+       no concurrent updates occur, this means that flow control mechanism has reached the
+       target even before starting.
 2. Flow control is done in several passes. In each pass, the current notification queue (which
    increases due to concurrent updates and decreases due to threadpool workers sending notifications)
    is evaluated, so
-       * If current notification queue is equal or less than target, then flow control mechanism
-         returns control and the update response is finally sent
-       * If current notification queue is greater than target, then the flow control mechanism waits
-         for a while (`stepDelay` parameter) and does a new pass.
+     * If current notification queue is equal or less than target, then flow control mechanism
+       returns control and the update response is finally sent
+     * If current notification queue is greater than target, then the flow control mechanism waits
+       for a while (`stepDelay` parameter) and does a new pass.
 3. In order not waiting too much (which eventually could cause a timeout connection close by the
    client) we have the `maxInterval` parameter. This specifies and absolute waiting time for clients so,
    if `maxInternval` time is reached in a given pass, flow control mechanism returns control, no
