@@ -493,7 +493,7 @@ _MB-18: mongoRegisterContext_
 * `processRegisterContext()` is called to process the registration (step 5).
 * For each registration in the request, `addTriggeredSubscriptions()` is called (step 6). This function in sequence uses `collectionQuery()` in the `connectionOperations` module in order to check whether the registration triggers a subscription or not (steps 7 and 8). The `subsToNotify` map is used to store the triggered subscriptions.
 * The `registration` document is created or updated in the database. In order to do so, `collectionUpdate()` in the `connectionOperations` module is used, setting the `upsert` parameter to `true` (steps 9 and 10).
-* If the request semaphore was taken in step 2, then it is released before returning (step 13).  
+* If the request semaphore was taken in step 2, then it is released before returning (step 11).
 
 [Top](#top)
 

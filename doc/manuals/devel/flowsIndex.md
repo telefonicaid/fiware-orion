@@ -2,6 +2,9 @@
 
 This document provides an index of the different diagrams used in the development documentation.
 
+Note there is some gaps in the number sequences (for instance, between MB-19 an MB-23). This is due
+some diagrams were removed due to changes in Orion Context Broker functionality and it's fine.
+
 Related to request management (RQ management):
 
 * [RQ-01: Reception of a request](sourceCode.md#flow-rq-01)
