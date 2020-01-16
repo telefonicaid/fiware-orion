@@ -141,16 +141,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "compile_time": "REGEX(.*)",
-        "compiled_by": "REGEX(.*)",
-        "compiled_in": "REGEX(.*)",
-        "doc": "https://fiware-orion.readthedocs.org/en/master/",
-        "git_hash": "REGEX(.*)",
-        "release_date": "REGEX(.*)",
-        "uptime": "REGEX(.*)",
-        "version": "REGEX(.*)"
-    }
+    "compile_time": "REGEX(.*)",
+    "compiled_by": "REGEX(.*)",
+    "compiled_in": "REGEX(.*)",
+    "doc": "https://fiware-orion.readthedocs.org/en/master/",
+    "git_hash": "REGEX(.*)",
+    "orion version": "REGEX(.*)"
+    "orionld version": "REGEX(.*)"
+    "release_date": "REGEX(.*)",
+    "uptime": "REGEX(.*)"
 }
 
 

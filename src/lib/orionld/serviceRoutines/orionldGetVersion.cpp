@@ -45,7 +45,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldState.h"                       // orionldState
+#include "serviceRoutines/versionTreat.h"                      // versionGet
+#include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
@@ -79,16 +80,20 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
 //
 bool orionldGetVersion(ConnectionInfo* ciP)
 {
-  KjNode* nodeP;
-  char    mhdVersion[32];
+  KjNode*                  nodeP;
+  char                     mhdVersion[32];
   curl_version_info_data*  curlVersionP;
 
   mhdVersionGet(mhdVersion, sizeof(mhdVersion), MHD_VERSION);
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  // Branch
-  nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
+  // Orion-LD version
+  nodeP = kjString(orionldState.kjsonP, "Orion-LD version", orionldVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Orion version
+  nodeP = kjString(orionldState.kjsonP, "based on orion", versionGet());
   kjChildAdd(orionldState.responseTree, nodeP);
 
   // K-Lib versions
@@ -122,6 +127,10 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Branch
+  nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
   kjChildAdd(orionldState.responseTree, nodeP);
 
   //

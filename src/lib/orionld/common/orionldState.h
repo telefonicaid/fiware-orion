@@ -54,6 +54,14 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// ORIONLD_VERSION -
+//
+#define ORIONLD_VERSION "v0.1.0-alpha"
+
+
+
+// -----------------------------------------------------------------------------
+//
 // Forward declarations -
 //
 struct OrionLdRestService;
@@ -224,22 +232,23 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
-extern char      orionldHostName[128];
-extern int       orionldHostNameLen;
-extern char      kallocBuffer[32 * 1024];
-extern int       requestNo;                // Never mind protecting with semaphore. Just a debugging help
-extern KAlloc    kalloc;
-extern Kjson     kjson;
-extern Kjson*    kjsonP;
-extern uint16_t  portNo;
-extern char      dbName[];                 // From orionld.cpp
-extern int       dbNameLen;
-extern char      dbUser[];                 // From orionld.cpp
-extern char      dbPwd[];                  // From orionld.cpp
-extern bool      multitenancy;             // From orionld.cpp
-extern char*     tenant;                   // From orionld.cpp
-extern int       contextDownloadAttempts;  // From orionld.cpp
-extern int       contextDownloadTimeout;   // From orionld.cpp
+extern char        orionldHostName[128];
+extern int         orionldHostNameLen;
+extern char        kallocBuffer[32 * 1024];
+extern int         requestNo;                // Never mind protecting with semaphore. Just a debugging help
+extern KAlloc      kalloc;
+extern Kjson       kjson;
+extern Kjson*      kjsonP;
+extern uint16_t    portNo;
+extern char        dbName[];                 // From orionld.cpp
+extern int         dbNameLen;
+extern char        dbUser[];                 // From orionld.cpp
+extern char        dbPwd[];                  // From orionld.cpp
+extern bool        multitenancy;             // From orionld.cpp
+extern char*       tenant;                   // From orionld.cpp
+extern int         contextDownloadAttempts;  // From orionld.cpp
+extern int         contextDownloadTimeout;   // From orionld.cpp
+extern const char* orionldVersion;
 
 
 

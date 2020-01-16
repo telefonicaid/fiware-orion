@@ -583,8 +583,9 @@ void exitFunc(void)
 */
 const char* description =
   "\n"
-  "Orion context broker version details:\n"
-  "  version:            " ORION_VERSION   "\n"
+  "Orion-LD context broker version details:\n"
+  "  orionld version:    " ORIONLD_VERSION "\n"
+  "  orion version:      " ORION_VERSION   "\n"
   "  git hash:           " GIT_HASH        "\n"
   "  compile time:       " COMPILE_TIME    "\n"
   "  compiled by:        " COMPILED_BY     "\n"
@@ -849,7 +850,7 @@ int main(int argC, char* argV[])
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
-  paConfig("man author",                    (void*) "Telefonica I+D");
+  paConfig("man author",                    (void*) "Telefonica I+D and FIWARE Foundation");
   paConfig("man version",                   (void*) versionString.c_str());
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);

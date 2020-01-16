@@ -136,16 +136,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-"orion" : {
-  "version" : "REGEX(.*)",
-  "uptime" : "REGEX(.*)",
-  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
-  "compile_time" : "REGEX(.*)",
-  "compiled_by" : "REGEX(.*)",
-  "compiled_in" : "REGEX(.*)",
-  "release_date" : "REGEX(.*)",
-  "doc" : "REGEX(.*)
-}
+  "orionld version": "REGEX(.*)",
+  "orion version":   "REGEX(.*)",
+  "uptime":          "REGEX(.*)",
+  "git_hash":        "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time":    "REGEX(.*)",
+  "compiled_by":     "REGEX(.*)",
+  "compiled_in":     "REGEX(.*)",
+  "release_date":    "REGEX(.*)",
+  "doc":             "REGEX(.*)
 }
 
 2: ++++++++++++++++++++
@@ -156,16 +155,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-"orion" : {
-  "version" : "REGEX(.*)",
-  "uptime" : "REGEX(.*)",
-  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
-  "compile_time" : "REGEX(.*)",
-  "compiled_by" : "REGEX(.*)",
-  "compiled_in" : "REGEX(.*)",
-  "release_date" : "REGEX(.*)",
-  "doc" : "REGEX(.*)
-}
+  "orionld version": "REGEX(.*)",
+  "orion version":   "REGEX(.*)",
+  "uptime":          "REGEX(.*)",
+  "git_hash":        "REGEX(([0-9a-f]{40}|nogitversion))",
+  "compile_time":    "REGEX(.*)",
+  "compiled_by":     "REGEX(.*)",
+  "compiled_in":     "REGEX(.*)",
+  "release_date":    "REGEX(.*)",
+  "doc":             "REGEX(.*)
 }
 
 3: ++++++++++++++++++++

@@ -77,6 +77,8 @@ Date: REGEX(.*)
 
 {
     "Next File Descriptor": REGEX(\d+),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
     "boost version": "REGEX(.*)",
     "branch": "REGEX(.*)",
     "kalloc version": "REGEX(.*)",
