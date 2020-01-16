@@ -133,8 +133,8 @@ in the notification queue (which, at the end, causes notifications being discard
 is full).
 
 Flow control mechanism is configured using `-notifFlowControl` which takes three parameters:
-`-notifFlowControl gauge:stepDelay:maxInterval`. It requires threadpool notification mode
-(i.e. `-notificationMode` has to be `threadpool).
+`-notifFlowControl gauge:stepDelay:maxInterval` (which meaning and utilization is explained below).
+It requires threadpool notification mode (i.e. `-notificationMode` has to be `threadpool).
 
 Flow control is applied to updates that use the `flowControl` option (for instance,
 `POST /v2/op/update?options=flowControl`. In that case, Orion does not respond immediately
