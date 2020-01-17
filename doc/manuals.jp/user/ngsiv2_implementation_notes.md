@@ -18,6 +18,7 @@
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
@@ -311,6 +312,27 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 どちらも通知に関する問題の分析に使用できます。 詳しくは、
 [問題診断ドキュメント](../admin/diagnosis.md#diagnose-notification-reception-problems)
 のセクションを参照してください。
+
+[トップ](#top)
+
+<a name="flowcontrol-option"></a>
+## `flowControl` オプション
+
+これにより、更新操作でフロー制御を使用する必要があることを指定できます。これにより、パフォーマンスが
+向上し、高負荷シナリオでの飽和を回避できます。これは、[`-notifFlowControl` パラメータ](../admin/cli.md)
+を使用して ContextBroker が開始されている場合にのみ機能し、そうでない場合は無視されます。
+フロー制御メカニズムは、[ドキュメントのこのセクション](../admin/perf_tuning.md#updates-flow-control-mechanism)
+で説明しています。
+
+次のリクエストでは、flowControl URI param オプションを使用できます :
+
+* `POST /v2/entities/E/attrs?options=flowControl`
+* `POST /v2/entities/E/attrs?options=append,flowControl`
+* `POST /v2/op/update?options=flowControl`
+* `PUT /v2/entities/E/attrs?options=flowControl`
+* `PUT /v2/entities/E/attrs/A?options=flowControl`
+* `PUT /v2/entities/E/attrs/A/value?options=flowControl`
+* `PATCH /v2/entities/E/attrs?options=flowControl`
 
 [トップ](#top)
 
