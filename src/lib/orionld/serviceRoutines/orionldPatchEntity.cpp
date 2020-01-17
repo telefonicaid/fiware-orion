@@ -40,12 +40,102 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/CHECK.h"                                // DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// attributeCheck -
+//
+// FIXME - move to separate module - should be used also for:
+//   * POST /entities/*/attrs
+//   * PATCH /entities/*/attrs
+//   * etc
+//
+bool attributeCheck(ConnectionInfo* ciP, KjNode* attrNodeP, char** titleP, char** detailP)
+{
+  if (attrNodeP->type != KjObject)
+  {
+    *titleP  = (char*) "Invalid JSON Type";
+    *detailP = (char*) "Attribute must be an object";
+
+    return false;
+  }
+
+  KjNode* typeP    = NULL;
+  KjNode* valueP   = NULL;
+  KjNode* objectP  = NULL;
+  int     attrType = 0;   // 1: Property, 2: Relationship, 3: GeoProperty, 4: TemporalProperty
+
+  for (KjNode* nodeP = attrNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (strcmp(nodeP->name, "type") == 0)
+    {
+      DUPLICATE_CHECK(typeP, "type", nodeP);
+      STRING_CHECK(typeP, "type");
+
+      if      (strcmp(typeP->value.s, "Property")         == 0)  attrType = 1;
+      else if (strcmp(typeP->value.s, "Relationship")     == 0)  attrType = 2;
+      else if (strcmp(typeP->value.s, "GeoProperty")      == 0)  attrType = 3;
+      else if (strcmp(typeP->value.s, "TemporalProperty") == 0)  attrType = 4;
+      else
+      {
+        *titleP  = (char*) "Invalid Value of Attribute Type";
+        *detailP = typeP->value.s;
+
+        return false;
+      }
+    }
+    else if (strcmp(nodeP->name, "value") == 0)
+    {
+      DUPLICATE_CHECK(valueP, "value", nodeP);
+    }
+    else if (strcmp(nodeP->name, "object") == 0)
+    {
+      DUPLICATE_CHECK(objectP, "object", nodeP);
+    }
+  }
+
+  if (typeP == NULL)
+  {
+    *titleP  = (char*) "Mandatory field missing";
+    *detailP = (char*) "attribute type";
+
+    return false;
+  }
+
+  if (attrType == 2)  // 2 == Relationship
+  {
+    // Relationships MUST have an "object"
+    if (objectP == NULL)
+    {
+      *titleP  = (char*) "Mandatory field missing";
+      *detailP = (char*) "Relationship object";
+
+      return false;
+    }
+  }
+  else
+  {
+    // Properties MUST have a "value"
+    if (valueP == NULL)
+    {
+      *titleP  = (char*) "Mandatory field missing";
+      *detailP = (char*) "Property value";
+
+      return false;
+    }
+  }
+
+  return true;
+}
 
 
 
@@ -78,7 +168,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     return false;
   }
 
-
   // Is the payload not a JSON object?
   if  (orionldState.requestTree->type != KjObject)
   {
@@ -95,12 +184,14 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     return false;
   }
 
+  // Get the Entity from the database
   if ((currentEntityTree = dbEntityLookup(entityId)) == NULL)
   {
     ciP->httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
     return false;
   }
+
 
   //
   // o Make sure the attributes to be patched exist. If not - ignore!
@@ -118,6 +209,22 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     char* attrName;
 
     next = attrNodeP->next;
+
+    //
+    // Is the incoming payload correct?
+    // 1. All attributes must have a type
+    // 2. All attributes must have a value/object
+    //
+    char* title;
+    char* detail;
+
+    if (attributeCheck(ciP, attrNodeP, &title, &detail) == false)
+    {
+      LM_E(("attributeCheck: %s: %s", title, detail));
+      orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
 
     if ((strncmp(attrNodeP->name, "http://", 7) == 0) || (strncmp(attrNodeP->name, "https://", 8) == 0))
       attrName = attrNodeP->name;
