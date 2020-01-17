@@ -48,6 +48,8 @@ There are some exception cases in which the above restrictions do not apply. In 
 * URL parameter `q` allows the special characters needed by the Simple Query Language
 * URL parameter `mq` allows the special characters needed by the Simple Query Language
 * URL parameter `georel` and `coords` allow `;`
+* Whichever attribute value which uses "TextUnrestricted" as attribute type. It could have security
+  implications, use it at your own risk!
 
 ## Specific restrictions for ID fields
 

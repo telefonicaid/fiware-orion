@@ -38,6 +38,11 @@ From "Field syntax restrictions" section at NGSIv2 specification:
 The additional restrictions that apply to Orion are the ones describe in the
 [forbidden characters](forbidden_characters.md) section of the manual.
 
+Note that you can use "TextUnrestricted" attribut type (and special attribute type beyond
+the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
+in the attribute value. However, it could have security implications (possible script
+injections attacks) so use it at your own risk!
+
 [Top](#top)
 
 ## Custom payload decoding on notifications
