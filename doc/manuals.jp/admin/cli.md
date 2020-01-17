@@ -78,6 +78,8 @@ broker はデフォルトでバックグラウンドで実行されるため、�
     * transient モードでは、通知を送信した直後に接続は CB によって閉じられます
     * permanent 接続モードでは、通知が指定された URL パスに初めて送信されたときに、永続的な接続が作成されます (受信者が永続的な接続をサポートしている場合)。同じ URL パスへの通知が行われると、接続が再利用され、HTTP 接続時間が保存されます
     * threadpool モードでは、通知は `q` と `n` のサイズのキューにエンキューされます。スレッドがキューからの通知を取ると、非同期に発信リクエストを行います。このモードを使用する場合は、[スレッド・モデルのセクション](perf_tuning.md#orion)を参照してください
+-   **-notifFlowControl guage:stepDelay:maxInterval**. Enables flow control mechanism.
+    [ドキュメントのこのセクション](perf_tuning.md#updates-flow-control-mechanism)を参照してください
 -   **-simulatedNotification** : 通知は送信されませんが、内部で記録され、 [統計情報](statistics.md)オペレーション (`simulatedNotifications` カウンタ) に表示されます。これは本番用ではありませんが、デバッグでは CB の内部ロジックの観点から通知レートの最大上限を計算すると便利です。
 -   **-connectionMemory** : HTTP サーバ・ライブラリが内部的に使用する、接続ごとの接続メモリー・バッファのサイズ (KB 単位) を設定します。デフォルト値は64 KB です
 -   **-maxConnections** : 同時接続の最大数です。従来の理由から、デフォルト値は1020であり、下限は1であり、上限はありません。オペレーティング・システムの最大ファイル記述子によって制限されます
