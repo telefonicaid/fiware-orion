@@ -100,8 +100,8 @@ When we make any request then the corresponding Notification will come on accumu
 
 ## 7. Origin
 
-Origin is used as request HTTP header in Orion. 
-It initiates a request for cross-origin resource sharing (asks server for Access-Control- response fields).
+Origin is used in requests.
+Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md).
 	
     Origin: http://www.example-social-network.com
 		
@@ -109,8 +109,8 @@ It initiates a request for cross-origin resource sharing (asks server for Access
   
 ## 8. User-Agent
 
-User-Agent HTTP header is used by both requests and responses.
-It describes which version of Orion we are using along with its transfer library and version.
+User-Agent HTTP header is used in both requests and responses.
+It describes which version of Orion we are using along with its transfer library.
 It gives the string that identifies the user agent.
 
     User-Agent: orion/2.2.0-next libcurl/7.29.0     (in notification upon subscription on Accumulator-server)
@@ -122,7 +122,7 @@ It gives the string that identifies the user agent.
 
 It is a request HTTP header in Orion.
 Source IP of the HTTP request associated to the transaction, except if the request includes X-Forwarded-For header which overrides the former IP.
-X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides IP.
 X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
     X-Forwarded-For: 129.78.138.66
@@ -132,7 +132,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 ## 10. X-Real-IP
 
 Source IP of the HTTP request associated to the transaction, except if the request includes X-Real-IP which overrides X-Forwarded-For and source IP.
-X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
+X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides IP.
 X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
 [Top](#top)
@@ -140,16 +140,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 ## 11.  Access-Control-Allow-Origin
 
 It is an optional header used in Orion responses.  
-If the CORS mode is enabled, Origin header is present in the request and its value matches Orion's allowed origin, then this header 
-will always be added to the response.  
-Please note that if the above condition is not true and Access-Control-Allow-Origin header is not added to the response,
-all the CORS processes are stopped and no other CORS headers are added to the response.
-  	
-If -corsOrigin is set to a specific value, specificdomain.com in this case:	
-    
-    Access-Control-Allow-Origin: specificdomain.com
-      		
-If -corsOrigin is set to `__ALL`:
+Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-origin).
     
     Access-Control-Allow-Origin: *
 		
@@ -159,10 +150,7 @@ If -corsOrigin is set to `__ALL`:
 ## 12. Access-Control-Allow-Headers
 
 It is a response HTTP header in Orion.
-This header should be present in Orion's response for every OPTIONS request made to /v2 resources. Orion allows a specific 
-set of headers in CORS requests and these are defined in `lib/rest/HttpHeaders.h`.
-	
-Orion's response to a valid OPTIONS request would include the header and value below:
+Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-headers).
 
     Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token	
 									               								   
@@ -172,8 +160,7 @@ Orion's response to a valid OPTIONS request would include the header and value b
 ## 13. Access-Control-Allow-Methods
 
 It is a response HTTP header in Orion.
-This header should be present in Orion's response for every OPTIONS request made to `/v2` resources. Each resource has its
-own set of allowed methods and the header value is set by the options Only service routines in `lib/serviceRoutinesV2`.
+Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-methods).
 
 [Top](#top)
 
@@ -181,13 +168,7 @@ own set of allowed methods and the header value is set by the options Only servi
 ## 14. Access-Control-Max-Age
 
 It is a response HTTP header in Orion.
-This header should be present in Orion's response for every OPTIONS request made to `/v2` resources. The user is free to set a value for the maximum time (in seconds), a client is allowed to cache a preflight request made to Orion.
-
-If -corsMaxAge is set to a specific value, 600 in this case, Orion's response to a valid OPTIONS request would include the header and value below:
-		
-    Access-Control-Max-Age: 600
-		
-If -corsMaxAge is not set on startup, it will default to `86400` (24 hours) and Orion's response to a valid OPTIONS request would include the header and value below:
+Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-max-age).
 		
     Access-Control-Max-Age: 86400
 
@@ -197,9 +178,7 @@ If -corsMaxAge is not set on startup, it will default to `86400` (24 hours) and 
 ## 15. Access-Control-Expose-Headers
 
 It is a response HTTP header in Orion.
-This header should be present in Orion's responses for every request made with a valid Origin value. Orion allows a specific set of response headers to be accessed by the user agent (i.e. browser) in CORS requests and these are defined in `lib/rest/HttpHeaders.h`
-
-Orion's response to a valid CORS request would include the header and value below:
+Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-expose-headers).
 	
     Access-Control-Expose-Headers: Fiware-Correlator, Fiware-Total-Count, Location.
 
@@ -209,7 +188,7 @@ Orion's response to a valid CORS request would include the header and value belo
 ## 16. Allow
 
 Allow HTTP header is used in response notification.
-It notifies that which methods are allowed by the specified Host/resource.
+It notify that which methods are allowed by the specified host/resource.
 
     Allow: GET
 
@@ -218,9 +197,9 @@ It notifies that which methods are allowed by the specified Host/resource.
     
 ## 17. Location
 
-Location is used as a HTTP response header in Orion.
-Response  contains a Location header which holds the subscription ID: a 24 digit hexadecimal number used for updating and cancelling the subscription.
-we will use -v in request to get the Location header in the response.
+Location HTTP header is used in responses.
+Response contains a Location header which holds the subscription ID: a 24 digit hexadecimal number used for updating and cancelling the subscription.
+we use `-v` in requests to get the Location header in the response.
 	
     curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
     {
@@ -242,7 +221,7 @@ Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value o
 so that notification receivers are aware of the format without needing to process the notification payload.
 Note that if a custom payload is used for the notification then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.	
-Ngsiv2-AttrsFormat is a NON-MODIFIABLE HEADERS IN CUSTOM NOTIFICATIONS.
+Ngsiv2-AttrsFormat is a NON-MODIFIABLE header in custom notifications.
 Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsformat": "something"} ...}` will be ignored.
 	
     Ngsiv2-Attrsformat: normalized
@@ -329,12 +308,12 @@ iii) count (as option), if activated then a Fiware-Total-Count header is added t
 Fiware-Correlator is a response HTTP header.
 Fiware-Correlator is used as HTTP header in forwarding messages, notifications and responses.
 This correlator id is either transferred from an incoming request, or, if the incoming request doesn't carry any HTTP header Fiware-Correlator, the correlator is generated by the Orion context broker and then used in the log file. 
-It Can be either `N/A` or it is a string in the UUID format.
+It can be either `N/A` or it is a string in the UUID format.
 The correlator id is a common identifier among all applications involved in the `message chain` for one specific request.	
-Fiware-Correlator is a NON-MODIFIABLE Header in custom notifications.    
+Fiware-Correlator is a NON-MODIFIABLE header in custom notifications.    
 Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.	
     
-    Fiware-Correlator: 600119ce-eeaa-11e9-9e0c-080027a71049
+    Fiware-Correlator: 600119ce-eeaa-11e9-9e0c-080027a71049	
 
 [Top](#top)
 	
