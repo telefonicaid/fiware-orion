@@ -80,6 +80,7 @@
 #define DEFAULT_ATTR_ARRAY_TYPE   "StructuredValue"
 #define DEFAULT_ATTR_OBJECT_TYPE  "StructuredValue"
 #define DEFAULT_ATTR_NULL_TYPE    "None"
+#define TEXT_UNRESTRICTED_TYPE    "TextUnrestricted"
 #define DATE_TYPE                 "DateTime"
 #define DATE_TYPE_ALT             "ISO8601"
 #define NUMBER_TYPE_ALT           "Quantity"
