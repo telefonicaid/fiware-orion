@@ -128,6 +128,29 @@ Everything you do with Orion Context Broker when dockerized is non-persistent. *
 
 If you want to prevent this from happening take a look at [this link](https://registry.hub.docker.com/_/mongo/) in section *Where to Store Data* of the MongoDB docker documentation. In it you will find instructions and ideas on how to make your MongoDB data persistent.
 
+#### Set-up appropriate Mongo-DB Database Indexes
+
+Subscription, registration and entity details are retrieved from a database.  Without supplying the `fiware-service` header, 
+the default name of the database is `orion`. Database access can be optimized by creating appropriate indices.
+
+For example: 
+
+```console
+docker exec  db-mongo mongo --eval '
+	conn = new Mongo();db.createCollection("orion");
+	db = conn.getDB("orion");
+	db.createCollection("entities");
+	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
+	db.entities.createIndex({"_id.type": 1}); 
+	db.entities.createIndex({"_id.id": 1});' > /dev/null
+```
+
+if the `fiware-service` header is being used, the name of the database will vary. Alter the `conn.getDB()` statement 
+above if an alternative database is being used. Additional database indexes may be required depending upon your use case.
+Further information on [performance tuning](https://fiware-orion.readthedocs.io/en/master/admin/perf_tuning/index.html#database-indexes)
+and [database administration](https://fiware-orion.readthedocs.io/en/master/admin/database_admin/index.html) can
+be found within the Orion documentation.
+
 ### 4.2 Using `sudo`
 
 If you do not want to have to use `sudo` follow [these instructions](http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo).
