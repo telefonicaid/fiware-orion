@@ -147,6 +147,9 @@ docker exec  db-mongo mongo --eval '
 
 if the `fiware-service` header is being used, the name of the database will vary. Alter the `conn.getDB()` statement 
 above if an alternative database is being used. Additional database indexes may be required depending upon your use case.
+Further information on [performance tuning](https://fiware-orion.readthedocs.io/en/master/admin/perf_tuning/index.html#database-indexes)
+and [database administration](https://fiware-orion.readthedocs.io/en/master/admin/database_admin/index.html) can
+be found within the Orion documentation.
 
 ### 4.2 Using `sudo`
 
