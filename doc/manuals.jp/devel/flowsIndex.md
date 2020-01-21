@@ -2,6 +2,9 @@
 
 このドキュメントでは、開発ドキュメントで使用されているさまざまな図の索引を提供しています。
 
+番号シーケンスにいくつかのギャップがあることに注意してください (たとえば、MB-19 と MB-23 の間)。
+これは、Orion Context Broker 機能の変更により一部の図が削除されたためであり、問題ありません。
+
 リクエスト管理の関連図  (RQ management) : 
 
 * [RQ-01: リクエストの受信](sourceCode.md#flow-rq-01)
@@ -85,7 +88,6 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
     * MB-12 に続きます
 * [MB-18: mongoRegisterContext](mongoBackend.md#flow-mb-18)
     * RQ-02 からの続きです
-    * MD-04 に続きます
 * [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19)
     * RQ-02 からの続きです
 * [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
