@@ -157,7 +157,7 @@ Date: REGEX(.*)
 03. GET the entity, without context, see long names
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 737
+Content-Length: 723
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -180,9 +180,7 @@ Date: REGEX(.*)
   },
   "https://uri.fiware.org/ns/data-models#category": {
     "type": "Property",
-    "value": [
-      "https://uri.fiware.org/ns/data-models#commercial"
-    ]
+    "value": "https://uri.fiware.org/ns/data-models#commercial"
   },
   "location": {
     "type": "GeoProperty",
@@ -201,7 +199,7 @@ Date: REGEX(.*)
 04. GET the entity, with context, see short names
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 604
+Content-Length: 590
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -224,9 +222,7 @@ Date: REGEX(.*)
   },
   "category": {
     "type": "Property",
-    "value": [
-      "commercial"
-    ]
+    "value": "commercial"
   },
   "location": {
     "type": "GeoProperty",

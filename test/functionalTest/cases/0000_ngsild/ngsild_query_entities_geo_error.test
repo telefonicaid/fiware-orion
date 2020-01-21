@@ -168,9 +168,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : [
-				"https://uri.fiware.org/ns/data-models#commercial"
-			],
+			"value" : "https://uri.fiware.org/ns/data-models#commercial",
 			"mdNames" : [ ]
 		},
 		"location" : {
@@ -218,7 +216,7 @@ Date: REGEX(.*)
 04. GeoQuery near. Max Distance: 1291m - see Building:store002
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 332
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -231,9 +229,7 @@ Date: REGEX(.*)
             "postalCode": "10969",
             "streetAddress": "Friedrichstra\u00dfe 44"
         },
-        "category": [
-            "commercial"
-        ],
+        "category": "https://uri.fiware.org/ns/data-models#commercial",
         "id": "urn:ngsi-ld:Building:store002",
         "location": {
             "coordinates": [

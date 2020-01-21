@@ -126,9 +126,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : [
-				"https://uri.fiware.org/ns/data-models#commercial"
-			],
+			"value" : "https://uri.fiware.org/ns/data-models#commercial",
 			"mdNames" : [ ]
 		},
 		"https://schema=org/address" : {
@@ -192,7 +190,7 @@ bye
 03. Get the entity by type 'Building', and context https://fiware.github.io/data-models/full-context.jsonld
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 465
+Content-Length: 463
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -214,9 +212,7 @@ Date: REGEX(.*)
         },
         "category": {
             "type": "Property",
-            "value": [
-                "commercial"
-            ]
+            "value": "commercial"
         },
         "id": "urn:ngsi-ld:Building:store001",
         "location": {

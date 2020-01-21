@@ -214,7 +214,7 @@ Date: REGEX(.*)
 04. GET entities with type Building, see stores 1 and 2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 833
+Content-Length: 829
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -232,9 +232,7 @@ Date: REGEX(.*)
         },
         "category": {
             "type": "Property",
-            "value": [
-                "commercial"
-            ]
+            "value": "commercial"
         },
         "id": "urn:ngsi-ld:Building:store001",
         "location": {
@@ -265,9 +263,7 @@ Date: REGEX(.*)
         },
         "category": {
             "type": "Property",
-            "value": [
-                "commercial"
-            ]
+            "value": "commercial"
         },
         "id": "urn:ngsi-ld:Building:store002",
         "location": {
@@ -292,7 +288,7 @@ Date: REGEX(.*)
 05. GET entities with type Byggnad, see Store 3
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 408
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -310,9 +306,7 @@ Date: REGEX(.*)
         },
         "category": {
             "type": "Property",
-            "value": [
-                "commercial"
-            ]
+            "value": "commercial"
         },
         "id": "urn:ngsi-ld:Building:store003",
         "location": {
@@ -337,7 +331,7 @@ Date: REGEX(.*)
 06. GET Building-typed entities, using context https://fiware.github.io/data-models/full-context.jsonld
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 833
+Content-Length: 829
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -355,9 +349,7 @@ Date: REGEX(.*)
         },
         "category": {
             "type": "Property",
-            "value": [
-                "commercial"
-            ]
+            "value": "commercial"
         },
         "id": "urn:ngsi-ld:Building:store001",
         "location": {
@@ -388,9 +380,7 @@ Date: REGEX(.*)
         },
         "category": {
             "type": "Property",
-            "value": [
-                "commercial"
-            ]
+            "value": "commercial"
         },
         "id": "urn:ngsi-ld:Building:store002",
         "location": {

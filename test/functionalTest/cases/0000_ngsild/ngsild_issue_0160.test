@@ -108,7 +108,7 @@ Date: REGEX(.*)
 02. GET the entity with 'Accept: application/json' - see response as application/json
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 739
+Content-Length: 721
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -136,9 +136,7 @@ Date: REGEX(.*)
     },
     "category": {
       "type": "Property",
-      "value": [
-        "commercial"
-      ]
+      "value": "commercial"
     },
     "location": {
       "type": "GeoProperty",

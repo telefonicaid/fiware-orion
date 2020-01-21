@@ -506,12 +506,14 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttrib
   //
   // Expand name of attribute
   //
+  OrionldContextItem*  contextItemP = NULL;
+
   if ((strcmp(kNodeP->name, "location") != 0) && (strcmp(kNodeP->name, "observationSpace") != 0) && (strcmp(kNodeP->name, "operationSpace") != 0))
   {
-    char*  longName;
-    bool   valueMayBeExpanded  = false;
+    char*                longName;
+    bool                 valueMayBeExpanded  = false;
 
-    longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, NULL);
+    longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, &contextItemP);
 
     if (valueMayBeExpanded)
       orionldContextValueExpand(kNodeP);
@@ -615,6 +617,25 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttrib
     {
       DUPLICATE_CHECK(valueP, "attribute value", nodeP);
       // FIXME: "value" for Relationship Attribute should be added as metadata
+
+      //
+      // SINGLE ITEM ARRAY ?
+      //
+      // If the value of the attribute is an Array, and with only one item, then unless the @context item forbids it,
+      // the array should be dropped and only the array-item be left.
+      //
+
+      if (nodeP->type == KjArray)
+      {
+        if (nodeP->value.firstChildP->next == NULL)  // Only one item in the array
+        {
+          if ((contextItemP == NULL) || (contextItemP->type == NULL) || ((strcmp(contextItemP->type, "@list") != 0) && (strcmp(contextItemP->type, "@set") != 0)))
+          {
+            nodeP->type  = nodeP->value.firstChildP->type;
+            nodeP->value = nodeP->value.firstChildP->value;
+          }
+        }
+      }
     }
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {

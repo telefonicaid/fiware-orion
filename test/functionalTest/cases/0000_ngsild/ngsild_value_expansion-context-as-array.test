@@ -117,9 +117,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : [
-				"https://uri.fiware.org/ns/data-models#commercial"
-			],
+			"value" : "https://uri.fiware.org/ns/data-models#commercial",
 			"mdNames" : [ ]
 		},
 		"https://schema=org/address" : {
@@ -183,7 +181,7 @@ bye
 03. GET the entity and see the values	contracted again
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 463
+Content-Length: 461
 Content-Type: application/json
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -204,9 +202,7 @@ Date: REGEX(.*)
     },
     "category": {
         "type": "Property",
-        "value": [
-            "commercial"
-        ]
+        "value": "commercial"
     },
     "id": "urn:ngsi-ld:Building:store007",
     "location": {

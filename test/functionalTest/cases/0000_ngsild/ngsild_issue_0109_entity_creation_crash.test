@@ -100,7 +100,7 @@ Date: REGEX(.*)
 02. GET the entity, just to make sure all is A-OK
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 456
+Content-Length: 454
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -108,9 +108,7 @@ Date: REGEX(.*)
 {
     "category": {
         "type": "Property",
-        "value": [
-            "onstreet"
-        ]
+        "value": "onstreet"
     },
     "id": "urn:ngsi-ld:ParkingSpot:santander:daoiz_velarde_1_5:3",
     "location": {

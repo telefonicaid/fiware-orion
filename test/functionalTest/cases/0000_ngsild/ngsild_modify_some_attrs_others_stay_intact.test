@@ -171,9 +171,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : [
-				"P4"
-			],
+			"value" : "P4",
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
@@ -196,7 +194,7 @@ bye
 03. GET the entity - see P1-P5
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 364
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -218,9 +216,7 @@ Date: REGEX(.*)
   },
   "P4": {
     "type": "Property",
-    "value": [
-      "P4"
-    ]
+    "value": "P4"
   },
   "P5": {
     "type": "Property",
@@ -244,7 +240,7 @@ Date: REGEX(.*)
 05. GET the entity, see new P1
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 364
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -266,9 +262,7 @@ Date: REGEX(.*)
   },
   "P4": {
     "type": "Property",
-    "value": [
-      "P4"
-    ]
+    "value": "P4"
   },
   "P5": {
     "type": "Property",
@@ -317,9 +311,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : [
-				"P4"
-			],
+			"value" : "P4",
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
