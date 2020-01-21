@@ -11,7 +11,7 @@
 	* [`mongoUnsubscribeContext` (SR および SR2)](#mongounsubscribecontext-sr-and-sr2)
 	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
 	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
-	* [`mongoRegisterContext` (SR) および `mongoNotifyContextAvailability` (SR)](#mongoregistercontext-sr-and-mongonotifycontextavailability-sr)
+	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
 	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)	
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
@@ -55,7 +55,7 @@
 
 このセクションでは、いくつかの他のリクエスト処理モジュールと高度に結合された共通の機能を提供する、`MongoCommonRegister` および `MongoCommonUpdate` モジュールについても説明します。特に : 
 
-* `MongoCommonRegister` は、`mongoRegisterContext` および `mongoNotifyContextAvailability` モジュールに共通の機能を提供します
+* `MongoCommonRegister` は、`mongoRegisterContext` モジュールに共通の機能を提供します
 * `MongoCommonUpdate` は、`mongoUpdateContext` および `mongoNotifyContext` モジュールに共通の機能を提供します
 
 [Top](#top)
@@ -493,22 +493,23 @@ _MB-17: mongoUpdateContextSubscription_
 [Top](#top)
 
 <a name="mongoregistercontext-sr-and-mongonotifycontextavailability-sr"></a>
-#### `mongoRegisterContext` (SR) and `mongoNotifyContextAvailability` (SR) 
+#### `mongoRegisterContext` (SR)
 
-`mongoRegisterContext` モジュールは、ヘッダ・ファイルに定義された `mongoRegisterContext()` によってレジスタ・コンテキスト・オペレーション処理ロジックのエントリポイントを提供し、`mongoNotifyContextAvailability` モジュールは、ヘッダファイルに`mongoNotifyContextAvailability()` を使って、コンテキスト・アベイラビリティ通知処理ロジックのエントリポイントを追加します。しかし、コンテキスト・アベイラビリティ通知がレジスタ・コンテキストと同じ方法で処理されるので、 `mongoRegisterContext()` と `mongoNotifyContextAvailability()` は基本的に `processRegisterContext()` の ラッパー (`MongoCommonRegister` モジュール) は、新しいレジストレーションを作成するか、[管理文書のデータベース・モデルの一部として記述されている](../admin/database_model.md#registrations-collection)データベースの `registrations` コレクションの既存のものを更新します。
+`mongoRegisterContext`モジュールは、(ヘッダ・ファイルで定義された `mongoRegisterContext()` によって)
+レジスタ・コンテキスト・オペレーション処理ロジックのエントリポイントを提供します。
 
 <a name="flow-mb-18"></a>
 ![mongoRegisterContext](../../manuals/devel/images/Flow-MB-18.png)
 
 _MB-18: mongoRegisterContext_
 
-* `mongoRegisterContext()` または `mongoNotifyContextAvailability` がサービス・ルーチンから呼び出されます (ステップ1)
+* `mongoRegisterContext()` がサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォ が取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * `mongoRegisterContext()` の場合、リクエストにレジストレーション ID が指定されていれば、レジストレーション*更新*を示します。したがって、`registrations` モジュールは `collectionFindOne()` を使ってデータベースから検索されます (ステップ3と4)
 * `processRegisterContext()` がレジストレーションを処理するために呼び出されます (ステップ5)
 * リクエストの各レジストレーションに対して、`addTriggeredSubscriptions()` が呼び出されます (ステップ6)。この関数は  `registrationOperations` モジュールで `collectionQuery()` を順番に使用して、レジストレーションがサブスクリプションをトリガするかどうかをチェックします (ステップ7と8)。`subsToNotify` マップは、トリガーされたサブスクリプションを格納するために使用されます
 * `registration` ドキュメントは、データベースで作成または更新されます。そうするために、`upsert` パラメータを `true` に設定する `connectionOperations` モジュールの `collectionUpdate()` が使われます (ステップ9と10)
-* ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ13)
+* ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ11)
 
 [Top](#top)
 

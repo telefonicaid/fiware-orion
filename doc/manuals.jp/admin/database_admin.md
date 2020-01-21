@@ -131,7 +131,7 @@ NGSI は、レジストレーションとサブスクリプション (コンテ�
 ただし、有効期限が切れたレジストレーション/サブスクリプションはデータベース内の領域を消費するため、時々 "パージ" することができます。その作業を手助けするために、garbage- collector.py スクリプトが Orion Context Broker (RPM のインストール後に /usr/share/contextBroker/garbage-collector.py にあります) と一緒に提供されています。
 
 
-garbage-collector.py は、registrations, csubs および casubs コレクション内の期限切れのドキュメントを探し、次のフィールドでそれらを "マーク (marking)" します :
+garbage-collector.py は、registrations, csubs コレクション内の期限切れのドキュメントを探し、次のフィールドでそれらを "マーク (marking)" します :
 
 ```
 {
@@ -141,10 +141,10 @@ garbage-collector.py は、registrations, csubs および casubs コレクショ
 }
 ```
 
-garbage-collector.py プログラムは、解析されるコレクションを引数として取ります。たとえば、csubs と casubs を分析するために実行します :
+garbage-collector.py プログラムは、解析されるコレクションを引数として取ります。たとえば、csubs を分析するために実行します :
 
 ```
-garbage-collector.py csubs casubs
+garbage-collector.py csubs
 ```
 
 garbage-collector.py を実行した後は、mongo コンソールの次のコマンドを使用して、期限切れのドキュメントを簡単に削除できます :
