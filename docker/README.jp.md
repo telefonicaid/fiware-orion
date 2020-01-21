@@ -127,6 +127,29 @@ Docker コンテナ化された Orion Context Broker で行うすべての作業
 
 これを防ぐには、MongoDB Docker のドキュメントの "どこにデータを格納するか (*Where to Store Data*)" のセクションの [このリンク](https://registry.hub.docker.com/_/mongo/)を参照してください。その中に MongoDB のデータを永続化する方法とアイデアがあります。
 
+#### 適切な Mongo-DB データベース・インデックスのセットアップ
+
+サブスクリプション、レジストレーション および エンティティの詳細は、データベースから取得されます。`fiware-service`
+ヘッダを指定しない場合、データベースのデフォルト名は `orion` です。適切なインデックスを作成することにより、データベース・
+アクセスを最適化できます。
+
+例 :
+
+```console
+docker exec  db-mongo mongo --eval '
+    conn = new Mongo();db.createCollection("orion");
+    db = conn.getDB("orion");
+    db.createCollection("entities");
+    db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
+    db.entities.createIndex({"_id.type": 1});
+    db.entities.createIndex({"_id.id": 1});' > /dev/null
+```
+
+`fiware-service` ヘッダを使用している場合、データベースの名前は異なります。代替データベースが使用されている場合、上記の `conn.getDB()`
+ステートメントを変更します。ユースケースによっては、追加のデータベース・インデックスが必要になる場合があります。
+[パフォーマンス・チューニング](https://fiware-orion.readthedocs.io/en/master/admin/perf_tuning/index.html#database-indexes) および
+[データベース管理](https://fiware-orion.readthedocs.io/en/master/admin/database_admin/index.html)は、Orion ドキュメントにあります。
+
 ### 4.2 `sudo` を使用
 
 sudo を使用したくない場合は、[以下の手順](http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo)に従ってください。
