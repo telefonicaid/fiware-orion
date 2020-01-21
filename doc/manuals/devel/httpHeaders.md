@@ -92,7 +92,7 @@ It is typically used when sending a large request body. We expect the server to 
 ## 6. Host
 
 This HTTP header is used in Orion responses.
-When we make any request then the corresponding Notification will come on accumulator server, this header gives the port number of accumulator server. 	
+Orion includes this header in outgoing request (notifications and forwarded updates/queries).This header provides the port number of notification receiver. 	
 	
     Host: localhost:1028
 		
@@ -109,12 +109,11 @@ Its operation is related with CORS, see specific documentation at [../user/cors.
   
 ## 8. User-Agent
 
-User-Agent HTTP header is used in both requests and responses.
+User-Agent HTTP header is used in notifications and forwarded requests.
 It describes which version of Orion we are using along with its transfer library.
 It gives the string that identifies the user agent.
 
-    User-Agent: orion/2.2.0-next libcurl/7.29.0     (in notification upon subscription on Accumulator-server)
-    User-Agent: curl/7.29.0                         (Response upon subscription on Orion)
+    User-Agent: orion/2.2.0-next libcurl/7.29.0     (in notifications and forwarded requests)
 
 [Top](#top)		
 		
