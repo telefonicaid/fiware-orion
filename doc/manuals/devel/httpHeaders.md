@@ -34,7 +34,7 @@
 
 ## 1. Accept
 
-Accept HTTP header is used in requests. 
+Accept HTTP header is used in incoming HTTP requests received by Orion. 
 Accept HTTP header is used in the request to specify which MIME type the client accepts. Typically its value is `application/json` (for JSON MIME type) although some operations in the NGSIv2 API also allow `text/plain`. 
 For example in request URL if we use:
 	
@@ -81,7 +81,7 @@ This request will send data in well defined JSON format.
   
 ## 5. Expect
 
-Expect HTTP header is used in requests.
+Expect HTTP header is used in incoming HTTP requests received by Orion.
 It Indicates that behaviour of particular server are required by the client.
 It is typically used when sending a large request body. We expect the server to return back `100 Continue` HTTP status if it can handle the request, or `417 Expectation Failed` if not.
 
@@ -100,7 +100,7 @@ Orion includes this header in outgoing request (notifications and forwarded upda
 
 ## 7. Origin
 
-Origin is used in requests.
+Origin is used in incoming HTTP requests received by Orion.
 Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md).
 	
     Origin: http://www.example-social-network.com
@@ -119,8 +119,8 @@ It gives the string that identifies the user agent.
 		
 ## 9. X-Forwarded-For
 
-It is a request HTTP header in Orion.
-Source IP of the HTTP request associated to the transaction, except if the request includes X-Forwarded-For header which overrides the former IP.
+It is used in incoming HTTP requests received by Orion.
+X-Forwarded-For header overrides the original IP of the HTTP request as source of the transaction.
 X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides IP.
 X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
@@ -130,7 +130,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
 ## 10. X-Real-IP
 
-Source IP of the HTTP request associated to the transaction, except if the request includes X-Real-IP which overrides X-Forwarded-For and source IP.
+X-Forwarded-For header overrides the original IP of the HTTP request as source of the transaction.
 X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides IP.
 X-Real-IP takes preference over X-Forwarded-For, if both appear.
 	
@@ -138,7 +138,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 
 ## 11.  Access-Control-Allow-Origin
 
-It is an optional header used in Orion responses.  
+It is an optional header used in outgoing HTTP responses sent by Orion.  
 Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-origin).
     
     Access-Control-Allow-Origin: *
@@ -148,7 +148,7 @@ Its operation is related with CORS, see specific documentation at [../user/cors.
 
 ## 12. Access-Control-Allow-Headers
 
-It is a response HTTP header in Orion.
+It is used in outgoing HTTP responses sent by Orion.
 Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-headers).
 
     Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token	
@@ -158,7 +158,7 @@ Its operation is related with CORS, see specific documentation at [../user/cors.
 		
 ## 13. Access-Control-Allow-Methods
 
-It is a response HTTP header in Orion.
+It is used in outgoing HTTP responses sent by Orion.
 Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-methods).
 
 [Top](#top)
@@ -166,7 +166,7 @@ Its operation is related with CORS, see specific documentation at [../user/cors.
 									  
 ## 14. Access-Control-Max-Age
 
-It is a response HTTP header in Orion.
+It is used in outgoing HTTP responses sent by Orion.
 Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-max-age).
 		
     Access-Control-Max-Age: 86400
@@ -176,7 +176,7 @@ Its operation is related with CORS, see specific documentation at [../user/cors.
 
 ## 15. Access-Control-Expose-Headers
 
-It is a response HTTP header in Orion.
+It is used in outgoing HTTP responses sent by Orion.
 Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-expose-headers).
 	
     Access-Control-Expose-Headers: Fiware-Correlator, Fiware-Total-Count, Location.
@@ -186,8 +186,8 @@ Its operation is related with CORS, see specific documentation at [../user/cors.
 
 ## 16. Allow
 
-Allow HTTP header is used in response notification.
-It notify that which methods are allowed by the specified host/resource.
+It is used in outgoing HTTP responses sent by Orion.
+When the client uses a wrong HTTP method on a given URL resources, this header is used to inform the client which methods are allowed.
 
     Allow: GET
 
@@ -196,9 +196,8 @@ It notify that which methods are allowed by the specified host/resource.
     
 ## 17. Location
 
-Location HTTP header is used in responses.
-Response contains a Location header which holds the subscription ID: a 24 digit hexadecimal number used for updating and cancelling the subscription.
-we use `-v` in requests to get the Location header in the response.
+It is used in outgoing HTTP responses sent by Orion on subscriptions, entity creations and registrations.
+Response contains a Location header which holds the subscription ID, entity ID or registration ID: a 24 digit hexadecimal number used for updating and deleting the subscription, entity or registration. We use `-v` in requests to get the Location header in the response.
 	
     curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
     {
@@ -215,12 +214,12 @@ And the response that we will get:
 
 ## 18. Ngsiv2-AttrsFormat
 
-It is a response HTTP header in Orion.
+It is used in outgoing HTTP notifications sent by Orion.
 Notifications must include the `Ngsiv2-AttrsFormat` HTTP header with the value of the format of the associated subscription, 
-so that notification receivers are aware of the format without needing to process the notification payload.
+so that notification receivers are aware of the format without needing to infer it from the notification payload.
 Note that if a custom payload is used for the notification then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
 in the notification.	
-Ngsiv2-AttrsFormat is a NON-MODIFIABLE header in custom notifications.
+Ngsiv2-AttrsFormat is a non-modifiable header in custom notifications.
 Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsformat": "something"} ...}` will be ignored.
 	
     Ngsiv2-Attrsformat: normalized
@@ -230,87 +229,44 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsform
 
 ## 19. Fiware-Service
 
-Fiware-Service is an optional header used in requests.
-When `-multiservice` is used Orion includes the `Fiware-Service` header in the notifyContextRequest and notifyContextAvailability request messages associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present).
+Fiware-Service is used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion.
+When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation at [../user/multitenancy.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/multitenancy.md)
 		
     POST http://127.0.0.1:9977/notify    
     Content-Length: 725    
-    User-Agent: orion/0.13.0    
+    User-Agent: orion/2.3.0    
     Host: 127.0.0.1:9977      
     Accept: application/json    
     Fiware-Service: t_02    
     Content-Type: application/json    
     {    
 	   ...    
-    } 
-      
- Regarding service/tenant name syntax, it must be a string of alphanumeric characters (and the `_` symbol). 
- Maximum length is 50 characters, which should be enough for most use cases. 
- Orion Context Broker interprets the tenant name in lowercase, thus, although you can use tenants such as in updateContext `MyService` 
- it is not advisable, as the notifications related with that tenant will be sent with `myservice` and, 	in that sense, 
- it is not coherent the tenant you used in updateContext compared with the one that Orion sends in notifyContextRequest.
+    }
 	
 [Top](#top)
 
 
 ## 20. Fiware-Servicepath
 
-Fiware-ServicePath is an optional header used in requests.
-Fiware-ServicePath header is included in notification requests sent by Orion.
-When `-multiservice` is used, Orion uses the `Fiware-Service` HTTP header in the request to identify the service/tenant.
-If the header is not present in the HTTP request, the default service/tenant is used.	
-The scope to use is specified using the Fiware-ServicePath HTTP in update/query request. 
+Fiware-ServicePath is an optional header used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion. See specific documentation at [../user/service_path.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/service_path.md).
 
-    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
-		
-Queries without Fiware-ServicePath resolve to `/#`.
-	
-It is assumed that all the entities created without Fiware-ServicePath (or that don't include service path information in the database) 
-belongs to a root scope `/` implicitely. All the queries without using Fiware-ServicePath (including subscriptions) are on `/#` implicitly. 
-
-While entities belong to services and servicepaths, subscriptions and registrations belong only to the service. 
-The servicepath in subscriptions and registrations doesn't denote sense of belonging, but is the expression of the 
-query associated to the subscription or registration.
-
-Fiware-ServicePath header is ignored in `GET /v2/subscriptions/{id}` and `GET /v2/registrations/{id}` operations, 
-as the id fully qualifies the subscription or registration to retrieve.
-
-Fiware-ServicePath header is taken into account in `GET /v2/subscriptions` and `GET /v2/registrations` in order to narrow 
-down the results to subscriptions/registrations that use exactly that service path as query.
-
-At the present moment hierarchical service paths (i.e. the ones using ending with #) are not allowed in registrations.
-Fiware-Service and Fiware-ServicePath are set at entity creation time using HTTP headers in the entity creation REST request.
-		
-    "servicePath": "test/example" 		
+    Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1		
 
 [Top](#top)
  
  
 ## 21. Fiware-Total-Count
 
-It is an optional header used in responses.
-NGSIv2 implements a pagination mechanism in order to help clients to retrieve large sets of resources. This mechanism works for all listing operations in the API (e.g. `GET /v2/entities`, `GET /v2/subscriptions`, `POST /v2/op/query`, etc.).
-
-The mechanism is based on three URI parameters:
-
-i)   limit, in order to specify the maximum number of elements (default is 20, maximum allowed is 1000).
-
-ii)  offset, in order to skip a given number of elements at the beginning (default is 0)
-
-iii) count (as option), if activated then a Fiware-Total-Count header is added to the response, with a count of total elements.
+It is an optional header used in outgoing HTTP responses sent by Orion.
+Its operation is related with pagination, see related documentation at [../user/pagination.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/pagination.md#pagination).
 	    
 [Top](#top)
 
 
 ## 22. Fiware-Correlator
 
-Fiware-Correlator is a response HTTP header.
-Fiware-Correlator is used as HTTP header in forwarding messages, notifications and responses.
-This correlator id is either transferred from an incoming request, or, if the incoming request doesn't carry any HTTP header Fiware-Correlator, the correlator is generated by the Orion context broker and then used in the log file. 
-It can be either `N/A` or it is a string in the UUID format.
-The correlator id is a common identifier among all applications involved in the `message chain` for one specific request.	
-Fiware-Correlator is a NON-MODIFIABLE header in custom notifications.    
-Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.	
+Fiware-Correlator is a response HTTP header which is used in forwarding messages and notifications.
+Fiware-Correlator is a non-modifiable header in custom notifications. Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.	See related documentation at [../admin/logs.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/logs.md)
     
     Fiware-Correlator: 600119ce-eeaa-11e9-9e0c-080027a71049	
 
@@ -319,11 +275,8 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlato
 
 ## 23. X-Auth-Token
 
-X-Auth-Token is an optional HTTP header used in requests.
-It is used as a Access-Control HTTP header.	
-This header is used to provide security to Orion and it is frequently used in FIWARE-CEPHEUS(i.e. an another component used in fiware).
-X-Auth-Token forwarded in ngsi10 notifications.
+X-Auth-Token is an optional HTTP header, which Orion received in requests and propagates transparently to other requests (notifications and forwarded queries/updated) associated with the original one. It is supposed to be used by security enforcement proxies integrated with Orion [such as PEP Steelskin](https://github.com/telefonicaid/fiware-pep-steelskin).
 	
-    "authToken": "OAUTH_TOKEN"
+    "X-Auth-Token": "fff0f4af447f4b589c835f805fe4be29"
 
 [Top](#top)
