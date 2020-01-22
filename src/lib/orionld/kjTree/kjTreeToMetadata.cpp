@@ -55,6 +55,18 @@ extern bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 bool kjTreeToMetadata(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName, char** detailP)
 {
   //
+  // A sub-attribute must be a JSON object (except if key-values, but that's for GET only in NGSI-LD)
+  //
+  if (nodeP->type != KjObject)
+  {
+    *detailP = (char*) "sub-attribute must be a JSON object";
+    LM_E(("sub-attribute '%s' of '%s' is not a JSON object", nodeP->name, caP->name.c_str()));
+    orionldErrorResponseCreate(OrionldBadRequestData, *detailP, nodeP->name);
+    return false;
+  }
+
+
+  //
   // Expand sub-attribute name
   //
   bool  valueMayBeExpanded  = false;
@@ -74,9 +86,9 @@ bool kjTreeToMetadata(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP,
 
   if (metadataAdd(ciP, caP, nodeP, caName) == false)
   {
+    // metadataAdd calls orionldErrorResponseCreate
     LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-    *detailP = (char*) "Error adding metadata to attribute";
-    orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to an attribute", nodeP->name);
+    *detailP = (char*) "Error adding sub-attribute to attribute";
     return false;
   }
 

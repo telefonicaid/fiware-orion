@@ -368,10 +368,10 @@ bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char
       }
     }
 
-    if ((typeNodeP == NULL) && (observedAtP == NULL))  // "obserfvedAt" is a special metadata that has no type, just a value.
+    if ((typeNodeP == NULL) && (observedAtP == NULL))  // "observedAt" is a special metadata that has no type, just a value.
     {
       LM_E(("No type for metadata '%s'", nodeP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "The type field is missing for a metadata", nodeP->name);
+      orionldErrorResponseCreate(OrionldBadRequestData, "The 'type' field is missing for a sub-attribute", nodeP->name);
       return false;
     }
 
@@ -428,7 +428,7 @@ bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char
   {
     if (metadataValueSet(ciP, mdP, valueNodeP) == false)
     {
-      // metadataValueSet calls metadataValueSet
+      // metadataValueSet calls orionldErrorResponseCreate
       delete mdP;
       return false;
     }
@@ -642,9 +642,9 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttrib
       DUPLICATE_CHECK(unitCodeP, "unit code", nodeP);
       if (metadataAdd(ciP, caP, nodeP, caName) == false)
       {
+        // metadataAdd calls orionldErrorResponseCreate
         *detailP = (char*) "metadataAdd failed";
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name);
         return false;
       }
     }

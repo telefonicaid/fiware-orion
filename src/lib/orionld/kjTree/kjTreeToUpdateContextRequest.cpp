@@ -159,6 +159,7 @@ static bool kjTreeToContextElementAttributes
     // kjTreeToContextAttribute treats the attribute, including expanding the attribute name and values, if applicable
     if (kjTreeToContextAttribute(ciP, itemP, caP, &attrTypeNodeP, detailP) == false)
     {
+      // kjTreeToContextAttribute calls orionldErrorResponseCreate
       LM_E(("kjTreeToContextAttribute failed"));
       delete caP;
       return false;

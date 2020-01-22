@@ -1,1 +1,2 @@
 * Issue #310 - Arrays of one element must be reduced to a single item, unless the @context states otherwise
+* Issue #307 - Check validity of property-of-property

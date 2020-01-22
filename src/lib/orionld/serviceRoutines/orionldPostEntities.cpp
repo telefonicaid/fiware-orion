@@ -136,6 +136,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
     if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
+      // kjTreeToContextAttribute calls orionldErrorResponseCreate
       LM_E(("kjTreeToContextAttribute failed: %s", detail));
       delete caP;
       mongoRequest.release();

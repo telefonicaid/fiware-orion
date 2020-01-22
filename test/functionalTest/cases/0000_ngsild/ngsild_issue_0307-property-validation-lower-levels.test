@@ -1,0 +1,112 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Property Validity Check in lower levels
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Attempt to create an Entity with sub-property without type - see error
+# 02. Attempt to create an Entity with sub-property that is a STRING ("currency": "EUR"), not an Object - see error
+#
+
+echo "01. Attempt to create an Entity with sub-property without type - see error"
+echo "=========================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": 12,
+    "P1_P1": {
+      "value": 13
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '02. Attempt to create an Entity with sub-property that is a STRING ("currency": "EUR"), not an Object - see error'
+echo '================================================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:Product:002",
+  "type": "Product",
+  "price": {
+    "type": "Property",
+    "value": 10.99,
+    "currency": "EUR"
+  },
+  "size": {
+    "type": "Property",
+    "value": "M"
+  },
+  "name": {
+    "type": "Property",
+    "value": "Red Wine"
+  },
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an Entity with sub-property without type - see error
+==========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 181
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1_P1",
+    "title": "The 'type' field is missing for a sub-attribute",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an Entity with sub-property that is a STRING ("currency": "EUR"), not an Object - see error
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "currency",
+    "title": "sub-attribute must be a JSON object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -81,6 +81,7 @@ bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP)
         //
         if (kjTreeToContextAttribute(orionldState.ciP, aP, caP, &typeNodeP, &detail) == false)
         {
+          // kjTreeToContextAttribute calls orionldErrorResponseCreate
           delete caP;
           LM_E(("Internal Error (kjTreeToContextAttribute: %s)", detail));
           return false;

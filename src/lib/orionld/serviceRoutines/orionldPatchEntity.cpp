@@ -292,6 +292,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     char* detail;
     if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
+      // kjTreeToContextAttribute calls orionldErrorResponseCreate
       mongoRequest.release();
       LM_E(("kjTreeToContextAttribute failed: %s", detail));
       delete caP;
