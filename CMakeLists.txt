@@ -82,6 +82,8 @@ IF (${DISTRO} MATCHES "Ubuntu_17.*")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSEIF (${DISTRO} MATCHES "Ubuntu_18.*")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+ELSEIF (${DISTRO} MATCHES "Debian_9.*")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSE()
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
 ENDIF ()
@@ -211,10 +213,10 @@ SET (BOOST_MT
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
-    mongoclient.a
 )
 
 SET (DYNAMIC_LIBS
+    mongoclient
     curl
     gnutls
     pthread
