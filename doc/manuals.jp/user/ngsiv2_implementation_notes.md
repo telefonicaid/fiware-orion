@@ -270,7 +270,8 @@ NGSIv2 仕様では、サブスクリプションの対象となるエンティ�
 
 初期通知は、新しい URI パラメータオプション `skipInitialNotification`
 を使用して設定できます。
-例えば、`POST /v2/subscriptions?options=skipInitialNotification` です。
+例えば、`POST /v2/subscriptions?options=skipInitialNotification` または、
+`PATCH /v2/subscriptions/{subId}?options=skipInitialNotification` です。
 
 [初期通知](initial_notification.md) について、ドキュメントで詳細を
 確認してください。
