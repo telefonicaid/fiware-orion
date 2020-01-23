@@ -309,7 +309,7 @@ corresponding to a given subscription, based on updates to the entities covered 
 Apart from that kind of regular notifications, Orion may send also an initial notification at
 subscription creation/update time.
 
-Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification`. 
+Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification` or `PATCH /v2/subscriptions/{subId}?options=skipInitialNotification`
 
 Check details in the document about [initial notifications](initial_notification.md)
 
