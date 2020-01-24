@@ -36,6 +36,7 @@ extern "C"
 {
 #include "kbase/version.h"                                     // kbaseVersion
 #include "kalloc/version.h"                                    // kallocVersion
+#include "khash/version.h"                                     // khashVersion
 #include "kjson/version.h"                                     // kjsonVersion
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
@@ -100,6 +101,8 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "khash version", khashVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);

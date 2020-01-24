@@ -20,51 +20,96 @@ env:
   - STAGE=debian_functional_901_1300
   - STAGE=debian_release
   - STAGE=debian_deps
-before_install:
-- export PLATFORM=$(echo ${STAGE} | cut -c1-6)
-- export STAGE_TYPE=$(echo ${STAGE} | cut -c8-)
-- if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then export PUSH_STATUS="True"; fi
-- if [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" && "${STAGE_TYPE}" != "release" && "${STAGE_TYPE}" != "deps" ]]; then export TEST_STATUS="True"; fi
-- echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-- git lfs pull
-- if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then echo "0" | sudo tee
-  /proc/sys/net/ipv6/conf/all/disable_ipv6; echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}'
-  | sudo tee /etc/docker/daemon.json; sudo service docker restart; docker pull ${IMAGE_DEPS_DEBIAN}; docker pull ${IMAGE_DEPS_CENTOS};
+before_install: >
+  export PLATFORM=$(echo ${STAGE} | cut -c1-6);
+  export STAGE_TYPE=$(echo ${STAGE} | cut -c8-);
+  
+  if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then 
+    export PUSH_STATUS="True"; 
+  fi
+  
+  if [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" && "${STAGE_TYPE}" != "release" && "${STAGE_TYPE}" != "deps" ]]; then 
+    export TEST_STATUS="True"; 
+  fi
+  
+  echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin;
+  git lfs pull;
+  
+  if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then 
+    echo "0" | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
+    echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}'| sudo tee /etc/docker/daemon.json; 
+    sudo service docker restart; 
+
+    if [[ "${PLATFORM}" == "debian" ]]; then
+      docker build \
+        --build-arg TOKEN=${TOKEN} \
+        --build-arg REV=${TRAVIS_COMMIT} \
+        --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
+        -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+    elif [[ "${PLATFORM}" == "centos" ]]; then
+      docker build \
+        --build-arg TOKEN=${TOKEN} \
+        --build-arg REV=${TRAVIS_COMMIT} \
+        --build-arg STAGE=deps -t ${IMAGE_DEPS_CENTOS} \
+        -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ;
+    else
+      docker pull ${IMAGE_DEPS_DEBIAN}; 
+      docker pull ${IMAGE_DEPS_CENTOS};
+    fi
   fi
 install: true
 before_script: true
-script:
-- if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then $(pwd)/docker/build.sh
-  -s compliance -t -p $(pwd); fi
-- if [[ "${TEST_STATUS}" && "${PLATFORM}" == "debian" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
-  -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
-  -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt; fi
-- if [[ "${TEST_STATUS}" && "${PLATFORM}" == "centos" && "${STAGE}" != "compliance" ]]; then docker run -t --rm
-  -v $(pwd):${HOME} --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts
-  -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" ${IMAGE_DEPS_CENTOS} build.sh -s ${STAGE_TYPE} --os centos -dqt; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then docker build --build-arg
-  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN}
-  -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then docker build --build-arg
-  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=release -t ${IMAGE_RELEASE_CENTOS}
-  -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "debian" ]]; then docker build --build-arg
-  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN}
-  -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "centos" ]]; then docker build --build-arg
-  TOKEN=${TOKEN} --build-arg REV=${TRAVIS_COMMIT} --build-arg STAGE=deps -t ${IMAGE_DEPS_CENTOS}
-  -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ; fi
-after_success:
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "debian" ]]; then docker push ${IMAGE_DEPS_DEBIAN}; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "centos" ]]; then docker push ${IMAGE_DEPS_CENTOS}; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then docker push ${IMAGE_RELEASE_DEBIAN}; fi
-- if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then docker push ${IMAGE_RELEASE_CENTOS}; fi
+script: >
+  if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then
+    $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
+  elif [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then
+    docker build \
+      --build-arg TOKEN=${TOKEN} \
+      --build-arg REV=${TRAVIS_COMMIT} \
+      --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+  elif [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then
+    docker build \
+      --build-arg TOKEN=${TOKEN} \
+      --build-arg REV=${TRAVIS_COMMIT} \
+      --build-arg STAGE=release -t ${IMAGE_RELEASE_CENTOS} -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ;
+  elif [[ "${TEST_STATUS}" && "${PLATFORM}" == "debian" && "${STAGE}" != "compliance" ]]; then
+    docker run \
+      -t --rm -v $(pwd):${HOME} --entrypoint bash \
+      -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts \
+      -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" \
+      ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
+  elif [[ "${TEST_STATUS}" && "${PLATFORM}" == "centos" && "${STAGE}" != "compliance" ]]; then
+    docker run \
+      -t --rm -v $(pwd):${HOME} --entrypoint bash \
+      -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts \
+      -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" \
+      ${IMAGE_DEPS_CENTOS} build.sh -s ${STAGE_TYPE} --os centos -dqt;
+  fi
+  
+  exit $?
+ 
+  
+after_success: >
+  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "debian" ]]; then
+   docker push ${IMAGE_DEPS_DEBIAN};
+  fi 
+  
+  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "centos" ]]; then
+   docker push ${IMAGE_DEPS_CENTOS};
+  fi
+  
+  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then
+   docker push ${IMAGE_RELEASE_DEBIAN};
+  fi
+  
+  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then
+   docker push ${IMAGE_RELEASE_CENTOS};  
+  fi
+  
 notifications:
   email:
     recipients:
     - ken.zangelin@fiware.org
-    - josemanuel.cantera@fiware.org
-    - dmitrii.demin@fiware.org
     - jorgepereirasb@gmail.com
     - icazevedo10@gmail.com
     - douglasrolim@gmail.com
