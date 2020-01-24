@@ -16,6 +16,7 @@ guidelines only, and this section may be revised to provide newer information at
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming Alpha release 2 of Orion-LD:
 * Issue #302 (PATCH /ngsi-ld/v1/entities/{entityId}/attrs)
+* Simple NGSI-LD Forwarding of a GET and a PATCH request, just to get iot-agents testable using NGSI-LD
 * Check incoming payload for any null value of any field and return error if found, or, do whatever the spec states where null is allowed (to remove an attribute for example).
 * Contexts to be saved in DB
 * Give error for non-supported URI param?
