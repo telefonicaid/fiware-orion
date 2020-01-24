@@ -100,7 +100,7 @@ bool urlParse
   // 3. Getting the IP address
   //
   toIx = 0;
-  while ((url[urlIx] != 0) && (url[urlIx] != '/'))
+  while ((url[urlIx] != 0) && (url[urlIx] != '/') && (url[urlIx] != ':'))
   {
     if (toIx < ipSize - 1)
       ip[toIx] = url[urlIx];
@@ -115,10 +115,10 @@ bool urlParse
     ++urlIx;
   }
 
+  ip[toIx] = 0;
+
   if (url[urlIx] == 0)
     return true;
-
-  ip[toIx] = 0;
 
 
   //
@@ -130,18 +130,19 @@ bool urlParse
 
     toIx = 0;
 
-    urlIx += 1;  // Step over the ':'
+    urlIx += 1;     // Step over the ':'
 
     while ((url[urlIx] != 0) && (url[urlIx] != '/'))
     {
       portNumberString[toIx++] = url[urlIx++];
     }
 
-    if (url[urlIx] == 0)
-      return true;
-
+    LM_TMP(("FWD: portNumberString: '%s'", portNumberString));
     portNumberString[toIx] = 0;
     *portP = atoi(portNumberString);
+
+    if (url[urlIx] == 0)
+      return true;
   }
 
   //

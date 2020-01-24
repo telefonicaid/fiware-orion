@@ -36,9 +36,12 @@
 extern bool orionldRequestSend
 (
   OrionldResponseBuffer*  rBufP,
-  const char*             url,
+  const char*             protocol,
+  const char*             ip,
+  uint16_t                port,
+  const char*             urlPath,
   int                     tmoInMilliSeconds,
-  char**                  detailsPP,
+  char**                  detailPP,
   bool*                   tryAgainP,
   bool*                   downloadFailedP,
   const char*             acceptHeader

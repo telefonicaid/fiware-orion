@@ -228,7 +228,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Not a URL",
+    "detail": "Not a URI",
     "title": "Invalid @context",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

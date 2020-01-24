@@ -93,7 +93,10 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 bool orionldRequestSend
 (
   OrionldResponseBuffer*  rBufP,
-  const char*             url,
+  const char*             protocol,
+  const char*             ip,
+  uint16_t                port,
+  const char*             urlPath,
   int                     tmoInMilliSeconds,
   char**                  detailPP,
   bool*                   tryAgainP,
@@ -103,10 +106,7 @@ bool orionldRequestSend
 {
   CURLcode             cCode;
   struct curl_context  cc;
-  char                 protocol[16];
-  char                 ip[256];
-  uint16_t             port    = 0;
-  char*                urlPath = NULL;
+  char                 url[256];
 
   if (orionldState.delayedFreePointer != NULL)
   {
@@ -115,16 +115,6 @@ bool orionldRequestSend
   }
 
   *tryAgainP = false;
-
-  if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, detailPP) == false)
-  {
-    // urlParse sets *detailPP
-    LM_E(("urlParse failed for url '%s'. detail: %s", url, *detailPP));
-
-    rBufP->buf       = NULL;
-    *downloadFailedP = false;
-    return false;
-  }
 
   if (rBufP->buf == NULL)
   {
@@ -139,9 +129,26 @@ bool orionldRequestSend
     orionldState.delayedFreePointer = rBufP->buf;  // Saved the pointer to be freed once the request thread ends
   }
 
+  if (port != 0)
+  {
+    if (urlPath != NULL)
+      snprintf(url, sizeof(url), "%s://%s:%d%s", protocol, ip, port, urlPath);
+    else
+      snprintf(url, sizeof(url), "%s://%s:%d", protocol, ip, port);
+  }
+  else
+  {
+    if (urlPath != NULL)
+      snprintf(url, sizeof(url), "%s://%s%s", protocol, ip, urlPath);
+    else
+      snprintf(url, sizeof(url), "%s://%s", protocol, ip);
+  }
+
   LM_T(LmtRequestSend, ("protocol: %s", protocol));
   LM_T(LmtRequestSend, ("IP:       %s", ip));
+  LM_T(LmtRequestSend, ("port:     %d", port));
   LM_T(LmtRequestSend, ("URL Path: %s", urlPath));
+  LM_T(LmtRequestSend, ("URL:      %s", url));
 
   get_curl_context(ip, &cc);
   if (cc.curl == NULL)
@@ -171,6 +178,7 @@ bool orionldRequestSend
 
   if (acceptHeader != NULL)
   {
+    LM_TMP(("FWD: acceptHeader: '%s'", acceptHeader));
     headers = curl_slist_append(headers, acceptHeader);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
   }

@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, contextDownloadAttempts, ...
 #include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
-#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/context/orionldContextDownload.h"              // Own interface
 
@@ -51,6 +51,11 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
 
   *downloadFailedP = true;
 
+  char                 protocol[16];
+  char                 ip[256];
+  uint16_t             port    = 0;
+  char*                urlPath = NULL;
+
   if ((url == NULL || *url == 0))
   {
     pdP->type   = OrionldBadRequestData;
@@ -60,11 +65,13 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
 
     return NULL;
   }
-  else if (urlCheck((char*) url, NULL) == false)
+
+  LM_TMP(("KZ: Downloading context '%s'", url));
+  if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, &pdP->detail) == false)
   {
+    // pdP->detail set by urlParse
     pdP->type   = OrionldBadRequestData;
     pdP->title  = (char*) "Invalid @context";
-    pdP->detail = (char*) "Not a URL";
     pdP->status = 400;
 
     return NULL;
@@ -85,7 +92,7 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     //
     bool tryAgain = false;
 
-    reqOk = orionldRequestSend(&orionldState.httpResponse, url, contextDownloadTimeout, &pdP->detail, &tryAgain, downloadFailedP, "Accept: application/ld+json");
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, ip, port, urlPath, contextDownloadTimeout, &pdP->detail, &tryAgain, downloadFailedP, "Accept: application/ld+json");
     if (reqOk == true)
       break;
 

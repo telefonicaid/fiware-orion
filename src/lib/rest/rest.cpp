@@ -137,6 +137,8 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
 
+  LM_TMP(("FWD: Got a URI parameter: '%s': '%s'", ckey, val));
+
   if ((val == NULL) || (*val == 0))
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
@@ -585,6 +587,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   HttpHeaders*     headerP = &ciP->httpHeaders;
   std::string      key     = ckey;
 
+  LM_TMP(("FWD: Got HTTP Header:   %s: %s", ckey, value));
   LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", ckey, value));
 
   if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
