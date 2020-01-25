@@ -47,71 +47,11 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
+#include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
 
-
-#include "mongo/client/dbclient.h"                               // MongoDB C++ Client Legacy Driver
-#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
-
-
-
-// -----------------------------------------------------------------------------
-//
-// mongoCppLegacyRegistrationLookup - FIXME: move to src/lib/orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.cpp
-//
-static KjNode* mongoCppLegacyRegistrationLookup(char* entityId)
-{
-  //
-  // Query registrations collection for:
-  //   db.registrations.find({ "contextRegistration.entities.id": "urn:ngsi-ld:entities:E1" })
-  //
-  // This part is to be moved to "src/lib/orionld/mongoCppLegacy/" once working ...
-  //
-  char    collectionPath[256];
-  KjNode* kjRegArray = NULL;
-
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
-
-  //
-  // Populate filter - only Entity ID for this operation - FOR NOW ...
-  //
-  mongo::BSONObjBuilder  filter;
-  filter.append("contextRegistration.entities.id", entityId);
-
-  // semTake()
-  mongo::DBClientBase*                  connectionP = getMongoConnection();
-  std::auto_ptr<mongo::DBClientCursor>  cursorP;
-  mongo::Query                          query(filter.obj());
-
-  cursorP = connectionP->query(collectionPath, query);
-
-  while (cursorP->more())
-  {
-    mongo::BSONObj  bsonObj = cursorP->nextSafe();
-    char*           title;
-    char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, &title, &details);
-
-    if (kjTree == NULL)
-      LM_E(("%s: %s", title, details));
-    else
-    {
-      if (kjRegArray == NULL)
-        kjRegArray = kjArray(orionldState.kjsonP, NULL);
-      kjChildAdd(kjRegArray, kjTree);
-    }
-  }
-
-  releaseMongoConnection(connectionP);
-
-  // semGive()
-
-  return kjRegArray;
-}
 
 
 // -----------------------------------------------------------------------------
@@ -367,19 +307,9 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
 //
 // orionldForwardGetEntity -
 //
-static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* responseP)
+static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP)
 {
-  LM_TMP(("FWD: looking up registrations for entity '%s'", entityId));
-
-  KjNode*  regArrayP = mongoCppLegacyRegistrationLookup(entityId);
-
-  if (regArrayP == NULL)
-  {
-    LM_TMP(("FWD: no registration found for entity '%s'", entityId));
-    return NULL;
-  }
-
-  LM_TMP(("FWD: found registrations for entity '%s'", entityId));
+  LM_TMP(("FWD: treating registrations for entity '%s'", entityId));
 
   //
   // If URI param 'attrs' was used, split the attr-names into an array and expanmd according to @context
@@ -413,26 +343,19 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
   {
     KjNode* partTree = orionldForwardGetEntity2(regP, entityId, uriParamAttrsV, uriParamAttrs);
 
-    if (partTree != NULL)
+    if (partTree != NULL)  // Move all attributes from 'partTree' into responseP
     {
-      LM_TMP(("FWD: Got a partTree - now add its attrs to the response"));
-      // Move all attributes from 'partTree' into responseP
       KjNode* nodeP = partTree->value.firstChildP;
       KjNode* next;
 
       while (nodeP != NULL)
       {
         next = nodeP->next;
-        LM_TMP(("FWD: Got partTree attr '%s'", nodeP->name));
-        if (SCOMPARE3(nodeP->name, 'i', 'd', 0))
-        {}
-        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
-        {}
+
+        if      (SCOMPARE3(nodeP->name, 'i', 'd', 0))            {}
+        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))  {}
         else
-        {
-          LM_TMP(("FWD: Adding '%s' to responseP", nodeP->name));
           kjChildAdd(responseP, nodeP);
-        }
 
         nodeP = next;
       }
@@ -452,35 +375,45 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
 // - attrs               (orionldState.uriParams.attrs)
 // - options=keyValues   ()
 //
+// For the NGSI-LD Forwarding scheme to work, we need to check for registrations and not only in the
+// local database. For this to work correctly:
+// 1. Lookup matching registrations
+// 2. Lookup the entity in the local database
+// 3. If not found locally and no matching registrations, return a404 Not Found
+// 4. If not found locally, we need to extract the entity type from a Context Provider and if that doesn't work, then we can get
+//    the entity type from the matching registration.
+// 5. Forward the GET /entities/{entityId} to all matching CPs and add the attributes to the entity
+// 6. Return the full entity
+//
 bool orionldGetEntity(ConnectionInfo* ciP)
 {
-  if (orionldState.uriParams.attrs != NULL)
-    LM_TMP(("FWD: Got an 'attrs' URI param: %s", orionldState.uriParams.attrs));
-
-  bool                  keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
-  QueryContextRequest   request;
-  QueryContextResponse  response;
-  EntityId              entityId(orionldState.wildcard[0], "", "false", false);
-  char*                 details;
-
-  LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
-
-  request.entityIdVector.push_back(&entityId);
+  char*                 detail;
+  KjNode*               regArray;
 
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
+  if ((urlCheck(orionldState.wildcard[0], &detail) == false) && (urnCheck(orionldState.wildcard[0], &detail) == false))
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
     return false;
   }
 
+  regArray = dbRegistrationLookup(orionldState.wildcard[0]);
+
+  LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
+
+#if 1
   //
-  // FIXME: mongoQueryContext should respond with a KJson tree -
-  //        next year perhaps, and when starting with new mongo driver
+  // Use dbEntityLookup() instead of mongoQueryContext()
   //
+  bool                  keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+  EntityId              entityId(orionldState.wildcard[0], "", "false", false);
+  QueryContextRequest   request;
+  QueryContextResponse  response;
+  request.entityIdVector.push_back(&entityId);
+
   ciP->httpStatusCode = mongoQueryContext(&request,
                                           &response,
                                           orionldState.tenant,
@@ -505,13 +438,67 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   // Create response by converting "QueryContextResponse response" into a KJson tree
   orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, orionldState.uriParams.attrs, keyValues, &response);
+#else
+  //
+  // FIXME
+  // dbEntityLookup (mongoCppLegacyEntityLookup) uses dbDataToKjTree, which makes a complete copy of the tree in mongo:
+  // {
+  //   "_id": {
+  //     "id": "urn:ngsi-ld:E09",
+  //     "type": "https://uri.etsi.org/ngsi-ld/default-context/T",
+  //     "servicePath": "/"
+  //   },
+  //   "attrNames": [
+  //     "https://uri.etsi.org/ngsi-ld/default-context/P1"
+  //   ],
+  //   "attrs": {
+  //     "https://uri=etsi=org/ngsi-ld/default-context/P1": {
+  //       "type": "Property",
+  //       "creDate": 1579884546,
+  //       "modDate": 1579884546,
+  //       "value": {
+  //         "@type": "DateTime",
+  //         "@value": "2018-12-04T12:00:00"
+  //       },
+  //       "mdNames": []
+  //     }
+  //   },
+  //   "creDate": 1579884546,
+  //   "modDate": 1579884546,
+  //   "lastCorrelator": ""
+  // }
+  //
+  // Instead of:
+  // {
+  //   "id": "urn:ngsi-ld:E09",
+  //   "type": "T",
+  //   "P1": {
+  //     "type": "Property",
+  //     "value": {
+  //     "@type": "DateTime",
+  //     "@value": "2018-12-04T12:00:00"
+  //   }
+  // }
+  //
+  // To fix this:
+  // - Call a less generic function to create the KjNode tree (dbEntityDataToKjTree) that
+  //   - Removes "_id", "servicePath", "attrNames", "mdNames", "creDate", "modDate", "lastCorrelator"
+  // - Compact the attribute names and the entity id
+  // - keyValues
+  // - sysAttrs
+  //
+  // With all this done, I could stop using mongoBackend for this (and similar with all GET operations)
+  //
+  KjNode* entityWithDatabaseStructure = dbEntityLookup(orionldState.wildcard[0]);
+  orionldState.responseTree = kjTreeFromEntityWithDatabaseStructure(entityWithDatabaseStructure, keyValues, sysAttrs);
+#endif
 
-  if (orionldState.responseTree == NULL)
+  if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
-    // If found in registrations ...
     ciP->httpStatusCode = SccContextElementNotFound;
     return false;
   }
+
 
   //
   // GET /ngsi-ld/v1/entities/{entityId} returns a single Entity, not an Array.
@@ -525,10 +512,20 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   // If nothing found in the Context Providers, then the local database is searched.
   // This way, only one Entity is returned and we don't break the API. For now ...
   //
-  orionldForwardGetEntity(ciP, orionldState.wildcard[0], orionldState.responseTree);
+  if (regArray != NULL)
+  {
+    if (orionldState.responseTree == NULL)
+    {
+      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", orionldState.wildcard[0]);
 
+      orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+      kjChildAdd(orionldState.responseTree, idNodeP);
 
-  // request.entityIdVector.vec.erase(0);  // Remove 'entityId' from entityIdVector
+      // FIXME: Entity Type - from registration?
+    }
+
+    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree);
+  }
 
   return true;
 }

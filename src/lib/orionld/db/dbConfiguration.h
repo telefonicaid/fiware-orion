@@ -68,6 +68,7 @@ typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, cha
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
 typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray);
+typedef KjNode* (*DbRegistrationLookup)(const char* entityId);
 
 
 
@@ -83,5 +84,6 @@ extern DbDataToKjTreeFunction                   dbDataToKjTree;
 extern DbDataFromKjTreeFunction                 dbDataFromKjTree;
 extern DbSubscriptionMatchEntityIdAndAttributes dbSubscriptionMatchEntityIdAndAttributes;
 extern DbEntityListLookupWithIdTypeCreDate      dbEntityListLookupWithIdTypeCreDate;
+extern DbRegistrationLookup                     dbRegistrationLookup;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

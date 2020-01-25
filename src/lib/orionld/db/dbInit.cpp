@@ -34,6 +34,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"        // mongoCppLegacyEntityBatchDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"        // mongoCppLegacyEntityListLookupWithIdTypeCreDate
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"       // mongoCppLegacyRegistrationLookup
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -64,6 +65,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntityBatchDelete                      = mongoCppLegacyEntityBatchDelete;
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
   dbEntityListLookupWithIdTypeCreDate      = mongoCppLegacyEntityListLookupWithIdTypeCreDate;
+  dbRegistrationLookup                     = mongoCppLegacyRegistrationLookup;
 
   mongoCppLegacyInit(dbHost, dbName);
 
@@ -73,7 +75,10 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntityUpdate                           = mongocEntityUpdate;
   dbDataToKjTree                           = mongocKjTreeFromBsonObj;
   dbDataFromKjTree                         = NULL;  // FIXME: Implement mongocKjTreeToBson
+  dbEntityBatchDelete                      = NULL;  // FIXME: Implement mongocEntityBatchDelete
   dbSubscriptionMatchEntityIdAndAttributes = NULL;  // FIXME: Implement mongocSubscriptionMatchEntityIdAndAttributes
+  dbEntityListLookupWithIdTypeCreDate      = NULL;  // FIXME: Implement mongocEntityListLookupWithIdTypeCreDate
+  dbRegistrationLookup                     = NULL;  // FIXME: Implement mongocRegistrationLookup
 
   mongocInit(dbHost, dbName);
 
