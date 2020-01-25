@@ -171,14 +171,14 @@ Date: REGEX(.*)
 06. Attempt to GET non-existing E3, see 404 not Found
 =====================================================
 HTTP/1.1 404 Not Found
-Content-Length: 133
+Content-Length: 138
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
-  "title": "No context element found",
-  "detail": "no detail"
+  "title": "Entity Not Found",
+  "detail": "http://a.b.c/entity/E3"
 }
 
 

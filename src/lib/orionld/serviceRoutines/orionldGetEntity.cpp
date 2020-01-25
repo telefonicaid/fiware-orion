@@ -136,59 +136,40 @@ extern "C"
 //   YES                                               NO                                     "attrs" URI param exact copy of "URI param 'attrs' in Original Request"
 //   YES                                               YES                                    "attrs" URI param is a merge between the two
 //
+//
 static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uriParamAttrV, int uriParamAttrs)
 {
-  LM_TMP(("FWD: uriParamAttrs: %d", uriParamAttrs));
-  for (int ix = 0; ix < uriParamAttrs; ix++)
-    LM_TMP(("FWD: uriParamAttrV[%d]: '%s'", ix, uriParamAttrV[ix]));
-
-  char*           entityType            = NULL;
-  char            host[128]             = { 0 };
-  char            protocol[32]          = { 0 };
-  unsigned short  port                  = 0;
+  char            host[128]                  = { 0 };
+  char            protocol[32]               = { 0 };
+  unsigned short  port                       = 0;
   char*           uriDir;
   char*           detail;
-  KjNode*         entityP               = NULL;
-  int             ix                    = 0;
-  int             crIx                  = 0;
+  KjNode*         entityP                    = NULL;
+  int             ix                         = 0;
   char*           registrationAttrV[100];
-  int             registrationAttrs     = 0;
-  char*           format                = (char*) "JSON";
-  KjNode*         contextP              = NULL;
+  int             registrationAttrs          = 0;
 
   for (KjNode* nodeP = regP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    LM_TMP(("FWD: registration field %d: %s", ix, nodeP->name));
     ++ix;
 
     if (strcmp(nodeP->name, "format") == 0)
     {
-      format = nodeP->value.s;
+      // format = nodeP->value.s;
     }
     else if (strcmp(nodeP->name, "@context") == 0)
     {
-      contextP = nodeP;
+      // contextP = nodeP;
     }
     else if (strcmp(nodeP->name, "contextRegistration") == 0)
     {
       for (KjNode* crNodeP = nodeP->value.firstChildP; crNodeP != NULL; crNodeP = crNodeP->next)
       {
-        LM_TMP(("FWD: contextRegistration Array Item %d", crIx));
         int crItemIx = 0;
 
         for (KjNode* crItemNodeP = nodeP->value.firstChildP->value.firstChildP; crItemNodeP != NULL; crItemNodeP = crItemNodeP->next)
         {
-          if (strcmp(crItemNodeP->name, "entities") == 0)
-          {
-            // For now, there can only be one:
-            for (KjNode* entityNodeP = crItemNodeP->value.firstChildP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
-            {
-              LM_TMP(("FWD: contextRegistration.entities.%s: %s", entityNodeP->name, entityNodeP->value.s));
-              if (strcmp(entityNodeP->name, "type") == 0)
-                entityType = entityNodeP->value.s;
-            }
-          }
-          else if (strcmp(crItemNodeP->name, "attrs") == 0)
+          if (strcmp(crItemNodeP->name, "attrs") == 0)
           {
             //
             // Populate the array registrationAttrV with the registered attributes
@@ -209,15 +190,12 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
           }
           else if ((host[0] == 0) && (strcmp(crItemNodeP->name, "providingApplication") == 0))
           {
-            LM_TMP(("FWD: providingApplication: %s (must be parsed)", crItemNodeP->value.s));
             if (urlParse(crItemNodeP->value.s, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, &detail) == false)
             {
               // Mark Error so that "Incomplete Response" is present in response?
               return NULL;
             }
           }
-          else
-            LM_TMP(("FWD: contextRegistration[%d].%s: %s", crItemIx, crItemNodeP->name, kjValueType(crItemNodeP->type)));
 
           ++crItemIx;
         }
@@ -231,19 +209,16 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
     newUriParamAttrsString = (char*) "";
   else if ((uriParamAttrs == 0) && (registrationAttrs != 0))
   {
-    LM_TMP(("FWD: Flatten registrationAttrV"));
     newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, registrationAttrs * 200);
     kStringArrayJoin(newUriParamAttrsString, registrationAttrV, registrationAttrs, ",");
   }
   else if ((uriParamAttrs != 0) && (registrationAttrs == 0))
   {
-    LM_TMP(("FWD: Flatten uriParamAttrV"));
     newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, uriParamAttrs * 200);
     kStringArrayJoin(newUriParamAttrsString, uriParamAttrV, uriParamAttrs, ",");
   }
   else
   {
-    LM_TMP(("FWD: Flatten common attrs in registrationAttrV and uriParamAttrs"));
     char* attrsV[100];
     int   attrs = 0;
 
@@ -252,28 +227,16 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
       if (kStringArrayLookup(registrationAttrV, registrationAttrs, uriParamAttrV[ix]) != -1)
         attrsV[attrs++] = uriParamAttrV[ix];
     }
-    LM_TMP(("FWD: Calling kStringArrayJoin with %d items in vector", attrs));
     kStringArrayJoin(newUriParamAttrsString, attrsV, attrs, ",");
   }
-
-  LM_TMP(("FWD: entity::id:               %s", entityId));
-  LM_TMP(("FWD: entity::type:             %s", entityType));
-  LM_TMP(("FWD: attrs to forward:         %s", newUriParamAttrsString));
-  LM_TMP(("FWD: protocol for forwarding:  %s", protocol));
-  LM_TMP(("FWD: host for forwarding:      %s", host));
-  LM_TMP(("FWD: port for forwarding:      %d", port));
-  LM_TMP(("FWD: format:                   %s", format));
-  LM_TMP(("FWD: @context:                 %s", (contextP == NULL)? "Core" : (contextP->type == KjString)? contextP->value.s : kjValueType(contextP->type)));
 
   int   size    = 256 + strlen(newUriParamAttrsString);
   char* urlPath = (char*) kaAlloc(&orionldState.kalloc, size);
 
-  if (newUriParamAttrsString != NULL)
+  if (*newUriParamAttrsString != 0)
     snprintf(urlPath, size, "/ngsi-ld/v1/entities/%s?attrs=%s", entityId, newUriParamAttrsString);
   else
     snprintf(urlPath, size, "/ngsi-ld/v1/entities/%s", entityId);
-
-  LM_TMP(("FWD: urlPath: %s", urlPath));
 
   //
   // Sending the Forwarded request
@@ -287,14 +250,10 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
   bool reqOk;
   bool downloadFailed;
 
-  LM_TMP(("FWD: Calling orionldRequestSend, to send the forwarded request"));
   reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, urlPath, 5000, &detail, &tryAgain, &downloadFailed, "Accept: application/json");
 
   if (reqOk)
-  {
-    LM_TMP(("FWD: Parsing the response into a KjNode tree (%s)", orionldState.httpResponse.buf));
     entityP = kjParse(orionldState.kjsonP, orionldState.httpResponse.buf);
-  }
   else
     LM_TMP(("FWD: orionldRequestSend failed: %s", detail));
 
@@ -307,10 +266,8 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
 //
 // orionldForwardGetEntity -
 //
-static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP)
+static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType)
 {
-  LM_TMP(("FWD: treating registrations for entity '%s'", entityId));
-
   //
   // If URI param 'attrs' was used, split the attr-names into an array and expanmd according to @context
   //
@@ -320,19 +277,15 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
   if (!ciP->uriParam["attrs"].empty())
   {
     char* uriParamAttrsString = (char*) ciP->uriParam["attrs"].c_str();
-    LM_TMP(("FWD: Got an 'attrs' URI param: %s (%s)", uriParamAttrsString, orionldState.uriParams.attrs));
 
     uriParamAttrs = kStringSplit(uriParamAttrsString, ',', uriParamAttrsV, K_VEC_SIZE(uriParamAttrsV));
-    LM_TMP(("FWD: Split the 'attrs' URI param string into an array of %d items", uriParamAttrs));
 
     //
     // Populate the array uriParamAttrsV with the expanded attribute names
     //
     for (int ix = 0; ix < uriParamAttrs; ix++)
     {
-      LM_TMP(("FWD: Expanding attr %d '%s'", ix, uriParamAttrsV[ix]));
       uriParamAttrsV[ix] = orionldContextItemExpand(orionldState.contextP, uriParamAttrsV[ix], NULL, true, NULL);
-      LM_TMP(("FWD: Expanded attr %d '%s'", ix, uriParamAttrsV[ix]));
     }
   }
 
@@ -341,7 +294,7 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
   //
   for (KjNode* regP = regArrayP->value.firstChildP; regP != NULL; regP = regP->next)
   {
-    KjNode* partTree = orionldForwardGetEntity2(regP, entityId, uriParamAttrsV, uriParamAttrs);
+    KjNode*  partTree = orionldForwardGetEntity2(regP, entityId, uriParamAttrsV, uriParamAttrs);
 
     if (partTree != NULL)  // Move all attributes from 'partTree' into responseP
     {
@@ -352,8 +305,21 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
       {
         next = nodeP->next;
 
-        if      (SCOMPARE3(nodeP->name, 'i', 'd', 0))            {}
-        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))  {}
+        if      (SCOMPARE3(nodeP->name, 'i', 'd', 0))
+        {}
+        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
+        {
+          if (needEntityType)
+          {
+            //
+            // We're taking the entity::type from the Response to the forwarded request
+            // because no local entity was found.
+            // It could also betaken from the registration.
+            //
+            kjChildAdd(responseP, nodeP);
+            needEntityType = false;
+          }
+        }
         else
           kjChildAdd(responseP, nodeP);
 
@@ -436,8 +402,12 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     return false;
   }
 
-  // Create response by converting "QueryContextResponse response" into a KJson tree
-  orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, orionldState.uriParams.attrs, keyValues, &response);
+  // It's OK to not find the Entity in local - we still may find it in a Context Provider
+  if ((response.errorCode.code == SccOk) || (response.errorCode.code == 0))
+  {
+    // Create response by converting "QueryContextResponse response" into a KJson tree
+    orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, orionldState.uriParams.attrs, keyValues, &response);
+  }
 #else
   //
   // FIXME
@@ -495,6 +465,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
+    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
     ciP->httpStatusCode = SccContextElementNotFound;
     return false;
   }
@@ -514,6 +485,8 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   //
   if (regArray != NULL)
   {
+    bool needEntityType = false;
+
     if (orionldState.responseTree == NULL)
     {
       KjNode* idNodeP = kjString(orionldState.kjsonP, "id", orionldState.wildcard[0]);
@@ -521,10 +494,10 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(orionldState.responseTree, idNodeP);
 
-      // FIXME: Entity Type - from registration?
+      needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree);
+    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType);
   }
 
   return true;

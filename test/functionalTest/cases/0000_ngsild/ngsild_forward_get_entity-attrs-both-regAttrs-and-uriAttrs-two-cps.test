@@ -35,7 +35,7 @@ brokerStart CP2
 --SHELL--
 
 #
-# The typical Context Provider setup for the broker is to have an "attribute empty" entity pesent in the broker
+# The typical Context Provider setup for the broker is to have an "attribute empty" entity present in the broker
 # and the attributes registered out to CPs.
 # This test sets up that scenario with E1 empty in CB and the attrs P1 and R1 registered to CP1, and another context provider CP2 with P2 and R2 registered.
 # CP1 has an entity E1 with attrs P1, P2, R1, and R2, but only P1 and R1 are registered in the CB.

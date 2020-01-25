@@ -251,13 +251,13 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 404 Not Found
-Content-Length: 119
+Content-Length: 138
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "no detail",
-    "title": "No context element found",
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "Entity Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 

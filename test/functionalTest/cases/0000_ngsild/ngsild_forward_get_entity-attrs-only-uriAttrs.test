@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NGSI-LD Forward of GET /entities/{entityId}?attrs=<merge between Registered Attributes and URI Parameter attrs>
+NGSI-LD Forward of GET /entities/{entityId}?attrs=<Only URI Parameter Attributes>
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -35,16 +35,16 @@ brokerStart CP1
 #
 # The typical Context Provider setup for the broker is to have an "attribute empty" entity present in the broker
 # and the attributes registered out to CPs.
-# This test sets up that scenario with E1 empty in CB and the attrs P1 and R1 registered to CP1
-# CP1 has an entity E1 with attrs P1, P2, R1, and R2, but only P1 and R1 are registered in the CB.
-# The test is to query the CB for E1?attrs=P1,R2 and get back P1 from CP1, and eintity id + type from the CB.
-# The response should contain onbly entity id+type and the attribute P1
+# This test sets up that scenario with E1 empty in CB and E1 registered to CP1, without any attributes => all of them are registered.
+# CP1 has an entity E1 with attrs P1, P2, R1, and R2, and ALL OF THEM are registered in the CB.
+# The test is to query the CB for E1?attrs=P1,R2 and get back P1+R2 from CP1, and entity id + type from the CB.
+# The response should contain only entity id+type and the attributes P1+R1
 #
 # 01. Create entity urn:ngsi-ld:entities:E1 in CB, without attributes
-# 02. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, attributes P1 and R1
+# 02. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, all attributes
 # 03. See the registration in mongo
 # 04. Create entity urn:ngsi-ld:entities:E1 in CP1, with attributes P1, P2, R1, and R1
-# 05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1 to CP1
+# 05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1,R2 to CP1
 #
 
 echo "01. Create entity urn:ngsi-ld:entities:E1 in CB, without attributes"
@@ -58,8 +58,8 @@ echo
 echo
 
 
-echo "02. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, attributes P1 and R1"
-echo "================================================================================================="
+echo "02. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, all attributes"
+echo "==========================================================================================="
 payload='{
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr01",
   "type": "ContextSourceRegistration",
@@ -70,9 +70,7 @@ payload='{
           "id": "urn:ngsi-ld:entities:E1",
           "type": "Entity"
         }
-      ],
-      "properties": [ "P1" ],
-      "relationships": [ "R1" ]
+      ]
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'"
@@ -116,8 +114,8 @@ echo
 echo
 
 
-echo "05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1 to CP1"
-echo "======================================================================================================================================="
+echo "05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1,R2 to CP1"
+echo "=========================================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1,R2
 echo
 echo
@@ -134,8 +132,8 @@ Date: REGEX(.*)
 
 
 
-02. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, attributes P1 and R1
-=================================================================================================
+02. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, all attributes
+===========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -160,18 +158,7 @@ MongoDB server version: REGEX(.*)
 					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Entity"
 				}
 			],
-			"attrs" : [
-				{
-					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
-					"type" : "Property",
-					"isDomain" : "false"
-				},
-				{
-					"name" : "https://uri.etsi.org/ngsi-ld/default-context/R1",
-					"type" : "Relationship",
-					"isDomain" : "false"
-				}
-			],
+			"attrs" : [ ],
 			"providingApplication" : "http://REGEX(.*)"
 		}
 	],
@@ -192,10 +179,10 @@ Date: REGEX(.*)
 
 
 
-05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1 to CP1
-=======================================================================================================================================
+05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1,R2 to CP1
+==========================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 88
+Content-Length: 145
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -204,6 +191,10 @@ Date: REGEX(.*)
     "P1": {
         "type": "Property",
         "value": "P1 in CP1"
+    },
+    "R2": {
+        "object": "http://R2.in.CP1",
+        "type": "Relationship"
     },
     "id": "urn:ngsi-ld:entities:E1",
     "type": "T"
