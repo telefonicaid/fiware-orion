@@ -43,7 +43,6 @@
 #define HTTP_ACCESS_CONTROL_ALLOW_METHODS  "Access-Control-Allow-Methods"
 #define HTTP_ACCESS_CONTROL_MAX_AGE        "Access-Control-Max-Age"
 #define HTTP_ACCESS_CONTROL_EXPOSE_HEADERS "Access-Control-Expose-Headers"
-#define HTTP_CONNECTION                    "Connection"
 #define HTTP_CONTENT_LENGTH                "Content-Length"
 #define HTTP_CONTENT_TYPE                  "Content-Type"
 #define HTTP_EXPECT                        "Expect"
@@ -121,10 +120,7 @@ typedef struct HttpHeaders
   std::vector<HttpAcceptHeader*> acceptHeaderV;
 
   bool          gotHeaders;
-  std::string   userAgent;
-  std::string   host;
   std::string   accept;
-  std::string   expect;
   std::string   contentType;
   std::string   origin;
   std::string   tenant;
@@ -138,7 +134,6 @@ typedef struct HttpHeaders
   bool          servicePathReceived;
 
   unsigned int  contentLength;
-  std::string   connection;
 } HttpHeaders;
 
 #endif
