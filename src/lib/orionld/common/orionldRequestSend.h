@@ -41,6 +41,7 @@ extern bool orionldRequestSend
   uint16_t                port,
   const char*             urlPath,
   int                     tmoInMilliSeconds,
+  const char*             linkHeader,
   char**                  detailPP,
   bool*                   tryAgainP,
   bool*                   downloadFailedP,

@@ -98,6 +98,7 @@ bool orionldRequestSend
   uint16_t                port,
   const char*             urlPath,
   int                     tmoInMilliSeconds,
+  const char*             linkHeader,
   char**                  detailPP,
   bool*                   tryAgainP,
   bool*                   downloadFailedP,
@@ -175,6 +176,17 @@ bool orionldRequestSend
   curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
   struct curl_slist* headers = NULL;
+
+  if (linkHeader != NULL)
+  {
+    char linkHeaderString[512];
+
+    snprintf(linkHeaderString, sizeof(linkHeaderString), "Link: %s", linkHeader);
+    headers = curl_slist_append(headers, linkHeaderString);
+    curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
+
+    LM_TMP(("KZ: Link Header: %s", linkHeader));
+  }
 
   if (acceptHeader != NULL)
   {

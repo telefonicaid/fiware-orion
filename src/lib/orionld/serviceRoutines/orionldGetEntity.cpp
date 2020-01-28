@@ -24,7 +24,7 @@
 */
 extern "C"
 {
-#include "kbase/kMacros.h"                                       // K_VEC_SIZE
+#include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
 #include "kbase/kStringSplit.h"                                  // kStringSplit
 #include "kbase/kStringArrayJoin.h"                              // kStringArrayJoin
 #include "kbase/kStringArrayLookup.h"                            // kStringArrayLookup
@@ -47,10 +47,25 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attrsToAlias -
+//
+static void attrsToAlias(OrionldContext* contextP, char* attrV[], int attrs)
+{
+  for (int ix = 0; ix < attrs; ix++)
+  {
+    attrV[ix] = orionldContextItemAliasLookup(contextP, attrV[ix], NULL, NULL);
+  }
+}
 
 
 
@@ -142,7 +157,7 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
   char            host[128]                  = { 0 };
   char            protocol[32]               = { 0 };
   unsigned short  port                       = 0;
-  char*           uriDir;
+  char*           uriDir                     = (char*) "";
   char*           detail;
   KjNode*         entityP                    = NULL;
   int             ix                         = 0;
@@ -210,11 +225,13 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
   else if ((uriParamAttrs == 0) && (registrationAttrs != 0))
   {
     newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, registrationAttrs * 200);
+    attrsToAlias(orionldState.contextP, registrationAttrV, registrationAttrs);
     kStringArrayJoin(newUriParamAttrsString, registrationAttrV, registrationAttrs, ",");
   }
   else if ((uriParamAttrs != 0) && (registrationAttrs == 0))
   {
     newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, uriParamAttrs * 200);
+    attrsToAlias(orionldState.contextP, uriParamAttrV, uriParamAttrs);
     kStringArrayJoin(newUriParamAttrsString, uriParamAttrV, uriParamAttrs, ",");
   }
   else
@@ -227,16 +244,33 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
       if (kStringArrayLookup(registrationAttrV, registrationAttrs, uriParamAttrV[ix]) != -1)
         attrsV[attrs++] = uriParamAttrV[ix];
     }
+
+    attrsToAlias(orionldState.contextP, attrsV, attrs);
     kStringArrayJoin(newUriParamAttrsString, attrsV, attrs, ",");
   }
 
+
   int   size    = 256 + strlen(newUriParamAttrsString);
   char* urlPath = (char*) kaAlloc(&orionldState.kalloc, size);
+  char* uriDirP = (char*) ((uriDir == NULL)? "" : uriDir);
+
+
+  //
+  // If the uri directory (from the rgistration) ends in a slash, then have it removed.
+  // It is added in the snpintf further down
+  //
+  if (uriDirP != NULL)
+  {
+    int slen = strlen(uriDirP);
+    if (uriDirP[slen - 1] == '/')
+      uriDirP[slen - 1] = 0;
+  }
 
   if (*newUriParamAttrsString != 0)
-    snprintf(urlPath, size, "/ngsi-ld/v1/entities/%s?attrs=%s", entityId, newUriParamAttrsString);
+    snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?attrs=%s", uriDirP, entityId, newUriParamAttrsString);
   else
-    snprintf(urlPath, size, "/ngsi-ld/v1/entities/%s", entityId);
+    snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
+
 
   //
   // Sending the Forwarded request
@@ -250,7 +284,17 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
   bool reqOk;
   bool downloadFailed;
 
-  reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, urlPath, 5000, &detail, &tryAgain, &downloadFailed, "Accept: application/json");
+  LM_TMP(("KZ: forwarding to %s:%d '%s'", host, port, urlPath));
+  LM_TMP(("KZ: newUriParamAttrsString: %s", newUriParamAttrsString));
+  if (orionldState.linkHttpHeaderPresent)
+  {
+    char link[512];
+
+    snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, urlPath, 5000, link, &detail, &tryAgain, &downloadFailed, "Accept: application/json");
+  }
+  else
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, urlPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, "Accept: application/json");
 
   if (reqOk)
     entityP = kjParse(orionldState.kjsonP, orionldState.httpResponse.buf);

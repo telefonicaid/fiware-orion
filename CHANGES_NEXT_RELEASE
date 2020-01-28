@@ -1,2 +1,3 @@
 * Issue #310 - Arrays of one element must be reduced to a single item, unless the @context states otherwise
 * Issue #307 - Check validity of property-of-property
+* Issue #XXX - NGSI-LD style forwarding of GET /ngsi-ld/v1/entities/{EID}
