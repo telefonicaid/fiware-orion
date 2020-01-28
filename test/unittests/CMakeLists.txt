@@ -224,6 +224,12 @@ include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/test/unittests")
 include_directories("${PROJECT_SOURCE_DIR}/test")
 
+# Needed for the new C++ driver
+# FIXME OLD-DR: these includes are duplicated in top-level CMakelists.txt. Unify.
+include_directories("/usr/local/include/bsoncxx/v_noabi")
+include_directories("/usr/local/include/mongocxx/v_noabi")
+
+
 # Lib directories
 # ------------------------------------------------------------
 link_directories("/usr/local/lib/")
