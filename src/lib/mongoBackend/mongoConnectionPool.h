@@ -52,11 +52,12 @@ extern int mongoConnectionPoolInit
   const char* passwd,
   const char* mechanism,
   const char* authDb,
+  bool        dbSSL,
   bool        multitenant,
   double      timeout,
-  int         writeConcern,
-  int         poolSize,
-  bool        semTimeStat
+  int         writeConcern = 1,
+  int         poolSize = 10,
+  bool        semTimeStat = false
 );
 
 
