@@ -213,10 +213,10 @@ SET (BOOST_MT
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
+    mongoclient.a
 )
 
 SET (DYNAMIC_LIBS
-    mongoclient
     curl
     gnutls
     pthread
