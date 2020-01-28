@@ -55,6 +55,10 @@
 #include "mongoBackend/TriggeredSubscription.h"
 
 
+#ifdef UNIT_TEST
+// FIXME OLD-DR: this eventually would be a global include, not only for UNIT_TEST''
+#include <mongocxx/client.hpp>
+#endif
 
 /* ****************************************************************************
 *
@@ -111,7 +115,7 @@ extern bool mongoStart
 
 
 #ifdef UNIT_TEST
-extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection, mongocxx::client* _connectionCxx);
 #endif
 
 
@@ -141,6 +145,16 @@ extern void setNotifier(Notifier* n);
 */
 extern mongo::DBClientBase* getMongoConnection(void);
 
+#ifdef UNIT_TEST
+/* ****************************************************************************
+*
+* getMongoConnectionCxx -
+*
+* FIXME OLD-DR: eventually only connections using new driver will be used,
+* and not only in UNIT_TEST code
+*/
+extern mongocxx::client* getMongoConnectionCxx(void);
+#endif
 
 
 /* ****************************************************************************

@@ -763,7 +763,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
 
     /* Set MongoDB connection mock (preserving "actual" connection for later use) */
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Invoke the function in mongoBackend library */
     ms = mongoRegisterContext(&req, &res, uriParams);
@@ -779,7 +779,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
               "- exception: boom!!)", res.errorCode.details);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mock */
     delete connectionMock;

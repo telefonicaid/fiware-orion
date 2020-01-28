@@ -212,7 +212,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUnsubscribeContextAvailability(&req, &res);
@@ -235,7 +235,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     ASSERT_EQ(2, count);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mocks */
     delete notifierMock;
@@ -282,7 +282,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUnsubscribeContextAvailability(&req, &res);
@@ -303,7 +303,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     ASSERT_EQ(2, connectionDb->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mocks */
     delete notifierMock;

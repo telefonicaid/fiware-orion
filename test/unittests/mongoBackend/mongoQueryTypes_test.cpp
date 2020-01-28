@@ -897,7 +897,7 @@ TEST(mongoQueryTypes, queryAllDbException)
 
   /* Set MongoDB connection */
   DBClientBase* connectionDb = getMongoConnection();
-  setMongoConnectionForUnitTest(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
   /* Invoke the function in mongoBackend library */
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
@@ -919,7 +919,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   EXPECT_EQ(0, res.entityTypeVector.size());
 
   /* Restore real DB connection */
-  setMongoConnectionForUnitTest(connectionDb);
+  setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
   /* Release mock */
   delete connectionMock;
@@ -949,7 +949,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
 
   /* Set MongoDB connection */
   DBClientBase* connectionDb = getMongoConnection();
-  setMongoConnectionForUnitTest(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
   /* Invoke the function in mongoBackend library */
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams, V1, NULL, false);
@@ -972,7 +972,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ(0, res.entityTypeVector.size());
 
   /* Restore real DB connection */
-  setMongoConnectionForUnitTest(connectionDb);
+  setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
   /* Release mock */
   delete connectionMock;
@@ -1453,7 +1453,7 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
 
   /* Set MongoDB connection */
   DBClientBase* connectionDb = getMongoConnection();
-  setMongoConnectionForUnitTest(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
   /* Invoke the function in mongoBackend library */
   ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
@@ -1477,7 +1477,7 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
   EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
   /* Restore real DB connection */
-  setMongoConnectionForUnitTest(connectionDb);
+  setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
   /* Release mock */
   delete connectionMock;
@@ -1505,7 +1505,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
 
   /* Set MongoDB connection */
   DBClientBase* connectionDb = getMongoConnection();
-  setMongoConnectionForUnitTest(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
   /* Invoke the function in mongoBackend library */
   ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams, false, V1);
@@ -1529,7 +1529,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
   /* Restore real DB connection */
-  setMongoConnectionForUnitTest(connectionDb);
+  setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
   /* Release mock */
   delete connectionMock;

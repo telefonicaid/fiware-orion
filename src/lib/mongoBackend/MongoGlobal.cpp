@@ -66,6 +66,10 @@
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 
+#ifdef UNIT_TEST
+// FIXME OLD-DR: this eventually would be a global include, not only for UNIT_TEST
+#include <mongocxx/client.hpp>
+#endif
 
 
 /* ****************************************************************************
@@ -366,7 +370,10 @@ bool mongoStart
 
 #ifdef UNIT_TEST
 
-static DBClientBase* connection = NULL;
+
+// FIXME OLD-DR: eventually only connections using new driver will be used
+static DBClientBase* connection        = NULL;
+static mongocxx::client* connectionCxx = NULL;
 
 
 
@@ -377,9 +384,11 @@ static DBClientBase* connection = NULL;
 * For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
 * given out using the function getMongoConnection().
 */
-void setMongoConnectionForUnitTest(DBClientBase* _connection)
+void setMongoConnectionForUnitTest(DBClientBase* _connection, mongocxx::client* _connectionCxx)
 {
-  connection = _connection;
+  // FIXME OLD-DR: eventually only connections using new driver will be used
+  connection    = _connection;
+  connectionCxx = _connectionCxx;
 }
 
 
@@ -416,6 +425,22 @@ DBClientBase* getMongoConnection(void)
   return mongoPoolConnectionGet();
 #endif
 }
+
+
+
+#ifdef UNIT_TEST
+/* ****************************************************************************
+*
+* getMongoConnectionCxx -
+*
+* FIXME OLD-DR: eventually only connections using new driver will be used,
+* not only in UNIT_TEST code
+*/
+mongocxx::client* getMongoConnectionCxx(void)
+{
+  return connectionCxx;
+}
+#endif
 
 
 

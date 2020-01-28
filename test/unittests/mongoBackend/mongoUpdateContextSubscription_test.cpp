@@ -4383,7 +4383,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextSubscription(&req, &res, "", "", servicePathVector);
@@ -4398,7 +4398,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mocks */
     delete notifierMock;
@@ -4455,7 +4455,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextSubscription(&req, &res, "", "", servicePathVector);
@@ -4477,7 +4477,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mocks */
     delete notifierMock;

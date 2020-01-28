@@ -3228,7 +3228,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     /* Set MongoDB connection */
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Forge the request (from "inside" to "outside") */
     Entity* eP = new Entity();
@@ -3268,7 +3268,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mocks */
     delete connectionMock;
@@ -3297,7 +3297,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
     /* Set MongoDB connection */
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Forge the request (from "inside" to "outside") */
     Entity* eP = new Entity();
@@ -3330,7 +3330,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mock */
     delete connectionMock;

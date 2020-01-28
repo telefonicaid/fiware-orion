@@ -39,6 +39,11 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoConnectionPool.h"
 
+#ifdef UNIT_TEST
+// FIXME OLD-DR: this eventually would be a global include, not only for UNIT_TEST
+#include <mongocxx/instance.hpp>
+#include <mongocxx/client.hpp>
+#endif
 
 
 /* ****************************************************************************
@@ -100,7 +105,34 @@ void mongoVersionGet(int* mayor, int* minor)
   *minor = mongoVersionMinor;
 }
 
-
+#ifdef UNIT_TEST
+/* ****************************************************************************
+*
+* mongoConnectCxx -
+*
+* FIXME OLD-DR: eventually only connections using new driver will be used,
+* and not only in UNIT_TEST code
+*/
+static mongocxx::client* mongoConnectCxx
+(
+  const char*  host,
+  const char*  db,
+  const char*  rplSet,
+  const char*  username,
+  const char*  passwd,
+  const char*  mechanism,
+  const char*  authDb,
+  bool         multitenant,
+  int          writeConcern,
+  double       timeout
+)
+{
+  // Ignoring most of the parameters by the moment
+  // default uri in mongocxx::clint() is localhost:27017
+  mongocxx::client* clientP = new mongocxx::client(mongocxx::uri{});
+  return clientP;
+}
+#endif
 
 /* ****************************************************************************
 *
@@ -328,7 +360,12 @@ int mongoConnectionPoolInit
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
-  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout));
+  // FIXME OLD-DR: eventually only connections using new driver will be used, and not only in UNIT_TEST code
+  mongocxx::instance instance{}; // This should be done only once.
+  setMongoConnectionForUnitTest(
+    mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout),
+    mongoConnectCxx(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout)
+  );
   return 0;
 #else
   //

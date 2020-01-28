@@ -2241,7 +2241,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
 
     /* Set MongoDB connection */
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E3", "T3");
@@ -2266,7 +2266,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     EXPECT_EQ(0, res.responseVector.size());
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mock */
     delete connectionMock;

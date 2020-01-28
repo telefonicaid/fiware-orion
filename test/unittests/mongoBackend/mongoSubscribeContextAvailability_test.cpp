@@ -2536,7 +2536,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Invoke the function in mongoBackend library */
     ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
@@ -2558,7 +2558,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mocks */
     delete notifierMock;

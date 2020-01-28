@@ -3262,7 +3262,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryF
 
     /* Set MongoDB connection */
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Forge the request (from "inside" to "outside") */
     Entity* eP = new Entity();
@@ -3295,7 +3295,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryF
     CHECK_LAST_NOTIFICATION("51307b66f481db11bf860001", 20000000);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     /* Release mock */
     delete notifierMock;

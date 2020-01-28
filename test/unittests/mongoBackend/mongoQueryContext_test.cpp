@@ -3815,7 +3815,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
 
     /* Set MongoDB connection */
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock, getMongoConnectionCxx());
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1", "false");
@@ -3839,7 +3839,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     res.contextElementResponseVector.release();
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, getMongoConnectionCxx());
 
     delete connectionMock;
     utExit();

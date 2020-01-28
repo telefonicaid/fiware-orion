@@ -22,9 +22,13 @@
 *
 * Author: Fermin Galan
 */
-#include "gtest/gtest.h"
-#include "mongo/client/dbclient.h"
 
+#include <bsoncxx/builder/stream/document.hpp>
+#include <mongocxx/client.hpp>
+
+#include "gtest/gtest.h"
+#include "mongo/client/dbclient.h"  // FIXME OLD-DR: not actually needed but required
+                                    // by the moment by setMongoConnectionForUnitTest()
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
@@ -42,20 +46,23 @@
 *
 * USING
 */
-using mongo::DBClientBase;
-using mongo::BSONObj;
-using mongo::BSONArray;
-using mongo::BSONElement;
-using mongo::OID;
-using mongo::DBException;
-using mongo::BSONObjBuilder;
+using mongo::DBClientBase; // FIXME OLD-DR: needed by the setMongoConnectionForUnitTest
+using mongo::BSONObj;      // FIXME OLD-DR: needed by the tests that use DB mocks
+using mongo::BSONArray;    // FIXME OLD-DR: needed by the tests that use DB mocks
+using mongo::OID;          // FIXME OLD-DR: needed by the tests that use DB mocks
+using mongo::DBException;  // FIXME OLD-DR: needed by the tests that use DB mocks
+
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::open_document;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::finalize;
 
-
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection, mongocxx::client* _connectionCxx);
 
 
 
@@ -82,27 +89,52 @@ static void prepareDatabase(void)
     /* Set database */
     setupDatabase();
 
-    DBClientBase* connection = getMongoConnection();
+    mongocxx::client* connectionCxx = getMongoConnectionCxx();
 
-    BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 10000000 <<
-                        "lastNotification" << 15000000 <<
-                        "reference" << "http://notify1.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
-                        "attrs" << BSONArray() <<
-                        "conditions" << BSON_ARRAY("AX1" << "AY1"));
+    auto builder = bsoncxx::builder::stream::document{};
 
-    BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 20000000 <<
-                        "lastNotification" << 25000000 <<
-                        "reference" << "http://notify2.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
-                        "attrs" << BSON_ARRAY("A1" << "A2") <<
-                        "conditions" << BSON_ARRAY("AX2" << "AY2"));
+    bsoncxx::document::value sub1 = builder
+      << "_id" << bsoncxx::oid("51307b66f481db11bf860001")
+      << "expiration" << 10000000
+      << "lastNotification" << 15000000
+      << "reference" << "http://notify1.me"
+      << "entities" << open_array
+        << open_document << "id" << "E1" << "type" << "T1" << "isPattern" << "false" << close_document
+      << close_array
+      << "attrs" << open_array << close_array
+      << "contidions" << open_array << "AX1" << "AY1" << close_array
+      << finalize;
 
-    connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
-    connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
+    bsoncxx::document::value sub2 = builder
+      << "_id" << bsoncxx::oid("51307b66f481db11bf860002")
+      << "expiration" << 20000000
+      << "lastNotification" << 25000000
+      << "reference" << "http://notify2.me"
+      << "entities" << open_array
+        << open_document << "id" << "E1" << "type" << "T1" << "isPattern" << "false" << close_document
+      << close_array
+      << "attrs" << open_array << "A1" << "A2" << close_array
+      << "contidions" << open_array << "AX2" << "AY2" << close_array
+      << finalize;
+
+    // FIXME OLD-DR: connection must include the database itself
+    // FIXME OLD-DR: we should use SUBSCRIBECONTEXT_COLL but it includes "utest." prefix
+
+    (*connectionCxx)["utest"]["csubs"].insert_one(sub1.view());
+    (*connectionCxx)["utest"]["csubs"].insert_one(sub2.view());
 }
+
+
+
+/* ****************************************************************************
+*
+* getDocId -
+*/
+inline std::string getDocId(const bsoncxx::document::value& sub)
+{
+  return sub.view()["_id"].get_oid().value.to_string();
+}
+
 
 /* ****************************************************************************
 *
@@ -137,8 +169,8 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     EXPECT_EQ("subscriptionId: /51307b66f481db11bf869999/", res.statusCode.details);
 
     /* Check database (untouched) */
-    DBClientBase* connection = getMongoConnection();
-    ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
+    mongocxx::client* connectionCxx = getMongoConnectionCxx();
+    ASSERT_EQ(2, (*connectionCxx)["utest"]["csubs"].count_documents(bsoncxx::document::view()));
 
     /* Release mock */
     delete notifierMock;
@@ -177,10 +209,14 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     EXPECT_EQ(0, res.statusCode.details.size());
 
     /* Check database (one document, but not the deleted one) */
-    DBClientBase* connection = getMongoConnection();
-    ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
+    mongocxx::client* connectionCxx = getMongoConnectionCxx();
+    ASSERT_EQ(1, (*connectionCxx)["utest"]["csubs"].count_documents(bsoncxx::document::view()));
+
+    auto builder = bsoncxx::builder::stream::document{};
+    bsoncxx::document::value query = builder << "_id" << bsoncxx::oid("51307b66f481db11bf860002") << finalize;
+    bsoncxx::stdx::optional<bsoncxx::document::value> sub = (*connectionCxx)["utest"]["csubs"].find_one(query.view());
+    ASSERT_TRUE((bool)sub);  // ensure find_one actually found a document
+    EXPECT_EQ("51307b66f481db11bf860002", getDocId(*sub));
 
     /* Release mock */
     delete notifierMock;
@@ -216,7 +252,8 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    mongocxx::client* connectionCxx = getMongoConnectionCxx();
+    setMongoConnectionForUnitTest(connectionMock, connectionCxx);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUnsubscribeContext(&req, &res);
@@ -234,17 +271,17 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     // Without this sleep, this tests fails around 10% of the times (in Ubuntu 13.04)
     usleep(1000);
 
-    int count = connectionDb->count(SUBSCRIBECONTEXT_COLL, BSONObj());
-
+    int count = (*connectionCxx)["utest"]["csubs"].count_documents(bsoncxx::document::view());
     ASSERT_EQ(2, count);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, connectionCxx);
 
     /* Release mocks */
     delete notifierMock;
     delete connectionMock;
 }
+
 
 /* ****************************************************************************
 *
@@ -288,7 +325,8 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
     DBClientBase* connectionDb = getMongoConnection();
-    setMongoConnectionForUnitTest(connectionMock);
+    mongocxx::client* connectionCxx = getMongoConnectionCxx();
+    setMongoConnectionForUnitTest(connectionMock, connectionCxx);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUnsubscribeContext(&req, &res);
@@ -305,13 +343,13 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
 
-    ASSERT_EQ(2, connectionDb->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
+    int count = (*connectionCxx)["utest"]["csubs"].count_documents(bsoncxx::document::view());
+    ASSERT_EQ(2, count);
 
     /* Restore real DB connection */
-    setMongoConnectionForUnitTest(connectionDb);
+    setMongoConnectionForUnitTest(connectionDb, connectionCxx);
 
     /* Release mocks */
     delete notifierMock;
     delete connectionMock;
 }
-
