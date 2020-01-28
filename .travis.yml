@@ -68,13 +68,13 @@ script: >
     $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
   elif [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then
     echo -e " \033[1;33mBuilding Debian Docker image for Release";
-    docker build --quiet \
+    travis_wait 30  docker build --quiet \
       --build-arg TOKEN=${TOKEN} \
       --build-arg REV=${TRAVIS_COMMIT} \
       --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
   elif [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then
     echo -e " \033[1;33mBuilding CentOs Docker image for Release";
-    docker build --quiet \
+    travis_wait 30 docker build --quiet \
       --build-arg TOKEN=${TOKEN} \
       --build-arg REV=${TRAVIS_COMMIT} \
       --build-arg STAGE=release -t ${IMAGE_RELEASE_CENTOS} -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ;
