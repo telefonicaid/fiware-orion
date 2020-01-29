@@ -58,6 +58,11 @@ static std::string parseContextAttributeObject
   // valueTypeNotGiven will be overridden inside the 'for' block in case the attribute has an actual value
   caP->valueType = orion::ValueTypeNull;
 
+  // It may happen in the for iterator to see the same key twice. This is a problem for "value" in the
+  // case of compounds and may lead to a crash (see details in issue #3603). Thus, we need to control
+  // explicitely value has been set with this flag
+  bool valueSet = false;
+
   for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -76,6 +81,13 @@ static std::string parseContextAttributeObject
     }
     else if (name == "value")
     {
+      if (valueSet)
+      {
+        alarmMgr.badInput(clientIp, "ContextAttributeObject::duplicated value key in attribute");
+        return "duplicated value key in attribute";
+      }
+      valueSet = true;
+
       if (type == "String")
       {
         caP->stringValue  = iter->value.GetString();
