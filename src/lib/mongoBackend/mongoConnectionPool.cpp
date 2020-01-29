@@ -160,8 +160,8 @@ static DBClientBase* mongoConnect
     try
     {
       connected = (strlen(rplSet) == 0) ?
-            ((DBClientConnection*) connection)->connect(std::string(host), err) : // No repl set
-            ((DBClientReplicaSet*) connection)->connect();                        // Rpls set
+            ((DBClientConnection*) connection)->connect(std::string(host), err) :  // No repl set
+            ((DBClientReplicaSet*) connection)->connect();                         // Rpls set
     }
     catch (const std::exception &e)
     {
