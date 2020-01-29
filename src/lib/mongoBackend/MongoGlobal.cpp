@@ -72,7 +72,6 @@
 *
 * USING
 */
-using mongo::client::Options;
 using mongo::DBClientBase;
 using mongo::DBClientCursor;
 using mongo::BSONObj;
@@ -218,9 +217,24 @@ void mongoInit
   bool         mutexTimeStat
 )
 {
+  // Set the global multitenant variable
+  multitenant = mtenant;
+
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mechanism, authDb, dbSSL, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
+  if (mongoConnectionPoolInit(dbHost,
+                              dbName.c_str(),
+                              rplSet,
+                              user,
+                              pwd,
+                              mechanism,
+                              authDb,
+                              dbSSL,
+                              mtenant,
+                              tmo,
+                              writeConcern,
+                              dbPoolSize,
+                              mutexTimeStat) != 0)
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -264,103 +278,6 @@ void mongoInit
     }
   }
 }
-
-
-
-/* ****************************************************************************
-*
-* shutdownClient -
-*/
-static void shutdownClient(void)
-{
-  mongo::Status status = mongo::client::shutdown();
-  if (!status.isOK())
-  {
-    LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoStart -
-*
-* This function must be called just once, because of the intialization of mongo::client
-* and the creation of the connection pool.
-*/
-bool mongoStart
-(
-  const char*  host,
-  const char*  db,
-  const char*  rplSet,
-  const char*  username,
-  const char*  passwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         _multitenant,
-  double       timeout,
-  int          writeConcern,
-  int          poolSize,
-  bool         semTimeStat
-)
-{
-  static bool alreadyDone = false;
-
-  if (alreadyDone == true)
-  {
-    LM_E(("Runtime Error (mongoStart already called - can only be called once)"));
-    return false;
-  }
-  alreadyDone = true;
-
-  multitenant = _multitenant;
-
-  // We cannot move status variable declaration outside the if block. That fails at compilation time
-  bool statusOk = false;
-  std::string statusString;
-  if (dbSSL)
-  {
-    mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
-    statusOk = status.isOK();
-    statusString = status.toString();
-  }
-  else
-  {
-    mongo::Status status = mongo::client::initialize();
-    statusOk = status.isOK();
-    statusString = status.toString();
-  }
-
-  if (!statusOk)
-  {
-    LM_E(("Database Startup Error %s (cannot initialize mongo client)", statusString.c_str()));
-    return false;
-  }
-  atexit(shutdownClient);
-
-  if (mongoConnectionPoolInit(host,
-                              db,
-                              rplSet,
-                              username,
-                              passwd,
-                              mechanism,
-                              authDb,
-                              _multitenant,
-                              timeout,
-                              writeConcern,
-                              poolSize,
-                              semTimeStat) != 0)
-  {
-    LM_E(("Database Startup Error (cannot initialize mongo connection pool)"));
-    return false;
-  }
-
-  return true;
-}
-
-
 
 
 

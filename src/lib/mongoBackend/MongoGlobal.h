@@ -87,29 +87,6 @@ void mongoInit
 
 
 
-/* ****************************************************************************
-*
-* mongoStart - 
-*/
-extern bool mongoStart
-(
-  const char* host,
-  const char* db,
-  const char* rplSet,
-  const char* username,
-  const char* passwd,
-  const char* mechanism,
-  const char* authDb,
-  bool        dbSSL,
-  bool        _multitenant,
-  double      timeout,
-  int         writeConcern = 1,
-  int         poolSize     = 10,
-  bool        semTimeStat  = false
-);
-
-
-
 #ifdef UNIT_TEST
 extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
 #endif

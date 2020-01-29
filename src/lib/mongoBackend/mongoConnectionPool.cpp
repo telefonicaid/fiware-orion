@@ -60,6 +60,7 @@ using mongo::BSONObj;
 using mongo::DBClientBase;
 using mongo::DBClientConnection;
 using mongo::DBClientReplicaSet;
+using mongo::client::Options;
 
 
 
@@ -132,45 +133,12 @@ static DBClientBase* mongoConnect
 
   if (strlen(rplSet) == 0)
   {
-    // Setting the first argument to true is to use autoreconnect
+    // No replica set. Setting the first argument to true is to use autoreconnect
     connection = new DBClientConnection(true);
-
-    //
-    // Not sure of how to generalize the following code,
-    // given that DBClientBase class doesn't have a common connect() method (surprisingly)
-    //
-    for (int tryNo = 0; tryNo < retries; ++tryNo)
-    {
-      try
-      {
-        connected = ((DBClientConnection*) connection)->connect(std::string(host), err);
-      }
-      catch (const std::exception &e)
-      {
-        LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
-      }
-
-      if (connected)
-      {
-        break;
-      }
-
-      if (tryNo == 0)
-      {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
-              retries,
-              RECONNECT_DELAY));
-      }
-      else
-      {
-        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-      }
-
-      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
-    }
   }
   else
   {
+    // Replica set
     LM_T(LmtMongo, ("Using replica set %s", rplSet));
 
     // autoReconnect is always on for DBClientReplicaSet connections.
@@ -185,40 +153,38 @@ static DBClientBase* mongoConnect
     }
 
     connection = new DBClientReplicaSet(rplSet, rplSetHosts, timeout);
+  }
 
-    //
-    // Not sure of to generalize the following code,
-    // given that DBClientBase class hasn't a common connect() method (surprisingly)
-    //
-    for (int tryNo = 0; tryNo < retries; ++tryNo)
+  for (int tryNo = 0; tryNo < retries; ++tryNo)
+  {
+    try
     {
-      try
-      {
-        connected = ((DBClientReplicaSet*)connection)->connect();
-      }
-      catch (const std::exception &e)
-      {
-        LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
-      }
-
-      if (connected)
-      {
-        break;
-      }
-
-      if (tryNo == 0)
-      {
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
-              retries,
-              RECONNECT_DELAY));
-      }
-      else
-      {
-        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-      }
-
-      usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
+      connected = (strlen(rplSet) == 0) ?
+            ((DBClientConnection*) connection)->connect(std::string(host), err) :  // No repl set
+            ((DBClientReplicaSet*) connection)->connect();                         // Rpls set
     }
+    catch (const std::exception &e)
+    {
+      LM_E(("Database Startup Error (exception: %s)", ((std::string) e.what()).c_str()));
+    }
+
+    if (connected)
+    {
+      break;
+    }
+
+    if (tryNo == 0)
+    {
+      LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d millisecond interval)",
+            retries,
+            RECONNECT_DELAY));
+    }
+    else
+    {
+      LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+    }
+
+    usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds
   }
 
   if (connected == false)
@@ -307,6 +273,21 @@ static DBClientBase* mongoConnect
 
 /* ****************************************************************************
 *
+* shutdownClient -
+*/
+static void shutdownClient(void)
+{
+  mongo::Status status = mongo::client::shutdown();
+  if (!status.isOK())
+  {
+    LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoConnectionPoolInit -
 */
 int mongoConnectionPoolInit
@@ -318,6 +299,7 @@ int mongoConnectionPoolInit
   const char*  passwd,
   const char*  mechanism,
   const char*  authDb,
+  bool         dbSSL,
   bool         multitenant,
   double       timeout,
   int          writeConcern,
@@ -325,6 +307,29 @@ int mongoConnectionPoolInit
   bool         semTimeStat
 )
 {
+  // We cannot move status variable declaration outside the if block. That fails at compilation time
+  bool statusOk = false;
+  std::string statusString;
+  if (dbSSL)
+  {
+    mongo::Status status = mongo::client::initialize(Options().setSSLMode(Options::kSSLRequired));
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+  else
+  {
+    mongo::Status status = mongo::client::initialize();
+    statusOk = status.isOK();
+    statusString = status.toString();
+  }
+
+  if (!statusOk)
+  {
+    LM_E(("Database Startup Error %s (cannot initialize mongo client)", statusString.c_str()));
+    return -1;
+  }
+  atexit(shutdownClient);
+
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
