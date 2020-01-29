@@ -82,10 +82,10 @@ This request will send data in well defined JSON format.
 ## 5. Expect
 
 Expect HTTP header is used in incoming HTTP requests received by Orion.
-It Indicates that behaviour of particular server are required by the client.
-It is typically used when sending a large request body. We expect the server to return back `100 Continue` HTTP status if it can handle the request, or `417 Expectation Failed` if not.
+It is used when sending a large request body, on response Orion sends only `Expect:` i.e. blank, if it is able to handle the request. For more details, follow general documentation of Expect HTTP header [Link1](https://flaviocopes.com/http-request-headers/), [Link2](https://tools.ietf.org/html/rfc7231#section-5.1.1) or [Link3](https://en.wikipedia.org/wiki/List_of_HTTP_header_fields).
 
-    Expect: 100-continue
+
+    Expect:
 	
 [Top](#top)	
 	
@@ -138,8 +138,7 @@ X-Real-IP takes preference over X-Forwarded-For, if both appear.
 
 ## 11.  Access-Control-Allow-Origin
 
-It is an optional header used in outgoing HTTP responses sent by Orion.  
-Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-origin).
+It is an optional header used in outgoing HTTP responses sent by Orion. Its operation is related with CORS, see specific documentation at [../user/cors.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-origin).
     
     Access-Control-Allow-Origin: *
 		
@@ -230,7 +229,7 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsform
 ## 19. Fiware-Service
 
 Fiware-Service is used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion.
-When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation at [../user/multitenancy.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/multitenancy.md)
+When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation at [../user/multitenancy.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/multitenancy.md).
 		
     POST http://127.0.0.1:9977/notify    
     Content-Length: 725    
@@ -266,7 +265,7 @@ Its operation is related with pagination, see related documentation at [../user/
 ## 22. Fiware-Correlator
 
 Fiware-Correlator is a response HTTP header which is used in forwarding messages and notifications.
-Fiware-Correlator is a non-modifiable header in custom notifications. Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.	See related documentation at [../admin/logs.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/logs.md)
+Fiware-Correlator is a non-modifiable header in custom notifications. Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.	See related documentation at [../admin/logs.md](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/logs.md).
     
     Fiware-Correlator: 600119ce-eeaa-11e9-9e0c-080027a71049	
 
