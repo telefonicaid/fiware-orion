@@ -96,6 +96,12 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
       if (SCOMPARE9(infoNodeP->name, 'e', 'n', 't', 'i', 't', 'i', 'e', 's', 0))
       {
         DUPLICATE_CHECK(entitiesP, "Registration::information::entities", infoNodeP);
+        if (infoNodeP->value.firstChildP == NULL)
+        {
+          orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information::entities");
+          return false;
+        }
+
         if (kjTreeToEntIdVector(ciP, infoNodeP, &regP->dataProvided.entities) == false)
         {
           LM_E(("kjTreeToEntIdVector failed"));
@@ -105,6 +111,12 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
       else if (SCOMPARE11(infoNodeP->name, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's', 0))
       {
         DUPLICATE_CHECK(propertiesP, "Registration::information::properties", infoNodeP);
+        if (infoNodeP->value.firstChildP == NULL)
+        {
+          orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information::properties");
+          return false;
+        }
+
         for (KjNode* propP = infoNodeP->value.firstChildP; propP != NULL; propP = propP->next)
         {
           STRING_CHECK(propP, "PropertyInfo::name");
@@ -116,6 +128,12 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
       else if (SCOMPARE14(infoNodeP->name, 'r', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 's', 0))
       {
         DUPLICATE_CHECK(relationshipsP, "Registration::information::relationships", infoNodeP);
+
+        if (infoNodeP->value.firstChildP == NULL)
+        {
+          orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "information::relationships");
+          return false;
+        }
 
         for (KjNode* relP = infoNodeP->value.firstChildP; relP != NULL; relP = relP->next)
         {

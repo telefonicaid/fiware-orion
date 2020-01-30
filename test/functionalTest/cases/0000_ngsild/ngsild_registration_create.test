@@ -43,6 +43,9 @@ brokerStart CB
 # 04. Create R1 registration with embedded context
 # 05. See the R1 registration in mongo
 # 06. Create R2 registration without @Context Attribute
+# 07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error
+# 08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error
+# 09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error
 #
 
 echo "01. Create a registration with ALL fields"
@@ -228,6 +231,73 @@ payload='{
         "type": "T"
       }],
       "properties": ["p1", "p2"],
+      "relationships": ["rel1"]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error"
+echo "=========================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [],
+      "relationships": ["rel1"]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error"
+echo "=============================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "prop1" ],
+      "relationships": []
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [ ],
+      "properties": [ "prop1" ],
       "relationships": ["rel1"]
     }
   ],
@@ -684,6 +754,48 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R2
 Date: REGEX(.*)
 
+
+
+07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information::properties",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information::relationships",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information::entities",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 --TEARDOWN--
