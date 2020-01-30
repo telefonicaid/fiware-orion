@@ -300,7 +300,8 @@ std::string postQueryContext
   {
     countP = &count;
   }
-
+  else if ((ciP->apiVersion == NGSI_LD_V1) && (ciP->uriParamOptions["count"]))
+    countP = &count;
 
 
   //
@@ -331,7 +332,7 @@ std::string postQueryContext
   //
   // If API version 2, add count, if asked for, in HTTP header Fiware-Total-Count
   //
-  if ((ciP->apiVersion == V2) && (countP != NULL))
+  if (((ciP->apiVersion == V2) || (ciP->apiVersion == NGSI_LD_V1)) && (countP != NULL))
   {
     char cV[32];
 

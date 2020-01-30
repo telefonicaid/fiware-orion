@@ -129,7 +129,7 @@ echo
 
 echo "08. GET all entities with id E.*, see all four entities"
 echo "======================================================="
-orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes&type=T,T2' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes&type=T,T2&options=count' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -269,6 +269,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 873
 Content-Type: application/ld+json
+Fiware-Total-Count: 4
 Date: REGEX(.*)
 
 [

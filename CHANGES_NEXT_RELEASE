@@ -4,3 +4,4 @@
 * Issue #XXX - Registrations with empty arrays inside information are now rejected, as per spec.
 * Issue #342 - Empty arrays for properties when creating entities crashes the broker
 * Issue #329 - Incorrect storage of Subscription Q-filter when more than one part-filter (;-separated)
+* Issue #340 - If ?options=count, then an HTTP header (Fiware-Total-Count) is added to the response
