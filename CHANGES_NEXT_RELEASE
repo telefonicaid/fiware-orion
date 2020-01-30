@@ -2,4 +2,4 @@
 * Issue #307 - Check validity of property-of-property
 * Issue #XXX - NGSI-LD style forwarding of GET /ngsi-ld/v1/entities/{EID}
 * Issue #XXX - Registrations with empty arrays inside information are now rejected, as per spec.
-
+* Issue #342 - Empty arrays for properties when creating entities crashes the broker

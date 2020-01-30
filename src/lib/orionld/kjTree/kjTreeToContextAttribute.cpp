@@ -627,7 +627,10 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttrib
 
       if (nodeP->type == KjArray)
       {
-        if (nodeP->value.firstChildP->next == NULL)  // Only one item in the array
+        if (nodeP->value.firstChildP == NULL)  // Empty Array
+        {
+        }
+        else if (nodeP->value.firstChildP->next == NULL)  // Only one item in the array
         {
           if ((contextItemP == NULL) || (contextItemP->type == NULL) || ((strcmp(contextItemP->type, "@list") != 0) && (strcmp(contextItemP->type, "@set") != 0)))
           {
