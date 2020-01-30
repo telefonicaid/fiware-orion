@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_APITYPESV2_HTTPINFO_H_
-#define SRC_LIB_APITYPESV2_HTTPINFO_H_
-
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,38 +20,53 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Fermín Galán
 */
+
 #include <string>
-#include <map>
 
-#include "rest/Verb.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
-#include "mongoDriver/BSONObj.h"
-
-
-
-namespace ngsiv2
+namespace orion
 {
 /* ****************************************************************************
 *
-* HttpInfo - 
+* BSONArrayBuilder::BSONArrayBuilder -
 */
-struct HttpInfo
+BSONArrayBuilder::BSONArrayBuilder(void)
 {
-  std::string                         url;
-  Verb                                verb;
-  std::map<std::string, std::string>  qs;      // URI parameters
-  std::map<std::string, std::string>  headers;
-  std::string                         payload;
-  bool                                custom;
-
-  HttpInfo();
-  explicit HttpInfo(const std::string& _url);
-
-  std::string  toJson();
-  void         fill(const orion::BSONObj& bo);
-};
 }
 
-#endif  // SRC_LIB_APITYPESV2_HTTPINFO_H_
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::arr -
+*/
+BSONArray BSONArrayBuilder::arr(void)
+{
+  return BSONArray(bab.arr());
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::append -
+*/
+void BSONArrayBuilder::append(const BSONObj& value)
+{
+  bab.append(value.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::append -
+*/
+void BSONArrayBuilder::append(const std::string& value)
+{
+  bab.append(value);
+}
+}

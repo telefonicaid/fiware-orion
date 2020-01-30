@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_HTTPINFO_H_
-#define SRC_LIB_APITYPESV2_HTTPINFO_H_
+#ifndef SRC_LIB_MONGODRIVER_DBCONNECTION_H_
+#define SRC_LIB_MONGODRIVER_DBCONNECTION_H_
 
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,38 +23,32 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Fermín Galán
 */
-#include <string>
-#include <map>
 
-#include "rest/Verb.h"
+#include "mongo/client/dbclient.h"  // FIXME OLD-DR: change in next PoC stage
 
-#include "mongoDriver/BSONObj.h"
-
-
-
-namespace ngsiv2
+namespace orion
 {
 /* ****************************************************************************
 *
-* HttpInfo - 
+* DBConnection -
 */
-struct HttpInfo
+class DBConnection
 {
-  std::string                         url;
-  Verb                                verb;
-  std::map<std::string, std::string>  qs;      // URI parameters
-  std::map<std::string, std::string>  headers;
-  std::string                         payload;
-  bool                                custom;
+ private:
+  mongo::DBClientBase* dbcP;
 
-  HttpInfo();
-  explicit HttpInfo(const std::string& _url);
+ public:
+  // methods to be used by client code (without references to low-level driver code)
+  DBConnection();
+  bool operator== (const DBConnection &rhs);
+  bool isNull(void);
 
-  std::string  toJson();
-  void         fill(const orion::BSONObj& bo);
+  // methods to be used only by mongoDriver/ code (with references to low-level driver code)
+  explicit DBConnection(mongo::DBClientBase* _dbc);
+  mongo::DBClientBase* get(void);
 };
 }
 
-#endif  // SRC_LIB_APITYPESV2_HTTPINFO_H_
+#endif  // SRC_LIB_MONGODRIVER_DBCONNECTION_H_

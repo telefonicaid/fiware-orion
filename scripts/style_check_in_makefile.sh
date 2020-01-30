@@ -50,6 +50,7 @@ style_check src/lib/logSummary
 style_check src/lib/jsonParseV2
 style_check src/lib/apiTypesV2
 style_check src/lib/mongoBackend
+style_check src/lib/mongoDriver
 style_check src/lib/logMsg
 style_check src/lib/parseArgs
 style_check src/lib/cache

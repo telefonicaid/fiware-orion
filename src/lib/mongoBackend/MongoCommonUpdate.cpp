@@ -1423,7 +1423,8 @@ static bool addTriggeredSubscriptions_noCache
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
-      httpInfo.fill(sub);
+      // FIXME OLD-DR: this should be just "httpInfo.fill(sub);" when update entity logic would be "assimilated"
+      httpInfo.fill(orion::BSONObj(sub));
 
       bool op = false;
       StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);

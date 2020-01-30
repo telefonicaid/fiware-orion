@@ -26,7 +26,7 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
+#include "mongoBackend/mongoGetSubscriptions.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,24 +37,19 @@
 #include "cache/subCache.h"
 #include "apiTypesV2/Subscription.h"
 
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/MongoGlobal.h"  // getSubscribeContextCollectionName
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/mongoGetSubscriptions.h"
 
-
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/OID.h"
 
 /* ****************************************************************************
 *
 * USING - 
 */
-using mongo::BSONObj;
-using mongo::BSONElement;
-using mongo::DBClientCursor;
-using mongo::DBClientBase;
-using mongo::OID;
 using ngsiv2::Subscription;
 using ngsiv2::EntID;
 
@@ -64,9 +59,9 @@ using ngsiv2::EntID;
 *
 * setSubscriptionId -
 */
-static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
+static void setNewSubscriptionId(Subscription* s, const orion::BSONObj& r)
 {
-  s->id = getFieldF(r, "_id").OID().toString();
+  s->id = getFieldF(r, "_id").OID();
 }
 
 
@@ -75,7 +70,7 @@ static void setNewSubscriptionId(Subscription* s, const BSONObj& r)
 *
 * setDescription -
 */
-static void setDescription(Subscription* s, const BSONObj& r)
+static void setDescription(Subscription* s, const orion::BSONObj& r)
 {
   s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
 }
@@ -86,18 +81,18 @@ static void setDescription(Subscription* s, const BSONObj& r)
 *
 * setSubject -
 */
-static void setSubject(Subscription* s, const BSONObj& r)
+static void setSubject(Subscription* s, const orion::BSONObj& r)
 {
   // Entities
-  std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
-    BSONObj ent               = ents[ix].embeddedObject();
-    std::string id            = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
-    bool        isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
-                                  getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    orion::BSONObj ent           = ents[ix].embeddedObject();
+    std::string    id            = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string    type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string    isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    bool           isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
+                                     getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -127,7 +122,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 
   if (r.hasField(CSUB_EXPR))
   {
-    mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
+    orion::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
 
     std::string  q      = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
     std::string  mq     = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
@@ -148,7 +143,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 *
 * setNotification -
 */
-static void setNotification(Subscription* subP, const BSONObj& r, const std::string& tenant)
+static void setNotification(Subscription* subP, const orion::BSONObj& r, const std::string& tenant)
 {
   // Attributes
   setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
@@ -225,7 +220,7 @@ static void setNotification(Subscription* subP, const BSONObj& r, const std::str
 *
 * setStatus -
 */
-static void setStatus(Subscription* s, const BSONObj& r)
+static void setStatus(Subscription* s, const orion::BSONObj& r)
 {
   s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
 
@@ -275,29 +270,33 @@ void mongoListSubscriptions
    * Note that expiration is not taken into account (in the future, a q= query
    * could be added to the operation in order to filter results)
    */
-  std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
-  BSONObj                        q;
+  orion::DBCursor        cursor;
+  std::string            err;
+  orion::BSONObjBuilder  qB;
+  orion::BSONObjBuilder  sortBy;
 
   // FIXME P6: This here is a bug ... See #3099 for more info
   if (!servicePath.empty() && (servicePath != "/#"))
   {
-    q = BSON(CSUB_SERVICE_PATH << servicePath);
+    qB.append(CSUB_SERVICE_PATH, servicePath);
   }
+  sortBy.append("_id", 1);
+
+  orion::BSONObj q = qB.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection,
-                             getSubscribeContextCollectionName(tenant),
-                             q,
-                             BSON("_id" << 1),
-                             limit,
-                             offset,
-                             &cursor,
-                             count,
-                             &err))
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (!orion::collectionRangedQuery(connection,
+                                    getSubscribeContextCollectionName(tenant),
+                                    q,
+                                    sortBy.obj(),
+                                    limit,
+                                    offset,
+                                    &cursor,
+                                    count,
+                                    &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
@@ -308,11 +307,11 @@ void mongoListSubscriptions
   /* Process query result */
   unsigned int docs = 0;
 
-  while (moreSafe(cursor))
+  while (orion::moreSafe(&cursor))
   {
-    BSONObj  r;
+    orion::BSONObj  r;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!orion::nextSafeOrErrorF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
@@ -332,7 +331,7 @@ void mongoListSubscriptions
     subs->push_back(s);
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
 
   *oe = OrionError(SccOk);
@@ -355,7 +354,7 @@ void mongoGetSubscription
 {
   bool         reqSemTaken = false;
   std::string  err;
-  OID          oid;
+  orion::OID   oid;
   StatusCode   sc;
 
   if (safeGetSubId(idSub, &oid, &sc) == false)
@@ -368,14 +367,17 @@ void mongoGetSubscription
 
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
-  std::auto_ptr<DBClientCursor>  cursor;
-  BSONObj                        q     = BSON("_id" << oid);
+  orion::DBCursor        cursor;
+  orion::BSONObjBuilder  qB;
+
+  qB.append("_id", oid);
+  orion::BSONObj q = qB.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
-  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (!orion::collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
@@ -384,13 +386,13 @@ void mongoGetSubscription
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (moreSafe(cursor))
+  if (orion::moreSafe(&cursor))
   {
-    BSONObj r;
+    orion::BSONObj r;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!orion::nextSafeOrErrorF(cursor, &r, &err))
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
@@ -404,9 +406,9 @@ void mongoGetSubscription
     setNotification(sub, r, tenant);
     setStatus(sub, r);
 
-    if (moreSafe(cursor))
+    if (orion::moreSafe(&cursor))
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
@@ -417,7 +419,7 @@ void mongoGetSubscription
   }
   else
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
@@ -425,7 +427,7 @@ void mongoGetSubscription
     return;
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
 
   *oe = OrionError(SccOk);

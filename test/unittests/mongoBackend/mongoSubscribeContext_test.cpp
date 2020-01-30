@@ -4181,8 +4181,12 @@ TEST(mongoSubscribeContext, defaultDuration)
 /* ****************************************************************************
 *
 * MongoDbInsertFail -
+*
+* FIXME OLD-DR: we cannot inject the mock properly. mongoSubscribeContext is using
+* the "new driver" connection pool, but setMongoConnectionForUnitTest() used to
+* inject mocked connection does it the "old driver" connection pool.
 */
-TEST(mongoSubscribeContext, MongoDbInsertFail)
+TEST(DISABLED_mongoSubscribeContext, MongoDbInsertFail)
 {
     HttpStatusCode           ms;
     SubscribeContextRequest  req;

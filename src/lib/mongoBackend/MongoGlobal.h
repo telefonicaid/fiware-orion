@@ -54,6 +54,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
+#include "mongoDriver/BSONArray.h"
 
 
 /* ****************************************************************************
@@ -408,7 +409,7 @@ extern StringList subToAttributeList(const mongo::BSONObj& attrL);
 *
 * NGSIv2 wrapper
 */
-extern mongo::BSONArray processConditionVector
+extern orion::BSONArray processConditionVector
 (
   const std::vector<std::string>&    condAttributesV,
   const std::vector<ngsiv2::EntID>&  entitiesV,

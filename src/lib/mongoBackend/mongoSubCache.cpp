@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
+#include "mongoBackend/mongoSubCache.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -39,24 +39,14 @@
 #include "rest/StringFilter.h"
 #include "cache/subCache.h"
 
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/MongoGlobal.h"  // tenantFromDb (FIXME OLD-DR)
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/mongoSubCache.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::BSONElement;
-using mongo::DBClientCursor;
-using mongo::DBClientBase;
-using mongo::OID;
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/safeMongo.h"
 
 
 
@@ -75,12 +65,12 @@ using mongo::OID;
 * Note that the 'count' of the inserted subscription is set to ZERO.
 *
 */
-int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
+int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 {
   //
   // 01. Check validity of subP parameter
   //
-  BSONElement  idField = getFieldF(sub, "_id");
+  orion::BSONElement  idField = getFieldF(sub, "_id");
 
   if (idField.eoo() == true)
   {
@@ -113,7 +103,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
-  cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
+  cSubP->subscriptionId        = strdup(idField.OID().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
@@ -142,7 +132,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
+    orion::BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
 
     if (expression.hasField(CSUB_EXPR_Q))
     {
@@ -198,10 +188,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
-  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
-    BSONObj entity = eVec[ix].embeddedObject();
+    orion::BSONObj entity = eVec[ix].embeddedObject();
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
@@ -271,21 +261,21 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 */
 int mongoSubCacheItemInsert
 (
-  const char*         tenant,
-  const BSONObj&      sub,
-  const char*         subscriptionId,
-  const char*         servicePath,
-  int                 lastNotificationTime,
-  long long           expirationTime,
-  const std::string&  status,
-  const std::string&  q,
-  const std::string&  mq,
-  const std::string&  geometry,
-  const std::string&  coords,
-  const std::string&  georel,
-  StringFilter*       stringFilterP,
-  StringFilter*       mdStringFilterP,
-  RenderFormat        renderFormat
+  const char*            tenant,
+  const orion::BSONObj&  sub,
+  const char*            subscriptionId,
+  const char*            servicePath,
+  int                    lastNotificationTime,
+  long long              expirationTime,
+  const std::string&     status,
+  const std::string&     q,
+  const std::string&     mq,
+  const std::string&     geometry,
+  const std::string&     coords,
+  const std::string&     georel,
+  StringFilter*          stringFilterP,
+  StringFilter*          mdStringFilterP,
+  RenderFormat           renderFormat
 )
 {
   //
@@ -322,11 +312,11 @@ int mongoSubCacheItemInsert
   //     NOTE that if there is no patterned entity in the entity-vector,
   //     then the subscription is not valid for the sub-cache and is rejected.
   //
-  std::vector<BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
-    BSONObj entity = eVec[ix].embeddedObject();
+    orion::BSONObj entity = eVec[ix].embeddedObject();
 
     if (!entity.hasField(CSUB_ENTITY_ID))
     {
@@ -459,16 +449,16 @@ void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                        query;      // empty query (all subscriptions)
-  std::string                    db          = database;
-  std::string                    tenant      = tenantFromDb(db);
-  std::string                    collection  = getSubscribeContextCollectionName(tenant);
-  std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    errorString;
+  orion::BSONObj   query;      // empty query (all subscriptions)
+  std::string      db          = database;
+  std::string      tenant      = tenantFromDb(db);
+  std::string      collection  = getSubscribeContextCollectionName(tenant);
+  orion::DBCursor  cursor;
+  std::string      errorString;
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
-  if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
+  orion::DBConnection connection = orion::getMongoConnection();
+  if (orion::collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -477,9 +467,9 @@ void mongoSubCacheRefresh(const std::string& database)
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   int subNo = 0;
-  while (moreSafe(cursor))
+  while (orion::moreSafe(&cursor))
   {
-    BSONObj      sub;
+    orion::BSONObj      sub;
     std::string  err;
 
     if (!nextSafeOrErrorF(cursor, &sub, &err))
@@ -512,14 +502,16 @@ static void mongoSubCountersUpdateCount
   long long           count
 )
 {
-  BSONObj      condition;
-  BSONObj      update;
+  orion::BSONObjBuilder  condition;
+  orion::BSONObjBuilder  update;
+  orion::BSONObjBuilder  countB;
   std::string  err;
 
-  condition = BSON("_id"  << OID(subId));
-  update    = BSON("$inc" << BSON(CSUB_COUNT << count));
+  condition.append("_id", orion::OID(subId));
+  countB.append(CSUB_COUNT, count);
+  update.append("$inc", countB.obj());
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  if (collectionUpdate(collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'count' for a subscription)"));
   }
@@ -538,16 +530,43 @@ static void mongoSubCountersUpdateLastNotificationTime
   long long           lastNotificationTime
 )
 {
-  BSONObj      condition;
-  BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                     BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
-                     BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
+  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
+  // should be changed?
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  // condition
+  orion::BSONObjBuilder condition;
+
+  orion::BSONArrayBuilder  o;
+
+  // first or token
+  orion::BSONObjBuilder  or1;
+  orion::BSONObjBuilder  lastNotificationTimeFilter;
+  lastNotificationTimeFilter.append("$lt", lastNotificationTime);
+  or1.append(CSUB_LASTNOTIFICATION, lastNotificationTimeFilter.obj());
+
+  // second or token
+  orion::BSONObjBuilder  or2;
+  orion::BSONObjBuilder  exists;
+  exists.append("$exists", false);
+  or2.append(CSUB_LASTNOTIFICATION, exists.obj());
+
+  o.append(or1.obj());
+  o.append(or2.obj());
+
+  condition.append("_id", orion::OID(subId));
+  condition.append("$or", o.arr());
+
+  // update
+  orion::BSONObjBuilder update;
+
+  orion::BSONObjBuilder lastNotificationTimeB;
+  lastNotificationTimeB.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+
+  update.append("$set", lastNotificationTimeB.obj());
+
+  if (orion::collectionUpdate(collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
   }
@@ -567,16 +586,44 @@ static void mongoSubCountersUpdateLastFailure
   const std::string&  failureReason
 )
 {
-  BSONObj      condition;
-  BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                     BSON(CSUB_LASTFAILURE << BSON("$lt" << lastFailure)) <<
-                     BSON(CSUB_LASTFAILURE << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTFAILURE << lastFailure << CSUB_LASTFAILUREASON << failureReason));
+  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
+  // should be changed?
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  // condition
+  orion::BSONObjBuilder condition;
+
+  orion::BSONArrayBuilder  o;
+
+  // first or token
+  orion::BSONObjBuilder  or1;
+  orion::BSONObjBuilder  lastFailureFilter;
+  lastFailureFilter.append("$lt", lastFailure);
+  or1.append(CSUB_LASTFAILURE, lastFailureFilter.obj());
+
+  // second or token
+  orion::BSONObjBuilder  or2;
+  orion::BSONObjBuilder  exists;
+  exists.append("$exists", false);
+  or2.append(CSUB_LASTFAILURE, exists.obj());
+
+  o.append(or1.obj());
+  o.append(or2.obj());
+
+  condition.append("_id", orion::OID(subId));
+  condition.append("$or", o.arr());
+
+  // update
+  orion::BSONObjBuilder update;
+
+  orion::BSONObjBuilder lastFailureB;
+  lastFailureB.append(CSUB_LASTFAILURE, lastFailure);
+  lastFailureB.append(CSUB_LASTFAILUREASON, failureReason);
+
+  update.append("$set", lastFailureB.obj());
+
+  if (orion::collectionUpdate(collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastFailure' for a subscription)"));
   }
@@ -596,16 +643,44 @@ static void mongoSubCountersUpdateLastSuccess
   long long           statusCode
 )
 {
-  BSONObj      condition;
-  BSONObj      update;
   std::string  err;
 
-  condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
-                     BSON(CSUB_LASTSUCCESS << BSON("$lt" << lastSuccess)) <<
-                     BSON(CSUB_LASTSUCCESS << BSON("$exists" << false))));
-  update    = BSON("$set" << BSON(CSUB_LASTSUCCESS << lastSuccess << CSUB_LASTSUCCESSCODE << statusCode));
+  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
+  // should be changed?
 
-  if (collectionUpdate(collection, condition, update, false, &err) != true)
+  // condition
+  orion::BSONObjBuilder condition;
+
+  orion::BSONArrayBuilder  o;
+
+  // first or token
+  orion::BSONObjBuilder  or1;
+  orion::BSONObjBuilder  lastSuccessFilter;
+  lastSuccessFilter.append("$lt", lastSuccess);
+  or1.append(CSUB_LASTSUCCESS, lastSuccessFilter.obj());
+
+  // second or token
+  orion::BSONObjBuilder  or2;
+  orion::BSONObjBuilder  exists;
+  exists.append("$exists", false);
+  or2.append(CSUB_LASTSUCCESS, exists.obj());
+
+  o.append(or1.obj());
+  o.append(or2.obj());
+
+  condition.append("_id", orion::OID(subId));
+  condition.append("$or", o.arr());
+
+  // update
+  orion::BSONObjBuilder update;
+
+  orion::BSONObjBuilder lastSuccessB;
+  lastSuccessB.append(CSUB_LASTSUCCESS, lastSuccess);
+  lastSuccessB.append(CSUB_LASTSUCCESSCODE, statusCode);
+
+  update.append("$set", lastSuccessB.obj());
+
+  if (collectionUpdate(collection, condition.obj(), update.obj(), false, &err) != true)
   {
     LM_E(("Internal Error (error updating 'lastSuccess' for a subscription)"));
   }

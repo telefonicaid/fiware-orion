@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_APITYPESV2_HTTPINFO_H_
-#define SRC_LIB_APITYPESV2_HTTPINFO_H_
-
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,38 +20,58 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Fermín Galán
 */
+
 #include <string>
-#include <map>
 
-#include "rest/Verb.h"
+#include "mongoDriver/BSONArray.h"
 
-#include "mongoDriver/BSONObj.h"
-
-
-
-namespace ngsiv2
+namespace orion
 {
 /* ****************************************************************************
 *
-* HttpInfo - 
+* BSONArray::BSONArray -
 */
-struct HttpInfo
+BSONArray::BSONArray()
 {
-  std::string                         url;
-  Verb                                verb;
-  std::map<std::string, std::string>  qs;      // URI parameters
-  std::map<std::string, std::string>  headers;
-  std::string                         payload;
-  bool                                custom;
-
-  HttpInfo();
-  explicit HttpInfo(const std::string& _url);
-
-  std::string  toJson();
-  void         fill(const orion::BSONObj& bo);
-};
 }
 
-#endif  // SRC_LIB_APITYPESV2_HTTPINFO_H_
+
+
+/* ****************************************************************************
+*
+* BSONArray::toString -
+*/
+std::string BSONArray::toString(void)
+{
+  return ba.toString();
+}
+
+
+
+///////// from now on, only methods with low-level driver types in return or parameters /////////
+
+
+
+/* ****************************************************************************
+*
+* BSONArray::BSONArray -
+*/
+BSONArray::BSONArray(const mongo::BSONArray& _ba)
+{
+  ba = _ba;
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObj::get -
+*/
+mongo::BSONArray BSONArray::get(void) const
+{
+  return ba;
+}
+}
+

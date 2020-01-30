@@ -184,6 +184,7 @@ SET (ORION_LIBS
     ngsi
     cache
     mongoBackend
+    mongoDriver
     parse
     apiTypesV2
     orionTypes
@@ -288,6 +289,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
+  ADD_SUBDIRECTORY(src/lib/mongoDriver)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)

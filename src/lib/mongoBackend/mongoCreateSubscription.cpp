@@ -26,7 +26,7 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
+#include "mongoBackend/MongoCommonSubscription.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -35,11 +35,11 @@
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
 
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/MongoCommonSubscription.h"
+#include "mongoBackend/MongoGlobal.h"  // getSubscribeContextCollectionName (FIXME OLD-DR)
 #include "mongoBackend/dbConstants.h"
+
 #include "mongoBackend/mongoCreateSubscription.h"
+#include "mongoDriver/connectionOperations.h"
 
 
 
@@ -47,8 +47,6 @@
 *
 * USING
 */
-using mongo::BSONObj;
-using mongo::BSONObjBuilder;
 using ngsiv2::Subscription;
 
 
@@ -149,10 +147,10 @@ std::string mongoCreateSubscription
 
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
-  BSONObjBuilder     b;
-  std::string        servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
-  bool               notificationDone = false;
-  const std::string  subId            = setNewSubscriptionId(&b);
+  orion::BSONObjBuilder  b;
+  std::string            servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
+  bool                   notificationDone = false;
+  const std::string      subId            = setNewSubscriptionId(&b);
 
   // Build the BSON object to insert
   setExpiration(sub, &b);
@@ -204,12 +202,12 @@ std::string mongoCreateSubscription
   setExpression(sub, &b);
   setFormat(sub, &b);
 
-  BSONObj doc = b.obj();
+  orion::BSONObj doc = b.obj();
 
   // Insert in DB
   std::string err;
 
-  if (!collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
+  if (!orion::collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
