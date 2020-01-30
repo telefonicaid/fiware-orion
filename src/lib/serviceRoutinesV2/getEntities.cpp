@@ -314,30 +314,22 @@ std::string getEntities
 
   // 03. Render Entities response
 
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+  OrionError oe;
+  entities.fill(parseDataP->qcrs.res, &oe);
+  if (oe.code == SccNone)
   {
+    TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
+                                          attributeFilter.stringV,
+                                          false,
+                                          parseDataP->qcr.res.metadataList.stringV));
     ciP->httpStatusCode = SccOk;
-    answer = "[]";
   }
   else
   {
-    OrionError oe;
-    entities.fill(parseDataP->qcrs.res, &oe);
-
-    if (oe.code != SccNone)
-    {
-      TIMED_RENDER(answer = oe.toJson());
-      ciP->httpStatusCode = oe.code;
-    }
-    else
-    {
-      TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
-                                            attributeFilter.stringV,
-                                            false,
-                                            parseDataP->qcr.res.metadataList.stringV));
-      ciP->httpStatusCode = SccOk;
-    }
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
+
 
   // 04. Cleanup and return result
   entities.release();
