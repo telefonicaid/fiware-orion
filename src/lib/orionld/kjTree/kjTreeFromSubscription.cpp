@@ -92,7 +92,6 @@ static bool qAliasCompress(char* qString)
       }
 
       alias = orionldContextItemAliasLookup(orionldState.contextP, varStart, NULL, NULL);
-
       if (alias != NULL)
       {
         strcpy(&out[outIx], alias);
@@ -117,6 +116,7 @@ static bool qAliasCompress(char* qString)
     {
       insideVarName = true;
       out[outIx++] = ';';
+      varStart = &cP[1];
     }
     else if (insideVarName == false)
     {

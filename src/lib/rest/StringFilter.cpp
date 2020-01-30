@@ -1944,6 +1944,8 @@ bool StringFilter::render(char* buf, int bufLen, std::string* errorStringP)
     if (ix != 0)
     {
       *bufP = ';';
+      ++bufP;
+      *bufP = 0;
       ++charsUsed;
     }
 
