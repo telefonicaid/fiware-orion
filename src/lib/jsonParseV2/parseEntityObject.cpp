@@ -52,6 +52,9 @@ std::string parseEntityObject
 {
   std::string type  = jsonParseTypeNames[valueP->GetType()];
 
+  rapidjson::Document  document;
+  document.Parse(ciP->payload);
+
   if (type != "Object")
   {
     return "entity is not a JSON object";
@@ -88,6 +91,10 @@ std::string parseEntityObject
     }
     else if (name == "idPattern")
     {
+      if(document.HasMember("actionType"))
+      {
+        return ERROR_DESC_IDPATTERN_NOTSUPPORTED;
+      }
       if (type != "String")
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN;
