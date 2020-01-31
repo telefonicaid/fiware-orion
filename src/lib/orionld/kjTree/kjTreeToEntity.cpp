@@ -41,6 +41,11 @@ extern "C"
 //
 // kjTreeToEntity -
 //
+// This function assumes the KjNode tree comes from the DB, i.e. all attributes are under "attrs",
+// and, "attrNames" already exists.
+//
+// Also, ucrP->contextElementVector[0] must exist!
+//
 bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP)
 {
   // Get 'id' and 'type' from '_id'
@@ -52,9 +57,7 @@ bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP)
       for (KjNode* idPartP = attrP->value.firstChildP; idPartP != NULL; idPartP = idPartP->next)
       {
         if (strcmp(idPartP->name, "id") == 0)
-        {
           ucrP->contextElementVector[0]->entityId.id = idPartP->value.s;
-        }
         else if (strcmp(idPartP->name, "type") == 0)
           ucrP->contextElementVector[0]->entityId.type = idPartP->value.s;
         else if (strcmp(idPartP->name, "isPattern") == 0)

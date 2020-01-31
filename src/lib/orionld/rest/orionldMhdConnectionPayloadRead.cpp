@@ -22,10 +22,17 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"      // Own interface
 
 
@@ -85,13 +92,9 @@ int orionldMhdConnectionPayloadRead
   if (ciP->payloadSize == 0)  // First call with payload
   {
     if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-    {
       ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
-    }
     else
-    {
       ciP->payload = static_buffer;
-    }
   }
 
   // Copy the chunk

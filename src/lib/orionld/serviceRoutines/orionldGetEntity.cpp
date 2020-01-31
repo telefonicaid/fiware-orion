@@ -30,7 +30,6 @@ extern "C"
 #include "kbase/kStringArrayLookup.h"                            // kStringArrayLookup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, ...
-#include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjParse.h"                                       // kjParse
 }
 
@@ -42,7 +41,6 @@ extern "C"
 
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -50,6 +48,7 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
+#include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
 
@@ -152,7 +151,7 @@ static void attrsToAlias(OrionldContext* contextP, char* attrV[], int attrs)
 //   YES                                               YES                                    "attrs" URI param is a merge between the two
 //
 //
-static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uriParamAttrV, int uriParamAttrs)
+static KjNode* orionldForwardGetEntity2(KjNode* registrationP, char* entityId, char** uriParamAttrV, int uriParamAttrs)
 {
   char            host[128]                  = { 0 };
   char            protocol[32]               = { 0 };
@@ -160,63 +159,11 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
   char*           uriDir                     = (char*) "";
   char*           detail;
   KjNode*         entityP                    = NULL;
-  int             ix                         = 0;
   char*           registrationAttrV[100];
   int             registrationAttrs          = 0;
 
-  for (KjNode* nodeP = regP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-  {
-    ++ix;
-
-    if (strcmp(nodeP->name, "format") == 0)
-    {
-      // format = nodeP->value.s;
-    }
-    else if (strcmp(nodeP->name, "@context") == 0)
-    {
-      // contextP = nodeP;
-    }
-    else if (strcmp(nodeP->name, "contextRegistration") == 0)
-    {
-      for (KjNode* crNodeP = nodeP->value.firstChildP; crNodeP != NULL; crNodeP = crNodeP->next)
-      {
-        int crItemIx = 0;
-
-        for (KjNode* crItemNodeP = nodeP->value.firstChildP->value.firstChildP; crItemNodeP != NULL; crItemNodeP = crItemNodeP->next)
-        {
-          if (strcmp(crItemNodeP->name, "attrs") == 0)
-          {
-            //
-            // Populate the array registrationAttrV with the registered attributes
-            //
-            for (KjNode* attrItemP = crItemNodeP->value.firstChildP; attrItemP != NULL; attrItemP = attrItemP->next)
-            {
-              KjNode* nameP = kjLookup(attrItemP, "name");
-
-              if (nameP == NULL)
-              {
-                LM_W(("FWD: 'name' field not found in attrs array item"));
-                continue;
-              }
-
-              registrationAttrV[registrationAttrs] = nameP->value.s;
-              ++registrationAttrs;
-            }
-          }
-          else if ((host[0] == 0) && (strcmp(crItemNodeP->name, "providingApplication") == 0))
-          {
-            if (urlParse(crItemNodeP->value.s, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, &detail) == false)
-            {
-              // Mark Error so that "Incomplete Response" is present in response?
-              return NULL;
-            }
-          }
-
-          ++crItemIx;
-        }
-      }
-    }
-  }
+  if (kjTreeRegistrationInfoExtract(registrationP, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, registrationAttrV, 100, &registrationAttrs, &detail) == false)
+    return NULL;
 
   char* newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, 200 * 30);  // Assuming max 20 attrs, max 200 chars per attr ...
 
@@ -284,17 +231,16 @@ static KjNode* orionldForwardGetEntity2(KjNode* regP, char* entityId, char** uri
   bool reqOk;
   bool downloadFailed;
 
-  LM_TMP(("KZ: forwarding to %s:%d '%s'", host, port, urlPath));
-  LM_TMP(("KZ: newUriParamAttrsString: %s", newUriParamAttrsString));
+
   if (orionldState.linkHttpHeaderPresent)
   {
     char link[512];
 
     snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, urlPath, 5000, link, &detail, &tryAgain, &downloadFailed, "Accept: application/json");
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, link, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0);
   }
   else
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, urlPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, "Accept: application/json");
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0);
 
   if (reqOk)
     entityP = kjParse(orionldState.kjsonP, orionldState.httpResponse.buf);
@@ -410,18 +356,16 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     return false;
   }
 
-  regArray = dbRegistrationLookup(orionldState.wildcard[0]);
+  regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
 
 #if 1
-  //
-  // Use dbEntityLookup() instead of mongoQueryContext()
-  //
   bool                  keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
   EntityId              entityId(orionldState.wildcard[0], "", "false", false);
   QueryContextRequest   request;
   QueryContextResponse  response;
+
   request.entityIdVector.push_back(&entityId);
 
   ciP->httpStatusCode = mongoQueryContext(&request,
@@ -453,6 +397,9 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, orionldState.uriParams.attrs, keyValues, &response);
   }
 #else
+  //
+  // Use dbEntityLookup() instead of mongoQueryContext()
+  //
   //
   // FIXME
   // dbEntityLookup (mongoCppLegacyEntityLookup) uses dbDataToKjTree, which makes a complete copy of the tree in mongo:

@@ -681,6 +681,14 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 
   //
+  // Save a copy of the incoming payload before it is destroyed during kjParse
+  //
+  // FIXME - Only for "some" requests - right now only for "PATCH /ngsi-ld/v1/entities/*/attrs/*"
+  //
+  if (ciP->payload != NULL)
+    orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
+
+  //
   // 04. Parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
   if ((ciP->payload != NULL) && (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false))

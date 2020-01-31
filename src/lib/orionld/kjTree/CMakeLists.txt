@@ -42,6 +42,7 @@ SET (SOURCES
     kjTreeToEntity.cpp
     kjTreeToMetadata.cpp
     kjTreeToContextAttribute.cpp
+    kjTreeRegistrationInfoExtract.cpp
 )
 
 # Include directories

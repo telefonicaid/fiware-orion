@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYREGISTRATIONLOOKUP_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYREGISTRATIONLOOKUP_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEREGISTRATIONINFOEXTRACT_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREEREGISTRATIONINFOEXTRACT_H_
 
 /*
 *
@@ -25,18 +25,30 @@
 *
 * Author: Ken Zangelin
 */
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyRegistrationLookup -
+// kjTreeRegistrationInfoExtract -
 //
-extern KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attribute, int* noOfRegsP);
+extern bool kjTreeRegistrationInfoExtract
+(
+  KjNode*          registrationP,
+  char*            protocol,
+  int              protocolSize,
+  char*            host,
+  int              hostSize,
+  unsigned short*  portP,
+  char**           uriDirP,
+  char*            registrationAttrV[],
+  int              registrationAttrSize,
+  int*             registrationAttrsP,
+  char**           detailP
+);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYREGISTRATIONLOOKUP_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEREGISTRATIONINFOEXTRACT_H_

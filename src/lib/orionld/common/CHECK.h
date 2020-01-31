@@ -256,4 +256,57 @@ do                                                                              
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PAYLOAD_EMPTY_CHECK -
+//
+#define PAYLOAD_EMPTY_CHECK()                                                                   \
+do                                                                                              \
+{                                                                                               \
+  if (orionldState.requestTree == NULL)                                                         \
+  {                                                                                             \
+    ciP->httpStatusCode = SccBadRequest;                                                        \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is missing", NULL);              \
+    return false;                                                                               \
+  }                                                                                             \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PAYLOAD_IS_OBJECT_CHECK -
+//
+#define PAYLOAD_IS_OBJECT_CHECK()                                                               \
+do                                                                                              \
+{                                                                                               \
+  if (orionldState.requestTree->type != KjObject)                                               \
+  {                                                                                             \
+    ciP->httpStatusCode = SccBadRequest;                                                        \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload not a JSON object",              \
+                               kjValueType(orionldState.requestTree->type));                    \
+    return false;                                                                               \
+  }                                                                                             \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PAYLOAD_EMPTY_OBJECT_CHECK -
+//
+#define PAYLOAD_EMPTY_OBJECT_CHECK()                                                            \
+do                                                                                              \
+{                                                                                               \
+  if (orionldState.requestTree->value.firstChildP == NULL)                                      \
+  {                                                                                             \
+    ciP->httpStatusCode = SccBadRequest;                                                        \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Payload is an empty JSON object", NULL); \
+    return false;                                                                               \
+  }                                                                                             \
+} while (0)
+
 #endif  // SRC_LIB_ORIONLD_COMMON_CHECK_H_

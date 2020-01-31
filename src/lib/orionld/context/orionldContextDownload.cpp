@@ -92,7 +92,22 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     //
     bool tryAgain = false;
 
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, ip, port, urlPath, contextDownloadTimeout, NULL, &pdP->detail, &tryAgain, downloadFailedP, "Accept: application/ld+json");
+    reqOk = orionldRequestSend(&orionldState.httpResponse,
+                               protocol,
+                               ip,
+                               port,
+                               "GET",
+                               urlPath,
+                               contextDownloadTimeout,
+                               NULL,
+                               &pdP->detail,
+                               &tryAgain,
+                               downloadFailedP,
+                               "Accept: application/ld+json",
+                               NULL,
+                               NULL,
+                               0);
+
     if (reqOk == true)
       break;
 

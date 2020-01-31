@@ -96,18 +96,41 @@ bool orionldRequestSend
   const char*             protocol,
   const char*             ip,
   uint16_t                port,
+  const char*             verb,
   const char*             urlPath,
   int                     tmoInMilliSeconds,
   const char*             linkHeader,
   char**                  detailPP,
   bool*                   tryAgainP,
   bool*                   downloadFailedP,
-  const char*             acceptHeader
+  const char*             acceptHeader,
+  const char*             contentType,
+  const char*             payload,
+  int                     payloadLen
 )
 {
   CURLcode             cCode;
   struct curl_context  cc;
   char                 url[256];
+
+  //
+  // If we have a payload, we also need a payloadLen and a content-length
+  // If no payload, there should be no payloadLen nor content-length
+  //
+  if      ((payload == NULL) && (payloadLen == 0) && (contentType == NULL))  {}   // OK
+  else if ((payload != NULL) && (payloadLen  > 0) && (contentType != NULL))  {}   // OK
+  else
+  {
+    LM_E(("Inconsistent parameters regarding payload data"));
+    LM_E(("payload at     %p (%s)", payload, payload));
+    LM_E(("payloadLen  == %d", payloadLen));
+    LM_E(("contentType == %s", contentType));
+
+    *detailPP        = (char*) "Inconsistent parameters regarding payload data";
+    rBufP->buf       = NULL;
+    *downloadFailedP = true;
+    return false;
+  }
 
   if (orionldState.delayedFreePointer != NULL)
   {
@@ -167,7 +190,7 @@ bool orionldRequestSend
   // Prepare the CURL handle
   //
   curl_easy_setopt(cc.curl, CURLOPT_URL, url);                             // Set the URL Path
-  curl_easy_setopt(cc.curl, CURLOPT_CUSTOMREQUEST, "GET");                 // Set the HTTP verb
+  curl_easy_setopt(cc.curl, CURLOPT_CUSTOMREQUEST, verb);                  // Set the HTTP verb
   curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Allow redirection
   curl_easy_setopt(cc.curl, CURLOPT_WRITEFUNCTION, writeCallback);         // Callback function for writes
   curl_easy_setopt(cc.curl, CURLOPT_WRITEDATA, rBufP);                     // Custom data for response handling
@@ -176,6 +199,24 @@ bool orionldRequestSend
   curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
   struct curl_slist* headers = NULL;
+
+
+  if (contentType != NULL)  // then also payload and payloadLen is supplied
+  {
+    char contentTypeHeader[128];
+    char contentLenHeader[128];
+
+    snprintf(contentTypeHeader, sizeof(contentTypeHeader), "Content-Type:%s", contentType);
+    snprintf(contentLenHeader,  sizeof(contentLenHeader),  "Content-Length:%d", payloadLen);
+
+    headers = curl_slist_append(headers, contentTypeHeader);
+    curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
+
+    headers = curl_slist_append(headers, contentLenHeader);
+    curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
+
+    curl_easy_setopt(cc.curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
+  }
 
   if (linkHeader != NULL)
   {
@@ -190,9 +231,8 @@ bool orionldRequestSend
 
   if (acceptHeader != NULL)
   {
-    LM_TMP(("FWD: acceptHeader: '%s'", acceptHeader));
     headers = curl_slist_append(headers, acceptHeader);
-    curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);  // Should be enough with one call ...
   }
 
   LM_T(LmtRequestSend, ("Calling curl_easy_perform for GET %s", url));
@@ -211,9 +251,9 @@ bool orionldRequestSend
     release_curl_context(&cc);
     LM_E(("curl_easy_perform error %d", cCode));
 
-    *tryAgainP = true;  // FIXME: might depend on cCode ...
-
+    *tryAgainP       = true;  // FIXME: might depend on cCode ...
     *downloadFailedP = true;
+    *detailPP        = (char*) "Internal CURL Error";
     return false;
   }
 
