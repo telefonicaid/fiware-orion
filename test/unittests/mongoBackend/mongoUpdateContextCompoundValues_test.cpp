@@ -34,6 +34,7 @@
 #include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextElementResponse.h"

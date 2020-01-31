@@ -87,12 +87,6 @@ void mongoInit
 
 
 
-#ifdef UNIT_TEST
-extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
-#endif
-
-
-
 /* ****************************************************************************
 *
 * getNotifier -
@@ -106,25 +100,6 @@ extern Notifier* getNotifier(void);
 * setNotifier -
 */
 extern void setNotifier(Notifier* n);
-
-
-
-/* ****************************************************************************
-*
-* getMongoConnection -
-*
-* I would prefer to have per-collection methods, to have a better encapsulation, but
-* the Mongo C++ API seems not to work that way
-*/
-extern mongo::DBClientBase* getMongoConnection(void);
-
-
-
-/* ****************************************************************************
-*
-* releaseMongoConnection - 
-*/
-extern void releaseMongoConnection(mongo::DBClientBase* connection);
 
 
 
