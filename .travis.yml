@@ -1,25 +1,114 @@
 dist: xenial
-sudo: false
 language: minimal
+
 env:
   global:
-  - IMAGE_RELEASE_DEBIAN=fiware/orion-ld
-  - IMAGE_RELEASE_CENTOS=fiware/orion-ld:centos
-  - IMAGE_DEPS_DEBIAN=fiware/orion-ld:deps-debian
-  - IMAGE_DEPS_CENTOS=fiware/orion-ld:deps-centos
-  - HOME=/opt/orion
-  - secure: tVGPaHVXk+oRNs3civESLFQImhM5bpYTbjk9SXwHg/2hdX5laANEtxAKS8k7X5TZwj2oMV8nDzJojU1NOm3292IZsP/0BijCnkwSrLgN2zi/AK8FmiO0KT9+jkQH7T8/K9KisqVSUIaBFlIlFhhDwR2OPGjlPWZpt7DuTePNV4jgFhkMjfROzLZDc4aWA7uzKvw4XTegMvP/lRiU3urlTqJGXuKaCmkQeTHr1cGPbnycAqwDKYKxzKQdRhyQT96+MsZnfwgg8JLKQJpqEIFVQ22rxoZWUZaYbMpDJP1ZPnoF7v12ODNoFoZM7xWom98VAQ6L7SBcY7laInfa/N7zzu0GeIjGa7RwigLy9BPmOfpXBOSifdcAE6sZ9vLYoMKdE4SOYZ8uOfeuK5kJe0AY4tqVvCvuTdsQp0wmCnd8spH3L9sHlt7QJz+q+RklhFk2h9duyPNr5mfv/maWF8lJz/9eR8Lmmzeg/B79nvZEd2eCOYi2I9HcAucYZL4bZXIW6ROnf5WFdPcbHZtbeB5iBWKwhHp2gcDwTZtS6Ugx9axXMV4pAOS5qPKZNmH6n1GSCj25iGzluObje72xDy0s0lsLDlym7xvey3Ox/udSj17nEZf1ylQ9HR+ey7YS3UBRadopfvAyWy7ss03Tj2dobI7HcICknuztb+IdlAXceqE=
-  - secure: dGrPDCxNNZe72esWl6Lvj7mn9IFYT8rbOJ9QPjsU0CsRFTu2t2XwDAMNRzbwlLIO3ANWTuMXuURsjQwdIh+fIjIG48rS4iTn7TiI4q3kP5pDbw0tZ5twpleZ5xh7twkb5CYTUeOtkBAbL/onOFavqAwZN3lu8sqFqOSbWi1VTAW2ZRTEX6QXUTd6fs0rXpdzSRzIqVZceHcDKcy1X07LmEWcm92jZf1jlJ2snhxOoSx/Ox29gSsbfyIyAl1HByVxqq20od6IViWh8Gpt4HJZU6+4Gp0MU+0yQI34heD7q02PB+/TQElVMmnadsd9HU1HfVF5uv4TuYO0zcmEgQHfwLKLD+d/mZhwrH2RgRwLSiCol6DJkpMHPbDEpB5l8Z32Ex+E6h7CtIE9l3nCGLJu4m+wbL0TT1wHGI8lpXW4RifW4vd6Zf+71CVW3OjFptXEjJPtrdGH51r3BH4LnTTMrOXzI8ZRyFpBi8EorLJAnrMc+7EwzVd1NTU07gDB22jNmtJkDty7BfE31GL4C04q9BBQSefFuZI92EnMKbYHHQUPdl9rLxn1QACcS2W+CYYA78X+R8RoTeu4Lrmcb7x6ByQuzenwj//Udu+0TBh3F5O1S4hC3FMDjwi5RC8u8GiEdLxmnKQXuhD/839SeFJXtmFnyN27wfrceAOivsP1rjw=
-  - secure: aTkQKOSU2eSx5DjEqj5/GPiu0UiyBKNmXPoGYd6wQFajnKbk6ErEW66onFJGMiL3g/yiyP6Utwm4JaBgqxQ1WJDHSn8MbljFJ03xAtJsyz+E0Wh65kshK3IFxF2M7glt0ZHH3kvLEH9czFrNcZ3eusMC8GEWAkXQ0jwK7DVW4+rVaajHpZLsxgU3TOwxMML0AT+kfSPnOKBsjUwOtLmU+ffatGxA1r5leYvVTpzza9di6bqJf/hQN6z07gnhkAX3Ypz3JNPDYuFjK0jHwhkDFeN91FmoShuB5dOuvs16fXojjxYJDwMQIW/Eo0WjVEV6qhGtnYI6RnGFDI6Cc/NjDN4CAmssarj8pXdAQSzQVzSXohxsILIMuY1QdQpwLjJJdmHMwtPegeS49PCIaRKpgKPR9/FuqUpRFFkAX6Hy0fxC9rRkSTCSIwpFL37PWpRZKE5e12wNZPPDK2A2gpFIruv/upDmL1dhK5YjNoMENtBgOrG3Uo/YfCIEngDesNzE9XwGisW1u4TqaQ1rNVrdezS4KzC1njnjqw6MC+w9rCUNk4d/lR1y/h0q68Pa3c7IdLWUhdKDjLPAZdH0G4dpRxpZzwV/ocBmWSwcWT+74hBe1BC8kWPL7J2Q0T7IxcLDEKQvnfT1q2/Gg4oPrgh3Zp2mOrXtTKgmCHo5FrNdTnI=
-  matrix:
-  - STAGE=compliance
-  - STAGE=debian_unit
-  - STAGE=debian_functional_1_380
-  - STAGE=debian_functional_381_600
-  - STAGE=debian_functional_601_900
-  - STAGE=debian_functional_901_1300
-  - STAGE=debian_release
-  - STAGE=debian_deps
+    - IMAGE_RELEASE_DEBIAN=fiware/orion-ld
+    - IMAGE_RELEASE_CENTOS=fiware/orion-ld:centos
+    - IMAGE_DEPS_DEBIAN=fiware/orion-ld:deps-debian
+    - IMAGE_DEPS_CENTOS=fiware/orion-ld:deps-centos
+    - HOME=/opt/orion
+    - secure: tVGPaHVXk+oRNs3civESLFQImhM5bpYTbjk9SXwHg/2hdX5laANEtxAKS8k7X5TZwj2oMV8nDzJojU1NOm3292IZsP/0BijCnkwSrLgN2zi/AK8FmiO0KT9+jkQH7T8/K9KisqVSUIaBFlIlFhhDwR2OPGjlPWZpt7DuTePNV4jgFhkMjfROzLZDc4aWA7uzKvw4XTegMvP/lRiU3urlTqJGXuKaCmkQeTHr1cGPbnycAqwDKYKxzKQdRhyQT96+MsZnfwgg8JLKQJpqEIFVQ22rxoZWUZaYbMpDJP1ZPnoF7v12ODNoFoZM7xWom98VAQ6L7SBcY7laInfa/N7zzu0GeIjGa7RwigLy9BPmOfpXBOSifdcAE6sZ9vLYoMKdE4SOYZ8uOfeuK5kJe0AY4tqVvCvuTdsQp0wmCnd8spH3L9sHlt7QJz+q+RklhFk2h9duyPNr5mfv/maWF8lJz/9eR8Lmmzeg/B79nvZEd2eCOYi2I9HcAucYZL4bZXIW6ROnf5WFdPcbHZtbeB5iBWKwhHp2gcDwTZtS6Ugx9axXMV4pAOS5qPKZNmH6n1GSCj25iGzluObje72xDy0s0lsLDlym7xvey3Ox/udSj17nEZf1ylQ9HR+ey7YS3UBRadopfvAyWy7ss03Tj2dobI7HcICknuztb+IdlAXceqE=
+    - secure: dGrPDCxNNZe72esWl6Lvj7mn9IFYT8rbOJ9QPjsU0CsRFTu2t2XwDAMNRzbwlLIO3ANWTuMXuURsjQwdIh+fIjIG48rS4iTn7TiI4q3kP5pDbw0tZ5twpleZ5xh7twkb5CYTUeOtkBAbL/onOFavqAwZN3lu8sqFqOSbWi1VTAW2ZRTEX6QXUTd6fs0rXpdzSRzIqVZceHcDKcy1X07LmEWcm92jZf1jlJ2snhxOoSx/Ox29gSsbfyIyAl1HByVxqq20od6IViWh8Gpt4HJZU6+4Gp0MU+0yQI34heD7q02PB+/TQElVMmnadsd9HU1HfVF5uv4TuYO0zcmEgQHfwLKLD+d/mZhwrH2RgRwLSiCol6DJkpMHPbDEpB5l8Z32Ex+E6h7CtIE9l3nCGLJu4m+wbL0TT1wHGI8lpXW4RifW4vd6Zf+71CVW3OjFptXEjJPtrdGH51r3BH4LnTTMrOXzI8ZRyFpBi8EorLJAnrMc+7EwzVd1NTU07gDB22jNmtJkDty7BfE31GL4C04q9BBQSefFuZI92EnMKbYHHQUPdl9rLxn1QACcS2W+CYYA78X+R8RoTeu4Lrmcb7x6ByQuzenwj//Udu+0TBh3F5O1S4hC3FMDjwi5RC8u8GiEdLxmnKQXuhD/839SeFJXtmFnyN27wfrceAOivsP1rjw=
+    - secure: aTkQKOSU2eSx5DjEqj5/GPiu0UiyBKNmXPoGYd6wQFajnKbk6ErEW66onFJGMiL3g/yiyP6Utwm4JaBgqxQ1WJDHSn8MbljFJ03xAtJsyz+E0Wh65kshK3IFxF2M7glt0ZHH3kvLEH9czFrNcZ3eusMC8GEWAkXQ0jwK7DVW4+rVaajHpZLsxgU3TOwxMML0AT+kfSPnOKBsjUwOtLmU+ffatGxA1r5leYvVTpzza9di6bqJf/hQN6z07gnhkAX3Ypz3JNPDYuFjK0jHwhkDFeN91FmoShuB5dOuvs16fXojjxYJDwMQIW/Eo0WjVEV6qhGtnYI6RnGFDI6Cc/NjDN4CAmssarj8pXdAQSzQVzSXohxsILIMuY1QdQpwLjJJdmHMwtPegeS49PCIaRKpgKPR9/FuqUpRFFkAX6Hy0fxC9rRkSTCSIwpFL37PWpRZKE5e12wNZPPDK2A2gpFIruv/upDmL1dhK5YjNoMENtBgOrG3Uo/YfCIEngDesNzE9XwGisW1u4TqaQ1rNVrdezS4KzC1njnjqw6MC+w9rCUNk4d/lR1y/h0q68Pa3c7IdLWUhdKDjLPAZdH0G4dpRxpZzwV/ocBmWSwcWT+74hBe1BC8kWPL7J2Q0T7IxcLDEKQvnfT1q2/Gg4oPrgh3Zp2mOrXtTKgmCHo5FrNdTnI=
+
+stages:
+  - test
+  - name: deploy
+    if: branch = develop
+
+jobs:
+  include:
+    - env: STAGE=compliance
+      name: "Compliance Tests"
+      stage: test
+      install: true
+      script: >
+        echo -e " \033[1;33mRunning Compliance Tests";
+        $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
+    - env: STAGE=debian_unit
+      name: "Unit Tests (Debian)"
+      stage: test
+    - env: STAGE=debian_functional_1_380
+      name: "Functional Tests 1-380 (Debian)"
+      stage: test
+    - env: STAGE=debian_functional_381_600
+      name: "Functional Tests 381-600 (Debian)"
+      stage: test
+    - env: STAGE=debian_functional_601_900
+      name: "Functional Tests 601-900 (Debian)"
+      stage: test
+    - env: STAGE=debian_functional_901_1300
+      name: "Functional Tests 900-1300 (Debian)"
+      stage: test
+    - env: STAGE=debian_integration
+      name: "NGSI-LD Integration Tests"
+      stage: test
+      language: nodejs
+      node_js: 12.14
+      install: >
+        echo -e " \033[1;33mBuilding Debian Docker image for Integration Test";
+        travis_wait 30 docker build --quiet \
+            --build-arg TOKEN=${TOKEN} \
+            --build-arg REV=${TRAVIS_COMMIT} \
+            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
+            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+     
+      before_script : >
+        curl -LO https://github.com/FIWARE/NGSI-LD_TestSuite/archive/master.zip;
+        unzip -q master.zip;
+        rm master.zip;
+        cd NGSI-LD_TestSuite-master;  
+        npm install;
+
+      script:  >
+         echo -e " \033[1;33mRunning NGSI-LD Integration Test Suite";
+         ./services orion;
+         export TEST_ENDPOINT=http://localhost:1026;
+         npm test;
+    - env: STAGE=debian_release
+      name: "Deploy to Docker Hub"
+      stage: deploy
+      install: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          echo -e " \033[1;33mBuilding Debian Docker image for Release";
+          travis_wait 30 docker build --quiet \
+            --build-arg TOKEN=${TOKEN} \
+            --build-arg REV=${TRAVIS_COMMIT} \
+            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
+            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+        fi
+      script: true
+      after_success: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          echo -e " \033[1;33mPushing Debian Release to Docker Hub";
+          docker push ${IMAGE_RELEASE_DEBIAN};
+        fi
+    - env: STAGE=debian_deps
+      name: "Deploy to Docker Hub - Image with Deps"
+      stage: deploy
+      install: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          travis_wait 30 docker build --quiet \
+            --build-arg TOKEN=${TOKEN} \
+            --build-arg REV=${TRAVIS_COMMIT} \
+            --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
+            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+        fi
+      script: true
+      after_success: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          echo -e " \033[1;33mPushing Debian Release (with Dependencies) to Docker Hub";
+          docker push ${IMAGE_DEPS_DEBIAN};
+        fi
+    
+
+  allow_failures:
+    - env: STAGE=debian_integration
+      
+
+
+
 before_install: >
   export PLATFORM=$(echo ${STAGE} | cut -c1-6);
   export STAGE_TYPE=$(echo ${STAGE} | cut -c8-);
@@ -34,86 +123,30 @@ before_install: >
   
   echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin;
   git lfs pull;
-  
-install: >
+
   if [[ "${TEST_STATUS}" && "${STAGE}" != "compliance" ]]; then 
     echo "0" | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
     echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}'| sudo tee /etc/docker/daemon.json; 
     sudo service docker restart; 
-
-    if [[ "${PLATFORM}" == "debian" ]]; then
-      echo -e " \033[1;33mRebuilding Debian Docker Images";
-      docker build --quiet \
-        --build-arg TOKEN=${TOKEN} \
-        --build-arg REV=${TRAVIS_COMMIT} \
-        --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
-        -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-    elif [[ "${PLATFORM}" == "centos" ]]; then
-      echo -e " \033[1;33mRebuilding CentOs Docker Images";
-      docker build --quiet \
-        --build-arg TOKEN=${TOKEN} \
-        --build-arg REV=${TRAVIS_COMMIT} \
-        --build-arg STAGE=deps -t ${IMAGE_DEPS_CENTOS} \
-        -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ;
-    else
-      echo -e " \033[1;33mPulling existing Docker Images";
-      docker pull ${IMAGE_DEPS_DEBIAN}; 
-      docker pull ${IMAGE_DEPS_CENTOS};
-    fi
   fi
 
+install: >
+  echo -e " \033[1;33mRebuilding Debian Docker Images (with deps)";
+  travis_wait 30 docker build --quiet \
+    --build-arg TOKEN=${TOKEN} \
+    --build-arg REV=${TRAVIS_COMMIT} \
+    --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
+    -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+    
 script: >
-  if [[ "${TEST_STATUS}" && "${STAGE}" == "compliance" ]]; then
-    echo -e " \033[1;33mRunning Compliance Tests";
-    $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
-  elif [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then
-    echo -e " \033[1;33mBuilding Debian Docker image for Release";
-    travis_wait 30  docker build --quiet \
-      --build-arg TOKEN=${TOKEN} \
-      --build-arg REV=${TRAVIS_COMMIT} \
-      --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-  elif [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then
-    echo -e " \033[1;33mBuilding CentOs Docker image for Release";
-    travis_wait 30 docker build --quiet \
-      --build-arg TOKEN=${TOKEN} \
-      --build-arg REV=${TRAVIS_COMMIT} \
-      --build-arg STAGE=release -t ${IMAGE_RELEASE_CENTOS} -f $(pwd)/docker/Dockerfile-centos $(pwd)/docker/ ;
-  elif [[ "${TEST_STATUS}" && "${PLATFORM}" == "debian" && "${STAGE}" != "compliance" ]]; then
-    echo -e " \033[1;33mRunning Tests against Debian Image";
-    docker run \
-      -t --rm -v $(pwd):${HOME} --entrypoint bash \
-      -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts \
-      -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" \
-      ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
-  elif [[ "${TEST_STATUS}" && "${PLATFORM}" == "centos" && "${STAGE}" != "compliance" ]]; then
-    echo -e " \033[1;33mRunning Tests against CentOs Image";
-    docker run \
-      -t --rm -v $(pwd):${HOME} --entrypoint bash \
-      -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts \
-      -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" \
-      ${IMAGE_DEPS_CENTOS} build.sh -s ${STAGE_TYPE} --os centos -dqt;
-  fi
-  
-after_success: >
-  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "debian" ]]; then
-   echo -e " \033[1;33mPushing Debian Release (with Dependencies) to Docker Hub";
-   docker push ${IMAGE_DEPS_DEBIAN};
-  fi 
-  
-  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "deps" && "${PLATFORM}" == "centos" ]]; then
-   echo -e " \033[1;33mPushing CentOs Release (with Dependencies) to Docker Hub";
-   docker push ${IMAGE_DEPS_CENTOS};
-  fi
-  
-  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "debian" ]]; then
-   echo -e " \033[1;33mPushing Debian Release to Docker Hub";
-   docker push ${IMAGE_RELEASE_DEBIAN};
-  fi
-  
-  if [[ "${PUSH_STATUS}" && "${STAGE_TYPE}" == "release" && "${PLATFORM}" == "centos" ]]; then
-   echo -e " \033[1;33mPushing CentOs Release to Docker Hub";
-   docker push ${IMAGE_RELEASE_CENTOS};  
-  fi
+  echo -e " \033[1;33mRunning Tests against Debian Image";
+  docker run \
+    -t --rm -v $(pwd):${HOME} --entrypoint bash \
+    -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts \
+    -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" \
+    ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
+
+after_success: true
   
 notifications:
   email:
