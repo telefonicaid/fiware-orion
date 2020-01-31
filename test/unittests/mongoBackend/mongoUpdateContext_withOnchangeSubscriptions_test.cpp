@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "cache/subCache.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextElementResponse.h"

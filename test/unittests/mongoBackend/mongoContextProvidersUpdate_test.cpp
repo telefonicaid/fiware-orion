@@ -31,6 +31,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/EntityId.h"
