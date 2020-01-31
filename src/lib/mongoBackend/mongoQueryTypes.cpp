@@ -35,7 +35,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoConnectionPool.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
