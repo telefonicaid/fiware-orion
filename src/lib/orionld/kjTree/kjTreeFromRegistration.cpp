@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
 #include "orionld/common/OrionldConnection.h"                    // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeFromRegistration.h"               // Own interface
@@ -61,6 +62,9 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   char*            details;
   unsigned int     infoSize;
   OrionldContext*  contextP = orionldContextCacheLookup(registrationP->ldContext.c_str());
+
+  if (contextP == NULL)
+    contextP = orionldCoreContextP;
 
   // id
   nodeP = kjString(orionldState.kjsonP, "id", registrationP->id.c_str());

@@ -1,0 +1,154 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET registration crash
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration
+# 02. See the registration in mongo
+# 03. GET /ngsi-ld/v1/csourceRegistrations
+#
+
+echo "01. Create a registration"
+echo "========================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Building",
+          "id": "urn:ngsi-ld:Building:store001"
+        }
+      ],
+      "properties": [
+        "tweets"
+      ]
+    }
+  ],
+  "endpoint": "http://context-provider:3000/static/tweets",
+  "@context": "https://schema.lab.fiware.org/ld/context"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest 'db.registrations.findOne()'
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/csourceRegistrations"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Building:store001",
+					"type" : "https://uri.fiware.org/ns/data-models#Building"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/tweets",
+					"type" : "Property",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://context-provider:3000/static/tweets"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*)
+}
+bye
+
+
+03. GET /ngsi-ld/v1/csourceRegistrations
+========================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "endpoint": "http://context-provider:3000/static/tweets",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Building:store001",
+                        "type": "https://uri.fiware.org/ns/data-models#Building"
+                    }
+                ],
+                "properties": [
+                    "tweets"
+                ]
+            }
+        ],
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
