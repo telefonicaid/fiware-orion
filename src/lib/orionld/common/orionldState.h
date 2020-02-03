@@ -217,6 +217,11 @@ typedef struct OrionldConnectionState
   // Instructions for mongoBackend
   //
   KjNode*                 creDatesP;
+
+  //
+  // General Behavior
+  //
+  bool                    forwardAttrsCompacted;
 } OrionldConnectionState;
 
 

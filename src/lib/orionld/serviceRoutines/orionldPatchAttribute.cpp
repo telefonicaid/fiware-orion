@@ -42,6 +42,7 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // *CHECK*
@@ -49,6 +50,9 @@ extern "C"
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
+#include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeToEntity.h"                       // kjTreeToEntity
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
@@ -92,8 +96,29 @@ static bool orionldForwardPatchAttribute
   bool         reqOk;
   char         uriPath[512];
 
+  LM_TMP(("PATCH: Forwarding for PATCH Attribute '%s'", attrName));
+
+  if (orionldState.forwardAttrsCompacted == true)
+  {
+    KjNode*         regContextNodeP;
+    OrionldContext* regContextP;
+
+    regContextNodeP = kjLookup(registrationP, "@context");
+    if (regContextNodeP != NULL)
+    {
+      OrionldProblemDetails pd;
+      regContextP = orionldContextFromTree(NULL, false, regContextNodeP, &pd);
+    }
+    else
+      regContextP = orionldCoreContextP;
+
+    if (regContextP != NULL)
+      attrName = orionldContextItemAliasLookup(regContextP, attrName, NULL, NULL);
+  }
+
+
   //
-  // If the uri directory (from the rgistration) ends in a slash, then have it removed.
+  // If the uri directory (from the registration) ends in a slash, then have it removed.
   // It is added in the snpintf further down
   //
   if (uriDir == NULL)

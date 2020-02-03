@@ -165,6 +165,8 @@ void orionldStateInit(void)
   orionldState.prefixCache.items     = 0;
 
   orionldState.creDatesP             = NULL;
+
+  orionldState.forwardAttrsCompacted = true;
 }
 
 
