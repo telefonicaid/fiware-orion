@@ -64,22 +64,6 @@ extern int mongoConnectionPoolInit
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionGet - 
-*/
-extern mongo::DBClientBase* mongoPoolConnectionGet(void);
-
-
-
-/* ****************************************************************************
-*
-* mongoPoolConnectionRelease - 
-*/
-extern void mongoPoolConnectionRelease(mongo::DBClientBase* connection);
-
-
-
-/* ****************************************************************************
-*
 * mongoPoolConnectionSemWaitingTimeGet - 
 */
 extern float mongoPoolConnectionSemWaitingTimeGet(void);
