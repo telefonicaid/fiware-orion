@@ -414,7 +414,7 @@ int mongoConnectionPoolInit
 * Very important to call the function 'mongoPoolConnectionRelease' after finishing using the connection !
 *
 */
-DBClientBase* mongoPoolConnectionGet(void)
+static DBClientBase* mongoPoolConnectionGet(void)
 {
   DBClientBase*    connection = NULL;
   struct timespec  startTime;
@@ -453,12 +453,12 @@ DBClientBase* mongoPoolConnectionGet(void)
 }
 
 
-
+#ifndef UNIT_TEST
 /* ****************************************************************************
 *
 * mongoPoolConnectionRelease -
 */
-void mongoPoolConnectionRelease(DBClientBase* connection)
+static void mongoPoolConnectionRelease(DBClientBase* connection)
 {
   sem_wait(&connectionPoolSem);
 
@@ -474,7 +474,7 @@ void mongoPoolConnectionRelease(DBClientBase* connection)
 
   sem_post(&connectionPoolSem);
 }
-
+#endif
 
 
 /* ****************************************************************************
