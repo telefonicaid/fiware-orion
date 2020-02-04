@@ -89,37 +89,52 @@ static bool orionldForwardPatchAttribute
     return false;
 
   LM_TMP(("PATCH: Forwarding payload '%s' to %s:%d - %s", orionldState.requestPayload, host, port, uriDir));
-  const char*  contentType = "application/json";
+  const char*  contentType = (orionldState.ngsildContent == true)? "application/ld+json" : "application/json";
   int          payloadLen  = strlen(orionldState.requestPayload);
   bool         tryAgain;
   bool         downloadFailed;
   bool         reqOk;
   char         uriPath[512];
 
-  LM_TMP(("PATCH: Forwarding for PATCH Attribute '%s'", attrName));
+  LM_TMP(("FWD: Forwarding for PATCH Attribute '%s'", attrName));
 
   if (orionldState.forwardAttrsCompacted == true)
   {
     KjNode*         regContextNodeP;
-    OrionldContext* regContextP;
+    OrionldContext* regContextP = NULL;
 
+    LM_TMP(("FWD: Compacting Attribute Name '%s'", attrName));
     regContextNodeP = kjLookup(registrationP, "@context");
+
+    //
+    // For now - if a @context present in the registration, usae it
+    //           else, use the one of the current request
+    //
     if (regContextNodeP != NULL)
     {
+      LM_TMP(("FWD: Found a context node in the registration - looking it up"));
       OrionldProblemDetails pd;
       regContextP = orionldContextFromTree(NULL, false, regContextNodeP, &pd);
     }
-    else
-      regContextP = orionldCoreContextP;
+
+    if (regContextP == NULL)
+    {
+      LM_TMP(("FWD: regContextP == NULL - using the context of the current request"));
+      regContextP = orionldState.contextP;
+    }
+
+    LM_TMP(("FWD: using @context '%s'", regContextP->url));
 
     if (regContextP != NULL)
       attrName = orionldContextItemAliasLookup(regContextP, attrName, NULL, NULL);
+
+    LM_TMP(("FWD: attrName: '%s'", attrName));
   }
 
 
   //
   // If the uri directory (from the registration) ends in a slash, then have it removed.
-  // It is added in the snpintf further down
+  // It is added in the snprintf further down
   //
   if (uriDir == NULL)
     snprintf(uriPath, sizeof(uriPath), "/ngsi-ld/v1/entities/%s/attrs/%s", entityId, attrName);
@@ -133,15 +148,21 @@ static bool orionldForwardPatchAttribute
     snprintf(uriPath, sizeof(uriPath), "%s/ngsi-ld/v1/entities/%s/attrs/%s", uriDir, entityId, attrName);
   }
 
+  LM_TMP(("FWD: orionldState.requestPayload: '%s'", orionldState.requestPayload));
+  LM_TMP(("FWD: Forwarding with contentType '%s'", contentType));
   if (orionldState.linkHttpHeaderPresent)
   {
     char link[512];
 
     snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
+    LM_TMP(("FWD: HTTP Link: %s", link));
     reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, link, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen);
   }
   else
+  {
+    LM_TMP(("FWD: Without HTTP Link"));
     reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen);
+  }
 
   if (reqOk == false)
   {

@@ -1013,7 +1013,7 @@ function dbInsertEntity()
 #   -H            <HTTP header>    (more headers)
 #   --verbose                      (verbose output)
 #   -v                             (verbose output)
-#   --debug                        (debug mode - output to /tmp/orionFuncTestDebug.log
+#   --debug                        (debug mode - output to /tmp/orionFuncTestDebug.log)
 #
 # Any parameters are sent as is to 'curl'
 # 

@@ -1,0 +1,234 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding of PATCH Entity-Attribute requests with contexts
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit C1
+brokerStart CB 0-255
+brokerStart CP1
+
+--SHELL--
+#
+# This test uses @context during the forwarding.
+# The functest ngsild_forward_patch_entity-attr.test does the same but without contexts (i.e. using the Core Context)
+#
+# 01. Create entity 'urn:ngsi-ld:Building:store001' with attr 'tweets' in CP1
+# 02. Register urn:ngsi-ld:Building:store001/tweets for CP1, in CB
+# 03. GET the registration (just for fun)
+# 04. See the registration in the database
+# 05. PATCH tweets in CB - it gets forwarded to CP1
+# 06. GET the entity from CP1 - see that tweets has changed
+#
+
+
+echo "01. Create entity 'urn:ngsi-ld:Building:store001' with attr 'tweets' in CP1"
+echo "==========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store001",
+  "type": "T",
+  "tweets": {
+    "type": "Property",
+    "value": [ "A1 in CP1" ]
+  },
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" --port $CP1_PORT -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Register urn:ngsi-ld:Building:store001/tweets for CP1, in CB"
+echo "================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Building",
+          "id": "urn:ngsi-ld:Building:store001"
+        }
+      ],
+      "properties": [ "tweets" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. GET the registration (just for fun)"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "04. See the registration in the database"
+echo "========================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "05. PATCH tweets in CB - it gets forwarded to CP1"
+echo "================================================="
+payload='{
+  "type": "Property", 
+  "value": ["I never could get the hang of Thursdays"],
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001/attrs/tweets --payload "$payload" -X PATCH -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "06. GET the entity from CP1 - see that tweets has changed"
+echo "========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001 --port $CP1_PORT -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity 'urn:ngsi-ld:Building:store001' with attr 'tweets' in CP1
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
+Date: REGEX(.*)
+
+
+
+02. Register urn:ngsi-ld:Building:store001/tweets for CP1, in CB
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+03. GET the registration (just for fun)
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 348
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "endpoint": "http://localhost:9801",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Building:store001",
+                        "type": "https://uri.fiware.org/ns/data-models#Building"
+                    }
+                ],
+                "properties": [
+                    "https://fiware.github.io/tutorials.Step-by-Step/schema/tweets"
+                ]
+            }
+        ],
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+04. See the registration in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Building:store001",
+					"type" : "https://uri.fiware.org/ns/data-models#Building"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://fiware.github.io/tutorials.Step-by-Step/schema/tweets",
+					"type" : "Property",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://localhost:9801"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*)
+}
+bye
+
+
+05. PATCH tweets in CB - it gets forwarded to CP1
+=================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+
+
+06. GET the entity from CP1 - see that tweets has changed
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 128
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:Building:store001",
+    "tweets": {
+        "type": "Property",
+        "value": "I never could get the hang of Thursdays"
+    },
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
