@@ -370,7 +370,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // If also not found locally, then it's a 404 Not Found
   //
-  entityP = dbEntityLookup(entityId);  // dbAttributeLookup(entityId, attrName)
+  entityP = dbEntityAttributeLookup(entityId, attrName);
   if (entityP == NULL)
   {
     char pair[1024];

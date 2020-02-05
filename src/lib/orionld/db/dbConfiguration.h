@@ -62,6 +62,7 @@ typedef bool    (*DbSubscriptionMatchCallback)(const char* entityId, KjNode* sub
 //
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
 typedef KjNode* (*DbEntityLookupManyFunction)(KjNode* requestTree);
+typedef KjNode* (*DbEntityAttributeLookupFunction)(const char* entityId, const char* attributeName);
 typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestTree);
 typedef bool    (*DbEntityBatchDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, char** detailsP);
@@ -76,14 +77,15 @@ typedef KjNode* (*DbRegistrationLookup)(const char* entityId, const char* attrib
 //
 // Function pointers for the DB interface
 //
-extern DbEntityLookupFunction                   dbEntityLookup;
-extern DbEntityLookupManyFunction               dbEntityLookupMany;
-extern DbEntityUpdateFunction                   dbEntityUpdate;
-extern DbEntityBatchDeleteFunction              dbEntityBatchDelete;
-extern DbDataToKjTreeFunction                   dbDataToKjTree;
-extern DbDataFromKjTreeFunction                 dbDataFromKjTree;
-extern DbSubscriptionMatchEntityIdAndAttributes dbSubscriptionMatchEntityIdAndAttributes;
-extern DbEntityListLookupWithIdTypeCreDate      dbEntityListLookupWithIdTypeCreDate;
-extern DbRegistrationLookup                     dbRegistrationLookup;
+extern DbEntityLookupFunction                    dbEntityLookup;
+extern DbEntityLookupManyFunction                dbEntityLookupMany;
+extern DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
+extern DbEntityUpdateFunction                    dbEntityUpdate;
+extern DbEntityBatchDeleteFunction               dbEntityBatchDelete;
+extern DbDataToKjTreeFunction                    dbDataToKjTree;
+extern DbDataFromKjTreeFunction                  dbDataFromKjTree;
+extern DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
+extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;  // FIXME: Name must change - what does it to really?
+extern DbRegistrationLookup                      dbRegistrationLookup;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_
