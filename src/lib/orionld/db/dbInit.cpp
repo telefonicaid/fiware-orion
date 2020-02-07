@@ -36,6 +36,8 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"        // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"       // mongoCppLegacyRegistrationLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationExists.h"       // mongoCppLegacyRegistrationExists
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationDelete.h"       // mongoCppLegacyRegistrationDelete
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -68,6 +70,8 @@ void dbInit(const char* dbHost, const char* dbName)
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
   dbEntityListLookupWithIdTypeCreDate      = mongoCppLegacyEntityListLookupWithIdTypeCreDate;
   dbRegistrationLookup                     = mongoCppLegacyRegistrationLookup;
+  dbRegistrationExists                     = mongoCppLegacyRegistrationExists;
+  dbRegistrationDelete                     = mongoCppLegacyRegistrationDelete;
 
   mongoCppLegacyInit(dbHost, dbName);
 
@@ -81,6 +85,8 @@ void dbInit(const char* dbHost, const char* dbName)
   dbSubscriptionMatchEntityIdAndAttributes = NULL;  // FIXME: Implement mongocSubscriptionMatchEntityIdAndAttributes
   dbEntityListLookupWithIdTypeCreDate      = NULL;  // FIXME: Implement mongocEntityListLookupWithIdTypeCreDate
   dbRegistrationLookup                     = NULL;  // FIXME: Implement mongocRegistrationLookup
+  dbRegistrationExists                     = NULL;  // FIXME: Implement mongocRegistrationExists
+  dbRegistrationDelete                     = NULL;  // FIXME: Implement mongocRegistrationDelete
 
   mongocInit(dbHost, dbName);
 

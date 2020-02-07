@@ -46,6 +46,8 @@ DbDataFromKjTreeFunction                  dbDataFromKjTree;
 DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
 DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;  // FIXME: Name must change - what does it to really?
 DbRegistrationLookup                      dbRegistrationLookup;
+DbRegistrationExists                      dbRegistrationExists;
+DbRegistrationDelete                      dbRegistrationDelete;
 
 //
 // FIXME

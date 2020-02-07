@@ -70,6 +70,8 @@ typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
 typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray);
 typedef KjNode* (*DbRegistrationLookup)(const char* entityId, const char* attribute, int* noOfRegsP);
+typedef bool    (*DbRegistrationExists)(const char* registrationId);
+typedef bool    (*DbRegistrationDelete)(const char* registrationId);
 
 
 
@@ -87,5 +89,7 @@ extern DbDataFromKjTreeFunction                  dbDataFromKjTree;
 extern DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
 extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;  // FIXME: Name must change - what does it to really?
 extern DbRegistrationLookup                      dbRegistrationLookup;
+extern DbRegistrationExists                      dbRegistrationExists;
+extern DbRegistrationDelete                      dbRegistrationDelete;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

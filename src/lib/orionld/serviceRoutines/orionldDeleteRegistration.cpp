@@ -27,7 +27,10 @@
 
 #include "rest/ConnectionInfo.h"                                  // ConnectionInfo
 #include "orionld/common/orionldState.h"                          // orionldState
+#include "orionld/common/urlCheck.h"                              // urlCheck
+#include "orionld/common/urnCheck.h"                              // urnCheck
 #include "orionld/common/orionldErrorResponse.h"                  // orionldErrorResponseCreate
+#include "orionld/db/dbConfiguration.h"                           // dbRegistrationDelete
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"    // Own Interface
 
 
@@ -38,11 +41,33 @@
 //
 bool orionldDeleteRegistration(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldDeleteRegistration"));
+  char* detail;
 
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*", orionldState.wildcard[0]);
+  if ((urlCheck(orionldState.wildcard[0], &detail) == false) && (urnCheck(orionldState.wildcard[0], &detail) == false))
+  {
+    LM_E(("uriCheck: %s", detail));
+    ciP->httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0]);
+    return false;
+  }
 
-  ciP->httpStatusCode = SccNotImplemented;
+  if (dbRegistrationExists(orionldState.wildcard[0]) == false)
+  {
+    LM_E(("dbRegistrationExists says that the registration '%s' doesn't exist", orionldState.wildcard[0]));
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
+    return false;
+  }
+
+  if (dbRegistrationDelete(orionldState.wildcard[0]) == false)
+  {
+    LM_E(("dbRegistrationDelete failed - not found?"));
+    ciP->httpStatusCode = SccNotFound;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
+    return false;
+  }
+
+  ciP->httpStatusCode = SccNoContent;
 
   return true;
 }

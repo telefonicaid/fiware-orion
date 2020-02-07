@@ -224,7 +224,7 @@ echo
 
 echo "18. DELETE /ngsi-ld/v1/csourceRegistrations/R1"
 echo "=============================================="
-orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 -X DELETE
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 -X DELETE
 echo
 echo
 
@@ -456,14 +456,14 @@ Date: REGEX(.*)
 
 18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
 ==============================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 145
+HTTP/1.1 404 Not Found
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "R1",
-    "title": "Not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*",
+    "detail": "urn:R1",
+    "title": "Context Source Registration not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
