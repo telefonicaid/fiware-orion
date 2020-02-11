@@ -110,6 +110,7 @@ echo "INSTALL: gmock" \
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
 echo "INSTALL: python special dependencies" \
 && cd /opt \
+&& pip install --upgrade pip \
 && pip install virtualenv\
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
