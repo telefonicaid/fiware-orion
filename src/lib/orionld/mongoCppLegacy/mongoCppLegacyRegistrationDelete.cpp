@@ -43,7 +43,7 @@ bool mongoCppLegacyRegistrationDelete(const char* registrationId)
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   //
-  // Populate filter - only Entity ID for this operation - FOR NOW ...
+  // Populate filter
   //
   mongo::BSONObjBuilder  filter;
   filter.append("_id", registrationId);

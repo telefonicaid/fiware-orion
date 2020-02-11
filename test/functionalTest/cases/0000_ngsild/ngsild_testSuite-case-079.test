@@ -202,7 +202,7 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : 12,
 			"md" : {
-				"https://uri=etsi=org/ngsi-ld/observedAt" : {
+				"observedAt" : {
 					"value" : 1543924800
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
@@ -215,16 +215,14 @@ MongoDB server version: REGEX(.*)
 				}
 			},
 			"mdNames" : [
-				"https://uri.etsi.org/ngsi-ld/observedAt",
-				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1",
-				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1"
+				"observedAt",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1"
 			]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
-			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:T2:6789",
+			"type" : "Relationship",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/R1_R1" : {
 					"type" : "Relationship",
@@ -238,12 +236,11 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [
 				"https://uri.etsi.org/ngsi-ld/default-context/R1_R1",
 				"https://uri.etsi.org/ngsi-ld/default-context/R1_P1"
-			]
+			],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
 		},
 		"https://uri=etsi=org/ngsi-ld/location" : {
-			"type" : "GeoProperty",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : {
 				"type" : "Point",
 				"coordinates" : [
@@ -251,7 +248,10 @@ MongoDB server version: REGEX(.*)
 					40.01
 				]
 			},
-			"mdNames" : [ ]
+			"type" : "GeoProperty",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
 		}
 	},
 	"creDate" : REGEX(.*),

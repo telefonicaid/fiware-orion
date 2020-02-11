@@ -40,6 +40,7 @@ OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode sc)
   case SccOk:                             return OrionldInternalError;  // Should not be here if 200 ...
   case SccCreated:                        return OrionldInternalError;
   case SccNoContent:                      return OrionldInternalError;
+  case SccMultiStatus:                    return OrionldInternalError;
   case SccBadRequest:                     return OrionldBadRequestData;
   case SccForbidden:                      return OrionldOperationNotSupported;
   case SccContextElementNotFound:         return OrionldResourceNotFound;

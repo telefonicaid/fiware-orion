@@ -76,6 +76,7 @@ struct ConnectionInfo;
 typedef struct OrionldUriParamOptions
 {
   bool noOverwrite;
+  bool count;
   bool update;
   bool replace;
 } OrionldUriParamOptions;
@@ -92,7 +93,7 @@ typedef struct OrionldUriParams
   char* type;
   char* idPattern;
   char* attrs;
-  char* options;   // Not Implemented - use ciP->uriParams for now
+  char* options;
   int   offset;    // Not Implemented - use ciP->uriParams for now
   int   limit;     // Not Implemented - use ciP->uriParams for now
   // To Be Continued ...

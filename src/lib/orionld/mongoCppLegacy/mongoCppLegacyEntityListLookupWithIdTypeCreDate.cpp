@@ -53,8 +53,6 @@ extern "C"
 //   * Entity Type
 //   * Entity Creation Date
 //
-// 
-//
 KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
 {
   char collectionPath[256];

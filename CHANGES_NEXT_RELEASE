@@ -8,3 +8,4 @@
 * Issue #XXX - Crash in GET /csourceRegistrations if the @context of a registration isn't found
 * Issue #XXX - Fixed a bug in Patch Attribute forwarding - Content-Type was always application/json
 * Issue #XXX - Implemented the service "DELETE /ngsi-ld/v1/csourceRegistrations/{registrationId}
+* Issue #XXX - Complete reimplementation of POST /ngsi-ld/v1/entities/{EID}/attrs

@@ -610,7 +610,8 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttrib
         return false;
       }
 
-      *typeNodePP = typeP;
+      if (typeNodePP != NULL)
+        *typeNodePP = typeP;
       caP->type   = typeP->value.s;
     }
     else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))

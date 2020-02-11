@@ -155,11 +155,21 @@ bye
 
 02. Attempt to ADD the attribute P2=22 with noOverwrite set
 ===========================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 207 Multi Status
+Content-Length: 162
+Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
 
 
 03. GET the entity, make sure P2 == 12
@@ -219,4 +229,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB

@@ -185,18 +185,18 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [ ]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "new",
-			"mdNames" : [ ]
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : false,
-			"mdNames" : [ ]
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
 		}
 	},
 	"creDate" : REGEX(.*),

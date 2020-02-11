@@ -39,6 +39,7 @@ typedef enum HttpStatusCode
   SccOk                     = 200,   // Success
   SccCreated                = 201,   // Created
   SccNoContent              = 204,   // No content
+  SccMultiStatus            = 207,   // Muilt-Status
   SccBadRequest             = 400,   // The request is not well formed
   SccForbidden              = 403,   // The request is not allowed
   SccContextElementNotFound = 404,   // No context element found

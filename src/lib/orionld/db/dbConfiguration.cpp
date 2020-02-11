@@ -39,6 +39,7 @@ extern "C"
 DbEntityLookupFunction                    dbEntityLookup;
 DbEntityLookupManyFunction                dbEntityLookupMany;
 DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
+DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
 DbEntityUpdateFunction                    dbEntityUpdate;
 DbEntityBatchDeleteFunction               dbEntityBatchDelete;
 DbDataToKjTreeFunction                    dbDataToKjTree;

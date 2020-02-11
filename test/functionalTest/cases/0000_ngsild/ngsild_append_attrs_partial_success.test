@@ -1,0 +1,115 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an entity with a property P1
+# 02. Attempt to overwrite P1 and P2 using POST /ngsi-ld/v1/entities/*/attrs?options=noOverwrite - see error
+#
+
+echo "01. Create an entity with a property P1"
+echo "======================================="
+payload='{
+  "id": "urn:ngsi-ld:T:01.02.03",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "old",
+    "observedAt": "2018-12-04T12:00:00Z",
+    "P1_R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:T2:6789"
+    },
+    "P1_P1": {
+      "type": "Property",
+      "value": 0.1
+    }
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"  
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "02. Attempt to overwrite P1 and P2 using POST /ngsi-ld/v1/entities/*/attrs?options=noOverwrite - see error"
+echo "=========================================================================================================="
+payload='{
+  "P1": {
+  "type": "Property",
+    "value": "Hola"
+  },
+  "P2": {
+    "type": "Property",
+    "value": "Adios"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:01.02.03/attrs?options=noOverwrite --payload "$payload" --in jsonld
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with a property P1
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:01.02.03
+Date: REGEX(.*)
+
+
+
+02. Attempt to overwrite P1 and P2 using POST /ngsi-ld/v1/entities/*/attrs?options=noOverwrite - see error
+==========================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 159
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "http://example.org/P1",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": [
+        "http://example.org/P2"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

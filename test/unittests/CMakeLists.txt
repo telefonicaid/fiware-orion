@@ -65,8 +65,6 @@ SET (SOURCES
     testInit.cpp
     unittest.cpp
 
-    orionld/partialUpdate_test.cpp
-
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp

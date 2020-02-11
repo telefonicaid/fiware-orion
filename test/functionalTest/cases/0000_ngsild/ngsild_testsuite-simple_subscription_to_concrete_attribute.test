@@ -94,8 +94,10 @@ echo
 echo "04. Update the entity - provoking a notification"
 echo "================================================"
 payload='{
-  "type": "Property",
-  "value": 5
+  "speed": {
+    "type": "Property",
+    "value": 5
+  }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234/attrs --payload "$payload"
 echo
@@ -179,7 +181,7 @@ Date: REGEX(.*)
 ==========================================
 POST http://REGEX(.*)
 Fiware-Servicepath: /
-Content-Length: 346
+Content-Length: 345
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(.*)
@@ -197,7 +199,7 @@ Content-Type: application/json; charset=utf-8
             "id": "urn:ngsi-ld:Vehicle:V1234", 
             "speed": {
                 "type": "Property", 
-                "value": 34
+                "value": 5
             }, 
             "type": "Vehicle"
         }

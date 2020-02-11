@@ -237,18 +237,9 @@ MongoDB server version: REGEX(.*)
 			"value" : "Corner Unit",
 			"mdNames" : [ ]
 		},
-		"https://fiware=github=io/tutorials=Step-by-Step/schema/stocks" : {
-			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "urn:ngsi-ld:Product:001",
-			"mdNames" : [ ]
-		},
 		"https://fiware=github=io/tutorials=Step-by-Step/schema/locatedIn" : {
-			"type" : "Relationship",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:Building:store001",
+			"type" : "Relationship",
 			"md" : {
 				"https://fiware=github=io/tutorials=Step-by-Step/schema/installedBy" : {
 					"type" : "Relationship",
@@ -262,11 +253,30 @@ MongoDB server version: REGEX(.*)
 			"mdNames" : [
 				"https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy",
 				"https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork"
-			]
+			],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		},
+		"https://fiware=github=io/tutorials=Step-by-Step/schema/stocks" : {
+			"value" : "urn:ngsi-ld:Product:001",
+			"type" : "Relationship",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
 		}
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
+	"location" : {
+		"attrName" : "location",
+		"coords" : {
+			"type" : "Point",
+			"coordinates" : [
+				13.3986112,
+				52.554699
+			]
+		}
+	},
 	"lastCorrelator" : ""
 }
 bye

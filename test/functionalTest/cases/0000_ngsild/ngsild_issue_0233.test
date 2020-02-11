@@ -220,8 +220,8 @@ MongoDB server version: REGEX(.*)
 				}
 			},
 			"mdNames" : [
-				"https://uri=etsi=org/ngsi-ld/default-context/Prop",
-				"https://uri=etsi=org/ngsi-ld/default-context/Rel"
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
 			]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
@@ -240,15 +240,13 @@ MongoDB server version: REGEX(.*)
 				}
 			},
 			"mdNames" : [
-				"https://uri=etsi=org/ngsi-ld/default-context/Prop",
-				"https://uri=etsi=org/ngsi-ld/default-context/Rel"
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
 			]
 		},
 		"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
 			"value" : "Property with Property as sub-attr",
+			"type" : "Property",
 			"md" : {
 				"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
 					"type" : "Property",
@@ -257,7 +255,9 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [
 				"https://uri.etsi.org/ngsi-ld/default-context/Prop2"
-			]
+			],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
 		}
 	},
 	"creDate" : REGEX(.*),

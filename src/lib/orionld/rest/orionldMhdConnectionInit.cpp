@@ -22,19 +22,24 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
-#include <microhttpd.h>                                        // MHD
+#include <string.h>                                              // strlen
+#include <microhttpd.h>                                          // MHD
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+extern "C"
+{
+#include "kbase/kMacros.h"                                       // K_FT
+}
 
-#include "rest/Verb.h"                                         // Verb
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, ...
-#include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
-#include "orionld/common/SCOMPARE.h"                           // SCOMPARE
-#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "rest/Verb.h"                                           // Verb
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
+#include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
+#include "orionld/common/SCOMPARE.h"                             // SCOMPARE
+#include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
 
 
 
@@ -166,6 +171,48 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
 }
 
 
+// -----------------------------------------------------------------------------
+//
+// optionsParse -
+//
+static void optionsParse(const char* options)
+{
+  char* optionStart = (char*) options;
+  char* cP          = (char*) options;
+
+  while (1)
+  {
+    if ((*cP == ',') || (*cP == 0))  // Found the end of an option
+    {
+      bool done  = (*cP == 0);
+      char saved = *cP;
+
+      *cP = 0;  // Zero-terminate
+
+      if      (strcmp(optionStart, "update")      == 0)  orionldState.uriParamOptions.update      = true;
+      else if (strcmp(optionStart, "count")       == 0)  orionldState.uriParamOptions.count       = true;
+      else if (strcmp(optionStart, "replace")     == 0)  orionldState.uriParamOptions.replace     = true;
+      else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
+      else
+        LM_W(("Unknown 'options' value: %s", optionStart));
+
+      if (done == true)
+        break;
+
+      *cP = saved;
+      optionStart = &cP[1];
+    }
+
+    ++cP;
+  }
+
+  LM_TMP(("KZ: URI Param 'noOverwrite': %s", K_FT(orionldState.uriParamOptions.noOverwrite)));
+  LM_TMP(("KZ: URI Param 'count':       %s", K_FT(orionldState.uriParamOptions.count)));
+  LM_TMP(("KZ: URI Param 'update':      %s", K_FT(orionldState.uriParamOptions.update)));
+  LM_TMP(("KZ: URI Param 'replace':     %s", K_FT(orionldState.uriParamOptions.replace)));
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -181,8 +228,16 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     orionldState.uriParams.idPattern = (char*) value;
   else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
     orionldState.uriParams.attrs = (char*) value;
+  else if (SCOMPARE7(key, 'o', 'f', 'f', 's', 'e', 't', 0))
+    orionldState.uriParams.offset = atoi(value);
+  else if (SCOMPARE6(key, 'l', 'i', 'm', 'i', 't', 0))
+    orionldState.uriParams.limit = atoi(value);
   else if (SCOMPARE8(key, 'o', 'p', 't', 'i', 'o', 'n', 's', 0))
+  {
+    LM_TMP(("KZ: Got an options URL Param: '%s'", value));
     orionldState.uriParams.options = (char*) value;
+    optionsParse(value);
+  }
   return MHD_YES;
 }
 

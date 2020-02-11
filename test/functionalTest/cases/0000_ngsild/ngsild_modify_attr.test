@@ -164,11 +164,11 @@ MongoDB server version: REGEX(.*)
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"value" : 2,
 			"type" : "Property",
+			"mdNames" : [ ],
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*)
-			"value" : 2,
-			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
