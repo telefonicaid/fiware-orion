@@ -47,22 +47,25 @@ yum -y install \
   cyrus-sasl-devel
 
 # FIXME: remove legacy driver when it gets discontinued in the code
-curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
+echo "INSTALL: mongodb legacy c++ driver" \
+&& curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-cxx-driver-legacy-1.1.2 \
 && scons --disable-warnings-as-errors --use-sasl-client --ssl \
 && scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl \
 && rm -Rf /opt/mongo-cxx-driver-legacy-1.1.2
 
-curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz | tar xzC /opt/ \
+echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-c-driver-1.16.0 \
 && mkdir cmake-build \
 && cd cmake-build \
 && cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
 && make install \
-&& rm -Rf /opt/mongo-c-driver-1.16.0.tar.gz
+&& rm -Rf /opt/mongo-c-driver-1.16.0
 
-curl -L https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.tar.gz | tar xzC /opt/ \
+echo "INSTALL: mongodb c++ driver" \
+&& curl -L https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-cxx-driver-r3.4.0/build \
 && cmake3 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. \
 && cd cmake-build \
@@ -70,20 +73,23 @@ curl -L https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.tar.gz | tar 
 && make \
 && make install \
 && ldconfig \
-&& rm -Rf /opt/r3.4.0.tar.gz
+&& rm -Rf /opt/mongo-cxx-driver-r3.4.0
 
-curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC /opt/ \
+echo "INSTALL: rapidjson" \
+&& curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC /opt/ \
 && mv /opt/rapidjson-1.0.2/include/rapidjson/ /usr/local/include \
 && rm -Rf /opt/rapidjson-1.0.2
 
-curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC /opt/ \
+echo "INSTALL: libmicrohttpd" \
+&& curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC /opt/ \
 && cd /opt/libmicrohttpd-0.9.48  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install \
 && rm -Rf /opt/libmicrohttpd-0.9.48
 
-curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
+echo "INSTALL: gmock" \
+&& curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
 && ./configure \
 && make \
@@ -92,7 +98,8 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 
 # FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
 # which the same procedure described in "Build from source" documentation
-#curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
+#  echo "INSTALL: mosquitto" \
+#  && curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
 #  && cd /opt/mosquitto-1.5 \
 #  && make \
 #  && make install \
@@ -102,7 +109,8 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 # in Werkzeug which makes an empty content-length header appear in the accumulator-server.py
 # dumps. The bug is fixed in Werkzeug==0.11.16. Thus, we override the system setting,
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
-cd /opt \
+echo "INSTALL: python special dependencies" \
+&& cd /opt \
 && pip install virtualenv\
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
