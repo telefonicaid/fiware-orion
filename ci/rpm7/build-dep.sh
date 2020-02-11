@@ -68,7 +68,6 @@ echo "INSTALL: mongodb c++ driver" \
 && curl -L https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-cxx-driver-r3.4.0/build \
 && cmake3 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-&& cd cmake-build \
 && make EP_mnmlstc_core \
 && make \
 && make install \
