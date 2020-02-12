@@ -99,7 +99,6 @@ echo
 =======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://gitlab.com/synchronicity-iot/synchronicity-data-models/raw/master/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Store:santander:COM4111
 Date: REGEX(.*)
 

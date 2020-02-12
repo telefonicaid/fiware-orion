@@ -67,7 +67,6 @@ echo
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 

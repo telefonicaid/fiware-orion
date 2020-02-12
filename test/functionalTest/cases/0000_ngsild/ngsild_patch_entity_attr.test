@@ -106,7 +106,6 @@ payload='{
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
-contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $8}' | awk -F\> '{ print $1 }')
 echo
 echo
 
@@ -129,10 +128,9 @@ echo
 echo
 
 
-HOST=$(hostname)
-echo "06. GET the entity E2, make sure that the attr_A3 value was changed  (attrs as short name)"
-echo "=========================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2?prettyPrint=yes' -H 'Link: <http://'$HOST:$CB_PORT'/ngsi-ld/ex/v1/contexts/'$contextId'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix --noPayloadCheck
+echo "06. GET the entity E2, make sure that the attr_A3 value was changed"
+echo "==================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2?prettyPrint=yes' --noPayloadCheck
 echo
 echo
 
@@ -143,7 +141,6 @@ echo
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
 Date: REGEX(.*)
 
@@ -153,7 +150,6 @@ Date: REGEX(.*)
 ==================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: REGEX(.*)
 Date: REGEX(.*)
 
 
@@ -185,7 +181,6 @@ Date: REGEX(.*)
 =================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
 Date: REGEX(.*)
 
@@ -195,23 +190,22 @@ Date: REGEX(.*)
 ======================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: REGEX(.*)
 Date: REGEX(.*)
 
 
 
-06. GET the entity E2, make sure that the attr_A3 value was changed  (attrs as short name)
-==========================================================================================
+06. GET the entity E2, make sure that the attr_A3 value was changed
+===================================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 164
 Content-Type: application/json
 Link: REGEX(.*)
 Date: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:entity:E2",
-  "type": "T",
-  "attr_A3": {
+  "type": "http://example.org/T",
+  "http://a.b.c/A3": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:entity:E3"
   }

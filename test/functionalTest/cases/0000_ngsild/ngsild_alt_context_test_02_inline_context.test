@@ -127,7 +127,6 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
-contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $8}' | awk -F\> '{ print $1 }')
 echo
 echo
 
@@ -143,14 +142,6 @@ echo
 echo "03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1"
 echo "======================================================================================================================"
 orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=2'
-echo
-echo
-
-
-echo "04. Get E1 with the context of the entity creation in Step 01 - see all three attributes in compact form"
-echo "========================================================================================================"
-HOST=$(hostname)
-orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=2' -H 'Link: <http://'$HOST:$CB_PORT'/ngsi-ld/ex/v1/contexts/'$contextId'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix
 echo
 echo
 
@@ -198,7 +189,6 @@ echo
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 Date: REGEX(.*)
 
@@ -276,37 +266,10 @@ Date: REGEX(.*)
 }
 
 
-04. Get E1 with the context of the entity creation in Step 01 - see all three attributes in compact form
-========================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 319
-Content-Type: application/json
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
-Date: REGEX(.*)
-
-{
-    "id": "http://a.b.c/entity/E1",
-    "name": {
-        "type": "Property",
-        "value": "John 2"
-    },
-    "name2": {
-        "type": "Property",
-        "value": "name2 is part of the inline context"
-    },
-    "name3": {
-        "type": "Property",
-        "value": "name3 is not in any context - default URL from @vocab"
-    },
-    "type": "A"
-}
-
-
 05. Create entity E2 with a context that is an array of a string and an inline context (same as in Step 01)
 ===========================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 Date: REGEX(.*)
 

@@ -195,7 +195,6 @@ echo
 =====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:value-expansion
 Date: REGEX(.*)
 
@@ -236,7 +235,6 @@ Date: REGEX(.*)
 ==================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Date: REGEX(.*)
 
 
@@ -290,7 +288,6 @@ Later
 ==========================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:value-expansion:E2
 Date: REGEX(.*)
 

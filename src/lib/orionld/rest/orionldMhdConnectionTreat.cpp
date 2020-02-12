@@ -793,10 +793,11 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //   What if "Accept: appplication/ld+json" in a creation request?
   //   Creation requests have no payload data so the context can't be put in the payload ...
   //
-  // What is clear is that no @context is to be returned for error reponses
+  // What is clear is that no @context is to be returned for error reponses.
+  // Also, if there is no payload data in the response, no need for @context
   // Also, GET /.../contexts/{context-id} should NOT give back the link header
   //
-  if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false))
+  if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false) && (orionldState.responseTree != NULL))
   {
     if (orionldState.acceptJsonld == false)
       httpHeaderLinkAdd(ciP, orionldState.link);

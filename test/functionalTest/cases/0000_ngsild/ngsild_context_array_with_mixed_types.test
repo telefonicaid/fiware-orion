@@ -32,8 +32,6 @@ brokerStart CB 212-249
 
 #
 # 01. Create an entity urn:entity:E1 with a mixed type context: URI-string	and inline object
-# 02. Obtain the context from the Link header
-# 03. Get the entity, with its creation context - see that attr_A1/2 are returned as short names
 # 04. Get the entity, without context - see that attr_A1/2 are returned as long names
 #
 
@@ -60,22 +58,6 @@ payload='{
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/json" --linkHeaderFix
-contextId=$(cat /tmp/httpHeaders.out | grep 'Link:' | awk -F/ '{ print $8}' | awk -F\> '{ print $1 }')
-echo
-echo
-
-
-echo "02. Obtain the context from the Link header"
-echo "==========================================="
-orionCurl --url /ngsi-ld/ex/v1/contexts/$contextId
-echo
-echo
-
-
-HOST=$(hostname)
-echo "03. Get the entity, with its creation context - see that attr_A1/2 are returned as short names"
-echo "=============================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities/urn:entity:E1?prettyPrint=yes" -H "Link: <http://$HOST:$CB_PORT/ngsi-ld/ex/v1/contexts/"$contextId">;"' rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix --noPayloadCheck
 echo
 echo
 
@@ -92,51 +74,8 @@ echo
 =====================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
 Location: /ngsi-ld/v1/entities/urn:entity:E1
 Date: REGEX(.*)
-
-
-
-02. Obtain the context from the Link header
-===========================================
-HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "@context": [
-        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-        {
-            "attr_A1": "http://a.b.c/A1",
-            "attr_A2": "http://a.b.c/A2",
-            "type_T": "http://a.b.c/T"
-        }
-    ]
-}
-
-
-03. Get the entity, with its creation context - see that attr_A1/2 are returned as short names
-==============================================================================================
-HTTP/1.1 200 OK
-Content-Length: 185
-Content-Type: application/json
-Link: REGEX(<http://IP:PORT/ngsi-ld/ex/v1/contexts/.*)
-Date: REGEX(.*)
-
-{
-  "id": "urn:entity:E1",
-  "type": "T",
-  "attr_A1": {
-    "type": "Property",
-    "value": "Attribute 1"
-  },
-  "attr_A2": {
-    "type": "Property",
-    "value": "Attribute 2"
-  }
-}
 
 
 

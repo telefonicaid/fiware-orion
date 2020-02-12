@@ -94,7 +94,6 @@ echo
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:test12
 Date: REGEX(.*)
 
@@ -104,7 +103,6 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Test:12
 Date: REGEX(.*)
 
