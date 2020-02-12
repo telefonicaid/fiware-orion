@@ -25,17 +25,19 @@
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "ngsi/ParseData.h"                                    // ParseData needed for postUpdateContext()
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
-#include "serviceRoutines/postUpdateContext.h"                 // postUpdateContext
-#include "orionld/serviceRoutines/orionldDeleteEntity.h"       // Own Interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
+#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
 
 
@@ -45,9 +47,6 @@
 //
 bool orionldDeleteEntity(ConnectionInfo* ciP)
 {
-  ParseData  parseData;
-  Entity     entity;
-
   LM_T(LmtServiceRoutine, ("In orionldDeleteEntity"));
 
   // Check that the Entity ID is a valid URI
@@ -60,32 +59,41 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
     return false;
   }
 
-  // Fill in entity with the entity-id from the URL
-  entity.id = orionldState.wildcard[0];
+  // Fill in mongoRequest with the entity-id from the URL and Deleteas Action Type
+  UpdateContextRequest   mongoRequest;
+  UpdateContextResponse  mongoResponse;
+  ContextElement         ce;
+  HttpStatusCode         status;
 
-  // Fill in the upcr field for postUpdateContext, with the entity and DELETE as action
-  parseData.upcr.res.fill(&entity, ActionTypeDelete);
+  ce.entityId.id = orionldState.wildcard[0];
+  mongoRequest.contextElementVector.push_back(&ce);
+  mongoRequest.updateActionType = ActionTypeDelete;
 
-  // Call standard op postUpdateContext
-  std::vector<std::string> compV;  // dum my - postUpdateContext requires this arg as its 3rd parameter
-  postUpdateContext(ciP, 3, compV, &parseData);
+  // Call mongoBackend
+  status = mongoUpdateContext(&mongoRequest,
+                              &mongoResponse,
+                              orionldState.tenant,
+                              ciP->servicePathV,
+                              ciP->uriParam,
+                              ciP->httpHeaders.xauthToken,
+                              ciP->httpHeaders.correlator,
+                              ciP->httpHeaders.ngsiv2AttrsFormat,
+                              ciP->apiVersion,
+                              NGSIV2_NO_FLAVOUR);
 
   // Check result
-  if (parseData.upcrs.res.oe.code != SccNone)
+  if (status != SccOk)
+    LM_E(("mongoUpdateContext: %d", status));
+
+  if (mongoResponse.oe.code != SccNone)
   {
-    OrionldResponseErrorType eType = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
+    OrionldResponseErrorType eType = (mongoResponse.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
 
-    orionldErrorResponseCreate(eType, parseData.upcrs.res.oe.details.c_str(), orionldState.wildcard[0]);
-    ciP->httpStatusCode = (parseData.upcrs.res.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
-
-    // Release allocated data
-    parseData.upcr.res.contextElementVector.release();
+    orionldErrorResponseCreate(eType, mongoResponse.oe.details.c_str(), orionldState.wildcard[0]);
+    ciP->httpStatusCode = (mongoResponse.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
 
     return false;
   }
-
-  // Release allocated data
-  parseData.upcr.res.contextElementVector.release();
 
   // HTTP Response Code is 204 - No Content
   ciP->httpStatusCode = SccNoContent;

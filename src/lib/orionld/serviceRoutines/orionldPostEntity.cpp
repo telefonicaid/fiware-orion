@@ -42,12 +42,10 @@ extern "C"
 
 #include "common/MimeType.h"                                     // MimeType
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "ngsi/ParseData.h"                                      // ParseData
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
-#include "serviceRoutines/postUpdateContext.h"                   // postUpdateContext
 
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
@@ -143,26 +141,23 @@ KjNode* kjContainerStringValueLookup(KjNode* container, const char* value)
 //         * If options==noOverwrite: the existing Attribute in the target Entity shall be left untouched
 //         * If options!=noOverwrite: the existing Attribute in the target Entity shall be replaced by the new one supplied.
 //
+// The new idea on how to be able to use mongoBackend's mongoUpdateContext() for just about ANY DB Update:
+// The attributes (or entire entities) that are to be updated are first selected and then REMOVED, using libdb.
+// After that operation, we're free to use mongoBackend's mongoUpdateContext() to Update (Append) the attributes/entities.
 //
-// If options=noOverwrite is set, then we can simply use updateActionType == ActionTypeAppendStrict
-//
-// If options=noOverwrite is NOT set, then we have no matching already existing function.
-// Tries have been made to modify mongoBackend but without success - see issue https://github.com/FIWARE/context.Orion-LD/issues/153
-//
-// INSTEAD of using ActionTypeAppendStrict for options=noOverwrite and trying to make the non-noOverwrite case work we will do the following:
-//
-// 1. Get the entity from mongo - as a KjNode tree (db + mongoCppLegacy lib)
-// 2. Merge entity from mongo with attrs from DB
-//    - If OK to overwrite, clashing attrs will be removed from 'entity from mongo'
-//    - If NOT OK to overwrite, clashing attrs will be removed from 'attrs from payload'
-//    - New attributes will be simply added to 'entity from mongo'
-//    - Make sure creDate is preserved
-//    - Make sure modDate is updated
-// 3. Create UpdateContext from the KjNode tree 'entity from mongo'
-// 4. Call postUpdateContext to REPLACE the "new" entity ('entity from mongo') - make sure creDate is preserved
-//
-// Like this, we get subscriptions and forwarding for free and the operation works as the spec says.
-// We use mongoBackend only in the last step.
+// So:
+// 01. Is the Entity ID in the URL a valid URI?
+// 02. Is the payload not a JSON object?
+// 03. Get the entity from mongo (using libdb)
+// 04. Get the 'attrNames' array from the mongo entity
+// 05. How many attributes are there (in the payload), and are they valid (if overwrite == false)?
+//     Those that are invalid are removed from the tree "orionldState.requestTree"
+// 06. If no valid attributes, then we're done
+// 07. Create an array of the attributes "still left"
+// 08. Save all attribute long names in attrNameV, also - replace all '.' for '='
+// 09. Convert the remaining attributes in orionldState.requestTree to an UpdateContextRequest to prepare for call to mongoBackend
+// 10. Call mongoBackend (mongoUpdateContext) to do the Update
+// 11. Prepare the response
 //
 bool orionldPostEntity(ConnectionInfo* ciP)
 {
@@ -195,7 +190,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     return false;
   }
 
-
+  // 4. Get the 'attrNames' array from the mongo entity
   KjNode* inDbAttrNamesP = NULL;
   if (overwrite == false)
   {
@@ -211,7 +206,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   //
   // 5. How many attributes are there (in the payload), and are they valid (if overwrite == false)?
-  //    Those invalid are removed from the tree "orionldState.requestTree"
+  //    Those that are invalid are removed from the tree "orionldState.requestTree"
   int     attrsInPayload = 0;
   KjNode* attrP          = orionldState.requestTree->value.firstChildP;
   KjNode* next;
@@ -281,7 +276,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
   LM_TMP(("KZ: In orionldPostEntity - %d attributes to append to entity", attrsInPayload));
 
-  // 5. If no valid attributes, then we're done
+  // 6. If no valid attributes, then we're done
   if (attrsInPayload == 0)
   {
     LM_TMP(("KZ: In orionldPostEntity - no valid attributes - we're done here"));
@@ -305,11 +300,11 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     return true;
   }
 
-  // 6. Create an array of the attributes
+  // 7. Create an array of the attributes "still left"
   char** attrNameV  = (char**) kaAlloc(&orionldState.kalloc, attrsInPayload * sizeof(char*));
   int    attrNameIx = 0;
 
-  // 7. Save all attribute long names in attrNameV, also - replace all '.' for '='
+  // 8. Save all attribute long names in attrNameV, also - replace all '.' for '='
   LM_TMP(("KZ: In orionldPostEntity - composing an array of attributes, for dbEntityAttributesDelete"));
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -325,8 +320,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
   //
-  // 9. Convert the remaining attributes in orionldState.requestTree to an UpdateContextRequest
-  //    to prepare for call to mongoBackend
+  // 9. Convert the remaining attributes in orionldState.requestTree to an UpdateContextRequest to prepare for call to mongoBackend
   //
   UpdateContextRequest ucr;
   ContextElement       ce;
@@ -375,7 +369,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     LM_E(("mongoUpdateContext: %d", status));
 
   //
-  // Prepare response
+  // 11. Prepare the response
   //
   LM_TMP(("KZ: In orionldPostEntity - preparing response"));
   if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK

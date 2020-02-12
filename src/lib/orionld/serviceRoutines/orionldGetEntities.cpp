@@ -34,8 +34,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "serviceRoutines/postQueryContext.h"                  // V1 service routine that does the whole work ...
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi10/QueryContextRequest.h"                        // QueryContextRequest
+#include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
+#include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
+
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
@@ -71,28 +74,29 @@ extern "C"
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
 {
-  ParseData    parseData;
-  char*        id             = (ciP->uriParam["id"].empty())?          NULL : (char*) ciP->uriParam["id"].c_str();
-  char*        type           = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
-  char*        idPattern      = (ciP->uriParam["idPattern"].empty())?   NULL : (char*) ciP->uriParam["idPattern"].c_str();
-  char*        q              = (ciP->uriParam["q"].empty())?           NULL : (char*) ciP->uriParam["q"].c_str();
-  char*        attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
+  char*                 id             = (ciP->uriParam["id"].empty())?          NULL : (char*) ciP->uriParam["id"].c_str();
+  char*                 type           = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
+  char*                 idPattern      = (ciP->uriParam["idPattern"].empty())?   NULL : (char*) ciP->uriParam["idPattern"].c_str();
+  char*                 q              = (ciP->uriParam["q"].empty())?           NULL : (char*) ciP->uriParam["q"].c_str();
+  char*                 attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
 
-  char*        geometry       = (ciP->uriParam["geometry"].empty())?    NULL : (char*) ciP->uriParam["geometry"].c_str();
-  char*        georel         = (ciP->uriParam["georel"].empty())?      NULL : (char*) ciP->uriParam["georel"].c_str();
-  char*        coordinates    = (ciP->uriParam["coordinates"].empty())? NULL : (char*) ciP->uriParam["coordinates"].c_str();
+  char*                 geometry       = (ciP->uriParam["geometry"].empty())?    NULL : (char*) ciP->uriParam["geometry"].c_str();
+  char*                 georel         = (ciP->uriParam["georel"].empty())?      NULL : (char*) ciP->uriParam["georel"].c_str();
+  char*                 coordinates    = (ciP->uriParam["coordinates"].empty())? NULL : (char*) ciP->uriParam["coordinates"].c_str();
 
-  char*        idString       = (id != NULL)? id      : idPattern;
-  const char*  isIdPattern    = (id != NULL)? "false" : "true";
-  bool         isTypePattern  = (*type != 0)? false   : true;
-  EntityId*    entityIdP;
-  char*        typeExpanded   = NULL;
-  char*        detail;
-  char*        idVector[32];    // Is 32 a good limit?
-  char*        typeVector[32];  // Is 32 a good limit?
-  int          idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
-  int          typeVecItems   = (int) sizeof(typeVector) / sizeof(typeVector[0]);
-  bool         keyValues      = ciP->uriParamOptions[OPT_KEY_VALUES];
+  char*                 idString       = (id != NULL)? id      : idPattern;
+  const char*           isIdPattern    = (id != NULL)? "false" : "true";
+  bool                  isTypePattern  = (*type != 0)? false   : true;
+  EntityId*             entityIdP;
+  char*                 typeExpanded   = NULL;
+  char*                 detail;
+  char*                 idVector[32];    // Is 32 a good limit?
+  char*                 typeVector[32];  // Is 32 a good limit?
+  int                   idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
+  int                   typeVecItems   = (int) sizeof(typeVector) / sizeof(typeVector[0]);
+  bool                  keyValues      = ciP->uriParamOptions[OPT_KEY_VALUES];
+  QueryContextRequest   mongoRequest;
+  QueryContextResponse  mongoResponse;
 
   if ((id == NULL) && (idPattern == NULL) && (*type == 0) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
   {
@@ -203,7 +207,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     }
 
     LM_E(("Geo: Scope::fill OK"));
-    parseData.qcr.res.restriction.scopeVector.push_back(scopeP);
+    mongoRequest.restriction.scopeVector.push_back(scopeP);
   }
 
   if (idString == NULL)
@@ -262,7 +266,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     for (int ix = 0; ix < idVecItems; ix++)
     {
       entityIdP = new EntityId(idVector[ix], type, "false", isTypePattern);
-      parseData.qcr.res.entityIdVector.push_back(entityIdP);
+      mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
   else if (typeVecItems > 1)  // A list of Entity Types
@@ -275,13 +279,13 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         typeExpanded = typeVector[ix];
 
       entityIdP = new EntityId(idString, typeExpanded, isIdPattern, false);
-      parseData.qcr.res.entityIdVector.push_back(entityIdP);
+      mongoRequest.entityIdVector.push_back(entityIdP);
     }
   }
   else  // Definitely no lists in EntityId id/type
   {
     entityIdP = new EntityId(idString, type, isIdPattern, isTypePattern);
-    parseData.qcr.res.entityIdVector.push_back(entityIdP);
+    mongoRequest.entityIdVector.push_back(entityIdP);
   }
 
   if (attrs != NULL)
@@ -295,7 +299,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], NULL, true, NULL);
 
-      parseData.qcr.res.attributeList.push_back(longName);
+      mongoRequest.attributeList.push_back(longName);
     }
   }
 
@@ -310,7 +314,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input (qLex: %s: %s)", title, detail));
       orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
-      parseData.qcr.res.release();
+      mongoRequest.release();
       return false;
     }
 
@@ -318,7 +322,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input (qParse: %s: %s)", title, detail));
       orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
-      parseData.qcr.res.release();
+      mongoRequest.release();
       return false;
     }
 
@@ -334,22 +338,45 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input (qTreeToBsonObj: %s: %s)", title, detail));
       orionldErrorResponseCreate(OrionldBadRequestData, title, detail);
-      parseData.qcr.res.release();
+      mongoRequest.release();
       return false;
     }
 
     *orionldState.qMongoFilterP = objBuilder.obj();
   }
 
-  // Call standard op postQueryContext
-  std::vector<std::string>  compV;    // Not used but part of signature for postQueryContext
-  std::string               answer = postQueryContext(ciP, 0, compV, &parseData);
+
+  //
+  // Call mongoBackend
+  //
+  long long   count;
+  long long*  countP = (ciP->uriParamOptions["count"] == true)? &count : NULL;
+
+  ciP->httpStatusCode = mongoQueryContext(&mongoRequest,
+                                          &mongoResponse,
+                                          orionldState.tenant,
+                                          ciP->servicePathV,
+                                          ciP->uriParam,
+                                          ciP->uriParamOptions,
+                                          countP,
+                                          ciP->apiVersion);
+
 
   //
   // Transform QueryContextResponse to KJ-Tree
   //
-  ciP->httpStatusCode       = SccOk;
-  orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &parseData.qcrs.res);
+  ciP->httpStatusCode = SccOk;
+
+  orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &mongoResponse);
+
+  // Add "count" if asked for
+  if (countP != NULL)
+  {
+    char cV[32];
+    snprintf(cV, sizeof(cV), "%llu", *countP);
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeaderValue.push_back(cV);
+  }
 
   return true;
 }

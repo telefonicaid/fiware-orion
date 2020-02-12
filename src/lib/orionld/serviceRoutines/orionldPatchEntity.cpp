@@ -306,7 +306,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   }
 
   //
-  // Call mongoBackend - FIXME: call postUpdateContext, not mongoUpdateContext
+  // Call mongoBackend
   //
   ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
                                            &mongoResponse,
