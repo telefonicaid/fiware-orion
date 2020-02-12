@@ -49,13 +49,13 @@ extern "C"
 //
 // hashCode -
 //
-int hashCode(const char* name)
+unsigned int hashCode(const char* name)
 {
-  int code = 0;
+  unsigned int code = 0;
 
   while (*name != 0)
   {
-    code += *name;
+    code += (unsigned char) *name;
     ++name;
   }
 
