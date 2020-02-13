@@ -215,7 +215,7 @@ Date: REGEX(.*)
 04. GeoQuery near. Max Distance: 1291m - see Building:store002
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 332
+Content-Length: 294
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -228,7 +228,7 @@ Date: REGEX(.*)
             "postalCode": "10969",
             "streetAddress": "Friedrichstra\u00dfe 44"
         },
-        "category": "https://uri.fiware.org/ns/data-models#commercial",
+        "category": "commercial",
         "id": "urn:ngsi-ld:Building:store002",
         "location": {
             "coordinates": [

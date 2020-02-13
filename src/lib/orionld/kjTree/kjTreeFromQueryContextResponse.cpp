@@ -365,7 +365,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
           if (valueMayBeCompacted == true)
           {
             char* compactedValue = orionldContextItemAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL, NULL);
-            if (compactedValue == NULL)
+            if (compactedValue != NULL)
               aTop = kjString(orionldState.kjsonP, attrName, compactedValue);
             else
               aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());

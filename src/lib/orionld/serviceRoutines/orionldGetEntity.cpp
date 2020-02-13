@@ -151,7 +151,7 @@ static void attrsToAlias(OrionldContext* contextP, char* attrV[], int attrs)
 //   YES                                               YES                                    "attrs" URI param is a merge between the two
 //
 //
-static KjNode* orionldForwardGetEntity2(KjNode* registrationP, char* entityId, char** uriParamAttrV, int uriParamAttrs)
+static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId, char** uriParamAttrV, int uriParamAttrs)
 {
   char            host[128]                  = { 0 };
   char            protocol[32]               = { 0 };
@@ -284,7 +284,7 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
   //
   for (KjNode* regP = regArrayP->value.firstChildP; regP != NULL; regP = regP->next)
   {
-    KjNode*  partTree = orionldForwardGetEntity2(regP, entityId, uriParamAttrsV, uriParamAttrs);
+    KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, uriParamAttrsV, uriParamAttrs);
 
     if (partTree != NULL)  // Move all attributes from 'partTree' into responseP
     {
