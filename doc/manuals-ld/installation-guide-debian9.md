@@ -1,11 +1,24 @@
-# Orion-LD Installation Guide for Ubuntu 18.04.3
+# Orion-LD Installation Guide for Debian 9
 
-In order to write this guide, Ubuntu 18.04.3 LTS (Desktop image) was downloaded from [here](http://releases.ubuntu.com/18.04/), and installed as a virtual machine under VMWare.
+In order to write this guide, Debian 9 (Desktop image) was downloaded from [here](https://cdimage.debian.org/mirror/cdimage/archive/9.4.0/amd64/iso-cd/debian-9.4.0-amd64-netinst.iso), and installed as a virtual machine under VMWare.
+
+## Sudo user installation
+
+In many of the following steps, commands need to be executed as superuser (root).
+To be able to use the _sudo_ command in Debian, do the following:
+
+```bash
+apt-get update
+apt-get install sudo
+adduser <USERNAME> sudo
+# Restart the OS
+reboot
+```
 
 ## Installation of dependency packages
 
 To be installed via package manager:
-* boost (plenty of libraries)
+* boost (plenty of libraries) v1.62
 * libssl1.0
 * libcurl4
 * libsasl2
@@ -27,10 +40,7 @@ sudo aptitude install build-essential cmake scons curl
 Libraries that aren't built from source code:
 
 ```bash
-sudo aptitude install libssl1.0-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
-                      libgcrypt-dev uuid-dev libboost-dev libboost-regex-dev libboost-thread-dev \
-                      libboost-filesystem-dev
-
+sudo aptitude install libssl1.0-dev libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev libgcrypt-dev uuid-dev libboost-dev libboost-regex-dev libboost-thread-dev libboost-filesystem-dev
 ```
 
 ## Download and build dependency libraries from source code
@@ -38,11 +48,11 @@ Some libraries are built from source code and those sources must be downloaded a
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.48
 * rapidjson:      1.0.2
-* kbase:          0.2
-* klog:           0.2
-* kalloc:         0.2
-* kjson:          0.2
-* khash:          0.2
+* kbase:          0.3
+* klog:           0.3
+* kalloc:         0.3
+* kjson:          0.3
+* khash:          0.3
 * gtest:          1.5 (needed for unit testing only)
 * gmock:          1.5 (needed for unit testing only)
 
@@ -224,24 +234,28 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
+For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
-This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Ubuntu 18.04:
+This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Debian 9.
 
 ```bash
-# Import the MongoDB public GPG Key
-wget -qO - https://www.mongodb.org/static/pgp/server-4.0.asc | sudo apt-key add -
-# Should respon with "OK"
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+apt-get install gnupg
 
-# Create the list file /etc/apt/sources.list.d/mongodb-org-4.2.list
-echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc |  sudo apt-key add -
+echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
 
-# Reload local package database
 sudo apt-get update
-
-# Install the MongoDB packages
 sudo apt-get install -y mongodb-org
+echo "mongodb-org hold" | sudo dpkg --set-selections
+echo "mongodb-org-server hold" | sudo dpkg --set-selections
+echo "mongodb-org-shell hold" | sudo dpkg --set-selections
+echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+sudo systemctl start mongod
+sudo systemctl status mongod
+sudo systemctl enable mongod
 ```
 
-For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/)

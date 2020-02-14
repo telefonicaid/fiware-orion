@@ -73,7 +73,7 @@ To install Orion-LD from source code, please follow the instructions for your se
 Installation guides for different distributions:
 * [Ubuntu 18.04.3 LTS](installation-guide-ubuntu-18.04.3.md) - the Official Distribution
 * [CentOS 7](installation-guide-centos7.md)
-* [Debian 10](installation-guide-debian10.md)
+* [Debian 9](installation-guide-debian9.md)
 
 
 ### Sanity check

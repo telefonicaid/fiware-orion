@@ -121,7 +121,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kbase.git
 cd kbase
-git checkout release/0.2
+git checkout release/0.3
 make install
 ```
 
@@ -134,7 +134,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/klog.git
 cd klog
-git checkout release/0.2
+git checkout release/0.3
 make install
 ```
 
@@ -151,7 +151,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
 cd kalloc
-git checkout release/0.2
+git checkout release/0.3
 make install
 ```
 
@@ -166,7 +166,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.2
+git checkout release/0.3
 make install
 ```
 
@@ -179,7 +179,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
-git checkout release/0.2
+git checkout release/0.3
 vi makefile
 # Edit makefile and add/write that content at CFLAGS after "-g"
 CFLAGS= -g -std=c99
