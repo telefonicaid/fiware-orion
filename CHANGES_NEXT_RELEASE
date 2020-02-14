@@ -9,4 +9,5 @@
 * Issue #XXX - Fixed a bug in Patch Attribute forwarding - Content-Type was always application/json
 * Issue #XXX - Implemented the service "DELETE /ngsi-ld/v1/csourceRegistrations/{registrationId}
 * Issue #XXX - Complete reimplementation of POST /ngsi-ld/v1/entities/{EID}/attrs
-* Issue #364 - Attribute value compaction not done when 'keyValues' option is set
+* Issue #364 - Attribute value compaction not done when 'keyValues' option is set - now it is!
+* Issue #XXX - Implemented PATCH /ngsi-ld/v1/subscriptions/{subscriptionId}

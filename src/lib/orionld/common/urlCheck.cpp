@@ -43,7 +43,7 @@
 // 6. Optionally, a :<port number> - if so, make sure it is a number
 // 7. Make sure the rest is a valid path
 //
-bool urlCheck(char* url, char** detailsPP)
+bool urlCheck(char* url, char** detailP)
 {
   //
   // 1. A URL for ngsi-ld MUST start with http:// or https://
@@ -55,8 +55,8 @@ bool urlCheck(char* url, char** detailsPP)
   //
   if (!SCOMPARE4(url, 'h', 't', 't', 'p'))
   {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "protocol doesn't start with 'http' nor 'https'";
+    if (detailP != NULL)
+      *detailP = (char*) "protocol doesn't start with 'http' nor 'https'";
     return false;
   }
 
@@ -67,8 +67,8 @@ bool urlCheck(char* url, char** detailsPP)
 
   if (!SCOMPARE3(urlP, ':', '/', '/'))
   {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "protocol doesn't start with 'http://' nor 'https://'";
+    if (detailP != NULL)
+      *detailP = (char*) "protocol doesn't start with 'http://' nor 'https://'";
     return false;
   }
 
@@ -86,8 +86,8 @@ bool urlCheck(char* url, char** detailsPP)
       ip[toIx] = *urlP;
     else
     {
-      if (detailsPP != NULL)
-        *detailsPP = (char*) "assumed IP address too long";
+      if (detailP != NULL)
+        *detailP = (char*) "assumed IP address too long";
       ip[toIx] = 0;
       return false;
     }
@@ -120,8 +120,8 @@ bool urlCheck(char* url, char** detailsPP)
     {
       if (toIx >= portNumberStringSize - 1)  // One char left for nuling the string
       {
-        if (detailsPP != NULL)
-          *detailsPP = (char*) "port number too big";
+        if (detailP != NULL)
+          *detailP = (char*) "port number too big";
         return false;
       }
 
@@ -138,8 +138,8 @@ bool urlCheck(char* url, char** detailsPP)
     {
       if ((*portCharP < '0') || (*portCharP > '9'))
       {
-        if (detailsPP != NULL)
-          *detailsPP = (char*) "URL parse error - invalid port number";
+        if (detailP != NULL)
+          *detailP = (char*) "URL parse error - invalid port number";
         return false;
       }
     }
@@ -153,8 +153,8 @@ bool urlCheck(char* url, char** detailsPP)
     if (*urlP == 0)
       return true;
 
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
+    if (detailP != NULL)
+      *detailP = (char*) "URL parse error - no slash found to start the URL PATH";
     return false;
   }
 

@@ -27,47 +27,52 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjRender.h"                                      // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
+
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"   // Own interface
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionReplace.h"   // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityUpdate -
+// mongoCppLegacySubscriptionReplace -
 //
-bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree)
+bool mongoCppLegacySubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptionP)
 {
-  char                   collectionPath[256];
-  mongo::BSONObj         payloadAsBsonObj;
+  char            collectionPath[256];
+  mongo::BSONObj  payloadAsBsonObj;
 
-  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
-  dbDataFromKjTree(requestTree, &payloadAsBsonObj);
-
+  dbCollectionPathGet(collectionPath, sizeof(collectionPath), "csubs");
+  dbDataFromKjTree(dbSubscriptionP, &payloadAsBsonObj);
 
   //
-  // Populate filter - only Entity ID for this operation
+  // Populate filter - only Subscription ID for this operation
   //
   mongo::BSONObjBuilder  filter;
-  filter.append("_id.id", entityId);
-
+  filter.append("_id", subscriptionId);
 
   // semTake()
-  bool                  upsert      = false;
   mongo::DBClientBase*  connectionP = getMongoConnection();
   mongo::Query          query(filter.obj());
-  connectionP->update(collectionPath, query, payloadAsBsonObj, upsert, false);
+
+  try
+  {
+    connectionP->update(collectionPath, query, payloadAsBsonObj, false, false);
+  }
+  catch (const std::exception &e)
+  {
+    LM_E(("Mongo Exception: %s", e.what()));
+  }
+
   releaseMongoConnection(connectionP);
   // semGive()
 
-  return true;
+  return false;
 }

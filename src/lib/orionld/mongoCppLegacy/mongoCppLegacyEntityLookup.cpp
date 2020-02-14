@@ -123,5 +123,6 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
       }
     }
   }
-  return  kjTree;
+
+  return kjTree;
 }

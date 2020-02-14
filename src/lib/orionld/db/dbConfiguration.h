@@ -73,6 +73,8 @@ typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray);
 typedef KjNode* (*DbRegistrationLookup)(const char* entityId, const char* attribute, int* noOfRegsP);
 typedef bool    (*DbRegistrationExists)(const char* registrationId);
 typedef bool    (*DbRegistrationDelete)(const char* registrationId);
+typedef KjNode* (*DbSubscriptionGet)(const char* subscriptionId);
+typedef bool    (*DbSubscriptionReplace)(const char* subscriptionId, KjNode* dbSubscriptionP);
 
 
 
@@ -93,5 +95,7 @@ extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCre
 extern DbRegistrationLookup                      dbRegistrationLookup;
 extern DbRegistrationExists                      dbRegistrationExists;
 extern DbRegistrationDelete                      dbRegistrationDelete;
+extern DbSubscriptionGet                         dbSubscriptionGet;
+extern DbSubscriptionReplace                     dbSubscriptionReplace;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

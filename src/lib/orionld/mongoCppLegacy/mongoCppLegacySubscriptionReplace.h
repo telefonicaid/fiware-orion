@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONREPLACE_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONREPLACE_H_
+
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,29 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/urnCheck.h"                           // Own interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// urnCheck -
-//
-bool urnCheck(char* urn, char** detailP)
+extern "C"
 {
-  // FIXME: Implement!!!
-
-  if (!SCOMPARE4(urn, 'u', 'r', 'n', ':'))
-  {
-    if (detailP != NULL)
-      *detailP = (char*) "protocol doesn't start with 'urn:'";
-    return false;
-  }
-
-  return true;
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
+
+
+// -----------------------------------------------------------------------------
+//
+// mongoCppLegacySubscriptionReplace -
+//
+extern bool mongoCppLegacySubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptionP);
+
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONREPLACE_H_

@@ -1,0 +1,369 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Patch
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription
+# 02. Get Subscription from mongo
+# 03. GET the subscription - see its initial state
+# 04. Patch it,	changing the name and adding a description
+# 05. GET the subscription - see the modification
+# 06. Get Subscription from mongo
+# 07. Create an entity that triggers a notification
+# 08. Dump the accumulator to see the notification
+#
+
+echo "01. Create a subscription"
+echo "========================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:01",
+  "type": "Subscription",
+  "name": "Test subscription S01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "csf": "not implemented",
+  "isActive": true,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+echo "02. Get Subscription from mongo"
+echo "==============================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription - see its initial state"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Patch it,	changing the name and adding a description"
+echo "========================================================"
+payload='{
+  "name": "Changed Name for Test subscription S01",
+  "description": "New Description of Test subscription S01"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET the subscription - see the modification"
+echo "==============================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "06. Get Subscription from mongo"
+echo "==============================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "07. Create an entity that triggers a notification"
+echo "================================================="
+payload='{
+  "id": "urn:ngsi-ld:E01",
+  "type": "T1",
+  "P2": {
+    "type": "Property",
+    "value": 13
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump the accumulator to see the notification"
+echo "================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01
+Date: REGEX(.*)
+
+
+
+02. Get Subscription from mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:01",
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : NumberLong(5),
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Test subscription S01",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"expression" : {
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : ""
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+03. GET the subscription - see its initial state
+================================================
+HTTP/1.1 200 OK
+Content-Length: 519
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:01",
+  "type": "Subscription",
+  "name": "Test subscription S01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+04. Patch it,	changing the name and adding a description
+========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET the subscription - see the modification
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 597
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:01",
+  "type": "Subscription",
+  "name": "Changed Name for Test subscription S01",
+  "description": "New Description of Test subscription S01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+06. Get Subscription from mongo
+===============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:01",
+	"expiration" : REGEX(.*),
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Changed Name for Test subscription S01",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"expression" : {
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : ""
+	},
+	"format" : "keyValues",
+	"description" : "New Description of Test subscription S01"
+}
+bye
+
+
+07. Create an entity that triggers a notification
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
+Date: REGEX(.*)
+
+
+
+08. Dump the accumulator to see the notification
+================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 291
+User-Agent: REGEX(.*)
+Ngsiv2-Attrsformat: keyValues
+Host: localhost:9997
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
+    "data": [
+        {
+            "P2": 13, 
+            "id": "urn:ngsi-ld:E01", 
+            "type": "T1"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:subscriptions:01", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

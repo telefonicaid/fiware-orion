@@ -34,6 +34,8 @@ SET (SOURCES
     mongoCppLegacyRegistrationExists.cpp
     mongoCppLegacyRegistrationDelete.cpp
     mongoCppLegacyEntityAttributesDelete.cpp
+    mongoCppLegacySubscriptionGet.cpp
+    mongoCppLegacySubscriptionReplace.cpp
 )
 
 # Include directories
