@@ -8,6 +8,8 @@ Docker を使用して Orion Context Broker を非常に簡単に実行できま
 
 これらは同じことをする別の方法ですが、3つすべてを行う必要はありません。
 
+また、Raspberry Pi で Orion を実行することもできます。これを行う方法については、この[ドキュメント](./raspberry_pi.jp.md)を参照してください。
+
 Docker が動作するマシンが必要です。これを行う方法の [ドキュメント](https://docs.docker.com/installation/)を参照してください。
 
 ----
@@ -115,6 +117,15 @@ Orion Context Broker を試してみたいし、データベースについて�
 	 curl localhost:1026/version
 
 `docker build` コマンドのパラメータ `-t orion` は、イメージに名前を付けます。この名前は何でもかまいませんし、`-t org/fiware-orion` のような組織も含めています。この名前は後でイメージに基づいてコンテナを実行するために使用されます。
+
+`docker build` のパラメータ `--build-arg`i はビルド時の変数を設定できます。
+
+| ARG             | 説明                                                           | 例                              |
+| --------------- | -------------------------------------------------------------- | ------------------------------- |
+| IMAGE_TAG       | ベース・イメージのタグを指定します                             | --build-arg IMAGE_TAG=centos7   |
+| GIT_NAME        | GitHub リポジトリのユーザ名を指定します                        | --build-arg GIT_NAME=fiware-ges |
+| GIT_REV_ORION   | ビルドする Orion バージョンを指定します                        | --build-arg GIT_REV_ORION=2.3.0 |
+| CLEAN_DEV_TOOLS | 開発ツールをクリアするかどうかを指定します。0 の場合は残ります | --build-arg CLEAN_DEV_TOOLS=0   |
 
 イメージとビルド・プロセスの詳細については、[Docker のドキュメント](https://docs.docker.com/userguide/dockerimages/)を参照してください。
 
