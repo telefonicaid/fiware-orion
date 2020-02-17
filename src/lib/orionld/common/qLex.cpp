@@ -111,8 +111,11 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
     int        digits   = 0;
     int        dots     = 0;
     int        others   = 0;
+    int        colons   = 0;
     int        spaces   = 0;
     int        hyphens  = 0;
+    int        Ts       = 0;
+    int        Zs       = 0;
     char*      sP       = term;
     bool       dateTime = false;
     QNodeType  type;
@@ -135,12 +138,24 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
           ++spaces;
         else if (*sP == '-')
           ++hyphens;
+        else if (*sP == ':')
+          ++colons;
+        else if (*sP == 'T')
+          ++Ts;
+        else if (*sP == 'Z')
+          ++Zs;
         else
           ++others;
 
         ++sP;
       }
-
+#if 0
+      LM_TMP(("DT: others: %d", others));
+      LM_TMP(("DT: hyphens: %d", hyphens));
+      LM_TMP(("DT: Ts:     %d", Ts));
+      LM_TMP(("DT: Zs:     %d", Zs));
+      LM_TMP(("DT: colons: %d", colons));
+#endif
       if (others == 0)
       {
         if (hyphens > 0)
@@ -165,13 +180,16 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
     {
       int64_t dTime;
 
-      if ((dateTime == true) && ((dTime = parse8601Time(term)) == -1))
-        dateTime = false;
+      if (dateTime == true)
+      {
+        if ((dTime = parse8601Time(term)) == -1)
+          dateTime = false;
+        else
+          qNodeP->value.i = dTime;
+      }
 
       if (dateTime == false)
         qNodeP->value.i = strtoul(term, NULL, 10);
-      else
-        qNodeP->value.i = dTime;
     }
     else if (type == QNodeFloatValue)
       qNodeP->value.f = strtod(term, NULL);
