@@ -31,9 +31,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "apiTypesV2/Registration.h"                                 // ngsiv2::Registration
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
 #include "mongoBackend/dbConstants.h"                                // REG_ATTRS, ...
 #include "mongoBackend/safeMongo.h"                                  // getFieldF
+#include "orionld/common/orionldState.h"                             // orionldState
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
+#include "orionld/context/orionldContextItemAliasLookup.h"           // orionldContextItemAliasLookup
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"             // Own interface
 
 
@@ -58,7 +60,8 @@ void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
       if (propName != "")
       {
-        reg->dataProvided.propertyV.push_back(propName);
+        char* alias = orionldContextItemAliasLookup(orionldState.contextP, propName.c_str(), NULL, NULL);
+        reg->dataProvided.propertyV.push_back(alias);
       }
     }
   }
@@ -86,7 +89,8 @@ void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
       if (relName != "")
       {
-        reg->dataProvided.relationshipV.push_back(relName);
+        char* alias = orionldContextItemAliasLookup(orionldState.contextP, relName.c_str(), NULL, NULL);
+        reg->dataProvided.relationshipV.push_back(alias);
       }
     }
   }
@@ -176,7 +180,7 @@ void mongoSetLdTimestamp(long long* timestampP, const char* name, const mongo::B
 
 // -----------------------------------------------------------------------------
 //
-// mongoSetLdTimeInterval -
+// mongoSetLdTimeInterval - extract TimeInterval from BSONObj
 //
 bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, const mongo::BSONObj& bobj, char** titleP, char** detailP)
 {
@@ -211,14 +215,17 @@ bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, 
 //
 bool mongoSetLdProperties(ngsiv2::Registration* regP, const char* name, const mongo::BSONObj& bobj, char** titleP, char** detailP)
 {
-  mongo::BSONObj  propertiesObj   = getObjectFieldF(bobj, name);
-
-  regP->properties = mongoCppLegacyKjTreeFromBsonObj(&propertiesObj, titleP, detailP);
-
-  if (regP->properties == NULL)
+  if (bobj.hasField(name))
   {
-    LM_E(("Internal Error (%s: %s)", *titleP, *detailP));
-    return false;
+    mongo::BSONObj  propertiesObj   = getObjectFieldF(bobj, name);
+
+    regP->properties = mongoCppLegacyKjTreeFromBsonObj(&propertiesObj, titleP, detailP);
+
+    if (regP->properties == NULL)
+    {
+      LM_E(("Internal Error (%s: %s)", *titleP, *detailP));
+      return false;
+    }
   }
 
   return true;

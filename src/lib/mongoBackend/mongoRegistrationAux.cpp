@@ -37,7 +37,9 @@
 #include "mongoBackend/connectionOperations.h"                 // collectionQuery
 #include "mongoBackend/dbConstants.h"                          // REG_*
 #include "mongoBackend/safeMongo.h"                            // moreSafe
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLd*
+#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "mongoBackend/mongoRegistrationAux.h"                 // Own interface
 
 
@@ -147,6 +149,9 @@ void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
     else
     {
       entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
+
+      if (orionldState.apiVersion == NGSI_LD_V1)
+        entity.type = orionldContextItemAliasLookup(orionldState.contextP, entity.type.c_str(), NULL, NULL);
     }
 
     regP->dataProvided.entities.push_back(entity);

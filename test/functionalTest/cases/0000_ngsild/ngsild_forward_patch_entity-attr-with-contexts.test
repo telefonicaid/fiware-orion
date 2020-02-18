@@ -138,7 +138,7 @@ Date: REGEX(.*)
 03. GET the registration (just for fun)
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 255
 Content-Type: application/json
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -152,11 +152,11 @@ Date: REGEX(.*)
                 "entities": [
                     {
                         "id": "urn:ngsi-ld:Building:store001",
-                        "type": "https://uri.fiware.org/ns/data-models#Building"
+                        "type": "Building"
                     }
                 ],
                 "properties": [
-                    "https://fiware.github.io/tutorials.Step-by-Step/schema/tweets"
+                    "tweets"
                 ]
             }
         ],
