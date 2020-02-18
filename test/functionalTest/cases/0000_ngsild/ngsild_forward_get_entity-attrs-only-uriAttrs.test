@@ -46,6 +46,7 @@ brokerStart CP1
 # 04. Create entity urn:ngsi-ld:entities:E1 in CP1, with attributes P1, P2, R1, and R1
 # 05. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1,R2 to CP1
 # 06. Do the same GET, but with a Link HTTP header, with a @context that redefines P1 and R2 => no hits and no attrs are returned
+# 07. Like 5 but with options=keyValues
 #
 
 echo "01. Create entity urn:ngsi-ld:entities:E1 in CB, without attributes"
@@ -125,6 +126,13 @@ echo
 echo "06. Do the same GET, but with	a Link HTTP header, with a @context that redefines P1 and R2 => no hits and no attrs are returned"
 echo "==============================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1,R2 -H "Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;"' rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "07. Like 5 but with options=keyValues"
+echo "====================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1,R2&options=keyValues'
 echo
 echo
 
@@ -215,6 +223,22 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 Date: REGEX(.*)
 
 {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+07. Like 5 but with options=keyValues
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": "P1 in CP1",
+    "R2": "http://R2.in.CP1",
     "id": "urn:ngsi-ld:entities:E1",
     "type": "T"
 }

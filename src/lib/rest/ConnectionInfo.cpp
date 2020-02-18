@@ -231,6 +231,8 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
       orionldState.uriParamOptions.update = true;
     else if (strcmp(vec[ix].c_str(), "replace") == 0)
       orionldState.uriParamOptions.replace = true;
+    else if (strcmp(vec[ix].c_str(), "keyValues") == 0)
+      orionldState.uriParamOptions.keyValues = true;
 #endif
   }
 

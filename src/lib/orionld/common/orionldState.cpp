@@ -127,6 +127,7 @@ void orionldStateInit(void)
   orionldState.uriParamOptions.noOverwrite = false;
   orionldState.uriParamOptions.update      = false;
   orionldState.uriParamOptions.replace     = false;
+  orionldState.uriParamOptions.keyValues   = false;
   orionldState.prettyPrintSpaces           = 2;
   orionldState.prettyPrint                 = false;
   orionldState.locationAttributeP          = NULL;

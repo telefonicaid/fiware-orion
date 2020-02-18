@@ -203,7 +203,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 
 
   //
-  // If the uri directory (from the rgistration) ends in a slash, then have it removed.
+  // If the uri directory (from the registration) ends in a slash, then have it removed.
   // It is added in the snpintf further down
   //
   if (uriDirP != NULL)
@@ -214,10 +214,19 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
   }
 
   if (*newUriParamAttrsString != 0)
-    snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?attrs=%s", uriDirP, entityId, newUriParamAttrsString);
+  {
+    if (orionldState.uriParamOptions.keyValues)
+      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?options=keyValues&attrs=%s", uriDirP, entityId, newUriParamAttrsString);
+    else
+      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?attrs=%s", uriDirP, entityId, newUriParamAttrsString);
+  }
   else
-    snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
-
+  {
+    if (orionldState.uriParamOptions.keyValues)
+      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?options=keyValues", uriDirP, entityId);
+    else
+      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
+  }
 
   //
   // Sending the Forwarded request

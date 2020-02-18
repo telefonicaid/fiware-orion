@@ -43,6 +43,7 @@ brokerStart CP1
 # 01. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, attributes P1 and R1
 # 02. Create entity urn:ngsi-ld:entities:E1 in CP1, with attributes P1, P2, R1, and R1
 # 03. Ask CB to GET entity urn:ngsi-ld:entities:E1?attrs=P1,R2 - provoke a forward request of GET urn:ngsi-ld:entities:E1?attrs=P1 to CP1
+# 04. Like 3 but with options=keyValues
 #
 # As no local entity exists, the Entity Type is taken from the forward-response from CP1.
 # The entity id is given. It's part or the URL PATH of the initial request
@@ -105,6 +106,13 @@ echo
 echo
 
 
+echo "04. Like 3 but with options=keyValues"
+echo "====================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1,R2&options=keyValues'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create a registration in CB for CP1 over entity urn:ngsi-ld:entities:E1, attributes P1 and R1
 =================================================================================================
@@ -137,6 +145,21 @@ Date: REGEX(.*)
         "type": "Property",
         "value": "P1 in CP1"
     },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+04. Like 3 but with options=keyValues
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 60
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": "P1 in CP1",
     "id": "urn:ngsi-ld:entities:E1",
     "type": "T"
 }

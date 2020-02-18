@@ -45,6 +45,7 @@ brokerStart CP1
 # 03. See the registration in mongo
 # 04. Create entity urn:ngsi-ld:entities:E1 in CP1, with attributes P1, P2, R1, and R1
 # 05. Ask CB to GET entity urn:ngsi-ld:entities:E1 - provoke a forward request of GET urn:ngsi-ld:entities:E1, without ?attrs=X
+# 06. Like 5 but with keyValues
 #
 
 echo "01. Create entity urn:ngsi-ld:entities:E1 in CB, without attributes"
@@ -117,6 +118,13 @@ echo
 echo "05. Ask CB to GET entity urn:ngsi-ld:entities:E1 - provoke a forward request of GET urn:ngsi-ld:entities:E1, without ?attrs=X"
 echo "============================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "06. Like 5 but with keyValues"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=keyValues
 echo
 echo
 
@@ -201,6 +209,24 @@ Date: REGEX(.*)
         "object": "http://R2.in.CP1",
         "type": "Relationship"
     },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+06. Like 5 but with keyValues
+=============================
+HTTP/1.1 200 OK
+Content-Length: 125
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": "P1 in CP1",
+    "P2": "P2 in CP1",
+    "R1": "http://R1.in.CP1",
+    "R2": "http://R2.in.CP1",
     "id": "urn:ngsi-ld:entities:E1",
     "type": "T"
 }
