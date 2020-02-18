@@ -56,6 +56,7 @@ jobs:
      
       before_script : >
         curl -LO https://github.com/FIWARE/NGSI-LD_TestSuite/archive/master.zip;
+        shasum -a 256 master.zip
         unzip -q master.zip;
         rm master.zip;
         cd NGSI-LD_TestSuite-master;  
