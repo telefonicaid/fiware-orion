@@ -1,4 +1,4 @@
-# Installation Guide for the Orion-LD Functional Test Suite on CentOS 7
+# Installation Guide for the Orion-LD Functional Test Suite on Debian 9
 
 The functional test suite for Orion-LD, found in the Orion-LD repository, under `test/functionalTests`, needs some installation in order to work.
 
@@ -7,32 +7,22 @@ First of all, there is a python script (`scripts/accumulator-server.py`) that is
 This python script needs a few packages to be installed:
 
 1. Install **pip**
-As `pip` is not available in CentOS 7 core repositories, you need to enable the EPEL repository to be able to install `pip`.
-The EPEL (Extra Packages for Enterprise Linux) repository provides additional software packages that are not included in the standard
-RedHat and CentOS repositories.
-
 ```bash
-sudo yum install epel-release
-sudo yum install python-pip
-```
-
-Update pip:
-```bash
-pip install -U pip
+sudo aptitude install python-pip
 ```
 
 2. Install **OpenSSL** for Python:
 ```bash
-pip install pyopenssl
+sudo aptitude install python-openssl
 ```
 
 3. Install **Flask**:
 ```bash
-pip install -U virtualenv
+sudo aptitude install python3-venv
 pip install Flask
 ```
 
-That should be all for the accumulator.
+That should be all for the accumulator python script.
 
 The test script (`test/functionalTest/testHarness.sh`) needs to *find* the accumulator, to be able to start it:
 ```bash
@@ -47,11 +37,11 @@ The output of the `which` command should be:
 ~/git/context.Orion-LD/scripts/accumulator-server.py
 ```
 
-Also, the test script uses `nc` to verify that the broker has started, and `bc` for simple calculations.
+Also, the test script uses `netcat` to verify that the broker has started, and `bc` for simple calculations.
 Install both of them:
 ```bash
-sudo yum install nc
-sudo yum install bc
+sudo aptitude install netcat
+sudo aptitude install bc
 ```
 
 Test it by launching:
