@@ -99,32 +99,36 @@ Date: REGEX(.*)
 
 02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'
 ===============================================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 207 Multi Status
+Content-Length: 171
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/location",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "https://uri.etsi.org/ngsi-ld/default-context/P1"
+    ]
+}
 
 
 03. Get the entity to see that the update was correctly performed
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 243
+Content-Length: 103
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
     "P1": {
-        "P1_P1": {
-            "type": "Property",
-            "value": 0.79
-        },
-        "P1_R1": {
-            "object": "urn:ngsi-ld:T2:6789",
-            "type": "Relationship"
-        },
         "object": "urn:ngsi-ld:T2:6789",
-        "observedAt": "2018-12-04T12:00:00Z",
         "type": "Relationship"
     },
     "id": "urn:ngsi-ld:Entities:E1",

@@ -45,8 +45,14 @@ KjNode* kjStringValueLookupInArray(KjNode* stringArrayNodeP, const char* value)
 {
   if (stringArrayNodeP != NULL)
   {
+    if ((stringArrayNodeP->type != KjArray) && (stringArrayNodeP->type != KjObject))
+      return NULL;
+
     for (KjNode* nodeP = stringArrayNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
+      if (nodeP->type != KjString)
+        continue;
+
       if (strcmp(value, nodeP->value.s) == 0)
         return nodeP;
     }

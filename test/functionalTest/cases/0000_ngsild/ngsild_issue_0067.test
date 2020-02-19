@@ -26,6 +26,7 @@ Subscription Creation/Retrieval and Deletion
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbInit openiot
 brokerStart CB 0-255 IPv4 -multiservice
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
@@ -145,3 +146,4 @@ Date: REGEX(.*)
 brokerStop CB
 accumulatorStop
 dbDrop CB
+dbDrop ftest-openiot

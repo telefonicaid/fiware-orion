@@ -36,7 +36,7 @@ brokerStart CB 0-255
 # 04. Create an entity E2 with relationship attr_A3
 # 05. Update the E2 relashionship attr_A3
 # 06. GET the entity E2, make sure that the attr_A3 value was changed  (attrs as short name)
-
+#
 
 echo "01. Create an entity E1 with properties attr_A1 and attr_A2"
 echo "==========================================================="

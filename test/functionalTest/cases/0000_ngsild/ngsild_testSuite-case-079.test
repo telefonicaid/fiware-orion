@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NGSI-LD Test Suite Case 079
+NGSI-LD Test Suite Case 079, 080, and 081 (contextProvision/append_entity_attrs_with_ldcontext_test.js)
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,14 +31,19 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt
-# 02. See E1 in the database
-# 03. Append to E1 two attributes: R1 and location
-# 05. GET E1 - see the three attributes
+# 01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt (preparation)
+# 02. See E1 in the database (preparation)
+# 03. Append to E1 two attributes: R1 and location (test case 079)
+# 04. See E1 in the database (test case 079)
+# 05. GET E1 - see the three attributes (test case 079)
+# 06. Overwrite P1, with @context in payload (test case 080)
+# 07. GET E1 - see the new value of P1 (test case 080)
+# 08. With options=noOverwrite, attempt to append two attrs P1 and P2. P1 already exists and should be ignored. P2 should be appended (test case 081)
+# 09. GET E1 - see the old value of P1 and the new attribute P2 (test case 081)
 #
 
-echo "01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt"
-echo "===================================================================================="
+echo "01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt (preparation)"
+echo "=================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
@@ -62,15 +67,15 @@ echo
 echo
 
 
-echo "02. See E1 in the database"
-echo "=========================="
+echo "02. See E1 in the database (preparation)"
+echo "========================================"
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
 
-echo "03. Append to E1 two attributes: R1 and location"
-echo "================================================"
+echo "03. Append to E1 two attributes: R1 and location (test case 079)"
+echo "================================================================"
 payload='{
   "R1": {
     "type": "Relationship",
@@ -98,23 +103,69 @@ echo
 echo
 
 
-echo "04. See E1 in the database"
-echo "=========================="
+echo "04. See E1 in the database (test case 079)"
+echo "=========================================="
 mongoCmd2 ftest "db.entities.findOne()"
 echo
 echo
 
 
-echo "05. GET E1 - see the three attributes"
-echo "====================================="
+echo "05. GET E1 - see the three attributes (test case 079)"
+echo "====================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?prettyPrint=yes'
+echo
+echo
+
+
+echo "06. Overwrite P1, with @context in payload (test case 080)"
+echo "=========================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "Hola"
+  },
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "07. GET E1 - see the new value of P1 (test case 080)"
+echo "===================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?prettyPrint=yes'
+echo
+echo
+
+
+echo "08. With options=noOverwrite, attempt to append two attrs P1 and P2. P1 already exists and should be ignored. P2 should be appended (test case 081)"
+echo "==================================================================================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "Adeu"
+  },
+  "P2": {
+    "type": "Property",
+    "value": "Adios"
+  },
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs?options=noOverwrite --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "09. GET E1 - see the old value of P1 and the new attribute P2 (test case 081)"
+echo "============================================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?prettyPrint=yes'
 echo
 echo
 
 
 --REGEXPECT--
-01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt
-====================================================================================
+01. Create entity E1 with attribute P1 having sub-attrs P1_R1, P1_P1, and observedAt (preparation)
+==================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
@@ -122,8 +173,8 @@ Date: REGEX(.*)
 
 
 
-02. See E1 in the database
-==========================
+02. See E1 in the database (preparation)
+========================================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -169,16 +220,16 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Append to E1 two attributes: R1 and location
-================================================
+03. Append to E1 two attributes: R1 and location (test case 079)
+================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-04. See E1 in the database
-==========================
+04. See E1 in the database (test case 079)
+==========================================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -259,8 +310,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-05. GET E1 - see the three attributes
-=====================================
+05. GET E1 - see the three attributes (test case 079)
+=====================================================
 HTTP/1.1 200 OK
 Content-Length: 699
 Content-Type: application/json
@@ -280,6 +331,119 @@ Date: REGEX(.*)
         "observedAt": "2018-12-04T12:00:00Z",
         "type": "Property",
         "value": 12
+    },
+    "R1": {
+        "R1_P1": {
+            "type": "Property",
+            "value": false
+        },
+        "R1_R1": {
+            "object": "urn:ngsi-ld:T3:A2345",
+            "type": "Relationship"
+        },
+        "object": "urn:ngsi-ld:T2:6789",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                -8.01,
+                40.01
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+06. Overwrite P1, with @context in payload (test case 080)
+==========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. GET E1 - see the new value of P1 (test case 080)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 503
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "Hola"
+    },
+    "R1": {
+        "R1_P1": {
+            "type": "Property",
+            "value": false
+        },
+        "R1_R1": {
+            "object": "urn:ngsi-ld:T3:A2345",
+            "type": "Relationship"
+        },
+        "object": "urn:ngsi-ld:T2:6789",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                -8.01,
+                40.01
+            ],
+            "type": "Point"
+        }
+    },
+    "type": "T"
+}
+
+
+08. With options=noOverwrite, attempt to append two attrs P1 and P2. P1 already exists and should be ignored. P2 should be appended (test case 081)
+===================================================================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 211
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": [
+        "https://uri.etsi.org/ngsi-ld/default-context/P2"
+    ]
+}
+
+
+09. GET E1 - see the old value of P1 and the new attribute P2 (test case 081)
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 563
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "Hola"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "Adios"
     },
     "R1": {
         "R1_P1": {

@@ -450,6 +450,7 @@ bool collectionUpdate
   }
   catch (const std::exception& e)
   {
+    LM_E(("Database Error: %s", e.what()));
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
 

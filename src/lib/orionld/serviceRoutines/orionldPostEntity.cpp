@@ -59,6 +59,7 @@ extern "C"
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
 
 
@@ -90,32 +91,6 @@ static void attributeUpdated(KjNode* updatedP, const char* attrName)
   KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrName);
 
   kjChildAdd(updatedP, attrNameP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjContainerStringValueLookup -
-//
-// FIXME: this function should be moved to libkjson.
-//        I have deja-vu ... did I already implement a function for this???
-//
-KjNode* kjContainerStringValueLookup(KjNode* container, const char* value)
-{
-  if ((container->type == KjArray) || (container->type == KjObject))
-  {
-    for (KjNode* nodeP = container->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-    {
-      if (nodeP->type != KjString)
-        continue;
-
-      if (strcmp(nodeP->value.s, value) == 0)
-        return nodeP;
-    }
-  }
-
-  return NULL;
 }
 
 
@@ -190,7 +165,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     return false;
   }
 
-  // 4. Get the 'attrNames' array from the mongo entity
+  // 4. Get the 'attrNames' array from the mongo entity - to see whether an attribute already existed or not
   KjNode* inDbAttrNamesP = NULL;
   if (overwrite == false)
   {
@@ -253,7 +228,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
       if (inDbAttrNamesP->value.firstChildP != NULL)
         LM_TMP(("KZ: the first item of the array is of type '%s' and is called '%s'", kjValueType(inDbAttrNamesP->value.firstChildP->type), inDbAttrNamesP->value.firstChildP->value.s));
 
-      if (kjContainerStringValueLookup(inDbAttrNamesP, attrP->name) != NULL)
+      if (kjStringValueLookupInArray(inDbAttrNamesP, attrP->name) != NULL)
       {
         LM_TMP(("KZ: Attribute '%s' to 'Not Updated' set", attrP->name));
         attributeNotUpdated(notUpdatedP, attrP->name, "attribute already exists and overwrite is not allowed");
