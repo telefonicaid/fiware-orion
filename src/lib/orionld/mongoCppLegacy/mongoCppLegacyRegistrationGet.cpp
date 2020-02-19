@@ -40,7 +40,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyRegistrationLookup -
+// mongoCppLegacyRegistrationGet -
 //
 // If attribute is NULL: query registrations collection for:
 //   db.registrations.find({ "contextRegistration.entities.id": "urn:ngsi-ld:entities:E1" })
@@ -59,43 +59,18 @@ extern "C"
 // ToDo
 //   o Include idPattern in the query
 //
-KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attribute, int* noOfRegsP)
+KjNode* mongoCppLegacyRegistrationGet(const char* registrationId)
 {
   char    collectionPath[256];
-  KjNode* kjRegArray = NULL;
-
-  if (noOfRegsP != NULL)
-    *noOfRegsP = 0;
 
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   //
-  // Populate filter - on Entity ID and Attribute Name
+  // Populate filter - only Registration ID for this operation
   //
   mongo::BSONObjBuilder  filter;
-  filter.append("contextRegistration.entities.id", entityId);
+  filter.append("_id", registrationId);
 
-  if (attribute != NULL)
-  {
-    mongo::BSONObjBuilder   zeroSizeObject;
-    mongo::BSONObjBuilder   zeroSizeArrayItem;
-    mongo::BSONObjBuilder   attrNameMatchArrayItem;
-    mongo::BSONArrayBuilder orArray;
-    
-    zeroSizeObject.append("$size", 0);
-    zeroSizeArrayItem.append("contextRegistration.attrs", zeroSizeObject.obj());
-
-    attrNameMatchArrayItem.append("contextRegistration.attrs.name", attribute);
-    
-    orArray.append(zeroSizeArrayItem.obj());
-    orArray.append(attrNameMatchArrayItem.obj());
-
-    filter.append("$or", orArray.arr());
-
-    if (noOfRegsP != NULL)
-      *noOfRegsP += 1;
-  }
-  
   // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
@@ -103,26 +78,20 @@ KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attri
 
   cursorP = connectionP->query(collectionPath, query);
 
-  while (cursorP->more())
-  {
-    mongo::BSONObj  bsonObj = cursorP->nextSafe();
-    char*           title;
-    char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, &title, &details);
+  mongo::BSONObj  bsonObj = cursorP->nextSafe();
 
-    if (kjTree == NULL)
-      LM_E(("%s: %s", title, details));
-    else
-    {
-      if (kjRegArray == NULL)
-        kjRegArray = kjArray(orionldState.kjsonP, NULL);
-      kjChildAdd(kjRegArray, kjTree);
-    }
-  }
+  char*    title;
+  char*    details;
+  KjNode*  registrationP;
+
+  registrationP = dbDataToKjTree(&bsonObj, &title, &details);
+
+  if (registrationP == NULL)
+    LM_E(("%s: %s", title, details));
 
   releaseMongoConnection(connectionP);
 
   // semGive()
 
-  return kjRegArray;
+  return registrationP;
 }

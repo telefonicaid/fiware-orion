@@ -34,8 +34,9 @@
 #include "mongoBackend/dbConstants.h"                                // REG_ATTRS, ...
 #include "mongoBackend/safeMongo.h"                                  // getFieldF
 #include "orionld/common/orionldState.h"                             // orionldState
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
+
 #include "orionld/context/orionldContextItemAliasLookup.h"           // orionldContextItemAliasLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"             // Own interface
 
 
@@ -122,6 +123,17 @@ void mongoSetLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r)
 
 /* ****************************************************************************
 *
+* mongoSetExpiration -
+*/
+void mongoSetExpiration(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+{
+  regP->expires = (r.hasField(REG_EXPIRATION))? getIntOrLongFieldAsLong(r, REG_EXPIRATION) : -1;
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoSetLdObservationInterval
 */
 void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r)
@@ -130,8 +142,8 @@ void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONO
   {
     mongo::BSONObj obj              = getObjectFieldF(r, REG_OBSERVATION_INTERVAL);
 
-    reg->observationInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
+    reg->observationInterval.start  = getIntOrLongFieldAsLongF(obj, REG_INTERVAL_START);
+    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getIntOrLongFieldAsLongF(obj, REG_INTERVAL_END) : -1;
   }
   else
   {
@@ -152,8 +164,8 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
   {
     mongo::BSONObj obj             = getObjectFieldF(r, REG_MANAGEMENT_INTERVAL);
 
-    reg->managementInterval.start  = getLongFieldF(obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getLongFieldF(obj, REG_INTERVAL_END) : -1;
+    reg->managementInterval.start  = getIntOrLongFieldAsLongF(obj, REG_INTERVAL_START);
+    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getIntOrLongFieldAsLongF(obj, REG_INTERVAL_END) : -1;
   }
   else
   {

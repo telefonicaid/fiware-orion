@@ -397,14 +397,14 @@ Date: REGEX(.*)
 
 14. PATCH /ngsi-ld/v1/csourceRegistrations/R1
 =============================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 144
+HTTP/1.1 400 Bad Request
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "R1",
-    "title": "Not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
+    "title": "Registration ID must be a valid URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

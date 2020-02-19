@@ -64,7 +64,7 @@ bool mongoLdRegistrationGet
 
   LM_T(LmtMongo, ("Mongo Get Registration"));
 
-
+  LM_TMP(("RGET: In mongoLdRegistrationGet"));
   //
   // Query
   //
@@ -128,7 +128,7 @@ bool mongoLdRegistrationGet
 
     mongoSetLdObservationInterval(regP, bob);
     mongoSetLdManagementInterval(regP, bob);
-    mongoSetExpires(regP, bob);
+    mongoSetExpiration(regP, bob);
     mongoSetStatus(regP, bob);
 
     mongoSetLdTimestamp(&regP->createdAt, "createdAt", bob);

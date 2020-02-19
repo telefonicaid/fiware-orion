@@ -1,0 +1,908 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration with all fields, except 'name'
+# 02. See the registration in mongo
+# 03. GET the registration
+# 04. Patch the registration, adding 'name' and changing 'description'
+# 05. See the registration in mongo
+# 06. GET the registration, see 'name' and the new value for 'description'
+# 07. Patch the registration, changing 'endpoint'
+# 08. GET the registration, see the new value for 'endpoint'
+#
+
+echo "01. Create a registration with all fields, except 'name'"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "04. Patch the registration, adding 'name' and changing 'description'"
+echo "===================================================================="
+payload='{
+  "name": "New Name",
+  "description": "Modified description of reg R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "06. GET the registration, see 'name' and the new value for 'description'"
+echo "========================================================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "07. Patch the registration, changing 'endpoint'"
+echo "==============================================="
+payload='{
+  "endpoint": "http://new.csource.org:0707"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. GET the registration, see the new value for 'endpoint'"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with all fields, except 'name'
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Date: REGEX(.*)
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"description" : "description of reg R1",
+	"expiration" : NumberLong(1861869600),
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"observationInterval" : {
+		"start" : NumberLong(1546250400),
+		"end" : NumberLong(1861869600)
+	},
+	"managementInterval" : {
+		"start" : NumberLong(1514714400),
+		"end" : NumberLong(1830247200)
+	},
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					200,
+					0
+				],
+				[
+					201,
+					0
+				],
+				[
+					201,
+					1
+				],
+				[
+					200,
+					1
+				],
+				[
+					200,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					300,
+					0
+				],
+				[
+					301,
+					0
+				],
+				[
+					301,
+					1
+				],
+				[
+					300,
+					1
+				],
+				[
+					300,
+					0
+				]
+			]
+		]
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : true,
+		"https://uri.etsi.org/ngsi-ld/default-context/P4" : 4.5,
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"object" : 6
+		},
+		"https://uri.etsi.org/ngsi-ld/default-context/P6" : [
+			7,
+			8
+		]
+	}
+}
+bye
+
+
+03. GET the registration
+========================
+HTTP/1.1 200 OK
+Content-Length: 1801
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "description": "description of reg R1",
+  "expires": "2028-12-31T10:00:00Z",
+  "endpoint": "http://my.csource.org:1026",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [
+        "brandName",
+        "speed"
+      ],
+      "relationships": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00Z",
+    "end": "2028-12-31T10:00:00Z"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00Z",
+    "end": "2027-12-31T10:00:00Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          100,
+          0
+        ],
+        [
+          101,
+          0
+        ],
+        [
+          101,
+          1
+        ],
+        [
+          100,
+          1
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          200,
+          0
+        ],
+        [
+          201,
+          0
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          200,
+          1
+        ],
+        [
+          200,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          300,
+          0
+        ],
+        [
+          301,
+          0
+        ],
+        [
+          301,
+          1
+        ],
+        [
+          300,
+          1
+        ],
+        [
+          300,
+          0
+        ]
+      ]
+    ]
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ]
+}
+
+
+
+04. Patch the registration, adding 'name' and changing 'description'
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"description" : "Modified description of reg R1",
+	"expiration" : 1861869600,
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"observationInterval" : {
+		"start" : 1546250400,
+		"end" : 1861869600
+	},
+	"managementInterval" : {
+		"start" : 1514714400,
+		"end" : 1830247200
+	},
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					200,
+					0
+				],
+				[
+					201,
+					0
+				],
+				[
+					201,
+					1
+				],
+				[
+					200,
+					1
+				],
+				[
+					200,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					300,
+					0
+				],
+				[
+					301,
+					0
+				],
+				[
+					301,
+					1
+				],
+				[
+					300,
+					1
+				],
+				[
+					300,
+					0
+				]
+			]
+		]
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : true,
+		"https://uri.etsi.org/ngsi-ld/default-context/P4" : 4.5,
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"object" : 6
+		},
+		"https://uri.etsi.org/ngsi-ld/default-context/P6" : [
+			7,
+			8
+		]
+	},
+	"name" : "New Name"
+}
+bye
+
+
+06. GET the registration, see 'name' and the new value for 'description'
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 1832
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "New Name",
+  "description": "Modified description of reg R1",
+  "expires": "2028-12-31T10:00:00Z",
+  "endpoint": "http://my.csource.org:1026",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [
+        "brandName",
+        "speed"
+      ],
+      "relationships": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00Z",
+    "end": "2028-12-31T10:00:00Z"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00Z",
+    "end": "2027-12-31T10:00:00Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          100,
+          0
+        ],
+        [
+          101,
+          0
+        ],
+        [
+          101,
+          1
+        ],
+        [
+          100,
+          1
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          200,
+          0
+        ],
+        [
+          201,
+          0
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          200,
+          1
+        ],
+        [
+          200,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          300,
+          0
+        ],
+        [
+          301,
+          0
+        ],
+        [
+          301,
+          1
+        ],
+        [
+          300,
+          1
+        ],
+        [
+          300,
+          0
+        ]
+      ]
+    ]
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ]
+}
+
+
+
+07. Patch the registration, changing 'endpoint'
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. GET the registration, see the new value for 'endpoint'
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 1833
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "New Name",
+  "description": "Modified description of reg R1",
+  "expires": "2028-12-31T10:00:00Z",
+  "endpoint": "http://new.csource.org:0707",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [
+        "brandName",
+        "speed"
+      ],
+      "relationships": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00Z",
+    "end": "2028-12-31T10:00:00Z"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00Z",
+    "end": "2027-12-31T10:00:00Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          100,
+          0
+        ],
+        [
+          101,
+          0
+        ],
+        [
+          101,
+          1
+        ],
+        [
+          100,
+          1
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          200,
+          0
+        ],
+        [
+          201,
+          0
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          200,
+          1
+        ],
+        [
+          200,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          300,
+          0
+        ],
+        [
+          301,
+          0
+        ],
+        [
+          301,
+          1
+        ],
+        [
+          300,
+          1
+        ],
+        [
+          300,
+          0
+        ]
+      ]
+    ]
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ]
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

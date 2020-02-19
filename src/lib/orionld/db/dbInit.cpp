@@ -41,6 +41,8 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationDelete.h"       // mongoCppLegacyRegistrationDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h"          // mongoCppLegacySubscriptionGet
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionReplace.h"      // mongoCppLegacySubscriptionReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationGet.h"          // mongoCppLegacyRegistrationGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"      // mongoCppLegacyRegistrationReplace
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -78,6 +80,8 @@ void dbInit(const char* dbHost, const char* dbName)
   dbRegistrationDelete                     = mongoCppLegacyRegistrationDelete;
   dbSubscriptionGet                        = mongoCppLegacySubscriptionGet;
   dbSubscriptionReplace                    = mongoCppLegacySubscriptionReplace;
+  dbRegistrationGet                        = mongoCppLegacyRegistrationGet;
+  dbRegistrationReplace                    = mongoCppLegacyRegistrationReplace;
 
   mongoCppLegacyInit(dbHost, dbName);
 
@@ -95,6 +99,8 @@ void dbInit(const char* dbHost, const char* dbName)
   dbRegistrationDelete                     = NULL;  // FIXME: Implement mongocRegistrationDelete
   dbSubscriptionGet                        = NULL;  // FIXME: Implement mongocSubscriptionGet
   dbSubscriptionReplace                    = NULL;  // FIXME: Implement mongocSubscriptionReplace
+  dbRegistrationGet                        = NULL;  // FIXME: Implement mongocRegistrationGet
+  dbRegistrationReplace                    = NULL;  // FIXME: Implement mongocRegistrationReplace
 
   mongocInit(dbHost, dbName);
 

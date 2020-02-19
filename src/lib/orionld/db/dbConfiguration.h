@@ -75,6 +75,8 @@ typedef bool    (*DbRegistrationExists)(const char* registrationId);
 typedef bool    (*DbRegistrationDelete)(const char* registrationId);
 typedef KjNode* (*DbSubscriptionGet)(const char* subscriptionId);
 typedef bool    (*DbSubscriptionReplace)(const char* subscriptionId, KjNode* dbSubscriptionP);
+typedef KjNode* (*DbRegistrationGet)(const char* registrationId);
+typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbRegistrationP);
 
 
 
@@ -97,5 +99,7 @@ extern DbRegistrationExists                      dbRegistrationExists;
 extern DbRegistrationDelete                      dbRegistrationDelete;
 extern DbSubscriptionGet                         dbSubscriptionGet;
 extern DbSubscriptionReplace                     dbSubscriptionReplace;
+extern DbRegistrationGet                         dbRegistrationGet;
+extern DbRegistrationReplace                     dbRegistrationReplace;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

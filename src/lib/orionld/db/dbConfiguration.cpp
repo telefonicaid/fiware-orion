@@ -51,3 +51,5 @@ DbRegistrationExists                      dbRegistrationExists;
 DbRegistrationDelete                      dbRegistrationDelete;
 DbSubscriptionGet                         dbSubscriptionGet;
 DbSubscriptionReplace                     dbSubscriptionReplace;
+DbRegistrationGet                         dbRegistrationGet;
+DbRegistrationReplace                     dbRegistrationReplace;

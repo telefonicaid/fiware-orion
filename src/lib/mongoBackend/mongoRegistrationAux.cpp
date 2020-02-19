@@ -30,17 +30,18 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "apiTypesV2/Registration.h"                           // ngsiv2::Registration
-#include "rest/HttpStatusCode.h"                               // HttpStatusCode
-#include "common/statistics.h"                                 // TIME_STAT_MONGO_READ_WAIT_START
-#include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
-#include "mongoBackend/connectionOperations.h"                 // collectionQuery
-#include "mongoBackend/dbConstants.h"                          // REG_*
-#include "mongoBackend/safeMongo.h"                            // moreSafe
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLd*
-#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
-#include "mongoBackend/mongoRegistrationAux.h"                 // Own interface
+
+#include "apiTypesV2/Registration.h"                             // ngsiv2::Registration
+#include "rest/HttpStatusCode.h"                                 // HttpStatusCode
+#include "common/statistics.h"                                   // TIME_STAT_MONGO_READ_WAIT_START
+#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
+#include "mongoBackend/connectionOperations.h"                   // collectionQuery
+#include "mongoBackend/dbConstants.h"                            // REG_*
+#include "mongoBackend/safeMongo.h"                              // moreSafe
+#include "orionld/mongoBackend/mongoLdRegistrationAux.h"         // mongoSetLd*
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "mongoBackend/mongoRegistrationAux.h"                   // Own interface
 
 
 
@@ -108,7 +109,8 @@ void mongoSetProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 */
 void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
 {
-  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
+  std::vector<mongo::BSONElement>  dbEntityV  = getFieldF(cr0, REG_ENTITIES).Array();
+  bool                             typeGiven  = false;
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
   {
@@ -143,16 +145,21 @@ void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
       }
       else
       {
+        typeGiven = true;
         entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
       }
     }
     else
     {
+      typeGiven = true;
       entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
 
       if (orionldState.apiVersion == NGSI_LD_V1)
         entity.type = orionldContextItemAliasLookup(orionldState.contextP, entity.type.c_str(), NULL, NULL);
     }
+
+    if ((typeGiven == true) && (entity.type != "") && (orionldState.apiVersion == NGSI_LD_V1))
+      entity.type = orionldContextItemAliasLookup(orionldState.contextP, entity.type.c_str(), NULL, NULL);
 
     regP->dataProvided.entities.push_back(entity);
   }

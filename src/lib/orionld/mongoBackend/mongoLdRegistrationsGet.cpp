@@ -227,6 +227,8 @@ bool mongoLdRegistrationsGet
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
 
+  LM_TMP(("RGET: In mongoLdRegistrationsGet"));
+
   if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
     limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());  // Error handling already done by uriArgumentGet() in rest.cpp
 
@@ -305,6 +307,7 @@ bool mongoLdRegistrationsGet
     mongoSetLdName(&reg, bob);
     mongoSetDescription(&reg, bob);
 
+    LM_TMP(("RGET: calling mongoSetDataProvided"));
     if (mongoSetDataProvided(&reg, bob, false) == false)
     {
       releaseMongoConnection(connection);

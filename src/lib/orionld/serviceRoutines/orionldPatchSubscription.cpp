@@ -44,9 +44,9 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// entityInfoPayloadCheck -
+// orionldCheckEntityInfo -
 //
-static bool entityInfoPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, const char* filedName)
+static bool orionldCheckEntityInfo(ConnectionInfo* ciP, KjNode* subNodeP, const char* filedName)
 {
   return true;
 }
@@ -55,9 +55,9 @@ static bool entityInfoPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, const 
 
 // -----------------------------------------------------------------------------
 //
-// geoqPayloadCheck -
+// orionldCheckGeoQ -
 //
-static bool geoqPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, const char* filedName)
+static bool orionldCheckGeoQ(ConnectionInfo* ciP, KjNode* subNodeP, const char* filedName)
 {
   return true;
 }
@@ -134,7 +134,7 @@ static bool subscriptionPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, bool
     {
       DUPLICATE_CHECK(entitiesP, "Subscription::entities", nodeP);
       ARRAY_CHECK(nodeP, nodeP->name);
-      if (entityInfoPayloadCheck(ciP, nodeP, "Subscription::entities") == false)
+      if (orionldCheckEntityInfo(ciP, nodeP, "Subscription::entities") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "watchedAttributes") == 0)
@@ -160,7 +160,7 @@ static bool subscriptionPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, bool
     {
       DUPLICATE_CHECK(geoqP, "Subscription::geoQ", nodeP);
       OBJECT_CHECK(nodeP, "Subscription::geoQ");
-      if (geoqPayloadCheck(ciP, nodeP, "Subscription::geoQ") == false)
+      if (orionldCheckGeoQ(ciP, nodeP, "Subscription::geoQ") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "csf") == 0)
@@ -216,7 +216,9 @@ static bool subscriptionPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, bool
 
 // -----------------------------------------------------------------------------
 //
-// kjChildAddOrReplace
+// kjChildAddOrReplace -
+//
+// FIXME: move to kjson library - also used in orionldPatchRegistration.cpp
 //
 void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replacementP)
 {
@@ -224,12 +226,12 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 
   if (itemToReplace == NULL)
   {
-    LM_TMP(("SPAT: Adding %s", itemName));
+    LM_TMP(("PATCH: Adding %s", itemName));
     kjChildAdd(container, replacementP);
   }
   else
   {
-    LM_TMP(("SPAT: Replacing %s", itemName));
+    LM_TMP(("PATCH: Replacing %s", itemName));
     itemToReplace->type  = replacementP->type;
     itemToReplace->value = replacementP->value;
     // KjNode::cSum and KjNode::valueString aren't used
@@ -486,7 +488,7 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
 //
 static void fixDbSubscription(KjNode* dbSubscriptionP)
 {
-  KjNode*  nodeP;
+  KjNode* nodeP;
 
   if ((nodeP = kjLookup(dbSubscriptionP, "expiration")) != NULL)
   {
@@ -592,7 +594,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // </DEBUG>
 
   //
-  // Overwrite the current Subscription is the database
+  // Overwrite the current Subscription in the database
   //
   dbSubscriptionReplace(subscriptionId, dbSubscriptionP);
 

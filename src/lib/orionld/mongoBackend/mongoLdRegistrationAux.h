@@ -39,6 +39,7 @@ extern void mongoSetLdPropertyV(ngsiv2::Registration* reg, const mongo::BSONObj&
 extern void mongoSetLdRelationshipV(ngsiv2::Registration* reg, const mongo::BSONObj& r);
 extern void mongoSetLdRegistrationId(ngsiv2::Registration* reg, const mongo::BSONObj& r);
 extern void mongoSetLdName(ngsiv2::Registration* reg, const mongo::BSONObj& r);
+extern void mongoSetExpiration(ngsiv2::Registration* regP, const mongo::BSONObj& r);
 extern void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r);
 extern void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONObj& r);
 extern void mongoSetLdTimestamp(long long* timestampP, const char* name, const mongo::BSONObj& bobj);
