@@ -52,6 +52,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから Google Test/Mock をインストールします (このための RPM パッケージがありますが、現在の CMakeLists.txt の設定では動作しません)。以前は URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google では2016年8月下旬にそのパッケージを削除したため、動作しなくなりました
 
+        yum install perl-Digest-MD5 libxslt
         wget ftp://repositories.lab.fiware.org/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
@@ -72,6 +73,15 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * (オプションですが強く推奨されます) ユニット・テストの実行です。まず、MongoDB をユニットとしてインストールする必要があり、機能テストは localhost で動作する mongod に依存しています。詳細については、[公式 MongoDB のドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 3.6 です。ただし、3.2 および 3.4 も正常に動作するはずです
 
+* yum を使用して、mongodb-org-shell をインストールするために、 /etc/yum.repos.d/mongodb.repo ファイルを作成します。
+
+        [mongodb-org-3.6]
+        name=MongoDB Repository
+        baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
+        gpgcheck=1
+        enabled=1
+        gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
+
 * バイナリをインストールします。INSTALL_DIR を使用して、インストール・プレフィックス・パス (デフォルトは /usr) を設定することができます。したがって、broker は `$INSTALL_DIR/bin` ディレクトリにインストールされます
 
         sudo make install INSTALL_DIR=/usr
@@ -84,14 +94,18 @@ Orion Context Broker には、次の手順 (オプション) に従って実行�
 
 * 必要なツールをインストールします :
 
-        sudo yum install python python-flask pyOpenSSL curl nc mongodb-org-shell valgrind bc
+        sudo yum install python curl nc mongodb-org-shell valgrind bc python-devel libffi-devel python-pip
 
-* テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定する必要があります
+* テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、CentOS7 のデフォルトの Flask の代わりに Flask version 1.0.2 を使用するために、virtualenv 環境を作成する必要があります。この環境でテスト・ハーネスを実行します。
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
+        pip install virtualenv
+        virtualenv /opt/ft_env
+        . /opt/ft_env/bin/activate
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0 enum34==1.1.6
 
 * テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
