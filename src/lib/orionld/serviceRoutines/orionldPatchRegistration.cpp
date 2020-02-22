@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/geoJsonCheck.h"                       // geoJsonCheck
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/db/dbConfiguration.h"                        // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
@@ -479,43 +480,347 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
 
 
 
-static bool orionldCheckGeoJsonGeometry(ConnectionInfo* ciP, KjNode* regNodeP, const char* fieldName)
+// -----------------------------------------------------------------------------
+//
+// orionldCheckGeoJsonGeometry -
+//
+static bool orionldCheckGeoJsonGeometry(ConnectionInfo* ciP, KjNode* geoAttributeP, const char* fieldName)
 {
+  return geoJsonCheck(ciP, geoAttributeP, NULL, NULL);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckRegistrationInformationEntity -
+//
+// An item of the "entities" array is a JSON Object and can have three different mebmers:
+//   * id             (Optional JSON String that is a valid URI)
+//   * idPattern      (Optional JSON String that is a valid REGEX)
+//   * type           (Mandatory JSON String)
+//
+static bool orionldCheckRegistrationInformationEntity(ConnectionInfo* ciP, KjNode* entityP)
+{
+  KjNode* idP         = NULL;
+  KjNode* idPatternP  = NULL;
+  KjNode* typeP       = NULL;
+
+  for (KjNode* entityItemP = entityP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
+  {
+    if (strcmp(entityItemP->name, "id") == 0)
+    {
+      DUPLICATE_CHECK(idP, "Registration::information[X]::entities[X]::id", entityItemP);
+      STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::id");
+      URI_CHECK(entityItemP, "Registration::information[X]::entities[X]::id");
+    }
+    else if (strcmp(entityItemP->name, "idPattern") == 0)
+    {
+      DUPLICATE_CHECK(idPatternP, "Registration::information[X]::entities[X]::idPattern", entityItemP);
+      STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::idPattern");
+      EMPTY_STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::idPattern");
+      // FIXME: How check for valid REGEX???
+    }
+    else if (strcmp(entityItemP->name, "type") == 0)
+    {
+      DUPLICATE_CHECK(typeP, "Registration::information[X]::entities[X]::type", entityItemP);
+      STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::type");
+      EMPTY_STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::id");
+    }
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::information[X]::entities[X]", entityItemP->name);
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
+  }
+
+  // Only if Fully NGSI-LD compliant
+  if (typeP == NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::information[X]::entities[X]::type");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
   return true;
 }
 
-static bool orionldCheckRegistrationInformationArray(ConnectionInfo* ciP, KjNode* regNodeP, const char* fieldName)
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckRegistrationInformation
+//
+// The "information" field can have only three members:
+//   * entities       (Mandatory JSON Array)
+//   * properties     (Optional JSON Array with strings)
+//   * relationships  (Optional JSON Array with strings)
+//
+static bool orionldCheckRegistrationInformation(ConnectionInfo* ciP, KjNode* informationP)
 {
+  for (KjNode* infoItemP = informationP->value.firstChildP; infoItemP != NULL; infoItemP = infoItemP->next)
+  {
+    if (strcmp(infoItemP->name, "entities") == 0)
+    {
+      ARRAY_CHECK(infoItemP, "Registration::information[X]::entities");
+
+      if (infoItemP->value.firstChildP == NULL)  // Empty Array
+      {
+        LM_E(("Registration::information[X]::entities is an empty array"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "Registration::information[X]::entities");
+        ciP->httpStatusCode = SccBadRequest;
+        return false;
+      }
+      LM_TMP(("RC: Registration::information[X]::entities firstChild at: 0x%x", infoItemP->value.firstChildP));
+
+      for (KjNode* entityP = infoItemP->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      {
+        OBJECT_CHECK(entityP, "Registration::information[X]::entities[X]");
+        if (orionldCheckRegistrationInformationEntity(ciP, entityP) == false)
+          return false;
+      }
+    }
+    else if (strcmp(infoItemP->name, "properties") == 0)
+    {
+      ARRAY_CHECK(infoItemP, "Registration::information[X]::properties");
+      EMPTY_ARRAY_CHECK(infoItemP, "Registration::information[X]::properties");
+      for (KjNode* propP = infoItemP->value.firstChildP; propP != NULL; propP = propP->next)
+      {
+        STRING_CHECK(propP, "Registration::information[X]::properties[X]");
+        EMPTY_STRING_CHECK(propP, "Registration::information[X]::properties[X]");
+      }
+    }
+    else if (strcmp(infoItemP->name, "relationships") == 0)
+    {
+      ARRAY_CHECK(infoItemP, "Registration::information[X]::relationships");
+      EMPTY_ARRAY_CHECK(infoItemP, "Registration::information[X]::relationships");
+      for (KjNode* relP = infoItemP->value.firstChildP; relP != NULL; relP = relP->next)
+      {
+        STRING_CHECK(relP, "Registration::information[X]::relationships[X]");
+        EMPTY_STRING_CHECK(relP, "Registration::information[X]::relationships[X]");
+        URI_CHECK(relP, "Registration::information[X]::relationships[X]");
+      }
+    }
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::information[X]", infoItemP->name);
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
+  }
+
   return true;
 }
 
-static bool orionldCheckTimeInterval(ConnectionInfo* ciP, KjNode* regNodeP, const char* fieldName)
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckRegistrationInformationArray
+//
+static bool orionldCheckRegistrationInformationArray(ConnectionInfo* ciP, KjNode* informationArrayP, const char* fieldName)
 {
+  if (informationArrayP->value.firstChildP == NULL)  // Empty Array
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "Registration::information");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  for (KjNode* informationP = informationArrayP->value.firstChildP; informationArrayP != NULL; informationArrayP = informationArrayP->next)
+  {
+    OBJECT_CHECK(informationP, "Registration::information[X]");
+
+    if (orionldCheckRegistrationInformation(ciP, informationP) == false)
+      return false;
+  }
+
   return true;
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckObservationInterval -
+//
+static bool orionldCheckObservationInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const char* fieldName)
+{
+  KjNode* startP = NULL;
+  KjNode* endP   = NULL;
+  int64_t start  = 0;
+  int64_t end    = 0;
+
+  LM_TMP(("OI: examining an ObservationInterval named '%s'", timeIntervalNodeP));
+  for (KjNode* tiItemP = timeIntervalNodeP->value.firstChildP; tiItemP != NULL; tiItemP = tiItemP->next)
+  {
+    LM_TMP(("OI: examining a child of the ObservationInterval named '%s'", tiItemP->name));
+    if (strcmp(tiItemP->name, "start") == 0)
+    {
+      DUPLICATE_CHECK(startP, "Registration::observationInterval::start", tiItemP);
+      STRING_CHECK(tiItemP, "Registration::observationInterval::start");
+      DATETIME_CHECK(tiItemP->value.s, start, "Registration::observationInterval::start");
+    }
+    else if (strcmp(tiItemP->name, "end") == 0)
+    {
+      DUPLICATE_CHECK(endP, "Registration::observationInterval::end", tiItemP);
+      STRING_CHECK(tiItemP, "Registration::observationInterval::end");
+      DATETIME_CHECK(tiItemP->value.s, end, "Registration::observationInterval::end");
+    }
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::observationInterval", tiItemP->name);
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
+  }
+
+  if ((startP == NULL) && (endP == NULL))
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", "Registration::observationInterval");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (startP == NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::observationInterval::start");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (endP == NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::observationInterval::end");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (start > end)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Inconsistent DateTimes", "Registration::observationInterval ends before it starts");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckManagementInterval -
+//
+static bool orionldCheckManagementInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const char* fieldName)
+{
+  KjNode* startP = NULL;
+  KjNode* endP   = NULL;
+  int64_t start  = 0;
+  int64_t end    = 0;
+
+  for (KjNode* tiItemP = timeIntervalNodeP->value.firstChildP; tiItemP != NULL; tiItemP = tiItemP->next)
+  {
+    if (strcmp(tiItemP->name, "start") == 0)
+    {
+      DUPLICATE_CHECK(startP, "Registration::managementInterval::start", tiItemP);
+      STRING_CHECK(tiItemP, "Registration::managementInterval::start");
+      DATETIME_CHECK(tiItemP->value.s, start, "Registration::managementInterval::start");
+    }
+    else if (strcmp(tiItemP->name, "end") == 0)
+    {
+      DUPLICATE_CHECK(endP, "Registration::managementInterval::end", tiItemP);
+      STRING_CHECK(tiItemP, "Registration::managementInterval::end");
+      DATETIME_CHECK(tiItemP->value.s, end, "Registration::managementInterval::end");
+    }
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::managementInterval", tiItemP->name);
+      ciP->httpStatusCode = SccBadRequest;
+      return false;
+    }
+  }
+
+  if ((startP == NULL) && (endP == NULL))
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", "Registration::managementInterval");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (startP == NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::managementInterval::start");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (endP == NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::managementInterval::end");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  if (start > end)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Inconsistent DateTimes", "Registration::managementInterval ends before it starts");
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+
+  return true;
+}
+
 
 
 // -----------------------------------------------------------------------------
 //
 // registrationPayloadCheck -
 //
-static bool registrationPayloadCheck(ConnectionInfo* ciP, KjNode* regNodeP, bool idCanBePresent)
+static bool registrationPayloadCheck(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBePresent)
 {
-  KjNode* idP                     = NULL;
-  KjNode* typeP                   = NULL;
-  KjNode* nameP                   = NULL;
-  KjNode* descriptionP            = NULL;
-  KjNode* expiresP                = NULL;
+  KjNode*  idP                   = NULL;
+  KjNode*  typeP                 = NULL;
+  KjNode*  nameP                 = NULL;
+  KjNode*  descriptionP          = NULL;
+  KjNode*  informationP          = NULL;
+  KjNode*  observationIntervalP  = NULL;
+  KjNode*  managementIntervalP   = NULL;
+  KjNode*  locationP             = NULL;
+  KjNode*  observationSpaceP     = NULL;
+  KjNode*  operationSpaceP       = NULL;
+  KjNode*  expiresP              = NULL;
+  KjNode*  endpointP             = NULL;
+  KjNode*  propertiesTree        = kjObject(orionldState.kjsonP, NULL);  // Temp storage for properties
+  int64_t  dateTime;
 
-  if (regNodeP->type != KjObject)
+  if (registrationP->type != KjObject)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Registration", "The payload data for updating a registration must be a JSON Object");
     ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 
-  for (KjNode* nodeP = regNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+
+  //
+  // Loop over the entire registration (incoming payload data) and check all is OK
+  //
+  // To be able to easy and fast check that no registration properties are duplicated, the registration properties are
+  // removed from the tree and added to 'propertiesTree'.
+  // Later, these registration properties must be put back!
+  //
+  // It's quicker to implement this like that, as there's no need to go over the entire path tree and also not necessary to look for >1 matches.
+  // When Property P1 is about to be added to 'propertiesTree' for a second time, the duplication will be noticed and the error triggered.
+  //
+  KjNode* nodeP = registrationP->value.firstChildP;
+  KjNode* next;
+
+  while (nodeP != NULL)
   {
+    next = nodeP->next;
+
     if (strcmp(nodeP->name, "id") == 0)
     {
       if (idCanBePresent == false)
@@ -526,13 +831,13 @@ static bool registrationPayloadCheck(ConnectionInfo* ciP, KjNode* regNodeP, bool
       }
 
       DUPLICATE_CHECK(idP, "Registration::id", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
-      URI_CHECK(nodeP, nodeP->name);
+      STRING_CHECK(nodeP, "Registration::id");
+      URI_CHECK(nodeP, "Registration::id");
     }
     else if (strcmp(nodeP->name, "type") == 0)
     {
       DUPLICATE_CHECK(typeP, "Registration::type", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
+      STRING_CHECK(nodeP, "Registration::type");
 
       if (strcmp(nodeP->value.s, "ContextSourceRegistration") != 0)
       {
@@ -544,52 +849,55 @@ static bool registrationPayloadCheck(ConnectionInfo* ciP, KjNode* regNodeP, bool
     else if (strcmp(nodeP->name, "name") == 0)
     {
       DUPLICATE_CHECK(nameP, "Registration::name", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
+      STRING_CHECK(nodeP, "Registration::name");
     }
     else if (strcmp(nodeP->name, "description") == 0)
     {
       DUPLICATE_CHECK(descriptionP, "Registration::description", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
+      STRING_CHECK(nodeP, "Registration::description");
     }
     else if (strcmp(nodeP->name, "information") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::information", nodeP);
-      ARRAY_CHECK(nodeP, nodeP->name);
+      DUPLICATE_CHECK(informationP, "Registration::information", nodeP);
+      ARRAY_CHECK(nodeP, "Registration::information");
       if (orionldCheckRegistrationInformationArray(ciP, nodeP, "Registration::information") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "observationInterval") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::observationInterval", nodeP);
-      OBJECT_CHECK(nodeP, nodeP->name);
-      if (orionldCheckTimeInterval(ciP, nodeP, "Registration::observationInterval") == false)
+      DUPLICATE_CHECK(observationIntervalP, "Registration::observationInterval", nodeP);
+      OBJECT_CHECK(nodeP, "Registration::observationInterval");
+      EMPTY_OBJECT_CHECK(nodeP, "Registration::observationInterval");
+      if (orionldCheckObservationInterval(ciP, nodeP, "Registration::observationInterval") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "managementInterval") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::managementInterval", nodeP);
-      OBJECT_CHECK(nodeP, nodeP->name);
-      if (orionldCheckTimeInterval(ciP, nodeP, "Registration::managementInterval") == false)
+      DUPLICATE_CHECK(managementIntervalP, "Registration::managementInterval", nodeP);
+      OBJECT_CHECK(nodeP, "Registration::managementInterval");
+      if (orionldCheckManagementInterval(ciP, nodeP, "Registration::managementInterval") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "location") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::location", nodeP);
-      OBJECT_CHECK(nodeP, nodeP->name);
-      if (orionldCheckGeoJsonGeometry(ciP, nodeP, "Registration::location") == false)
+      LM_TMP(("MLS: Got a 'location' field at %p", nodeP));
+      DUPLICATE_CHECK(locationP, "Registration::location", nodeP);
+      OBJECT_CHECK(nodeP, "Registration::location");
+      LM_TMP(("MLS: Calling orionldCheckGeoJsonGeometry"));
+      if (orionldCheckGeoJsonGeometry(ciP, locationP, "Registration::location") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "observationSpace") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::observationSpace", nodeP);
-      OBJECT_CHECK(nodeP, nodeP->name);
+      DUPLICATE_CHECK(observationSpaceP, "Registration::observationSpace", nodeP);
+      OBJECT_CHECK(nodeP, "Registration::observationSpace");
       if (orionldCheckGeoJsonGeometry(ciP, nodeP, "Registration::observationSpace") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "operationSpace") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::operationSpace", nodeP);
-      OBJECT_CHECK(nodeP, nodeP->name);
+      DUPLICATE_CHECK(operationSpaceP, "Registration::operationSpace", nodeP);
+      OBJECT_CHECK(nodeP, "Registration::operationSpace");
       if (orionldCheckGeoJsonGeometry(ciP, nodeP, "Registration::operationSpace") == false)
         return false;
     }
@@ -597,18 +905,47 @@ static bool registrationPayloadCheck(ConnectionInfo* ciP, KjNode* regNodeP, bool
     {
       DUPLICATE_CHECK(expiresP, "Registration::expires", nodeP);
       STRING_CHECK(nodeP, "Registration::expires");
-      DATETIME_CHECK(expiresP->value.s, "Registration::expires");
+      DATETIME_CHECK(expiresP->value.s, dateTime, "Registration::expires");
     }
     else if (strcmp(nodeP->name, "endpoint") == 0)
     {
-      DUPLICATE_CHECK(descriptionP, "Registration::endpoint", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
+      DUPLICATE_CHECK(endpointP, "Registration::endpoint", nodeP);
+      STRING_CHECK(nodeP, "Registration::endpoint");
       URI_CHECK(nodeP, nodeP->name);
     }
     else
     {
       // This is a Property (with keyValues) - can be anything
+      kjChildRemove(registrationP, nodeP);
+
+      //
+      // Add the Property to 'propertiesTree'
+      //
+      // But, before adding, look it up.
+      // If already there, then we have a case of duplicate property and that is an error
+      //
+      if (kjLookup(propertiesTree, nodeP->name) != NULL)
+      {
+        ciP->httpStatusCode = SccBadRequest;
+        orionldErrorResponseCreate(OrionldBadRequestData, "Duplicate Property in Registration Update", nodeP->name);
+        return false;
+      }
+
+      kjChildAdd(propertiesTree, nodeP);
     }
+
+    nodeP = next;
+  }
+
+  //
+  // Before we can return, we need to put all the properties from 'propertiesTree' back into the 'registrationP'.
+  // This is REALLY FAST !!!
+  // We just make the "next pointer" of the last child of 'registrationP' point to the first chile of 'propertiesTree'.
+  //
+  if (propertiesTree->value.firstChildP != NULL)
+  {
+    registrationP->lastChild->next = propertiesTree->value.firstChildP;
+    registrationP->lastChild       = propertiesTree->lastChild;
   }
 
   return true;
@@ -664,7 +1001,7 @@ static void ngsildRegistrationPatch(KjNode* dbRegistrationP, KjNode* patchTree)
 //
 bool orionldPatchRegistration(ConnectionInfo* ciP)
 {
-  char* registrationId = orionldState.wildcard[0];
+  char*    registrationId = orionldState.wildcard[0];
 
   LM_TMP(("RPAT: orionldPatchRegistration: registrationId == '%s'", registrationId));
 

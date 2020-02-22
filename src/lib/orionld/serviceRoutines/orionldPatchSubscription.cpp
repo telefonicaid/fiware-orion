@@ -85,6 +85,7 @@ static bool subscriptionPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, bool
   KjNode* expiresP                = NULL;
   KjNode* throttlingP             = NULL;
   KjNode* temporalqP              = NULL;
+  int64_t dateTime;
 
   if (subNodeP->type != KjObject)
   {
@@ -182,7 +183,7 @@ static bool subscriptionPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, bool
     {
       DUPLICATE_CHECK(expiresP, "Subscription::expires", nodeP);
       STRING_CHECK(nodeP, "Subscription::expires");
-      DATETIME_CHECK(expiresP->value.s, "Subscription::expires");
+      DATETIME_CHECK(expiresP->value.s, dateTime, "Subscription::expires");
     }
     else if (strcmp(nodeP->name, "throttling") == 0)
     {

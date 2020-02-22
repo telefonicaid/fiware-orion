@@ -1,0 +1,2815 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling of PATCH of a registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration with all fields
+# 02. Attempt to PATCH the registration with a Registration ID - see failure
+# 03. Attempt to PATCH the registration with a payload data that is not a JSON object - see failure
+# 04. Attempt to PATCH the registration with a 'type' that is not a string - see failure
+# 05. Attempt to PATCH the registration with a 'type' string that is not 'ContextSourceRegistration' - see failure
+# 06. Attempt to PATCH the registration with duplicate 'type' - see failure
+# 07. Attempt to PATCH the registration with a 'name' that is not a string - see failure
+# 08. Attempt to PATCH the registration with duplicate 'name' - see failure
+# 09. Attempt to PATCH the registration with a 'description' that is not a string - see failure
+# 10. Attempt to PATCH the registration with duplicate 'description' - see failure
+# 11. Attempt to PATCH the registration with an 'information' that is not a JSON Array - see failure
+# 12. Attempt to PATCH the registration with duplicate 'information' - see failure
+# 13. Attempt to PATCH the registration with an 'information' that is an empty array - see failure
+# 14. Attempt to PATCH the registration with an 'information' that has a member that is not a JSON Object - see failure
+# 15. Attempt to PATCH the registration with an 'information::entities that is not an array' - see failure
+# 16. Attempt to PATCH the registration with an 'information::entities array item that is not an object' - see failure
+# 17. Attempt to PATCH the registration with an 'information::entities array that is empty' - see failure
+# 18. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a string - see failure
+# 19. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a valid URI - see failure
+# 20. Attempt to PATCH the registration with duplicate 'information::entities[0]::id - see failure
+# 21. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is not a string - see failure
+# 22. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is an empty string - see failure
+# 23. Attempt to PATCH the registration with duplicate 'information::entities[0]::idPattern - see failure
+# 24. Attempt to PATCH the registration with an 'information::entities[0]::type' that is not a string - see failure
+# 25. Attempt to PATCH the registration with an 'information::entities[0]::type' that is an empty string - see failure
+# 26. Attempt to PATCH the registration with duplicate 'information::entities[0]::type' - see failure
+# 27. Attempt to PATCH the registration with no 'information::entities[0]::type' - see failure
+# 28. Attempt to PATCH the registration with an invalid field 'information::entities[0]::inv' - see failure
+# 29. Attempt to PATCH the registration with an 'information::properties' that is not an array - see failure
+# 30. Attempt to PATCH the registration with an 'information::properties' item that is not a string - see failure
+# 31. Attempt to PATCH the registration with an 'information::properties' item that is an empty string - see failure
+# 32. Attempt to PATCH the registration with an 'information::properties' that is an empty array - see failure
+# 33. Attempt to PATCH the registration with an 'information::relationships' that is not an array - see failure
+# 34. Attempt to PATCH the registration with an 'information::relationships' item that is not a string - see failure
+# 35. Attempt to PATCH the registration with an 'information::relationships' item that is an empty string - see failure
+# 36. Attempt to PATCH the registration with an 'information::relationships' item that is an invalid URI - see failure
+# 37. Attempt to PATCH the registration with an 'information::relationships' that is an empty array - see failure
+# 38. Attempt to PATCH the registration with an invalid field 'information::xyz - see failure
+# 39. Attempt to PATCH the registration with an 'observationInterval' that is not a JSON Object - see failure
+# 40. Attempt to PATCH the registration with an 'observationInterval' that is an empty JSON Object - see failure
+# 41. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'start' field - see failure
+# 42. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'end' field - see failure
+# 43. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'start' field - see failure
+# 44. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'end' field - see failure
+# 45. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a string - see failure
+# 46. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a valid DateTime - see failure
+# 47. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a string - see failure
+# 48. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a valid DateTime - see failure
+# 49. Attempt to PATCH the registration with an 'observationInterval' with an invalid field 'xyz' - see failure
+# 50. Attempt to PATCH the registration with a duplicated 'observationInterval' - see failure
+# 51. Attempt to PATCH the registration with a 'observationInterval' whose start>end - see failure
+# 52. Attempt to PATCH the registration with an 'managementInterval' that is not a JSON Object - see failure
+# 53. Attempt to PATCH the registration with an 'managementInterval' that is an empty JSON Object - see failure
+# 54. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'start' field - see failure
+# 55. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'end' field - see failure
+# 56. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'start' field - see failure
+# 57. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'end' field - see failure
+# 58. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a string - see failure
+# 59. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a valid DateTime - see failure
+# 60. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a string - see failure
+# 61. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a valid DateTime - see failure
+# 62. Attempt to PATCH the registration with an 'managementInterval' with an invalid field 'xyz' - see failure
+# 63. Attempt to PATCH the registration with a duplicated 'managementInterval' - see failure	
+# 64. Attempt to PATCH the registration with a 'managementInterval' whose start>end - see failure
+# 65. Attempt to PATCH the registration with a 'location' that is not a JSON Object - see failure
+# 66. Attempt to PATCH the registration with a duplicated 'location' - see failure
+# 67. Attempt to PATCH the registration with a 'location' that contains no 'type' field - see failure
+# 68. Attempt to PATCH the registration with a 'location' with a 'type' that is not a string  - see failure
+# 69. Attempt to PATCH the registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure
+# 70. Attempt to PATCH the registration with a 'location' that has a duplicated 'type' - see failure
+# 71. Attempt to PATCH the registration with a 'location' that contains no 'coordinates' field - see failure
+# 72. Attempt to PATCH the registration with a 'location' that has a duplicated	'coordinates' - see failure
+# 73. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is not an Array - see failure
+# 74. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is an empty Array - see failure
+# 75. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an empty array - see failure
+# 76. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure
+# 77. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure
+# 78. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure
+# 79. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure
+# 80. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure
+# 81. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure
+# 82. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' and one of its double array items is not a number - see failure
+# 83. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' that is not a double array - see failure
+# 84. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure
+# 85. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure
+# 86. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure
+# 87. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with	one of its Points as an empty array - see failure
+# 88. Attempt to PATCH the registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure
+# 89. Attempt to PATCH the registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure
+# 90. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
+# 91. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
+# 92. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of three Numbers - see failure
+# 93. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
+# 94. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array where first item != last item
+# 95. Attempt to PATCH the registration with an 'observationSpace' that is not a JSON Object - see failure
+# 96. Attempt to PATCH the registration with a duplicated 'observationSpace' - see failure
+# 97. Attempt to PATCH the registration with an 'operationSpace' that is not a JSON Object - see failure
+# 98. Attempt to PATCH the registration with a duplicated 'operationSpace' - see failure
+# 99. Attempt to PATCH the registration with an 'expires' that is not a string - see failure
+#100. Attempt to PATCH the registration with an 'expires' that is not a valid DateTime - see failure
+#101. Attempt to PATCH the registration with a duplicated 'expires' - see failure
+#102. Attempt to PATCH the registration with an 'endpoint' that is not a string - see failure
+#103. Attempt to PATCH the registration with an 'endpoint' that is not a valid URI - see failure
+#104. Attempt to PATCH the registration with a duplicated 'endpoint' - see failure
+#105. Attempt to PATCH the registration with a duplicated Property - see failure
+#
+
+echo "01. Create a registration with all fields"
+echo "========================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "R1",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to PATCH the registration with a Registration ID - see failure"
+echo "=========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R2"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to PATCH the registration with a payload data that is not a JSON object - see failure"
+echo "================================================================================================="
+payload='[
+  "id",
+  "urn:ngsi-ld:ContextSourceRegistration:R2"
+]'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to PATCH the registration with a 'type' that is not a string - see failure"
+echo "======================================================================================"
+payload='{
+  "type": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to PATCH the registration with a 'type' string that is not 'ContextSourceRegistration' - see failure"
+echo "================================================================================================================"
+payload='{
+  "type": "InvalidValueForRegType"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to PATCH the registration with duplicate 'type' - see failure"
+echo "========================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "type": "ContextSourceRegistration"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to PATCH the registration with a 'name' that is not a string - see failure"
+echo "======================================================================================"
+payload='{
+  "name": true
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. Attempt to PATCH the registration with duplicate 'name' - see failure"
+echo "========================================================================="
+payload='{
+  "name": "Name",
+  "name": "Name"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. Attempt to PATCH the registration with a 'description' that is not a string - see failure"
+echo "============================================================================================="
+payload='{
+  "description": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "10. Attempt to PATCH the registration with duplicate 'description' - see failure"
+echo "================================================================================"
+payload='{
+  "description": "Description",
+  "description": "Description"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. Attempt to PATCH the registration with an 'information' that is not a JSON Array - see failure"
+echo "=================================================================================================="
+payload='{
+  "information": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "12. Attempt to PATCH the registration with duplicate 'information' - see failure"
+echo "================================================================================"
+payload='{
+  "information": [ { "entities": [ { "type": "b" } ] } ],
+  "information": [ { "entities": [ { "type": "b" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "13. Attempt to PATCH the registration with an 'information' that is an empty array - see failure"
+echo "================================================================================================"
+payload='{
+  "information": []
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "14. Attempt to PATCH the registration with an 'information' that has a member that is not a JSON Object - see failure"
+echo "====================================================================================================================="
+payload='{
+  "information": [ 14 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "15. Attempt to PATCH the registration with an 'information::entities that is not an array' - see failure"
+echo "========================================================================================================"
+payload='{
+  "information": [ { "entities": { "a": "b" } } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "16. Attempt to PATCH the registration with an 'information::entities array item that is not an object' - see failure"
+echo "===================================================================================================================="
+payload='{
+  "information": [ { "entities": [ "not-an-object" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "17. Attempt to PATCH the registration with an 'information::entities array that is empty' - see failure"
+echo "======================================================================================================="
+payload='{
+  "information": [ { "entities": [] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "18. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a string - see failure"
+echo "=============================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "id": 12 } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "19. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a valid URI - see failure"
+echo "================================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "id": "12" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "20. Attempt to PATCH the registration with duplicate 'information::entities[0]::id - see failure"
+echo "================================================================================================"
+payload='{
+  "information": [ { "entities": [ { "id": "urn:E1", "id": "urn:E1" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "21. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is not a string - see failure"
+echo "====================================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "idPattern": false } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "22. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is an empty string - see failure"
+echo "========================================================================================================================"
+payload='{
+  "information": [ { "entities": [ { "idPattern": "" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "23. Attempt to PATCH the registration with duplicate 'information::entities[0]::idPattern - see failure"
+echo "======================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "idPattern": "E.*", "idPattern": "E.*" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "24. Attempt to PATCH the registration with an 'information::entities[0]::type' that is not a string - see failure"
+echo "================================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "type": false } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "25. Attempt to PATCH the registration with an 'information::entities[0]::type' that is an empty string - see failure"
+echo "===================================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "type": "" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "26. Attempt to PATCH the registration with duplicate 'information::entities[0]::type' - see failure"
+echo "==================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "type": "T1", "type": "T2" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "27. Attempt to PATCH the registration with no 'information::entities[0]::type' - see failure"
+echo "============================================================================================"
+payload='{
+  "information": [ { "entities": [ { "id": "urn:E1" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "28. Attempt to PATCH the registration with an invalid field 'information::entities[0]::inv' - see failure"
+echo "========================================================================================================="
+payload='{
+  "information": [ { "entities": [ { "inv": "alid" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "29. Attempt to PATCH the registration with an 'information::properties' that is not an array - see failure"
+echo "=========================================================================================================="
+payload='{
+  "information": [ { "properties": 14 } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "30. Attempt to PATCH the registration with an 'information::properties' item that is not a string - see failure"
+echo "==============================================================================================================="
+payload='{
+  "information": [ { "properties": [ 4 ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "31. Attempt to PATCH the registration with an 'information::properties' item that is an empty string - see failure"
+echo "=================================================================================================================="
+payload='{
+  "information": [ { "properties": [ "" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "32. Attempt to PATCH the registration with an 'information::properties' that is an empty array - see failure"
+echo "============================================================================================================"
+payload='{
+  "information": [ { "properties": [] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "33. Attempt to PATCH the registration with an 'information::relationships' that is not an array - see failure"
+echo "============================================================================================================="
+payload='{
+  "information": [ { "relationships": 14 } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "34. Attempt to PATCH the registration with an 'information::relationships' item that is not a string - see failure"
+echo "=================================================================================================================="
+payload='{
+  "information": [ { "relationships": [ 14 ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "35. Attempt to PATCH the registration with an 'information::relationships' item that is an empty string - see failure"
+echo "====================================================================================================================="
+payload='{
+  "information": [ { "relationships": [ "" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "36. Attempt to PATCH the registration with an 'information::relationships' item that is an invalid URI - see failure"
+echo "===================================================================================================================="
+payload='{
+  "information": [ { "relationships": [ "not a URI" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "37. Attempt to PATCH the registration with an 'information::relationships' that is an empty array - see failure"
+echo "==============================================================================================================="
+payload='{
+  "information": [ { "relationships": [ ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "38. Attempt to PATCH the registration with an invalid field 'information::xyz - see failure"
+echo "==========================================================================================="
+payload='{
+  "information": [ { "xyz": [ ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "39. Attempt to PATCH the registration with an 'observationInterval' that is not a JSON Object - see failure"
+echo "==========================================================================================================="
+payload='{
+  "observationInterval": 44
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "40. Attempt to PATCH the registration with an 'observationInterval' that is an empty JSON Object - see failure"
+echo "=============================================================================================================="
+payload='{
+  "observationInterval": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "41. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'start' field - see failure"
+echo "==================================================================================================================="
+payload='{
+  "observationInterval": {
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "42. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'end' field - see failure"
+echo "================================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "43. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'start' field - see failure"
+echo "================================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "44. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'end' field - see failure"
+echo "==============================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "45. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a string - see failure"
+echo "==========================================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": 2028,
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "46. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a valid DateTime - see failure"
+echo "==================================================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-3010:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "47. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a string - see failure"
+echo "=========================================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": 2028
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "48. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a valid DateTime - see failure"
+echo "=================================================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end":   "2028-12-3110:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "49. Attempt to PATCH the registration with an 'observationInterval' with an invalid field 'xyz' - see failure"
+echo "============================================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00",
+    "xyz": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "50. Attempt to PATCH the registration with a duplicated 'observationInterval' - see failure"
+echo "==========================================================================================="
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "51. Attempt to PATCH the registration with a 'observationInterval' whose start>end - see failure"
+echo "================================================================================================"
+payload='{
+  "observationInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "52. Attempt to PATCH the registration with an 'managementInterval' that is not a JSON Object - see failure"
+echo "=========================================================================================================="
+payload='{
+  "managementInterval": 44
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "53. Attempt to PATCH the registration with an 'managementInterval' that is an empty JSON Object - see failure"
+echo "============================================================================================================="
+payload='{
+  "managementInterval": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "54. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'start' field - see failure"
+echo "=================================================================================================================="
+payload='{
+  "managementInterval": {
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "55. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'end' field - see failure"
+echo "================================================================================================================"
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "56. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'start' field - see failure"
+echo "================================================================================================================"
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "57. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'end' field - see failure"
+echo "=============================================================================================================="
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "58. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a string - see failure"
+echo "=========================================================================================================================="
+payload='{
+  "managementInterval": {
+    "start": 2028,
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "59. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a valid DateTime - see failure"
+echo "=================================================================================================================================="
+payload='{
+  "managementInterval": {
+    "start": "2028-12-3010:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "60. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a string - see failure"
+echo "========================================================================================================================="
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": 2028
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "61. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a valid DateTime - see failure"
+echo "================================================================================================================================="
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end":   "2028-12-3110:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "62. Attempt to PATCH the registration with an 'managementInterval' with an invalid field 'xyz' - see failure"
+echo "============================================================================================================"
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00",
+    "xyz": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "63. Attempt to PATCH the registration with a duplicated 'managementInterval' - see failure"
+echo "=========================================================================================="
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "64. Attempt to PATCH the registration with a 'managementInterval' whose start>end - see failure"
+echo "==============================================================================================="
+payload='{
+  "managementInterval": {
+    "start": "2028-12-30T10:00:00",
+    "end": "2028-12-29T10:00:00"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "65. Attempt to PATCH the registration with a 'location' that is not a JSON Object - see failure"
+echo "==============================================================================================="
+payload='{
+  "location": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "66. Attempt to PATCH the registration with a duplicated 'location' - see failure"
+echo "================================================================================"
+payload='{
+  "location": { "type": "Point", "coordinates": [ 1, 2 ] },
+  "location": { "type": "Point", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "67. Attempt to PATCH the registration with a 'location' that contains no 'type' field - see failure"
+echo "==================================================================================================="
+payload='{
+  "location": { "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "68. Attempt to PATCH the registration with a 'location' with a 'type' that is not a string  - see failure"
+echo "========================================================================================================="
+payload='{
+  "location": { "type": 12, "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "69. Attempt to PATCH the registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure"
+echo "============================================================================================================================="
+payload='{
+  "location": { "type": "punto", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "70. Attempt to PATCH the registration with a 'location' that has a duplicated 'type' - see failure"
+echo "=================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": [ 1, 2 ], "type": "Point" }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "71. Attempt to PATCH the registration with a 'location' that contains no 'coordinates' field - see failure"
+echo "=========================================================================================================="
+payload='{
+  "location": { "type": "Point" }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "72. Attempt to PATCH the registration with a 'location' that has a duplicated	'coordinates' - see failure"
+echo "========================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": [ 1, 2 ], "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "73. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is not an Array - see failure"
+echo "========================================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": true }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "74. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is an empty Array - see failure"
+echo "==========================================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": [ ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "75. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an empty array - see failure"
+echo "========================================================================================================================================"
+payload='{
+  "location": { "type": "Point", "coordinates": [ ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "76. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure"
+echo "================================================================================================================================================"
+payload='{
+  "location": { "type": "Point", "coordinates": [ 7 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "77. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure"
+echo "=================================================================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": [ 1, 2.0, 3, 4.0 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "78. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure"
+echo "==============================================================================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": [ 5.0, false ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "79. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure"
+echo "=================================================================================================================================================================="
+payload='{
+  "location": { "type": "Point", "coordinates": [ 1, 2.0, "string" ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "80. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure"
+echo "================================================================================================================================================="
+payload='{
+  "location": { "type": "MultiPoint", "coordinates": [ 1, 2.0 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "81. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure"
+echo "================================================================================================================================================================"
+payload='{
+  "location": { "type": "MultiPoint", "coordinates": [ [ 1, 2.0 ], [] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "82. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' and one of its double array items is not a number - see failure"
+echo "====================================================================================================================================================="
+payload='{
+  "location": { "type": "MultiPoint", "coordinates": [ [ 1, 2.0 ], [ 3, "string" ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "83. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' that is not a double array - see failure"
+echo "================================================================================================================================================="
+payload='{
+  "location": { "type": "LineString", "coordinates": [ 1, 2.0 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "84. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure"
+echo "================================================================================================================================================================"
+payload='{
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2.0 ], "string" ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "85. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure"
+echo "============================================================================================================================================================================"
+payload='{
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2.0 ], [ 5 ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "86. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure"
+echo "=================================================================================================================================================================================="
+payload='{
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2.0 ], [ 5, "string" ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "87. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with	one of its Points as an empty array - see failure"
+echo "==============================================================================================================================================================="
+payload='{
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2.0 ], [ ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "88. Attempt to PATCH the registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure"
+echo "=================================================================================================================================================="
+payload='{
+  "location": { "type": "MultiLineString", "coordinates": [ [ 1, 2.0 ], [ 5, 4 ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "89. Attempt to PATCH the registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure"
+echo "====================================================================================================================================================="
+payload='{
+  "location": { "type": "MultiLineString", "coordinates": [ [ [ [ 1, 2.0 ], [ 5, 4 ] ] ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "90. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a double array - see failure"
+echo "=========================================================================================================================================="
+payload='{
+  "location": { "type": "Polygon", "coordinates": [ [ 1, 2.0 ], [ 5, 4 ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "91. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure"
+echo "============================================================================================================================================="
+payload='{
+  "location": { "type": "Polygon", "coordinates": [ [ [ [ 1, 2.0 ], [ 5, 4 ] ] ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "92. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of three Numbers - see failure"
+echo "========================================================================================================================================================"
+payload='{
+  "location": { "type": "Polygon", "coordinates": [ [ [ 2, 0 ], [ 0, 5 ], [ 2, 0 ] ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "93. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure"
+echo "========================================================================================================================================================================"
+payload='{
+  "location": { "type": "Polygon", "coordinates": [ [ [ 2, 0 ], [ 0, 5 ], [ 0, 0 ], "OK",  [ 2, 0 ] ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "94. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array where first item != last item"
+echo "======================================================================================================================================================="
+payload='{
+  "location": { "type": "Polygon", "coordinates": [ [ [ 2, 0 ], [ 0, 5 ], [ 0, 0 ], [ 1, 0 ] ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "95. Attempt to PATCH the registration with an 'observationSpace' that is not a JSON Object - see failure"
+echo "========================================================================================================"
+payload='{
+  "observationSpace": true
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "96. Attempt to PATCH the registration with a duplicated 'observationSpace' - see failure"
+echo "========================================================================================"
+payload='{
+  "observationSpace": { "type": "Point",  "coordinates": [ 2, 0 ] },
+  "observationSpace": { "type": "Point",  "coordinates": [ 2, 1 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "97. Attempt to PATCH the registration with an 'operationSpace' that is not a JSON Object - see failure"
+echo "======================================================================================================"
+payload='{
+  "operationSpace": true
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "98. Attempt to PATCH the registration with a duplicated 'operationSpace' - see failure"
+echo "======================================================================================"
+payload='{
+  "operationSpace": { "type": "Point",  "coordinates": [ 2, 0 ] },
+  "operationSpace": { "type": "Point",  "coordinates": [ 2, 1 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "99. Attempt to PATCH the registration with an 'expires' that is not a string - see failure"
+echo "=========================================================================================="
+payload='{
+  "expires": true
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "100. Attempt to PATCH the registration with an 'expires' that is not a valid DateTime - see failure"
+echo "==================================================================================================="
+payload='{
+  "expires": "no date"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "101. Attempt to PATCH the registration with a duplicated 'expires' - see failure"
+echo "================================================================================"
+payload='{
+  "expires": "2028-12-30T10:00:00",
+  "expires": "2028-12-30T10:00:00"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "102. Attempt to PATCH the registration with an 'endpoint' that is not a string - see failure"
+echo "============================================================================================"
+payload='{
+  "endpoint": true
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "103. Attempt to PATCH the registration with an 'endpoint' that is not a valid URI - see failure"
+echo "==============================================================================================="
+payload='{
+  "endpoint": "not an uri"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "104. Attempt to PATCH the registration with a duplicated 'endpoint' - see failure"
+echo "================================================================================="
+payload='{
+  "endpoint": "urn:ok",
+  "endpoint": "urn:ok"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "105. Attempt to PATCH the registration with a duplicated Property - see failure"
+echo "==============================================================================="
+payload='{
+  "P1": "first P1",
+  "P1": "second P1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with all fields
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Date: REGEX(.*)
+
+
+
+02. Attempt to PATCH the registration with a Registration ID - see failure
+==========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::id",
+    "title": "Invalid field for Registration Update",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to PATCH the registration with a payload data that is not a JSON object - see failure
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 170
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The payload data for updating a registration must be a JSON Object",
+    "title": "Invalid Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to PATCH the registration with a 'type' that is not a string - see failure
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to PATCH the registration with a 'type' string that is not 'ContextSourceRegistration' - see failure
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "InvalidValueForRegType",
+    "title": "Invalid value for Registration::type",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to PATCH the registration with duplicate 'type' - see failure
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to PATCH the registration with a 'name' that is not a string - see failure
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::name",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to PATCH the registration with duplicate 'name' - see failure
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::name",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to PATCH the registration with a 'description' that is not a string - see failure
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 126
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::description",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Attempt to PATCH the registration with duplicate 'description' - see failure
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::description",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Attempt to PATCH the registration with an 'information' that is not a JSON Array - see failure
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. Attempt to PATCH the registration with duplicate 'information' - see failure
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. Attempt to PATCH the registration with an 'information' that is an empty array - see failure
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. Attempt to PATCH the registration with an 'information' that has a member that is not a JSON Object - see failure
+=====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. Attempt to PATCH the registration with an 'information::entities that is not an array' - see failure
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. Attempt to PATCH the registration with an 'information::entities array item that is not an object' - see failure
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+17. Attempt to PATCH the registration with an 'information::entities array that is empty' - see failure
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+18. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a string - see failure
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+19. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a valid URI - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+20. Attempt to PATCH the registration with duplicate 'information::entities[0]::id - see failure
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+21. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is not a string - see failure
+=====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+22. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is an empty string - see failure
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+23. Attempt to PATCH the registration with duplicate 'information::entities[0]::idPattern - see failure
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 152
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+24. Attempt to PATCH the registration with an 'information::entities[0]::type' that is not a string - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+25. Attempt to PATCH the registration with an 'information::entities[0]::type' that is an empty string - see failure
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+26. Attempt to PATCH the registration with duplicate 'information::entities[0]::type' - see failure
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+27. Attempt to PATCH the registration with no 'information::entities[0]::type' - see failure
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+28. Attempt to PATCH the registration with an invalid field 'information::entities[0]::inv' - see failure
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "inv",
+    "title": "Invalid field for Registration::information[X]::entities[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+29. Attempt to PATCH the registration with an 'information::properties' that is not an array - see failure
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::properties",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+30. Attempt to PATCH the registration with an 'information::properties' item that is not a string - see failure
+===============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::properties[X]",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+31. Attempt to PATCH the registration with an 'information::properties' item that is an empty string - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::properties[X]",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+32. Attempt to PATCH the registration with an 'information::properties' that is an empty array - see failure
+============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::properties",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+33. Attempt to PATCH the registration with an 'information::relationships' that is not an array - see failure
+=============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationships",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+34. Attempt to PATCH the registration with an 'information::relationships' item that is not a string - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationships[X]",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+35. Attempt to PATCH the registration with an 'information::relationships' item that is an empty string - see failure
+=====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationships[X]",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+36. Attempt to PATCH the registration with an 'information::relationships' item that is an invalid URI - see failure
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationships[X]",
+    "title": "Not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+37. Attempt to PATCH the registration with an 'information::relationships' that is an empty array - see failure
+===============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationships",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+38. Attempt to PATCH the registration with an invalid field 'information::xyz - see failure
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field for Registration::information[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+39. Attempt to PATCH the registration with an 'observationInterval' that is not a JSON Object - see failure
+===========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+40. Attempt to PATCH the registration with an 'observationInterval' that is an empty JSON Object - see failure
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+41. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'start' field - see failure
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::start",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+42. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'end' field - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::end",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+43. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'start' field - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::start",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+44. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'end' field - see failure
+===============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::end",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+45. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a string - see failure
+===========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::start",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+46. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a valid DateTime - see failure
+===================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::start",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+47. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a string - see failure
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::end",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+48. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a valid DateTime - see failure
+==================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval::end",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+49. Attempt to PATCH the registration with an 'observationInterval' with an invalid field 'xyz' - see failure
+=============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field for Registration::observationInterval",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+50. Attempt to PATCH the registration with a duplicated 'observationInterval' - see failure
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+51. Attempt to PATCH the registration with a 'observationInterval' whose start>end - see failure
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationInterval ends before it starts",
+    "title": "Inconsistent DateTimes",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+52. Attempt to PATCH the registration with an 'managementInterval' that is not a JSON Object - see failure
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+53. Attempt to PATCH the registration with an 'managementInterval' that is an empty JSON Object - see failure
+=============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+54. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'start' field - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::start",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+55. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'end' field - see failure
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::end",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+56. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'start' field - see failure
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::start",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+57. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'end' field - see failure
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::end",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+58. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a string - see failure
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::start",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+59. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a valid DateTime - see failure
+==================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::start",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+60. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a string - see failure
+=========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::end",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+61. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a valid DateTime - see failure
+=================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval::end",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+62. Attempt to PATCH the registration with an 'managementInterval' with an invalid field 'xyz' - see failure
+============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field for Registration::managementInterval",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+63. Attempt to PATCH the registration with a duplicated 'managementInterval' - see failure
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 132
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+64. Attempt to PATCH the registration with a 'managementInterval' whose start>end - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 160
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::managementInterval ends before it starts",
+    "title": "Inconsistent DateTimes",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+65. Attempt to PATCH the registration with a 'location' that is not a JSON Object - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 123
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::location",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+66. Attempt to PATCH the registration with a duplicated 'location' - see failure
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::location",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+67. Attempt to PATCH the registration with a 'location' that contains no 'type' field - see failure
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Mandatory 'type' field missing for GeoJSON Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+68. Attempt to PATCH the registration with a 'location' with a 'type' that is not a string  - see failure
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "the 'type' field of a GeoJSON object must be a JSON String",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+69. Attempt to PATCH the registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure
+=============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "punto",
+    "title": "invalid GeoJSON type",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+70. Attempt to PATCH the registration with a 'location' that has a duplicated 'type' - see failure
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "geo-location::type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+71. Attempt to PATCH the registration with a 'location' that contains no 'coordinates' field - see failure
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 211
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Mandatory 'coordinates' field missing for a GeoJSON Property",
+    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+72. Attempt to PATCH the registration with a 'location' that has a duplicated	'coordinates' - see failure
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "geo-location::coordinates",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+73. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is not an Array - see failure
+=========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 164
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+74. Attempt to PATCH the registration with a 'location' that has a 'coordinates' field that is an empty Array - see failure
+===========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+75. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an empty array - see failure
+========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+76. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure
+================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+77. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure
+==================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+78. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure
+===============================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+79. Attempt to PATCH the registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure
+==================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+80. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure
+=================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'MultiPoint' must be a JSON Array of Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+81. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure
+================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+82. Attempt to PATCH the registration with a 'location' that has a 'type==MultiPoint' and one of its double array items is not a number - see failure
+=====================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+83. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' that is not a double array - see failure
+=================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+84. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure
+================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+85. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure
+============================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+86. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure
+==================================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+87. Attempt to PATCH the registration with a 'location' that has a 'type==LineString' with 'coordinates' with	one of its Points as an empty array - see failure
+===============================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+88. Attempt to PATCH the registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure
+==================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+89. Attempt to PATCH the registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure
+=====================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+90. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
+==========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 191
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+91. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
+=============================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "A Polygon must have at least 4 points",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+92. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of three Numbers - see failure
+========================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "A Polygon must have at least 4 points",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+93. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
+========================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 191
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+94. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' and its triple array items is an array where first item != last item
+=======================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 162
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "In a Polygon, the first and the last position must be identical",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+95. Attempt to PATCH the registration with an 'observationSpace' that is not a JSON Object - see failure
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationSpace",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+96. Attempt to PATCH the registration with a duplicated 'observationSpace' - see failure
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::observationSpace",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+97. Attempt to PATCH the registration with an 'operationSpace' that is not a JSON Object - see failure
+======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::operationSpace",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+98. Attempt to PATCH the registration with a duplicated 'operationSpace' - see failure
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::operationSpace",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+99. Attempt to PATCH the registration with an 'expires' that is not a string - see failure
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::expires",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+100. Attempt to PATCH the registration with an 'expires' that is not a valid DateTime - see failure
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::expires",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+101. Attempt to PATCH the registration with a duplicated 'expires' - see failure
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::expires",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+102. Attempt to PATCH the registration with an 'endpoint' that is not a string - see failure
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 123
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::endpoint",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+103. Attempt to PATCH the registration with an 'endpoint' that is not a valid URI - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 101
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endpoint",
+    "title": "Not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+104. Attempt to PATCH the registration with a duplicated 'endpoint' - see failure
+=================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::endpoint",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+105. Attempt to PATCH the registration with a duplicated Property - see failure
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "P1",
+    "title": "Duplicate Property in Registration Update",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

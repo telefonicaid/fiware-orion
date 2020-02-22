@@ -305,9 +305,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     {
       DUPLICATE_CHECK(expiresP, "Registration::expires", kNodeP);
       STRING_CHECK(kNodeP, "Registration::expires");
-      DATETIME_CHECK(expiresP->value.s, "Registration::expires");
-
-      regP->expires = parse8601Time(expiresP->value.s);
+      DATETIME_CHECK(expiresP->value.s, regP->expires, "Registration::expires");
     }
     else if (SCOMPARE9(kNodeP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))
     {

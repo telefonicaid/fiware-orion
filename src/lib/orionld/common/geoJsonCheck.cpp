@@ -42,6 +42,283 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// orionldCheckGeoJsonPoint -
+//
+bool orionldCheckGeoJsonPoint(ConnectionInfo* ciP, KjNode* geoPointCoordinatesNodeP)
+{
+  int numbers = 0;
+
+  if (geoPointCoordinatesNodeP->type != KjArray)
+  {
+    LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array");
+    return false;
+  }
+
+  // Must be an array of Number, two or three members
+  for (KjNode* memberP = geoPointCoordinatesNodeP->value.firstChildP; memberP != NULL; memberP = memberP->next)
+  {
+    if ((memberP->type == KjInt) || (memberP->type == KjFloat))
+      ++numbers;
+    else
+    {
+      LM_W(("Bad Input (member of 'coordinates' array is not a number but of type: '%s')", kjValueType(memberP->type)));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "all members of a 'Point' in 'coordinates' must be of type 'Number'");
+      return false;
+    }
+  }
+
+  if ((numbers != 2) && (numbers != 3))
+  {
+    LM_W(("Bad Input (invalid coordinates: %d numbers in array)", numbers));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "The 'coordinates' member for a 'Point' must be an array with two or three Numbers");
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckGeoJsonMultiPoint -
+//
+bool orionldCheckGeoJsonMultiPoint(ConnectionInfo* ciP, KjNode* geoPointCoordinatesNodeP)
+{
+  if (geoPointCoordinatesNodeP->type != KjArray)
+  {
+    LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array");
+    return false;
+  }
+
+  // Must be an array of arrays (that are of the type 'Point')
+  for (KjNode* memberP = geoPointCoordinatesNodeP->value.firstChildP; memberP != NULL; memberP = memberP->next)
+  {
+    if (memberP->type != KjArray)
+    {
+      LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'MultiPoint' must be a JSON Array of Arrays");
+      return false;
+    }
+
+    if (orionldCheckGeoJsonPoint(ciP, memberP) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckGeoJsonLineString -
+//
+bool orionldCheckGeoJsonLineString(ConnectionInfo* ciP, KjNode* geoPointCoordinatesNodeP)
+{
+  if (geoPointCoordinatesNodeP->type != KjArray)
+  {
+    LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array");
+    return false;
+  }
+
+  // Must be an array of at least two arrays (that are of the type 'Point')
+  int arrays = 0;
+  for (KjNode* pointP = geoPointCoordinatesNodeP->value.firstChildP; pointP != NULL; pointP = pointP->next)
+  {
+    LM_TMP(("MLS: Point at %p is a JSON %s", pointP, kjValueType(pointP->type)));
+    if (pointP->type != KjArray)
+    {
+      LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays");
+      return false;
+    }
+
+    if (orionldCheckGeoJsonPoint(ciP, pointP) == false)
+      return false;
+    ++arrays;
+  }
+
+  if (arrays < 2)
+  {
+    LM_W(("Bad Input ('coordinates' in a 'LineString' must be a JSON Array of at least two Arrays)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays");
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckGeoJsonMultiLineString -
+//
+bool orionldCheckGeoJsonMultiLineString(ConnectionInfo* ciP, KjNode* multiLineStringNodeP)
+{
+  LM_TMP(("MLS: MultiLineString at %p is a JSON %s", multiLineStringNodeP, kjValueType(multiLineStringNodeP->type)));
+  if (multiLineStringNodeP->type != KjArray)
+  {
+    LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array");
+    return false;
+  }
+
+  for (KjNode* lineStringNodeP = multiLineStringNodeP->value.firstChildP; lineStringNodeP != NULL; lineStringNodeP = lineStringNodeP->next)
+  {
+    if (lineStringNodeP->type != KjArray)
+    {
+      LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'MultiLineString' must be a JSON Array of 'LineString arrays'");
+      return false;
+    }
+
+    LM_TMP(("MLS: LineString at %p is a JSON %s", lineStringNodeP, kjValueType(lineStringNodeP->type)));
+    if (orionldCheckGeoJsonLineString(ciP, lineStringNodeP) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckGeoJsonPolygon -
+//
+// This is how a Polygon looks:
+//     "value": {
+//      "type": "Polygon",
+//      "coordinates": [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ], [ [0,0], ...]]
+//    }
+//
+// I.e. an Array of Arrays of Points
+//
+bool orionldCheckGeoJsonPolygon(ConnectionInfo* ciP, KjNode* geoPointCoordinatesNodeP)
+{
+  if (geoPointCoordinatesNodeP->type != KjArray)
+  {
+    LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array");
+    return false;
+  }
+
+  //
+  // A Polygon contains "rings" and a ring is an array of points
+  //
+  int ringNo = 0;
+  for (KjNode* ringP = geoPointCoordinatesNodeP->value.firstChildP; ringP != NULL; ringP = ringP->next)
+  {
+    KjNode* firstPosP = NULL;
+    KjNode* lastPosP  = NULL;
+    int     points    = 0;
+
+    for (KjNode* memberP = ringP->value.firstChildP; memberP != NULL; memberP = memberP->next)
+    {
+      if (memberP->type != KjArray)
+      {
+        LM_W(("Bad Input (a member of Polygon must be a JSON Array)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'");
+        return false;
+      }
+
+      if (points == 0)
+        firstPosP = memberP;
+      lastPosP = memberP;
+
+      ++points;
+    }
+
+    //
+    // A polygon must have at least 4 points
+    //
+    if (points < 4)
+    {
+      LM_W(("Bad Input (A Polygon must have at least 4 points)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "A Polygon must have at least 4 points");
+      return false;
+    }
+
+    //
+    // The first position and the last position must be identical
+    //
+    KjNode* firstItemNodeP = firstPosP->value.firstChildP;
+    KjNode* lastItemNodeP  = lastPosP->value.firstChildP;
+    int     index          = 0;
+
+    while (firstItemNodeP != NULL)
+    {
+      if ((lastItemNodeP == NULL) || (firstItemNodeP->value.f != lastItemNodeP->value.f))
+      {
+        LM_W(("Bad Input (In a Polygon, the first and the last position must be identical)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "In a Polygon, the first and the last position must be identical");
+        return false;
+      }
+
+      ++index;
+      firstItemNodeP = firstItemNodeP->next;
+      lastItemNodeP  = lastItemNodeP->next;
+    }
+
+    // Now both firstItemNodeP and lastItemNodeP must be NULL - we already know that firstItemNodeP is NULL - that's when the loop ended
+    if (lastItemNodeP != NULL)
+    {
+      LM_W(("Bad Input (In a Polygon, the first and the last position must be identical)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "In a Polygon, the first and the last position must be identical");
+      return false;
+    }
+
+    //
+    // FIXME: If ringNo == 0, the ring must be counterclockwise
+    //        Else: clockwise
+    //
+
+    ++ringNo;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldCheckGeoJsonMultiPolygon -
+//
+bool orionldCheckGeoJsonMultiPolygon(ConnectionInfo* ciP, KjNode* geoPointCoordinatesNodeP)
+{
+  if (geoPointCoordinatesNodeP->type != KjArray)
+  {
+    LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' must be a JSON Array");
+    return false;
+  }
+
+  for (KjNode* memberP = geoPointCoordinatesNodeP->value.firstChildP; memberP != NULL; memberP = memberP->next)
+  {
+    if (memberP->type != KjArray)
+    {
+      LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'MultiPolygon' must be a JSON Array of 'Polygon arrays'");
+      return false;
+    }
+
+    if (orionldCheckGeoJsonPolygon(ciP, memberP) == false)
+      return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // geoJsonCheck - check validity of any geo-property
 //
 // The value of a GeoJSON Property must be a JSON Object.
@@ -67,6 +344,7 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
   OrionldGeoJsonType  geoType           = GeoJsonNoType;
   char*               geoTypeString     = (char*) "NoGeometry";
 
+  LM_TMP(("MLS: In geoJsonCheck, geoLocationNodeP->name: %s", geoLocationNodeP->name));
   if (geoLocationNodeP->type != KjObject)
   {
     LM_W(("Bad Input (the value of a geo-location attribute must be a JSON Object: '%s')", geoLocationNodeP->name));
@@ -83,14 +361,15 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
       DUPLICATE_CHECK(typeNodeP, "geo-location::type", nodeP);
       STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object must be a JSON String");
 
+      LM_TMP(("MLS: Calling geoJsonTypeCheck for '%s'", typeNodeP->value.s));
       if (geoJsonTypeCheck(typeNodeP->value.s, &geoType, &details) == false)
       {
         LM_W(("Bad Input (invalid type for geoJson: '%s')", typeNodeP->value.s));
         orionldErrorResponseCreate(OrionldBadRequestData, details, typeNodeP->value.s);
         return false;
       }
-
       geoTypeString = typeNodeP->value.s;
+      LM_TMP(("MLS: geoJsonTypeCheck returned %d for '%s'", geoType, geoTypeString));
     }
     else if (SCOMPARE12(nodeP->name, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
     {
@@ -119,8 +398,8 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
   {
     LM_W(("Bad Input ('type' missing in geo-location '%s')", geoLocationNodeP->name));
     orionldErrorResponseCreate(OrionldBadRequestData,
-                               "The value of an attribute of type GeoProperty must be valid GeoJson",
-                               "Mandatory 'type' field missing for a GeoJSON Property");
+                               "Mandatory 'type' field missing for GeoJSON Property",
+                               geoLocationNodeP->name);
 
     return false;
   }
@@ -135,71 +414,31 @@ bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoLocationNodeP, char** geoTypeP
   }
 
   // Now we check that the coordinates (coordinatesNodeP) JSON Array coincides with the type 'geoType'
-  int numbers = 0;
-  int arrays  = 0;
+  bool result = false;
 
+  LM_TMP(("MLS: Got geoType: %d", geoType));
   switch (geoType)
   {
-  case GeoJsonPoint:
-    // Must be an array of Number, and at least two members
-    // Or, an array of arrays
-    for (KjNode* memberP = coordinatesNodeP->value.firstChildP; memberP != NULL; memberP = memberP->next)
-    {
-      if ((memberP->type == KjInt) || (memberP->type == KjFloat))
-      {
-        ++numbers;
-      }
-      else if (memberP->type == KjArray)
-      {
-        ++arrays;
-      }
-      else
-      {
-        LM_W(("Bad Input (member of 'coordinates' array is not a number but of type: '%s')", kjValueType(memberP->type)));
-        orionldErrorResponseCreate(OrionldBadRequestData, "all members of 'coordinates' must be of type 'Number'", geoLocationNodeP->name);
-        return false;
-      }
-    }
-
-    if ((numbers != 0) && (arrays != 0))
-    {
-      LM_W(("Bad Input (invalid coordinates)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "invalid value of 'coordinates'", geoLocationNodeP->name);
-      return false;
-    }
-
-    if ((numbers == 0) && (arrays == 0))
-    {
-      LM_W(("Bad Input (empty array for 'coordinates')"));
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "The value of an attribute of type GeoProperty must be valid GeoJson",
-                                 "empty array for 'coordinates'");
-      return false;
-    }
-
-    if (numbers == 1)
-    {
-      LM_W(("Bad Input (array with only ONE member for 'coordinates')"));
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "The value of an attribute of type GeoProperty must be valid GeoJson",
-                                 "array with only ONE member for 'coordinates'");
-      return false;
-    }
-    break;
-
-  case GeoJsonMultiPoint:
-    break;
-  case GeoJsonLineString:
-    break;
-  case GeoJsonMultiLineString:
-    break;
-  case GeoJsonPolygon:
-    break;
-  case GeoJsonMultiPolygon:
-    break;
+  case GeoJsonPoint:            result = orionldCheckGeoJsonPoint(ciP,           coordinatesNodeP); break;
+  case GeoJsonMultiPoint:       result = orionldCheckGeoJsonMultiPoint(ciP,      coordinatesNodeP); break;
+  case GeoJsonLineString:       result = orionldCheckGeoJsonLineString(ciP,      coordinatesNodeP); break;
+  case GeoJsonMultiLineString:  result = orionldCheckGeoJsonMultiLineString(ciP, coordinatesNodeP); break;
+  case GeoJsonPolygon:          result = orionldCheckGeoJsonPolygon(ciP,         coordinatesNodeP); break;
+  case GeoJsonMultiPolygon:     result = orionldCheckGeoJsonMultiPolygon(ciP,    coordinatesNodeP); break;
 
   default:
+    //
+    // Can't reach this point, we would have discovered the error already right after the call to geoJsonTypeCheck()
+    //
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid type for GeoJSON", "This can't happen");
+    result = false;
     break;
+  }
+
+  if (result == false)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
   }
 
   //

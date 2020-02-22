@@ -223,7 +223,7 @@ Date: REGEX(.*)
 
 {
     "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
-    "title": "not a JSON Array",
+    "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -231,13 +231,13 @@ Date: REGEX(.*)
 03. Only one 'coordinate' in payload for creation - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 195
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "array with only ONE member for 'coordinates'",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -250,8 +250,8 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "empty array for 'coordinates'",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -259,13 +259,13 @@ Date: REGEX(.*)
 05. 'type' member missing in value of a GeoProperty - see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 204
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Mandatory 'type' field missing for a GeoJSON Property",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
+    "detail": "value",
+    "title": "Mandatory 'type' field missing for GeoJSON Property",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

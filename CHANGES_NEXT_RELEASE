@@ -14,4 +14,5 @@
 * Issue #370 - Compaction of attribute names and entity types in GET /ngsi-ld/v1/csourceRegistrations
 * Issue #371 - Forwarded GET now respects options=keyValues
 * Issue #XXX - Reimplemented PATCH /entities/{EID}/attrs
+* Issue #XXX - Implemented PATCH /subscriptions/{reg-id}
 * Issue #368 - Implemented PATCH /csourceRegistrations/{reg-id}

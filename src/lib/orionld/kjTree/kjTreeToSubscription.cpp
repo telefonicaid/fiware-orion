@@ -272,9 +272,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
     {
       DUPLICATE_CHECK(expiresP, "Subscription::expires", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::expires");
-      DATETIME_CHECK(expiresP, "Subscription::expires");
-
-      subP->expires = parse8601Time(expiresP);
+      DATETIME_CHECK(expiresP, subP->expires, "Subscription::expires");
     }
     else if (SCOMPARE11(kNodeP->name, 't', 'h', 'r', 'o', 't', 't', 'l', 'i', 'n', 'g', 0))
     {

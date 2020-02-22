@@ -88,6 +88,23 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// EMPTY_OBJECT_CHECK -
+//
+#define EMPTY_OBJECT_CHECK(kNodeP, what)                                                                     \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->value.firstChildP == NULL)                                                                     \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", what);                                 \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // ARRAY_CHECK -
 //
 #define ARRAY_CHECK(kNodeP, fieldName)                                                                       \
@@ -95,7 +112,7 @@ do                                                                              
 {                                                                                                            \
   if (kNodeP->type != KjArray)                                                                               \
   {                                                                                                          \
-    orionldErrorResponseCreate(OrionldBadRequestData, "not a JSON Array", fieldName);                        \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array", fieldName);                        \
     ciP->httpStatusCode = SccBadRequest;                                                                     \
     return false;                                                                                            \
   }                                                                                                          \
@@ -156,6 +173,23 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// EMPTY_STRING_CHECK -
+//
+#define EMPTY_STRING_CHECK(kNodeP, what)                                                                     \
+do                                                                                                           \
+{                                                                                                            \
+  if (kNodeP->value.s[0] == 0)                                                                               \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Empty String", what);                                 \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // INTEGER_CHECK -
 //
 #define INTEGER_CHECK(nodeP, fieldName)                                                                      \
@@ -192,10 +226,10 @@ do                                                                              
 //
 // DATETIME_CHECK -
 //
-#define DATETIME_CHECK(stringValue, fieldName)                                                               \
+#define DATETIME_CHECK(stringValue, dateTimeValue, fieldName)                                                \
 do                                                                                                           \
 {                                                                                                            \
-  if (parse8601Time(stringValue) == -1)                                                                      \
+  if ((dateTimeValue = parse8601Time(stringValue)) == -1)                                                    \
   {                                                                                                          \
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid DateTime value", fieldName);                  \
     ciP->httpStatusCode = SccBadRequest;                                                                     \
