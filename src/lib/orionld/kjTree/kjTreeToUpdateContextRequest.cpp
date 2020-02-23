@@ -34,41 +34,10 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/entityErrorPush.h"                      // entityErrorPush
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityErrorPush -
-//
-static void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status)
-{
-  KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
-  KjNode* eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);
-  KjNode* problemDetailsP = kjObject(orionldState.kjsonP,  "error");
-  KjNode* typeP           = kjString(orionldState.kjsonP,  "type",     orionldErrorTypeToString(type));
-  KjNode* titleP          = kjString(orionldState.kjsonP,  "title",    title);
-  KjNode* statusP         = kjInteger(orionldState.kjsonP, "status",   status);
-
-  kjChildAdd(problemDetailsP, typeP);
-  kjChildAdd(problemDetailsP, titleP);
-
-  if (detail != NULL)
-  {
-    KjNode* detailP = kjString(orionldState.kjsonP, "detail", detail);
-    kjChildAdd(problemDetailsP, detailP);
-  }
-
-  kjChildAdd(problemDetailsP, statusP);
-
-  kjChildAdd(objP, eIdP);
-  kjChildAdd(objP, problemDetailsP);
-
-  kjChildAdd(errorsArrayP, objP);
-}
 
 
 

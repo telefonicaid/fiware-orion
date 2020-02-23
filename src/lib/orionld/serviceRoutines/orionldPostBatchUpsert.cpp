@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -61,54 +62,6 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityErrorPush -
-//
-// The array "errors" in BatchOperationResult is an array of BatchEntityError.
-// BatchEntityError contains a string (the entity id) and an instance of ProblemDetails.
-//
-// ProblemDetails is described in https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf
-// and contains:
-//
-// * type      (string) A URI reference that identifies the problem type
-// * title     (string) A short, human-readable summary of the problem
-// * detail    (string) A human-readable explanation specific to this occurrence of the problem
-// * status    (number) The HTTP status code
-// * instance  (string) A URI reference that identifies the specific occurrence of the problem
-//
-// Of these five items, only "type" seems to be mandatory.
-//
-// This implementation will treat "type", "title", and "status" as MANDATORY, and "detail" as OPTIONAL
-//
-static void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status)
-{
-  KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
-  KjNode* eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);
-  KjNode* problemDetailsP = kjObject(orionldState.kjsonP,  "error");
-  KjNode* typeP           = kjString(orionldState.kjsonP,  "type",     orionldErrorTypeToString(type));
-  KjNode* titleP          = kjString(orionldState.kjsonP,  "title",    title);
-  KjNode* statusP         = kjInteger(orionldState.kjsonP, "status",   status);
-
-  kjChildAdd(problemDetailsP, typeP);
-  kjChildAdd(problemDetailsP, titleP);
-
-  if (detail != NULL)
-  {
-    KjNode* detailP = kjString(orionldState.kjsonP, "detail", detail);
-    kjChildAdd(problemDetailsP, detailP);
-  }
-
-  kjChildAdd(problemDetailsP, statusP);
-
-  kjChildAdd(objP, eIdP);
-  kjChildAdd(objP, problemDetailsP);
-
-  kjChildAdd(errorsArrayP, objP);
-}
 
 
 
