@@ -1,0 +1,250 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert - different Contexts for different entities
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+#
+# First Error Handling of Context-Type VS @context in payload data
+# 01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error
+# 02. Batch Upsert, Content-Type is LD+JSON, no @context present in an item of the array - see error
+# 03. Batch Upsert, Content-Type is JSON, and no @context present in an item of the array - OK
+#
+# Now testing thateach Entity is created with the @context of its array item
+# 04. Issue a Batch upsert command, creating 3 new entities, each with a different context
+# 05. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context
+#
+
+echo "01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error"
+echo "================================================================================================"
+payload='[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "urn:E1",
+    "type": "Tx",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "02. Batch Upsert, Content-Type is LD+JSON, no @context present in an item of the array - see error"
+echo "=================================================================================================="
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "Tx",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Batch Upsert, Content-Type is JSON, and no @context present in an item of the array - OK"
+echo "============================================================================================"
+payload='[
+  {
+    "id": "urn:test:E1",
+    "type": "Tx",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "04. Issue a Batch upsert command, creating 3 new entities, each with a different context"
+echo "========================================================================================"
+payload='[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "urn:E1",
+    "type": "Tx",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "05. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context"
+echo "=========================================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Tx
+echo
+echo
+
+
+echo "06. See urn:E1 in mongo"
+echo "======================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:E1"})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error
+================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 234
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "status": 400,
+                "title": "Content-Type is 'application/json', and an @context is present in the payload data array item",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+02. Batch Upsert, Content-Type is LD+JSON, no @context present in an item of the array - see error
+==================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 222
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "status": 400,
+                "title": "Content-Type is 'application/ld+json', but no @context in payload data array item",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+03. Batch Upsert, Content-Type is JSON, and no @context present in an item of the array - OK
+============================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Issue a Batch upsert command, creating 3 new entities, each with a different context
+========================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context
+==========================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": 1
+        },
+        "id": "urn:test:E1",
+        "type": "Tx"
+    },
+    {
+        "http://example.org/P1": {
+            "type": "Property",
+            "value": 1
+        },
+        "id": "urn:E1",
+        "type": "Tx"
+    }
+]
+
+
+06. See urn:E1 in mongo
+=======================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Tx",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"http://example.org/P1"
+	],
+	"attrs" : {
+		"http://example=org/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

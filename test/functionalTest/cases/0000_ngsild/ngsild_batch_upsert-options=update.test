@@ -58,7 +58,7 @@ payload='[
     }
   }
 ]'
-orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
 echo
 echo
 
@@ -90,7 +90,7 @@ payload='[
     }
   }
 ]'
-orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
 echo
 echo
 
@@ -105,19 +105,10 @@ echo
 --REGEXPECT--
 01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
 ===========================================================================================
-HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
 
 
 02. GET the entities
@@ -145,19 +136,10 @@ Date: REGEX(.*)
 
 03. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
 ======================================================================================
-HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2",
-        "urn:ngsi-ld:entity:E3"
-    ]
-}
 
 
 04. GET all entities - see E1 as it was and E2 changed by step 3, and the new E3

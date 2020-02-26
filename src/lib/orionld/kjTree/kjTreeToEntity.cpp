@@ -82,7 +82,7 @@ bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP)
         //
         // Here, as the data comes from the DB, no expansion is necessary - kjTreeToContextAttribute should have a parameter for that
         //
-        if (kjTreeToContextAttribute(orionldState.ciP, aP, caP, &typeNodeP, &detail) == false)
+        if (kjTreeToContextAttribute(orionldState.ciP, orionldState.contextP, aP, caP, &typeNodeP, &detail) == false)
         {
           // kjTreeToContextAttribute calls orionldErrorResponseCreate
           delete caP;

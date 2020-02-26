@@ -35,6 +35,8 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
+#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // Own interface
@@ -49,7 +51,7 @@ extern "C"
 // No need to check for duplicates, already done.
 // We only need to lookup id and type and remove them
 //
-static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, char** entityTypeP)
+static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, char** entityTypeP, KjNode** contextPP)
 {
   KjNode*  itemP = entityNodeP->value.firstChildP;
 
@@ -67,6 +69,11 @@ static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, cha
       *entityTypeP = itemP->value.s;
       kjChildRemove(entityNodeP, itemP);
     }
+    else if (SCOMPARE9(itemP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
+    {
+      *contextPP = itemP;
+      kjChildRemove(entityNodeP, itemP);
+    }
 
     itemP = next;
   }
@@ -80,11 +87,12 @@ static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, cha
 //
 // kjTreeToContextElementAttributes -
 //
-// NOTE: "id" and "type" of the entity must be removed from the tree before this function is called
+// NOTE: "id", "type", and "@context" of the entity must be removed from the tree before this function is called
 //
 static bool kjTreeToContextElementAttributes
 (
   ConnectionInfo*  ciP,
+  OrionldContext*  contextP,
   KjNode*          entityNodeP,
   KjNode*          createdAtP,
   KjNode*          modifiedAtP,
@@ -96,24 +104,15 @@ static bool kjTreeToContextElementAttributes
   // Iterate over the items of the entity
   for (KjNode* itemP = entityNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
-    if (createdAtP != NULL)
-    {
-      if (itemP == createdAtP)
-        continue;
-    }
+    if (itemP == createdAtP)
+      continue;
+    else if (itemP == modifiedAtP)
+      continue;
     else if (SCOMPARE8(itemP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
       continue;
-
-    if (modifiedAtP != NULL)
-    {
-      if (itemP == modifiedAtP)
-        continue;
-    }
     else if (SCOMPARE8(itemP->name, 'm', 'o', 'd', 'D', 'a', 't', 'e', 0))
       continue;
-
-    // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate')
-    if (itemP->type != KjObject)
+    else if (itemP->type != KjObject)  // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate')
     {
       LM_E(("UPSERT: item '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
       *titleP  = (char*) "invalid entity";
@@ -121,20 +120,24 @@ static bool kjTreeToContextElementAttributes
 
       return false;
     }
-
-    KjNode*           attrTypeNodeP = NULL;
-    ContextAttribute* caP           = new ContextAttribute();
-
-    // kjTreeToContextAttribute treats the attribute, including expanding the attribute name and values, if applicable
-    if (kjTreeToContextAttribute(ciP, itemP, caP, &attrTypeNodeP, detailP) == false)
+    else
     {
-      // kjTreeToContextAttribute calls orionldErrorResponseCreate
-      LM_E(("kjTreeToContextAttribute failed"));
-      delete caP;
-      return false;
-    }
+      KjNode*           attrTypeNodeP = NULL;
+      ContextAttribute* caP           = new ContextAttribute();
 
-    ceP->contextAttributeVector.push_back(caP);
+      // kjTreeToContextAttribute treats the attribute, including expanding the attribute name and values, if applicable
+      if (kjTreeToContextAttribute(ciP, contextP, itemP, caP, &attrTypeNodeP, detailP) == false)
+      {
+        // kjTreeToContextAttribute calls orionldErrorResponseCreate
+        LM_E(("kjTreeToContextAttribute failed for attribute '%s': %s", itemP->name, *detailP));
+        *titleP = (char*) "Error treating attribute";
+        delete caP;
+
+        return false;
+      }
+
+      ceP->contextAttributeVector.push_back(caP);
+    }
   }
 
   return true;
@@ -148,6 +151,9 @@ static bool kjTreeToContextElementAttributes
 //
 // NOTE
 //   treeP is supposed to be an Array of Entities
+//   This function is called only by BATCH Create/Update/Upsert
+//
+// If Content-Type is "application/ld+json", then the @context must be part of each and every item of the array
 //
 void kjTreeToUpdateContextRequest(ConnectionInfo* ciP, UpdateContextRequest* ucrP, KjNode* treeP, KjNode* errorsArrayP)
 {
@@ -167,15 +173,51 @@ void kjTreeToUpdateContextRequest(ConnectionInfo* ciP, UpdateContextRequest* ucr
       continue;
     }
 
-    char*  title;
-    char*  detail;
-    char*  entityId           = NULL;
-    char*  entityType         = NULL;
-    char*  entityTypeExpanded = NULL;
+    char*           title;
+    char*           detail;
+    char*           entityId           = NULL;
+    char*           entityType         = NULL;
+    char*           entityTypeExpanded = NULL;
+    KjNode*         contextNodeP       = NULL;
+    OrionldContext* contextP           = orionldState.contextP;
 
-    entityFieldsExtractSimple(entityP, &entityId, &entityType);
+    entityFieldsExtractSimple(entityP, &entityId, &entityType, &contextNodeP);
 
-    entityTypeExpanded = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
+    if (orionldState.ngsildContent == true)
+    {
+      if (contextNodeP == NULL)
+      {
+        LM_E(("Content-Type is 'application/ld+json', but no @context found for entity '%s'", entityId));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Content-Type is 'application/ld+json', but no @context in payload data array item", NULL, 400);
+        entityP = next;
+        continue;
+      }
+
+      OrionldProblemDetails pd;
+      contextP = orionldContextFromTree(NULL, false, contextNodeP, &pd);
+
+      if (contextP == NULL)
+      {
+        LM_E(("orionldContextFromTree reports error: %s: %s", pd.title, pd.detail));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, pd.title, pd.detail, pd.status);
+        entityP = next;
+        continue;
+      }
+    }
+    else
+    {
+      if (contextNodeP != NULL)
+      {
+        LM_E(("Content-Type is 'application/json', and an @context is present in the payload data array item of entity '%s'", entityId));
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Content-Type is 'application/json', and an @context is present in the payload data array item", NULL, 400);
+        entityP = next;
+        continue;
+      }
+      else
+        contextP = orionldState.contextP;
+    }
+
+    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, NULL, true, NULL);
     if (entityTypeExpanded == NULL)
     {
       LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));
@@ -184,14 +226,14 @@ void kjTreeToUpdateContextRequest(ConnectionInfo* ciP, UpdateContextRequest* ucr
       continue;
     }
 
-    ContextElement* ceP        = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
-    EntityId*       entityIdP  = &ceP->entityId;
+    ContextElement* ceP          = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
+    EntityId*       entityIdP    = &ceP->entityId;
 
     entityIdP->id        = entityId;
     entityIdP->type      = entityTypeExpanded;
     entityIdP->isPattern = "false";
 
-    if (kjTreeToContextElementAttributes(ciP, entityP, NULL, NULL, ceP, &title, &detail) == false)
+    if (kjTreeToContextElementAttributes(ciP, contextP, entityP, NULL, NULL, ceP, &title, &detail) == false)
     {
       LM_W(("kjTreeToContextElementAttributes flags error '%s: %s' for entity '%s'", title, detail, entityId));
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, title, detail, 400);

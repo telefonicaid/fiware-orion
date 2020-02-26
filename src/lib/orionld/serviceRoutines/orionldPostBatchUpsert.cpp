@@ -664,6 +664,13 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     ciP->httpStatusCode = SccReceiverInternalError;
     return false;
   }
+  else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
+    ciP->httpStatusCode = SccMultiStatus;
+  else
+  {
+    ciP->httpStatusCode = SccNoContent;
+    orionldState.responseTree = NULL;
+  }
 
   return true;
 }

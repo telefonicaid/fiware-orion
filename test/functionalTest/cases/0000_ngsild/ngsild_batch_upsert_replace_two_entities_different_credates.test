@@ -158,18 +158,10 @@ echo
 --REGEXPECT--
 01. Create entity E1
 ====================
-HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1"
-    ]
-}
 
 
 02. Sleep 2 secs
@@ -179,18 +171,10 @@ Slept 2 seconds
 
 03. Create entity E2
 ====================
-HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
 
 
 04. Get the creDates of E1 and E2
@@ -206,19 +190,10 @@ Slept 2 seconds
 
 06. Replace E1 and E2 using batch upsert with options=replace
 =============================================================
-HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:entity:E1",
-        "urn:ngsi-ld:entity:E2"
-    ]
-}
 
 
 07. Get the creDates of E1 and E2 and make sure they are as in step 4

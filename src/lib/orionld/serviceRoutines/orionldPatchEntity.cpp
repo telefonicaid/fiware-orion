@@ -330,7 +330,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   {
     ContextAttribute* caP = new ContextAttribute();
 
-    if (kjTreeToContextAttribute(ciP, attrP, caP, NULL, &detail) == false)
+    if (kjTreeToContextAttribute(ciP, orionldState.contextP, attrP, caP, NULL, &detail) == false)
     {
       LM_E(("kjTreeToContextAttribute: %s", detail));
       attributeNotUpdated(notUpdatedP, attrP->name, "Error");

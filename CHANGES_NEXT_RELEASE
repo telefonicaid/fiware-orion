@@ -16,3 +16,4 @@
 * Issue #XXX - Reimplemented PATCH /entities/{EID}/attrs
 * Issue #XXX - Implemented PATCH /subscriptions/{reg-id}
 * Issue #368 - Implemented PATCH /csourceRegistrations/{reg-id}
+* Issue #387 - allowing @context inside the array items of the payload data for BATCH Upsert

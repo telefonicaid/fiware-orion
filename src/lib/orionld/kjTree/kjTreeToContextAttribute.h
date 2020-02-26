@@ -27,11 +27,13 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "ngsi/ContextAttribute.h"                             // ContextAttribute
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "ngsi/ContextAttribute.h"                               // ContextAttribute
+
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 
@@ -39,6 +41,6 @@ extern "C"
 //
 // kjTreeToContextAttribute -
 //
-extern bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP);
+extern bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOCONTEXTATTRIBUTE_H_

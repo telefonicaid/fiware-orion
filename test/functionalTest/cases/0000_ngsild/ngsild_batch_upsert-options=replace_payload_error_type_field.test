@@ -193,26 +193,15 @@ echo
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entityOperations/upsert?options=replace - 4 entities
 =========================================================================
-HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:Vehicle:00001",
-        "urn:ngsi-ld:Vehicle:00002",
-        "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00004"
-    ]
-}
 
 
 02. Update all four entities. Vehicle:00001 with a entity::type that differs
 ============================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 289
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

@@ -134,7 +134,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
-    if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    if (kjTreeToContextAttribute(ciP, orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       // kjTreeToContextAttribute calls orionldErrorResponseCreate
       LM_E(("kjTreeToContextAttribute failed: %s", detail));

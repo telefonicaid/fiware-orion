@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/geoJsonCheck.h"                         // geoJsonCheck
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
@@ -483,14 +484,14 @@ static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** title
 //
 // FIXME: This function is TOO LONG - try to split up
 //
-bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
+bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
 {
   char* caName = kNodeP->name;
 
   *detailP = (char*) "unknown error";
 
-  if (orionldState.contextP == NULL)
-    orionldState.contextP = orionldCoreContextP;
+  if (contextP == NULL)
+    contextP = orionldCoreContextP;
 
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", caName, kNodeP));
 
@@ -513,7 +514,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, KjNode* kNodeP, ContextAttrib
     char*                longName;
     bool                 valueMayBeExpanded  = false;
 
-    longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, &contextItemP);
+    longName = orionldContextItemExpand(contextP, kNodeP->name, &valueMayBeExpanded, true, &contextItemP);
 
     if (valueMayBeExpanded)
       orionldContextValueExpand(kNodeP);

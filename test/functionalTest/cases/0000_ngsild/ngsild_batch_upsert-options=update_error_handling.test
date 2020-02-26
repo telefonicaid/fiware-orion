@@ -447,7 +447,7 @@ echo
 --REGEXPECT--
 01. Attempt to upsert with an entity having an id that is not a string - see error
 ==================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 223
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -473,7 +473,7 @@ Date: REGEX(.*)
 
 02. Attempt to upsert with an entity without ID field - see error
 =================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 218
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -499,7 +499,7 @@ Date: REGEX(.*)
 
 03. Attempt to upsert with an entity having an id with URI invalid - see error
 ==============================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 201
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -525,7 +525,7 @@ Date: REGEX(.*)
 
 04. Attempt to upsert with an entity having a TYPE that is not a string - see error
 ===================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 230
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -551,7 +551,7 @@ Date: REGEX(.*)
 
 05. Attempt to upsert with an entity without TYPE field - see error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 403
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -584,7 +584,7 @@ Date: REGEX(.*)
 
 06. Attempt to upsert with an entity with 2 ID fields - see error
 =================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 223
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -610,7 +610,7 @@ Date: REGEX(.*)
 
 07. Attempt to upsert with an entity with 2 TYPE fields - see error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 223
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -650,40 +650,18 @@ Date: REGEX(.*)
 
 11. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 entities
 ========================================================================
-HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:Vehicle:00001",
-        "urn:ngsi-ld:Vehicle:00002",
-        "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00004"
-    ]
-}
 
 
 12. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 same entities from step 11
 ==========================================================================================
-HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:Vehicle:00001",
-        "urn:ngsi-ld:Vehicle:00002",
-        "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00004"
-    ]
-}
 
 
 --TEARDOWN--

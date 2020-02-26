@@ -111,7 +111,7 @@ payload='[
         }
     }
 ]'
-orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
 echo
 echo
 
@@ -215,7 +215,7 @@ payload='[
         }
     }
 ]'
-orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
 echo
 echo
 
@@ -230,21 +230,10 @@ echo
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities
 ========================================================================
-HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:Vehicle:00001",
-        "urn:ngsi-ld:Vehicle:00002",
-        "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00004"
-    ]
-}
 
 
 02. See the entity urn:ngsi-ld:Vehicle:00001 in mongo
@@ -380,21 +369,10 @@ Date: REGEX(.*)
 
 04. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
 ===============================================================================
-HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "errors": [],
-    "success": [
-        "urn:ngsi-ld:Vehicle:00001",
-        "urn:ngsi-ld:Vehicle:00002",
-        "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00004"
-    ]
-}
 
 
 05. GET /ngsi-ld/v1/entities?type=Vehicle - See changes of 2 Entities
