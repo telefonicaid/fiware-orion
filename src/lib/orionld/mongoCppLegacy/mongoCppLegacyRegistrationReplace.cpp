@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                       // K_FT
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
@@ -48,6 +49,7 @@ bool mongoCppLegacyRegistrationReplace(const char* registrationId, KjNode* dbReg
 {
   char            collectionPath[256];
   mongo::BSONObj  payloadAsBsonObj;
+  bool            ok = true;
 
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
   dbDataFromKjTree(dbRegistrationP, &payloadAsBsonObj);
@@ -69,10 +71,11 @@ bool mongoCppLegacyRegistrationReplace(const char* registrationId, KjNode* dbReg
   catch (const std::exception &e)
   {
     LM_E(("Mongo Exception: %s", e.what()));
+    ok = false;
   }
 
   releaseMongoConnection(connectionP);
   // semGive()
 
-  return false;
+  return ok;
 }

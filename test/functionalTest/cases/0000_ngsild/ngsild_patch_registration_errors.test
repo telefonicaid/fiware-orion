@@ -66,7 +66,6 @@ brokerStart CB
 # 33. Attempt to PATCH the registration with an 'information::relationships' that is not an array - see failure
 # 34. Attempt to PATCH the registration with an 'information::relationships' item that is not a string - see failure
 # 35. Attempt to PATCH the registration with an 'information::relationships' item that is an empty string - see failure
-# 36. Attempt to PATCH the registration with an 'information::relationships' item that is an invalid URI - see failure
 # 37. Attempt to PATCH the registration with an 'information::relationships' that is an empty array - see failure
 # 38. Attempt to PATCH the registration with an invalid field 'information::xyz - see failure
 # 39. Attempt to PATCH the registration with an 'observationInterval' that is not a JSON Object - see failure
@@ -556,16 +555,6 @@ echo "35. Attempt to PATCH the registration with an 'information::relationships'
 echo "====================================================================================================================="
 payload='{
   "information": [ { "relationships": [ "" ] } ]
-}'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "36. Attempt to PATCH the registration with an 'information::relationships' item that is an invalid URI - see failure"
-echo "===================================================================================================================="
-payload='{
-  "information": [ { "relationships": [ "not a URI" ] } ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
 echo
@@ -1679,12 +1668,12 @@ Date: REGEX(.*)
 25. Attempt to PATCH the registration with an 'information::entities[0]::type' that is an empty string - see failure
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 141
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::id",
+    "detail": "Registration::information[X]::entities[X]::type",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1826,20 +1815,6 @@ Date: REGEX(.*)
 {
     "detail": "Registration::information[X]::relationships[X]",
     "title": "Empty String",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-36. Attempt to PATCH the registration with an 'information::relationships' item that is an invalid URI - see failure
-====================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 139
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "Registration::information[X]::relationships[X]",
-    "title": "Not a URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
