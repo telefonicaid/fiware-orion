@@ -61,6 +61,8 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
+aarch64 アーキテクチャの場合、yum を使用して perl-Digest-MD5 と libxslt をインストールし、`.-configure` を `--build=arm-linux` オプションとともに実行します。
+
 * コードを取得します (または、圧縮されたバージョンや別の URL パターンを使用してダウンロードできます。例えば、`git clone git@github.com:telefonicaid/fiware-orion.git`) :
 
         sudo yum install git
@@ -94,7 +96,11 @@ Orion Context Broker には、次の手順 (オプション) に従って実行�
 
 * 必要なツールをインストールします :
 
-        sudo yum install python curl nc mongodb-org-shell valgrind bc python-devel libffi-devel python-pip
+        sudo yum install python python-devel python-pip curl nc valgrind bc
+        sudo pip install --upgrade pip 
+
+aarch64 アーキテクチャの場合、さらに yum で、libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
+
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、CentOS7 のデフォルトの Flask の代わりに Flask version 1.0.2 を使用するために、virtualenv 環境を作成する必要があります。この環境でテスト・ハーネスを実行します。
 
@@ -105,7 +111,7 @@ Orion Context Broker には、次の手順 (オプション) に従って実行�
         pip install virtualenv
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 enum34==1.1.6
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
 * テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 

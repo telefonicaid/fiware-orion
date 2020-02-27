@@ -53,7 +53,6 @@ commands that require root privilege):
 
 * Install Google Test/Mock from sources (there are RPM packages for this, but they do not work with the current CMakeLists.txt configuration). Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        yum install perl-Digest-MD5 libxslt
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
@@ -61,6 +60,8 @@ commands that require root privilege):
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
+
+In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt using yum, and run `./configure` with `--build=arm-linux` option.
 
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
@@ -97,7 +98,10 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 * Install the required tools:
 
-        sudo yum install python curl nc mongodb-org-shell valgrind bc python-devel libffi-devel python-pip
+        sudo yum install python python-devel python-pip curl nc valgrind bc
+        sudo pip install --upgrade pip
+
+In the case of the aarch64 architecture, additionally install libffi-devel using yum. It is needed when building pyOpenSSL.
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv envirionment to use Flask version 1.0.2 instead of default Flask in CentOS7. Run test harness in this environment.
 
@@ -108,7 +112,7 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
         pip install virtualenv
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==1.0.2 pyOpenSSL==19.0.0 enum34==1.1.6
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
 * Run test harness (it takes some time, please be patient).
 
