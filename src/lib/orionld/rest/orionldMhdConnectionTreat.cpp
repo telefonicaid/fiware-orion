@@ -109,13 +109,13 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
     if (orionldState.linkHttpHeaderPresent == true)
     {
       errorTitle   = (char*) "@context in Link HTTP Header";
-      errorDetails = (char*) "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header";
+      errorDetails = (char*) "If the Content-Type header is application/ld+json, the body of the request must be valid JSON and include an @context attribute";
     }
 
     if (orionldState.payloadContextNode == NULL)
     {
-      errorTitle   = (char*) "@context missing in JSON payload";
-      errorDetails = (char*) "For application/ld+json, the @context must be present in the JSON payload";
+      errorTitle   = (char*) "@context attribute not found in the body of the request";
+      errorDetails = (char*) "If the Content-Type header is application/ld+json, the body of the request must be valid JSON and include an @context attribute";
     }
   }
   else
@@ -124,8 +124,8 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
 
     if (orionldState.payloadContextNode != NULL)
     {
-      errorTitle   = (char*) "Mismatch between /Content-Type/ and contents of the request payload body";
-      errorDetails = (char*) "Content-Type is application/json, yet a '@context' item was present in the payload body";
+      errorTitle   = (char*) "Mismatch between the Content-Type header and the contents of the body of the request";
+      errorDetails = (char*) "If the Content-Type header is application/json, the body of the request must be valid JSON and must not contain an @context attribute";
     }
   }
 
