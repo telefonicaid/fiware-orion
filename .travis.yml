@@ -9,7 +9,9 @@ env:
     - TEST=compliance
     - TEST=unit
     - TEST=functional
-before_install: true
+before_install:
+  - echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json
+  - sudo service docker restart
 install: true
 before_script:
   - if [ "$TEST" != "compliance" ]; then echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json; fi
