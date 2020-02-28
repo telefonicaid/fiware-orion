@@ -9,7 +9,10 @@ You can run Orion Context Broker very easily using docker. There are several way
 
 These are alternative ways to do the same thing, you do not need to do all three of them.
 
+And you can also run Orion on Raspberry Pi. See the [documentation](./raspberry_pi.md) on how to do this.
+
 You do need to have docker in your machine. See the [documentation](https://docs.docker.com/installation/) on how to do this.
+
 
 ----
 ## 1. The Fastest Way
@@ -116,6 +119,15 @@ Check that everything works with
 	curl localhost:1026/version
 
 The parameter `-t orion` in the `docker build` command gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
+
+The parameter `--build-arg` in the `docker build` can be set build-time variables. 
+
+| ARG             | Description                                                         | Example                         |
+| --------------- | ------------------------------------------------------------------- | ------------------------------- |
+| IMAGE_TAG       | Specify a tag of the base image.                                    | --build-arg IMAGE_TAG=centos7   |
+| GIT_NAME        | Specify a username of GitHub repository.                            | --build-arg GIT_NAME=fiware-ges |
+| GIT_REV_ORION   | Specify the Orion version you want to build.                        | --build-arg GIT_REV_ORION=2.3.0 |
+| CLEAN_DEV_TOOLS | Specify whether the development tools clear. It is remained when 0. | --build-arg CLEAN_DEV_TOOLS=0   |
 
 If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
 

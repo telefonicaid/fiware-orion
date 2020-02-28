@@ -61,6 +61,8 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
+In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt using yum, and run `./configure` with `--build=arm-linux` option.
+
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
         sudo yum install git
@@ -85,16 +87,32 @@ for details. Recommended version is 3.6 (although 3.2 and 3.4 should also work f
 
 The Orion Context Broker comes with a suite of functional, valgrind and end-to-end tests that you can also run, following the following procedure (optional):
 
+* To install mongodb-org-shell using yum, create a /etc/yum.repos.d/mongodb.repo file.
+
+        [mongodb-org-3.6]
+        name=MongoDB Repository
+        baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
+        gpgcheck=1
+        enabled=1
+        gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
+
 * Install the required tools:
 
-        sudo yum install python python-flask pyOpenSSL curl nc mongodb-org-shell valgrind bc
+        sudo yum install python python-pip curl nc mongodb-org-shell valgrind bc
+        sudo pip install --upgrade pip
 
-* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file).
+In the case of the aarch64 architecture, additionally install python-devel and libffi-devel using yum. It is needed when building pyOpenSSL.
+
+* Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv envirionment to use Flask version 1.0.2 instead of default Flask in CentOS7. Run test harness in this environment.
 
         mkdir ~/bin
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
+        pip install virtualenv
+        virtualenv /opt/ft_env
+        . /opt/ft_env/bin/activate
+        pip install Flask==1.0.2 pyOpenSSL==19.0.0
 
 * Run test harness (it takes some time, please be patient).
 
