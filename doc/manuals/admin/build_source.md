@@ -98,10 +98,10 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 * Install the required tools:
 
-        sudo yum install python python-devel python-pip curl nc valgrind bc
+        sudo yum install python python-pip curl nc mongodb-org-shell valgrind bc
         sudo pip install --upgrade pip
 
-In the case of the aarch64 architecture, additionally install libffi-devel using yum. It is needed when building pyOpenSSL.
+In the case of the aarch64 architecture, additionally install python-devel and libffi-devel using yum. It is needed when building pyOpenSSL.
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an RPM installation, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv envirionment to use Flask version 1.0.2 instead of default Flask in CentOS7. Run test harness in this environment.
 

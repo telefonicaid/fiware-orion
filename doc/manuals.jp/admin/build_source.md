@@ -96,10 +96,10 @@ Orion Context Broker には、次の手順 (オプション) に従って実行�
 
 * 必要なツールをインストールします :
 
-        sudo yum install python python-devel python-pip curl nc valgrind bc
+        sudo yum install python python-pip curl nc mongodb-org-shell valgrind bc
         sudo pip install --upgrade pip 
 
-aarch64 アーキテクチャの場合、さらに yum で、libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
+aarch64 アーキテクチャの場合、さらに yum で、python-devel と libffi-devel をインストールします。これは、pyOpenSSL をビルドするときに必要です。
 
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、RPM インストールと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、CentOS7 のデフォルトの Flask の代わりに Flask version 1.0.2 を使用するために、virtualenv 環境を作成する必要があります。この環境でテスト・ハーネスを実行します。
