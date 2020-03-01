@@ -5,12 +5,14 @@ You can run Orion Context Broker very easily using docker on Raspberry Pi.
 The [Raspberry Pi](https://www.raspberrypi.org/) is a low cost, credit-card sized computer.
 It is an ARM based device and requires binaries compiled for the ARM architecture. 
 To build and run the docker image of Orion, the 64 bit Linux and docker for the ARM architecture are installed on Raspberry Pi.
+If you want to build and run Orion directly on an operating system installed on a Raspberry Pi, See the
+[documentation](../doc/manuals/admin/build_source.md#ubuntu-1804-lts) on how to do this.
 
 ## Prerequisites
 
 ### Hardware
 
-The target hardwares are Raspberry Pi 3 and 4 which support the 64bit ARM architecture (aarch64).
+The target devices are Raspberry Pi 3 and 4 which support the 64 bit ARM architecture (aarch64).
 
 ### Linux OS
 
@@ -44,10 +46,10 @@ for Ubuntu 18.04 LTS (Bionic). You should replace `$(lsb_release -cs)` with `bio
 
 The details to install Docker are [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
-### Dokcer compose
+### Docker compose
 
 The Docker Compose binary for aarch64 is not provided. It is necessary to build it from its source code.
-You can install the docker compose versin 1.25.1 by running the commands as shown:
+You can install the docker compose version 1.25.1 by running the commands as shown:
 
 ```
 git clone -b 1.25.1 https://github.com/docker/compose.git
