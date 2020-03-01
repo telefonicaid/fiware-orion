@@ -144,27 +144,3 @@ aarch64 アーキテクチャの場合、さらに yum で、python-devel と li
         make rpm
 
 * 生成された RPM は `~/rpmbuild/RPMS/x86_64` ディレクトリに置かれます
-
-### SASL と SSL をサポートする MongoDB ドライバの構築
-
-手順は次のとおりです :
-
-```
-wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
-tar xfvz legacy-1.1.2.tar.gz cd mongo-cxx-driver-legacy-1.1.2
-yum install cyrus-sasl-devel
-scons --use-sasl-client --ssl                                   # The build/linux2/normal/libmongoclient.a library is generated as outcome
-sudo scons install --prefix=/usr/local --use-sasl-client --ssl  # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
-```
-
-## その他
-
-CentOS 7.x とは異なるシステムで Orion をビルドしている場合は、お気軽にご連絡いただき、このセクションの拡張にご協力ください。おそらく、新しい情報でこのファイルを変更するためのプル・リクエストを実行することが最良の方法です。ありがとう！
-
-### Debian 7
-
-パッケージは基本的に上記の RedHat/CentOS と同じですが、yum ではなく apt-get を使ってパッケージをインストールする必要があります。
-
-Google Test と Google Mock バージョン 1.5 をソースから直接インストールします。
-
-Debian 7.0 (1.9) に付属している lcov にはバグがあります (https://bugs.launchpad.net/ubuntu/+source/lcov/+bug/1163758 を参照)。ソースから lcov 1.10 をインストールします。
