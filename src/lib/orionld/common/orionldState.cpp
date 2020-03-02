@@ -114,6 +114,7 @@ void orionldStateInit(void)
   orionldState.ciP                         = NULL;
   orionldState.requestNo                   = requestNo;
   orionldState.tenant                      = (char*) "";
+  orionldState.servicePath                 = (char*) "";
   orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.linkHttpHeaderPresent       = false;
   orionldState.link                        = NULL;

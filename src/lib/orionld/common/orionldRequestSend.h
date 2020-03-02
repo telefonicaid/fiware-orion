@@ -31,7 +31,37 @@
 
 // -----------------------------------------------------------------------------
 //
+// OrionldHttpHeaderType -
+//
+typedef enum OrionldHttpHeaderType
+{
+  HttpHeaderNone,             // Marks the end of the vector
+  HttpHeaderContentType,
+  HttpHeaderAccept,
+  HttpHeaderLink,
+  HttpHeaderTenant,
+  HttpHeaderPath
+} OrionldHttpHeaderType;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldHttpHeader -
+//
+typedef struct OrionldHttpHeader
+{
+  OrionldHttpHeaderType   type;
+  char*                   value;
+} OrionldHttpHeader;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldRequestSend - send a request and await its response
+//
+// FIXME: Implement OrionldHttpHeader[] as parameter to orionldRequestSend
 //
 extern bool orionldRequestSend
 (
@@ -49,7 +79,8 @@ extern bool orionldRequestSend
   const char*             acceptHeader,
   const char*             contentType,
   const char*             payload,
-  int                     payloadLen
+  int                     payloadLen,
+  OrionldHttpHeader*      headers
 );
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDREQUESTSEND_H_

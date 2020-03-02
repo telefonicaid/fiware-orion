@@ -148,6 +148,26 @@ static bool orionldForwardPatchAttribute
     snprintf(uriPath, sizeof(uriPath), "%s/ngsi-ld/v1/entities/%s/attrs/%s", uriDir, entityId, attrName);
   }
 
+  //
+  // Prepare HTTP headers
+  //
+  OrionldHttpHeader headerV[5];
+  int               header = 0;
+
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+  {
+    headerV[header].type  = HttpHeaderTenant;
+    headerV[header].value = orionldState.tenant;
+    ++header;
+  }
+  if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
+  {
+    headerV[header].type  = HttpHeaderPath;
+    headerV[header].value = orionldState.servicePath;
+    ++header;
+  }
+  headerV[header].type = HttpHeaderNone;
+
   LM_TMP(("FWD: orionldState.requestPayload: '%s'", orionldState.requestPayload));
   LM_TMP(("FWD: Forwarding with contentType '%s'", contentType));
   if (orionldState.linkHttpHeaderPresent)
@@ -156,12 +176,12 @@ static bool orionldForwardPatchAttribute
 
     snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
     LM_TMP(("FWD: HTTP Link: %s", link));
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, link, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, link, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen, headerV);
   }
   else
   {
     LM_TMP(("FWD: Without HTTP Link"));
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "PATCH", uriPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, NULL, contentType, orionldState.requestPayload, payloadLen, headerV);
   }
 
   if (reqOk == false)

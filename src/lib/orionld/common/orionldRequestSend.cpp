@@ -88,6 +88,21 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 
 // -----------------------------------------------------------------------------
 //
+// headerName -
+//
+static const char* headerName[6] = {
+  "None",
+  "Content-Type",
+  "Accept",
+  "Link",
+  "NGSILD-Tenant",
+  "NGSILD-Path"
+};
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldRequestSend - send a request and await its response
 //
 bool orionldRequestSend
@@ -106,7 +121,8 @@ bool orionldRequestSend
   const char*             acceptHeader,
   const char*             contentType,
   const char*             payload,
-  int                     payloadLen
+  int                     payloadLen,
+  OrionldHttpHeader*      headerV
 )
 {
   CURLcode             cCode;
@@ -235,10 +251,19 @@ bool orionldRequestSend
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);  // Should be enough with one call ...
   }
 
-  LM_T(LmtRequestSend, ("Calling curl_easy_perform for GET %s", url));
-  cCode = curl_easy_perform(cc.curl);
-  LM_T(LmtRequestSend, ("curl_easy_perform returned %d", cCode));
+  int ix = 0;
+  while (headerV[ix].type != HttpHeaderNone)
+  {
+    OrionldHttpHeader* headerP = &headerV[ix];
+    char               headerString[256];
 
+    LM_TMP(("FHEAD: key: %d (%s: '%s')", headerP->type, headerName[headerP->type], headerP->value));
+    snprintf(headerString, sizeof(headerString), "%s:%s", headerName[headerP->type], headerP->value);
+    headers = curl_slist_append(headers, headerString);
+    ++ix;
+  }
+
+  cCode = curl_easy_perform(cc.curl);
   if (cCode != CURLE_OK)
   {
     LM_E(("Internal Error (curl_easy_perform returned error code %d)", cCode));

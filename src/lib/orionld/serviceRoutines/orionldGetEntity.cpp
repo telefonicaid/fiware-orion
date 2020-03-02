@@ -240,16 +240,35 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
   bool reqOk;
   bool downloadFailed;
 
+  //
+  // Prepare HTTP headers
+  //
+  OrionldHttpHeader headerV[5];
+  int               header = 0;
+
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+  {
+    headerV[header].type  = HttpHeaderTenant;
+    headerV[header].value = orionldState.tenant;
+    ++header;
+  }
+  if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
+  {
+    headerV[header].type  = HttpHeaderPath;
+    headerV[header].value = orionldState.servicePath;
+    ++header;
+  }
+  headerV[header].type = HttpHeaderNone;
 
   if (orionldState.linkHttpHeaderPresent)
   {
     char link[512];
 
     snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, link, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, link, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0, headerV);
   }
   else
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0);
+    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0, headerV);
 
   if (reqOk)
     entityP = kjParse(orionldState.kjsonP, orionldState.httpResponse.buf);

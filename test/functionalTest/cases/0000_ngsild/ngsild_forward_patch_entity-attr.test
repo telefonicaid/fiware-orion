@@ -106,7 +106,7 @@ payload='{
     "value": "Added via Forward"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/A1 --payload "$payload" -X PATCH
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/A1 --payload "$payload" -X PATCH -H "FIWARE-Service: t1" -H "FIWARE-ServicePath: /a/b/c"
 echo
 echo
 

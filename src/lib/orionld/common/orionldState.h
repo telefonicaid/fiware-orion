@@ -143,6 +143,7 @@ typedef struct OrionldConnectionState
   char*                   responsePayload;
   bool                    responsePayloadAllocated;
   char*                   tenant;
+  char*                   servicePath;
   bool                    linkHttpHeaderPresent;
   char*                   link;
   bool                    linkHeaderAdded;
