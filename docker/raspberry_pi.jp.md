@@ -5,7 +5,9 @@ Raspberry Pi で Docker を使用すると、Orion Context Broker を非常に�
 [Raspberry Pi](https://www.raspberrypi.org/) は、低価格のクレジット・カード・サイズのコンピュータです。
 ARM ベースのデバイスであり、ARM アーキテクチャ用にコンパイルされたバイナリが必要です。 Orion の Docker
 イメージをビルドして実行するには、ARM architecture 用の 64 ビット Linux と Docker を Raspberry Pi に
-インストールします。
+インストールします。Raspberry Pi にインストールされたオペレーティング・システムで Orion を直接ビルド
+して実行する場合は、その方法に関する
+[ドキュメント](../doc/manuals.jp/admin/build_source.md#ubuntu-1804-lts)を参照してください。
 
 ## 前提条件
 
