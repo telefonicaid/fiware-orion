@@ -128,7 +128,7 @@ echo
 01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error
 ================================================================================================
 HTTP/1.1 207 Multi Status
-Content-Length: 234
+Content-Length: 261
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -138,8 +138,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:E1",
             "error": {
+                "detail": "Content-Type is 'application/json', and an @context is present in the payload data array item",
                 "status": 400,
-                "title": "Content-Type is 'application/json', and an @context is present in the payload data array item",
+                "title": "Invalid payload",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
@@ -151,7 +152,7 @@ Date: REGEX(.*)
 02. Batch Upsert, Content-Type is LD+JSON, no @context present in an item of the array - see error
 ==================================================================================================
 HTTP/1.1 207 Multi Status
-Content-Length: 222
+Content-Length: 249
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -161,8 +162,9 @@ Date: REGEX(.*)
         {
             "entityId": "urn:E1",
             "error": {
+                "detail": "Content-Type is 'application/ld+json', but no @context in payload data array item",
                 "status": 400,
-                "title": "Content-Type is 'application/ld+json', but no @context in payload data array item",
+                "title": "Invalid payload",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
             }
         }
