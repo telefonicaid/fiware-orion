@@ -33,6 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/geoJsonCreate.h"                      // Own interface
 
 
@@ -50,6 +51,7 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
   {
     LM_E(("The coordinates must be a JSON Array"));
     *errorStringP = (char*) "The coordinates must be a JSON Array";
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Coordinates", "The coordinates must be a JSON Array");
     return false;
   }
 
@@ -58,8 +60,9 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
 
   if ((aLongitudeNodeP == NULL) || (aLatitudeNodeP == NULL) || (aLatitudeNodeP->next != NULL))
   {
-    LM_E(("The coordinates must be a JSON Array with TWO members"));
+    LM_E(("The coordinates must be a JSON Array with 2 or 3 members"));
     *errorStringP = (char*) "The coordinates must be a JSON Array";
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Coordinates", "The coordinates must be a JSON Array with 2 or 3 members");
     return false;
   }
 
@@ -69,6 +72,7 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
   {
     LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(aLongitudeNodeP->type)));
     *errorStringP = (char*) "invalid JSON type for coordinate member";
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Coordinates", "coordinate items must be numbers");
     return false;
   }
 
@@ -78,6 +82,7 @@ static bool pointCoordsGet(KjNode* coordsNodeP, double* aLongP, double* aLatP, c
   {
     LM_E(("The coordinate members must be a Number, not a '%s'", kjValueType(aLatitudeNodeP->type)));
     *errorStringP = (char*) "invalid JSON type for coordinate member";
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Coordinates", "coordinate items must be numbers");
     return false;
   }
 
@@ -116,7 +121,7 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
   else if (strcmp(orionldState.geoType, "Polygon") == 0)
   {
     //
-    // In its simplest case, a polygon is a vector of vector of positio-vectors. E.g.:
+    // In its simplest case, a polygon is a vector of vector of position-vectors. E.g.:
     //   [[ [0,0], [0,6], [-4,6], [-4,0], [0,0] ]]
     // The points that form the polygon must go in counter-clockwise direction and the last
     // point must be identical to the first, to close the polygon.
@@ -176,10 +181,60 @@ bool geoJsonCreate(KjNode* attrP, mongo::BSONObjBuilder* geoJsonP, char** errorS
     geoJsonP->append("type", "Polygon");
     geoJsonP->append("coordinates", BSON_ARRAY(ba.arr()));
   }
+  else if (strcmp(orionldState.geoType, "LineString") == 0)
+  {
+    // First level
+    if (orionldState.geoCoordsP->type != KjArray)
+    {
+      LM_E(("The coordinates must be a JSON Array in the first level of a LineString"));
+      *errorStringP = (char*) "The coordinates must be a JSON Array";
+      return false;
+    }
+
+    // Second level
+    KjNode* l2P = orionldState.geoCoordsP->value.firstChildP;
+    if (l2P->type != KjArray)
+    {
+      LM_E(("The coordinates must be a JSON Array in the second level of a LineString"));
+      *errorStringP = (char*) "The coordinates must be a JSON Array";
+      return false;
+    }
+
+    //
+    // Second level must be arrays with 2 or 3 Numbers
+    //
+    mongo::BSONArrayBuilder  ba;
+
+    for (KjNode* subArrayP = orionldState.geoCoordsP->value.firstChildP; subArrayP != NULL; subArrayP = subArrayP->next)
+    {
+      if (subArrayP->type != KjArray)
+      {
+        LM_E(("second level LineString item is not an Array"));
+        *errorStringP = (char*) "second level LineString item is not an Array";
+        return false;
+      }
+
+      double aLat;
+      double aLong;
+
+      if (pointCoordsGet(subArrayP, &aLong, &aLat, errorStringP) == false)
+      {
+        LM_E(("error extracting coordinates from second level of LineString: %s", *errorStringP));
+        *errorStringP = (char*) "error extracting coordinates from second level of LineString";
+        return false;
+      }
+
+      ba.append(BSON_ARRAY(aLong << aLat));
+    }
+
+    geoJsonP->append("type", "LineString");
+    geoJsonP->append("coordinates", ba.arr());
+  }
   else
   {
     LM_E(("Unrecognized geometry: '%s'", orionldState.geoType));
     *errorStringP = (char*) "Unrecognized geometry";
+    orionldErrorResponseCreate(OrionldBadRequestData, "the geometry used in not recognized as a GoeJSON geometry", orionldState.geoType);
     return false;
   }
 

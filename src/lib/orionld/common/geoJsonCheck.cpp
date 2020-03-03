@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECKx(U)
 #include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/geoJsonTypeCheck.h"                   // geoJsonTypeCheck
 #include "orionld/common/geoJsonCheck.h"                       // Own interface
 
