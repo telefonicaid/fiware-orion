@@ -49,7 +49,7 @@ bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, Subscri
   char*    geometryP          = NULL;
   KjNode*  coordinatesNodeP   = NULL;
   char*    georelP            = NULL;
-  char*    geoPropertyP       = NULL;
+  char*    geopropertyP       = NULL;
 
   for (itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -82,7 +82,7 @@ bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, Subscri
     }
     else if (SCOMPARE12(itemP->name, 'g', 'e', 'o', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
     {
-      DUPLICATE_CHECK(geoPropertyP, "GeoQuery::geoproperty", itemP->value.s);
+      DUPLICATE_CHECK(geopropertyP, "GeoQuery::geoproperty", itemP->value.s);
       STRING_CHECK(itemP, "GeoQuery::geoproperty");
     }
     else
@@ -129,8 +129,9 @@ bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, Subscri
   else
     subExpressionP->coords = coordinatesNodeP->value.s;
 
-  subExpressionP->geometry = geometryP;
-  subExpressionP->georel   = georelP;
+  subExpressionP->geometry    = geometryP;
+  subExpressionP->georel      = georelP;
+  subExpressionP->geoproperty = (geopropertyP != NULL)? geopropertyP : "";
 
   //
   // FIXME: geoproperty is not part of SubscriptionExpression in APIv2.

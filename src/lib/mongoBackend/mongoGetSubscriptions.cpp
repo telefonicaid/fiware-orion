@@ -130,17 +130,25 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     mongo::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
 
-    std::string  q      = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
-    std::string  mq     = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
-    std::string  geo    = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
-    std::string  coords = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
-    std::string  georel = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
+    std::string  q           = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
+    std::string  mq          = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
+    std::string  geo         = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
+    std::string  coords      = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
+    std::string  georel      = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
+    std::string  geoproperty = expression.hasField("geoproperty") ?    getStringFieldF(expression, "geoproperty")    : "";
 
-    if (q  != "")      s->subject.condition.expression.q        = q;
-    if (mq != "")      s->subject.condition.expression.mq       = mq;
-    if (geo != "")     s->subject.condition.expression.geometry = geo;
-    if (coords != "")  s->subject.condition.expression.coords   = coords;
-    if (georel != "")  s->subject.condition.expression.georel   = georel;
+    if (q  != "")          s->subject.condition.expression.q           = q;
+    if (mq != "")          s->subject.condition.expression.mq          = mq;
+    if (geo != "")         s->subject.condition.expression.geometry    = geo;
+    if (coords != "")      s->subject.condition.expression.coords      = coords;
+    if (georel != "")      s->subject.condition.expression.georel      = georel;
+    if (geoproperty != "") s->subject.condition.expression.geoproperty = geoproperty;
+
+    LM_TMP(("SPAT: q:           %s", s->subject.condition.expression.q.c_str()));
+    LM_TMP(("SPAT: geo:         %s", s->subject.condition.expression.geometry.c_str()));
+    LM_TMP(("SPAT: coords:      %s", s->subject.condition.expression.coords.c_str()));
+    LM_TMP(("SPAT: georel:      %s", s->subject.condition.expression.georel.c_str()));
+    LM_TMP(("SPAT: geoproperty: %s", s->subject.condition.expression.geoproperty.c_str()));
   }
 }
 
@@ -281,6 +289,17 @@ static void setContext(Subscription* s, const BSONObj& r)
 
 /* ****************************************************************************
 *
+* setCsf -
+*/
+static void setCsf(Subscription* s, const BSONObj& r)
+{
+  s->csf = r.hasField("csf") ? getStringFieldF(r, "csf") : "";
+}
+
+
+
+/* ****************************************************************************
+*
 * setMimeType -
 */
 static void setMimeType(Subscription* s, const BSONObj& r)
@@ -291,6 +310,18 @@ static void setMimeType(Subscription* s, const BSONObj& r)
 
     s->notification.httpInfo.mimeType = longStringToMimeType(mimeTypeString);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* setTimeInterval -
+*/
+static void setTimeInterval(Subscription* s, const BSONObj& r)
+{
+  s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(r, "timeInterval") : -1);
+  LM_TMP(("TIV: got timeInterval from mongo: %d", s->timeInterval));
 }
 
 #endif
@@ -541,6 +572,9 @@ bool mongoGetLdSubscription
     setStatus(subP, r);
     setName(subP, r);
     setContext(subP, r);
+    setCsf(subP, r);
+    setTimeInterval(subP, r);
+    LM_TMP(("TIV: timeInterval: %d", subP->timeInterval));
 
     if (moreSafe(cursor))
     {
@@ -575,7 +609,7 @@ bool mongoGetLdSubscription
 
 /* ****************************************************************************
 *
-* mongoGetLdSubscriptions - 
+* mongoGetLdSubscriptions -
 */
 bool mongoGetLdSubscriptions
 (
@@ -666,6 +700,8 @@ bool mongoGetLdSubscriptions
     setStatus(&s, r);
     setName(&s, r);
     setContext(&s, r);
+    setCsf(&s, r);
+    setTimeInterval(&s, r);
 
     subVecP->push_back(s);
   }

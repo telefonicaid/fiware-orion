@@ -56,7 +56,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   KjNode*                   kNodeP;
   char*                     nameP                     = NULL;
   char*                     descriptionP              = NULL;
-  char*                     timeIntervalP             = NULL;
+  KjNode*                   timeIntervalP             = NULL;
   KjNode*                   entitiesP                 = NULL;
   bool                      entitiesPresent           = false;
   KjNode*                   watchedAttributesP        = NULL;
@@ -195,9 +195,18 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
     }
     else if (SCOMPARE13(kNodeP->name, 't', 'i', 'm', 'e', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
-      DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP->value.s);
+      DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP);
       INTEGER_CHECK(kNodeP, "Subscription::timeInterval");
-      // FIXME: Implement this ???
+
+      if (timeIntervalP->value.i <= 0)
+      {
+        LM_W(("Bad Input (Subscription::timeInterval has a negative value)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value in payload data", "Subscription::timeInterval has a negative value");
+        ciP->httpStatusCode = SccBadRequest;
+        return false;
+      }
+
+      subP->timeInterval = timeIntervalP->value.i;
     }
     else if (SCOMPARE2(kNodeP->name, 'q', 0))
     {
@@ -249,7 +258,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
     {
       DUPLICATE_CHECK(csfP, "Subscription::csf", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::csf");
-      LM_W(("ToDo: Implement Subscription::csf"));
+      subP->csf = csfP;
     }
     else if (SCOMPARE9(kNodeP->name, 'i', 's', 'A', 'c', 't', 'i', 'v', 'e', 0))
     {

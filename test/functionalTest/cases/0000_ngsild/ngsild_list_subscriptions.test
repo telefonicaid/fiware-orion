@@ -73,10 +73,8 @@ do
       "geoQ": {
         "geometry": "circle",
         "coordinates": "1,2",
-        "georel": "near",
-        "geoproperty": "not supported"
+        "georel": "near"
       },
-      "csf": "not implemented",
       "isActive": false,
       "notification": {
         "attributes": [ "P1", "P2", "A3" ],

@@ -37,7 +37,6 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/geoJsonCheck.h"                         // geoJsonCheck
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
@@ -45,6 +44,7 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/payloadCheck/pcheckGeoProperty.h"              // pcheckGeoProperty
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // Own interface
 
@@ -800,11 +800,12 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     //
     if (isGeoProperty == true)
     {
-      if (geoJsonCheck(ciP, valueP, &orionldState.geoType, &orionldState.geoCoordsP) == false)
+      if (pcheckGeoProperty(ciP, valueP, &orionldState.geoType, &orionldState.geoCoordsP) == false)
       {
-        LM_E(("geoJsonCheck error for %s", caName));
-        // geoJsonCheck fills in error response
-        *detailP = (char*) "geoJsonCheck failed";
+        LM_E(("pcheckGeoProperty error for %s", caName));
+        // pcheckGeoProperty fills in error response
+        *detailP = (char*) "pcheckGeoProperty failed";
+        ciP->httpStatusCode = SccBadRequest;
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;

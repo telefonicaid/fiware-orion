@@ -203,6 +203,7 @@ SET (ORION_LIBS
     orionld_common       # mongoBackend calls geoJsonCreate from orionld_common
     orionld_context      # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
     orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
+    orionld_payloadCheck
     parse
     apiTypesV2
     orionTypes
@@ -332,6 +333,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
+  ADD_SUBDIRECTORY(src/lib/orionld/payloadCheck)
 #  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)

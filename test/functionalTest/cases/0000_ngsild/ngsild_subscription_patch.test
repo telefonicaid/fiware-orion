@@ -175,6 +175,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription S01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -183,7 +185,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
-		"georel" : ""
+		"georel" : "",
+		"geoproperty" : ""
 	},
 	"format" : "keyValues"
 }
@@ -193,7 +196,7 @@ bye
 03. GET the subscription - see its initial state
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 547
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -212,6 +215,7 @@ Date: REGEX(.*)
     "P2"
   ],
   "q": "P2>10",
+  "csf": "not implemented",
   "notification": {
     "attributes": [
       "P1",
@@ -241,7 +245,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 597
+Content-Length: 625
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -261,6 +265,7 @@ Date: REGEX(.*)
     "P2"
   ],
   "q": "P2>10",
+  "csf": "not implemented",
   "notification": {
     "attributes": [
       "P1",
@@ -310,6 +315,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Changed Name for Test subscription S01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -318,7 +325,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
-		"georel" : ""
+		"georel" : "",
+		"geoproperty" : ""
 	},
 	"format" : "keyValues",
 	"description" : "New Description of Test subscription S01"

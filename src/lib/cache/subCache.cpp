@@ -753,6 +753,9 @@ void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
+#ifdef ORIONLD
+  const std::string&                 geoproperty,
+#endif
   bool                               blacklist
 )
 {
@@ -782,16 +785,17 @@ void subCacheItemInsert
 #ifdef ORIONLD
   cSubP->name                  = name;
   cSubP->ldContext             = ldContext;
+  cSubP->expression.geoproperty = geoproperty;
 #endif
-  cSubP->expression.q          = q;
-  cSubP->expression.geometry   = geometry;
-  cSubP->expression.coords     = coords;
-  cSubP->expression.georel     = georel;
-  cSubP->blacklist             = blacklist;
-  cSubP->httpInfo              = httpInfo;
-  cSubP->notifyConditionV      = conditionAttrs;
-  cSubP->attributes            = attributes;
-  cSubP->metadata              = metadata;
+  cSubP->expression.q           = q;
+  cSubP->expression.geometry    = geometry;
+  cSubP->expression.coords      = coords;
+  cSubP->expression.georel      = georel;
+  cSubP->blacklist              = blacklist;
+  cSubP->httpInfo               = httpInfo;
+  cSubP->notifyConditionV       = conditionAttrs;
+  cSubP->attributes             = attributes;
+  cSubP->metadata               = metadata;
 
 
   //

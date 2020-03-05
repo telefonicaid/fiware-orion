@@ -39,7 +39,7 @@
 
 /* ****************************************************************************
 *
-* USING - 
+* USING -
 */
 using mongo::BSONObjBuilder;
 using mongo::BSONArrayBuilder;
@@ -404,7 +404,8 @@ void setExpression(const Subscription& sub, BSONObjBuilder* b)
                             CSUB_EXPR_MQ     << sub.subject.condition.expression.mq       <<
                             CSUB_EXPR_GEOM   << sub.subject.condition.expression.geometry <<
                             CSUB_EXPR_COORDS << sub.subject.condition.expression.coords   <<
-                            CSUB_EXPR_GEOREL << sub.subject.condition.expression.georel);
+                            CSUB_EXPR_GEOREL << sub.subject.condition.expression.georel   <<
+                            "geoproperty"    << sub.subject.condition.expression.geoproperty);
 
   b->append(CSUB_EXPR, expression);
   LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
@@ -515,6 +516,33 @@ void setMimeType(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 {
   bobP->append(CSUB_MIMETYPE, sub.notification.httpInfo.mimeType);
   LM_T(LmtMongo, ("Subscription mimeType: %s", mimeTypeToLongString(sub.notification.httpInfo.mimeType)));
+}
+
+
+
+/* ****************************************************************************
+*
+* setCsf -
+*/
+void setCsf(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  if (sub.csf != "")
+  {
+    bobP->append("csf", sub.csf);
+    LM_T(LmtMongo, ("Subscription context: %s", sub.csf.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setTimeInterval -
+*/
+void setTimeInterval(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
+{
+  LM_TMP(("TIV: timeInterval: %d", sub.timeInterval));
+  bobP->append("timeInterval", sub.timeInterval);
 }
 
 #endif

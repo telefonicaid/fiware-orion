@@ -89,9 +89,16 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   else
     sub.ldContext = ORIONLD_CORE_CONTEXT_URL;
 
-  // FIXME: attrsFormat should be set to default by constructor
+  //
+  // FIXME: attrsFormat etc. should be set to default by constructor
+  //        only ... there is no constructor ...
+  //
   sub.attrsFormat = DEFAULT_RENDER_FORMAT;
+  sub.expires             = -1;  // 0?
+  sub.throttling          = -1;  // 0?
+  sub.timeInterval        = -1;  // 0?
 
+  LM_TMP(("TIV: timeInterval: %d", sub.timeInterval));
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
   char* subIdP = NULL;
   if (kjTreeToSubscription(ciP, &sub, &subIdP) == false)
@@ -122,6 +129,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Create the subscription
   //
+  LM_TMP(("TIV: timeInterval: %d", sub.timeInterval));
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   orionldState.tenant,

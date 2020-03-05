@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_GEOJSONCHECK_H_
-#define SRC_LIB_ORIONLD_COMMON_GEOJSONCHECK_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQGEOREL_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQGEOREL_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,14 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// geoJsonCheck - check validity of any geo-property
+// pcheckGeoqGeorel -
 //
-extern bool geoJsonCheck(ConnectionInfo* ciP, KjNode* geoJsonNodeP, char** geoTypePP, KjNode** geoCoordsPP);
+extern bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detailP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONCHECK_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQGEOREL_H_

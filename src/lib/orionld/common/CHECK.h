@@ -207,6 +207,40 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// NUMBER_CHECK -
+//
+#define NUMBER_CHECK(nodeP, fieldName)                                                                       \
+do                                                                                                           \
+{                                                                                                            \
+  if ((nodeP->type != KjInt) && (nodeP->type != KjFloat))                                                    \
+  {                                                                                                          \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Number", fieldName);                       \
+    ciP->httpStatusCode = SccBadRequest;                                                                     \
+    return false;                                                                                            \
+  }                                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// POSITIVE_NUMBER_CHECK -
+//
+#define POSITIVE_NUMBER_CHECK(nodeP, fieldName)                                                                    \
+do                                                                                                                 \
+{                                                                                                                  \
+  if (((nodeP->type == KjInt) && (nodeP->value.i < 0)) || ((nodeP->type == KjFloat) && (nodeP->value.f < 0)))      \
+  {                                                                                                                \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Negative Number not allowed in this position", fieldName);  \
+    ciP->httpStatusCode = SccBadRequest;                                                                           \
+    return false;                                                                                                  \
+  }                                                                                                                \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // BOOL_CHECK -
 //
 #define BOOL_CHECK(kNodeP, fieldName)                                                                        \

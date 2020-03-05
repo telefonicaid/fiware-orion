@@ -116,6 +116,7 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"timeInterval" : -1,
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -124,7 +125,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
-		"georel" : ""
+		"georel" : "",
+		"geoproperty" : ""
 	},
 	"format" : "normalized"
 }

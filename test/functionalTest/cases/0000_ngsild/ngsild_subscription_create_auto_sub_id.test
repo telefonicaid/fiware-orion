@@ -161,6 +161,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
 	"conditions" : [
 		"http://example.org/P2"
 	],
@@ -169,7 +171,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "circle",
 		"coords" : "1,2",
-		"georel" : "near"
+		"georel" : "near",
+		"geoproperty" : "not supported"
 	},
 	"format" : "keyValues"
 }
@@ -179,7 +182,7 @@ bye
 03. Grep mongo content for subscription id and do a GET /ngsi-ld/v1/subscription/$SUB_ID
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 846
+Content-Length: 910
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -210,9 +213,12 @@ Date: REGEX(.*)
   "geoQ": {
     "geometry": "circle",
     "coordinates": "1,2",
-    "georel": "near"
+    "georel": "near",
+    "geoproperty": "not supported"
   },
+  "csf": "not implemented",
   "isActive": false,
+  "status": "paused",
   "notification": {
     "attributes": [
       "P1",
@@ -226,8 +232,7 @@ Date: REGEX(.*)
     }
   },
   "expires": "2028-12-31T10:00:00Z",
-  "throttling": 5,
-  "status": "paused"
+  "throttling": 5
 }
 
 

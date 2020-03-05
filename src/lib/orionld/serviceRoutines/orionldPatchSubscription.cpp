@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -24,194 +24,23 @@
 */
 extern "C"
 {
-#include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjLookup.h"                                     // kjLookup
+#include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
+#include "kjson/kjRender.h"                                     // kjRender
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                      // LM_*
+#include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "rest/ConnectionInfo.h"                                // ConnectionInfo
 
-#include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/db/dbConfiguration.h"                        // dbSubscriptionGet
-#include "orionld/serviceRoutines/orionldPatchSubscription.h"  // Own Interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckEntityInfo -
-//
-static bool orionldCheckEntityInfo(ConnectionInfo* ciP, KjNode* subNodeP, const char* filedName)
-{
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckGeoQ -
-//
-static bool orionldCheckGeoQ(ConnectionInfo* ciP, KjNode* subNodeP, const char* filedName)
-{
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// subscriptionPayloadCheck -
-//
-static bool subscriptionPayloadCheck(ConnectionInfo* ciP, KjNode* subNodeP, bool idCanBePresent)
-{
-  KjNode* idP                     = NULL;
-  KjNode* typeP                   = NULL;
-  KjNode* nameP                   = NULL;
-  KjNode* descriptionP            = NULL;
-  KjNode* entitiesP               = NULL;
-  KjNode* watchedAttributesP      = NULL;
-  KjNode* timeIntervalP           = NULL;
-  KjNode* qP                      = NULL;
-  KjNode* geoqP                   = NULL;
-  KjNode* csfP                    = NULL;
-  KjNode* isActiveP               = NULL;
-  KjNode* notificationP           = NULL;
-  KjNode* expiresP                = NULL;
-  KjNode* throttlingP             = NULL;
-  KjNode* temporalqP              = NULL;
-  int64_t dateTime;
-
-  if (subNodeP->type != KjObject)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription", "The payload data for updating a subscription must be a JSON Object");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  for (KjNode* nodeP = subNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-  {
-    if (strcmp(nodeP->name, "id") == 0)
-    {
-      if (idCanBePresent == false)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Subscription Update", "Subscription::id");
-        ciP->httpStatusCode = SccBadRequest;
-        return false;
-      }
-
-      DUPLICATE_CHECK(idP, "Subscription::id", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
-      URI_CHECK(nodeP, nodeP->name);
-    }
-    else if (strcmp(nodeP->name, "type") == 0)
-    {
-      DUPLICATE_CHECK(typeP, "Subscription::type", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
-
-      if (strcmp(nodeP->value.s, "Subscription") != 0)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription Type", nodeP->value.s);
-        ciP->httpStatusCode = SccBadRequest;
-        return false;
-      }
-    }
-    else if (strcmp(nodeP->name, "name") == 0)
-    {
-      DUPLICATE_CHECK(nameP, "Subscription::name", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
-    }
-    else if (strcmp(nodeP->name, "description") == 0)
-    {
-      DUPLICATE_CHECK(descriptionP, "Subscription::description", nodeP);
-      STRING_CHECK(nodeP, nodeP->name);
-    }
-    else if (strcmp(nodeP->name, "entities") == 0)
-    {
-      DUPLICATE_CHECK(entitiesP, "Subscription::entities", nodeP);
-      ARRAY_CHECK(nodeP, nodeP->name);
-      if (orionldCheckEntityInfo(ciP, nodeP, "Subscription::entities") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "watchedAttributes") == 0)
-    {
-      DUPLICATE_CHECK(watchedAttributesP, "Subscription::watchedAttributes", nodeP);
-      ARRAY_CHECK(nodeP, nodeP->name);
-      for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
-      {
-        STRING_CHECK(itemP, "watchedAttributes item");
-      }
-    }
-    else if (strcmp(nodeP->name, "timeInterval") == 0)
-    {
-      DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", nodeP);
-      INTEGER_CHECK(nodeP, "Subscription::timeInterval");
-    }
-    else if (strcmp(nodeP->name, "q") == 0)
-    {
-      DUPLICATE_CHECK(qP, "Subscription::q", nodeP);
-      STRING_CHECK(nodeP, "Subscription::q");
-    }
-    else if (strcmp(nodeP->name, "geoQ") == 0)
-    {
-      DUPLICATE_CHECK(geoqP, "Subscription::geoQ", nodeP);
-      OBJECT_CHECK(nodeP, "Subscription::geoQ");
-      if (orionldCheckGeoQ(ciP, nodeP, "Subscription::geoQ") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "csf") == 0)
-    {
-      DUPLICATE_CHECK(csfP, "Subscription::csf", nodeP);
-      STRING_CHECK(nodeP, "Subscription::csf");
-    }
-    else if (strcmp(nodeP->name, "isActive") == 0)
-    {
-      DUPLICATE_CHECK(isActiveP, "Subscription::isActive", nodeP);
-      BOOL_CHECK(nodeP, "Subscription::isActive");
-    }
-    else if (strcmp(nodeP->name, "notification") == 0)
-    {
-      DUPLICATE_CHECK(notificationP, "Subscription::notification", nodeP);
-      OBJECT_CHECK(nodeP, "Subscription::notification");
-    }
-    else if (strcmp(nodeP->name, "expires") == 0)
-    {
-      DUPLICATE_CHECK(expiresP, "Subscription::expires", nodeP);
-      STRING_CHECK(nodeP, "Subscription::expires");
-      DATETIME_CHECK(expiresP->value.s, dateTime, "Subscription::expires");
-    }
-    else if (strcmp(nodeP->name, "throttling") == 0)
-    {
-      DUPLICATE_CHECK(throttlingP, "Subscription::throttling", nodeP);
-      INTEGER_CHECK(nodeP, "Subscription::throttling");
-    }
-    else if (strcmp(nodeP->name, "temporalQ") == 0)
-    {
-      DUPLICATE_CHECK(temporalqP, "Subscription::temporalQ", nodeP);
-      OBJECT_CHECK(nodeP, "Subscription::temporalQ");
-    }
-    else if (strcmp(nodeP->name, "status") == 0)
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Attempt to modify Read-Only attribute", "Subscription::status");
-      ciP->httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else
-    {
-      LM_E(("Unknown field in Subscription fragment: '%s'", nodeP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Unknown field in Subscription fragment", nodeP->name);
-      ciP->httpStatusCode = SccBadRequest;
-      return false;
-    }
-  }
-
-  return true;
-}
+#include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/urlCheck.h"                            // urlCheck
+#include "orionld/common/urnCheck.h"                            // urnCheck
+#include "orionld/payloadCheck/pcheckSubscription.h"            // pcheckSubscription
+#include "orionld/db/dbConfiguration.h"                         // dbSubscriptionGet
+#include "orionld/serviceRoutines/orionldPatchSubscription.h"   // Own Interface
 
 
 
@@ -227,12 +56,12 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 
   if (itemToReplace == NULL)
   {
-    LM_TMP(("PATCH: Adding %s", itemName));
+    LM_TMP(("QP: Adding '%s' to container '%s'", itemName, container->name));
     kjChildAdd(container, replacementP);
   }
   else
   {
-    LM_TMP(("PATCH: Replacing %s", itemName));
+    LM_TMP(("QP: Replacing '%s' in container '%s'", itemName, container->name));
     itemToReplace->type  = replacementP->type;
     itemToReplace->value = replacementP->value;
     // KjNode::cSum and KjNode::valueString aren't used
@@ -243,34 +72,140 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 
 // ----------------------------------------------------------------------------
 //
+// okToRemove -
+//
+static bool okToRemove(const char* fieldName)
+{
+  if (strcmp(fieldName, "id") == 0)
+    return false;
+  else if (strcmp(fieldName, "notification") == 0)
+    return false;
+  else if (strcmp(fieldName, "status") == 0)
+    return false;
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
 // ngsildSubscriptionPatch -
 //
-static void ngsildSubscriptionPatch(KjNode* dbSubscriptionP, KjNode* patchTree)
+// The 'q' and 'geoQ' of an NGSI-LD comes in like this:
+// {
+//   "q": "",
+//   "geoQ": {
+//     "geometry": "",
+//     ""
+// }
+//
+// In the DB, 'q' and 'geoQ' are inside "expression":
+// {
+//   "expression" : {
+//     "q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
+//     "mq" : "",
+//     "geometry" : "circle",
+//     "coords" : "1,2",
+//     "georel" : "near"
+//   }
+// }
+//
+// So, if "geoQ" is present in the patch tree, then "geoQ" replaces "expression",
+// by simply changing its name from "geoQ" to "expression".
+// DON'T forget the "q", that is also part of "expression" but not a part of "geoQ".
+// If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
+// OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
+//
+//
+//
+//
+//
+static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
-  for (KjNode* fragmentP = patchTree->value.firstChildP; fragmentP != NULL; fragmentP = fragmentP->next)
+  KjNode* fragmentP = patchTree->value.firstChildP;
+  KjNode* next;
+
+  while (fragmentP != NULL)
   {
+    next = fragmentP->next;
+
     if (fragmentP->type == KjNull)
     {
       KjNode* toRemove = kjLookup(dbSubscriptionP, fragmentP->name);
 
       if (toRemove != NULL)
       {
+        if (okToRemove(fragmentP->name) == false)
+        {
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name);
+          ciP->httpStatusCode = SccBadRequest;
+          return false;
+        }
+
         LM_TMP(("SPAT: Calling kjChildRemove for '%s'", fragmentP->name));
         kjChildRemove(dbSubscriptionP, toRemove);
-
-        //
-        // Dangerous to remove without checking ... what if we remove "Subscription::endpoint" ... ???
-        //
       }
       else
         LM_TMP(("SPAT: Can't remove '%s' - it's not present in the DB", fragmentP->name));
     }
     else
     {
-      LM_TMP(("SPAT: Calling kjChildAddOrReplace for '%s'", fragmentP->name));
-      kjChildAddOrReplace(dbSubscriptionP, fragmentP->name, fragmentP);
+      if ((fragmentP != qP) && (fragmentP != expressionP))
+      {
+        LM_TMP(("SPAT: Calling kjChildAddOrReplace for '%s'", fragmentP->name));
+        kjChildAddOrReplace(dbSubscriptionP, fragmentP->name, fragmentP);
+      }
+    }
+
+    fragmentP = next;
+  }
+
+
+  LM_TMP(("QP: qP at %p: %s", qP, (qP != NULL)? qP->value.s : "not present"));
+  LM_TMP(("QP: geoqP at %p", expressionP));
+
+  //
+  // If geoqP/expressionP != NULL, then it replaces the "expression" in the DB
+  // If also qP != NULL, then this qP is added to geoqP/expressionP
+  // If not, we have to lookup 'q' in the old "expression" and add it to geoqP/expressionP
+  //
+  if (expressionP != NULL)
+  {
+    KjNode* dbExpressionP = kjLookup(dbSubscriptionP, "expression");
+
+    if (dbExpressionP != NULL)
+      kjChildRemove(dbSubscriptionP, dbExpressionP);
+    kjChildRemove(patchTree, expressionP);
+    kjChildAdd(dbSubscriptionP, expressionP);
+
+    //
+    // If 'q' is not present in the patch tree, and we have replaced the 'expression', then
+    // we need to get the 'q' from the old 'expression' and add it to the new expression.
+    //
+    if ((qP == NULL) && (dbExpressionP != NULL))
+      qP = kjLookup(dbExpressionP, "q");
+
+    if (qP != NULL)
+      kjChildAdd(expressionP, qP);
+  }
+  else if (qP != NULL)
+  {
+    KjNode* dbExpressionP = kjLookup(dbSubscriptionP, "expression");
+
+    if (dbExpressionP != NULL)
+      kjChildAddOrReplace(dbExpressionP, "q", qP);
+    else
+    {
+      // A 'q' has been given but there is no "expression" - need to create one
+      expressionP = kjObject(orionldState.kjsonP, "expression");
+
+      kjChildAdd(expressionP, qP);
+      kjChildAdd(dbSubscriptionP, expressionP);
     }
   }
+
+  return true;
 }
 
 
@@ -373,7 +308,35 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
     }
     else if (strcmp(fragmentP->name, "entities") == 0)
     {
-      // Here we might need to add "isTypePattern" : false to every item in the Array ...
+      // Make sure there is an "id" and an "isPattern"
+      for (KjNode* entityNodeP = fragmentP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
+      {
+        KjNode* isTypePatternP = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
+        KjNode* idP            = kjLookup(entityNodeP, "id");
+        KjNode* idPatternP     = kjLookup(entityNodeP, "idPattern");
+
+        if ((idP == NULL) && (idPatternP == NULL))
+        {
+          KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", ".*");
+          KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "true");
+
+          kjChildAdd(entityNodeP, idNodeP);
+          kjChildAdd(entityNodeP, isPatternNodeP);
+        }
+        else if (idP == NULL)
+        {
+          KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "true");
+          kjChildAdd(entityNodeP, isPatternNodeP);
+          idPatternP->name = (char*) "id";
+        }
+        else if (idPatternP == NULL)
+        {
+          KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "false");
+          kjChildAdd(entityNodeP, isPatternNodeP);
+        }
+
+        kjChildAdd(entityNodeP, isTypePatternP);
+      }
     }
     else if (strcmp(fragmentP->name, "watchedAttributes") == 0)
       fragmentP->name = (char*) "conditions";
@@ -394,32 +357,19 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
     else if (strcmp(fragmentP->name, "notification") == 0)
       notificationP = fragmentP;
     else if (strcmp(fragmentP->name, "expires") == 0)
-      fragmentP->name = (char*) "expiration";
+    {
+      fragmentP->name    = (char*) "expiration";
+      fragmentP->type    = KjInt;
+      fragmentP->value.i = parse8601Time(fragmentP->value.s);  // FIXME: Already done in pcheckSubscription() ...
+    }
   }
 
-  //
-  // "q" and "geoQ" must be treated together.
-  // That's why this was delayed until after the loop.
-  //
-  //
-  // If "geoQ" present, change its name to "expression"
-  // If "q" present:
-  //   add "q" to "expression"
-  //   if "expression" doesn't exist, create it
-  //
-  KjNode* expressionP = NULL;
   if (geoqP != NULL)
-  {
     geoqP->name = (char*) "expression";
-    expressionP = geoqP;
-  }
 
   if (qP != NULL)
-  {
-    if (expressionP == NULL)
-      expressionP = kjObject(orionldState.kjsonP, "expression");
-    kjChildAdd(expressionP, qP);
-  }
+    kjChildRemove(patchTree, qP);
+
 
   //
   // The "notification" field is also treated after the loop, just to make the loop "nicer"
@@ -453,16 +403,17 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
         KjNode* uriP    = kjLookup(nItemP, "uri");
         KjNode* acceptP = kjLookup(nItemP, "accept");
 
+        kjChildRemove(notificationP, nItemP);
         if (uriP != NULL)
         {
           uriP->name = (char*) "reference";
-          kjChildAdd(patchTree, nItemP);
+          kjChildAdd(patchTree, uriP);
         }
 
         if (acceptP != NULL)
         {
-          uriP->name = (char*) "mimeType";
-          kjChildAdd(patchTree, nItemP);
+          acceptP->name = (char*) "mimeType";
+          kjChildAdd(patchTree, acceptP);
         }
       }
 
@@ -491,22 +442,34 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 {
   KjNode* nodeP;
 
+  //
+  // If 'expiration' is an Object, it means it's a NumberLong and it is then changed to a 32 bit integer
+  //
   if ((nodeP = kjLookup(dbSubscriptionP, "expiration")) != NULL)
   {
-    char*      expirationString = nodeP->value.firstChildP->value.s;
-    long long  expiration       = strtol(expirationString, NULL, 10);
+    if (nodeP->type == KjObject)
+    {
+      char*      expirationString = nodeP->value.firstChildP->value.s;
+      long long  expiration       = strtol(expirationString, NULL, 10);
 
-    nodeP->type    = KjInt;
-    nodeP->value.i = expiration;
+      nodeP->type    = KjInt;
+      nodeP->value.i = expiration;
+    }
   }
 
+  //
+  // If 'throttling' is an Object, it means it's a NumberLong and it is then changed to a 32 bit integer
+  //
   if ((nodeP = kjLookup(dbSubscriptionP, "throttling")) != NULL)
   {
-    char*      throttlingString = nodeP->value.firstChildP->value.s;
-    long long  throttling       = strtol(throttlingString, NULL, 10);
+    if (nodeP->type == KjObject)
+    {
+      char*      throttlingString = nodeP->value.firstChildP->value.s;
+      long long  throttling       = strtol(throttlingString, NULL, 10);
 
-    nodeP->type    = KjInt;
-    nodeP->value.i = throttling;
+      nodeP->type    = KjInt;
+      nodeP->value.i = throttling;
+    }
   }
 }
 
@@ -535,6 +498,10 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 bool orionldPatchSubscription(ConnectionInfo* ciP)
 {
   char* subscriptionId = orionldState.wildcard[0];
+  char buffer[1024];
+
+  kjRender(orionldState.kjsonP, orionldState.requestTree, buffer, sizeof(buffer));
+  LM_TMP(("patch: '%s'", buffer));
 
   LM_TMP(("SPAT: orionldPatchSubscription: subscriptionId == '%s'", subscriptionId));
 
@@ -545,10 +512,15 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     return false;
   }
 
-  LM_TMP(("SPAT: Calling subscriptionPayloadCheck"));
-  if (subscriptionPayloadCheck(ciP, orionldState.requestTree, false) == false)
+  KjNode* watchedAttributesNodeP = NULL;
+  KjNode* timeIntervalNodeP      = NULL;
+  KjNode* qP                     = NULL;
+  KjNode* geoqP                  = NULL;
+
+  LM_TMP(("SPAT: Calling pcheckSubscription"));
+  if (pcheckSubscription(ciP, orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP) == false)
   {
-    LM_E(("subscriptionPayloadCheck FAILED"));
+    LM_E(("pcheckSubscription FAILED"));
     return false;
   }
 
@@ -556,7 +528,6 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   KjNode* dbSubscriptionP = dbSubscriptionGet(subscriptionId);
 
   // <DEBUG>
-  char buffer[1024];
   kjRender(orionldState.kjsonP, dbSubscriptionP, buffer, sizeof(buffer));
   LM_TMP(("SPAT: DB tree: '%s'", buffer));
   // </DEBUG>
@@ -568,6 +539,43 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription not found", subscriptionId);
     return false;
   }
+
+  //
+  // Make sure we don't get both watchedAttributed AND timeInterval
+  // If so, the PATCH is invalid
+  //
+  if ((watchedAttributesNodeP != NULL) && (timeIntervalNodeP != NULL))
+  {
+    LM_W(("Bad Input (Both 'watchedAttributes' and 'timeInterval' given in Subscription Payload Data)"));
+    ciP->httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Both 'watchedAttributes' and 'timeInterval' given");
+    return false;
+  }
+  else if (watchedAttributesNodeP != NULL)
+  {
+    KjNode* dbTimeIntervalNodeP = kjLookup(dbSubscriptionP, "timeInterval");
+
+    if ((dbTimeIntervalNodeP != NULL) && (dbTimeIntervalNodeP->value.i != -1))
+    {
+      LM_W(("Bad Input (Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'"));
+      ciP->httpStatusCode = SccBadRequest;
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'");
+      return false;
+    }
+  }
+  else if (timeIntervalNodeP != NULL)
+  {
+    KjNode* dbConditionsNodeP = kjLookup(dbSubscriptionP, "conditions");
+
+    if ((dbConditionsNodeP != NULL) && (dbConditionsNodeP->value.firstChildP != NULL))
+    {
+      LM_W(("Bad Input (Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes')"));
+      ciP->httpStatusCode = SccBadRequest;
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'");
+      return false;
+    }
+  }
+
 
   //
   // Remove Occurrences of $numberLong, i.e. "expiration"
@@ -584,10 +592,11 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // After calling ngsildSubscriptionToAPIv1Datamodel, the incoming payload data has beed structured just as the
   // API v1 database model and the original tree (obtained calling dbSubscriptionGet()) can easily be
   // modified.
-  // ngsildSubscriptionPatch() perfoirms that modification
+  // ngsildSubscriptionPatch() performs that modification
   //
   LM_TMP(("SPAT: Going over the payload data to patch the subscription as a KjNode tree"));
-  ngsildSubscriptionPatch(dbSubscriptionP, orionldState.requestTree);
+  if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
+    return false;
 
   // <DEBUG>
   kjRender(orionldState.kjsonP, dbSubscriptionP, buffer, sizeof(buffer));

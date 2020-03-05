@@ -47,6 +47,7 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   subscription.descriptionProvided = false;
   subscription.expires             = -1;  // 0?
   subscription.throttling          = -1;  // 0?
+  subscription.timeInterval        = -1;  // 0?
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", orionldState.wildcard[0]));
 
@@ -56,9 +57,10 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
     return false;
   }
+  LM_TMP(("TIV: got timeInterval from mongoGetLdSubscription: %d", subscription.timeInterval));
 
   // Transform to KjNode tree
-  ciP->httpStatusCode       = SccOk;
+  ciP->httpStatusCode = SccOk;
   orionldState.responseTree = kjTreeFromSubscription(ciP, &subscription);
 
   return true;

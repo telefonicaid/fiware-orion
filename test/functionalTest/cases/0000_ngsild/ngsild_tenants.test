@@ -249,13 +249,15 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"timeInterval" : -1,
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
-		"georel" : ""
+		"georel" : "",
+		"geoproperty" : ""
 	},
 	"format" : "keyValues"
 }
@@ -296,13 +298,15 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"timeInterval" : -1,
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
-		"georel" : ""
+		"georel" : "",
+		"geoproperty" : ""
 	},
 	"format" : "keyValues"
 }

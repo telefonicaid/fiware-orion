@@ -24,17 +24,17 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/CHECK.h"                              // CHECKx()
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/geoJsonCheck.h"                       // geoJsonCheck
-#include "orionld/types/OrionldGeoLocation.h"                  // OrionldGeoLocation
-#include "orionld/kjTree/kjTreeToGeoLocation.h"                // Own Interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "orionld/common/CHECK.h"                                // CHECKx()
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/types/OrionldGeoLocation.h"                    // OrionldGeoLocation
+#include "orionld/payloadCheck/pcheckGeoProperty.h"              // pcheckGeoProperty
+#include "orionld/kjTree/kjTreeToGeoLocation.h"                  // Own Interface
 
 
 
@@ -47,10 +47,11 @@ bool kjTreeToGeoLocation(ConnectionInfo* ciP, KjNode* geoLocationNodeP, OrionldG
   char*    geoType;
   KjNode*  geoCoordsP;
 
-  if (geoJsonCheck(ciP, geoLocationNodeP, &geoType, &geoCoordsP) == false)
+  if (pcheckGeoProperty(ciP, geoLocationNodeP, &geoType, &geoCoordsP) == false)
   {
-    LM_E(("geoJsonCheck failed"));
-    // geoJsonCheck sets the Error Response
+    LM_E(("pcheckGeoProperty failed"));
+    // pcheckGeoProperty sets the Error Response
+    ciP->httpStatusCode = SccBadRequest;
     return false;
   }
 

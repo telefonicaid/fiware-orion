@@ -224,6 +224,22 @@ extern void setName(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP
 */
 extern void setMimeType(ngsiv2::Subscription* subP, mongo::BSONObjBuilder* bobP);
 
+
+
+/* ****************************************************************************
+*
+* setCsf -
+*/
+extern void setCsf(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
+
+
+
+/* ****************************************************************************
+*
+* setTimeInterval - 
+*/
+extern void setTimeInterval(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP);
+
 #endif
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONSUBSCRIPTION_H_

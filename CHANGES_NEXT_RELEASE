@@ -17,5 +17,5 @@
 * Issue #XXX - Implemented PATCH /subscriptions/{reg-id}
 * Issue #368 - Implemented PATCH /csourceRegistrations/{reg-id}
 * Issue #387 - allowing @context inside the array items of the payload data for BATCH Upsert
-* Issue #393 - mixup in contexts when validating entity type in batch upsert operation
-* Issue #392 - LineString Geo type not supported
+* Issue #393 - Fixed a mixup in contexts when validating entity type in batch upsert operation
+* Issue #392 - LineString Geo type was not supported

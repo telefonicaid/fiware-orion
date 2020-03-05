@@ -122,6 +122,7 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+	"timeInterval" : -1,
 	"conditions" : [
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/numberOfItems"
 	],
@@ -130,7 +131,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "",
 		"coords" : "",
-		"georel" : ""
+		"georel" : "",
+		"geoproperty" : ""
 	},
 	"format" : "keyValues"
 }

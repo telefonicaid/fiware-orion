@@ -287,13 +287,13 @@ Date: REGEX(.*)
 07. Invalid value for 'type' in payload for creation - see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "invalid string for geo type",
-    "title": "invalid GeoJSON type",
+    "title": "invalid geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -120,6 +120,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
 	"conditions" : [
 		"http://example.org/P2"
 	],
@@ -128,7 +130,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "valid geometry",
 		"coords" : "1,2",
-		"georel" : "valid georel"
+		"georel" : "valid georel",
+		"geoproperty" : "not supported"
 	},
 	"format" : "keyValues"
 }

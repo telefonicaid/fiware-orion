@@ -24,24 +24,26 @@
 */
 extern "C"
 {
-#include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
+#include "kjson/kjLookup.h"                                     // kjLookup
+#include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                      // LM_*
+#include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "common/globals.h"                                    // parse8601Time
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "common/globals.h"                                     // parse8601Time
+#include "rest/ConnectionInfo.h"                                // ConnectionInfo
 
-#include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/geoJsonCheck.h"                       // geoJsonCheck
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"         // orionldContextValueExpand
-#include "orionld/db/dbConfiguration.h"                        // dbRegistrationGet, dbRegistrationReplace
-#include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
+#include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/urlCheck.h"                            // urlCheck
+#include "orionld/common/urnCheck.h"                            // urnCheck
+#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
+#include "orionld/context/orionldContextValueExpand.h"          // orionldContextValueExpand
+#include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
+#include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
+#include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
+#include "orionld/serviceRoutines/orionldPatchRegistration.h"   // Own Interface
 
 
 
@@ -72,28 +74,6 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
-// alreadyExpanded -
-//
-static bool alreadyExpanded(char* value)
-{
-  if (value == NULL)
-    return false;
-
-  for (int ix = 0; ix < 10; ix++)
-  {
-    if (value[ix] == 0)
-      return false;
-    else if (value[ix] == ':')
-      return true;
-  }
-
-  return false;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // longToInt -
 //
 static void longToInt(KjNode* nodeP)
@@ -114,7 +94,7 @@ static void longToInt(KjNode* nodeP)
 //
 // fixDbRegistration -
 //
-// As long long members are respresented as "xxx": { "$numberLong": "1234565678901234" }
+// As long long members are represented as "xxx": { "$numberLong": "1234565678901234" }
 // and this gives an error when trying to Update this, we simply change the object to an int.
 //
 // In a Registration, this must be done for "expiration", and "throttling".
@@ -539,496 +519,6 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
 
 
 
-// -----------------------------------------------------------------------------
-//
-// orionldCheckGeoJsonGeometry -
-//
-static bool orionldCheckGeoJsonGeometry(ConnectionInfo* ciP, KjNode* geoAttributeP, const char* fieldName)
-{
-  return geoJsonCheck(ciP, geoAttributeP, NULL, NULL);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckRegistrationInformationEntity -
-//
-// An item of the "entities" array is a JSON Object and can have three different mebmers:
-//   * id             (Optional JSON String that is a valid URI)
-//   * idPattern      (Optional JSON String that is a valid REGEX)
-//   * type           (Mandatory JSON String)
-//
-static bool orionldCheckRegistrationInformationEntity(ConnectionInfo* ciP, KjNode* entityP)
-{
-  KjNode* idP         = NULL;
-  KjNode* idPatternP  = NULL;
-  KjNode* typeP       = NULL;
-
-  for (KjNode* entityItemP = entityP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
-  {
-    if (strcmp(entityItemP->name, "id") == 0)
-    {
-      DUPLICATE_CHECK(idP, "Registration::information[X]::entities[X]::id", entityItemP);
-      STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::id");
-      URI_CHECK(entityItemP, "Registration::information[X]::entities[X]::id");
-    }
-    else if (strcmp(entityItemP->name, "idPattern") == 0)
-    {
-      DUPLICATE_CHECK(idPatternP, "Registration::information[X]::entities[X]::idPattern", entityItemP);
-      STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::idPattern");
-      EMPTY_STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::idPattern");
-      // FIXME: How check for valid REGEX???
-    }
-    else if (strcmp(entityItemP->name, "type") == 0)
-    {
-      DUPLICATE_CHECK(typeP, "Registration::information[X]::entities[X]::type", entityItemP);
-      STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::type");
-      EMPTY_STRING_CHECK(entityItemP, "Registration::information[X]::entities[X]::type");
-
-      //
-      // Expand, unless already expanded
-      // If a ':' is found inside the first 10 chars, the value is assumed to be expanded ...
-      //
-      if (alreadyExpanded(entityItemP->value.s) == false)
-        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, NULL, true, NULL);
-    }
-    else
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::information[X]::entities[X]", entityItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
-      return false;
-    }
-  }
-
-  // Only if Fully NGSI-LD compliant
-  if (typeP == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::information[X]::entities[X]::type");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckRegistrationInformation
-//
-// The "information" field can have only three members:
-//   * entities       (Mandatory JSON Array)
-//   * properties     (Optional JSON Array with strings)
-//   * relationships  (Optional JSON Array with strings)
-//
-// NOTE
-//   This function also expands ATTRIBUTE NAMES and ENTITY TYPES
-//
-static bool orionldCheckRegistrationInformation(ConnectionInfo* ciP, KjNode* informationP)
-{
-  for (KjNode* infoItemP = informationP->value.firstChildP; infoItemP != NULL; infoItemP = infoItemP->next)
-  {
-    if (strcmp(infoItemP->name, "entities") == 0)
-    {
-      ARRAY_CHECK(infoItemP, "Registration::information[X]::entities");
-
-      if (infoItemP->value.firstChildP == NULL)  // Empty Array
-      {
-        LM_E(("Registration::information[X]::entities is an empty array"));
-        orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "Registration::information[X]::entities");
-        ciP->httpStatusCode = SccBadRequest;
-        return false;
-      }
-
-      for (KjNode* entityP = infoItemP->value.firstChildP; entityP != NULL; entityP = entityP->next)
-      {
-        OBJECT_CHECK(entityP, "Registration::information[X]::entities[X]");
-        if (orionldCheckRegistrationInformationEntity(ciP, entityP) == false)
-          return false;
-      }
-    }
-    else if (strcmp(infoItemP->name, "properties") == 0)
-    {
-      ARRAY_CHECK(infoItemP, "Registration::information[X]::properties");
-      EMPTY_ARRAY_CHECK(infoItemP, "Registration::information[X]::properties");
-      for (KjNode* propP = infoItemP->value.firstChildP; propP != NULL; propP = propP->next)
-      {
-        STRING_CHECK(propP, "Registration::information[X]::properties[X]");
-        EMPTY_STRING_CHECK(propP, "Registration::information[X]::properties[X]");
-        if (alreadyExpanded(propP->value.s) == false)
-          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, NULL, true, NULL);
-      }
-    }
-    else if (strcmp(infoItemP->name, "relationships") == 0)
-    {
-      ARRAY_CHECK(infoItemP, "Registration::information[X]::relationships");
-      EMPTY_ARRAY_CHECK(infoItemP, "Registration::information[X]::relationships");
-      for (KjNode* relP = infoItemP->value.firstChildP; relP != NULL; relP = relP->next)
-      {
-        STRING_CHECK(relP, "Registration::information[X]::relationships[X]");
-        EMPTY_STRING_CHECK(relP, "Registration::information[X]::relationships[X]");
-        if (alreadyExpanded(relP->value.s) == false)
-          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, NULL, true, NULL);
-      }
-    }
-    else
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::information[X]", infoItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckRegistrationInformationArray
-//
-static bool orionldCheckRegistrationInformationArray(ConnectionInfo* ciP, KjNode* informationArrayP, const char* fieldName)
-{
-  if (informationArrayP->value.firstChildP == NULL)  // Empty Array
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Array", "Registration::information");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  for (KjNode* informationP = informationArrayP->value.firstChildP; informationArrayP != NULL; informationArrayP = informationArrayP->next)
-  {
-    OBJECT_CHECK(informationP, "Registration::information[X]");
-
-    if (orionldCheckRegistrationInformation(ciP, informationP) == false)
-      return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckObservationInterval -
-//
-static bool orionldCheckObservationInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const char* fieldName)
-{
-  KjNode* startP = NULL;
-  KjNode* endP   = NULL;
-  int64_t start  = 0;
-  int64_t end    = 0;
-
-  for (KjNode* tiItemP = timeIntervalNodeP->value.firstChildP; tiItemP != NULL; tiItemP = tiItemP->next)
-  {
-    if (strcmp(tiItemP->name, "start") == 0)
-    {
-      DUPLICATE_CHECK(startP, "Registration::observationInterval::start", tiItemP);
-      STRING_CHECK(tiItemP, "Registration::observationInterval::start");
-      DATETIME_CHECK(tiItemP->value.s, start, "Registration::observationInterval::start");
-    }
-    else if (strcmp(tiItemP->name, "end") == 0)
-    {
-      DUPLICATE_CHECK(endP, "Registration::observationInterval::end", tiItemP);
-      STRING_CHECK(tiItemP, "Registration::observationInterval::end");
-      DATETIME_CHECK(tiItemP->value.s, end, "Registration::observationInterval::end");
-    }
-    else
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::observationInterval", tiItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
-      return false;
-    }
-  }
-
-  if ((startP == NULL) && (endP == NULL))
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", "Registration::observationInterval");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (startP == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::observationInterval::start");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (endP == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::observationInterval::end");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (start > end)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Inconsistent DateTimes", "Registration::observationInterval ends before it starts");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldCheckManagementInterval -
-//
-static bool orionldCheckManagementInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const char* fieldName)
-{
-  KjNode* startP = NULL;
-  KjNode* endP   = NULL;
-  int64_t start  = 0;
-  int64_t end    = 0;
-
-  for (KjNode* tiItemP = timeIntervalNodeP->value.firstChildP; tiItemP != NULL; tiItemP = tiItemP->next)
-  {
-    if (strcmp(tiItemP->name, "start") == 0)
-    {
-      DUPLICATE_CHECK(startP, "Registration::managementInterval::start", tiItemP);
-      STRING_CHECK(tiItemP, "Registration::managementInterval::start");
-      DATETIME_CHECK(tiItemP->value.s, start, "Registration::managementInterval::start");
-    }
-    else if (strcmp(tiItemP->name, "end") == 0)
-    {
-      DUPLICATE_CHECK(endP, "Registration::managementInterval::end", tiItemP);
-      STRING_CHECK(tiItemP, "Registration::managementInterval::end");
-      DATETIME_CHECK(tiItemP->value.s, end, "Registration::managementInterval::end");
-    }
-    else
-    {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration::managementInterval", tiItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
-      return false;
-    }
-  }
-
-  if ((startP == NULL) && (endP == NULL))
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", "Registration::managementInterval");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (startP == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::managementInterval::start");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (endP == NULL)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "Registration::managementInterval::end");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  if (start > end)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Inconsistent DateTimes", "Registration::managementInterval ends before it starts");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// registrationPayloadCheck -
-//
-// This function makes sure that the incoming payload is OK
-// - all types are as they should,
-// - the values with special needs are correct (if DataTikme for example)
-// - no field is duplicated
-// - etc
-//
-// However, there is ONE thing that cannot be checked here, as we still haven't queries the database
-// for the original registration - the one to be patched.
-// The problem is with registration properties.
-// A registration can have any property added to it, and with any name.
-// In this function we can check that the property isn't duplicated but, as this is a PATCH, the
-// property to be patched MUST ALREADY EXIST in the original registration, and this cannot be checked until
-// AFTER we extract the the original registration from the database.
-//
-// SO, what we do here is to separate the regiustration properties from the rest of the fields and keep thjat
-// as a KjNode tree, until we are able to perform this check.
-// The output parameter 'propertyTreeP' is used for this purpose.
-//
-static bool registrationPayloadCheck(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBePresent, KjNode**  propertyTreeP)
-{
-  KjNode*  idP                   = NULL;
-  KjNode*  typeP                 = NULL;
-  KjNode*  nameP                 = NULL;
-  KjNode*  descriptionP          = NULL;
-  KjNode*  informationP          = NULL;
-  KjNode*  observationIntervalP  = NULL;
-  KjNode*  managementIntervalP   = NULL;
-  KjNode*  locationP             = NULL;
-  KjNode*  observationSpaceP     = NULL;
-  KjNode*  operationSpaceP       = NULL;
-  KjNode*  expiresP              = NULL;
-  KjNode*  endpointP             = NULL;
-  KjNode*  propertyTree          = kjObject(orionldState.kjsonP, NULL);  // Temp storage for properties
-  int64_t  dateTime;
-
-  if (registrationP->type != KjObject)
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Registration", "The payload data for updating a registration must be a JSON Object");
-    ciP->httpStatusCode = SccBadRequest;
-    return false;
-  }
-
-
-  //
-  // Loop over the entire registration (incoming payload data) and check all is OK
-  //
-  // To be able to easy and fast check that no registration properties are duplicated, the registration properties are
-  // removed from the tree and added to 'propertyTree'.
-  // Later, these registration properties must be put back!
-  //
-  // It's quicker to implement this like that, as there's no need to go over the entire path tree and also not necessary to look for >1 matches.
-  // When Property P1 is about to be added to 'propertyTree' for a second time, the duplication will be noticed and the error triggered.
-  //
-  KjNode* nodeP = registrationP->value.firstChildP;
-  KjNode* next;
-
-  while (nodeP != NULL)
-  {
-    next = nodeP->next;
-
-    if (strcmp(nodeP->name, "id") == 0)
-    {
-      if (idCanBePresent == false)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration Update", "Registration::id");
-        ciP->httpStatusCode = SccBadRequest;
-        return false;
-      }
-
-      DUPLICATE_CHECK(idP, "Registration::id", nodeP);
-      STRING_CHECK(nodeP, "Registration::id");
-      URI_CHECK(nodeP, "Registration::id");
-    }
-    else if (strcmp(nodeP->name, "type") == 0)
-    {
-      DUPLICATE_CHECK(typeP, "Registration::type", nodeP);
-      STRING_CHECK(nodeP, "Registration::type");
-
-      if (strcmp(nodeP->value.s, "ContextSourceRegistration") != 0)
-      {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Registration::type", nodeP->value.s);
-        ciP->httpStatusCode = SccBadRequest;
-        return false;
-      }
-    }
-    else if (strcmp(nodeP->name, "name") == 0)
-    {
-      DUPLICATE_CHECK(nameP, "Registration::name", nodeP);
-      STRING_CHECK(nodeP, "Registration::name");
-    }
-    else if (strcmp(nodeP->name, "description") == 0)
-    {
-      DUPLICATE_CHECK(descriptionP, "Registration::description", nodeP);
-      STRING_CHECK(nodeP, "Registration::description");
-    }
-    else if (strcmp(nodeP->name, "information") == 0)
-    {
-      DUPLICATE_CHECK(informationP, "Registration::information", nodeP);
-      ARRAY_CHECK(nodeP, "Registration::information");
-      if (orionldCheckRegistrationInformationArray(ciP, nodeP, "Registration::information") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "observationInterval") == 0)
-    {
-      DUPLICATE_CHECK(observationIntervalP, "Registration::observationInterval", nodeP);
-      OBJECT_CHECK(nodeP, "Registration::observationInterval");
-      EMPTY_OBJECT_CHECK(nodeP, "Registration::observationInterval");
-      if (orionldCheckObservationInterval(ciP, nodeP, "Registration::observationInterval") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "managementInterval") == 0)
-    {
-      DUPLICATE_CHECK(managementIntervalP, "Registration::managementInterval", nodeP);
-      OBJECT_CHECK(nodeP, "Registration::managementInterval");
-      if (orionldCheckManagementInterval(ciP, nodeP, "Registration::managementInterval") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "location") == 0)
-    {
-      DUPLICATE_CHECK(locationP, "Registration::location", nodeP);
-      OBJECT_CHECK(nodeP, "Registration::location");
-
-      if (orionldCheckGeoJsonGeometry(ciP, locationP, "Registration::location") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "observationSpace") == 0)
-    {
-      DUPLICATE_CHECK(observationSpaceP, "Registration::observationSpace", nodeP);
-      OBJECT_CHECK(nodeP, "Registration::observationSpace");
-      if (orionldCheckGeoJsonGeometry(ciP, nodeP, "Registration::observationSpace") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "operationSpace") == 0)
-    {
-      DUPLICATE_CHECK(operationSpaceP, "Registration::operationSpace", nodeP);
-      OBJECT_CHECK(nodeP, "Registration::operationSpace");
-      if (orionldCheckGeoJsonGeometry(ciP, nodeP, "Registration::operationSpace") == false)
-        return false;
-    }
-    else if (strcmp(nodeP->name, "expires") == 0)
-    {
-      DUPLICATE_CHECK(expiresP, "Registration::expires", nodeP);
-      STRING_CHECK(nodeP, "Registration::expires");
-      DATETIME_CHECK(expiresP->value.s, dateTime, "Registration::expires");
-    }
-    else if (strcmp(nodeP->name, "endpoint") == 0)
-    {
-      DUPLICATE_CHECK(endpointP, "Registration::endpoint", nodeP);
-      STRING_CHECK(nodeP, "Registration::endpoint");
-      URI_CHECK(nodeP, nodeP->name);
-    }
-    else
-    {
-      kjChildRemove(registrationP, nodeP);
-
-      //
-      // Add the Property to 'propertyTree'
-      //
-      // But, before adding, look it up.
-      // If already there, then we have a case of duplicate property and that is an error
-      //
-      if (kjLookup(propertyTree, nodeP->name) != NULL)
-      {
-        ciP->httpStatusCode = SccBadRequest;
-        orionldErrorResponseCreate(OrionldBadRequestData, "Duplicate Property in Registration Update", nodeP->name);
-        return false;
-      }
-
-      kjChildAdd(propertyTree, nodeP);
-    }
-
-    nodeP = next;
-  }
-
-  *propertyTreeP = propertyTree;  // These properties will be checked later, after getting the reg from DB
-
-  return true;
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // ngsildRegistrationPatch -
@@ -1052,7 +542,7 @@ static void ngsildRegistrationPatch(KjNode* dbRegistrationP, KjNode* patchTree)
         kjChildRemove(dbRegistrationP, toRemove);
 
         //
-        // Dangerous to remove without checking ... what if we remove "Registration::endpoint" ... ???
+        // Dangerous to remove without checking ... what if we remove "endpoint" ... ???
         //
       }
     }
@@ -1081,9 +571,9 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
     return false;
   }
 
-  if (registrationPayloadCheck(ciP, orionldState.requestTree, false, &propertyTree) == false)
+  if (pcheckRegistration(ciP, orionldState.requestTree, false, &propertyTree) == false)
   {
-    LM_E(("registrationPayloadCheck FAILED"));
+    LM_E(("pcheckRegistration FAILED"));
     return false;
   }
 
@@ -1131,7 +621,7 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
     next = propertyP->next;
 
-    if (alreadyExpanded(propertyP->name) == false)
+    if (orionldContextItemAlreadyExpanded(propertyP->name) == false)
       propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, &valueMayBeExpanded, true, NULL);
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)

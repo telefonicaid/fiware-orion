@@ -118,6 +118,9 @@ static void insertInCache
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
+#ifdef ORIONLD
+                     sub.subject.condition.expression.geoproperty,
+#endif
                      sub.notification.blacklist);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
@@ -130,7 +133,7 @@ static void insertInCache
 * mongoCreateSubscription -
 *
 * Returns:
-* - subId: subscription susscessfully created ('oe' must be ignored), the subId
+* - subId: subscription successfully created ('oe' must be ignored), the subId
 *   must be used to fill Location header
 * - "": subscription creation fail (look at 'oe')
 */
@@ -175,6 +178,8 @@ std::string mongoCreateSubscription
 #ifdef ORIONLD
   setName(sub, &b);
   setContext(sub, &b);
+  setCsf(sub, &b);
+  setTimeInterval(sub, &b);
 #endif
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
@@ -210,6 +215,7 @@ std::string mongoCreateSubscription
     setCount(1, &b);
   }
 
+  LM_TMP(("GPROP: Setting Expression"));
   setExpression(sub, &b);
   setFormat(sub, &b);
 

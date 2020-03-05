@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_GEOJSONTYPECHECK_H_
-#define SRC_LIB_ORIONLD_COMMON_GEOJSONTYPECHECK_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
 // -----------------------------------------------------------------------------
 //
-// geoJsonTypeCheck -
+// pcheckNotification -
 //
-extern bool geoJsonTypeCheck(char* typeName, OrionldGeoJsonType* typeP, char** detailsP);
+extern bool pcheckNotification(ConnectionInfo* ciP, KjNode* notificationP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_GEOJSONTYPECHECK_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_

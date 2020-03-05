@@ -1346,12 +1346,12 @@ Date: REGEX(.*)
 02. Attempt to PATCH the registration with a Registration ID - see failure
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::id",
+    "detail": "id",
     "title": "Invalid field for Registration Update",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1374,12 +1374,12 @@ Date: REGEX(.*)
 04. Attempt to PATCH the registration with a 'type' that is not a string - see failure
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::type",
+    "detail": "type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1388,13 +1388,13 @@ Date: REGEX(.*)
 05. Attempt to PATCH the registration with a 'type' string that is not 'ContextSourceRegistration' - see failure
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "InvalidValueForRegType",
-    "title": "Invalid value for Registration::type",
+    "title": "Invalid value for type",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1402,12 +1402,12 @@ Date: REGEX(.*)
 06. Attempt to PATCH the registration with duplicate 'type' - see failure
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::type",
+    "detail": "type",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1416,12 +1416,12 @@ Date: REGEX(.*)
 07. Attempt to PATCH the registration with a 'name' that is not a string - see failure
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::name",
+    "detail": "name",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1430,12 +1430,12 @@ Date: REGEX(.*)
 08. Attempt to PATCH the registration with duplicate 'name' - see failure
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::name",
+    "detail": "name",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1444,12 +1444,12 @@ Date: REGEX(.*)
 09. Attempt to PATCH the registration with a 'description' that is not a string - see failure
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::description",
+    "detail": "description",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1458,12 +1458,12 @@ Date: REGEX(.*)
 10. Attempt to PATCH the registration with duplicate 'description' - see failure
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::description",
+    "detail": "description",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1472,12 +1472,12 @@ Date: REGEX(.*)
 11. Attempt to PATCH the registration with an 'information' that is not a JSON Array - see failure
 ==================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information",
+    "detail": "information",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1486,12 +1486,12 @@ Date: REGEX(.*)
 12. Attempt to PATCH the registration with duplicate 'information' - see failure
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information",
+    "detail": "information",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1500,12 +1500,12 @@ Date: REGEX(.*)
 13. Attempt to PATCH the registration with an 'information' that is an empty array - see failure
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 120
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information",
+    "detail": "information",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1514,12 +1514,12 @@ Date: REGEX(.*)
 14. Attempt to PATCH the registration with an 'information' that has a member that is not a JSON Object - see failure
 =====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]",
+    "detail": "information[X]",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1528,12 +1528,12 @@ Date: REGEX(.*)
 15. Attempt to PATCH the registration with an 'information::entities that is not an array' - see failure
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities",
+    "detail": "entities",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1542,12 +1542,12 @@ Date: REGEX(.*)
 16. Attempt to PATCH the registration with an 'information::entities array item that is not an object' - see failure
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]",
+    "detail": "entities[X]",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1556,12 +1556,12 @@ Date: REGEX(.*)
 17. Attempt to PATCH the registration with an 'information::entities array that is empty' - see failure
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities",
+    "detail": "entities",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1570,12 +1570,12 @@ Date: REGEX(.*)
 18. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a string - see failure
 ==============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 146
+Content-Length: 116
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::id",
+    "detail": "entities[X]::id",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1584,12 +1584,12 @@ Date: REGEX(.*)
 19. Attempt to PATCH the registration with an 'information::entities[0]::id that is not a valid URI - see failure
 =================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::id",
+    "detail": "entities[X]::id",
     "title": "Not a URI",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1598,12 +1598,12 @@ Date: REGEX(.*)
 20. Attempt to PATCH the registration with duplicate 'information::entities[0]::id - see failure
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 145
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::id",
+    "detail": "entities[X]::id",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1612,12 +1612,12 @@ Date: REGEX(.*)
 21. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is not a string - see failure
 =====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 153
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "detail": "entities[X]::idPattern",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1626,12 +1626,12 @@ Date: REGEX(.*)
 22. Attempt to PATCH the registration with an 'information::entities[0]::idPattern that is an empty string - see failure
 ========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 148
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "detail": "entities[X]::idPattern",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1640,12 +1640,12 @@ Date: REGEX(.*)
 23. Attempt to PATCH the registration with duplicate 'information::entities[0]::idPattern - see failure
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 152
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "detail": "entities[X]::idPattern",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1654,12 +1654,12 @@ Date: REGEX(.*)
 24. Attempt to PATCH the registration with an 'information::entities[0]::type' that is not a string - see failure
 =================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 148
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::type",
+    "detail": "entities[X]::type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1668,12 +1668,12 @@ Date: REGEX(.*)
 25. Attempt to PATCH the registration with an 'information::entities[0]::type' that is an empty string - see failure
 ====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 143
+Content-Length: 113
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::type",
+    "detail": "entities[X]::type",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1682,12 +1682,12 @@ Date: REGEX(.*)
 26. Attempt to PATCH the registration with duplicate 'information::entities[0]::type' - see failure
 ===================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 147
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::type",
+    "detail": "entities[X]::type",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1696,12 +1696,12 @@ Date: REGEX(.*)
 27. Attempt to PATCH the registration with no 'information::entities[0]::type' - see failure
 ============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 154
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::entities[X]::type",
+    "detail": "entities[X]::type",
     "title": "Missing mandatory field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1710,13 +1710,13 @@ Date: REGEX(.*)
 28. Attempt to PATCH the registration with an invalid field 'information::entities[0]::inv' - see failure
 =========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 146
+Content-Length: 116
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "inv",
-    "title": "Invalid field for Registration::information[X]::entities[X]",
+    "title": "Invalid field for entities[X]",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1724,12 +1724,12 @@ Date: REGEX(.*)
 29. Attempt to PATCH the registration with an 'information::properties' that is not an array - see failure
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 140
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::properties",
+    "detail": "information[X]::properties",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1738,12 +1738,12 @@ Date: REGEX(.*)
 30. Attempt to PATCH the registration with an 'information::properties' item that is not a string - see failure
 ===============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 144
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::properties[X]",
+    "detail": "information[X]::properties[X]",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1752,12 +1752,12 @@ Date: REGEX(.*)
 31. Attempt to PATCH the registration with an 'information::properties' item that is an empty string - see failure
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::properties[X]",
+    "detail": "information[X]::properties[X]",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1766,12 +1766,12 @@ Date: REGEX(.*)
 32. Attempt to PATCH the registration with an 'information::properties' that is an empty array - see failure
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 135
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::properties",
+    "detail": "information[X]::properties",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1780,12 +1780,12 @@ Date: REGEX(.*)
 33. Attempt to PATCH the registration with an 'information::relationships' that is not an array - see failure
 =============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 143
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::relationships",
+    "detail": "information[X]::relationships",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1794,12 +1794,12 @@ Date: REGEX(.*)
 34. Attempt to PATCH the registration with an 'information::relationships' item that is not a string - see failure
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 147
+Content-Length: 133
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::relationships[X]",
+    "detail": "information[X]::relationships[X]",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1808,12 +1808,12 @@ Date: REGEX(.*)
 35. Attempt to PATCH the registration with an 'information::relationships' item that is an empty string - see failure
 =====================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 142
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::relationships[X]",
+    "detail": "information[X]::relationships[X]",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1822,12 +1822,12 @@ Date: REGEX(.*)
 37. Attempt to PATCH the registration with an 'information::relationships' that is an empty array - see failure
 ===============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::information[X]::relationships",
+    "detail": "information[X]::relationships",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1836,13 +1836,13 @@ Date: REGEX(.*)
 38. Attempt to PATCH the registration with an invalid field 'information::xyz - see failure
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "xyz",
-    "title": "Invalid field for Registration::information[X]",
+    "title": "Invalid field for information[X]",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1850,12 +1850,12 @@ Date: REGEX(.*)
 39. Attempt to PATCH the registration with an 'observationInterval' that is not a JSON Object - see failure
 ===========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 134
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval",
+    "detail": "observationInterval",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1864,12 +1864,12 @@ Date: REGEX(.*)
 40. Attempt to PATCH the registration with an 'observationInterval' that is an empty JSON Object - see failure
 ==============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval",
+    "detail": "observationInterval",
     "title": "Empty Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1878,12 +1878,12 @@ Date: REGEX(.*)
 41. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'start' field - see failure
 ===================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 147
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::start",
+    "detail": "start",
     "title": "Missing mandatory field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1892,12 +1892,12 @@ Date: REGEX(.*)
 42. Attempt to PATCH the registration with an 'observationInterval' that is missing the 'end' field - see failure
 =================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 145
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::end",
+    "detail": "end",
     "title": "Missing mandatory field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1906,12 +1906,12 @@ Date: REGEX(.*)
 43. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'start' field - see failure
 =================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 140
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::start",
+    "detail": "start",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1920,12 +1920,12 @@ Date: REGEX(.*)
 44. Attempt to PATCH the registration with an 'observationInterval' with a duplicated 'end' field - see failure
 ===============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::end",
+    "detail": "end",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1934,12 +1934,12 @@ Date: REGEX(.*)
 45. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a string - see failure
 ===========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 141
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::start",
+    "detail": "start",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1948,12 +1948,12 @@ Date: REGEX(.*)
 46. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a valid DateTime - see failure
 ===================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 146
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::start",
+    "detail": "start",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1962,12 +1962,12 @@ Date: REGEX(.*)
 47. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a string - see failure
 ==========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::end",
+    "detail": "end",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1976,12 +1976,12 @@ Date: REGEX(.*)
 48. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a valid DateTime - see failure
 ==================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 144
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval::end",
+    "detail": "end",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1990,13 +1990,13 @@ Date: REGEX(.*)
 49. Attempt to PATCH the registration with an 'observationInterval' with an invalid field 'xyz' - see failure
 =============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "xyz",
-    "title": "Invalid field for Registration::observationInterval",
+    "title": "Invalid field for TimeInterval",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2004,12 +2004,12 @@ Date: REGEX(.*)
 50. Attempt to PATCH the registration with a duplicated 'observationInterval' - see failure
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval",
+    "detail": "observationInterval",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2018,13 +2018,13 @@ Date: REGEX(.*)
 51. Attempt to PATCH the registration with a 'observationInterval' whose start>end - see failure
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 161
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationInterval ends before it starts",
-    "title": "Inconsistent DateTimes",
+    "detail": "TimeInterval ends before it starts",
+    "title": "Inconsistent TimeInterval",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2032,12 +2032,12 @@ Date: REGEX(.*)
 52. Attempt to PATCH the registration with an 'managementInterval' that is not a JSON Object - see failure
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval",
+    "detail": "managementInterval",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2046,12 +2046,12 @@ Date: REGEX(.*)
 53. Attempt to PATCH the registration with an 'managementInterval' that is an empty JSON Object - see failure
 =============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 128
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval",
+    "detail": "managementInterval",
     "title": "Empty Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2060,12 +2060,12 @@ Date: REGEX(.*)
 54. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'start' field - see failure
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 146
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::start",
+    "detail": "start",
     "title": "Missing mandatory field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2074,12 +2074,12 @@ Date: REGEX(.*)
 55. Attempt to PATCH the registration with an 'managementInterval' that is missing the 'end' field - see failure
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 144
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::end",
+    "detail": "end",
     "title": "Missing mandatory field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2088,12 +2088,12 @@ Date: REGEX(.*)
 56. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'start' field - see failure
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::start",
+    "detail": "start",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2102,12 +2102,12 @@ Date: REGEX(.*)
 57. Attempt to PATCH the registration with an 'managementInterval' with a duplicated 'end' field - see failure
 ==============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::end",
+    "detail": "end",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2116,12 +2116,12 @@ Date: REGEX(.*)
 58. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a string - see failure
 ==========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 140
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::start",
+    "detail": "start",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2130,12 +2130,12 @@ Date: REGEX(.*)
 59. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a valid DateTime - see failure
 ==================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 145
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::start",
+    "detail": "start",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2144,12 +2144,12 @@ Date: REGEX(.*)
 60. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a string - see failure
 =========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::end",
+    "detail": "end",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2158,12 +2158,12 @@ Date: REGEX(.*)
 61. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a valid DateTime - see failure
 =================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 143
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval::end",
+    "detail": "end",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2172,13 +2172,13 @@ Date: REGEX(.*)
 62. Attempt to PATCH the registration with an 'managementInterval' with an invalid field 'xyz' - see failure
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "xyz",
-    "title": "Invalid field for Registration::managementInterval",
+    "title": "Invalid field for TimeInterval",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2186,12 +2186,12 @@ Date: REGEX(.*)
 63. Attempt to PATCH the registration with a duplicated 'managementInterval' - see failure
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 132
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval",
+    "detail": "managementInterval",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2200,13 +2200,13 @@ Date: REGEX(.*)
 64. Attempt to PATCH the registration with a 'managementInterval' whose start>end - see failure
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 160
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::managementInterval ends before it starts",
-    "title": "Inconsistent DateTimes",
+    "detail": "TimeInterval ends before it starts",
+    "title": "Inconsistent TimeInterval",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2214,12 +2214,12 @@ Date: REGEX(.*)
 65. Attempt to PATCH the registration with a 'location' that is not a JSON Object - see failure
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::location",
+    "detail": "location",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2228,12 +2228,12 @@ Date: REGEX(.*)
 66. Attempt to PATCH the registration with a duplicated 'location' - see failure
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::location",
+    "detail": "location",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2270,13 +2270,13 @@ Date: REGEX(.*)
 69. Attempt to PATCH the registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure
 =============================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "punto",
-    "title": "invalid GeoJSON type",
+    "title": "invalid geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2578,12 +2578,12 @@ Date: REGEX(.*)
 91. Attempt to PATCH the registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
 =============================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 136
+Content-Length: 191
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "A Polygon must have at least 4 points",
+    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
     "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2634,12 +2634,12 @@ Date: REGEX(.*)
 95. Attempt to PATCH the registration with an 'observationSpace' that is not a JSON Object - see failure
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationSpace",
+    "detail": "observationSpace",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2648,12 +2648,12 @@ Date: REGEX(.*)
 96. Attempt to PATCH the registration with a duplicated 'observationSpace' - see failure
 ========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 130
+Content-Length: 116
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::observationSpace",
+    "detail": "observationSpace",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2662,12 +2662,12 @@ Date: REGEX(.*)
 97. Attempt to PATCH the registration with an 'operationSpace' that is not a JSON Object - see failure
 ======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::operationSpace",
+    "detail": "operationSpace",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2676,12 +2676,12 @@ Date: REGEX(.*)
 98. Attempt to PATCH the registration with a duplicated 'operationSpace' - see failure
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 128
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::operationSpace",
+    "detail": "operationSpace",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2690,12 +2690,12 @@ Date: REGEX(.*)
 99. Attempt to PATCH the registration with an 'expires' that is not a string - see failure
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::expires",
+    "detail": "expires",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2704,12 +2704,12 @@ Date: REGEX(.*)
 100. Attempt to PATCH the registration with an 'expires' that is not a valid DateTime - see failure
 ===================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 127
+Content-Length: 113
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::expires",
+    "detail": "expires",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2718,12 +2718,12 @@ Date: REGEX(.*)
 101. Attempt to PATCH the registration with a duplicated 'expires' - see failure
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 121
+Content-Length: 107
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::expires",
+    "detail": "expires",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2732,12 +2732,12 @@ Date: REGEX(.*)
 102. Attempt to PATCH the registration with an 'endpoint' that is not a string - see failure
 ============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::endpoint",
+    "detail": "endpoint",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2760,12 +2760,12 @@ Date: REGEX(.*)
 104. Attempt to PATCH the registration with a duplicated 'endpoint' - see failure
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Registration::endpoint",
+    "detail": "endpoint",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

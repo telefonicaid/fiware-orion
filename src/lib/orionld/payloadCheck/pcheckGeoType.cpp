@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,17 +27,23 @@
 
 #include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/geoJsonTypeCheck.h"                   // Own interface
+#include "orionld/payloadCheck/pcheckGeoType.h"                // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// geoJsonTypeCheck -
+// pcheckGeoType -
 //
-bool geoJsonTypeCheck(char* typeName, OrionldGeoJsonType* typeP, char** detailsP)
+bool pcheckGeoType(char* typeName, OrionldGeoJsonType* typeP, char** detailsP)
 {
-  if      (SCOMPARE6(typeName,  'P', 'o', 'i', 'n', 't', 0))                                                      *typeP = GeoJsonPoint;
+  if (typeName[0] == 0)
+  {
+    LM_E(("Invalid GeoJSON type: 'Empty String'"));
+    *detailsP = (char*) "geometry cannot be an empty string";
+    return false;
+  }
+  else if (SCOMPARE6(typeName,  'P', 'o', 'i', 'n', 't', 0))                                                      *typeP = GeoJsonPoint;
   else if (SCOMPARE11(typeName, 'M', 'u', 'l', 't', 'i', 'P', 'o', 'i', 'n', 't', 0))                             *typeP = GeoJsonMultiPoint;
   else if (SCOMPARE11(typeName, 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))                             *typeP = GeoJsonLineString;
   else if (SCOMPARE16(typeName, 'M', 'u', 'l', 't', 'i', 'L', 'i', 'n', 'e', 'S', 't', 'r', 'i', 'n', 'g', 0))    *typeP = GeoJsonMultiLineString;
@@ -46,7 +52,7 @@ bool geoJsonTypeCheck(char* typeName, OrionldGeoJsonType* typeP, char** detailsP
   else
   {
     LM_E(("Invalid GeoJSON type: %s", typeName));
-    *detailsP = (char*) "invalid GeoJSON type";
+    *detailsP = (char*) "invalid geometry";
 
     return false;
   }
