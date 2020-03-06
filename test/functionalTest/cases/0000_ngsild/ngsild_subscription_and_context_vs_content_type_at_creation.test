@@ -1,0 +1,106 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation and Content-Type + @context in payload
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create a subscription S1, with Content-Type: application/json and contexzt in Link header
+# 02. Create a subscription S2, with Content-Type: application/json and contexzt in Link header
+#
+
+
+echo "01. Create a subscription S1, with Content-Type: application/json and contexzt in Link header"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+	"type": "Subscription",
+  "description": "Notify me of low stock in Store 001",
+	"entities": [{"type": "Shelf"}],
+	"watchedAttributes": ["numberOfItems"],
+	"q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Building:store001",
+	"notification": {
+		"attributes": ["numberOfItems", "stocks", "locatedIn"],
+		"format": "keyValues",
+		"endpoint": {
+			"uri": "http://tutorial:3000/subscription/low-stock-store001",
+			"accept": "application/json"
+		}
+	}
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. Create a subscription S2, with Content-Type: application/json and contexzt in Link header"
+echo "============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S2",
+	"type": "Subscription",
+  "description": "Notify me of low stock in Store 001",
+	"entities": [{"type": "Shelf"}],
+	"watchedAttributes": ["numberOfItems"],
+	"q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Building:store001",
+	"notification": {
+		"attributes": ["numberOfItems", "stocks", "locatedIn"],
+		"format": "keyValues",
+		"endpoint": {
+			"uri": "http://tutorial:3000/subscription/low-stock-store001",
+			"accept": "application/json"
+		}
+	}
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1, with Content-Type: application/json and contexzt in Link header
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+Date: REGEX(.*)
+
+
+
+02. Create a subscription S2, with Content-Type: application/json and contexzt in Link header
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

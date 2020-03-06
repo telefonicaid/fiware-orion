@@ -98,77 +98,28 @@ mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;
 void orionldStateInit(void)
 {
   //
-  // FIXME: bzero(&orionldState, sizeof(orionldState)) ... ?
-  //        This is NOT DONE by the operating system
-  //        If I bzero orionldState, I get a SIGSEGV inside kjson ...
-  //        Must try again!
+  // NOTE
+  //   About 'bzero(&orionldState, sizeof(orionldState))'
+  //   This is NOT DONE by the operating system, so, it needs to be done here 'manually'
   //
-  bzero(orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
+  bzero(&orionldState, sizeof(orionldState));
 
   //
   // Creating kjson environment for KJson parse and render
   //
-  bzero(orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer));
   kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 16 * 1024, NULL, "Thread KAlloc buffer");
 
-  orionldState.ciP                         = NULL;
-  orionldState.requestNo                   = requestNo;
-  orionldState.tenant                      = (char*) "";
-  orionldState.servicePath                 = (char*) "";
-  orionldState.kjsonP                      = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
-  orionldState.linkHttpHeaderPresent       = false;
-  orionldState.link                        = NULL;
-  orionldState.noLinkHeader                = false;  // Service routines can set this value to 'true' to avoid having the Link HTTP Header in its output
-  orionldState.entityCreated               = false;
-  orionldState.entityId                    = NULL;
-  orionldState.linkHeaderAdded             = false;
-  orionldState.errorAttributeArrayP        = orionldState.errorAttributeArray;
-  orionldState.errorAttributeArraySize     = sizeof(orionldState.errorAttributeArray);
-  orionldState.errorAttributeArrayUsed     = 0;
-  orionldState.uriParamOptions.noOverwrite = false;
-  orionldState.uriParamOptions.update      = false;
-  orionldState.uriParamOptions.replace     = false;
-  orionldState.uriParamOptions.keyValues   = false;
-  orionldState.prettyPrintSpaces           = 2;
-  orionldState.prettyPrint                 = false;
-  orionldState.locationAttributeP          = NULL;
-  orionldState.contextP                    = orionldCoreContextP;
-  orionldState.payloadContextNode          = NULL;
-  orionldState.payloadIdNode               = NULL;
-  orionldState.payloadTypeNode             = NULL;
-  orionldState.acceptJson                  = false;
-  orionldState.acceptJsonld                = false;
-  orionldState.qMongoFilterP               = NULL;
-
-  //
-  // FIXME: This initialization of qNodeV is only necessary if a String-Filter is part of the request
-  //        Should be moved elsewhere (unless I do the bzero of the entire orionldState):
-  //          if (ciP->uriParam["q"] != "")
-  //            bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
-  //
-  bzero(orionldState.qNodeV, sizeof(orionldState.qNodeV));
-  orionldState.qNodeIx               = 0;
-  orionldState.jsonBuf               = NULL;
-
-  bzero(orionldState.delayedKjFreeVec, sizeof(orionldState.delayedKjFreeVec));
-  orionldState.delayedKjFreeVecIndex = 0;
-  orionldState.delayedKjFreeVecSize  = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
-
-  bzero(orionldState.delayedFreeVec, sizeof(orionldState.delayedFreeVec));
-  orionldState.delayedFreeVecIndex   = 0;
-  orionldState.delayedFreeVecSize    = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
-
-  orionldState.delayedFreePointer    = NULL;
-
-  orionldState.notify                = false;
-  orionldState.notificationRecords   = 0;
-
-  orionldState.prefixCache.index     = 0;
-  orionldState.prefixCache.items     = 0;
-
-  orionldState.creDatesP             = NULL;
-
-  orionldState.forwardAttrsCompacted = true;
+  orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
+  orionldState.requestNo               = requestNo;
+  orionldState.tenant                  = (char*) "";
+  orionldState.servicePath             = (char*) "";
+  orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
+  orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);
+  orionldState.contextP                = orionldCoreContextP;
+  orionldState.prettyPrintSpaces       = 2;
+  orionldState.forwardAttrsCompacted   = true;
+  orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
+  orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
 }
 
 
