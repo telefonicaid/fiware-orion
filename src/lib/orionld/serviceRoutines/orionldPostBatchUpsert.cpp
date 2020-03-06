@@ -538,9 +538,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       //
       if (typeInPayload != NULL)
       {
-        LM_TMP(("BUG: Expanding '%s' in context '%s'", typeInPayload, contextP->url));
         char* typeInPayloadExpanded = orionldContextItemExpand(contextP, typeInPayload, NULL, true, NULL);
-        LM_TMP(("BUG: Expanded: '%s'", typeInPayloadExpanded));
 
         if (strcmp(typeInPayloadExpanded, typeInDb) != 0)
         {

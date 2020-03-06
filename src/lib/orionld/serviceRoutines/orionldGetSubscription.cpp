@@ -57,7 +57,6 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
     return false;
   }
-  LM_TMP(("TIV: got timeInterval from mongoGetLdSubscription: %d", subscription.timeInterval));
 
   // Transform to KjNode tree
   ciP->httpStatusCode = SccOk;

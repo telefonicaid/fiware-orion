@@ -419,8 +419,6 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
 {
   KjNode* informationP         = NULL;
   KjNode* endpointP            = NULL;
-  KjNode* modDateP             = NULL;
-  KjNode* creDateP             = NULL;
   KjNode* observationIntervalP = NULL;
   KjNode* managementIntervalP  = NULL;
   KjNode* expiresP             = NULL;
@@ -430,7 +428,6 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
   //
   for (KjNode* fragmentP = patchTree->value.firstChildP; fragmentP != NULL; fragmentP = fragmentP->next)
   {
-    LM_TMP(("RP: treating field '%s' of the patch-tree", fragmentP->name));
     if (strcmp(fragmentP->name, "id") == 0)
       fragmentP->name = (char*) "_id";
     else if (strcmp(fragmentP->name, "type") == 0)
@@ -443,10 +440,6 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
       expiresP = fragmentP;
     else if (strcmp(fragmentP->name, "endpoint") == 0)
       endpointP = fragmentP;
-    else if (strcmp(fragmentP->name, "modDate") == 0)
-      modDateP = fragmentP;
-    else if (strcmp(fragmentP->name, "creDate") == 0)
-      creDateP = fragmentP;
     else if (strcmp(fragmentP->name, "observationInterval") == 0)
       observationIntervalP = fragmentP;
     else if (strcmp(fragmentP->name, "managementInterval") == 0)
@@ -507,13 +500,6 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
   if (expiresP != NULL)
     ngsildExpiresToAPIv1Datamodel(expiresP);
 
-  if (modDateP != NULL)
-    LM_TMP(("RP: modDateP exists - must modify it to 'right now'"));
-  else
-    LM_TMP(("RP: modDateP doesn't exist - must add it with value 'right now'"));
-  if (creDateP == NULL)
-    LM_TMP(("RP: creDateP doesn't exist - CORRUPTED DB"));
-
   return true;
 }
 
@@ -532,7 +518,6 @@ static void ngsildRegistrationPatch(KjNode* dbRegistrationP, KjNode* patchTree)
   {
     next = fragmentP->next;
 
-    LM_TMP(("RP: Patching fragment '%s'", fragmentP->name));
     if (fragmentP->type == KjNull)
     {
       KjNode* toRemove = kjLookup(dbRegistrationP, fragmentP->name);

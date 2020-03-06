@@ -180,7 +180,6 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
 
   // timeInterval (it's not in use ...)
-  LM_TMP(("TIV: timeInterval: %d", subscriptionP->timeInterval));
   if ((subscriptionP->timeInterval != -1) && (subscriptionP->timeInterval != 0))
   {
     nodeP = kjInteger(orionldState.kjsonP, "timeInterval", subscriptionP->timeInterval);
@@ -190,14 +189,10 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
 
   // q
   const char* q = subscriptionP->subject.condition.expression.q.c_str();
-  LM_TMP(("QAC: q == '%s'", q));
   if (q[0] != 0)
   {
-    LM_TMP(("Got Q: %s", q));
     nodeP = kjString(orionldState.kjsonP, "q", q);
-    LM_TMP(("Calling qAliasCompact with: %s (%s)", q, nodeP->value.s));
     qAliasCompact(nodeP, true);
-    LM_TMP(("After qAliasCompact: %s (%s)", q, nodeP->value.s));
     kjChildAdd(topP, nodeP);
   }
 

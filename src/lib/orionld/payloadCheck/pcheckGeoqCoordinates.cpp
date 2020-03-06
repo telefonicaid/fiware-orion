@@ -125,7 +125,6 @@ static bool pcheckGeoLineString(KjNode* geoPointCoordinatesNodeP)
   int arrays = 0;
   for (KjNode* pointP = geoPointCoordinatesNodeP->value.firstChildP; pointP != NULL; pointP = pointP->next)
   {
-    LM_TMP(("MLS: Point at %p is a JSON %s", pointP, kjValueType(pointP->type)));
     if (pointP->type != KjArray)
     {
       LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
@@ -156,7 +155,6 @@ static bool pcheckGeoLineString(KjNode* geoPointCoordinatesNodeP)
 //
 static bool pcheckGeoMultiLineString(KjNode* multiLineStringNodeP)
 {
-  LM_TMP(("MLS: MultiLineString at %p is a JSON %s", multiLineStringNodeP, kjValueType(multiLineStringNodeP->type)));
   if (multiLineStringNodeP->type != KjArray)
   {
     LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
@@ -173,7 +171,6 @@ static bool pcheckGeoMultiLineString(KjNode* multiLineStringNodeP)
       return false;
     }
 
-    LM_TMP(("MLS: LineString at %p is a JSON %s", lineStringNodeP, kjValueType(lineStringNodeP->type)));
     if (pcheckGeoLineString(lineStringNodeP) == false)
       return false;
   }
@@ -197,7 +194,6 @@ static bool pcheckGeoMultiLineString(KjNode* multiLineStringNodeP)
 //
 static bool pcheckGeoPolygon(KjNode* geoPointCoordinatesNodeP)
 {
-  LM_TMP(("GEO: In pcheckGeoPolygon"));
   if (geoPointCoordinatesNodeP->type != KjArray)
   {
     LM_W(("Bad Input ('coordinates' must be a JSON Array)"));
@@ -245,7 +241,6 @@ static bool pcheckGeoPolygon(KjNode* geoPointCoordinatesNodeP)
 
       ++points;
     }
-    LM_TMP(("GEO: Polygon with %d points", points));
 
     //
     // A polygon must have at least 4 points
@@ -256,7 +251,6 @@ static bool pcheckGeoPolygon(KjNode* geoPointCoordinatesNodeP)
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid GeoJSON", "A Polygon must have at least 4 points");
       return false;
     }
-    LM_TMP(("GEO: OK - %d points", points));
 
     //
     // The first position and the last position must be identical

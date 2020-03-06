@@ -149,13 +149,7 @@ static QNode* qTermPush(QNode* prev, char* term, char** titleP, char** detailsP)
 
         ++sP;
       }
-#if 0
-      LM_TMP(("DT: others: %d", others));
-      LM_TMP(("DT: hyphens: %d", hyphens));
-      LM_TMP(("DT: Ts:     %d", Ts));
-      LM_TMP(("DT: Zs:     %d", Zs));
-      LM_TMP(("DT: colons: %d", colons));
-#endif
+
       if (others == 0)
       {
         if (hyphens > 0)

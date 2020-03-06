@@ -55,13 +55,9 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
   KjNode* itemToReplace = kjLookup(container, itemName);
 
   if (itemToReplace == NULL)
-  {
-    LM_TMP(("QP: Adding '%s' to container '%s'", itemName, container->name));
     kjChildAdd(container, replacementP);
-  }
   else
   {
-    LM_TMP(("QP: Replacing '%s' in container '%s'", itemName, container->name));
     itemToReplace->type  = replacementP->type;
     itemToReplace->value = replacementP->value;
     // KjNode::cSum and KjNode::valueString aren't used
@@ -143,27 +139,18 @@ static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP
           return false;
         }
 
-        LM_TMP(("SPAT: Calling kjChildRemove for '%s'", fragmentP->name));
         kjChildRemove(dbSubscriptionP, toRemove);
       }
-      else
-        LM_TMP(("SPAT: Can't remove '%s' - it's not present in the DB", fragmentP->name));
     }
     else
     {
       if ((fragmentP != qP) && (fragmentP != expressionP))
-      {
-        LM_TMP(("SPAT: Calling kjChildAddOrReplace for '%s'", fragmentP->name));
         kjChildAddOrReplace(dbSubscriptionP, fragmentP->name, fragmentP);
-      }
     }
 
     fragmentP = next;
   }
 
-
-  LM_TMP(("QP: qP at %p: %s", qP, (qP != NULL)? qP->value.s : "not present"));
-  LM_TMP(("QP: geoqP at %p", expressionP));
 
   //
   // If geoqP/expressionP != NULL, then it replaces the "expression" in the DB
@@ -498,12 +485,6 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 bool orionldPatchSubscription(ConnectionInfo* ciP)
 {
   char* subscriptionId = orionldState.wildcard[0];
-  char buffer[1024];
-
-  kjRender(orionldState.kjsonP, orionldState.requestTree, buffer, sizeof(buffer));
-  LM_TMP(("patch: '%s'", buffer));
-
-  LM_TMP(("SPAT: orionldPatchSubscription: subscriptionId == '%s'", subscriptionId));
 
   if ((urlCheck(subscriptionId, NULL) == false) && (urnCheck(subscriptionId, NULL) == false))
   {
@@ -517,21 +498,13 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   KjNode* qP                     = NULL;
   KjNode* geoqP                  = NULL;
 
-  LM_TMP(("SPAT: Calling pcheckSubscription"));
   if (pcheckSubscription(ciP, orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP) == false)
   {
     LM_E(("pcheckSubscription FAILED"));
     return false;
   }
 
-  LM_TMP(("SPAT: Calling dbSubscriptionGet"));
   KjNode* dbSubscriptionP = dbSubscriptionGet(subscriptionId);
-
-  // <DEBUG>
-  kjRender(orionldState.kjsonP, dbSubscriptionP, buffer, sizeof(buffer));
-  LM_TMP(("SPAT: DB tree: '%s'", buffer));
-  // </DEBUG>
-  LM_TMP(("SPAT: dbSubscriptionGet returned: %p", dbSubscriptionP));
 
   if (dbSubscriptionP == NULL)
   {
@@ -585,7 +558,6 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   fixDbSubscription(dbSubscriptionP);
 
 
-  LM_TMP(("SPAT: Converting the NGSI-LD Subscription into the APIv1 database model"));
   ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
 
   //
@@ -594,14 +566,8 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // modified.
   // ngsildSubscriptionPatch() performs that modification
   //
-  LM_TMP(("SPAT: Going over the payload data to patch the subscription as a KjNode tree"));
   if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
     return false;
-
-  // <DEBUG>
-  kjRender(orionldState.kjsonP, dbSubscriptionP, buffer, sizeof(buffer));
-  LM_TMP(("SPAT: PATCHed tree: '%s'", buffer));
-  // </DEBUG>
 
   //
   // Overwrite the current Subscription in the database

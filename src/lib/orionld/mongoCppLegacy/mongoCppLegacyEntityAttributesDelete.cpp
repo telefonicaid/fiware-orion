@@ -92,22 +92,9 @@ bool mongoCppLegacyEntityAttributesDelete(const char* entityId, char** attrNameV
   mongo::BSONObj          commandObj  = command.obj();
   mongo::Query            query(filter.obj());
 
-  // ---------------------------------------------------------------------------------------
-  // <DEBUG>
-  LM_TMP(("MLEG: -------------- Mongo Legacy Driver Deleting Attribute from Entity '%s' ------------", entityId));
-  LM_TMP(("MLEG: Collection:              '%s'", collectionPath));
-  for (int ix = 0; ix < vecSize; ix++)
-    LM_TMP(("MLEG: Removing attribute       '%s' (%d/%d)", attrNameV[ix], ix+1, vecSize));
-  LM_TMP(("MLEG: filter for attr removal: '%s'", query.toString().c_str()));
-  LM_TMP(("MLEG: command:                 '%s'", commandObj.toString().c_str()));
-  // </DEBUG>
-  // ---------------------------------------------------------------------------------------
-
   connectionP->update(collectionPath, query, commandObj, true, false);
 
   std::string lastError = connectionP->getLastError();
-  LM_TMP(("MLEG: lastError: '%s'", lastError.c_str()));
-  LM_TMP(("MLEG: ----------------------------------------------------------------------------------------"));
   releaseMongoConnection(connectionP);
   // semGive()
 

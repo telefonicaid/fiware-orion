@@ -51,7 +51,6 @@ KjNode* mongoCppLegacyKjTreeFromBsonObj(const void* dataP, char** titleP, char**
   KjNode*         treeP    = NULL;
 
   std::string jsonString = bsonObjP->jsonString();
-  LM_TMP(("BsonObj Converted to a JSON String: %s", jsonString.c_str()));
 
   if (jsonString == "")
   {

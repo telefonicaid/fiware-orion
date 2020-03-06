@@ -98,7 +98,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   sub.throttling          = -1;  // 0?
   sub.timeInterval        = -1;  // 0?
 
-  LM_TMP(("TIV: timeInterval: %d", sub.timeInterval));
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
   char* subIdP = NULL;
   if (kjTreeToSubscription(ciP, &sub, &subIdP) == false)
@@ -129,7 +128,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   //
   // Create the subscription
   //
-  LM_TMP(("TIV: timeInterval: %d", sub.timeInterval));
   subId = mongoCreateSubscription(sub,
                                   &oError,
                                   orionldState.tenant,

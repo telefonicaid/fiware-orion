@@ -541,7 +541,6 @@ void setCsf(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 */
 void setTimeInterval(const ngsiv2::Subscription& sub, mongo::BSONObjBuilder* bobP)
 {
-  LM_TMP(("TIV: timeInterval: %d", sub.timeInterval));
   bobP->append("timeInterval", sub.timeInterval);
 }
 

@@ -140,10 +140,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   char* entityId   = orionldState.wildcard[0];
   char* detail;
 
-  LM_TMP(("KZ: In orionldPostEntity - entityId: '%s', overwriteAttrs == %s", entityId, K_FT(overwrite)));
-
   // 1. Is the Entity ID in the URL a valid URI?
-  LM_TMP(("KZ: In orionldPostEntity - checking for valid URI of the Entity ID '%s'", entityId));
   if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
   {
     ciP->httpStatusCode = SccBadRequest;
@@ -152,12 +149,10 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   // 2. Is the payload not a JSON object?
-  LM_TMP(("KZ: In orionldPostEntity - making sure the payload data is a JSON Object"));
   OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
 
   // 3. Get the entity from mongo
   KjNode* dbEntityP;
-  LM_TMP(("KZ: In orionldPostEntity - querying mongo for the Entity '%s'", entityId));
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
     ciP->httpStatusCode = SccNotFound;
@@ -169,7 +164,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   KjNode* inDbAttrNamesP = NULL;
   if (overwrite == false)
   {
-    LM_TMP(("KZ: In orionldPostEntity - no overwrite is allowed. Those attrs that would cause a overwrite will be dropped and reported as errors in the response"));
     inDbAttrNamesP = kjLookup(dbEntityP, "attrNames");
     if (inDbAttrNamesP == NULL)
     {
@@ -200,7 +194,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   kjChildAdd(responseP, updatedP);
   kjChildAdd(responseP, notUpdatedP);
 
-  LM_TMP(("KZ: In orionldPostEntity - looping over the attributes of the incoming payload data to discard those attributes that must be discarded"));
   while (attrP != NULL)
   {
     next = attrP->next;
@@ -208,7 +201,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     if ((strcmp(attrP->name, "createdAt") == 0) || (strcmp(attrP->name, "modifiedAt") == 0))
     {
       // Remove attr from tree
-      LM_TMP(("KZ: Removing Builtin attribute '%s'", attrP->name));
       kjChildRemove(orionldState.requestTree, attrP);
       attrP = next;
       continue;
@@ -223,39 +215,27 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     // If overwrite is NOT allowed, attrs already in the the entity must be left alone and an error item added to the response
     if (overwrite == false)
     {
-      LM_TMP(("KZ: Looking up attribute '%s' in 'attrNames' (. not =). attrNames is a JSON %s", attrP->name, kjValueType(inDbAttrNamesP->type)));
-
-      if (inDbAttrNamesP->value.firstChildP != NULL)
-        LM_TMP(("KZ: the first item of the array is of type '%s' and is called '%s'", kjValueType(inDbAttrNamesP->value.firstChildP->type), inDbAttrNamesP->value.firstChildP->value.s));
-
       if (kjStringValueLookupInArray(inDbAttrNamesP, attrP->name) != NULL)
       {
-        LM_TMP(("KZ: Attribute '%s' to 'Not Updated' set", attrP->name));
         attributeNotUpdated(notUpdatedP, attrP->name, "attribute already exists and overwrite is not allowed");
 
         // Remove attr from tree
-        LM_TMP(("KZ: Removing Already-Existing attribute '%s' (overwrite == false)", attrP->name));
         kjChildRemove(orionldState.requestTree, attrP);
         attrP = next;
         continue;
       }
-      LM_TMP(("KZ: Keeping Attribute '%s' (did not find '%s' in DB-Entity::attrNames)", attrP->name, attrP->name));
     }
 
     if (valueMayBeExpanded)
       orionldContextValueExpand(attrP);
 
-    LM_TMP(("KZ: Counting with new/overwriting attribute '%s'", attrP->name));
     ++attrsInPayload;
     attrP = next;
   }
-  LM_TMP(("KZ: In orionldPostEntity - %d attributes to append to entity", attrsInPayload));
 
   // 6. If no valid attributes, then we're done
   if (attrsInPayload == 0)
   {
-    LM_TMP(("KZ: In orionldPostEntity - no valid attributes - we're done here"));
-
     //
     // This is a copy of code from the end of this function ... fix it !
     //
@@ -263,11 +243,9 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     {
       orionldState.responseTree = NULL;
       ciP->httpStatusCode       = SccNoContent;
-      LM_TMP(("KZ: In orionldPostEntity - empty array of 'not updated attributes' - All OK - responding with 204 No Content"));
     }
     else
     {
-      LM_TMP(("KZ: In orionldPostEntity - some attribute was not updated - responding with 207 Multi Status"));
       orionldState.responseTree = responseP;
       ciP->httpStatusCode       = SccMultiStatus;
     }
@@ -280,18 +258,14 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   int    attrNameIx = 0;
 
   // 8. Save all attribute long names in attrNameV, also - replace all '.' for '='
-  LM_TMP(("KZ: In orionldPostEntity - composing an array of attributes, for dbEntityAttributesDelete"));
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    LM_TMP(("KZ: Got long-name for attr '%s'", attrP->name));
     attrNameV[attrNameIx] = attrP->name;
     dotForEq(attrNameV[attrNameIx]);
-    LM_TMP(("KZ: final long attr name '%s'", attrP->name));
     ++attrNameIx;
   }
 
   // 8. Remove those attributes that need to be removed before adding attributes to the entity
-  LM_TMP(("KZ: In orionldPostEntity - removing those attributes that need to be removed before adding attributes"));
   dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
   //
@@ -304,7 +278,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   ucr.contextElementVector.push_back(&ce);
 
-  LM_TMP(("KZ: In orionldPostEntity - converting the remaining attributes in orionldState.requestTree to an UpdateContextRequest to prepare for call to mongoBackend"));
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     ContextAttribute* caP     = new ContextAttribute();
@@ -319,7 +292,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
     attributeUpdated(updatedP, attrP->name);
     ce.contextAttributeVector.push_back(caP);
-    LM_TMP(("KZ: In orionldPostEntity - added the attribute '%s' to the UpdateContextRequest for mongoBackend (mongoUpdateContext)", attrP->name));
   }
 
   // 10. Call mongoBackend to do the Update
@@ -327,7 +299,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   UpdateContextResponse     ucResponse;
 
   ucr.updateActionType = ActionTypeAppend;
-  LM_TMP(("KZ: In orionldPostEntity - calling mongoBackend (mongoUpdateContext)"));
   status = mongoUpdateContext(&ucr,
                               &ucResponse,
                               orionldState.tenant,
@@ -339,27 +310,22 @@ bool orionldPostEntity(ConnectionInfo* ciP)
                               ciP->apiVersion,
                               NGSIV2_NO_FLAVOUR);
 
-  LM_TMP(("KZ: In orionldPostEntity - mongoUpdateContext finished with status %d", status));
   if (status != SccOk)
     LM_E(("mongoUpdateContext: %d", status));
 
   //
   // 11. Prepare the response
   //
-  LM_TMP(("KZ: In orionldPostEntity - preparing response"));
   if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
   {
     orionldState.responseTree = NULL;
     ciP->httpStatusCode       = SccNoContent;
-    LM_TMP(("KZ: In orionldPostEntity - empty array of 'not updated attributes' - All OK - responding with 204 No Content"));
   }
   else
   {
-    LM_TMP(("KZ: In orionldPostEntity - some attribute was not updated - responding with 207 Multi Status"));
     orionldState.responseTree = responseP;
     ciP->httpStatusCode       = SccMultiStatus;
   }
 
-  LM_TMP(("KZ: In orionldPostEntity - Done!"));
   return true;
 }

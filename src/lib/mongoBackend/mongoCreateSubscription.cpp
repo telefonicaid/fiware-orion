@@ -215,7 +215,6 @@ std::string mongoCreateSubscription
     setCount(1, &b);
   }
 
-  LM_TMP(("GPROP: Setting Expression"));
   setExpression(sub, &b);
   setFormat(sub, &b);
 

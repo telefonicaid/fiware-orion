@@ -64,7 +64,6 @@ bool qAliasCompact(KjNode* qP, bool compact)
   char*  out           = kaAlloc(&orionldState.kalloc, 2048);  // 2048 ... should be enough
   int    outIx         = 0;
 
-  LM_TMP(("QAC: Compacting aliases. In-string: '%s'", cP));
   bzero(out, sizeof(out));
 
   while (*cP != 0)
@@ -91,10 +90,7 @@ bool qAliasCompact(KjNode* qP, bool compact)
       char* alias;
       char* eqP;
 
-      LM_TMP(("QAC: found an operator, out before: %s", out));
       cP[0] = 0;
-      LM_TMP(("QAC: found an operator (%c%s). Nulled it to extract the variable preceding it", c0, (c1 == '=')? "=" : ""));
-      LM_TMP(("QAC: variable: %s", varStart));
 
       if (compact == true)
       {
@@ -112,19 +108,16 @@ bool qAliasCompact(KjNode* qP, bool compact)
       else
       {
         // Expand the variable
-        LM_TMP(("QAC: Expand the variable '%s'", varStart));
         alias = orionldContextItemExpand(orionldState.contextP, varStart, NULL, true, NULL);
       }
 
       if (alias != NULL)
       {
-        LM_TMP(("QAC: Copying variable-alias (%s) to 'out'", alias));
         strcpy(&out[outIx], alias);
         outIx += strlen(alias);
       }
       else
       {
-        LM_TMP(("QAC: Copying variable-longName to 'out'"));
         strcpy(&out[outIx], varStart);
         outIx += strlen(varStart);
       }
@@ -137,33 +130,27 @@ bool qAliasCompact(KjNode* qP, bool compact)
       }
 
       insideVarName = false;
-      LM_TMP(("QAC: found an operator (and a preceding variable), out after: '%s'", out));
     }
     else if (*cP == ';')
     {
-      LM_TMP(("QAC: found a semi-colon. out before: '%s'", out));
       insideVarName = true;
       out[outIx++] = ';';
       varStart = &cP[1];
-      LM_TMP(("QAC: found a semi-colon. out after: '%s'", out));
     }
     else if (insideVarName == false)
     {
       out[outIx++] = *cP;
-      LM_TMP(("QAC: Added varName-char to 'out': out == '%s'", out));
     }
 
     ++cP;
   }
 
-  LM_TMP(("QAC: Done. out == '%s'", out));
   out[outIx] = 0;
 
   //
   // Time to set the new value of 'qP'
   //
   qP->value.s = out;
-  LM_TMP(("QAC: Done. q == '%s'", qP->value.s));
 
   return true;
 }

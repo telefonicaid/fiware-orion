@@ -66,7 +66,6 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     return NULL;
   }
 
-  LM_TMP(("KZ: Downloading context '%s'", url));
   if (urlParse(url, protocol, sizeof(protocol), ip, sizeof(ip), &port, &urlPath, &pdP->detail) == false)
   {
     // pdP->detail set by urlParse

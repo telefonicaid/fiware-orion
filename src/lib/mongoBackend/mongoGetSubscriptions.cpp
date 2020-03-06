@@ -143,12 +143,6 @@ static void setSubject(Subscription* s, const BSONObj& r)
     if (coords != "")      s->subject.condition.expression.coords      = coords;
     if (georel != "")      s->subject.condition.expression.georel      = georel;
     if (geoproperty != "") s->subject.condition.expression.geoproperty = geoproperty;
-
-    LM_TMP(("SPAT: q:           %s", s->subject.condition.expression.q.c_str()));
-    LM_TMP(("SPAT: geo:         %s", s->subject.condition.expression.geometry.c_str()));
-    LM_TMP(("SPAT: coords:      %s", s->subject.condition.expression.coords.c_str()));
-    LM_TMP(("SPAT: georel:      %s", s->subject.condition.expression.georel.c_str()));
-    LM_TMP(("SPAT: geoproperty: %s", s->subject.condition.expression.geoproperty.c_str()));
   }
 }
 
@@ -321,7 +315,6 @@ static void setMimeType(Subscription* s, const BSONObj& r)
 static void setTimeInterval(Subscription* s, const BSONObj& r)
 {
   s->timeInterval = (int) (r.hasField("timeInterval") ? getIntOrLongFieldAsLongF(r, "timeInterval") : -1);
-  LM_TMP(("TIV: got timeInterval from mongo: %d", s->timeInterval));
 }
 
 #endif
@@ -574,7 +567,6 @@ bool mongoGetLdSubscription
     setContext(subP, r);
     setCsf(subP, r);
     setTimeInterval(subP, r);
-    LM_TMP(("TIV: timeInterval: %d", subP->timeInterval));
 
     if (moreSafe(cursor))
     {

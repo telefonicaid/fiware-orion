@@ -114,7 +114,6 @@ bool attributeCheck(ConnectionInfo* ciP, KjNode* attrNodeP, char** titleP, char*
 
   for (KjNode* nodeP = attrNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    LM_TMP(("AC: Treating '%s' of attribute '%s'", nodeP->name, attrNodeP->name));
     if (strcmp(nodeP->name, "type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
@@ -144,7 +143,6 @@ bool attributeCheck(ConnectionInfo* ciP, KjNode* attrNodeP, char** titleP, char*
 
   if (typeP == NULL)
   {
-    LM_TMP(("AC: attribute::type field missing"));
     *titleP  = (char*) "Mandatory field missing";
     *detailP = (char*) "attribute type";
 
@@ -276,7 +274,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     next = newAttrP->next;
 
-    LM_TMP(("PATCH: Looping over attrs from incoming payload. Now: '%s'", newAttrP->name));
     newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, &valueMayBeExpanded, true, NULL);
 
     // Is the attribute in the incoming payload a valid attribute?
@@ -293,7 +290,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     dbAttrP = kjLookup(inDbAttrsP, eqName);
     if (dbAttrP == NULL)  // Doesn't already exist - must be discarded
     {
-      LM_TMP(("PATCH: attribute doesn't exist"));
       attributeNotUpdated(notUpdatedP, newAttrP->name, "attribute doesn't exist");
       newAttrP = next;
       continue;
@@ -309,9 +305,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     // <DEBUG>
     char buf[1024];
     kjRender(orionldState.kjsonP, dbAttrP, buf, sizeof(buf));
-    LM_TMP(("PATCH: Removing DB attr: %s", buf));
     kjRender(orionldState.kjsonP, newAttrP, buf, sizeof(buf));
-    LM_TMP(("PATCH: Adding Payload Attr: '%s'", buf));
 
     kjChildRemove(inDbAttrsP, dbAttrP);
     kjChildAdd(inDbAttrsP, newAttrP);

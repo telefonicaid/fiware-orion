@@ -241,8 +241,6 @@ bool orionldRequestSend
     snprintf(linkHeaderString, sizeof(linkHeaderString), "Link: %s", linkHeader);
     headers = curl_slist_append(headers, linkHeaderString);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
-
-    LM_TMP(("KZ: Link Header: %s", linkHeader));
   }
 
   if (acceptHeader != NULL)
@@ -257,7 +255,6 @@ bool orionldRequestSend
     OrionldHttpHeader* headerP = &headerV[ix];
     char               headerString[256];
 
-    LM_TMP(("FHEAD: key: %d (%s: '%s')", headerP->type, headerName[headerP->type], headerP->value));
     snprintf(headerString, sizeof(headerString), "%s:%s", headerName[headerP->type], headerP->value);
     headers = curl_slist_append(headers, headerString);
     ++ix;

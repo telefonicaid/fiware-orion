@@ -148,7 +148,6 @@ bool pcheckSubscription
       DUPLICATE_CHECK(qP, "q", nodeP);
       STRING_CHECK(nodeP, "q");
       *qPP = qP;
-      LM_TMP(("QP: qP at %p", qP));
       qAliasCompact(qP, false);
     }
     else if (strcmp(nodeP->name, "geoQ") == 0)
@@ -158,7 +157,6 @@ bool pcheckSubscription
       if (pcheckGeoQ(ciP, nodeP) == false)
         return false;
       *geoqPP = geoqP;
-      LM_TMP(("QP: geoqP at %p", geoqP));
     }
     else if (strcmp(nodeP->name, "csf") == 0)
     {

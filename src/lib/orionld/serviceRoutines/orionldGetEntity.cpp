@@ -272,8 +272,6 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 
   if (reqOk)
     entityP = kjParse(orionldState.kjsonP, orionldState.httpResponse.buf);
-  else
-    LM_TMP(("FWD: orionldRequestSend failed: %s", detail));
 
   return entityP;
 }

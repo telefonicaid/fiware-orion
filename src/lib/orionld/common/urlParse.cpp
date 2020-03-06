@@ -137,7 +137,6 @@ bool urlParse
       portNumberString[toIx++] = url[urlIx++];
     }
 
-    LM_TMP(("FWD: portNumberString: '%s'", portNumberString));
     portNumberString[toIx] = 0;
     *portP = atoi(portNumberString);
 

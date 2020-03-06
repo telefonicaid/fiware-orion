@@ -64,7 +64,6 @@ bool mongoLdRegistrationGet
 
   LM_T(LmtMongo, ("Mongo Get Registration"));
 
-  LM_TMP(("RGET: In mongoLdRegistrationGet"));
   //
   // Query
   //

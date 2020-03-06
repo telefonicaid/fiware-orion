@@ -3086,16 +3086,13 @@ static bool createEntity
   {
     char* errorString;
 
-    LM_TMP(("GEO: Calling geoJsonCreate"));
     if (geoJsonCreate(orionldState.locationAttributeP, &geoJson, &errorString) == false)
     {
-      LM_TMP(("GEO: geoJsonCreate failed"));
       LM_E(("Internal Error (%s)", errorString));
       oeP->fill(SccReceiverInternalError, errorString, "InternalError");
       return false;
     }
 
-    // LM_TMP(("GEO: geoJsonCreate OK. geoJson: '%s'", geoJson.obj().toString().c_str()));
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << orionldState.locationAttributeP->name <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
