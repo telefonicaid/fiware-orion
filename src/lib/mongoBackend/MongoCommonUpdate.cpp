@@ -2941,7 +2941,7 @@ static bool createEntity
 
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
-   * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
+   * exist (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
   ensureLocationIndex(tenant);
   ensureDateExpirationIndex(tenant);
 
@@ -3109,6 +3109,7 @@ static bool createEntity
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
+    LM_E(("Internal Error (%s)", errDetail->c_str()));
     oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }

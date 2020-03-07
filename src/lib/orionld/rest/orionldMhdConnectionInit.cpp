@@ -232,6 +232,12 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     orionldState.uriParams.options = (char*) value;
     optionsParse(value);
   }
+  else if (SCOMPARE12(key, 'g', 'e', 'o', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+  {
+    LM_TMP(("GEO: Got a geoproperty URI Param: %s", value));
+    orionldState.uriParams.geoproperty = (char*) value;
+  }
+
   return MHD_YES;
 }
 

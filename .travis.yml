@@ -29,17 +29,17 @@ jobs:
     - env: STAGE=debian_unit
       name: "Unit Tests (Debian)"
       stage: test
-    - env: STAGE=debian_functional_1_500
-      name: "Functional Tests 1-500 (Debian)"
+    - env: STAGE=debian_functional_1_450
+      name: "Functional Tests 1-450 (Debian)"
       stage: test
-    - env: STAGE=debian_functional_501_850
-      name: "Functional Tests 501-850 (Debian)"
+    - env: STAGE=debian_functional_451_700
+      name: "Functional Tests 451-700 (Debian)"
       stage: test
-    - env: STAGE=debian_functional_851_1100
-      name: "Functional Tests 851-1100 (Debian)"
+    - env: STAGE=debian_functional_701_1000
+      name: "Functional Tests 701-1000 (Debian)"
       stage: test
-    - env: STAGE=debian_functional_1101_1400
-      name: "Functional Tests 1101-1400 (Debian)"
+    - env: STAGE=debian_functional_1001_1400
+      name: "Functional Tests 1001-1400 (Debian)"
       stage: test
     - env: STAGE=debian_integration
       name: "NGSI-LD Integration Tests"
