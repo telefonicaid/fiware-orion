@@ -1,4 +1,4 @@
-ARG  IMAGE_TAG=centos7.6.1810
+ARG  IMAGE_TAG=7.7.1908
 FROM centos:${IMAGE_TAG}
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
