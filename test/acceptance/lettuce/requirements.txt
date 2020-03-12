@@ -3,5 +3,5 @@ pymongo==2.8
 flask==1.0.0   # changed from 0.12.3 to 1.0.0 due to vulnerability check in github although we havent checked if it works...
 lettuce==0.2.20
 requests==2.20.0
-psutil==2.2.1
+psutil==5.6.6
 fabric==1.10.0
