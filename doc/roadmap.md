@@ -42,6 +42,7 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
+- Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
 - Attribute update operators (inc, push, etc.)
 - MQTT notifications (community)
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
