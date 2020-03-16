@@ -57,4 +57,4 @@ you wish to get involved in the implementation or influence the roadmap
 
 - Migration from legacy to new MongoDB driver
 - Performance improvements in the notifications system ([#3461](https://github.com/telefonicaid/fiware-orion/issues/3461))
-- Lightweight ingestion for connection oriented updates
+- Improve performance in update/notifications (connection-oriented, lightweight ingestion, etc.)
