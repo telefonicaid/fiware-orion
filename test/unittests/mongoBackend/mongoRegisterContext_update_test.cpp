@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi/ContextRegistration.h"
 #include "ngsi/EntityId.h"

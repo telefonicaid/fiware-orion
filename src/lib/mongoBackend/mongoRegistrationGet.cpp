@@ -40,6 +40,7 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegistrationGet.h"
 
 
@@ -363,7 +364,7 @@ void mongoRegistrationsGet
   LM_T(LmtMongo, ("Mongo Get Registrations"));
 
   std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::Query                          q;
+  mongo::BSONObj                        q;
 
   // FIXME P6: This here is a bug ... See #3099 for more info
   if (!servicePath.empty() && (servicePath != "/#"))
@@ -371,11 +372,9 @@ void mongoRegistrationsGet
     q = BSON(REG_SERVICE_PATH << servicePathV[0]);
   }
 
-  q.sort(BSON("_id" << 1));
-
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
-  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, limit, offset, &cursor, countP, &err))
+  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, BSON("_id" << 1), limit, offset, &cursor, countP, &err))
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
