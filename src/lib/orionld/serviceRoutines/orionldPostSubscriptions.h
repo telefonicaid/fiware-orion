@@ -25,8 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
-
 #include "rest/ConnectionInfo.h"
 
 

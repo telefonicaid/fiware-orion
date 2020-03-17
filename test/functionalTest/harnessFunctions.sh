@@ -713,7 +713,7 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py --port $port --url /notify --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  $REPO_HOME/scripts/accumulator-server.py --port $port --url /notify --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -734,6 +734,52 @@ function accumulatorStart()
    nc -zv $bindIp $port &>/dev/null </dev/null
    port_not_ok=$?
   done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mqttTestClientStart -
+#
+function mqttTestClientStart()
+{
+  logMsg Starting MQTT notification client
+  logMsg Parameters for MQTT notification client: $*
+
+  rm -f /tmp/mqttTestClient.log
+  rm -f /tmp/mqttTestClient.dump
+
+  $REPO_HOME/scripts/mqttTestClient.py $*   &
+  sleep 0.2
+  ps aux | grep mqttTestClient > /tmp/kz
+  logMsg Started MQTT notification client
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mqttTestClientStop -
+#
+function mqttTestClientStop()
+{
+  topic=$1
+  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload exit
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# mqttTestClientDump -
+#
+function mqttTestClientDump()
+{
+  sleep 0.2
+  topic=$1
+  $REPO_HOME/scripts/mqttSend.py --topic "$topic" --payload dump
+  cat /tmp/mqttTestClient.dump
 }
 
 
@@ -1298,8 +1344,10 @@ export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f mongoCmd2
-export -f logMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait
 export -f dateDiff
+export -f mqttTestClientStart
+export -f mqttTestClientStop
+export -f mqttTestClientDump

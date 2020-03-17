@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,20 +22,18 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
+#include <semaphore.h>                                         // sem_t
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/Subscription.h"                           // Subscription
+#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToSubscription -
+// MQTT Connection List Variable
 //
-extern bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP);
-
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
+MqttConnection* mqttConnectionList            = NULL;
+int             mqttConnectionListSize        = 0;
+int             mqttConnectionListIx          = 0;
+bool            mqttConnectionListInitialized = false;
+sem_t           mqttConnectionListSem;

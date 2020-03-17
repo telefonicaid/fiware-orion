@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,20 +22,36 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
+#include "MQTTClient.h"                                        // MQTT Client header
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/Subscription.h"                           // Subscription
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List
+#include "orionld/mqtt/mqttConnectionLookup.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToSubscription -
+// mqttConnectionLookup - 
 //
-extern bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP);
+MqttConnection* mqttConnectionLookup(const char* host, unsigned short port)
+{
+  LM_TMP(("MQTT: Looking up connection for MQTT server on '%s', port %d", host, port));
+  for (int ix = 0; ix < mqttConnectionListIx; ix++)
+  {
+    MqttConnection* mqP = &mqttConnectionList[ix];
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
+    if (mqP->port != port)
+      continue;
+    if (strcmp(host, mqP->host) == 0)
+      return mqP;
+  }
+
+  return NULL;
+}
+
+
+

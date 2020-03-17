@@ -237,7 +237,8 @@ If using a docker image, the MongoDB server comes as part of the docker, but if 
 For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
-This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Debian 9.
+This is what the MongoDB documentation tells us to do to install MongoDB server 4.2 under Debian 9.
+The version 4.2 has been tested to work just fine in debian 9.
 
 ```bash
 wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -

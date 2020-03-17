@@ -143,9 +143,10 @@ install: >
 script: >
   echo -e " \033[1;33mRunning Tests against Debian Image";
   docker run \
-    -t --rm -v $(pwd):${HOME} --entrypoint bash \
-    -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts \
-    -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}" \
+    -t --rm -v $(pwd):${HOME} --entrypoint bash             \
+    -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts  \
+    -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}"           \
+    -e TRAVIS=${TRAVIS}                                     \
     ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
 
 after_success: true

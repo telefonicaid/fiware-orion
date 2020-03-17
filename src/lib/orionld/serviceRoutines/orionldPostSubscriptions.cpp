@@ -30,8 +30,11 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
+
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -49,6 +52,8 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // kjTreeToEndpoint
 #include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
+#include "orionld/mqtt/mqttParse.h"                            // mqttParse
+#include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
 
@@ -99,12 +104,45 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   sub.timeInterval        = -1;  // 0?
 
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
-  char* subIdP = NULL;
-  if (kjTreeToSubscription(ciP, &sub, &subIdP) == false)
+  char*    subIdP    = NULL;
+  KjNode*  endpointP = NULL;
+
+  if (kjTreeToSubscription(ciP, &sub, &subIdP, &endpointP) == false)
   {
     LM_E(("kjTreeToSubscription FAILED"));
     // orionldErrorResponseCreate is invoked by kjTreeToSubscription
     return false;
+  }
+
+  if (endpointP != NULL)
+  {
+    KjNode* uriP = kjLookup(endpointP, "uri");
+
+    if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
+    {
+      char*           mqttHost;
+      unsigned short  mqttPort;
+      char*           mqttTopic;
+      char*           detail;
+      char*           uri = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
+
+      LM_TMP(("MQTT: this is an MQTT subscription - I need to connect (if not alreadt connected)"));
+      if (mqttParse(uri, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+      {
+        LM_W(("Bad Input (invalid MQTT endpoint)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid MQTT endpoint", detail);
+        ciP->httpStatusCode = SccBadRequest;
+        return false;
+      }
+
+      if (mqttConnectionEstablish(mqttHost, mqttPort) == false)
+      {
+        LM_E(("Internal Error (unable to connect to MQTT server)"));
+        orionldErrorResponseCreate(OrionldInternalError, "Unable to connect to MQTT server", "xxx");
+        ciP->httpStatusCode = SccReceiverInternalError;
+        return false;
+      }
+    }
   }
 
   //

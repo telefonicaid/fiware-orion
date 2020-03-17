@@ -94,7 +94,7 @@ mkdir -p /var/{log,run}/${BROKER}
 echo "Builder: update apt"
 apt-get -y update
 
-echo "Builder: installing  tools and dependencies"
+echo "Builder: installing tools and dependencies"
 apt-get -y install --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
@@ -106,12 +106,12 @@ scons --disable-warnings-as-errors --use-sasl-client --ssl
 scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
 cd ${ROOT} && rm -Rf mongo-cxx-driver
 
-echo "Builder: installing rapid json"
+echo "Builder: installing rapidjson"
 curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC ${ROOT}
 mv ${ROOT}/rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 cd ${ROOT} && rm -Rf rapidjson-1.0.2
 
-echo "Builder: installing libmicronhttpd"
+echo "Builder: installing libmicrohttpd"
 curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC ${ROOT}
 cd ${ROOT}/libmicrohttpd-0.9.48
 ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -121,7 +121,7 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 
 ldconfig
 
-echo "Builder: installing k tools"
+echo "Builder: installing k libs"
 for kproj in kbase klog kalloc kjson khash
 do
     git clone https://gitlab.com/kzangeli/${kproj}.git ${ROOT}/$kproj
@@ -135,8 +135,15 @@ do
     make install
 done
 
+echo "Builder: installing Paho MQTT C library"
+git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c
+cd ${ROOT}/paho.mqtt.c
+make
+make install
+
+
 if [[ "${STAGE}" == 'deps' ]]; then
-    echo "Builder: installing mongo"
+    echo "Builder: installing mongo and MQTT"
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
 
     echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
@@ -144,6 +151,16 @@ if [[ "${STAGE}" == 'deps' ]]; then
     apt-get -y install \
         mongodb-org \
         mongodb-org-shell
+
+    #
+    # FIXME
+    #   For unknown reasons, 'mosquitto' can't be installed in this repo
+    #   As workaround, all MQTT functests are disabled for travis. 
+    #
+    # echo "Builder: installing and starting mosquitto"
+    # apt-get -y install mosquitto
+    # sudo service mosquitto start
+    #
 
     echo "Builder: installing gmock"
     curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
@@ -159,7 +176,7 @@ if [[ "${STAGE}" == 'deps' ]]; then
 
     echo "Builder: installing python dependencies"
     pip install --upgrade setuptools wheel
-    pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt
     yes | pip uninstall setuptools wheel
 fi
 

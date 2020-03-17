@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONLIST_H_
+#define SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONLIST_H_
 
 /*
 *
@@ -25,20 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
+#include <semaphore.h>                                         // sem_t
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/Subscription.h"                           // Subscription
+#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToSubscription -
+// MQTT Connection List Variable
 //
-extern bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP);
+extern MqttConnection* mqttConnectionList;
+extern int             mqttConnectionListSize;
+extern int             mqttConnectionListIx;
+extern bool            mqttConnectionListInitialized ;
+extern sem_t           mqttConnectionListSem;
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
+#endif  // MQTT_MQTTCONNECTIONLIST_H_

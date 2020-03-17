@@ -204,6 +204,7 @@ SET (ORION_LIBS
     orionld_context      # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
     orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_payloadCheck
+    orionld_mqtt
     parse
     apiTypesV2
     orionTypes
@@ -255,6 +256,7 @@ SET (DYNAMIC_LIBS
     icudata
     z
     resolv
+    paho-mqtt3c
 )
 
 #
@@ -334,6 +336,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
   ADD_SUBDIRECTORY(src/lib/orionld/payloadCheck)
+  ADD_SUBDIRECTORY(src/lib/orionld/mqtt)
 #  ADD_SUBDIRECTORY(src/lib/orionld/mongoc)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)

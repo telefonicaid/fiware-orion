@@ -57,6 +57,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"        // orionldPostRegistrations
 #include "orionld/serviceRoutines/orionldGetVersion.h"               // orionldGetVersion
 #include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
+#include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
 #include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
 
@@ -296,4 +297,10 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 
   if (orionldContextInit(&pd) == false)
     LM_X(1, ("orionldContextInit failed: %s %s", pd.title, pd.detail));
+
+
+  //
+  // Initialize NQTT notifications
+  //
+  mqttConnectionInit();
 }

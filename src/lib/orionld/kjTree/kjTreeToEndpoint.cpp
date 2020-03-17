@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/mqtt/mqttCheck.h"                            // mqttCheck
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // Own interface
 
 
@@ -51,7 +52,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 {
   char* uriP    = NULL;
   char* acceptP = NULL;
-  char* details;
+  char* detail;
 
   // Set default values
   httpInfoP->mimeType = JSON;
@@ -63,9 +64,19 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
       DUPLICATE_CHECK(uriP, "Endpoint::uri", itemP->value.s);
       STRING_CHECK(itemP, "Endpoint::uri");
 
-      if (!urlCheck(uriP, &details) && !urnCheck(uriP, &details))
+      if (strncmp(uriP, "mqtt://", 7) == 0)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN");
+        if (mqttCheck(uriP, &detail) == false)
+        {
+          LM_W(("Bad Input (endpoint is not a valid MQTT endpoint)"));
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid MQTT endpoint");
+          return false;
+        }
+      }
+      else if (!urlCheck(uriP, &detail) && !urnCheck(uriP, &detail))
+      {
+        LM_W(("Bad Input (endpoint is not a valid URI)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid URI");
         return false;
       }
 

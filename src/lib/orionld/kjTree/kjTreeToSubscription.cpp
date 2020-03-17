@@ -51,7 +51,7 @@ extern "C"
 //
 // kjTreeToSubscription -
 //
-bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP)
+bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP)
 {
   KjNode*                   kNodeP;
   char*                     nameP                     = NULL;
@@ -271,7 +271,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       DUPLICATE_CHECK_WITH_PRESENCE(notificationPresent, notificationP, "Subscription::notification", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::notification");
 
-      if (kjTreeToNotification(ciP, notificationP, subP) == false)
+      if (kjTreeToNotification(ciP, notificationP, subP, endpointPP) == false)
       {
         LM_E(("kjTreeToNotification failed"));
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToNotification

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,20 +22,28 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/mqtt/mqttCheck.h"                            // Own interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// mqttCheck -
+//
+bool mqttCheck(char* mqtt, char** detailP)
 {
-#include "kjson/KjNode.h"                                      // KjNode
+  // FIXME: Implement!
+
+  if (!SCOMPARE7(mqtt, 'm', 'q', 't', 't', ':', '/', '/'))
+  {
+    if (detailP != NULL)
+      *detailP = (char*) "protocol doesn't start with 'mqtt://'";
+    return false;
+  }
+
+  return true;
 }
-
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "apiTypesV2/Subscription.h"                           // Subscription
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjTreeToSubscription -
-//
-extern bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP);
-
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_

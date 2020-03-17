@@ -68,7 +68,7 @@ static bool formatExtract(ConnectionInfo* ciP, char* format, ngsiv2::Subscriptio
 //
 // kjTreeToNotification -
 //
-bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscription* subP)
+bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** endpointPP)
 {
   KjNode*   attributesP   = NULL;
   char*     formatP       = NULL;
@@ -103,6 +103,8 @@ bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscript
     {
       DUPLICATE_CHECK(endpointP, "Notification::endpoint", itemP);
       OBJECT_CHECK(itemP, "Notification::endpoint");
+
+      *endpointPP = itemP;
 
       if (kjTreeToEndpoint(ciP, itemP, &subP->notification.httpInfo) == false)
         return false;

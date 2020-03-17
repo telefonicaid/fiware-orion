@@ -31,11 +31,12 @@
 #include "common/statistics.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
-
 #include "cache/subCache.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/QueueStatistics.h"
+#include "orionld/common/orionldState.h"
+#include "orionld/mqtt/mqttNotification.h"
 #include "ngsiNotify/QueueWorkers.h"
 
 
@@ -89,6 +90,13 @@ static void* workerFunc(void* pSyncQ)
     pthread_exit(NULL);
   }
 
+  // Initialize kjson and kalloc libs - needed for MQTT
+  orionldStateInit();
+  orionldState.kjson.spacesPerIndent    = 0;
+  orionldState.kjson.stringBeforeColon  = (char*) "";
+  orionldState.kjson.stringAfterColon   = (char*) "";
+  orionldState.kjson.nlString           = (char*) "";
+
   for (;;)
   {
     std::vector<SenderThreadParams*>* paramsV = queue->pop();
@@ -109,7 +117,8 @@ static void* workerFunc(void* pSyncQ)
 
       strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+      LM_T(LmtNotifier, ("worker sending '%s' message to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
+                         params->protocol.c_str(),
                          params->ip.c_str(),
                          params->port,
                          params->verb.c_str(),
@@ -119,34 +128,48 @@ static void* workerFunc(void* pSyncQ)
                          params->resource.c_str(),
                          params->content_type.c_str()));
 
+      int r = 0;
+
       if (simulatedNotification)
       {
         LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
         __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
       }
+      else if (params->protocol == "mqtt:")
+      {
+        char* topic = (char*) params->resource.c_str();
+
+        ++topic;  // step over the initial '/'
+        LM_TMP(("MQTT: Preparing to send an MQTT notification to '%s', port %d, topic '%s'", params->ip.c_str(), params->port, topic));
+        LM_TMP(("MQTT: Payload Data: %s", params->content.c_str()));
+
+        r = mqttNotification(params->ip.c_str(), params->port, topic, params->content.c_str(), params->content_type.c_str());
+      }
       else // we'll send the notification
       {
         std::string  out;
-        int          r;
 
-        r =  httpRequestSendWithCurl(curl,
-                                     params->ip,
-                                     params->port,
-                                     params->protocol,
-                                     params->verb,
-                                     params->tenant,
-                                     params->servicePath,
-                                     params->xauthToken,
-                                     params->resource,
-                                     params->content_type,
-                                     params->content,
-                                     params->fiwareCorrelator,
-                                     params->renderFormat,
-                                     true,
-                                     NOTIFICATION_WAIT_MODE,
-                                     &out,
-                                     params->extraHeaders);
+        r = httpRequestSendWithCurl(curl,
+                                    params->ip,
+                                    params->port,
+                                    params->protocol,
+                                    params->verb,
+                                    params->tenant,
+                                    params->servicePath,
+                                    params->xauthToken,
+                                    params->resource,
+                                    params->content_type,
+                                    params->content,
+                                    params->fiwareCorrelator,
+                                    params->renderFormat,
+                                    true,
+                                    NOTIFICATION_WAIT_MODE,
+                                    &out,
+                                    params->extraHeaders);
+      }
 
+      if (!simulatedNotification)
+      {
         //
         // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
         // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)

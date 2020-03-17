@@ -779,6 +779,15 @@ Also, either "entities" or "watchedAttributes" *must* be present (both of them a
 NOTE that the `q` query filter for subscriptions uses the Orion NGSIv2 `q` for subscriptions in Alpha 1.
 The new NGSi-LD `q` Query Filter has been implemented but is in use only for Queries of Entities in Alpha 1.
 
+##### MQTT Notifications
+The notifications of a subscription can be sent either as REST requests or as MQTT publish messages.
+In the case of MQTT, the `endpoint::uri` would look as follows:
+```json
+  "endpoint": "mqtt://<server-ip>:<port>/<topic>"
+```
+The normal way for MQTT notifications would be to start an MQTT broker beside the NGSI-LD Broker and make the notifications
+go to the MQTT broker, while the client subscribes to the `topic` in the MQTT broker apart from creating the subscription in the NGSI-LD broker.
+
 #### Request URI Parameters
 This service has no URI Parameters.
 
