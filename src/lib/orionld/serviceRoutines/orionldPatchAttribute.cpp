@@ -346,8 +346,13 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // Expand the attribute name, if not a special attribute - special attributes aren't expanded
   //
-  if ((strcmp(attrName, "location") != 0) && (strcmp(attrName, "observationSpace") != 0) && (strcmp(attrName, "operationSpace") != 0))
+  if ((strcmp(attrName, "location")         != 0) &&
+      (strcmp(attrName, "observationSpace") != 0) &&
+      (strcmp(attrName, "operationSpace")   != 0) &&
+      (strcmp(attrName, "observedAt")       != 0))
+  {
     attrName = orionldContextItemExpand(orionldState.contextP, attrName, NULL, true, NULL);
+  }
 
   //
   // If a matching registration is found, no local treatment will be done.

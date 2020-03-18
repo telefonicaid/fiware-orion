@@ -274,7 +274,13 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     next = newAttrP->next;
 
-    newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, &valueMayBeExpanded, true, NULL);
+    if ((strcmp(newAttrP->name, "location")         != 0) &&
+        (strcmp(newAttrP->name, "observationSpace") != 0) &&
+        (strcmp(newAttrP->name, "operationSpace")   != 0) &&
+        (strcmp(newAttrP->name, "observedAt")       != 0))
+    {
+      newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, NULL, true, NULL);
+    }
 
     // Is the attribute in the incoming payload a valid attribute?
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
