@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_
 
 /*
 *
@@ -31,8 +31,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostBatchUpsert -
+// orionldPostBatchCreate -
 //
-extern bool orionldPostBatchUpsert(ConnectionInfo* ciP);
+extern bool orionldPostBatchCreate(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHCREATE_H_

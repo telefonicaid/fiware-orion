@@ -55,6 +55,11 @@ extern "C"
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
+#include "orionld/common/entityIdCheck.h"                      // entityIdCheck
+#include "orionld/common/entityTypeCheck.h"                    // entityTypeCheck
+#include "orionld/common/entityIdAndTypeGet.h"                 // entityIdAndTypeGet
+#include "orionld/common/entityLookupById.h"                   // entityLookupById
+#include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
 #include "orionld/common/OrionldProblemDetails.h"              // OrionldProblemDetails
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
@@ -82,25 +87,6 @@ static void entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
 
 // -----------------------------------------------------------------------------
 //
-// entityLookupById - lookup an entity in an array of entities, by its entity-id
-//
-static KjNode* entityLookupById(KjNode* entityArray, char* entityId)
-{
-  for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
-  {
-    KjNode* idNodeP = kjLookup(entityP, "id");
-
-    if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
-      return entityP;
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // entityTypeGet - lookup 'type' in a KjTree
 //
 static char* entityTypeGet(KjNode* entityNodeP, KjNode** contextNodePP)
@@ -117,144 +103,6 @@ static char* entityTypeGet(KjNode* entityNodeP, KjNode** contextNodePP)
 
   return type;
 }
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityIdCheck -
-//
-static bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArrayP)
-{
-  // Entity ID is mandatory
-  if (entityIdNodeP == NULL)
-  {
-    LM_W(("Bad Input (UPSERT: mandatory field missing: entity::id)"));
-    entityErrorPush(errorsArrayP, "no entity::id", OrionldBadRequestData, "mandatory field missing", "entity::id", 400);
-    return false;
-  }
-
-  // Entity ID must be a string
-  if (entityIdNodeP->type != KjString)
-  {
-    LM_W(("Bad Input (UPSERT: entity::id not a string)"));
-    entityErrorPush(errorsArrayP, "invalid entity::id", OrionldBadRequestData, "field with invalid type", "entity::id", 400);
-    return false;
-  }
-
-  // Entity ID must be a valid URI
-  char* detail;
-  if (!urlCheck(entityIdNodeP->value.s, &detail) && !urnCheck(entityIdNodeP->value.s, &detail))
-  {
-    LM_W(("Bad Input (UPSERT: entity::id is a string but not a valid URI)"));
-    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400);
-    return false;
-  }
-
-  // Entity ID must not be duplicated
-  if (duplicatedId == true)
-  {
-    LM_W(("Bad Input (UPSERT: Duplicated entity::id)"));
-    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Duplicated field", "entity::id", 400);
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityTypeCheck -
-//
-static bool entityTypeCheck(KjNode* entityTypeNodeP, bool duplicatedType, char* entityId, bool typeMandatory, KjNode* errorsArrayP)
-{
-  // Entity TYPE is mandatory?
-  if ((typeMandatory == true) && (entityTypeNodeP == NULL))
-  {
-    LM_W(("Bad Input (UPSERT: mandatory field missing: entity::type)"));
-    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "mandatory field missing", "entity::type", 400);
-    return false;
-  }
-
-  // Entity TYPE must not be duplicated
-  if (duplicatedType == true)
-  {
-    LM_W(("KZ: Bad Input (UPSERT: Duplicated entity::type)"));
-    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated field", "entity::type", 400);
-    return false;
-  }
-
-  // Entity TYPE must be a string
-  if (entityTypeNodeP->type != KjString)
-  {
-    LM_W(("Bad Input (UPSERT: entity::type not a string)"));
-    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "field with invalid type", "entity::type", 400);
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityIdAndTypeGet - lookup 'id' and 'type' in a KjTree
-//
-static bool entityIdAndTypeGet(KjNode* entityNodeP, char** idP, char** typeP, KjNode* errorsArrayP)
-{
-  KjNode*  idNodeP        = NULL;
-  KjNode*  typeNodeP      = NULL;
-  bool     idDuplicated   = false;
-  bool     typeDuplicated = false;
-
-  *idP   = NULL;
-  *typeP = NULL;
-
-  for (KjNode* itemP = entityNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
-  {
-    if (SCOMPARE3(itemP->name, 'i', 'd', 0))
-    {
-      if (idNodeP != NULL)
-        idDuplicated = true;
-      else
-        idNodeP = itemP;
-    }
-    else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
-    {
-      if (typeNodeP != NULL)
-        typeDuplicated = true;
-      else
-        typeNodeP = itemP;
-    }
-  }
-
-  if (entityIdCheck(idNodeP, idDuplicated, errorsArrayP) == false)
-  {
-    LM_E(("UPSERT: entityIdCheck flagged error"));
-    return false;
-  }
-
-  *idP = idNodeP->value.s;
-
-  if (typeNodeP != NULL)
-  {
-    if (entityTypeCheck(typeNodeP, typeDuplicated, idNodeP->value.s, false, errorsArrayP) == false)
-    {
-      LM_E(("UPSERT: entityTypeCheck flagged error"));
-      return false;
-    }
-
-    *typeP = typeNodeP->value.s;
-  }
-
-  LM_E(("UPSERT: OK"));
-
-  return true;
-}
-
 
 
 // ----------------------------------------------------------------------------
@@ -285,83 +133,6 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
     else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
       *creDateP = nodeP->value.i;
   }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// removeArrayRemoveEntity -
-//
-KjNode* removeArrayEntityLookup(KjNode* removeArray, char* entityId)
-{
-  for (KjNode* nodeP = removeArray->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-  {
-    if (strcmp(nodeP->value.s, entityId) == 0)
-      return nodeP;
-  }
-
-  return NULL;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// typeCheckForNonExistingEntities -
-//
-bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreDateFromDb, KjNode* errorsArrayP, KjNode* removeArray)
-{
-  KjNode* inNodeP = incomingTree->value.firstChildP;
-  KjNode* next;
-
-  while (inNodeP != NULL)
-  {
-    //
-    // entities that weren't found in the DB MUST contain entity::type
-    //
-    KjNode* inEntityIdNodeP = kjLookup(inNodeP, "id");
-
-    if (inEntityIdNodeP == NULL)  // Entity ID is mandatory
-    {
-      LM_E(("KZ: Invalid Entity: Mandatory field entity::id is missing"));
-      entityErrorPush(errorsArrayP, "No ID", OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::id is missing", 400);
-      next = inNodeP->next;
-      kjChildRemove(incomingTree, inNodeP);
-      inNodeP = next;
-      continue;
-    }
-
-    KjNode* dbEntityId = NULL;
-
-    // Lookup the entity::id in what came from the database - if anything at all came
-    if (idTypeAndCreDateFromDb != NULL)
-      dbEntityId = entityLookupById(idTypeAndCreDateFromDb, inEntityIdNodeP->value.s);
-
-    if (dbEntityId == NULL)  // This Entity is to be created - "type" is mandatory!
-    {
-      KjNode* inEntityTypeNodeP = kjLookup(inNodeP, "type");
-
-      if (inEntityTypeNodeP == NULL)
-      {
-        LM_E(("KZ: Invalid Entity: Mandatory field entity::type is missing"));
-        entityErrorPush(errorsArrayP, inEntityIdNodeP->value.s, OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::type is missing", 400);
-
-        KjNode* entityInRemoveArray = removeArrayEntityLookup(removeArray, inEntityIdNodeP->value.s);
-        if (entityInRemoveArray != NULL)
-          kjChildRemove(removeArray, entityInRemoveArray);
-
-        next = inNodeP->next;
-        kjChildRemove(incomingTree, inNodeP);
-        inNodeP = next;
-        continue;
-      }
-    }
-
-    inNodeP = inNodeP->next;
-  }
-
-  return true;
 }
 
 

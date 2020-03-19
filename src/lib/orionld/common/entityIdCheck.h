@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYIDCHECK_H_
+#define SRC_LIB_ORIONLD_COMMON_ENTITYIDCHECK_H_
 
 /*
 *
@@ -23,16 +23,21 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma
+* Author: Gabriel Quaresma and Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldPostBatchUpsert -
+// entityIdCheck -
 //
-extern bool orionldPostBatchUpsert(ConnectionInfo* ciP);
+extern bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArrayP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYIDCHECK_H_

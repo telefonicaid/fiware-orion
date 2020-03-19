@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -23,16 +20,30 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma
+* Author: Gabriel Quaresma and Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                      // kjLookup
+}
+
+#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
+#include "orionld/common/orionldState.h"                         // orionldState
 
 
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldPostBatchUpsert -
+// removeArrayRemoveEntity -
 //
-extern bool orionldPostBatchUpsert(ConnectionInfo* ciP);
+KjNode* removeArrayEntityLookup(KjNode* removeArray, char* entityId)
+{
+  for (KjNode* nodeP = removeArray->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (strcmp(nodeP->value.s, entityId) == 0)
+      return nodeP;
+  }
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHUPSERT_H_
+  return NULL;
+}
