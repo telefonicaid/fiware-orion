@@ -58,13 +58,24 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 *
 * parseContextAttributeCompoundValue -
 */
-std::string parseContextAttributeCompoundValue
+static std::string parseContextAttributeCompoundValue
 (
   const rapidjson::Value::ConstValueIterator&   node,
   ContextAttribute*                             caP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached")
+
+    return "max deep reached";
+  }
+
   if (node->IsObject())
   {
     for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
@@ -108,7 +119,11 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -153,7 +168,11 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -171,9 +190,20 @@ std::string parseContextAttributeCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
   ContextAttribute*                             caP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached")
+
+    return "max deep reached";
+  }
+
   std::string type = jsonParseTypeNames[node->value.GetType()];
 
   if (caP->compoundValueP == NULL)
@@ -231,7 +261,11 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -274,7 +308,11 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -345,7 +383,12 @@ std::string parseContextAttributeCompoundValueStandAlone
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, 0);
+        if (r != "OK")
+        {
+          // Early return
+          return r;
+        }
       }
       else if (!caP->typeGiven)
       {
@@ -395,7 +438,12 @@ std::string parseContextAttributeCompoundValueStandAlone
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseContextAttributeCompoundValue(iter, caP, cvnP);
+        std::string r = parseContextAttributeCompoundValue(iter, caP, cvnP, 0);
+        if (r != "OK")
+        {
+          // Early return
+          return r;
+        }
       }
       else if (!caP->typeGiven)
       {

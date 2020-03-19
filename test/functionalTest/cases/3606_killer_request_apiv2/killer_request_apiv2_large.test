@@ -44,15 +44,15 @@ echo
 --REGEXPECT--
 01. Send killer request to CB, get error
 ========================================
-HTTP/1.1 500 Internal Server Error
-Content-Length: 9574
+HTTP/1.1 400 Bad Request
+Content-Length: 93
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Database Error &#40;collection: ftest.entities - insert&#40;&#41;: {REGEX(.*)} - exception: OperationException: { ok: 0.0, errmsg: &quot;Client Error: bad object in message: BSONObj exceeded maximum nested object depth: 200&quot;, code: 22, codeName: &quot;InvalidBSON&quot; }&#41;",
-    "error": "InternalError"
+    "description": "JSON document has overpassed maximum nesting limit: 50",
+    "error": "ParseError"
 }
 
 

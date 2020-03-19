@@ -209,4 +209,15 @@
 
 
 
+/* ****************************************************************************
+*
+* MAX_JSON_NESTING -
+*
+* 50 seems to be a reasonable limit (note that MongoDB sets this limit in 100
+* see https://docs.mongodb.com/manual/reference/limits/#Nested-Depth-for-BSON-Documents
+*/
+#define MAX_JSON_NESTING  50
+
+
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_
