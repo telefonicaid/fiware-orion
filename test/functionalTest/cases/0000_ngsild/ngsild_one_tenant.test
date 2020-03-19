@@ -82,7 +82,7 @@ Date: REGEX(.*)
 02. Dump mongo::entities collection of tenant tn1 - see E1
 ==========================================================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest-tn1
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {

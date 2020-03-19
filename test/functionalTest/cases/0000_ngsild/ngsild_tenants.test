@@ -218,7 +218,7 @@ Date: REGEX(.*)
 07. Get all subscriptions from default tenant using mongo - see only S1
 =======================================================================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 1
 bye
@@ -226,7 +226,7 @@ bye
 ==========
 
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:S1",
@@ -267,7 +267,7 @@ bye
 08. Get all subscriptions from tenant tn1 using mongo - see only S2
 ===================================================================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest-tn1
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 1
 bye
@@ -275,7 +275,7 @@ bye
 ==========
 
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest-tn1
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:S2",

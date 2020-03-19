@@ -120,7 +120,7 @@ Date: REGEX(.*)
 02. Check subscription in mongo
 ===============================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:REGEX([0-9a-f\-]{24})",

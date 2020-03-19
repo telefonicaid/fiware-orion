@@ -129,7 +129,7 @@ Date: REGEX(.*)
 02. See the entity in mongo
 ===========================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {
@@ -275,7 +275,7 @@ Date: REGEX(.*)
 06. See the entity in mongo - P1 with value 2, P2-P4 as before
 ==============================================================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {

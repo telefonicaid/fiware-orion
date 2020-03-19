@@ -193,6 +193,7 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "count")       == 0)  orionldState.uriParamOptions.count       = true;
       else if (strcmp(optionStart, "replace")     == 0)  orionldState.uriParamOptions.replace     = true;
       else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
+      else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
       else
         LM_W(("Unknown 'options' value: %s", optionStart));
 

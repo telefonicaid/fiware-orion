@@ -1,2 +1,3 @@
 # Issue #XXX  MQTT Notifications
+# Issue #409  Removed an incorrect warning about options=keyValues not supported
 # Issue #XXX  'location' not to be expanded - fixed for PATCH ops

@@ -86,7 +86,7 @@ Date: REGEX(.*)
 02. See the entity in the database
 ==================================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:REGEX(.*)/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {

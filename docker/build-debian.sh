@@ -99,6 +99,16 @@ apt-get -y install --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
 
+# echo "Builder: installing Paho MQTT C library"
+# git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c
+# cd ${ROOT}/paho.mqtt.c
+# rm -f /usr/local/lib/libpaho*
+# apt install doxygen
+# make html
+# make
+# make install
+
+
 echo "Builder: installing mongo cxx driver"
 git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT}/mongo-cxx-driver
 cd ${ROOT}/mongo-cxx-driver
@@ -135,13 +145,6 @@ do
     make install
 done
 
-echo "Builder: installing Paho MQTT C library"
-git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c
-cd ${ROOT}/paho.mqtt.c
-make
-make install
-
-
 if [[ "${STAGE}" == 'deps' ]]; then
     echo "Builder: installing mongo and MQTT"
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
@@ -176,7 +179,7 @@ if [[ "${STAGE}" == 'deps' ]]; then
 
     echo "Builder: installing python dependencies"
     pip install --upgrade setuptools wheel
-    pip install Flask==1.0.2 pyOpenSSL==19.0.0 paho-mqtt
+    pip install Flask==1.0.2 pyOpenSSL==19.0.0 # paho-mqtt
     yes | pip uninstall setuptools wheel
 fi
 

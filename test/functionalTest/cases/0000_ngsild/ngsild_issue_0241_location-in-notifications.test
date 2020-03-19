@@ -160,7 +160,7 @@ Content-Type: application/ld+json
 04. See the entity in mongo
 ===========================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://REGEX(.*)
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {

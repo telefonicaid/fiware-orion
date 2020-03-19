@@ -108,7 +108,7 @@ Date: REGEX(.*)
 02. See E1 in the database
 ==========================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://REGEX(.*)
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {
