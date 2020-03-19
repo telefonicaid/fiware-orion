@@ -25,7 +25,7 @@ Killer request APIv2 deeply nested attribute value
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -logForHumans
+brokerStart CB
 
 --SHELL--
 

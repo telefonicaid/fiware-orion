@@ -45,13 +45,13 @@ echo
 01. Send killer request to CB, get error
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 93
+Content-Length: 107
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "JSON document has overpassed maximum nesting limit: 50",
+    "description": "attribute or metadata value has overpassed maximum nesting limit: 50",
     "error": "ParseError"
 }
 
