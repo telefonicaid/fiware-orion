@@ -71,7 +71,8 @@ static std::string parseContextAttributeCompoundValue
     // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
     // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
     // Depending of the answer, this check could be removed (along with the deep parameter
-    // in this an another functions and the returns check for "max deep reached")
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit 9d8775d71a78168934da94d96e73e18a41a735e8
 
     return "max deep reached";
   }
@@ -199,7 +200,8 @@ std::string parseContextAttributeCompoundValue
     // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
     // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
     // Depending of the answer, this check could be removed (along with the deep parameter
-    // in this an another functions and the returns check for "max deep reached")
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit 9d8775d71a78168934da94d96e73e18a41a735e8
 
     return "max deep reached";
   }
