@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Killer request APIv1 more parsing cases
+Killer request APIv2 deeply nested attribute value
 
 --SHELL-INIT--
 dbInit CB
