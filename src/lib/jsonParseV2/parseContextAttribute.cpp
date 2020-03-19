@@ -81,7 +81,7 @@ static std::string parseContextAttributeObject
     else if (name == "value")
     {
       if (valueSet)
-      {        
+      {
         return "duplicated value key in attribute";
       }
       valueSet = true;
@@ -239,7 +239,7 @@ std::string parseContextAttribute
         ciP->httpStatusCode = SccBadRequest;
         return "max deep reached";
       }
-      else if (r != "OK") // other error cases get a general treatment
+      else if (r != "OK")  // other error cases get a general treatment
       {
         alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
         ciP->httpStatusCode = SccBadRequest;
