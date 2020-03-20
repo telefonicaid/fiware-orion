@@ -35,14 +35,14 @@
 //
 // mqttConnectionEstablish - MOVE to its own module, perhaps even its own library - src/lib/orionld/mqtt
 //
-bool mqttConnectionEstablish(const char* host, unsigned short port)
+bool mqttConnectionEstablish(bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
 {
   LM_TMP(("MQTT: Getting connection for MQTT server on '%s', port %d", host, port));
 
   if (mqttConnectionLookup(host, port) != NULL)
     return true;  // Already connected
 
-  if (mqttConnectionAdd(host, port) == NULL)
+  if (mqttConnectionAdd(mqtts, username, password, host, port) == NULL)
     return false;
 
   return true;

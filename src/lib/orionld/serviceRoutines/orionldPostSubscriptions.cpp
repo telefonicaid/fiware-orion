@@ -120,14 +120,17 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
 
     if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
     {
-      char*           mqttHost;
-      unsigned short  mqttPort;
-      char*           mqttTopic;
-      char*           detail;
-      char*           uri = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
+      bool            mqtts         = false;
+      char*           mqttUser      = NULL;
+      char*           mqttPassword  = NULL;
+      char*           mqttHost      = NULL;
+      unsigned short  mqttPort      = 0;
+      char*           mqttTopic     = NULL;
+      char*           detail        = NULL;
+      char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
 
       LM_TMP(("MQTT: this is an MQTT subscription - I need to connect (if not alreadt connected)"));
-      if (mqttParse(uri, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+      if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
       {
         LM_W(("Bad Input (invalid MQTT endpoint)"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid MQTT endpoint", detail);
@@ -135,7 +138,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
         return false;
       }
 
-      if (mqttConnectionEstablish(mqttHost, mqttPort) == false)
+      if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort) == false)
       {
         LM_E(("Internal Error (unable to connect to MQTT server)"));
         orionldErrorResponseCreate(OrionldInternalError, "Unable to connect to MQTT server", "xxx");

@@ -36,7 +36,7 @@
 //
 // mqttConnectionAdd -
 //
-MqttConnection* mqttConnectionAdd(const char* host, unsigned short port)
+MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
 {
   LM_TMP(("MQTT: Adding connection for MQTT server on '%s', port %d (index %d)", host, port, mqttConnectionListIx));
   if (mqttConnectionListIx >= mqttConnectionListSize)
@@ -50,7 +50,7 @@ MqttConnection* mqttConnectionAdd(const char* host, unsigned short port)
   mqP->host = (char*) host;
   mqP->port = port;
 
-  if (mqttConnect(mqP, host, port) == false)
+  if (mqttConnect(mqP, mqtts, username, password, host, port) == false)
     return NULL;
 
   ++mqttConnectionListIx;

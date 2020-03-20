@@ -36,22 +36,60 @@
 //
 // mqttParse -
 //
-bool mqttParse(char* mqtt, char** hostP, unsigned short* portP, char** topicP, char** detailP)
+// mqtt[s]://[username:password@]host[:port]
+//
+bool mqttParse(char* url, bool* mqttsP, char** usernameP, char** passwordP, char** hostP, unsigned short* portP, char** topicP, char** detailP)
 {
-  LM_TMP(("MQTT: In mqttCheck: '%s'", mqtt));
+  LM_TMP(("MQTT: In mqttCheck: '%s'", url));
 
-  if (!SCOMPARE7(mqtt, 'm', 'q', 't', 't', ':', '/', '/'))
+  if (SCOMPARE7(url, 'm', 'q', 't', 't', ':', '/', '/'))
+  {
+    *mqttsP = false;
+
+    // Step over "mqtt://"
+    url = &url[7];
+  }
+  else if (SCOMPARE8(url, 'm', 'q', 't', 't', 's', ':', '/', '/'))
+  {
+    *mqttsP = true;
+
+    // Step over "mqtts://"
+    url = &url[8];
+  }
+  else
   {
     if (detailP != NULL)
-      *detailP = (char*) "protocol doesn't start with 'mqtt://'";
+      *detailP = (char*) "protocol doesn't start with 'mqtt://' nor 'mqtts://'";
     return false;
   }
 
-  // Step over "mqtt://"
-  mqtt = &mqtt[7];
-  LM_TMP(("MQTT: In mqttCheck (after stepping over the protocol): '%s'", mqtt));
+  LM_TMP(("MQTT: secure:   '%s'", (*mqttsP == true)? "YES" : "NO"));
+  LM_TMP(("MQTT: REST:     '%s'", url));
 
-  char* slash = strchr(mqtt, '/');
+  char* atP = strchr(url, '@');
+  if (atP != NULL)  // username and password present
+  {
+    *usernameP = url;
+
+    char* colonP = strchr(url, ':');
+    if (colonP == NULL)
+    {
+      if (detailP != NULL)
+        *detailP = (char*) "Invalid username:password in MQTT URL (colon separator missing)";
+      return false;
+    }
+
+    *colonP = 0;
+    *passwordP = &colonP[1];
+    *atP = 0;
+    url = &atP[1];
+
+    LM_TMP(("MQTT: username: '%s'", *usernameP));
+    LM_TMP(("MQTT: password: '%s'", *passwordP));
+    LM_TMP(("MQTT: REST:     '%s'", url));
+  }
+
+  char* slash = strchr(url, '/');
 
   if (slash == NULL)
   {
@@ -60,11 +98,11 @@ bool mqttParse(char* mqtt, char** hostP, unsigned short* portP, char** topicP, c
     return false;
   }
   *slash = 0;
-  LM_TMP(("MQTT: In mqttCheck (after removing slash): '%s'", mqtt));
   *topicP = &slash[1];
+  LM_TMP(("MQTT: topic:    '%s'", *topicP));
 
   // If ':' is found, an integer < MAXSHORT must come after it
-  char* colon = strchr(mqtt, ':');
+  char* colon = strchr(url, ':');
   if (colon != NULL)
   {
     char* portString = &colon[1];
@@ -96,12 +134,10 @@ bool mqttParse(char* mqtt, char** hostP, unsigned short* portP, char** topicP, c
 
     *portP = atoi(portString);
   }
-  *hostP = mqtt;
+  *hostP = url;
 
-  LM_TMP(("MQTT: In mqttCheck:"));
-  LM_TMP(("MQTT: host:  %s", *hostP));
-  LM_TMP(("MQTT: port:  %d", *portP));
-  LM_TMP(("MQTT: topic: %s", *topicP));
+  LM_TMP(("MQTT: host:      '%s'", *hostP));
+  LM_TMP(("MQTT: port:      %d",   *portP));
 
   return true;
 }

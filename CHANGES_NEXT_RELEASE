@@ -2,3 +2,4 @@
 # Issue #409  Removed an incorrect warning about options=keyValues not supported
 # Issue #XXX  'location' not to be expanded - fixed for PATCH ops
 # Issue #280  Implemented POST /ngsi-ld/v1/entityOperations/create
+# Issue #XXX  Added the option to use username:password for MQTT subscriptions

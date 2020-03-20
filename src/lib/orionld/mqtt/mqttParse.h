@@ -32,6 +32,6 @@
 //
 // mqttParse -
 //
-extern bool mqttParse(char* mqtt, char** hostP, unsigned short* portP, char** topicP, char** detailP);
+extern bool mqttParse(char* url, bool* mqttsP, char** usernameP, char** passwordP, char** hostP, unsigned short* portP, char** topicP, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_MQTT_MQTTPARSE_H_

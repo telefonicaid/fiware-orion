@@ -37,7 +37,7 @@
 //
 // mqttConnect -
 //
-bool mqttConnect(MqttConnection* mqP, const char* host, unsigned short port)
+bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
 {
   MQTTClient_connectOptions  connectOptions = MQTTClient_connectOptions_initializer;
   char                       address[64];
@@ -47,6 +47,13 @@ bool mqttConnect(MqttConnection* mqP, const char* host, unsigned short port)
   MQTTClient_create(&mqP->client, address, "Orion-LD", MQTTCLIENT_PERSISTENCE_NONE, NULL);
   connectOptions.keepAliveInterval = 20;
   connectOptions.cleansession      = 1;
+  connectOptions.username          = username;
+  connectOptions.password          = password;
+
+  if (mqtts)
+  {
+    LM_W(("WARNING - MQTT/SSL is not implemented yet - using unsecure MQTT for now. Sorry ... "));
+  }
 
   LM_TMP(("MQTT: Connecting to MQTT server on '%s'", address));
   if ((status = MQTTClient_connect(mqP->client, &connectOptions)) != MQTTCLIENT_SUCCESS)

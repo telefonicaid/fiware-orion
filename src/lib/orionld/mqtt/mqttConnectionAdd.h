@@ -33,6 +33,6 @@
 //
 // mqttConnectionAdd -
 //
-extern MqttConnection* mqttConnectionAdd(const char* host, unsigned short port);
+extern MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port);
 
 #endif  // MQTT_MQTTCONNECT_H_

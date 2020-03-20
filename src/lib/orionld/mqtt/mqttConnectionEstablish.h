@@ -33,6 +33,6 @@
 //
 // mqttConnectionEstablish -
 //
-extern bool mqttConnectionEstablish(const char* host, unsigned short port);
+extern bool mqttConnectionEstablish(bool mqtts, const char* username, const char* password, const char* host, unsigned short port);
 
 #endif  // MQTT_MQTTCONNECTIONESTABLISH_H_
