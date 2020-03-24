@@ -28,6 +28,7 @@
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"
 #include "orionld/serviceRoutines/orionldGetEntity.h"
 #include "orionld/serviceRoutines/orionldGetEntities.h"
+#include "orionld/serviceRoutines/orionldGetEntityTypes.h"
 #include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"
 #include "orionld/serviceRoutines/orionldGetSubscription.h"
@@ -47,6 +48,7 @@
 #include "orionld/serviceRoutines/orionldNotImplemented.h"
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"
+#include "orionld/serviceRoutines/orionldGetEntityTypes.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -55,12 +57,13 @@
 
 // -----------------------------------------------------------------------------
 //
-// getServices -
+// getServiceV -
 //
-static OrionLdRestServiceSimplified getServices[] =
+static OrionLdRestServiceSimplified getServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*",              orionldGetEntity          },
   { "/ngsi-ld/v1/entities",                orionldGetEntities        },
+  { "/ngsi-ld/v1/types",                   orionldGetEntityTypes     },
   { "/ngsi-ld/v1/subscriptions/*",         orionldGetSubscription    },
   { "/ngsi-ld/v1/subscriptions",           orionldGetSubscriptions   },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldGetRegistration    },
@@ -71,14 +74,15 @@ static OrionLdRestServiceSimplified getServices[] =
   { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented     }
 };
+static const int getServices = (sizeof(getServiceV) / sizeof(getServiceV[0]));
 
 
 
 // ----------------------------------------------------------------------------
 //
-// postServices -
+// postServiceV -
 //
-static OrionLdRestServiceSimplified postServices[] =
+static OrionLdRestServiceSimplified postServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs",        orionldPostEntity                     },
   { "/ngsi-ld/v1/entities",                orionldPostEntities                   },
@@ -90,34 +94,37 @@ static OrionLdRestServiceSimplified postServices[] =
   { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented                 },
   { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented                 }
 };
+static const int postServices = (sizeof(postServiceV) / sizeof(postServiceV[0]));
 
 
 
 // ----------------------------------------------------------------------------
 //
-// patchServices -
+// patchServiceV -
 //
-static OrionLdRestServiceSimplified patchServices[] =
+static OrionLdRestServiceSimplified patchServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs/*",      orionldPatchAttribute     },
   { "/ngsi-ld/v1/entities/*/attrs",        orionldPatchEntity        },
   { "/ngsi-ld/v1/subscriptions/*",         orionldPatchSubscription  },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldPatchRegistration  }
 };
+static const int patchServices = (sizeof(patchServiceV) / sizeof(patchServiceV[0]));
 
 
 
 // ----------------------------------------------------------------------------
 //
-// deleteServices -
+// deleteServiceV -
 //
-static OrionLdRestServiceSimplified deleteServices[] =
+static OrionLdRestServiceSimplified deleteServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs/*",      orionldDeleteAttribute    },  // Very important that orionldDeleteAttribute comes before orionldDeleteEntity
   { "/ngsi-ld/v1/entities/*",              orionldDeleteEntity       },
   { "/ngsi-ld/v1/subscriptions/*",         orionldDeleteSubscription },
   { "/ngsi-ld/v1/csourceRegistrations/*",  orionldDeleteRegistration }
 };
+static const int deleteServices = (sizeof(deleteServiceV) / sizeof(deleteServiceV[0]));
 
 
 
@@ -127,13 +134,13 @@ static OrionLdRestServiceSimplified deleteServices[] =
 //
 OrionLdRestServiceSimplifiedVector restServiceVV[] =
 {
-  { getServices,    11 },
-  { NULL,           0  },
-  { postServices,   9  },
-  { deleteServices, 4  },
-  { patchServices,  4  },
-  { NULL,           0  },
-  { NULL,           0  },
-  { NULL,           0  },
-  { NULL,           0  }
+  { getServiceV,    getServices     },
+  { NULL,           0               },
+  { postServiceV,   postServices    },
+  { deleteServiceV, deleteServices  },
+  { patchServiceV,  patchServices   },
+  { NULL,           0               },
+  { NULL,           0               },
+  { NULL,           0               },
+  { NULL,           0               }
 };

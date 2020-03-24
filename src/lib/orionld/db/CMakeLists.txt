@@ -25,6 +25,7 @@ SET (SOURCES
     dbNameGet.cpp
     dbCollectionPathGet.cpp
     dbConfiguration.cpp
+    dbEntityTypesGet.cpp
 )
 
 # Include directories

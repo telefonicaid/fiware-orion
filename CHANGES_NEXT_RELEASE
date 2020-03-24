@@ -3,3 +3,4 @@
 # Issue #XXX  'location' not to be expanded - fixed for PATCH ops
 # Issue #280  Implemented POST /ngsi-ld/v1/entityOperations/create
 # Issue #XXX  Added the option to use username:password for MQTT subscriptions
+# Issue #419  Implemented GET /ngsi-ld/v1/types

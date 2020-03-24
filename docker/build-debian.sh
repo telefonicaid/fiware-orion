@@ -99,14 +99,14 @@ apt-get -y install --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
 
-# echo "Builder: installing Paho MQTT C library"
-# git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c
-# cd ${ROOT}/paho.mqtt.c
-# rm -f /usr/local/lib/libpaho*
-# apt install doxygen
-# make html
-# make
-# make install
+echo "Builder: installing Paho MQTT C library"
+git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c
+cd ${ROOT}/paho.mqtt.c
+rm -f /usr/local/lib/libpaho*
+apt install doxygen
+make html
+make
+sudo make install
 
 
 echo "Builder: installing mongo cxx driver"
