@@ -54,7 +54,7 @@ extern "C"
 //
 // kjTreeToRegistrationInformation -
 //
-// FIXME: move to its own function
+// FIXME: move to its own module
 //
 static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfoNodeP, ngsiv2::Registration* regP)
 {

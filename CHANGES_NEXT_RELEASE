@@ -4,3 +4,4 @@
 # Issue #280  Implemented POST /ngsi-ld/v1/entityOperations/create
 # Issue #XXX  Added the option to use username:password for MQTT subscriptions
 # Issue #419  Implemented GET /ngsi-ld/v1/types
+# Issue #XXX  Fixed a bug that impeded the creation of reistrations with only entity-type in the entities array

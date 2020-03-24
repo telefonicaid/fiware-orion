@@ -154,7 +154,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
       }
       else
       {
-        // Error
+        entities.append(BSON(REG_ENTITY_TYPE << eP->type));
       }
     }
     else
