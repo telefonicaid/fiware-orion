@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTBATCHDELETE_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTBATCHDELETE_H_
 
 /*
 *
@@ -23,16 +23,16 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin, Chandra Challagonda
 */
-#include "rest/ConnectionInfo.h"           // ConnectionInfo
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostEntities -
+// temporalPostBatchDelete -
 //
-extern bool orionldPostEntities(ConnectionInfo* ciP);
+extern bool temporalPostBatchDelete(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTBATCHDELETE_H_

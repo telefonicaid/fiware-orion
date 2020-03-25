@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEENTITY_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEENTITY_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,16 +23,16 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin, Chandra Challagonda
 */
-#include "rest/ConnectionInfo.h"           // ConnectionInfo
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostEntities -
+// temporalDeleteEntity -
 //
-extern bool orionldPostEntities(ConnectionInfo* ciP);
+extern bool temporalDeleteEntity(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTENTITIES_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEENTITY_H_

@@ -50,6 +50,7 @@ style_check src/lib/orionld/context
 style_check src/lib/orionld/kjTree
 style_check src/lib/orionld/rest
 style_check src/lib/orionld/serviceRoutines
+style_check src/lib/orionld/temporal
 
 style_check src/lib/serviceRoutinesV2
 style_check src/lib/logSummary

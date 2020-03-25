@@ -849,6 +849,15 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   else
     restReply(ciP, "");
 
+  //
+  // Calling Temporal Routine to save the temporal data (if applicable)
+  // Only if the Service Routine was successful, of course
+  //
+  if ((ciP->httpStatusCode >= 200) && (ciP->httpStatusCode <= 300))
+  {
+    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
+      orionldState.serviceP->temporalRoutine(ciP);
+  }
 
   //
   // Cleanup
