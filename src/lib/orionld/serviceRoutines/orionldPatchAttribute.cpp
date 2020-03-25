@@ -42,7 +42,6 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // *CHECK*
@@ -50,6 +49,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

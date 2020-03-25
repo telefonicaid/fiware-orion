@@ -25,25 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldResponseErrorType -
-//
-typedef enum OrionldResponseErrorType
-{
-  OrionldInvalidRequest,
-  OrionldBadRequestData,
-  OrionldAlreadyExists,
-  OrionldOperationNotSupported,
-  OrionldResourceNotFound,
-  OrionldInternalError,
-  OrionldTooComplexQuery,
-  OrionldTooManyResults,
-  OrionldLdContextNotAvailable
-} OrionldResponseErrorType;
+#include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
 
 
 

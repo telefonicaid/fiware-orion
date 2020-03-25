@@ -35,8 +35,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                        // LM_*
 #include "logMsg/traceLevels.h"                                   // Lmt*
 
+#include "orionld/types/OrionldProblemDetails.h"                  // OrionldProblemDetails
 #include "orionld/common/orionldState.h"                          // orionldState
-#include "orionld/common/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
 #include "orionld/db/dbConfiguration.h"                           // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
 #include "orionld/db/dbEntityTypesGet.h"                          // Own interface

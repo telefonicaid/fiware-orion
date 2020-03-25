@@ -99,16 +99,6 @@ apt-get -y install --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
 
-echo "Builder: installing Paho MQTT C library"
-git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c
-cd ${ROOT}/paho.mqtt.c
-rm -f /usr/local/lib/libpaho*
-apt install doxygen
-make html
-make
-sudo make install
-
-
 echo "Builder: installing mongo cxx driver"
 git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT}/mongo-cxx-driver
 cd ${ROOT}/mongo-cxx-driver
@@ -146,6 +136,30 @@ do
 done
 
 if [[ "${STAGE}" == 'deps' ]]; then
+    echo "Builder: installing Paho MQTT C library"
+    apt-get -y install doxygen                                                    # OK - with -y. NOT OK without -y !!!
+    apt-get -y install graphviz 
+    rm -f /usr/local/lib/libpaho*                                                 # OK
+    git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c      # OK
+    cd ${ROOT}/paho.mqtt.c                                                        # OK
+    git fetch -a
+    git checkout tags/v1.3.1                                                      # OK - git checkout develop ...
+    make html                                                                     # OK
+
+    echo Building Paho MQTT C Library
+    make > /tmp/paho-build 2&>1 || /bin/true
+    echo Paho Built ...
+    echo "============== PAHO BUILD TRACES START ============================="
+    cat /tmp/paho-build
+    echo "============== PAHO BUILD TRACES END ==============================="
+
+    echo Installing Paho MQTT C Library
+    make install > /tmp/paho-install 2&>1 || /bin/true                            # ... ?
+    echo Paho Installed ...
+    echo "============== PAHO INSTALLATION TRACES START ============================="
+    cat /tmp/paho-install
+    echo "============== PAHO INSTALLATION TRACES END ==============================="
+
     echo "Builder: installing mongo and MQTT"
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
 

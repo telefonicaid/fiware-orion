@@ -30,8 +30,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldState.h"                         // orionldState, kalloc
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextCreate.h"                // orionldContextCreate
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate

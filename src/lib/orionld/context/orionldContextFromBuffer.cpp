@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // kjsonP
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree

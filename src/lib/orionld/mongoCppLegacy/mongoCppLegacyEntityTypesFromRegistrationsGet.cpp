@@ -37,7 +37,7 @@ extern "C"
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // Own interface
 

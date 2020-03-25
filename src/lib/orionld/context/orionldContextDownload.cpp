@@ -32,8 +32,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldState.h"                         // orionldState, contextDownloadAttempts, ...
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend

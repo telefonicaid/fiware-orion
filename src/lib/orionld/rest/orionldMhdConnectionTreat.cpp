@@ -43,8 +43,8 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd, httpHeaderLinkAdd
 #include "rest/restReply.h"                                      // restReply
 
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/CHECK.h"                                // CHECK

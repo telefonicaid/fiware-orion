@@ -31,7 +31,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
 

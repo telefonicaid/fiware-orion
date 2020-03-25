@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute

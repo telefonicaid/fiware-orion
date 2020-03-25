@@ -205,6 +205,7 @@ SET (ORION_LIBS
     orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_payloadCheck
     orionld_mqtt
+    orionld_types
     parse
     apiTypesV2
     orionTypes
@@ -330,6 +331,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/orionld/common)
+  ADD_SUBDIRECTORY(src/lib/orionld/types)
   ADD_SUBDIRECTORY(src/lib/orionld/context)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
   ADD_SUBDIRECTORY(src/lib/orionld/db)

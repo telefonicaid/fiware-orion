@@ -31,7 +31,7 @@ extern "C"
 }
 
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 
 
 

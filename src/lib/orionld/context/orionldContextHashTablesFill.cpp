@@ -34,8 +34,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/common/orionldState.h"                         // orionldState, kalloc
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails, orionldProblemDetailsFill
 #include "orionld/context/OrionldContext.h"                      // OrionldContext, OrionldContextHashTables
 #include "orionld/context/orionldContextCache.h"                 // ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem

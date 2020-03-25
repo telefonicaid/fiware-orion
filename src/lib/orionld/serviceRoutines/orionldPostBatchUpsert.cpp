@@ -60,7 +60,7 @@ extern "C"
 #include "orionld/common/entityIdAndTypeGet.h"                 // entityIdAndTypeGet
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
-#include "orionld/common/OrionldProblemDetails.h"              // OrionldProblemDetails
+#include "orionld/types/OrionldProblemDetails.h"               // OrionldProblemDetails
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup

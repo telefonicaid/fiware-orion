@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMTREE_H_
-#define SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMTREE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
 
 /*
 *
@@ -25,20 +25,24 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails, orionldProblemDetailsFill
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldContextFromTree -
+// OrionldResponseErrorType -
 //
-extern OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* contextTreeP, OrionldProblemDetails* pdP);
+typedef enum OrionldResponseErrorType
+{
+  OrionldInvalidRequest,
+  OrionldBadRequestData,
+  OrionldAlreadyExists,
+  OrionldOperationNotSupported,
+  OrionldResourceNotFound,
+  OrionldInternalError,
+  OrionldTooComplexQuery,
+  OrionldTooManyResults,
+  OrionldLdContextNotAvailable
+} OrionldResponseErrorType;
 
-#endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCONTEXTFROMTREE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_

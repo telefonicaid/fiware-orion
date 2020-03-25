@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDPROBLEMDETAILS_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDPROBLEMDETAILS_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,21 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldProblemDetails -
-//
-typedef struct OrionldProblemDetails
-{
-  OrionldResponseErrorType  type;
-  char*                     title;
-  char*                     detail;
-  int                       status;
-} OrionldProblemDetails;
+#include "orionld/types/OrionldResponseErrorType.h"            // OrionldResponseErrorType
+#include "orionld/types/OrionldProblemDetails.h"               // Own interface
 
 
 
@@ -54,6 +38,10 @@ void orionldProblemDetailsFill
   const char*              title,
   const char*              detail,
   int                      status
-);
-
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDPROBLEMDETAILS_H_
+)
+{
+  pdP->type   = type;
+  pdP->title  = (char*) title;
+  pdP->detail = (char*) detail;
+  pdP->status = status;
+}

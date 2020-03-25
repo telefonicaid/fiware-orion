@@ -33,8 +33,8 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/OrionldProblemDetails.h"                // OrionldProblemDetails
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/db/dbEntityTypesGet.h"                         // dbEntityTypesGet
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"       // Own Interface
 

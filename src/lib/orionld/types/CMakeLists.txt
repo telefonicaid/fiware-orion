@@ -21,37 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    orionldRequestSend.cpp
-    orionldErrorResponse.cpp
-    urlParse.cpp
-    urlCheck.cpp
-    urnCheck.cpp
-    linkCheck.cpp
-    httpStatusCodeToOrionldErrorType.cpp
-    geoJsonCreate.cpp
-    numberToDate.cpp
-    orionldState.cpp
-    QNode.cpp
-    qLex.cpp
-    qLexCheck.cpp
-    qLexRender.cpp
-    qParse.cpp
-    qTreePresent.cpp
-    qTreeToBsonObj.cpp
-    orionldEntityPayloadCheck.cpp
-    uuidGenerate.cpp
-    orionldServerConnect.cpp
-    dotForEq.cpp
-    eqForDot.cpp
-    entityErrorPush.cpp
-    entityIdCheck.cpp
-    entityTypeCheck.cpp
-    entityLookupById.cpp
-    removeArrayEntityLookup.cpp
-    typeCheckForNonExistingEntities.cpp
-    entityIdAndTypeGet.cpp
-    qAliasCompact.cpp
-    # qTreeToBson.cpp
+    OrionldProblemDetails.cpp
 )
 
 # Include directories
@@ -61,4 +31,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_common STATIC ${SOURCES})
+ADD_LIBRARY(orionld_types STATIC ${SOURCES})
