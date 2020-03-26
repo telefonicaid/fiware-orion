@@ -29,7 +29,7 @@
 #include "ngsi10/UnsubscribeContextRequest.h"                    // UnsubscribeContextRequest
 #include "ngsi10/UnsubscribeContextResponse.h"                   // UnsubscribeContextResponse
 #include "mongoBackend/mongoUnsubscribeContext.h"                // mongoUnsubscribeContext
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
 

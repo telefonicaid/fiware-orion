@@ -57,7 +57,7 @@ extern "C"
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/rest/orionldMhdConnectionInit.h"
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"
 #include "orionld/rest/orionldMhdConnectionTreat.h"

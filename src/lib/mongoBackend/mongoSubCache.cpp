@@ -40,7 +40,7 @@
 #include "cache/subCache.h"
 
 #ifdef ORIONLD
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #endif
 
 #include "mongoBackend/MongoGlobal.h"

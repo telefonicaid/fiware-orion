@@ -47,7 +47,7 @@ extern "C" {
 #include "kjson/kjRender.h"                                    // kjRender
 #include "kjson/kjson.h"                                       // Kjson
 }
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "cache/subCache.h"                                    // CachedSubscription

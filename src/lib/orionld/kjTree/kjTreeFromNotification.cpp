@@ -35,7 +35,7 @@ extern "C"
 #include "mongoBackend/MongoGlobal.h"                            // mongoIdentifier
 
 #include "common/RenderFormat.h"                                 // RenderFormat
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/context/OrionldContext.h"                      // OrionldContext

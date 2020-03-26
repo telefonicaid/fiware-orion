@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrlContext, ...
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/common/orionldRequestSend.h"                 // Own interface
 

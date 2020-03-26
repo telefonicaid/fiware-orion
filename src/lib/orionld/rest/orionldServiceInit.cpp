@@ -44,7 +44,7 @@ extern "C"
 #include "kjson/kjParse.h"                                           // kjParse
 }
 
-#include "orionld/common/OrionldConnection.h"                        // Global vars: orionldState, kjson, kalloc, kallocBuffer, ...
+#include "orionld/common/orionldState.h"                             // orionldState
 #include "orionld/common/urlCheck.h"                                 // urlCheck
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
@@ -210,9 +210,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //
   if (serviceP->serviceRoutine == orionldPostEntities)
   {
-    serviceP->options          = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
-    serviceP->options         |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
-    serviceP->temporalRoutine  = temporalPostEntities;
+    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldPostSubscriptions)
   {
@@ -229,8 +228,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
   {
-    serviceP->options           = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->temporalRoutine   = temporalPostBatchDelete;
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
@@ -241,24 +239,32 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
-  else if (serviceP->serviceRoutine == orionldPostEntity)
-    serviceP->temporalRoutine = temporalPostEntity;
-  else if (serviceP->serviceRoutine == orionldDeleteAttribute)
-    serviceP->temporalRoutine = temporalDeleteAttribute;
-  else if (serviceP->serviceRoutine == orionldDeleteEntity)
-    serviceP->temporalRoutine = temporalDeleteEntity;
-  else if (serviceP->serviceRoutine == orionldPatchAttribute)
-    serviceP->temporalRoutine = temporalPatchAttribute;
-  else if (serviceP->serviceRoutine == orionldPatchEntity)
-    serviceP->temporalRoutine = temporalPatchEntity;
-  else if (serviceP->serviceRoutine == orionldPostBatchCreate)
-    serviceP->temporalRoutine = temporalPostBatchCreate;
-  else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
-    serviceP->temporalRoutine = temporalPostBatchUpsert;
+
+  if (temporal)  // CLI Option to turn on Temporal Evolution of Entities
+  {
+    if (serviceP->serviceRoutine == orionldPostEntities)
+      serviceP->temporalRoutine  = temporalPostEntities;
+    else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+      serviceP->temporalRoutine   = temporalPostBatchDelete;
+    else if (serviceP->serviceRoutine == orionldPostEntity)
+      serviceP->temporalRoutine = temporalPostEntity;
+    else if (serviceP->serviceRoutine == orionldDeleteAttribute)
+      serviceP->temporalRoutine = temporalDeleteAttribute;
+    else if (serviceP->serviceRoutine == orionldDeleteEntity)
+      serviceP->temporalRoutine = temporalDeleteEntity;
+    else if (serviceP->serviceRoutine == orionldPatchAttribute)
+      serviceP->temporalRoutine = temporalPatchAttribute;
+    else if (serviceP->serviceRoutine == orionldPatchEntity)
+      serviceP->temporalRoutine = temporalPatchEntity;
+    else if (serviceP->serviceRoutine == orionldPostBatchCreate)
+      serviceP->temporalRoutine = temporalPostBatchCreate;
+    else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+      serviceP->temporalRoutine = temporalPostBatchUpsert;
 #if 0
-  else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
-    serviceP->temporalRoutine = temporalPostBatchUpdate;
+    else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
+      serviceP->temporalRoutine = temporalPostBatchUpdate;
 #endif
+  }
 }
 
 

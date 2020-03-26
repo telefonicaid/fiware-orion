@@ -37,7 +37,7 @@ extern "C"
 #include "apiTypesV2/Registration.h"                             // Registration
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

@@ -33,10 +33,10 @@ parseArgs complains about bool argument with a value
 #
 # -multiservice: bool option - no value allowed
 #
-$BROKER -multiserviceXXX
+$BROKER -multiservice XXX
 
 --REGEXPECT--
-'-multiserviceXXX' not recognized
+parameter 'XXX' not recognized
 
 Usage: orionld  [option '-U' (extended usage)]
                 [option '-u' (usage)]
@@ -92,5 +92,6 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-ngsiv1Autocast' (automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations)]
                 [option '-ctxTimeout' <Timeout in milliseconds for downloading of contexts>]
                 [option '-ctxAttempts' <Number of attempts for downloading of contexts>]
+                [option '-temporal' (enable temporal evolution of entities)]
 
 --TEARDOWN--
