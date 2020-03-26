@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma
+* Author: Ken Zangelin, Gabriel Quaresma
 */
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
@@ -37,7 +37,6 @@ extern "C"
 #include "orionTypes/OrionValueType.h"                           // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                         // ActionType
 #include "parse/CompoundValueNode.h"                             // CompoundValueNode
-#include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
@@ -50,48 +49,8 @@ extern "C"
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldEntityPayloadCheck.h"            // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldValidName -
-//
-bool orionldValidName(char* name, char** detailsPP)
-{
-  if (name == NULL)
-  {
-    *detailsPP = (char*) "empty name";
-    return false;
-  }
-
-  for (; *name != 0; ++name)
-  {
-    //
-    // Invalid chars:
-    //   '=',
-    //   '[',
-    //   ']',
-    //   '&',
-    //   '?',
-    //   '"',
-    //   ''',
-    //   '\b',
-    //   '\t',
-    //   '\n', and
-    //   '#'
-    //
-    if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
-        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#'))
-    {
-      *detailsPP = (char*) "invalid character in name";
-      return false;
-    }
-  }
-
-  return true;
-}
+#include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
+#include "orionld/payloadCheck/pcheckEntity.h"                   // Own interface
 
 
 
@@ -128,9 +87,9 @@ static bool checkEntityIdFieldExists(void)
 
 // -----------------------------------------------------------------------------
 //
-// orionldEntityPayloadCheck -
+// pcheckEntity -
 //
-bool orionldEntityPayloadCheck
+bool pcheckEntity
 (
   KjNode*          kNodeP,
   KjNode**         locationNodePP,
@@ -229,7 +188,7 @@ bool orionldEntityPayloadCheck
     {
       if (strcmp(kNodeP->name, "@context") != 0)
       {
-        if (orionldValidName(kNodeP->name, &detailsP) == false)
+        if (pcheckName(kNodeP->name, &detailsP) == false)
         {
           orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", detailsP);
           return false;

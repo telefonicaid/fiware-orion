@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYPAYLOADCHECK_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYPAYLOADCHECK_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNAME_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNAME_H_
 
 /*
 *
@@ -23,36 +23,19 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma
+* Author: Ken Zangelin
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldValidName -
+// pcheckEntity -
 //
-extern bool orionldValidName(char* name, char** detailsPP);
+extern bool pcheckName(char* name, char** detailsPP);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldEntityPayloadCheck -
-//
-extern bool orionldEntityPayloadCheck
-(
-  KjNode*          kNodeP,
-  KjNode**         locationNodePP,
-  KjNode**         observationSpaceNodePP,
-  KjNode**         operationSpaceNodePP,
-  KjNode**         createdAtPP,
-  KjNode**         modifiedAtPP,
-  bool             isBatchOperation
-);
-
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYPAYLOADCHECK_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNAME_H_

@@ -50,7 +50,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/orionldState.h"                         // orionldState, orionldHostName
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
-#include "orionld/common/orionldEntityPayloadCheck.h"            // orionldValidName  - FIXME: Own file for "orionldValidName()"!
+#include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
@@ -411,7 +411,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         STRING_CHECK(orionldState.payloadTypeNode, "entity type");
 
         char* detail;
-        if (orionldValidName(orionldState.payloadTypeNode->value.s, &detail) == false)
+        if (pcheckName(orionldState.payloadTypeNode->value.s, &detail) == false)
         {
           orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", detail);
           return false;

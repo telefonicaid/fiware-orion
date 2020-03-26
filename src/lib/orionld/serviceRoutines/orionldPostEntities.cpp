@@ -51,7 +51,7 @@ extern "C"
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldEntityPayloadCheck.h"            // orionldEntityPayloadCheck
+#include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
@@ -74,7 +74,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   KjNode*  createdAtP         = NULL;
   KjNode*  modifiedAtP        = NULL;
 
-  if (orionldEntityPayloadCheck(orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
+  if (pcheckEntity(orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
     return false;
 
   char*    entityId           = orionldState.payloadIdNode->value.s;
