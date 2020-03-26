@@ -22,11 +22,15 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                            // strchr
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
 
 
@@ -37,12 +41,75 @@ extern "C"
 //
 bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detailP)
 {
+  if (georelP == NULL)
+  {
+    *detailP = (char*) "georel missing";
+    return false;
+  }
+  else if (georelP->type != KjString)
+  {
+    *detailP = (char*) "georel must be a string";
+    return false;
+  }
+  else if (georelP->value.s[0] == 0)
+  {
+    *detailP = (char*) "no value for georel";
+    return false;
+  }
+
   if (geoType == GeoJsonPoint)
   {
     //
     // For a Point, reorel can have the following values:
-    // - nesr
-    // - 
+    // - near
+    // -
+    char* extra      = NULL;
+    char* grel       = kaStrdup(&orionldState.kalloc, georelP->value.s);
+    char* semicolonP;
+
+    if ((semicolonP = strchr(grel, ';')) != NULL)
+    {
+      *semicolonP = 0;
+      extra = &semicolonP[1];
+
+      if (strcmp(grel, "near") != 0)
+      {
+        *detailP = (char*) "invalid geo-relation for Point";
+        return false;
+      }
+
+      //
+      // Must be: (max|min)Distance==NUMBER
+      //
+      char* distance = strstr(extra, "==");
+
+      if (distance == NULL)
+      {
+        *detailP = (char*) "invalid distance for georel 'near' for Point";
+        return false;
+      }
+      *distance = 0;
+      distance = &distance[2];
+
+      if ((strcmp(extra, "maxDistance") != 0) && (strcmp(extra, "minDistance") != 0))
+      {
+        *detailP = (char*) "invalid distance for georel 'near' for Point";
+        return false;
+      }
+
+      //
+      // 'distance' must be an INTEGER
+      //
+      while (*distance != 0)
+      {
+        if ((*distance < '0') || (*distance > '9'))
+        {
+          *detailP = (char*) "invalid number for distance for georel 'near' for Point";
+          return false;
+        }
+        ++distance;
+      }
+    }
   }
 
   return true;

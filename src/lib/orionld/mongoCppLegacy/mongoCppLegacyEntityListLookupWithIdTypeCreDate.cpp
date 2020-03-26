@@ -20,8 +20,10 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Larysse Savanna
+* Author: Larysse Savanna, Ken Zangelin
 */
+#include <string>
+
 #include "mongo/client/dbclient.h"                                       // MongoDB C++ Client Legacy Driver
 
 extern "C"
@@ -133,7 +135,6 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
       LM_W(("Too many entities - breaking loop at 100"));
       break;
     }
-    
   }
 
   releaseMongoConnection(connectionP);

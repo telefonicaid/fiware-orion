@@ -55,7 +55,7 @@ bool mongoCppLegacyRegistrationDelete(const char* registrationId)
 
   connectionP->remove(collectionPath, query, true);
   operationOk = (connectionP->isFailed() == true)? false : true;
-  
+
   releaseMongoConnection(connectionP);
 
   // semGive()

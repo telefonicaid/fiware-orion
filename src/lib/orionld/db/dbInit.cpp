@@ -105,7 +105,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbSubscriptionReplace                    = NULL;  // FIXME: Implement mongocSubscriptionReplace
   dbRegistrationGet                        = NULL;  // FIXME: Implement mongocRegistrationGet
   dbRegistrationReplace                    = NULL;  // FIXME: Implement mongocRegistrationReplace
-  dbEntitiesGet                            = NULL;  // FIXME: Implement 
+  dbEntitiesGet                            = NULL;  // FIXME: Implement
   dbEntityTypesFromRegistrationsGet        = NULL;  // FIXME: Implement
 
   mongocInit(dbHost, dbName);

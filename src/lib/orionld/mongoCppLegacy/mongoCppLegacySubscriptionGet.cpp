@@ -22,22 +22,22 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                                // MongoDB C++ Client Legacy Driver
+#include "mongo/client/dbclient.h"                                 // MongoDB C++ Client Legacy Driver
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                         // KjNode
-#include "kjson/kjBuilder.h"                                      // kjArray, kjChildAdd, ...
+#include "kjson/KjNode.h"                                          // KjNode
+#include "kjson/kjBuilder.h"                                       // kjArray, kjChildAdd, ...
 }
 
-#include "logMsg/logMsg.h"                                        // LM_*
-#include "logMsg/traceLevels.h"                                   // Lmt*
+#include "logMsg/logMsg.h"                                         // LM_*
+#include "logMsg/traceLevels.h"                                    // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                             // getMongoConnection, releaseMongoConnection, ...
+#include "mongoBackend/MongoGlobal.h"                              // getMongoConnection, releaseMongoConnection, ...
 
-#include "orionld/db/dbCollectionPathGet.h"                       // dbCollectionPathGet
-#include "orionld/db/dbConfiguration.h"                           // dbDataToKjTree
-#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h" // Own interface
+#include "orionld/db/dbCollectionPathGet.h"                        // dbCollectionPathGet
+#include "orionld/db/dbConfiguration.h"                            // dbDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h"  // Own interface
 
 
 

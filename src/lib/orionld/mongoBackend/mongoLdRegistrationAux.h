@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOLDREGISTRATIONAUX_H_
-#define SRC_LIB_MONGOBACKEND_MONGOLDREGISTRATIONAUX_H_
+#ifndef SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONAUX_H_
+#define SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONAUX_H_
 
 /*
 *
@@ -46,4 +46,4 @@ extern void mongoSetLdTimestamp(long long* timestampP, const char* name, const m
 extern bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, const mongo::BSONObj& bobj, char** titleP, char** detailP);
 extern bool mongoSetLdProperties(ngsiv2::Registration* regP, const char* name, const mongo::BSONObj& bobj, char** titleP, char** detailP);
 
-#endif  // SRC_LIB_MONGOBACKEND_MONGOLDREGISTRATIONAUX_H_
+#endif  // SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONAUX_H_

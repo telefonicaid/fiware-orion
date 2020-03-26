@@ -35,7 +35,7 @@
 typedef struct OrionldTimeInterval
 {
   int64_t  start;
-  int64_t  end;  
+  int64_t  end;
 } OrionldTimeInterval;
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDTIMEINTERVAL_H_

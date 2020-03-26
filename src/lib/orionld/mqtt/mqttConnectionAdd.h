@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MQTT_MQTTCONNECT_H_
-#define SRC_LIB_ORIONLD_MQTT_MQTTCONNECT_H_
+#ifndef SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONADD_H_
+#define SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONADD_H_
 
 /*
 *
@@ -35,4 +35,4 @@
 //
 extern MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port);
 
-#endif  // MQTT_MQTTCONNECT_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONADD_H_

@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "MQTTClient.h"                                        // MQTT Client header
+#include <MQTTClient.h>                                        // MQTT Client header
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*

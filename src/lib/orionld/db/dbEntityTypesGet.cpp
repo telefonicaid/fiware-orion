@@ -129,7 +129,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   KjNode*  arrayP = NULL;
 
   fields[0] = (char*) "_id";
-  
+
   local  = dbEntitiesGet(fields, 1);
   remote = dbEntityTypesFromRegistrationsGet();
 

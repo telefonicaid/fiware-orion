@@ -28,7 +28,7 @@
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/db/dbCollectionPathGet.h"                      // Own interface
-  
+
 
 
 // ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
     orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "Unable to compose collection name - name too long");
     return -1;
   }
-    
+
   strcpy(path, dbName);
 
   if (tenantLen != 0)

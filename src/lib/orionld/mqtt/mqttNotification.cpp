@@ -23,8 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                            // strlen
-
-#include "MQTTClient.h"                                        // MQTT Client header
+#include <MQTTClient.h>                                        // MQTT Client header
 
 extern "C"
 {

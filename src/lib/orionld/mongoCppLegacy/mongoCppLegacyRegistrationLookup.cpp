@@ -81,12 +81,12 @@ KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attri
     mongo::BSONObjBuilder   zeroSizeArrayItem;
     mongo::BSONObjBuilder   attrNameMatchArrayItem;
     mongo::BSONArrayBuilder orArray;
-    
+
     zeroSizeObject.append("$size", 0);
     zeroSizeArrayItem.append("contextRegistration.attrs", zeroSizeObject.obj());
 
     attrNameMatchArrayItem.append("contextRegistration.attrs.name", attribute);
-    
+
     orArray.append(zeroSizeArrayItem.obj());
     orArray.append(attrNameMatchArrayItem.obj());
 
@@ -95,7 +95,7 @@ KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attri
     if (noOfRegsP != NULL)
       *noOfRegsP += 1;
   }
-  
+
   // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;

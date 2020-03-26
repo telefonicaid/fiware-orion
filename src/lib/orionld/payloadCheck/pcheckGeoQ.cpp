@@ -185,7 +185,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP)
   if (pcheckGeoqGeorel(georelP, geoJsonType, &detail) == false)
   {
     LM_W(("Bad Input (invalid georel (%s): for geo '%s')", georelP->value.s, geometryP->value.s));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Payload Data", "invalid georel");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Payload Data", detail);
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }

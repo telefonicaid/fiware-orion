@@ -120,23 +120,23 @@ void typeExtract(KjNode* regArray, KjNode* typeArray)
 //     }
 //  ],
 //  ...
-// 
+//
 //
 KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
 {
   char collectionPath[256];
-  
+
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   mongo::BSONObjBuilder  fields;
   mongo::BSONObjBuilder  filter;
   mongo::BSONObjBuilder  notEmpty;
-  
+
   fields.append("contextRegistration.entities",     1);  // Entity Type is inside the 'contextRegistration.entities' field ...
   fields.append("_id",     0);
   notEmpty.append("$ne", "");
   filter.append("contextRegistration.entities.type", notEmpty.obj());
-  
+
   mongo::BSONObj                        fieldsToReturn = fields.obj();
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
   mongo::Query                          query(filter.obj());

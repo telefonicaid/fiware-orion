@@ -37,7 +37,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacySubscriptionMatchEntityIdAndAttributes - 
+// mongoCppLegacySubscriptionMatchEntityIdAndAttributes -
 //
 // PARAMETERS
 //   * entityId             The ID of the entity as a string

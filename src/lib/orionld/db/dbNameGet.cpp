@@ -27,7 +27,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
 #include "orionld/db/dbNameGet.h"                                // Own interface
-  
+
 
 
 // ----------------------------------------------------------------------------

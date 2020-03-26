@@ -43,7 +43,8 @@ extern "C"
 //
 // mongoCppLegacyEntityAttributesDelete -
 //
-// db.entities.update({"_id.id": "urn:ngsi-ld:entities:E1"}, {"$unset": {"attrs.https://uri=etsi=org/ngsi-ld/default-context/P1": 1, "attrs.https://uri=etsi=org/ngsi-ld/default-context/P2": 1}}) 
+// db.entities.update({"_id.id": "urn:ngsi-ld:entities:E1"},
+//                    {"$unset": {"attrs.https://uri=etsi=org/ngsi-ld/default-context/P1": 1, "attrs.https://uri=etsi=org/ngsi-ld/default-context/P2": 1}})
 //
 bool mongoCppLegacyEntityAttributesDelete(const char* entityId, char** attrNameV, int vecSize)
 {
@@ -94,7 +95,6 @@ bool mongoCppLegacyEntityAttributesDelete(const char* entityId, char** attrNameV
 
   connectionP->update(collectionPath, query, commandObj, true, false);
 
-  std::string lastError = connectionP->getLastError();
   releaseMongoConnection(connectionP);
   // semGive()
 

@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "MQTTClient.h"                                        // MQTT Client header
+#include <MQTTClient.h>                                        // MQTT Client header
 
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 
@@ -33,8 +33,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// mqttConnectionLookup - 
+// mqttConnectionLookup -
 //
 extern MqttConnection* mqttConnectionLookup(const char* host, unsigned short port);
 
-#endif  // MQTT_MQTTCONNECTIONLOOKUP_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONLOOKUP_H_

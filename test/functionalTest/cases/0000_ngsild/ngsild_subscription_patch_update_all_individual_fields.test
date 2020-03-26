@@ -92,7 +92,7 @@ payload='{
   "geoQ": {
     "geometry": "Point",
     "coordinates": [ 1, 2 ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -413,7 +413,7 @@ payload='{
   "geoQ": {
     "geometry": "Point",
     "coordinates": [ 34, 34 ],
-    "georel": "near;maxDistance=34",
+    "georel": "near;maxDistance==34",
     "geoproperty": "geo34"
   },
   "csf": "34",
@@ -500,7 +500,7 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "Point",
 		"coords" : "1,2",
-		"georel" : "near;maxDistance=2000",
+		"georel" : "near;maxDistance==2000",
 		"geoproperty" : "geo0"
 	},
 	"format" : "keyValues"
@@ -511,7 +511,7 @@ bye
 03. GET subscription from the broker
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 757
+Content-Length: 758
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -537,7 +537,7 @@ Date: REGEX(.*)
       1,
       2
     ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -570,7 +570,7 @@ Date: REGEX(.*)
 05. GET subscription and see the new 'name'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 744
+Content-Length: 745
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -596,7 +596,7 @@ Date: REGEX(.*)
       1,
       2
     ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -629,7 +629,7 @@ Date: REGEX(.*)
 07. GET subscription and see the new 'description'
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 723
+Content-Length: 724
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -655,7 +655,7 @@ Date: REGEX(.*)
       1,
       2
     ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -733,7 +733,7 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "Point",
 		"coords" : "1,2",
-		"georel" : "near;maxDistance=2000",
+		"georel" : "near;maxDistance==2000",
 		"geoproperty" : "geo0"
 	},
 	"format" : "keyValues"
@@ -744,7 +744,7 @@ bye
 10. GET subscription and see the new 'entities'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 724
+Content-Length: 725
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -772,7 +772,7 @@ Date: REGEX(.*)
       1,
       2
     ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -850,7 +850,7 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "Point",
 		"coords" : "1,2",
-		"georel" : "near;maxDistance=2000",
+		"georel" : "near;maxDistance==2000",
 		"geoproperty" : "geo0"
 	},
 	"format" : "keyValues"
@@ -861,7 +861,7 @@ bye
 13. GET subscription and see the new 'watchedAttributes'
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 724
+Content-Length: 725
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -889,7 +889,7 @@ Date: REGEX(.*)
       1,
       2
     ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -981,7 +981,7 @@ MongoDB server version: REGEX(.)
 		"mq" : "",
 		"geometry" : "Point",
 		"coords" : "1,2",
-		"georel" : "near;maxDistance=2000",
+		"georel" : "near;maxDistance==2000",
 		"geoproperty" : "geo0"
 	},
 	"format" : "keyValues"
@@ -992,7 +992,7 @@ bye
 17. GET subscription and see the new 'q'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 733
+Content-Length: 734
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1020,7 +1020,7 @@ Date: REGEX(.*)
       1,
       2
     ],
-    "georel": "near;maxDistance=2000",
+    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
   "csf": "not implemented",
@@ -1779,7 +1779,7 @@ Date: REGEX(.*)
 35. GET subscription and see all the fields
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 784
+Content-Length: 785
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1809,7 +1809,7 @@ Date: REGEX(.*)
       34,
       34
     ],
-    "georel": "near;maxDistance=34",
+    "georel": "near;maxDistance==34",
     "geoproperty": "geo34"
   },
   "csf": "34",
@@ -1878,7 +1878,7 @@ MongoDB server version: REGEX(.)
 	"expression" : {
 		"geometry" : "Point",
 		"coords" : "34.000000,34.000000",
-		"georel" : "near;maxDistance=34",
+		"georel" : "near;maxDistance==34",
 		"geoproperty" : "geo34",
 		"q" : "https://uri.etsi.org/ngsi-ld/default-context/P34>34"
 	}

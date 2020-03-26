@@ -44,7 +44,7 @@ extern "C"
 // mongocEntityLookup -
 //
 KjNode* mongocEntityLookup(const char* entityId)
-{    
+{
   char              dbName[512];
   bson_t            mongoFilter;
   const bson_t*     mongoDocP;
@@ -53,7 +53,7 @@ KjNode* mongocEntityLookup(const char* entityId)
   char*             title;
   char*             details;
   KjNode*           entityNodeP = NULL;
-  
+
   if (dbNameGet(dbName, sizeof(dbName)) == -1)
     return NULL;
 
@@ -87,6 +87,6 @@ KjNode* mongocEntityLookup(const char* entityId)
   mongoc_cursor_destroy(mongoCursorP);
   // semGive(&mongoEntitiesSem);
   bson_destroy(&mongoFilter);
- 
+
   return entityNodeP;
 }

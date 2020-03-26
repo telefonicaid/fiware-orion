@@ -24,7 +24,7 @@
 */
 #include <stdlib.h>                                            // calloc
 
-#include "MQTTClient.h"                                        // MQTT Client header
+#include <MQTTClient.h>                                        // MQTT Client header
 
 #include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List

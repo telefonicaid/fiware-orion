@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "MQTTClient.h"                                        // MQTT Client header
+#include <MQTTClient.h>                                        // MQTT Client header
 
 
 
@@ -40,4 +40,4 @@ typedef struct MqttConnection
   MQTTClient      client;
 } MqttConnection;
 
-#endif  // MQTT_MQTTCONNECTION_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTION_H_

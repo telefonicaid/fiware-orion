@@ -30,8 +30,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// mqttConnectionInit - 
+// mqttConnectionInit -
 //
 extern void mqttConnectionInit(void);
 
-#endif  // MQTT_MQTTCONNECTIONINIT_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONINIT_H_

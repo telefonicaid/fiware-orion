@@ -38,7 +38,7 @@
 extern MqttConnection* mqttConnectionList;
 extern int             mqttConnectionListSize;
 extern int             mqttConnectionListIx;
-extern bool            mqttConnectionListInitialized ;
+extern bool            mqttConnectionListInitialized;
 extern sem_t           mqttConnectionListSem;
 
-#endif  // MQTT_MQTTCONNECTIONLIST_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTIONLIST_H_

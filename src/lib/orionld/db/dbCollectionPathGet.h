@@ -30,7 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
 #include "orionld/db/dbCollectionPathGet.h"                      // Own interface
-  
+
 
 
 // ----------------------------------------------------------------------------
