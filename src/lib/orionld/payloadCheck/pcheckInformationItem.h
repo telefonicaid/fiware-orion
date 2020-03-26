@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckInformationItem -
 //
-extern bool pcheckInformationItem(ConnectionInfo* ciP, KjNode* informationP);
+extern bool pcheckInformationItem(KjNode* informationP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATIONITEM_H_

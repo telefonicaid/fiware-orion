@@ -30,8 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
@@ -46,7 +44,7 @@ extern "C"
 //
 // pcheckGeoProperty -
 //
-bool pcheckGeoProperty(ConnectionInfo* ciP, KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP)
+bool pcheckGeoProperty(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP)
 {
   KjNode*             typeNodeP         = NULL;
   KjNode*             coordinatesNodeP  = NULL;

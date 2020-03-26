@@ -36,6 +36,7 @@ extern "C"
 
 #include "common/globals.h"                                      // ApiVersion
 #include "common/MimeType.h"                                     // MimeType
+#include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
@@ -137,6 +138,7 @@ typedef struct OrionldNotificationInfo
 typedef struct OrionldConnectionState
 {
   ConnectionInfo*         ciP;
+  HttpStatusCode          httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
   KAlloc                  kalloc;

@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
 #include "orionld/rest/OrionLdRestService.h"
 
 
@@ -34,6 +33,6 @@
 //
 // orionldServiceLookup -
 //
-extern OrionLdRestService* orionldServiceLookup(ConnectionInfo* ciP, OrionLdRestServiceVector* serviceV);
+extern OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV);
 
 #endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICELOOKUP_H_

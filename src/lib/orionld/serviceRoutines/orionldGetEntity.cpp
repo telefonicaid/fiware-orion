@@ -394,14 +394,14 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   request.entityIdVector.push_back(&entityId);
 
-  ciP->httpStatusCode = mongoQueryContext(&request,
-                                          &response,
-                                          orionldState.tenant,
-                                          ciP->servicePathV,
-                                          ciP->uriParam,
-                                          ciP->uriParamOptions,
-                                          NULL,
-                                          ciP->apiVersion);
+  orionldState.httpStatusCode = mongoQueryContext(&request,
+                                                  &response,
+                                                  orionldState.tenant,
+                                                  ciP->servicePathV,
+                                                  ciP->uriParam,
+                                                  ciP->uriParamOptions,
+                                                  NULL,
+                                                  ciP->apiVersion);
 
   if (response.errorCode.code == SccBadRequest)
   {
@@ -483,7 +483,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
     orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
-    ciP->httpStatusCode = SccContextElementNotFound;
+    orionldState.httpStatusCode = SccContextElementNotFound;
     return false;
   }
 

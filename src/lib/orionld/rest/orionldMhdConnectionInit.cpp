@@ -301,7 +301,7 @@ int orionldMhdConnectionInit
   ciP->connection = connection;
 
   // Flagging all as OK - errors will be flagged when occurring
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
 
 
   // IP Address and port of caller
@@ -331,7 +331,7 @@ int orionldMhdConnectionInit
     {
       LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
       orionldState.responsePayload = (char*) doubleSlashPayload;
-      ciP->httpStatusCode          = SccBadRequest;
+      orionldState.httpStatusCode  = SccBadRequest;
       return MHD_YES;
     }
   }
@@ -342,7 +342,7 @@ int orionldMhdConnectionInit
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);
-    ciP->httpStatusCode   = SccBadRequest;
+    orionldState.httpStatusCode   = SccBadRequest;
     return MHD_YES;
   }
 
@@ -350,7 +350,7 @@ int orionldMhdConnectionInit
   if (ciP->httpHeaders.contentLength > 2000000)
   {
     orionldState.responsePayload = (char*) payloadTooLargePayload;
-    ciP->httpStatusCode          = SccBadRequest;
+    orionldState.httpStatusCode  = SccBadRequest;
     return MHD_YES;
   }
 
@@ -378,7 +378,7 @@ int orionldMhdConnectionInit
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
                                  "only application/json and application/ld+json are supported");
-      ciP->httpStatusCode = SccUnsupportedMediaType;
+      orionldState.httpStatusCode = SccUnsupportedMediaType;
       return MHD_YES;
     }
   }
@@ -425,7 +425,7 @@ int orionldMhdConnectionInit
   {
     LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
   }
 
   LM_T(LmtMhd, ("Connection Init DONE"));

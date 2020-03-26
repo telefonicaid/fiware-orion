@@ -45,7 +45,7 @@ extern "C"
 //
 // kjTreeToStringList -
 //
-bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::string>* stringListP)
+bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP)
 {
   for (KjNode* attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
   {

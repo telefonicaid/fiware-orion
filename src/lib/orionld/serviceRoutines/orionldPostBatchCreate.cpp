@@ -127,7 +127,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   // * all entities must contain a entity::id (one level down)
   // * no entity can contain an entity::type (one level down)
   //
-  pcheckEntities(ciP, orionldState.requestTree);
+  pcheckEntities(orionldState.requestTree);
 
   KjNode*               incomingTree   = orionldState.requestTree;
   KjNode*               idArray        = kjArray(orionldState.kjsonP, NULL);
@@ -186,22 +186,22 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
   mongoRequest.updateActionType = ActionTypeAppendStrict;
 
-  kjTreeToUpdateContextRequest(ciP, &mongoRequest, incomingTree, errorsArrayP);
+  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP);
 
   UpdateContextResponse mongoResponse;
 
-  ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
-                                           &mongoResponse,
-                                           orionldState.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
+  orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
+                                                   &mongoResponse,
+                                                   orionldState.tenant,
+                                                   ciP->servicePathV,
+                                                   ciP->uriParam,
+                                                   ciP->httpHeaders.xauthToken,
+                                                   ciP->httpHeaders.correlator,
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->apiVersion,
+                                                   NGSIV2_NO_FLAVOUR);
 
-  if (ciP->httpStatusCode == SccOk)
+  if (orionldState.httpStatusCode == SccOk)
   {
     orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
@@ -234,17 +234,17 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);
 
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
   }
 
   mongoRequest.release();
   mongoResponse.release();
 
-  if (ciP->httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != SccOk)
   {
     LM_E(("mongoUpdateContext flagged an error"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Database Error");
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     return false;
   }
 

@@ -33,7 +33,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 
 
@@ -42,6 +41,6 @@ extern "C"
 //
 // kjTreeToNotification -
 //
-extern bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** endpointPP);
+extern bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** endpointPP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETONOTIFICATION_H_

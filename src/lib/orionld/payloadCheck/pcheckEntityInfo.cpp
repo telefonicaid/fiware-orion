@@ -30,7 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                      // LM_*
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
@@ -44,7 +43,7 @@ extern "C"
 //
 // pcheckEntityInfo -
 //
-bool pcheckEntityInfo(ConnectionInfo* ciP, KjNode* entityP)
+bool pcheckEntityInfo(KjNode* entityP)
 {
   KjNode* idP         = NULL;
   KjNode* idPatternP  = NULL;
@@ -85,7 +84,7 @@ bool pcheckEntityInfo(ConnectionInfo* ciP, KjNode* entityP)
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for entities[X]", entityItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -94,7 +93,7 @@ bool pcheckEntityInfo(ConnectionInfo* ciP, KjNode* entityP)
   if (typeP == NULL)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "entities[X]::type");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 

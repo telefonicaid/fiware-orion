@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckEndpoint -
 //
-extern bool pcheckEndpoint(ConnectionInfo* ciP, KjNode* endpointP);
+extern bool pcheckEndpoint(KjNode* endpointP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENDPOINT_H_

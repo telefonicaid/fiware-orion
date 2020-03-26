@@ -53,7 +53,7 @@ bool orionldBadVerb(ConnectionInfo* ciP)
   {
     if (verbNo == PUT) continue;
 
-    if (orionldServiceLookup(ciP, &orionldRestServiceV[verbNo]) != NULL)
+    if (orionldServiceLookup(&orionldRestServiceV[verbNo]) != NULL)
     {
       bitmask |= (1 << verbNo);
     }

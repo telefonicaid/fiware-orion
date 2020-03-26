@@ -27,8 +27,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
@@ -51,7 +49,7 @@ extern "C"
 // NOTE
 //   This function also expands ATTRIBUTE NAMES and ENTITY TYPES
 //
-bool pcheckInformationItem(ConnectionInfo* ciP, KjNode* informationP)
+bool pcheckInformationItem(KjNode* informationP)
 {
   KjNode* entitiesP      = NULL;
   KjNode* propertiesP    = NULL;
@@ -62,7 +60,7 @@ bool pcheckInformationItem(ConnectionInfo* ciP, KjNode* informationP)
     if (strcmp(infoItemP->name, "entities") == 0)
     {
       DUPLICATE_CHECK(entitiesP, "entities", infoItemP);
-      if (pcheckEntities(ciP, entitiesP) == false)
+      if (pcheckEntities(entitiesP) == false)
         return false;
     }
     else if (strcmp(infoItemP->name, "properties") == 0)
@@ -94,7 +92,7 @@ bool pcheckInformationItem(ConnectionInfo* ciP, KjNode* informationP)
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for information[X]", infoItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }

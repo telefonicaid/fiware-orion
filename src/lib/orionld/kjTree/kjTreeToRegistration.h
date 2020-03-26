@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Registration.h"                           // Registration
 
 
@@ -39,6 +38,6 @@ extern "C"
 //
 // kjTreeToSubscription -
 //
-extern bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char** subIdPP);
+extern bool kjTreeToRegistration(ngsiv2::Registration* regP, char** subIdPP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOREGISTRATION_H_

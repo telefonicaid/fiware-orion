@@ -28,7 +28,9 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -91,7 +93,6 @@ static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, cha
 //
 static bool kjTreeToContextElementAttributes
 (
-  ConnectionInfo*  ciP,
   OrionldContext*  contextP,
   KjNode*          entityNodeP,
   KjNode*          createdAtP,
@@ -126,7 +127,7 @@ static bool kjTreeToContextElementAttributes
       ContextAttribute* caP           = new ContextAttribute();
 
       // kjTreeToContextAttribute treats the attribute, including expanding the attribute name and values, if applicable
-      if (kjTreeToContextAttribute(ciP, contextP, itemP, caP, &attrTypeNodeP, detailP) == false)
+      if (kjTreeToContextAttribute(contextP, itemP, caP, &attrTypeNodeP, detailP) == false)
       {
         // kjTreeToContextAttribute calls orionldErrorResponseCreate
         LM_E(("kjTreeToContextAttribute failed for attribute '%s': %s", itemP->name, *detailP));
@@ -155,7 +156,7 @@ static bool kjTreeToContextElementAttributes
 //
 // If Content-Type is "application/ld+json", then the @context must be part of each and every item of the array
 //
-void kjTreeToUpdateContextRequest(ConnectionInfo* ciP, UpdateContextRequest* ucrP, KjNode* treeP, KjNode* errorsArrayP)
+void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjNode* errorsArrayP)
 {
   KjNode* next;
   KjNode* entityP = treeP->value.firstChildP;
@@ -233,7 +234,7 @@ void kjTreeToUpdateContextRequest(ConnectionInfo* ciP, UpdateContextRequest* ucr
     entityIdP->type      = entityTypeExpanded;
     entityIdP->isPattern = "false";
 
-    if (kjTreeToContextElementAttributes(ciP, contextP, entityP, NULL, NULL, ceP, &title, &detail) == false)
+    if (kjTreeToContextElementAttributes(contextP, entityP, NULL, NULL, ceP, &title, &detail) == false)
     {
       LM_W(("kjTreeToContextElementAttributes flags error '%s: %s' for entity '%s'", title, detail, entityId));
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, title, detail, 400);

@@ -199,7 +199,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   // 1. Is the Entity ID in the URL a valid URI?
   if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
   {
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);
     return false;
   }
@@ -211,7 +211,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
-    ciP->httpStatusCode = SccNotFound;
+    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
     return false;
   }
@@ -221,7 +221,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
   if (idNodeP == NULL)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'_id' field of entity from DB not found");
     return false;
   }
@@ -231,7 +231,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
   if (entityTypeNodeP == NULL)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'_id::type' field of entity from DB not found");
     return false;
   }
@@ -240,7 +240,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* inDbAttrNamesP = kjLookup(dbEntityP, "attrNames");
   if (inDbAttrNamesP == NULL)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found");
     return false;
   }
@@ -249,7 +249,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* inDbAttrsP = kjLookup(dbEntityP, "attrs");
   if (inDbAttrsP == NULL)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
     return false;
   }
@@ -330,7 +330,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   {
     ContextAttribute* caP = new ContextAttribute();
 
-    if (kjTreeToContextAttribute(ciP, orionldState.contextP, attrP, caP, NULL, &detail) == false)
+    if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
     {
       LM_E(("kjTreeToContextAttribute: %s", detail));
       attributeNotUpdated(notUpdatedP, attrP->name, "Error");
@@ -345,19 +345,19 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   // 8. Call mongoBackend to do the REPLACE of the entity
   UpdateContextResponse  ucResponse;
 
-  ciP->httpStatusCode = mongoUpdateContext(&ucRequest,
-                                           &ucResponse,
-                                           orionldState.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
+  orionldState.httpStatusCode = mongoUpdateContext(&ucRequest,
+                                                   &ucResponse,
+                                                   orionldState.tenant,
+                                                   ciP->servicePathV,
+                                                   ciP->uriParam,
+                                                   ciP->httpHeaders.xauthToken,
+                                                   ciP->httpHeaders.correlator,
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->apiVersion,
+                                                   NGSIV2_NO_FLAVOUR);
 
   // 9. Postprocess output from mongoBackend
-  if (ciP->httpStatusCode == SccOk)
+  if (orionldState.httpStatusCode == SccOk)
   {
     //
     // 204 or 207?
@@ -370,14 +370,14 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       kjChildAdd(orionldState.responseTree, updatedP);
       kjChildAdd(orionldState.responseTree, notUpdatedP);
 
-      ciP->httpStatusCode = SccMultiStatus;
+      orionldState.httpStatusCode = SccMultiStatus;
     }
     else
-      ciP->httpStatusCode = SccNoContent;
+      orionldState.httpStatusCode = SccNoContent;
   }
   else
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
+    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
     return false;
   }

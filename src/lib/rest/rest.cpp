@@ -202,6 +202,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 
 #ifdef ORIONLD
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
+        orionldState.httpStatusCode = SccBadRequest;
 #endif
         return MHD_YES;
       }
@@ -218,6 +219,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 
 #ifdef ORIONLD
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
+        orionldState.httpStatusCode = SccBadRequest;
 #endif
       return MHD_YES;
     }
@@ -229,6 +231,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 
 #ifdef ORIONLD
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
+        orionldState.httpStatusCode = SccBadRequest;
 #endif
       return MHD_YES;
     }

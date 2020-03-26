@@ -169,11 +169,11 @@ static bool orionldForwardPatchAttribute
   if (reqOk == false)
   {
     LM_E(("PATCH: orionldRequestSend failed: %s", detail));
-    ciP->httpStatusCode = SccReceiverInternalError;  // ???
+    orionldState.httpStatusCode = SccReceiverInternalError;  // ???
     return false;
   }
 
-  ciP->httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = SccNoContent;
 
   return true;
 }
@@ -381,7 +381,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     char pair[1024];
 
     snprintf(pair, sizeof(pair), "Entity '%s', Attribute '%s'", entityId, attrName);
-    ciP->httpStatusCode = SccNotFound;
+    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity/Attribute not found", pair);
     return false;
   }
@@ -406,22 +406,22 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   // Calling mongoBackend to do the actual DB update
   //
   mongoRequest.updateActionType = ActionTypeAppend;
-  ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
-                                           &mongoResponse,
-                                           orionldState.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
+  orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
+                                                   &mongoResponse,
+                                                   orionldState.tenant,
+                                                   ciP->servicePathV,
+                                                   ciP->uriParam,
+                                                   ciP->httpHeaders.xauthToken,
+                                                   ciP->httpHeaders.correlator,
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->apiVersion,
+                                                   NGSIV2_NO_FLAVOUR);
 
-  if (ciP->httpStatusCode == SccOk)
-    ciP->httpStatusCode = SccNoContent;
+  if (orionldState.httpStatusCode == SccOk)
+    orionldState.httpStatusCode = SccNoContent;
   else
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
+    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
     return false;
   }

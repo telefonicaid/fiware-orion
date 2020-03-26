@@ -63,7 +63,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   //
   if (mongoAttributeExists(orionldState.wildcard[0], attrNameP, orionldState.tenant) == false)
   {
-    ciP->httpStatusCode = SccContextElementNotFound;
+    orionldState.httpStatusCode = SccContextElementNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Attribute Not Found", orionldState.wildcard[1]);
     return false;
   }
@@ -82,27 +82,27 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   UpdateContextResponse ucResponse;
 
   ucr.fill(&entity, ActionTypeDelete);
-  ciP->httpStatusCode = mongoUpdateContext(&ucr,
-                                           &ucResponse,
-                                           orionldState.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
+  orionldState.httpStatusCode = mongoUpdateContext(&ucr,
+                                                   &ucResponse,
+                                                   orionldState.tenant,
+                                                   ciP->servicePathV,
+                                                   ciP->uriParam,
+                                                   ciP->httpHeaders.xauthToken,
+                                                   ciP->httpHeaders.correlator,
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->apiVersion,
+                                                   NGSIV2_NO_FLAVOUR);
 
-  if (ciP->httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != SccOk)
   {
-    orionldErrorResponseCreate(httpStatusCodeToOrionldErrorType(ciP->httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", orionldState.wildcard[0]);
+    orionldErrorResponseCreate(httpStatusCodeToOrionldErrorType(orionldState.httpStatusCode), "DELETE /ngsi-ld/v1/entities/*/attrs/*", orionldState.wildcard[0]);
     ucr.release();
 
     return false;
   }
 
   ucr.release();
-  ciP->httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = SccNoContent;
 
   return true;
 }

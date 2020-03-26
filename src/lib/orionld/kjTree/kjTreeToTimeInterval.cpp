@@ -29,7 +29,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "common/globals.h"                                    // parse8601Time
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
@@ -43,7 +42,7 @@ extern "C"
 //
 // kjTreeToTimeInterval -
 //
-bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterval* intervalP)
+bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP)
 {
   KjNode* startP = NULL;
   KjNode* endP   = NULL;
@@ -63,7 +62,7 @@ bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterv
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Unexpected field in TimeInterval", intervalItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -72,21 +71,21 @@ bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterv
   {
     const char* missing = (startP == NULL)? "TimeInterval::start" : "TimeInterval::end";
     orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in TimeInterval", missing);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   if ((intervalP->start = parse8601Time(startP->value.s)) == -1)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   if ((intervalP->end = parse8601Time(endP->value.s)) == -1)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 

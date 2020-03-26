@@ -29,7 +29,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
@@ -51,7 +50,7 @@ extern "C"
 //
 // kjTreeToSubscription -
 //
-bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP)
+bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP)
 {
   KjNode*                   kNodeP;
   char*                     nameP                     = NULL;
@@ -115,7 +114,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   {
     LM_W(("Bad Input (Subscription::id is not a URI)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", subP->id.c_str());
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -137,7 +136,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   {
     LM_W(("Bad Input (Mandatory field missing: Subscription::type)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::type");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -145,7 +144,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
   {
     LM_W(("Bad Input (subscription type must have the value /Subscription/)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription::type", orionldState.payloadTypeNode->value.s);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -175,7 +174,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       ARRAY_CHECK(kNodeP, "Subscription::entities");
       EMPTY_ARRAY_CHECK(kNodeP, "Subscription::entities");
 
-      if (kjTreeToEntIdVector(ciP, entitiesP, &subP->subject.entities) == false)
+      if (kjTreeToEntIdVector(entitiesP, &subP->subject.entities) == false)
       {
         LM_E(("kjTreeToEntIdVector failed"));
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
@@ -187,7 +186,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
       EMPTY_ARRAY_CHECK(kNodeP, "Subscription::watchedAttributes");
 
-      if (kjTreeToStringList(ciP, watchedAttributesP, &subP->subject.condition.attributes) == false)
+      if (kjTreeToStringList(watchedAttributesP, &subP->subject.condition.attributes) == false)
       {
         LM_E(("kjTreeToStringList failed"));
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToStringList
@@ -202,7 +201,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       {
         LM_W(("Bad Input (Subscription::timeInterval has a negative value)"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value in payload data", "Subscription::timeInterval has a negative value");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
 
@@ -248,7 +247,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       DUPLICATE_CHECK_WITH_PRESENCE(geoQPresent, geoQP, "Subscription::geoQ", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::geoQ");
 
-      if (kjTreeToSubscriptionExpression(ciP, geoQP, &subP->subject.condition.expression) == false)
+      if (kjTreeToSubscriptionExpression(geoQP, &subP->subject.condition.expression) == false)
       {
         LM_E(("kjTreeToSubscriptionExpression failed"));
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToSubscriptionExpression
@@ -271,7 +270,7 @@ bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char*
       DUPLICATE_CHECK_WITH_PRESENCE(notificationPresent, notificationP, "Subscription::notification", kNodeP);
       OBJECT_CHECK(kNodeP, "Subscription::notification");
 
-      if (kjTreeToNotification(ciP, notificationP, subP, endpointPP) == false)
+      if (kjTreeToNotification(notificationP, subP, endpointPP) == false)
       {
         LM_E(("kjTreeToNotification failed"));
         return false;  // orionldErrorResponseCreate is invoked by kjTreeToNotification

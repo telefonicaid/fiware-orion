@@ -65,7 +65,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
   {
     LM_W(("Bad Input (Payload must be a JSON Array)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Must be a JSON Array");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -80,7 +80,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input (Invalid payload - Array items must be JSON Strings)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be JSON Strings");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -88,7 +88,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input (Invalid payload - Array items must be valid URIs)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -97,7 +97,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
     if (mongoCppLegacyEntityListLookupWithIdTypeCreDate(orionldState.requestTree) == NULL)
     {
       LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       if (orionldState.responseTree == NULL)
         orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL");
       return false;
@@ -111,7 +111,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
   if (dbEntities == NULL)
   {
     LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entities not found", "Entities were not found in database.");
     return false;
   }
@@ -166,7 +166,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
   if (dbEntityBatchDelete(orionldState.requestTree) == false)
   {
     LM_E(("dbEntityBatchDelete returned false"));
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     if (orionldState.responseTree == NULL)
       orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntityBatchDelete");
     return false;
@@ -177,7 +177,7 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
 
     kjChildAdd(orionldState.responseTree, success);
     kjChildAdd(orionldState.responseTree, errors);
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
   }
 
   return true;

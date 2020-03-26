@@ -55,7 +55,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -90,13 +90,13 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
     OrionldResponseErrorType eType = (mongoResponse.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
 
     orionldErrorResponseCreate(eType, mongoResponse.oe.details.c_str(), orionldState.wildcard[0]);
-    ciP->httpStatusCode = (mongoResponse.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
+    orionldState.httpStatusCode = (mongoResponse.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
 
     return false;
   }
 
   // HTTP Response Code is 204 - No Content
-  ciP->httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = SccNoContent;
 
   return true;
 }

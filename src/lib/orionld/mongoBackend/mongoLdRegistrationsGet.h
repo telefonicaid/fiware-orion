@@ -27,7 +27,6 @@
 */
 #include <vector>
 
-#include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "apiTypesV2/Registration.h"
 
@@ -39,7 +38,6 @@
 */
 extern bool mongoLdRegistrationsGet
 (
-  ConnectionInfo*                     ciP,
   std::vector<ngsiv2::Registration>*  regVecP,
   const char*                         tenant,
   long long*                          countP,

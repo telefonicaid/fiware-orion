@@ -35,7 +35,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "apiTypesV2/Subscription.h"                             // Subscription
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
@@ -91,7 +90,7 @@ void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
 //
 // kjTreeFromSubscription -
 //
-KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscriptionP)
+KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
 {
   KjNode*          topP = kjObject(orionldState.kjsonP, NULL);
   KjNode*          objectP;

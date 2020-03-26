@@ -27,12 +27,11 @@ extern "C"
 #include "kjson/KjNode.h"                                       // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
-
 #include "logMsg/logMsg.h"                                      // LM_*
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
+#include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckTimeInterval.h"            // Own interface
 
@@ -42,7 +41,7 @@ extern "C"
 //
 // pcheckTimeInterval -
 //
-bool pcheckTimeInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const char* fieldName)
+bool pcheckTimeInterval(KjNode* timeIntervalNodeP, const char* fieldName)
 {
   KjNode* startP = NULL;
   KjNode* endP   = NULL;
@@ -66,7 +65,7 @@ bool pcheckTimeInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const ch
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for TimeInterval", tiItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -74,28 +73,28 @@ bool pcheckTimeInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const ch
   if ((startP == NULL) && (endP == NULL))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Empty Object", fieldName);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   if (startP == NULL)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "start");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   if (endP == NULL)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "end");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   if (start > end)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Inconsistent TimeInterval", "TimeInterval ends before it starts");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 

@@ -25,14 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
+
 
 
 // -----------------------------------------------------------------------------
 //
 // kjTreeFromSubscription -
 //
-extern KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscriptionP);
+extern KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMSUBSCRIPTION_H_

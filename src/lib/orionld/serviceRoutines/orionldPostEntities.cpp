@@ -74,7 +74,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   KjNode*  createdAtP         = NULL;
   KjNode*  modifiedAtP        = NULL;
 
-  if (orionldEntityPayloadCheck(ciP, orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
+  if (orionldEntityPayloadCheck(orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
     return false;
 
   char*    entityId           = orionldState.payloadIdNode->value.s;
@@ -97,7 +97,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (mongoEntityExists(entityId, orionldState.tenant) == true)
   {
     orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", entityId);
-    ciP->httpStatusCode = SccConflict;
+    orionldState.httpStatusCode = SccConflict;
     return false;
   }
 
@@ -134,7 +134,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
-    if (kjTreeToContextAttribute(ciP, orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       // kjTreeToContextAttribute calls orionldErrorResponseCreate
       LM_E(("kjTreeToContextAttribute failed: %s", detail));
@@ -153,29 +153,29 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   // Mongo
   //
-  ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
-                                           &mongoResponse,
-                                           orionldState.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
+  orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
+                                                   &mongoResponse,
+                                                   orionldState.tenant,
+                                                   ciP->servicePathV,
+                                                   ciP->uriParam,
+                                                   ciP->httpHeaders.xauthToken,
+                                                   ciP->httpHeaders.correlator,
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->apiVersion,
+                                                   NGSIV2_NO_FLAVOUR);
 
   mongoRequest.release();
   mongoResponse.release();
 
-  if (ciP->httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != SccOk)
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
+    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
     return false;
   }
 
-  ciP->httpStatusCode = SccCreated;
-  orionldState.entityCreated = true;
+  orionldState.httpStatusCode = SccCreated;
+  orionldState.entityCreated  = true;
 
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", entityId);
 

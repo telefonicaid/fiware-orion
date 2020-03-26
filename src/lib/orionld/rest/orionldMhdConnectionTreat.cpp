@@ -134,7 +134,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
     LM_E(("Bad Input (%s: %s)", errorTitle, errorDetails));
 
     orionldErrorResponseCreate(OrionldBadRequestData, errorTitle, errorDetails);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
 
     return false;
   }
@@ -207,7 +207,7 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
 
     LM_W(("Bad Input (HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json')"));
     orionldErrorResponseCreate(OrionldBadRequestData, title, details);
-    ciP->httpStatusCode = SccNotAcceptable;
+    orionldState.httpStatusCode = SccNotAcceptable;
 
     return false;
   }
@@ -240,15 +240,15 @@ static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
 {
   OrionLdRestService* serviceP;
 
-  serviceP = orionldServiceLookup(ciP, &orionldRestServiceV[ciP->verb]);
+  serviceP = orionldServiceLookup(&orionldRestServiceV[ciP->verb]);
   if (serviceP == NULL)
   {
     if (orionldBadVerb(ciP) == true)
-      ciP->httpStatusCode = SccBadVerb;
+      orionldState.httpStatusCode = SccBadVerb;
     else
     {
       orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
-      ciP->httpStatusCode = SccContextElementNotFound;
+      orionldState.httpStatusCode = SccContextElementNotFound;
     }
   }
 
@@ -267,7 +267,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   if (ciP->payload == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -275,7 +275,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   if (ciP->payload[0] == 0)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -319,7 +319,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if (orionldState.requestTree == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -329,7 +329,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Object", "{}");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -339,7 +339,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Array", "[]");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -463,7 +463,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     if ((orionldState.payloadContextNode->type != KjString) && (orionldState.payloadContextNode->type != KjArray) && (orionldState.payloadContextNode->type != KjObject))
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -495,7 +495,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   if (orionldState.link[0] != '<')
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid Link HTTP header", "link doesn't start with '<'");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -505,7 +505,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   {
     LM_E(("linkCheck: %s", details));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Link HTTP Header", details);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -523,7 +523,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   {
     LM_W(("Bad Input? (%s: %s)", pd.title, pd.detail));
     orionldErrorResponseFromProblemDetails(&pd);
-    ciP->httpStatusCode = (HttpStatusCode) pd.status;  // FIXME: Stop using ciP->httpStatusCode!!!
+    orionldState.httpStatusCode = (HttpStatusCode) pd.status;
     return false;
   }
 
@@ -662,7 +662,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // 01. Predetected Error?
   //
-  if (ciP->httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != SccOk)
     goto respond;
 
   //
@@ -732,7 +732,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input? (%s: %s (type == %d, status = %d))", pd.title, pd.detail, pd.type, pd.status));
       orionldErrorResponseFromProblemDetails(&pd);
-      ciP->httpStatusCode = (HttpStatusCode) pd.status;  // FIXME: Stop using ciP->httpStatusCode!!!
+      orionldState.httpStatusCode = (HttpStatusCode) pd.status;
 
       goto respond;
     }
@@ -758,8 +758,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if (serviceRoutineResult == false)
   {
-    if (ciP->httpStatusCode < 400)
-      ciP->httpStatusCode = SccBadRequest;
+    if (orionldState.httpStatusCode < 400)
+      orionldState.httpStatusCode = SccBadRequest;
   }
 
 
@@ -770,13 +770,13 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // The only exception is 405 that has no payload - the info comes in the "Accepted" HTTP header.
   //
-  if ((ciP->httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (ciP->httpStatusCode != 405))
+  if ((orionldState.httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (orionldState.httpStatusCode != 405))
     orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
 
   //
   // On error, the Content-Type is always "application/json" and there is NO Link header
   //
-  if (ciP->httpStatusCode >= 400)
+  if (orionldState.httpStatusCode >= 400)
   {
     orionldState.noLinkHeader  = true;   // We don't want the Link header for erroneous requests
     serviceRoutineResult       = false;  // Just in case ...
@@ -820,7 +820,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
     if (addContext)
     {
-      if ((orionldState.acceptJsonld == true) && (ciP->httpStatusCode < 300))
+      if ((orionldState.acceptJsonld == true) && (orionldState.httpStatusCode < 300))
         contextToPayload();
     }
 
@@ -844,6 +844,11 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
   }
 
+  //
+  // restReply assumes that the HTTP Status Code for the response is in 'ciP->httpStatusCode'
+  // FIXME: make the HTTP Status Code a parameter for restReply
+  //
+  ciP->httpStatusCode = orionldState.httpStatusCode;
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
@@ -853,7 +858,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Calling Temporal Routine to save the temporal data (if applicable)
   // Only if the Service Routine was successful, of course
   //
-  if ((ciP->httpStatusCode >= 200) && (ciP->httpStatusCode <= 300))
+  if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
   {
     if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
       orionldState.serviceP->temporalRoutine(ciP);

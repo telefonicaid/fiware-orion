@@ -46,7 +46,7 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetRegistration (%s)", orionldState.wildcard[0]));
 
-  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
+  if (mongoLdRegistrationGet(&registration, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoLdRegistrationGet error: %s", details));
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
@@ -54,8 +54,8 @@ bool orionldGetRegistration(ConnectionInfo* ciP)
   }
 
   // Transform to KjNode tree
-  ciP->httpStatusCode       = SccOk;
-  orionldState.responseTree = kjTreeFromRegistration(ciP, &registration);
+  orionldState.httpStatusCode  = SccOk;
+  orionldState.responseTree    = kjTreeFromRegistration(ciP, &registration);
 
   return true;
 }

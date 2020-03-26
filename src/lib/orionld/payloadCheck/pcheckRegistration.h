@@ -30,8 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 
 
 // -----------------------------------------------------------------------------
@@ -56,6 +54,6 @@ extern "C"
 // as a KjNode tree, until we are able to perform this check.
 // The output parameter 'propertyTreeP' is used for this purpose.
 //
-extern bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBePresent, KjNode**  propertyTreeP);
+extern bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  propertyTreeP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKREGISTRATION_H_

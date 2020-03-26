@@ -143,7 +143,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   // 1. Is the Entity ID in the URL a valid URI?
   if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
   {
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);
     return false;
   }
@@ -155,7 +155,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
   {
-    ciP->httpStatusCode = SccNotFound;
+    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
     return false;
   }
@@ -167,7 +167,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     inDbAttrNamesP = kjLookup(dbEntityP, "attrNames");
     if (inDbAttrNamesP == NULL)
     {
-      ciP->httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = SccReceiverInternalError;
       orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrNames' field of entity from DB not found");
       return false;
     }
@@ -186,7 +186,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   if (dbAttrsP == NULL)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
     return false;
   }
@@ -241,13 +241,13 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     //
     if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
     {
-      orionldState.responseTree = NULL;
-      ciP->httpStatusCode       = SccNoContent;
+      orionldState.responseTree   = NULL;
+      orionldState.httpStatusCode = SccNoContent;
     }
     else
     {
-      orionldState.responseTree = responseP;
-      ciP->httpStatusCode       = SccMultiStatus;
+      orionldState.responseTree   = responseP;
+      orionldState.httpStatusCode = SccMultiStatus;
     }
 
     return true;
@@ -283,7 +283,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     ContextAttribute* caP     = new ContextAttribute();
     char*             detail;
 
-    if (kjTreeToContextAttribute(ciP, orionldState.contextP, attrP, caP, NULL, &detail) == false)
+    if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
     {
       LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
       attributeNotUpdated(notUpdatedP, attrP->name, detail);
@@ -318,13 +318,13 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   //
   if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
   {
-    orionldState.responseTree = NULL;
-    ciP->httpStatusCode       = SccNoContent;
+    orionldState.responseTree   = NULL;
+    orionldState.httpStatusCode = SccNoContent;
   }
   else
   {
-    orionldState.responseTree = responseP;
-    ciP->httpStatusCode       = SccMultiStatus;
+    orionldState.responseTree   = responseP;
+    orionldState.httpStatusCode = SccMultiStatus;
   }
 
   return true;

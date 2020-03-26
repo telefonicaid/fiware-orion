@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 
 #include "orionld/common/CHECK.h"                              // CHECKx()
@@ -46,7 +45,7 @@ extern "C"
 //
 // formatExtract -
 //
-static bool formatExtract(ConnectionInfo* ciP, char* format, ngsiv2::Subscription* subP)
+static bool formatExtract(char* format, ngsiv2::Subscription* subP)
 {
   if (SCOMPARE10(format, 'k', 'e', 'y', 'V', 'a', 'l', 'u', 'e', 's', 0))
     subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
@@ -56,6 +55,7 @@ static bool formatExtract(ConnectionInfo* ciP, char* format, ngsiv2::Subscriptio
   {
     LM_E(("Invalid value for Notification::format: '%s'", format));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Notification::format", format);
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -68,7 +68,7 @@ static bool formatExtract(ConnectionInfo* ciP, char* format, ngsiv2::Subscriptio
 //
 // kjTreeToNotification -
 //
-bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** endpointPP)
+bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** endpointPP)
 {
   KjNode*   attributesP   = NULL;
   char*     formatP       = NULL;
@@ -86,7 +86,7 @@ bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscript
       DUPLICATE_CHECK(attributesP, "Notification::attributes", itemP);
       ARRAY_CHECK(itemP, "Notification::attributes");
 
-      if (kjTreeToStringList(ciP, itemP, &subP->notification.attributes) == false)
+      if (kjTreeToStringList(itemP, &subP->notification.attributes) == false)
         return false;
     }
     else if (SCOMPARE7(itemP->name, 'f', 'o', 'r', 'm', 'a', 't', 0))
@@ -95,7 +95,7 @@ bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscript
       STRING_CHECK(itemP, "Notification::format");
 
       LM_T(LmtNotificationFormat, ("Got a subscription format: '%s'", itemP->value.s));
-      if (formatExtract(ciP, formatP, subP) == false)
+      if (formatExtract(formatP, subP) == false)
         return false;
       LM_T(LmtNotificationFormat, ("Extracted subscription format: %d", subP->attrsFormat));
     }
@@ -106,7 +106,7 @@ bool kjTreeToNotification(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::Subscript
 
       *endpointPP = itemP;
 
-      if (kjTreeToEndpoint(ciP, itemP, &subP->notification.httpInfo) == false)
+      if (kjTreeToEndpoint(itemP, &subP->notification.httpInfo) == false)
         return false;
     }
     else if (SCOMPARE7(itemP->name, 's', 't', 'a', 't', 'u', 's', 0))

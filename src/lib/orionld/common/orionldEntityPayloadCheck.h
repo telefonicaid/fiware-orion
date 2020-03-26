@@ -30,8 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 
 
 // -----------------------------------------------------------------------------
@@ -48,7 +46,6 @@ extern bool orionldValidName(char* name, char** detailsPP);
 //
 extern bool orionldEntityPayloadCheck
 (
-  ConnectionInfo*  ciP,
   KjNode*          kNodeP,
   KjNode**         locationNodePP,
   KjNode**         observationSpaceNodePP,

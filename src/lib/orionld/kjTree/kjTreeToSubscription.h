@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Subscription.h"                           // Subscription
 
 
@@ -39,6 +38,6 @@ extern "C"
 //
 // kjTreeToSubscription -
 //
-extern bool kjTreeToSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP);
+extern bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** endpointPP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTION_H_

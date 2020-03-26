@@ -28,7 +28,6 @@ extern "C"
 #include "kjson/kjRender.h"                                    // kjRender
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/SubscriptionExpression.h"                 // SubscriptionExpression
 
 #include "orionld/common/CHECK.h"                              // CHECKx()
@@ -43,7 +42,7 @@ extern "C"
 //
 // kjTreeToSubscriptionExpression -
 //
-bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, SubscriptionExpression* subExpressionP)
+bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subExpressionP)
 {
   KjNode*  itemP;
   char*    geometryP          = NULL;

@@ -22,25 +22,27 @@
 *
 * Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
+#include <string>                                                // std::string
+#include <vector>                                                // std::vector
 
-#include "common/string.h"                                     // stringSplit
-#include "common/statistics.h"                                 // TIME_STAT_MONGO_READ_WAIT_START, ...
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/OrionError.h"                                   // OrionError
-#include "apiTypesV2/Registration.h"                           // ngsiv2::Registration
-#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, ...
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
-#include "mongoBackend/safeMongo.h"                            // moreSafe
-#include "mongoBackend/connectionOperations.h"                 // collectionRangedQuery
-#include "mongoBackend/mongoRegistrationAux.h"                 // mongoSetXxx
-#include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLdRelationshipV, mongoSetLdPropertyV, ...
-#include "orionld/mongoBackend/mongoLdRegistrationsGet.h"      // Own interface
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "common/string.h"                                       // stringSplit
+#include "common/statistics.h"                                   // TIME_STAT_MONGO_READ_WAIT_START, ...
+#include "rest/OrionError.h"                                     // OrionError
+#include "apiTypesV2/Registration.h"                             // ngsiv2::Registration
+#include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, ...
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
+#include "mongoBackend/safeMongo.h"                              // moreSafe
+#include "mongoBackend/connectionOperations.h"                   // collectionRangedQuery
+#include "mongoBackend/mongoRegistrationAux.h"                   // mongoSetXxx
+#include "orionld/mongoBackend/mongoLdRegistrationAux.h"         // mongoSetLdRelationshipV, mongoSetLdPropertyV, ...
+#include "orionld/mongoBackend/mongoLdRegistrationsGet.h"        // Own interface
 
 
 
@@ -213,7 +215,6 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
 */
 bool mongoLdRegistrationsGet
 (
-  ConnectionInfo*                     ciP,
   std::vector<ngsiv2::Registration>*  regVecP,
   const char*                         tenant,
   long long*                          countP,
@@ -221,17 +222,9 @@ bool mongoLdRegistrationsGet
 )
 {
   bool                   reqSemTaken        = false;
-  int                    offset             = 0;
-  int                    limit              = DEFAULT_PAGINATION_LIMIT_INT;
   std::string            err;
   mongo::BSONObjBuilder  queryBuilder;
   mongo::Query           query;
-
-  if (ciP->uriParam[URI_PARAM_PAGINATION_LIMIT] != "")
-    limit = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());  // Error handling already done by uriArgumentGet() in rest.cpp
-
-  if (ciP->uriParam[URI_PARAM_PAGINATION_OFFSET] != "")
-    offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
 
   if ((orionldState.uriParams.id != NULL) && uriParamIdToFilter(&queryBuilder, orionldState.uriParams.id, &oeP->details) == false)
     return false;
@@ -262,8 +255,8 @@ bool mongoLdRegistrationsGet
   if (!collectionRangedQuery(connection,
                              getRegistrationsCollectionName(tenant),
                              query,
-                             limit,
-                             offset,
+                             orionldState.uriParams.limit,
+                             orionldState.uriParams.offset,
                              &cursor,
                              countP,
                              &err))
@@ -327,7 +320,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      ciP->httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = SccReceiverInternalError;
       return false;
     }
 
@@ -336,7 +329,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      ciP->httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = SccReceiverInternalError;
       return false;
     }
 
@@ -345,7 +338,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      ciP->httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = SccReceiverInternalError;
       return false;
     }
 
@@ -354,7 +347,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdProperties: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      ciP->httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = SccReceiverInternalError;
       return false;
     }
 

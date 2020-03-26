@@ -33,7 +33,6 @@ extern "C"
 }
 
 #include "common/globals.h"                                      // parse8601Time
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "orionTypes/OrionValueType.h"                           // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                         // ActionType
@@ -133,7 +132,6 @@ static bool checkEntityIdFieldExists(void)
 //
 bool orionldEntityPayloadCheck
 (
-  ConnectionInfo*  ciP,
   KjNode*          kNodeP,
   KjNode**         locationNodePP,
   KjNode**         observationSpaceNodePP,
@@ -186,7 +184,7 @@ bool orionldEntityPayloadCheck
         // if (mongoEntityExists(orionldState.payloadIdNode->value.s, orionldState.tenant) == true)
         // {
         //   orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", orionldState.payloadIdNode->value.s);
-        //   ciP->httpStatusCode = SccConflict;
+        //   orionldState.httpStatusCode = SccConflict;
         //   return false;
         // }
       }

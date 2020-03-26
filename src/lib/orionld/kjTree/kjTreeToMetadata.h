@@ -33,7 +33,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
 
@@ -42,6 +41,6 @@ extern "C"
 //
 // kjTreeToMetadata -
 //
-extern bool kjTreeToMetadata(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName, char** detailP);
+extern bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOMETADATA_H_

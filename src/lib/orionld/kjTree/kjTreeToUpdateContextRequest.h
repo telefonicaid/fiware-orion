@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                 // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                          // ConnectionInfo
 #include "ngsi10/UpdateContextRequest.h"                  // UpdateContextRequest
 
 
@@ -41,7 +40,6 @@ extern "C"
 //
 extern void kjTreeToUpdateContextRequest
 (
-  ConnectionInfo*        ciP,
   UpdateContextRequest*  ucrP,
   KjNode*                treeP,
   KjNode*                errorsArrayP

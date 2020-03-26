@@ -43,13 +43,13 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
 {
   char* details;
 
-  if (mongoDeleteLdSubscription(orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) == false)
+  if (mongoDeleteLdSubscription(orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) == false)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, details, orionldState.wildcard[0]);
     return false;
   }
 
-  ciP->httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = SccNoContent;
 
   return true;
 }

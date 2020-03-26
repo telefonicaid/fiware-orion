@@ -32,7 +32,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/EntID.h"                                  // EntID
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECKx(U)
@@ -54,7 +53,7 @@ extern "C"
 // - idPattern
 // - type
 //
-bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
+bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
 {
   KjNode* entityP;
 
@@ -115,7 +114,7 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
       if ((urlCheck(idP, &details) == false) && (urnCheck(idP, &details) == false))
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }

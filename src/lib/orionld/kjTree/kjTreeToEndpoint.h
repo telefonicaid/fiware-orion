@@ -33,7 +33,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 
 
@@ -42,6 +41,6 @@ extern "C"
 //
 // kjTreeToEndpoint -
 //
-extern bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP);
+extern bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOENDPOINT_H_

@@ -30,8 +30,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                      // LM_*
 #include "logMsg/traceLevels.h"                                 // Lmt*
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
-
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
@@ -45,7 +43,7 @@ extern "C"
 //
 // pcheckNotification -
 //
-bool pcheckNotification(ConnectionInfo* ciP, KjNode* notificationP)
+bool pcheckNotification(KjNode* notificationP)
 {
   KjNode* attributesP = NULL;
   KjNode* formatP     = NULL;
@@ -76,7 +74,7 @@ bool pcheckNotification(ConnectionInfo* ciP, KjNode* notificationP)
       if ((strcmp(formatP->value.s, "keyValues") != 0) && (strcmp(formatP->value.s, "normalized") != 0))
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value of 'format' (must be either 'keyValues' or 'normalized'", formatP->value.s);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -85,19 +83,19 @@ bool pcheckNotification(ConnectionInfo* ciP, KjNode* notificationP)
       DUPLICATE_CHECK(endpointP, "endpoint", nItemP);
       OBJECT_CHECK(endpointP, "endpoint");
       EMPTY_OBJECT_CHECK(endpointP, "endpoint");
-      if (pcheckEndpoint(ciP, endpointP) == false)
+      if (pcheckEndpoint(endpointP) == false)
         return false;
     }
     else if (strcmp(nItemP->name, "status") == 0)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for notification", "'status' is read-only");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
     else
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for notification", nItemP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -105,7 +103,7 @@ bool pcheckNotification(ConnectionInfo* ciP, KjNode* notificationP)
   if (endpointP == NULL)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "endpoint");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 

@@ -23,7 +23,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     kjTreeFromQueryContextResponse.cpp
     kjTreeFromContextAttribute.cpp
-    kjTreeFromContextContextAttribute.cpp
     kjTreeFromCompoundValue.cpp
     kjTreeFromSubscription.cpp
     kjTreeFromNotification.cpp

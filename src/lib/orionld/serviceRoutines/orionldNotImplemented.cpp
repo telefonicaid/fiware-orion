@@ -37,8 +37,8 @@
 //
 bool orionldNotImplemented(ConnectionInfo* ciP)
 {
-  ciP->httpStatusCode        = SccNotImplemented;
-  orionldState.noLinkHeader  = true;  // We don't want the Link header for non-implemented requests
+  orionldState.httpStatusCode = SccNotImplemented;
+  orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
 
   orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
   return false;

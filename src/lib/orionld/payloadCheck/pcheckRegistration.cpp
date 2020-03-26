@@ -31,8 +31,6 @@ extern "C"
 #include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
 }
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
-
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
@@ -65,7 +63,7 @@ extern "C"
 // as a KjNode tree, until we are able to perform this check.
 // The output parameter 'propertyTreeP' is used for this purpose.
 //
-bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBePresent, KjNode**  propertyTreeP)
+bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  propertyTreeP)
 {
   KjNode*  idP                   = NULL;
   KjNode*  typeP                 = NULL;
@@ -85,7 +83,7 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
   if (registrationP->type != KjObject)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Registration", "The payload data for updating a registration must be a JSON Object");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -112,7 +110,7 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
       if (idCanBePresent == false)
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid field for Registration Update", "id");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
 
@@ -128,7 +126,7 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
       if (strcmp(nodeP->value.s, "ContextSourceRegistration") != 0)
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for type", nodeP->value.s);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -146,7 +144,7 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
     {
       DUPLICATE_CHECK(informationP, "information", nodeP);
       ARRAY_CHECK(nodeP, "information");
-      if (pcheckInformation(ciP, nodeP) == false)
+      if (pcheckInformation(nodeP) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "observationInterval") == 0)
@@ -154,14 +152,14 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
       DUPLICATE_CHECK(observationIntervalP, "observationInterval", nodeP);
       OBJECT_CHECK(nodeP, "observationInterval");
       EMPTY_OBJECT_CHECK(nodeP, "observationInterval");
-      if (pcheckTimeInterval(ciP, nodeP, "observationInterval") == false)
+      if (pcheckTimeInterval(nodeP, "observationInterval") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "managementInterval") == 0)
     {
       DUPLICATE_CHECK(managementIntervalP, "managementInterval", nodeP);
       OBJECT_CHECK(nodeP, "managementInterval");
-      if (pcheckTimeInterval(ciP, nodeP, "managementInterval") == false)
+      if (pcheckTimeInterval(nodeP, "managementInterval") == false)
         return false;
     }
     else if (strcmp(nodeP->name, "location") == 0)
@@ -169,9 +167,9 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
       DUPLICATE_CHECK(locationP, "location", nodeP);
       OBJECT_CHECK(nodeP, "location");
 
-      if (pcheckGeoProperty(ciP, locationP, NULL, NULL) == false)
+      if (pcheckGeoProperty(locationP, NULL, NULL) == false)
       {
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -179,9 +177,9 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
     {
       DUPLICATE_CHECK(observationSpaceP, "observationSpace", nodeP);
       OBJECT_CHECK(nodeP, "observationSpace");
-      if (pcheckGeoProperty(ciP, observationSpaceP, NULL, NULL) == false)
+      if (pcheckGeoProperty(observationSpaceP, NULL, NULL) == false)
       {
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -189,9 +187,9 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
     {
       DUPLICATE_CHECK(operationSpaceP, "operationSpace", nodeP);
       OBJECT_CHECK(nodeP, "operationSpace");
-      if (pcheckGeoProperty(ciP, operationSpaceP, NULL, NULL) == false)
+      if (pcheckGeoProperty(operationSpaceP, NULL, NULL) == false)
       {
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -219,7 +217,7 @@ bool pcheckRegistration(ConnectionInfo* ciP, KjNode* registrationP, bool idCanBe
       //
       if (kjLookup(propertyTree, nodeP->name) != NULL)
       {
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         orionldErrorResponseCreate(OrionldBadRequestData, "Duplicate Property in Registration Update", nodeP->name);
         return false;
       }

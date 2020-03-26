@@ -68,7 +68,7 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
 
   for (unsigned int ix = 0; ix < subVec.size(); ix++)
   {
-    KjNode* subscriptionNodeP = kjTreeFromSubscription(ciP, &subVec[ix]);
+    KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix]);
 
     kjChildAdd(orionldState.responseTree, subscriptionNodeP);
   }

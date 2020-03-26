@@ -32,7 +32,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/EntID.h"                                  // EntID
 
 
@@ -41,6 +40,6 @@ extern "C"
 //
 // kjTreeToEntIdVector -
 //
-extern bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP);
+extern bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOENTIDVECTOR_H_

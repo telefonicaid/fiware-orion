@@ -32,7 +32,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/types/OrionldTimeInterval.h"                 // OrionldTimeInterval
 
 
@@ -41,6 +40,6 @@ extern "C"
 //
 // kjTreeToTimeInterval -
 //
-extern bool kjTreeToTimeInterval(ConnectionInfo* ciP, KjNode* kNodeP, OrionldTimeInterval* intervalP);
+extern bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOTIMEINTERVAL_H_

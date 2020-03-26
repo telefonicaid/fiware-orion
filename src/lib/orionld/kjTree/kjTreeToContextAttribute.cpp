@@ -59,7 +59,7 @@ do                                                                           \
 {                                                                            \
   LM_E((errorString));                                                       \
   orionldErrorResponseCreate(OrionldBadRequestData, errorString, details);   \
-  ciP->httpStatusCode = SccBadRequest;                                       \
+  orionldState.httpStatusCode = SccBadRequest;                               \
   return false;                                                              \
 } while (0)
 
@@ -70,7 +70,7 @@ do                                                                           \
 // Forward declaration - compoundCreate is used by compoundValueNodeValueSet
 //                       and compoundValueNodeValueSet uses compoundCreate
 //
-static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNodeP, KjNode* parentP, int level = 0);
+static orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level = 0);
 
 
 
@@ -78,7 +78,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 //
 // compoundValueNodeValueSet - set the value of a CompoundeValueNode instance
 //
-static bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueNode* cNodeP, KjNode* kNodeP, int* levelP)
+static bool compoundValueNodeValueSet(orion::CompoundValueNode* cNodeP, KjNode* kNodeP, int* levelP)
 {
   if (kNodeP->type == KjString)
   {
@@ -111,7 +111,7 @@ static bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueN
 
     for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
     {
-      orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, *levelP);
+      orion::CompoundValueNode* cChildP = compoundCreate(kChildP, kNodeP, *levelP);
       cNodeP->childV.push_back(cChildP);
     }
   }
@@ -122,7 +122,7 @@ static bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueN
 
     for (KjNode* kChildP = kNodeP->value.firstChildP; kChildP != NULL; kChildP = kChildP->next)
     {
-      orion::CompoundValueNode* cChildP = compoundCreate(ciP, kChildP, kNodeP, *levelP);
+      orion::CompoundValueNode* cChildP = compoundCreate(kChildP, kNodeP, *levelP);
 
       cNodeP->childV.push_back(cChildP);
     }
@@ -131,6 +131,7 @@ static bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueN
   {
     LM_E(("Invalid json type (KjNone!) for value field of compound '%s'", cNodeP->name.c_str()));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson");
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -143,7 +144,7 @@ static bool compoundValueNodeValueSet(ConnectionInfo* ciP, orion::CompoundValueN
 //
 // compoundCreate -
 //
-static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNodeP, KjNode* parentP, int level)
+static orion::CompoundValueNode* compoundCreate(KjNode* kNodeP, KjNode* parentP, int level)
 {
   if (kNodeP->type != KjArray)
     LM_T(LmtCompoundCreation, ("In compoundCreate: creating '%s' called '%s' on level %d", kjValueType(kNodeP->type), kNodeP->name, level));
@@ -155,7 +156,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
   if ((parentP != NULL) && (parentP->type == KjObject))
     cNodeP->name = kNodeP->name;
 
-  if (compoundValueNodeValueSet(ciP, cNodeP, kNodeP, &level) == false)
+  if (compoundValueNodeValueSet(cNodeP, kNodeP, &level) == false)
   {
     // compoundValueNodeValueSet calls orionldErrorResponseCreate
     return NULL;
@@ -170,7 +171,7 @@ static orion::CompoundValueNode* compoundCreate(ConnectionInfo* ciP, KjNode* kNo
 //
 // specialCompoundCheck -
 //
-static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
+static bool specialCompoundCheck(KjNode* compoundValueP)
 {
   KjNode*  typeNodeP  = NULL;
   KjNode*  valueNodeP = NULL;
@@ -201,7 +202,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
     if (otherNodeP != NULL)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -215,7 +216,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
         const char* errorString = "DateTime value of @value/@type compound must be a valid ISO8601";
         LM_W(("Bad Input (%s - got '%s')", errorString, valueNodeP->value.s));
         orionldErrorResponseCreate(OrionldBadRequestData, errorString, valueNodeP->value.s);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -225,7 +226,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
     if (otherNodeP != NULL)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "unwanted extra items in @value/@type compound", otherNodeP->name);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -234,7 +235,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
     if (valueNodeP == NULL)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "missing @value in @value/@type compound", "@value is mandatory");
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
@@ -248,7 +249,7 @@ static bool specialCompoundCheck(ConnectionInfo* ciP, KjNode* compoundValueP)
 //
 // attributeValueSet - set the value of a ContextAttribute instance
 //
-static bool attributeValueSet(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* valueP)
+static bool attributeValueSet(ContextAttribute* caP, KjNode* valueP)
 {
   switch (valueP->type)
   {
@@ -256,19 +257,19 @@ static bool attributeValueSet(ConnectionInfo* ciP, ContextAttribute* caP, KjNode
   case KjInt:        caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.i; break;
   case KjFloat:      caP->valueType = orion::ValueTypeNumber;  caP->numberValue    = valueP->value.f; break;
   case KjString:     caP->valueType = orion::ValueTypeString;  caP->stringValue    = valueP->value.s; break;
-  case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
-  case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(ciP, valueP, NULL); break;
+  case KjObject:     caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(valueP, NULL); break;
+  case KjArray:      caP->valueType = orion::ValueTypeObject;  caP->compoundValueP = compoundCreate(valueP, NULL); break;
   case KjNull:       caP->valueType = orion::ValueTypeNull;    break;
   case KjNone:
     LM_E(("Invalid type from kjson"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson");
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     return false;
   }
 
   if (valueP->type == KjObject)
   {
-    if (specialCompoundCheck(ciP, valueP) == false)
+    if (specialCompoundCheck(valueP) == false)
       return false;
   }
 
@@ -281,7 +282,7 @@ static bool attributeValueSet(ConnectionInfo* ciP, ContextAttribute* caP, KjNode
 //
 // metadataValueSet - set the value of a Metadata instance
 //
-static bool metadataValueSet(ConnectionInfo* ciP, Metadata* mdP, KjNode* valueNodeP)
+static bool metadataValueSet(Metadata* mdP, KjNode* valueNodeP)
 {
   switch (valueNodeP->type)
   {
@@ -289,13 +290,13 @@ static bool metadataValueSet(ConnectionInfo* ciP, Metadata* mdP, KjNode* valueNo
   case KjInt:        mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.i; break;
   case KjFloat:      mdP->valueType = orion::ValueTypeNumber;  mdP->numberValue    = valueNodeP->value.f; break;
   case KjString:     mdP->valueType = orion::ValueTypeString;  mdP->stringValue    = valueNodeP->value.s; break;
-  case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL); break;
-  case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(ciP, valueNodeP, NULL);  break;
+  case KjObject:     mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(valueNodeP, NULL); break;
+  case KjArray:      mdP->valueType = orion::ValueTypeObject;  mdP->compoundValueP = compoundCreate(valueNodeP, NULL);  break;
   case KjNull:       mdP->valueType = orion::ValueTypeNull;    break;
   case KjNone:
     LM_E(("Invalid json type (KjNone!) for value field of metadata '%s'", valueNodeP->name));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal error", "Invalid type from kjson");
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     return false;
   }
 
@@ -308,7 +309,7 @@ static bool metadataValueSet(ConnectionInfo* ciP, Metadata* mdP, KjNode* valueNo
 //
 // metadataAdd -
 //
-bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName)
+bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
 {
   LM_T(LmtMetadata, ("Create metadata '%s' (a JSON %s) and add to attribute '%s'", nodeP->name, kjValueType(nodeP->type), caName));
 
@@ -427,7 +428,7 @@ bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char
   }
   else if (isProperty == true)
   {
-    if (metadataValueSet(ciP, mdP, valueNodeP) == false)
+    if (metadataValueSet(mdP, valueNodeP) == false)
     {
       // metadataValueSet calls orionldErrorResponseCreate
       delete mdP;
@@ -484,7 +485,7 @@ static bool atValueCheck(KjNode* atTypeNodeP, KjNode* atValueNodeP, char** title
 //
 // FIXME: This function is TOO LONG - try to split up
 //
-bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
+bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextAttribute* caP, KjNode** typeNodePP, char** detailP)
 {
   char* caName = kNodeP->name;
 
@@ -499,7 +500,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
   {
     *detailP = (char*) "Attribute must be a JSON object";
     orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", caName);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -558,7 +559,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
         *detailP = (char*) "Duplicated field";
         LM_E(("Duplicated field: 'Attribute Type'"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Attribute Type");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
       typeP = nodeP;
@@ -570,7 +571,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
       {
         *detailP = (char*) "Attribute type m,ust be a JSON String";
         orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", "attribute type");
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
 
@@ -645,7 +646,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
       DUPLICATE_CHECK(unitCodeP, "unit code", nodeP);
-      if (metadataAdd(ciP, caP, nodeP, caName) == false)
+      if (metadataAdd(caP, nodeP, caName) == false)
       {
         // metadataAdd calls orionldErrorResponseCreate
         *detailP = (char*) "metadataAdd failed";
@@ -681,7 +682,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
       nodeP->type    = KjInt;
       nodeP->value.i = dateTime;
 
-      if (metadataAdd(ciP, caP, nodeP, caName) == false)
+      if (metadataAdd(caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
         orionldErrorResponseCreate(OrionldBadRequestData, "Error adding metadata to attribute", nodeP->name);
@@ -692,7 +693,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     else if (SCOMPARE17(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
       DUPLICATE_CHECK(observationSpaceP, "observation space", nodeP);
-      if (metadataAdd(ciP, caP, nodeP, caName) == false)
+      if (metadataAdd(caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
         *detailP = (char*) "Error adding metadata to 'observation space' attribute";
@@ -703,7 +704,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     else if (SCOMPARE15(nodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
       DUPLICATE_CHECK(operationSpaceP, "operation space", nodeP);
-      if (metadataAdd(ciP, caP, nodeP, caName) == false)
+      if (metadataAdd(caP, nodeP, caName) == false)
       {
         LM_E(("Error adding metadata '%s' to attribute", nodeP->name));
         *detailP = (char*) "Error adding metadata to 'operation space' attribute";
@@ -728,13 +729,13 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     {
       for (KjNode* mdP = nodeP->value.firstChildP; mdP != NULL; mdP = mdP->next)
       {
-        if (kjTreeToMetadata(ciP, caP, mdP, caName, detailP) == false)
+        if (kjTreeToMetadata(caP, mdP, caName, detailP) == false)
           return false;
       }
     }
     else  // Other
     {
-      if (kjTreeToMetadata(ciP, caP, nodeP, caName, detailP) == false)
+      if (kjTreeToMetadata(caP, nodeP, caName, detailP) == false)
         return false;
     }
 
@@ -800,16 +801,16 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     //
     if (isGeoProperty == true)
     {
-      if (pcheckGeoProperty(ciP, valueP, &orionldState.geoType, &orionldState.geoCoordsP) == false)
+      if (pcheckGeoProperty(valueP, &orionldState.geoType, &orionldState.geoCoordsP) == false)
       {
         LM_E(("pcheckGeoProperty error for %s", caName));
         // pcheckGeoProperty fills in error response
         *detailP = (char*) "pcheckGeoProperty failed";
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
       caP->valueType       = orion::ValueTypeObject;
-      caP->compoundValueP  = compoundCreate(ciP, valueP, NULL, 0);
+      caP->compoundValueP  = compoundCreate(valueP, NULL, 0);
     }
     else if (isTemporalProperty == true)
     {
@@ -911,7 +912,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
     }
     else
     {
-      if (attributeValueSet(ciP, caP, valueP) == false)
+      if (attributeValueSet(caP, valueP) == false)
       {
         // attributeValueSet calls orionldErrorResponseCreate
         *detailP = (char*) "attributeValueSet failed";
@@ -946,7 +947,7 @@ bool kjTreeToContextAttribute(ConnectionInfo* ciP, OrionldContext* contextP, KjN
           ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", objectP->value.s);
       }
       caP->valueType      = orion::ValueTypeVector;
-      caP->compoundValueP = compoundCreate(ciP, objectP, NULL);
+      caP->compoundValueP = compoundCreate(objectP, NULL);
     }
     else
       ATTRIBUTE_ERROR("relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)", caName);

@@ -44,7 +44,7 @@ extern "C"
 //
 // metadataAdd - from kjTreeToContextAttribute.cpp - needs its own module under orionld/common
 //
-extern bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName);
+extern bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName);
 
 
 
@@ -52,7 +52,7 @@ extern bool metadataAdd(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* node
 //
 // kjTreeToMetadata -
 //
-bool kjTreeToMetadata(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP, char* caName, char** detailP)
+bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char** detailP)
 {
   //
   // A sub-attribute must be a JSON object (except if key-values, but that's for GET only in NGSI-LD)
@@ -84,7 +84,7 @@ bool kjTreeToMetadata(ConnectionInfo* ciP, ContextAttribute* caP, KjNode* nodeP,
     return false;
   }
 
-  if (metadataAdd(ciP, caP, nodeP, caName) == false)
+  if (metadataAdd(caP, nodeP, caName) == false)
   {
     // metadataAdd calls orionldErrorResponseCreate
     LM_E(("Error adding metadata '%s' to attribute", nodeP->name));

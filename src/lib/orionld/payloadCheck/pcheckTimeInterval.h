@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckTimeInterval -
 //
-extern bool pcheckTimeInterval(ConnectionInfo* ciP, KjNode* timeIntervalNodeP, const char* fieldName);
+extern bool pcheckTimeInterval(KjNode* timeIntervalNodeP, const char* fieldName);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKTIMEINTERVAL_H_

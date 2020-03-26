@@ -46,7 +46,7 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
   if ((urlCheck(orionldState.wildcard[0], &detail) == false) && (urnCheck(orionldState.wildcard[0], &detail) == false))
   {
     LM_E(("uriCheck: %s", detail));
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0]);
     return false;
   }
@@ -54,7 +54,7 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
   if (dbRegistrationExists(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbRegistrationExists says that the registration '%s' doesn't exist", orionldState.wildcard[0]));
-    ciP->httpStatusCode = SccNotFound;
+    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
     return false;
   }
@@ -62,12 +62,12 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
   if (dbRegistrationDelete(orionldState.wildcard[0]) == false)
   {
     LM_E(("dbRegistrationDelete failed - not found?"));
-    ciP->httpStatusCode = SccNotFound;
+    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Context Source Registration not found", orionldState.wildcard[0]);
     return false;
   }
 
-  ciP->httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = SccNoContent;
 
   return true;
 }

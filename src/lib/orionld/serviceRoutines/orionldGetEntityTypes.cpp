@@ -53,7 +53,7 @@ bool orionldGetEntityTypes(ConnectionInfo* ciP)
   {
     LM_E(("dbEntityTypesGet: %s: %s", pd.title, pd.detail));
     orionldErrorResponseCreate(OrionldResourceNotFound, pd.title, pd.detail);
-    ciP->httpStatusCode = (HttpStatusCode) pd.status;
+    orionldState.httpStatusCode = (HttpStatusCode) pd.status;
     return false;
   }
 

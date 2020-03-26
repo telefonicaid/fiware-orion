@@ -81,7 +81,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   //
   // Translate the incoming KjNode tree into a ngsiv2::Registration
   //
-  if (kjTreeToRegistration(ciP, &reg, &regIdP) == false)
+  if (kjTreeToRegistration(&reg, &regIdP) == false)
   {
     LM_E(("kjTreeToRegistration FAILED"));
     // orionldErrorResponseCreate is invoked by kjTreeToRegistration
@@ -99,7 +99,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
                           &oError);
 
   // FIXME: Check oError for failure!
-  ciP->httpStatusCode = SccCreated;
+  orionldState.httpStatusCode = SccCreated;
 
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/csourceRegistrations/", regIdP);
 

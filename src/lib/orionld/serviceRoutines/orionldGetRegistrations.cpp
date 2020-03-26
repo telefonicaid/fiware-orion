@@ -68,7 +68,7 @@ extern "C"
 // - offset
 // - options=count
 //
-bool orionldGetRegistrations(ConnectionInfo *ciP)
+bool orionldGetRegistrations(ConnectionInfo* ciP)
 {
   std::vector<ngsiv2::Registration>  registrationVec;
   OrionError                         oe;
@@ -76,10 +76,10 @@ bool orionldGetRegistrations(ConnectionInfo *ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetCSourceRegistrations"));
 
-  if (!mongoLdRegistrationsGet(ciP, &registrationVec, orionldState.tenant, &count, &oe))
+  if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenant, &count, &oe))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Bad Request", oe.details.c_str());
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -97,7 +97,7 @@ bool orionldGetRegistrations(ConnectionInfo *ciP)
     kjChildAdd(orionldState.responseTree, registrationNodeP);
   }
 
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
 
   return true;
 }

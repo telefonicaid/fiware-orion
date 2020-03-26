@@ -33,14 +33,12 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 
 
 // -----------------------------------------------------------------------------
 //
 // kjTreeToStringList -
 //
-extern bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::string>* stringListP);
+extern bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSTRINGLIST_H_

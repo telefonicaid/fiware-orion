@@ -27,7 +27,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -42,16 +41,16 @@ extern "C"
 //
 // kjTreeToGeoLocation -
 //
-bool kjTreeToGeoLocation(ConnectionInfo* ciP, KjNode* geoLocationNodeP, OrionldGeoLocation* locationP)
+bool kjTreeToGeoLocation(KjNode* geoLocationNodeP, OrionldGeoLocation* locationP)
 {
   char*    geoType;
   KjNode*  geoCoordsP;
 
-  if (pcheckGeoProperty(ciP, geoLocationNodeP, &geoType, &geoCoordsP) == false)
+  if (pcheckGeoProperty(geoLocationNodeP, &geoType, &geoCoordsP) == false)
   {
     LM_E(("pcheckGeoProperty failed"));
     // pcheckGeoProperty sets the Error Response
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 

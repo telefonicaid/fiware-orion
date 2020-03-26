@@ -30,8 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 
 
 // -----------------------------------------------------------------------------
@@ -40,7 +38,6 @@ extern "C"
 //
 extern bool pcheckSubscription
 (
-  ConnectionInfo*  ciP,
   KjNode*          subNodeP,
   bool             idCanBePresent,
   KjNode**         watchedAttributesPP,

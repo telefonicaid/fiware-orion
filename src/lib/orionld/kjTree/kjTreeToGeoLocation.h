@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
 
 
 // -----------------------------------------------------------------------------
 //
 // kjTreeToGeoLocation -
 //
-extern bool kjTreeToGeoLocation(ConnectionInfo* ciP, KjNode* geoLocationNodeP, OrionldGeoLocation* locationP);
+extern bool kjTreeToGeoLocation(KjNode* geoLocationNodeP, OrionldGeoLocation* locationP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOGEOLOCATION_H_

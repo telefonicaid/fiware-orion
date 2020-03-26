@@ -31,7 +31,6 @@ extern "C"
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/Registration.h"                           // Registration
 #include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
 
@@ -56,7 +55,7 @@ extern "C"
 //
 // FIXME: move to its own module
 //
-static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfoNodeP, ngsiv2::Registration* regP)
+static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Registration* regP)
 {
   //
   // For now, the information vector can only have ONE item.
@@ -77,7 +76,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
   else if (items > 1)
   {
     orionldErrorResponseCreate(OrionldOperationNotSupported, "More than one item in Registration::information vector", "Not Implemented");
-    ciP->httpStatusCode = SccNotImplemented;
+    orionldState.httpStatusCode = SccNotImplemented;
     return false;
   }
 
@@ -102,7 +101,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
           return false;
         }
 
-        if (kjTreeToEntIdVector(ciP, infoNodeP, &regP->dataProvided.entities) == false)
+        if (kjTreeToEntIdVector(infoNodeP, &regP->dataProvided.entities) == false)
         {
           LM_E(("kjTreeToEntIdVector failed"));
           return false;  // orionldErrorResponseCreate is invoked by kjTreeToEntIdVector
@@ -170,7 +169,7 @@ static bool kjTreeToRegistrationInformation(ConnectionInfo* ciP, KjNode* regInfo
 //
 // kjTreeToRegistration -
 //
-bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char** regIdPP)
+bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
 {
   KjNode*  kNodeP;
   KjNode*  nameP                     = NULL;
@@ -202,7 +201,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   {
     LM_W(("Bad Input (Registration::id is not a URI)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str());
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -223,7 +222,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
   {
     LM_W(("Bad Input (Mandatory field missing: Registration::type)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Registration::type");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -233,7 +232,7 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
     orionldErrorResponseCreate(OrionldBadRequestData,
                                "Registration::type must have a value of /ContextSourceRegistration/",
                                orionldState.payloadTypeNode->value.s);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -268,38 +267,38 @@ bool kjTreeToRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP, char*
       ARRAY_CHECK(kNodeP, "Registration::information");
       EMPTY_ARRAY_CHECK(kNodeP, "Registration::information");
 
-      if (kjTreeToRegistrationInformation(ciP, kNodeP, regP) == false)
+      if (kjTreeToRegistrationInformation(kNodeP, regP) == false)
         return false;
     }
     else if (SCOMPARE20(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
       DUPLICATE_CHECK(observationIntervalP, "Registration::observationInterval", kNodeP);
       OBJECT_CHECK(kNodeP, "Registration::observationInterval");
-      kjTreeToTimeInterval(ciP, kNodeP, &regP->observationInterval);
+      kjTreeToTimeInterval(kNodeP, &regP->observationInterval);
     }
     else if (SCOMPARE19(kNodeP->name, 'm', 'a', 'n', 'a', 'g', 'e', 'm', 'e', 'n', 't', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
       DUPLICATE_CHECK(managementIntervalP, "Registration::managementInterval", kNodeP);
       OBJECT_CHECK(kNodeP, "Registration::managementInterval");
-      kjTreeToTimeInterval(ciP, kNodeP, &regP->managementInterval);
+      kjTreeToTimeInterval(kNodeP, &regP->managementInterval);
     }
     else if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
     {
       DUPLICATE_CHECK(locationP, "Registration::location", kNodeP);
       OBJECT_CHECK(locationP, "Registration::location");
-      kjTreeToGeoLocation(ciP, kNodeP, &regP->location);
+      kjTreeToGeoLocation(kNodeP, &regP->location);
     }
     else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
       DUPLICATE_CHECK(observationSpaceP, "Registration::observationSpace", kNodeP);
       OBJECT_CHECK(observationSpaceP, "Registration::observationSpace");
-      kjTreeToGeoLocation(ciP, kNodeP, &regP->observationSpace);
+      kjTreeToGeoLocation(kNodeP, &regP->observationSpace);
     }
     else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
     {
       DUPLICATE_CHECK(operationSpaceP, "Registration::operationSpace", kNodeP);
       OBJECT_CHECK(operationSpaceP, "Registration::operationSpace");
-      kjTreeToGeoLocation(ciP, kNodeP, &regP->operationSpace);
+      kjTreeToGeoLocation(kNodeP, &regP->operationSpace);
     }
     else if (SCOMPARE8(kNodeP->name, 'e', 'x', 'p', 'i', 'r', 'e', 's', 0))
     {

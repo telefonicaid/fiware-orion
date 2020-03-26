@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/SubscriptionExpression.h"                 // SubscriptionExpression
 
 
@@ -39,6 +38,6 @@ extern "C"
 //
 // kjTreeToSubscriptionExpression -
 //
-extern bool kjTreeToSubscriptionExpression(ConnectionInfo* ciP, KjNode* kNodeP, SubscriptionExpression* subExpressionP);
+extern bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subExpressionP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOSUBSCRIPTIONEXPRESSION_H_

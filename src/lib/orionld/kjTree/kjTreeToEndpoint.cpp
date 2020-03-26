@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 
 #include "orionld/common/CHECK.h"                              // CHECKx()
@@ -48,7 +47,7 @@ extern "C"
 //
 // kjTreeToEndpoint -
 //
-bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
+bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
 {
   char* uriP    = NULL;
   char* acceptP = NULL;

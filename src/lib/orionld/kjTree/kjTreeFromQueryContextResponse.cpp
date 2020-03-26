@@ -47,7 +47,6 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // kjTreeFromContextAttribute
-#include "orionld/kjTree/kjTreeFromContextContextAttribute.h"  // kjTreeFromContextContextAttribute
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // Own interface
 
@@ -152,7 +151,7 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
 //
 // orionldSysAttrs -
 //
-bool orionldSysAttrs(ConnectionInfo* ciP, double creDate, double modDate, KjNode* containerP)
+bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 {
   char     date[128];
   char*    details;
@@ -216,7 +215,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
   if ((oneHit == false) && (responseP->contextElementResponseVector.size() == 0))
   {
     orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
-    ciP->httpStatusCode = SccOk;
+    orionldState.httpStatusCode = SccOk;
 
     return orionldState.responseTree;
   }
@@ -236,7 +235,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
     orionldErrorResponseCreate(errorType, responseP->errorCode.reasonPhrase.c_str(), responseP->errorCode.details.c_str());
 
     if (responseP->errorCode.code == SccContextElementNotFound)
-      ciP->httpStatusCode = responseP->errorCode.code;
+      orionldState.httpStatusCode = responseP->errorCode.code;
 
     return orionldState.responseTree;
   }
@@ -324,7 +323,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
     // System Attributes?
     if (sysAttrs == true)
     {
-      if (orionldSysAttrs(ciP, ceP->entityId.creDate, ceP->entityId.modDate, top) == false)
+      if (orionldSysAttrs(ceP->entityId.creDate, ceP->entityId.modDate, top) == false)
       {
         LM_E(("sysAttrs error"));
         return NULL;
@@ -498,7 +497,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         // System Attributes?
         if (sysAttrs == true)
         {
-          if (orionldSysAttrs(ciP, aP->creDate, aP->modDate, aTop) == false)
+          if (orionldSysAttrs(aP->creDate, aP->modDate, aTop) == false)
           {
             LM_E(("sysAttrs error"));
             return NULL;

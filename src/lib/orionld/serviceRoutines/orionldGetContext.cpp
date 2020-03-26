@@ -52,7 +52,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
   if (contextP == NULL)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Context Not Found", orionldState.wildcard[0]);
-    ciP->httpStatusCode = SccContextElementNotFound;
+    orionldState.httpStatusCode = SccContextElementNotFound;
     return false;
   }
 
@@ -63,7 +63,7 @@ bool orionldGetContext(ConnectionInfo* ciP)
   {
     LM_E(("Internal Error (out of memory)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "kjObject failed", "out of memory?");
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     return false;
   }
 

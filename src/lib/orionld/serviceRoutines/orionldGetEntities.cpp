@@ -106,7 +106,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                "too broad query",
                                "need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter");
 
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -114,7 +114,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     LM_W(("Bad Input (both 'idPattern' and 'id' used)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Incompatible parameters", "id, idPattern");
-    ciP->httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
@@ -134,7 +134,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     {
       LM_W(("Bad Input (invalid value for georel)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel", georel);
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -148,7 +148,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       {
         LM_W(("Bad Input (invalid value for georel parameter: %s)", georelExtra));
         orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel parameter", georel);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
@@ -164,7 +164,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                  "no coordinates",
                                  "geometry without coordinates");
 
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -176,7 +176,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                  "no georel",
                                  "geometry with coordinates but without georel");
 
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -202,7 +202,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
       LM_E(("Geo: Scope::fill failed"));
       orionldErrorResponseCreate(OrionldInternalError, "error filling a scope", errorString.c_str());
-      ciP->httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
 
@@ -352,20 +352,20 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   long long   count;
   long long*  countP = (ciP->uriParamOptions["count"] == true)? &count : NULL;
 
-  ciP->httpStatusCode = mongoQueryContext(&mongoRequest,
-                                          &mongoResponse,
-                                          orionldState.tenant,
-                                          ciP->servicePathV,
-                                          ciP->uriParam,
-                                          ciP->uriParamOptions,
-                                          countP,
-                                          ciP->apiVersion);
+  orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
+                                                  &mongoResponse,
+                                                  orionldState.tenant,
+                                                  ciP->servicePathV,
+                                                  ciP->uriParam,
+                                                  ciP->uriParamOptions,
+                                                  countP,
+                                                  ciP->apiVersion);
 
 
   //
   // Transform QueryContextResponse to KJ-Tree
   //
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
   orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &mongoResponse);
 

@@ -107,7 +107,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   char*    subIdP    = NULL;
   KjNode*  endpointP = NULL;
 
-  if (kjTreeToSubscription(ciP, &sub, &subIdP, &endpointP) == false)
+  if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
   {
     LM_E(("kjTreeToSubscription FAILED"));
     // orionldErrorResponseCreate is invoked by kjTreeToSubscription
@@ -134,7 +134,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
       {
         LM_W(("Bad Input (invalid MQTT endpoint)"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid MQTT endpoint", detail);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
 
@@ -142,7 +142,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
       {
         LM_E(("Internal Error (unable to connect to MQTT server)"));
         orionldErrorResponseCreate(OrionldInternalError, "Unable to connect to MQTT server", "xxx");
-        ciP->httpStatusCode = SccReceiverInternalError;
+        orionldState.httpStatusCode = SccReceiverInternalError;
         return false;
       }
     }
@@ -158,10 +158,10 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
     ngsiv2::Subscription  subscription;
     char*                 details;
 
-    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &ciP->httpStatusCode, &details) == true)
+    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &orionldState.httpStatusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "A subscription with that ID already exists", subIdP);
-      ciP->httpStatusCode = SccConflict;
+      orionldState.httpStatusCode = SccConflict;
       return false;
     }
   }
@@ -178,7 +178,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
                                   sub.ldContext);
 
   // FIXME: Check oError for failure!
-  ciP->httpStatusCode = SccCreated;
+  orionldState.httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
 
   return true;

@@ -30,14 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckGeoQ -
 //
-extern bool pcheckGeoQ(ConnectionInfo* ciP, KjNode* geoqNodeP);
+extern bool pcheckGeoQ(KjNode* geoqNodeP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQ_H_

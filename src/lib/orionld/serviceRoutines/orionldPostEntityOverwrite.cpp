@@ -45,7 +45,7 @@ bool kjTreeToContextElement(ConnectionInfo* ciP, KjNode* requestTreeP, ContextEl
 
 
     char* detail;
-    if (kjTreeToContextAttribute(ciP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       // kjTreeToContextAttribute calls orionldErrorResponseCreate
       LM_E(("kjTreeToContextAttribute failed: %s", detail));
@@ -768,7 +768,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // Expand attribute names
   if (expandAttrNames(requestTree, &details) == false)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldBadRequestData, "Can't expand attribute names", details);
     return false;
   }
@@ -795,7 +795,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
 
   if (currentEntityTree == NULL)
   {
-    ciP->httpStatusCode = SccNotFound;
+    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", orionldState.wildcard[0]);
     return false;
   }
@@ -813,7 +813,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // Merge requestTree with currentEntityTree
   if (kjTreeMergeAddNewAttrsOverwriteExisting(currentEntityTree, requestTree, &title, &details) == false)
   {
-    ciP->httpStatusCode = SccReceiverInternalError;
+    orionldState.httpStatusCode = SccReceiverInternalError;
     orionldErrorResponseCreate(OrionldInternalError, title, details);
 
     //
@@ -838,7 +838,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   //
   // All OK - set HTTP STatus Code
   //
-  ciP->httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = SccNoContent;
 
   //
   // Here we can put back the dots

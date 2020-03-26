@@ -51,7 +51,7 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetSubscription (%s)", orionldState.wildcard[0]));
 
-  if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &ciP->httpStatusCode, &details) != true)
+  if (mongoGetLdSubscription(&subscription, orionldState.wildcard[0], orionldState.tenant, &orionldState.httpStatusCode, &details) != true)
   {
     LM_E(("mongoGetLdSubscription error: %s", details));
     orionldErrorResponseCreate(OrionldResourceNotFound, details, orionldState.wildcard[0]);
@@ -59,8 +59,8 @@ bool orionldGetSubscription(ConnectionInfo* ciP)
   }
 
   // Transform to KjNode tree
-  ciP->httpStatusCode = SccOk;
-  orionldState.responseTree = kjTreeFromSubscription(ciP, &subscription);
+  orionldState.httpStatusCode = SccOk;
+  orionldState.responseTree   = kjTreeFromSubscription(&subscription);
 
   return true;
 }
