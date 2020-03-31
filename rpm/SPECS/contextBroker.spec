@@ -176,6 +176,17 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Mar 31 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.0-1
+- Add: TextUnrestricted attribute type to avoid forbidden chars checking (#3550)
+- Add: notification flow control on update (#3568)
+- Fix: crash when using null character in some NGSIv1 operations
+- Fix: crash when using attributes with invalid JSON having more than one "value" keys (#3603)
+- Hardening: add deepness control to compound attribute and metadata value (max 50 levels) (related with #3605, #3606 and #3608)
+- Hardening: NULL control in some strdup and calloc cases (very unlikely, but theoretically possible) (#3578)
+- Hardening: avoid crash in the unlikely case MongoDB get databases operations fails in csubs cache refresh logic (#3456, partly)
+- Hardening: refactor mongo connection logic at startup to make it simpler
+- Change centos7.6.1810 to centos7.7.1908 in Dockerfile
+
 * Tue Nov 05 2019 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.3.0-1
 - Add: basic NGSIv2 queries and updates forwarding (#3068)
 - Add: idPattern '.*' support in in NGSIv2 registrations (#3458)
