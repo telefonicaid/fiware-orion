@@ -588,15 +588,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
         isProperty    = true;
         isGeoProperty = true;
 
-        if (orionldState.locationAttributeP != NULL)
-        {
-          *detailP = (char*) "Multiple attributes cannot be defined using the GeoProperty type";
-          LM_W(("Bad Input (%s)", *detailP));
-          orionldErrorResponseCreate(OrionldBadRequestData, "Multiple attributes cannot be defined using the GeoProperty type", nodeP->name);
-          return false;
-        }
-
-        orionldState.locationAttributeP = kNodeP;
+        orionldState.geoAttrV[orionldState.geoAttrs++] = kNodeP;
       }
       else if (SCOMPARE17(nodeP->value.s, 'T', 'e', 'm', 'p', 'o', 'r', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
       {

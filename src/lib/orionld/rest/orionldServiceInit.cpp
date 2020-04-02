@@ -64,6 +64,8 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
+#include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
+#include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
 #include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
 #include "orionld/temporal/temporalPostBatchDelete.h"                // temporalPostBatchDelete
 #include "orionld/temporal/temporalDeleteAttribute.h"                // temporalDeleteAttribute
@@ -238,6 +240,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+  }
+  else if (serviceP->serviceRoutine == orionldGetTenants)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldGetDbIndexes)
+  {
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
 
   if (temporal)  // CLI Option to turn on Temporal Evolution of Entities

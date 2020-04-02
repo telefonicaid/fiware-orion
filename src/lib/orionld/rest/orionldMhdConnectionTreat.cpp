@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                              // strncpy
+#include <string>                                                // std::string
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
@@ -44,12 +47,18 @@ extern "C"
 #include "rest/restReply.h"                                      // restReply
 
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
+#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/linkCheck.h"                            // linkCheck
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
+#include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
+#include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
+#include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
+#include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
@@ -542,6 +551,7 @@ static void contextToPayload(void)
 {
   // If no contest node exists, create it with the default context
 
+  LM_TMP(("In contextToPayload"));
   if (orionldState.payloadContextNode == NULL)
   {
     if (orionldState.link == NULL)
@@ -549,9 +559,11 @@ static void contextToPayload(void)
     else
       orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
   }
+  LM_TMP(("Got the payloadContextNode"));
 
   if (orionldState.payloadContextNode == NULL)
   {
+    LM_E(("Out of memory"));
     orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
     return;
   }
@@ -568,6 +580,7 @@ static void contextToPayload(void)
   }
   else if (orionldState.responseTree->type == KjArray)
   {
+    LM_TMP(("In contextToPayload - it's an array!"));
     for (KjNode* rTreeItemP = orionldState.responseTree->value.firstChildP; rTreeItemP != NULL; rTreeItemP = rTreeItemP->next)
     {
       KjNode* contextNode;
@@ -600,6 +613,34 @@ static void contextToPayload(void)
   {
     // Any other type ??? Error
   }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbGeoIndexes -
+//
+static void dbGeoIndexes(void)
+{
+  char  tenant[64];
+  char* tenantP;
+
+  if ((orionldState.tenant == NULL) || (orionldState.tenant[0] == 0))
+    tenantP = dbName;
+  else
+  {
+    snprintf(tenant, sizeof(tenant), "%s-%s", dbName, orionldState.tenant);
+    tenantP = tenant;
+  }
+
+  // sem_take
+  for (int ix = 0; ix < orionldState.geoAttrs; ix++)
+  {
+    if (dbGeoIndexLookup(tenantP, orionldState.geoAttrV[ix]->name) == NULL)
+      dbGeoIndexCreate(tenantP, orionldState.geoAttrV[ix]->name);
+  }
+  // sem_give
 }
 
 
@@ -749,6 +790,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   LM_T(LmtServiceRoutine, ("Calling Service Routine %s (context at %p)", orionldState.serviceP->url, orionldState.contextP));
 
+  LM_TMP(("Calling serviceRoutine(tenant==%s)", orionldState.tenant));
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
   LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
 
@@ -761,7 +803,25 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (orionldState.httpStatusCode < 400)
       orionldState.httpStatusCode = SccBadRequest;
   }
+  else  // Service Routine worked
+  {
+    LM_TMP(("Service Routine worked - dbGeoIndexes ?"));
+    dbGeoIndexes();
 
+    // New tenant?
+    if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+    {
+      if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
+      {
+        char prefixed[64];
+
+        snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
+
+        if (orionldTenantLookup(prefixed) == NULL)
+          orionldTenantCreate(prefixed);
+      }
+    }
+  }
 
  respond:
   //
@@ -805,7 +865,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       httpHeaderLinkAdd(ciP, orionldState.link);
   }
 
-
   //
   // Is there a KJSON response tree to render?
   //
@@ -824,7 +883,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
         contextToPayload();
     }
 
-
     //
     // Render the payload to get a string for restReply to send the response
     //
@@ -834,8 +892,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     orionldState.responsePayload = (char*) malloc(bufLen);
     if (orionldState.responsePayload != NULL)
     {
+      LM_TMP(("Allocated 32MB foir the response"));
       orionldState.responsePayloadAllocated = true;
       kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, bufLen);
+      LM_TMP(("orionldState.responsePayload: '%s'", orionldState.responsePayload));
     }
     else
     {
@@ -852,8 +912,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
+  {
+    LM_TMP(("No payload for the response"));
     restReply(ciP, "");
-
+  }
   //
   // Calling Temporal Routine to save the temporal data (if applicable)
   // Only if the Service Routine was successful, of course

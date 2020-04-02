@@ -2942,7 +2942,10 @@ static bool createEntity
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exist (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
-  ensureLocationIndex(tenant);
+
+  if (orionldState.apiVersion != NGSI_LD_V1)
+    ensureLocationIndex(tenant);
+
   ensureDateExpirationIndex(tenant);
 
   if (!legalIdUsage(attrsV))
@@ -3078,25 +3081,6 @@ static bool createEntity
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
-  //
-  // Location attributes for NGSI-LD
-  //
-#ifdef ORIONLD
-  if (orionldState.locationAttributeP != NULL)
-  {
-    char* errorString;
-
-    if (geoJsonCreate(orionldState.locationAttributeP, &geoJson, &errorString) == false)
-    {
-      LM_E(("Internal Error (%s)", errorString));
-      oeP->fill(SccReceiverInternalError, errorString, "InternalError");
-      return false;
-    }
-
-    insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << orionldState.locationAttributeP->name <<
-                                          ENT_LOCATION_COORDS   << geoJson.obj()));
-  }
-#endif
 
   /* Add date expiration in the case it was found */
   if (dateExpiration != NO_EXPIRATION_DATE)

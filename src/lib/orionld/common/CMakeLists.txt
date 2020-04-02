@@ -50,6 +50,8 @@ SET (SOURCES
     typeCheckForNonExistingEntities.cpp
     entityIdAndTypeGet.cpp
     qAliasCompact.cpp
+    orionldTenantLookup.cpp
+    orionldTenantCreate.cpp
     # qTreeToBson.cpp
 )
 

@@ -49,6 +49,8 @@
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"
+#include "orionld/serviceRoutines/orionldGetTenants.h"
+#include "orionld/serviceRoutines/orionldGetDbIndexes.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -71,6 +73,8 @@ static OrionLdRestServiceSimplified getServiceV[] =
   { "/ngsi-ld/ex/v1/contexts/*",           orionldGetContext         },
   { "/ngsi-ld/ex/v1/contexts",             orionldGetContexts        },
   { "/ngsi-ld/ex/v1/version",              orionldGetVersion         },
+  { "/ngsi-ld/ex/v1/tenants",              orionldGetTenants         },
+  { "/ngsi-ld/ex/v1/dbIndexes",            orionldGetDbIndexes       },
   { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented     },
   { "/ngsi-ld/v1/temporal/entities/*",     orionldNotImplemented     }
 };

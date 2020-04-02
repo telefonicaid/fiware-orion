@@ -49,6 +49,8 @@ SET (SOURCES
     orionldPostBatchUpsert.cpp
     orionldPostBatchCreate.cpp
     orionldGetEntityTypes.cpp
+    orionldGetTenants.cpp
+    orionldGetDbIndexes.cpp
 )
 
 # Include directories

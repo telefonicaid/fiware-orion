@@ -31,15 +31,19 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. Create an entity E1 with a GeoProperty called geoLoc - a point at 10,10
+# 01. Create an entity E1 with a GeoProperty called geoLoc - a point at 10,10, and geoLoc2 - a point as 11,11
 # 02. See E1 in the database
 # 03. GET E1
-# 04. Create an entity E2 with a GeoProperty called geoLoc - a point at 20,20
-# 05. Query with a point 11,11 and near=200000, with 'geoLoc' as geoproperty - see E1 only
+# 04. Create an entity E2 with a GeoProperty called geoLoc - a point at 13,13
+# 05. Query with a point 11,11 and near=195000, with 'geoLoc' as geoproperty - see E1 only
+# 06. Query with a point 12,12 and near=200000, with 'geoLoc' as geoproperty - see E2 only
+# 07. Query with a point 12,12 and near=400000, with 'geoLoc' as geoproperty - see E1 and E2
+# 08. Query with a point 12,12 and near=400000, with 'geoLoc2' as geoproperty - see E1 only
+# 09. Query with a point 12,12 and near=400000, with 'geoLoc3' as geoproperty - see an empty array
 #
 
-echo "01. Create an entity E1 with a GeoProperty called geoLoc - a point at 10,10"
-echo "==========================================================================="
+echo "01. Create an entity E1 with a GeoProperty called geoLoc - a point at 10,10, and geoLoc2 - a point as	11,11"
+echo "==========================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
@@ -48,6 +52,13 @@ payload='{
     "value": {
       "type": "Point",
       "coordinates": [ 10, 10 ]
+    }
+  },
+  "geoLoc2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 11, 11 ]
     }
   }
 }'
@@ -70,7 +81,7 @@ echo
 echo
 
 
-echo "04. Create an entity E2 with a GeoProperty called geoLoc - a point at 20,20"
+echo "04. Create an entity E2 with a GeoProperty called geoLoc - a point at 13,13"
 echo "==========================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:E2",
@@ -79,7 +90,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "Point",
-      "coordinates": [ 20, 20 ]
+      "coordinates": [ 13, 13 ]
     }
   }
 }'
@@ -88,16 +99,45 @@ echo
 echo
 
 
-echo "05. Query with a point 11,11 and near=200000, with 'geoLoc' as geoproperty - see E1 only"
+echo "05. Query with a point 11,11 and near=195000, with 'geoLoc' as geoproperty - see E1 only"
 echo "========================================================================================"
-orionCurl --url '/ngsi-ld/v1/entities?type=T&geometry=Point&coordinates=\[11,11\]&georel=near;maxDistance==200000&geoproperty=geoLoc&prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?type=T&geometry=Point&coordinates=\[11,11\]&georel=near;maxDistance==195000&geoproperty=geoLoc&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+
+echo "06. Query with a point 12,12 and near=200000, with 'geoLoc' as geoproperty - see E2 only"
+echo "========================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&geometry=Point&coordinates=\[12,12\]&georel=near;maxDistance==200000&geoproperty=geoLoc&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "07. Query with a point 12,12 and near=400000, with 'geoLoc' as geoproperty - see E1 and E2"
+echo "=========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&geometry=Point&coordinates=\[12,12\]&georel=near;maxDistance==400000&geoproperty=geoLoc&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "08. Query with a point 12,12 and near=400000, with 'geoLoc2' as geoproperty - see E1 only"
+echo "========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&geometry=Point&coordinates=\[12,12\]&georel=near;maxDistance==400000&geoproperty=geoLoc2&prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "09. Query with a point 12,12 and near=400000, with 'geoLoc3' as geoproperty - see an empty array"
+echo "================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&geometry=Point&coordinates=\[12,12\]&georel=near;maxDistance==400000&geoproperty=geoLoc3&prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity E1 with a GeoProperty called geoLoc - a point at 10,10
-===========================================================================
+01. Create an entity E1 with a GeoProperty called geoLoc - a point at 10,10, and geoLoc2 - a point as	11,11
+===========================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
@@ -117,7 +157,8 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/geoLoc"
+		"https://uri.etsi.org/ngsi-ld/default-context/geoLoc",
+		"https://uri.etsi.org/ngsi-ld/default-context/geoLoc2"
 	],
 	"attrs" : {
 		"https://uri=etsi=org/ngsi-ld/default-context/geoLoc" : {
@@ -132,20 +173,23 @@ MongoDB server version: REGEX(.*)
 				]
 			},
 			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/geoLoc2" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					11,
+					11
+				]
+			},
+			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
-	"location" : {
-		"attrName" : "https://uri.etsi.org/ngsi-ld/default-context/geoLoc",
-		"coords" : {
-			"type" : "Point",
-			"coordinates" : [
-				10,
-				10
-			]
-		}
-	},
 	"lastCorrelator" : ""
 }
 bye
@@ -154,7 +198,7 @@ bye
 03. GET E1
 ==========
 HTTP/1.1 200 OK
-Content-Length: 197
+Content-Length: 342
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -171,12 +215,22 @@ Date: REGEX(.*)
         10
       ]
     }
+  },
+  "geoLoc2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        11,
+        11
+      ]
+    }
   }
 }
 
 
 
-04. Create an entity E2 with a GeoProperty called geoLoc - a point at 20,20
+04. Create an entity E2 with a GeoProperty called geoLoc - a point at 13,13
 ===========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -185,10 +239,10 @@ Date: REGEX(.*)
 
 
 
-05. Query with a point 11,11 and near=200000, with 'geoLoc' as geoproperty - see E1 only
+05. Query with a point 11,11 and near=195000, with 'geoLoc' as geoproperty - see E1 only
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 394
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -206,12 +260,149 @@ Date: REGEX(.*)
           10
         ]
       }
+    },
+    "geoLoc2": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          11
+        ]
+      }
     }
   }
 ]
 
 
 
+06. Query with a point 12,12 and near=200000, with 'geoLoc' as geoproperty - see E2 only
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 229
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "geoLoc": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          13
+        ]
+      }
+    }
+  }
+]
+
+
+
+07. Query with a point 12,12 and near=400000, with 'geoLoc' as geoproperty - see E1 and E2
+==========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 620
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "geoLoc": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          10,
+          10
+        ]
+      }
+    },
+    "geoLoc2": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          11
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "geoLoc": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          13
+        ]
+      }
+    }
+  }
+]
+
+
+
+08. Query with a point 12,12 and near=400000, with 'geoLoc2' as geoproperty - see E1 only
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 394
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "geoLoc": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          10,
+          10
+        ]
+      }
+    },
+    "geoLoc2": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          11
+        ]
+      }
+    }
+  }
+]
+
+
+
+09. Query with a point 12,12 and near=400000, with 'geoLoc3' as geoproperty - see an empty array
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[]
+
+
+
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

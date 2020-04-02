@@ -55,3 +55,4 @@ DbRegistrationGet                         dbRegistrationGet;
 DbRegistrationReplace                     dbRegistrationReplace;
 DbEntityTypesFromRegistrationsGet         dbEntityTypesFromRegistrationsGet;
 DbEntitiesGet                             dbEntitiesGet;
+DbGeoIndexCreate                          dbGeoIndexCreate;

@@ -37,7 +37,9 @@ extern "C"
 #include "common/globals.h"                                      // ApiVersion
 #include "common/MimeType.h"                                     // MimeType
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
+#include "rest/Verb.h"                                           // Verb
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
 #include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
@@ -157,7 +159,8 @@ typedef struct OrionldConnectionState
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;
-  KjNode*                 locationAttributeP;           // This assumes we have only ONE Geo-Location attribute ...
+  KjNode*                 geoAttrV[100];                // Array of GeoProperty attributes
+  int                     geoAttrs;
   char*                   geoType;
   KjNode*                 geoCoordsP;
   bool                    entityCreated;                // If an entity is created, if complex context, it must be stored
@@ -171,6 +174,7 @@ typedef struct OrionldConnectionState
   OrionLdRestService*     serviceP;
   char*                   wildcard[2];
   char*                   urlPath;
+  Verb                    verb;
   char*                   verbString;
   bool                    prettyPrint;
   char                    prettyPrintSpaces;
@@ -247,24 +251,27 @@ extern __thread OrionldConnectionState orionldState;
 //
 // Global state
 //
-extern char        orionldHostName[128];
-extern int         orionldHostNameLen;
-extern char        kallocBuffer[32 * 1024];
-extern int         requestNo;                // Never mind protecting with semaphore. Just a debugging help
-extern KAlloc      kalloc;
-extern Kjson       kjson;
-extern Kjson*      kjsonP;
-extern uint16_t    portNo;
-extern char        dbName[];                 // From orionld.cpp
-extern int         dbNameLen;
-extern char        dbUser[];                 // From orionld.cpp
-extern char        dbPwd[];                  // From orionld.cpp
-extern bool        multitenancy;             // From orionld.cpp
-extern char*       tenant;                   // From orionld.cpp
-extern int         contextDownloadAttempts;  // From orionld.cpp
-extern int         contextDownloadTimeout;   // From orionld.cpp
-extern bool        temporal;                 // From orionld.cpp
-extern const char* orionldVersion;
+extern char              orionldHostName[128];
+extern int               orionldHostNameLen;
+extern char              kallocBuffer[32 * 1024];
+extern int               requestNo;                // Never mind protecting with semaphore. Just a debugging help
+extern KAlloc            kalloc;
+extern Kjson             kjson;
+extern Kjson*            kjsonP;
+extern uint16_t          portNo;
+extern char              dbName[];                 // From orionld.cpp
+extern int               dbNameLen;
+extern char              dbUser[];                 // From orionld.cpp
+extern char              dbPwd[];                  // From orionld.cpp
+extern bool              multitenancy;             // From orionld.cpp
+extern char*             tenant;                   // From orionld.cpp
+extern int               contextDownloadAttempts;  // From orionld.cpp
+extern int               contextDownloadTimeout;   // From orionld.cpp
+extern bool              temporal;                 // From orionld.cpp
+extern const char*       orionldVersion;
+extern char*             tenantV[100];
+extern unsigned int      tenants;
+extern OrionldGeoIndex*  geoIndexList;
 
 
 

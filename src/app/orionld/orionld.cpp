@@ -562,6 +562,10 @@ void exitFunc(void)
   {
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
+
+  // Free the tenant list
+  for (unsigned int ix = 0; ix < tenants; ix++)
+    free(tenantV[ix]);
 }
 
 
@@ -613,8 +617,6 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 
   /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
-
-  dbInit(dbHost, dbName);
 }
 
 
@@ -1040,6 +1042,7 @@ int main(int argC, char* argV[])
   // Initialize orionld
   //
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
+  dbInit(dbHost, dbName);
 
   if (https)
   {

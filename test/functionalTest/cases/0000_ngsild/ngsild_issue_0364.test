@@ -213,16 +213,6 @@ MongoDB server REGEX(.*)
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
-	"location" : {
-		"attrName" : "location",
-		"coords" : {
-			"type" : "Point",
-			"coordinates" : [
-				13.4094,
-				52.5208
-			]
-		}
-	},
 	"lastCorrelator" : ""
 }
 bye

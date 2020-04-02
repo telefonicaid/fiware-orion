@@ -40,6 +40,12 @@ SET (SOURCES
     mongoCppLegacyRegistrationReplace.cpp
     mongoCppLegacyEntityTypesFromRegistrationsGet.cpp
     mongoCppLegacyEntitiesGet.cpp
+    mongoCppLegacyTenantsGet.cpp
+    mongoCppLegacyGeoIndexInit.cpp
+    mongoCppLegacyGeoIndexCreate.cpp
+    mongoCppLegacyDbStringFieldGet.cpp
+    mongoCppLegacyDbArrayFieldGet.cpp
+    mongoCppLegacyDbFieldGet.cpp
 )
 
 # Include directories

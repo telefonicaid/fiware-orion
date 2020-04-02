@@ -26,7 +26,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/rest/temporaryErrorPayloads.h"               // notFoundPayload
 #include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup

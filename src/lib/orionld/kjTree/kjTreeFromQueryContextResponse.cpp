@@ -340,17 +340,18 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
     {
       KjNode*           aTop                 = NULL;
       ContextAttribute* aP                   = ceP->contextAttributeVector[aIx];
-      const char*       attrShortName        = aP->name.c_str();
-      char*             attrName;              // Attribute Long Name
+      const char*       attrLongName         = aP->name.c_str();
+      char*             attrName;              // Attribute Short Name
       char*             valueFieldName;
       bool              valueMayBeCompacted  = false;
 
-      attrName = orionldContextItemAliasLookup(orionldState.contextP, attrShortName, &valueMayBeCompacted, NULL);
-
+      LM_TMP(("GEO: Calling orionldContextItemAliasLookup for '%s', context: '%s'", attrLongName, orionldState.contextP->url));
+      attrName = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, &valueMayBeCompacted, NULL);
+      LM_TMP(("GEO: orionldContextItemAliasLookup got: '%s'", attrName));
       //
       // If URI param attrList has been used, only matching attributes should be included in the response
       //
-      if ((attrListExpanded != NULL) && (inAttrList(attrShortName, attrListExpanded, attrsInAttrList) == false))
+      if ((attrListExpanded != NULL) && (inAttrList(attrLongName, attrListExpanded, attrsInAttrList) == false))
         continue;
 
       if (keyValues)
@@ -358,22 +359,19 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         // If keyValues, then just the value of the attribute is to be rendered (built)
         switch (aP->valueType)
         {
+        case orion::ValueTypeNull:      aTop = kjNull(orionldState.kjsonP, attrName);                              break;
         case orion::ValueTypeNumber:    aTop = kjFloat(orionldState.kjsonP, attrName,   aP->numberValue);          break;
         case orion::ValueTypeBoolean:   aTop = kjBoolean(orionldState.kjsonP, attrName, aP->boolValue);            break;
         case orion::ValueTypeString:
           if (valueMayBeCompacted == true)
           {
             char* compactedValue = orionldContextItemAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL, NULL);
-            if (compactedValue != NULL)
-              aTop = kjString(orionldState.kjsonP, attrName, compactedValue);
-            else
-              aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());
+            aTop = kjString(orionldState.kjsonP, attrName, (compactedValue != NULL)? compactedValue : aP->stringValue.c_str());
           }
           else
             aTop = kjString(orionldState.kjsonP, attrName, aP->stringValue.c_str());
           break;
 
-        case orion::ValueTypeNull:      aTop = kjNull(orionldState.kjsonP, attrName);                              break;
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
           aTop = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, attrName) : kjObject(orionldState.kjsonP, attrName);
@@ -408,6 +406,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         //
         // NOT keyValues - create entire attribute tree
         //
+        LM_TMP(("GEO: NOT keyValues - create entire attribute tree for att '%s'", attrName));
         aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {
@@ -436,7 +435,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:
-          if (SCOMPARE11(attrShortName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
+          if (SCOMPARE11(attrLongName, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
           {
             char   date[128];
             char*  details;

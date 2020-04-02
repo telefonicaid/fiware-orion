@@ -39,4 +39,12 @@
 //
 extern int dbCollectionPathGet(char* path, int pathLen, const char* collection);
 
+
+
+// ----------------------------------------------------------------------------
+//
+// dbCollectionPathGetWithTenant -
+//
+extern int dbCollectionPathGetWithTenant(char* path, int pathLen, const char* tenant, const char* collection);
+
 #endif  // SRC_LIB_ORIONLD_DB_DBCOLLECTIONPATHGET_H_

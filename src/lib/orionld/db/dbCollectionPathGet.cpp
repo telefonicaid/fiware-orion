@@ -37,7 +37,6 @@
 //
 int dbCollectionPathGet(char* path, int pathLen, const char* collection)
 {
-  int dbNameLen     = strlen(dbName);          // Can be faster - global variable can keep this constant
   int tenantLen     = ((multitenancy == true) && (orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))? strlen(orionldState.tenant) + 1 : 0;
   int collectionLen = strlen(collection) + 1;  // +1: '.'
 
@@ -58,6 +57,31 @@ int dbCollectionPathGet(char* path, int pathLen, const char* collection)
 
   path[dbNameLen + tenantLen] = '.';
   strcpy(&path[dbNameLen + tenantLen + 1], collection);
+
+  return 0;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// dbCollectionPathGetWithTenant -
+//
+int dbCollectionPathGetWithTenant(char* path, int pathLen, const char* tenant, const char* collection)
+{
+  int tenantLen     = strlen(tenant);
+  int collectionLen = strlen(collection) + 1;  // +1: '.'
+
+  if (tenantLen + collectionLen >= pathLen)
+  {
+    LM_E(("Internal Error (database name is too long)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "Unable to compose collection name - name too long");
+    return -1;
+  }
+
+  strcpy(path, dbName);
+
+  snprintf(path, pathLen, "%s.%s", tenant, collection);
 
   return 0;
 }

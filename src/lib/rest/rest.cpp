@@ -588,6 +588,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   HttpHeaders*     headerP = &ciP->httpHeaders;
   std::string      key     = ckey;
 
+  LM_TMP(("Got an HTTP Header: %s: %s", ckey, value));
   LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", ckey, value));
 
   if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
@@ -614,13 +615,18 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   {
 #ifdef ORIONLD
     orionldState.tenant = (char*) value;
+    LM_TMP(("TEN: orionldState.tenant == '%s'", orionldState.tenant));
 #endif
     headerP->tenant = value;
+    ciP->tenant     = value;
     toLowercase((char*) headerP->tenant.c_str());
   }
 #ifdef ORIONLD
   else if (strcasecmp(ckey, "NGSILD-Tenant") == 0)
+  {
     orionldState.tenant = (char*) value;
+    LM_TMP(("TEN: orionldState.tenant == '%s'", orionldState.tenant));
+  }
   else if (strcasecmp(ckey, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;
 #endif

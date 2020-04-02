@@ -26,6 +26,8 @@ SET (SOURCES
     dbCollectionPathGet.cpp
     dbConfiguration.cpp
     dbEntityTypesGet.cpp
+    dbGeoIndexAdd.cpp
+    dbGeoIndexLookup.cpp
 )
 
 # Include directories

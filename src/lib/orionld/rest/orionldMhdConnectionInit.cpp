@@ -337,8 +337,9 @@ int orionldMhdConnectionInit
   }
 
   // 3.  Check invalid verb
-  ciP->verb = verbGet(method);
-  if (ciP->verb == NOVERB)
+  orionldState.verb = verbGet(method);
+  ciP->verb = orionldState.verb;  // FIXME: to be removed
+  if (orionldState.verb == NOVERB)
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);
@@ -358,7 +359,7 @@ int orionldMhdConnectionInit
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: to be reimplemented in C !!!
 
   // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
-  ciP->servicePathV.push_back((ciP->verb == GET)? "/#" : "/");
+  ciP->servicePathV.push_back((orionldState.verb == GET)? "/#" : "/");
 
 
   // 7.  Check that GET/DELETE has no payload
@@ -368,7 +369,7 @@ int orionldMhdConnectionInit
   // 11. Check URL path is OK
 
   // 12. Check Content-Type is accepted
-  if ((ciP->verb == POST) || (ciP->verb == PATCH))
+  if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
   {
     //
     // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
@@ -421,7 +422,7 @@ int orionldMhdConnectionInit
   // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH
   // If any other verb is used, even if a valid REST Verb, a generic error will be returned
   //
-  if ((ciP->verb != POST) && (ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->verb != PATCH))
+  if ((orionldState.verb != POST) && (orionldState.verb != GET) && (orionldState.verb != DELETE) && (orionldState.verb != PATCH))
   {
     LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);

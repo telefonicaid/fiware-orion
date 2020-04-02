@@ -59,7 +59,14 @@
 #include "apiTypesV2/ngsiWrappers.h"
 
 #ifdef ORIONLD
-#include "orionld/common/orionldState.h"
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                  // kaStrdup
+}
+
+#include "orionld/common/orionldState.h"                      // orionldState
+#include "orionld/common/dotForEq.h"                          // dotForEq
+#include "orionld/context/orionldContextItemExpand.h"         // orionldContextItemExpand
 #endif
 
 #include "mongoBackend/mongoConnectionPool.h"
@@ -249,6 +256,7 @@ void mongoInit
   //
   ensureLocationIndex("");
   ensureDateExpirationIndex("");
+
   if (mtenant)
   {
     /* We get tenant database names and apply ensure the location and date expiration indexes in each one */
@@ -260,6 +268,7 @@ void mongoInit
     {
       std::string orionDb = orionDbs[ix];
       std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+
       ensureLocationIndex(tenant);
       ensureDateExpirationIndex(tenant);
     }
@@ -1325,6 +1334,7 @@ bool entitiesQuery
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
 
+  LM_TMP(("GEO: In entitiesQuery: geoproperty == '%s'", orionldState.uriParams.geoproperty));
   /* Part 1: entities */
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
@@ -1407,8 +1417,38 @@ bool entitiesQuery
 
         if (result)
         {
-          std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-          finalQuery.append(locCoords, areaQuery);
+          if (orionldState.apiVersion == NGSI_LD_V1)
+          {
+            char  locationCoordinates[512];
+            char* attrNameP = (char*) "location";  // Default geoproperty name
+
+            //
+            // If uriParams.geoproperty not present, then "location" is the default name of the geoproperty to use
+            // If uriParams.geoproperty  IS present, then we need to replace all '.' for '='
+            //
+            // After that, "attrs.$ATTRNAME.coordinates" must be used
+            //
+            if (orionldState.uriParams.geoproperty != NULL)
+            {
+              LM_TMP(("GEO: special geoproperty: '%s'", orionldState.uriParams.geoproperty));
+              attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, NULL, true, NULL);
+              dotForEq(attrNameP);
+            }
+            else
+              LM_TMP(("GEO: default geoproperty: '%s'", attrNameP));
+
+            snprintf(locationCoordinates, sizeof(locationCoordinates), "attrs.%s.value", attrNameP);
+
+            LM_TMP(("GEO: Using geo attribute path '%s'", locationCoordinates));
+            finalQuery.append(locationCoordinates, areaQuery);
+          }
+          else
+          {
+            std::string locationCoordinates;
+            LM_TMP(("GEO: Using hardcoded geo attribute name 'location'"));
+            locationCoordinates = ENT_LOCATION "." ENT_LOCATION_COORDS;
+            finalQuery.append(locationCoordinates, areaQuery);
+          }
         }
       }
     }
@@ -1493,6 +1533,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
+  LM_TMP(("GEO: Calling collectionRangedQuery"));
   if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
@@ -1504,6 +1545,7 @@ bool entitiesQuery
   /* Process query result */
   unsigned int docs = 0;
 
+  LM_TMP(("GEO: Getting results ... or not ... ?"));
   while (moreSafe(cursor))
   {
     BSONObj  r;
@@ -1511,13 +1553,15 @@ bool entitiesQuery
     try
     {
       // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
+      LM_TMP(("GEO: Getting a result"));
       r = cursor->nextSafe();
+      LM_TMP(("GEO: Got a result"));
     }
     catch (const AssertionException &e)
     {
       std::string              exErr = e.what();
       ContextElementResponse*  cer   = new ContextElementResponse();
-
+      LM_TMP(("GEO: DB Error: %s", e.what()));
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
       // So, we can just match the error and send a less descriptive text.
@@ -1562,10 +1606,16 @@ bool entitiesQuery
       cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
       releaseMongoConnection(connection);
-      return true;
+
+      //
+      // This is a bit weird ...
+      // We got an exception but 'true' is returned???
+      //
+      return false;
     }
     catch (const std::exception &e)
     {
+      LM_TMP(("GEO: DB Error: %s", e.what()));
       *err = e.what();
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", e.what(), query.toString().c_str()));
       releaseMongoConnection(connection);
@@ -1573,6 +1623,7 @@ bool entitiesQuery
     }
     catch (...)
     {
+      LM_TMP(("GEO: Generic DB Error - no info ... :("));
       *err = "generic exception at nextSafe()";
       LM_E(("Runtime Error (generic exception in nextSafe() - query: %s)", query.toString().c_str()));
       releaseMongoConnection(connection);
@@ -1583,6 +1634,7 @@ bool entitiesQuery
 
     // Build CER from BSON retrieved from DB
     docs++;
+    LM_TMP(("GEO: Got a result!!!"));
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
@@ -1619,6 +1671,7 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
+  LM_TMP(("GEO: Got %d results", docs));
   releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
@@ -1626,9 +1679,11 @@ bool entitiesQuery
    * FIXME P10 (it is easy :) limit should be unsigned int */
   if (limitReached != NULL)
   {
+    LM_TMP(("GEO: limitReached?  cerV->size == %d, limit == %d", cerV->size(), limit));
     *limitReached = (cerV->size() >= (unsigned int) limit);
     if (*limitReached)
     {
+      LM_TMP(("GEO: limitReached :(("));
       LM_T(LmtMongo, ("entities limit reached"));
       return true;
     }

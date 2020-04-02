@@ -22,22 +22,23 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
+#include <string.h>                                              // strlen
 
 extern "C"
 {
-#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
-#include "kjson/kjFree.h"                                      // kjFree
-#include "kalloc/kaBufferInit.h"                               // kaBufferInit
+#include "kjson/kjBufferCreate.h"                                // kjBufferCreate
+#include "kjson/kjFree.h"                                        // kjFree
+#include "kalloc/kaBufferInit.h"                                 // kaBufferInit
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/db/dbConfiguration.h"                        // DB_DRIVER_MONGOC
-#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext
-#include "orionld/common/QNode.h"                              // QNode
-#include "orionld/common/orionldState.h"                       // Own interface
+#include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
+#include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/orionldState.h"                         // Own interface
 
 
 
@@ -53,7 +54,7 @@ const char* orionldVersion = ORIONLD_VERSION;
 //
 // orionldState - the state of the connection
 //
-__thread OrionldConnectionState orionldState = { 0 };
+__thread OrionldConnectionState orionldState;
 
 
 
@@ -70,16 +71,18 @@ __thread OrionldConnectionState orionldState = { 0 };
 // - dbUser
 // - dbPwd
 //
-char            kallocBuffer[32 * 1024];
-int             requestNo                = 0;             // Never mind protecting with semaphore. Just a debugging help
-KAlloc          kalloc;
-Kjson           kjson;
-Kjson*          kjsonP;
-uint16_t        portNo                   = 0;
-int             dbNameLen;
-char            orionldHostName[128];
-int             orionldHostNameLen       = -1;
-
+char              kallocBuffer[32 * 1024];
+int               requestNo                = 0;             // Never mind protecting with semaphore. Just a debugging help
+KAlloc            kalloc;
+Kjson             kjson;
+Kjson*            kjsonP;
+uint16_t          portNo                   = 0;
+int               dbNameLen;
+char              orionldHostName[128];
+int               orionldHostNameLen       = -1;
+char*             tenantV[100];
+unsigned int      tenants                  = 0;
+OrionldGeoIndex*  geoIndexList             = NULL;
 
 //
 // Variables for Mongo C Driver

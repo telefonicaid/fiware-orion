@@ -40,6 +40,7 @@ brokerStart CB 0-255 IPv4 -multiservice
 # 06. Create a subscription urn:ngsi-ld:Subscription:S2 in tenant tn1
 # 07. Get all subscriptions from default tenant using mongo - see only S1
 # 08. Get all subscriptions from tenant tn1 using mongo - see only S2
+# 09. Get all tenants - see 'ftest' and 'tn1'
 #
 
 echo "01. Create an entity urn:ngsi-ld:entity:E1 in default tenant"
@@ -142,6 +143,13 @@ echo
 echo "=========="
 echo
 mongoCmd2 ftest-tn1 "db.csubs.findOne()"
+echo
+echo
+
+
+echo "09. Get all tenants - see 'ftest' and 'tn1'"
+echo "==========================================="
+orionCurl --url "/ngsi-ld/ex/v1/tenants?prettyPrint=yes" --noPayloadCheck
 echo
 echo
 
@@ -311,6 +319,20 @@ MongoDB server version: REGEX(.*)
 	"format" : "keyValues"
 }
 bye
+
+
+09. Get all tenants - see 'ftest' and 'tn1'
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 29
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+  "ftest",
+  "ftest-tn1"
+]
+
 
 
 --TEARDOWN--

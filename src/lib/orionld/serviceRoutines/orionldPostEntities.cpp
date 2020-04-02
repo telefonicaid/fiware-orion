@@ -65,6 +65,7 @@ extern "C"
 //
 bool orionldPostEntities(ConnectionInfo* ciP)
 {
+  LM_TMP(("In orionldPostEntities. tenant == '%s'", orionldState.tenant));
   OBJECT_CHECK(orionldState.requestTree, "toplevel");
 
   char*    detail;
