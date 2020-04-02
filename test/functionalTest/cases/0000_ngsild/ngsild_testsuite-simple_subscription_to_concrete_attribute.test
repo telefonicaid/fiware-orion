@@ -34,34 +34,15 @@ accumulatorStart --pretty-print
 #
 # FIXME: Once notifications for non-mongoBackend requests are implemented, this functest needs to be modified
 #
-# 01. Creation of entity
-# 02. Creation of subscription - initial notification should be received by the accumulator
+# 01. Creation of subscription
+# 02. Creation of entity
 # 03. Dump and reset accumulator. See one notification
 # 04. Update the entity - provoking a notification
 # 05. Dump accumulator. See the notification
 #
 
-echo "01. Creation of entity"
-echo "======================"
-payload='{
-  "id": "urn:ngsi-ld:Vehicle:V1234",
-  "type": "Vehicle",
-  "speed": {
-    "type": "Property",
-    "value": 34
-  },
-  "brandName": {
-    "type": "Property",
-    "value": "Mercedes"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Creation of subscription - initial notification should be received by the accumulator"
-echo "========================================================================================="
+echo "01. Creation of subscription"
+echo "============================"
 payload='{
   "id": "urn:ngsi-ld:Subscription:mySubscription:20-09-2019:13:13:00",
   "type": "Subscription",
@@ -79,6 +60,25 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Creation of entity"
+echo "======================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:V1234",
+  "type": "Vehicle",
+  "speed": {
+    "type": "Property",
+    "value": 34
+  },
+  "brandName": {
+    "type": "Property",
+    "value": "Mercedes"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
 echo
 
@@ -113,20 +113,20 @@ echo
 
 
 --REGEXPECT--
-01. Creation of entity
-======================
+01. Creation of subscription
+============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription:20-09-2019:13:13:00
 Date: REGEX(.*)
 
 
 
-02. Creation of subscription - initial notification should be received by the accumulator
-=========================================================================================
+02. Creation of entity
+======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription:20-09-2019:13:13:00
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
 Date: REGEX(.*)
 
 

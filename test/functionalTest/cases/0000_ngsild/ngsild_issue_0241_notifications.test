@@ -32,14 +32,39 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata
-# 02. Create a subscription matching the entity
-# 03. Dump the accumulator to see the initial notification
+# 01. Create a subscription
+# 02. Create a matching Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata
+# 03. Dump the accumulator to see the notification
 # 04. See the entity in mongo
 #
 
-echo "01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata"
-echo "================================================================================================="
+echo "01. Create a subscription"
+echo "========================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:01",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "Vehicle"
+    }
+  ],
+  "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "description": "Notify me of all product vehicles changes",
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Create a matching Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata"
+echo "========================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:Vehicle:A4501",
   "type": "Vehicle",
@@ -91,33 +116,8 @@ echo
 echo
 
 
-echo "02. Create a subscription matching the entity"
-echo "============================================="
-payload='{
-  "id": "urn:ngsi-ld:Subscription:01",
-  "type": "Subscription",
-  "entities": [
-    {
-      "type": "Vehicle"
-    }
-  ],
-  "@context": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-  "description": "Notify me of all product vehicles changes",
-  "notification": {
-    "format": "normalized",
-    "endpoint": {
-      "uri": "http://localhost:'$LISTENER_PORT'/notify",
-      "accept": "application/ld+json"
-    }
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
-echo
-echo
-
-
-echo "03. Dump the accumulator to see the initial notification"
-echo "========================================================"
+echo "03. Dump the accumulator to see the notification"
+echo "================================================"
 sleep 1
 accumulatorDump
 echo
@@ -132,17 +132,8 @@ echo
 
 
 --REGEXPECT--
-01. Create an Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata
-=================================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4501
-Date: REGEX(.*)
-
-
-
-02. Create a subscription matching the entity
-=============================================
+01. Create a subscription
+=========================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
@@ -150,8 +141,17 @@ Date: REGEX(.*)
 
 
 
-03. Dump the accumulator to see the initial notification
-========================================================
+02. Create a matching Entity urn:ngsi-ld:Vehicle:A4501, with both Property and Relationship with metadata
+=========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4501
+Date: REGEX(.*)
+
+
+
+03. Dump the accumulator to see the notification
+================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
 Content-Length: 858

@@ -61,12 +61,14 @@
 #ifdef ORIONLD
 extern "C"
 {
-#include "kalloc/kaStrdup.h"                                  // kaStrdup
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 }
 
-#include "orionld/common/orionldState.h"                      // orionldState
-#include "orionld/common/dotForEq.h"                          // dotForEq
-#include "orionld/context/orionldContextItemExpand.h"         // orionldContextItemExpand
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
 
 #include "mongoBackend/mongoConnectionPool.h"
@@ -2249,6 +2251,13 @@ static bool processOnChangeConditionForSubscription
   bool                             blacklist
 )
 {
+  //
+  // By default - no initial notifications in Orion-LD
+  // => if the service routine is "orionldPostSubscriptions", then nothing to be done in this function
+  //
+  if ((orionldState.serviceP != NULL) && (orionldState.serviceP->serviceRoutine == orionldPostSubscriptions))
+    return false;
+
   std::string                   err;
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;

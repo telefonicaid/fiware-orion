@@ -34,7 +34,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 #
 # 01. Create an Entity E01 with attr P1 and P2
 # 02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
-# 03. Dump accumulator to see one notification, then reset the accumulator
+# 03. Dump accumulator to see NO notification - NGSI-LD has no initial notifications
 # 04. Add P3 to E01
 # 05. Dump accumulator to see one notification
 #
@@ -89,10 +89,9 @@ echo
 echo
 
 
-echo "03. Dump accumulator to see one notification, then reset the accumulator"
-echo "========================================================================"
+echo "03. Dump accumulator to see NO notification - NGSI-LD has no initial notifications"
+echo "=================================================================================="
 accumulatorDump
-accumulatorReset
 echo
 echo
 
@@ -138,39 +137,8 @@ Date: REGEX(.*)
 
 
 
-03. Dump accumulator to see one notification, then reset the accumulator
-========================================================================
-POST http://REGEX(.*)/notify
-Fiware-Servicepath: /
-Content-Length: 362
-User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: normalized
-Host: REGEX(.*)
-Accept: application/json
-Content-Type: application/ld+json
-
-{
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
-    "data": [
-        {
-            "P1": {
-                "type": "Property", 
-                "value": 1
-            }, 
-            "P2": {
-                "type": "Property", 
-                "value": "ok"
-            }, 
-            "id": "urn:ngsi-ld:E01", 
-            "type": "T"
-        }
-    ], 
-    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})",
-    "notifiedAt": "REGEX(.*)", 
-    "subscriptionId": "http://a.b.c/subs/sub01", 
-    "type": "Notification"
-}
-=======================================
+03. Dump accumulator to see NO notification - NGSI-LD has no initial notifications
+==================================================================================
 
 
 04. Add P3 to E01

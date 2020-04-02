@@ -6,3 +6,4 @@
 # Issue #419  Implemented GET /ngsi-ld/v1/types
 # Issue #XXX  Fixed a bug that impeded the creation of reistrations with only entity-type in the entities array
 # Issue #280  Entities can now have more than one GeoProperty
+# Issue #280  Turned off initial notifications (when creating NGSI-LD subscriptions)

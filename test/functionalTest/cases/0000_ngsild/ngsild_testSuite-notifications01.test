@@ -32,30 +32,11 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create an entity with two attrs: speed, brandName
-# 02. Create a subscription for any attribute
+# 01. Create a subscription for any attribute
+# 02. Create an entity with two attrs: speed, brandName
 # 03. Dump accumulator to see one notification, then reset the accumulator
 #
-echo "01. Create an entity with two attrs: speed, brandName"
-echo "====================================================="
-payload='{
-  "id": "urn:ngsi-ld:Vehicle:V1234",
-  "type": "Vehicle",
-  "speed": {
-    "type": "Property",
-    "value": 34
-  },
-  "brandName": {
-    "type": "Property",
-    "value": "Mercedes"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
-echo
-echo
-
-
-echo "02. Create a subscription for any attribute"
+echo "01. Create a subscription for any attribute"
 echo "==========================================="
 payload='{
   "id": "urn:ngsi-ld:Subscription:mySubscription01",
@@ -77,6 +58,25 @@ echo
 echo
 
 
+echo "02. Create an entity with two attrs: speed, brandName"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:V1234",
+  "type": "Vehicle",
+  "speed": {
+    "type": "Property",
+    "value": 34
+  },
+  "brandName": {
+    "type": "Property",
+    "value": "Mercedes"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
 echo "03. Dump accumulator to see one notification, then reset the accumulator"
 echo "========================================================================"
 accumulatorDump
@@ -86,20 +86,20 @@ echo
 
 
 --REGEXPECT--
-01. Create an entity with two attrs: speed, brandName
-=====================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
-Date: REGEX(.*)
-
-
-
-02. Create a subscription for any attribute
+01. Create a subscription for any attribute
 ===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription01
+Date: REGEX(.*)
+
+
+
+02. Create an entity with two attrs: speed, brandName
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
 Date: REGEX(.*)
 
 

@@ -32,15 +32,37 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 --SHELL--
 
 #
-# 01. Create Entity urn:ngsi-ld:Vehicle:A4568
-# 02. GET the entity, check that observedAt is OK
-# 03. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json
+# 01. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json
+# 02. Create Entity urn:ngsi-ld:Vehicle:A4568
+# 03. GET the entity, check that observedAt is OK
 # 04. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/ld+json
-# 05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/json
-# 06. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present
+# 05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:B4568, with notification:endpoint:accept == application/json
+# 06. Create Entity urn:ngsi-ld:Vehicle:B4568
+# 07. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present
 #
 
-echo "01. Create Entity urn:ngsi-ld:Vehicle:A4568"
+echo "01. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json"
+echo "============================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:01",
+  "type": "Subscription",
+  "entities": [{"type": "Vehicle"}],
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "description": "Notify me of all product vehicles changes", 
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Create Entity urn:ngsi-ld:Vehicle:A4568"
 echo "==========================================="
 payload='{
   "id": "urn:ngsi-ld:Vehicle:A4568",
@@ -65,30 +87,9 @@ echo
 echo
 
 
-echo "02. GET the entity, check that observedAt is OK"
+echo "03. GET the entity, check that observedAt is OK"
 echo "==============================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4568
-echo
-echo
-
-
-echo "03. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json"
-echo "============================================================================================================================="
-payload='{
-  "id": "urn:ngsi-ld:Subscription:01",
-  "type": "Subscription",
-  "entities": [{"type": "Vehicle"}],
-  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-  "description": "Notify me of all product vehicles changes", 
-  "notification": {
-    "format": "normalized",
-    "endpoint": {
-      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-      "accept": "application/ld+json"
-    }
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
 
@@ -101,12 +102,12 @@ echo
 echo
 
 
-echo "05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/json"
+echo "05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:B4568, with notification:endpoint:accept == application/json"
 echo "================================================================================================================================"
 payload='{
   "id": "urn:ngsi-ld:Subscription:02",
   "type": "Subscription",
-  "entities": [{"type": "Vehicle"}],
+  "entities": [{"type": "VehicleB"}],
   "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
   "description": "Notify me of all product vehicles changes", 
   "notification": {
@@ -122,7 +123,32 @@ echo
 echo
 
 
-echo "06. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present"
+echo "06. Create Entity urn:ngsi-ld:Vehicle:B4568"
+echo "==========================================="
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:B4568",
+  "type": "VehicleB",
+  "brandName": {
+    "type": "Property",   
+    "value": "Mercedes"
+  },
+  "isParked": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+    "observedAt":"2018-12-04T12:00:00Z",
+    "providedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:Bob"
+     }
+  },
+  "@context": [ "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld" ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "07. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present"
 echo "============================================================================================================================================================"
 accumulatorDump
 echo
@@ -130,7 +156,16 @@ echo
 
 
 --REGEXPECT--
-01. Create Entity urn:ngsi-ld:Vehicle:A4568
+01. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json
+=============================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
+Date: REGEX(.*)
+
+
+
+02. Create Entity urn:ngsi-ld:Vehicle:A4568
 ===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -139,7 +174,7 @@ Date: REGEX(.*)
 
 
 
-02. GET the entity, check that observedAt is OK
+03. GET the entity, check that observedAt is OK
 ===============================================
 HTTP/1.1 200 OK
 Content-Length: 294
@@ -164,15 +199,6 @@ Date: REGEX(.*)
     },
     "type": "Vehicle"
 }
-
-
-03. Create a subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/ld+json
-=============================================================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
-Date: REGEX(.*)
-
 
 
 04. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/ld+json
@@ -215,7 +241,7 @@ Content-Type: application/ld+json
 =======================================
 
 
-05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:A4568, with notification:endpoint:accept == application/json
+05. Create another subscription matching Entity urn:ngsi-ld:Vehicle:B4568, with notification:endpoint:accept == application/json
 ================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -224,11 +250,20 @@ Date: REGEX(.*)
 
 
 
-06. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present
+06. Create Entity urn:ngsi-ld:Vehicle:B4568
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:B4568
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator to see one notification, make sure the observedAt timestamp is OK and that the Content-Type is application/json and Link header present
 ============================================================================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 467
+Content-Length: 468
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -243,7 +278,7 @@ Content-Type: application/json; charset=utf-8
                 "type": "Property",
                 "value": "Mercedes"
             },
-            "id": "urn:ngsi-ld:Vehicle:A4568",
+            "id": "urn:ngsi-ld:Vehicle:B4568",
             "isParked": {
                 "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
                 "observedAt": "2018-12-04T12:00:00Z",
@@ -253,7 +288,7 @@ Content-Type: application/json; charset=utf-8
                 },
                 "type": "Relationship"
             },
-            "type": "Vehicle"
+            "type": "VehicleB"
         }
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
