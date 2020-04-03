@@ -33,6 +33,7 @@
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "orionld/common/orionldState.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 
@@ -163,17 +164,23 @@ bool collectionRangedQuery
       *count = connection->count(col.c_str(), q);
     }
 
-    *cursor = connection->query(col.c_str(), q, limit, offset);
-
-    //
-    // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-    // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-    // exception ourselves
-    //
-    if (cursor->get() == NULL)
+    if (orionldState.onlyCount == false)
     {
-      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+      LM_TMP(("COUNT: limit == %d", limit));
+
+      *cursor = connection->query(col.c_str(), q, limit, offset);
+
+      //
+      // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+      // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+      // exception ourselves
+      //
+      if (cursor->get() == NULL)
+      {
+        throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+      }
     }
+
     LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)

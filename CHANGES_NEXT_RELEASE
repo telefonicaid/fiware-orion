@@ -7,3 +7,4 @@
 # Issue #XXX  Fixed a bug that impeded the creation of reistrations with only entity-type in the entities array
 # Issue #280  Entities can now have more than one GeoProperty
 # Issue #280  Turned off initial notifications (when creating NGSI-LD subscriptions)
+# Issue #280  New version for the 'count' URI parameter - in NGSI-LD 'options' isn't used for 'count

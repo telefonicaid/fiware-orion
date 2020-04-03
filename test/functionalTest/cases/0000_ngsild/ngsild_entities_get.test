@@ -40,6 +40,7 @@ brokerStart CB 212-249
 # 07. GET all entities with id E1, see entity E1 only
 # 08. GET all entities with id E.*, see all four entities
 # 09. GET all entities with id E5, see empty array
+# 10. GET all entities with id E.* with count and limit==0 - see empty array and count==4
 #
 
 echo "01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T"
@@ -129,7 +130,7 @@ echo
 
 echo "08. GET all entities with id E.*, see all four entities"
 echo "======================================================="
-orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes&type=T,T2&options=count' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes&type=T,T2&count=true' --noPayloadCheck -H "Accept: application/ld+json"  -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -141,6 +142,11 @@ echo
 echo
 
 
+echo "10. GET all entities with id E.* with count and limit==0 - see empty array and count==4"
+echo "======================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?idPattern=http://a.b.c/entity/E.*&prettyPrint=yes&type=T,T2&count=true&limit=0' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
 
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with test context, and type T
@@ -265,7 +271,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 873
 Content-Type: application/ld+json
-Fiware-Total-Count: 4
+NGSILD-Results-Count: 4
 Date: REGEX(.*)
 
 [
@@ -314,6 +320,18 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[]
+
+
+
+10. GET all entities with id E.* with count and limit==0 - see empty array and count==4
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+NGSILD-Results-Count: 4
 Date: REGEX(.*)
 
 []

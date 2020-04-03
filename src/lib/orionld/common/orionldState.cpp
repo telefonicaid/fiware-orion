@@ -123,6 +123,7 @@ void orionldStateInit(void)
   orionldState.forwardAttrsCompacted   = true;
   orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
   orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
+  orionldState.uriParams.limit         = 20;
 }
 
 

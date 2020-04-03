@@ -190,12 +190,16 @@ static void optionsParse(const char* options)
       *cP = 0;  // Zero-terminate
 
       if      (strcmp(optionStart, "update")      == 0)  orionldState.uriParamOptions.update      = true;
-      else if (strcmp(optionStart, "count")       == 0)  orionldState.uriParamOptions.count       = true;
       else if (strcmp(optionStart, "replace")     == 0)  orionldState.uriParamOptions.replace     = true;
       else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
       else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
       else
+      {
         LM_W(("Unknown 'options' value: %s", optionStart));
+        // orionldState.httpStatusCode = SccBadRequest;
+        // orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
+        // return;
+      }
 
       if (done == true)
         break;
@@ -237,6 +241,21 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     LM_TMP(("GEO: Got a geoproperty URI Param: %s", value));
     orionldState.uriParams.geoproperty = (char*) value;
+  }
+  else if (SCOMPARE6(key, 'c', 'o', 'u', 'n', 't', 0))
+  {
+    if (strcmp(value, "true") == 0)
+    {
+      LM_TMP(("COUNT: the URI parameter 'count' is set to 'true'"));
+      orionldState.uriParams.count = true;
+    }
+    else if (strcmp(value, "false") != 0)
+    {
+      LM_W(("Bad Input (invalid value for URI parameter 'count': %s)", value));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /count/", value);
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
   }
 
   return MHD_YES;
@@ -388,18 +407,8 @@ int orionldMhdConnectionInit
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);           // FIXME: To Be Removed!
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
-  if (lmTraceIsSet(LmtUriParams))
-    uriArgumentsPresent();
-
-  // 14. Check ...
-
-  // 20. Lookup the Service Routine
-  // 21. Not found?  Look it up in the badVerb vector
-  // 22. Not found still? Return error
-
-
   //
-  // 23. Format of response payload
+  // Format of response payload
   //
   if (orionldState.prettyPrint == true)
   {
@@ -417,6 +426,38 @@ int orionldMhdConnectionInit
     orionldState.kjsonP->stringBeforeColon = (char*) "";
     orionldState.kjsonP->stringAfterColon  = (char*) "";
   }
+
+  if (orionldState.httpStatusCode != SccOk)
+  {
+    LM_W(("Bad Input (invalid URI parameter)"));
+    orionldState.httpStatusCode = SccBadRequest;
+  }
+
+  //
+  // Check validity of URI parameters
+  //
+  if ((orionldState.uriParams.limit == 0) && (orionldState.uriParams.count == false))
+  {
+    LM_E(("Invalid value for URI parameter 'limit': 0"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1, if /count/ is not set");
+    orionldState.httpStatusCode = SccBadRequest;
+  }
+
+  if (orionldState.uriParams.limit > 1000)
+  {
+    LM_E(("Invalid value for URI parameter 'limit': %d", orionldState.uriParams.limit));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
+    orionldState.httpStatusCode = SccBadRequest;
+  }
+
+  if (lmTraceIsSet(LmtUriParams))
+    uriArgumentsPresent();
+
+  // 14. Check ...
+
+  // 20. Lookup the Service Routine
+  // 21. Not found?  Look it up in the badVerb vector
+  // 22. Not found still? Return error
 
   //
   // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH

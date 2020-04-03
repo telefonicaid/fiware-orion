@@ -79,7 +79,6 @@ struct ConnectionInfo;
 typedef struct OrionldUriParamOptions
 {
   bool noOverwrite;
-  bool count;
   bool update;
   bool replace;
   bool keyValues;
@@ -103,7 +102,7 @@ typedef struct OrionldUriParams
   char* geometry;
   char* geoloc;
   char* geoproperty;
-
+  bool  count;
   // To Be Continued ...
 } OrionldUriParams;
 
@@ -230,6 +229,7 @@ typedef struct OrionldConnectionState
   // Instructions for mongoBackend
   //
   KjNode*                 creDatesP;
+  bool                    onlyCount;
 
   //
   // General Behavior

@@ -58,9 +58,9 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
 
   mongoGetLdSubscriptions(ciP, &subVec, orionldState.tenant, (long long*) &count, &oe);
 
-  if ((ciP->uriParamOptions["count"]))
+  if (orionldState.uriParams.count == true)
   {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeader.push_back("NGSILD-Results-Count");
     ciP->httpHeaderValue.push_back(toString(count));
   }
 

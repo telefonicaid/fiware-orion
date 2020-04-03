@@ -196,7 +196,6 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []

@@ -1535,7 +1535,6 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
-  LM_TMP(("GEO: Calling collectionRangedQuery"));
   if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
     releaseMongoConnection(connection);
@@ -1547,7 +1546,9 @@ bool entitiesQuery
   /* Process query result */
   unsigned int docs = 0;
 
-  LM_TMP(("GEO: Getting results ... or not ... ?"));
+  if (orionldState.onlyCount == true)  // If only 'count', we can avoid to perform the "real" query
+    goto release;
+
   while (moreSafe(cursor))
   {
     BSONObj  r;
@@ -1673,6 +1674,8 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
+
+ release:
   LM_TMP(("GEO: Got %d results", docs));
   releaseMongoConnection(connection);
 

@@ -36,7 +36,7 @@ brokerStart CB
 # 04. GET  /ngsi-ld/v1/csourceRegistrations GET limit:5 csourceRegistration
 # 05. GET  /ngsi-ld/v1/csourceRegistrations GET limit:5/offset:0 csourceRegistration
 # 06. GET  /ngsi-ld/v1/csourceRegistrations GET limit:5/offset:1 csourceRegistration
-# 07. GET  /ngsi-ld/v1/csourceRegistrations GET options=count csourceRegistration
+# 07. GET  /ngsi-ld/v1/csourceRegistrations with count
 # 08. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:11 csourceRegistration
 # 09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
 #
@@ -148,9 +148,9 @@ echo
 echo
 
 
-echo "07. GET  /ngsi-ld/v1/csourceRegistrations GET options=count csourceRegistration"
-echo "==============================================================================="
-orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=3&options=count' -H 'Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo "07. GET  /ngsi-ld/v1/csourceRegistrations with count"
+echo "===================================================="
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations?limit=3&count=true' -H 'Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -2713,13 +2713,13 @@ Date: REGEX(.*)
 ]
 
 
-07. GET  /ngsi-ld/v1/csourceRegistrations GET options=count csourceRegistration
-===============================================================================
+07. GET  /ngsi-ld/v1/csourceRegistrations with count
+====================================================
 HTTP/1.1 200 OK
 Content-Length: 2370
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Fiware-Total-Count: 10
+NGSILD-Results-Count: 10
 Date: REGEX(.*)
 
 [

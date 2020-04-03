@@ -201,6 +201,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
+        LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
         orionldState.httpStatusCode = SccBadRequest;
 #endif
@@ -218,6 +219,7 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       ciP->answer         = error.smartRender(ciP->apiVersion);
 
 #ifdef ORIONLD
+        LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
         orionldState.httpStatusCode = SccBadRequest;
 #endif
@@ -225,14 +227,12 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
-      ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
-
-#ifdef ORIONLD
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
-        orionldState.httpStatusCode = SccBadRequest;
-#endif
+      if (orionldState.apiVersion != NGSI_LD_V1)
+      {
+        OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
+        ciP->httpStatusCode = error.code;
+        ciP->answer         = error.smartRender(ciP->apiVersion);
+      }
       return MHD_YES;
     }
   }

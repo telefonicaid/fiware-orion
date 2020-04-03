@@ -27,6 +27,7 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_FT
 #include "kbase/kStringSplit.h"                                // kStringSplit
 #include "kjson/kjBuilder.h"                                   // kjArray, kjChildAdd, ...
 }
@@ -350,7 +351,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   // Call mongoBackend
   //
   long long   count;
-  long long*  countP = (ciP->uriParamOptions["count"] == true)? &count : NULL;
+  long long*  countP = (orionldState.uriParams.count == true)? &count : NULL;
+
+  //
+  // Special case:
+  // If count is asked for and limit == 0 - just do the cunt query
+  //
+  if ((countP != NULL) && (orionldState.uriParams.limit == 0))
+    orionldState.onlyCount = true;
 
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
@@ -369,12 +377,15 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &mongoResponse);
 
+  if (orionldState.responseTree->value.firstChildP == NULL)
+    orionldState.noLinkHeader = true;
+
   // Add "count" if asked for
   if (countP != NULL)
   {
     char cV[32];
     snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeader.push_back("NGSILD-Results-Count");
     ciP->httpHeaderValue.push_back(cV);
   }
 

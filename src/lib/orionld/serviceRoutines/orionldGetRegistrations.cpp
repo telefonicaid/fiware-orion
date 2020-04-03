@@ -83,9 +83,9 @@ bool orionldGetRegistrations(ConnectionInfo* ciP)
     return false;
   }
 
-  if ((ciP->uriParamOptions["count"]))
+  if (orionldState.uriParams.count == true)
   {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeader.push_back("NGSILD-Results-Count");
     ciP->httpHeaderValue.push_back(toString(count));
   }
 
