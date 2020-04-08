@@ -121,7 +121,7 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 
 ldconfig
 
-echo "Builder: installing k libs"
+echo "Debian Builder: installing k libs"
 for kproj in kbase klog kalloc kjson khash
 do
     git clone https://gitlab.com/kzangeli/${kproj}.git ${ROOT}/$kproj
@@ -135,8 +135,7 @@ do
     make install
 done
 
-if [[ "${STAGE}" == 'deps' ]]; then
-    echo "Builder: installing Paho MQTT C library"
+    echo "Debian Builder: installing Paho MQTT C library"
     apt-get -y install doxygen                                                    # OK - with -y. NOT OK without -y !!!
     apt-get -y install graphviz 
     rm -f /usr/local/lib/libpaho*                                                 # OK
@@ -179,6 +178,8 @@ if [[ "${STAGE}" == 'deps' ]]; then
     # sudo service mosquitto start
     #
 
+
+if [[ "${STAGE}" == 'deps' ]]; then
     echo "Builder: installing gmock"
     curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
     cd ${ROOT}/gmock-1.5.0
@@ -199,7 +200,7 @@ fi
 
 if [[ ${STAGE} == 'release' ]]; then
 
-    echo "Builder: installing orion"
+    echo "Debian Builder: installing orion"
     git clone ${REPOSITORY} ${PATH_TO_SRC}
     cd ${PATH_TO_SRC}
     git checkout ${REV}
