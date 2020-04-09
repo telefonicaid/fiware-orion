@@ -41,33 +41,6 @@ jobs:
     - env: STAGE=debian_functional_1001_1400
       name: "Functional Tests 1001-1400 (Debian)"
       stage: test
-    - env: STAGE=debian_integration
-      name: "NGSI-LD Integration Tests"
-      stage: test
-      language: nodejs
-      node_js: 12.14
-      install: >
-        echo -e " \033[1;33mBuilding Debian Docker image for Integration Test";
-        travis_wait 30 docker build --quiet \
-            --build-arg TOKEN=${TOKEN} \
-            --build-arg REV=${TRAVIS_COMMIT} \
-            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
-            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-     
-      before_script : >
-        curl -LO https://github.com/FIWARE/NGSI-LD_TestSuite/archive/master.zip;
-        shasum -a 256 master.zip;
-        unzip -q master.zip;
-        rm master.zip;
-        cd NGSI-LD_TestSuite-master;  
-        export EXCLUDED_TESTS="003|004|";
-        npm install;
-
-      script:  >
-         echo -e " \033[1;33mRunning NGSI-LD Integration Test Suite";
-         ./services orion;
-         export TEST_ENDPOINT=http://localhost:1026;
-         npm test;
     - env: STAGE=debian_release
       name: "Deploy to Docker Hub"
       stage: deploy
