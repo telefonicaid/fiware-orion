@@ -76,7 +76,7 @@ Date: REGEX(.*)
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 817
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -105,6 +105,14 @@ Date: REGEX(.*)
       "R1": "http://example.org/R1",
       "P3": "http://example.org/P3"
     }
+  },
+  {
+    "url": "REGEX(.*)",
+    "id": "REGEX(.*)",
+    "type": "array",
+    "URLs": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    ]
   }
 ]
 

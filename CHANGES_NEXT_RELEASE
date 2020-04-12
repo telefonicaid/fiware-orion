@@ -8,3 +8,4 @@
 # Issue #280  Entities can now have more than one GeoProperty
 # Issue #280  Turned off initial notifications (when creating NGSI-LD subscriptions)
 # Issue #280  New version for the 'count' URI parameter - in NGSI-LD 'options' isn't used for 'count
+* Issue #XXX  Fixed bug in context cache that didn't save some contexts in the cache and made them downloading each and every time

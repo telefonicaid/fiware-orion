@@ -30,6 +30,9 @@ extern "C"
 #include "khash/khash.h"                                         // KHashTable
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -47,6 +50,8 @@ OrionldContextItem* orionldContextItemLookup(OrionldContext* contextP, const cha
 
   if (contextP == NULL)
     contextP = orionldCoreContextP;
+
+  LM_TMP(("CTX: Looking for '%s' in context '%s'", name, contextP->url));
 
   if (contextP->keyValues == true)
     itemP = (OrionldContextItem*) khashItemLookup(contextP->context.hash.nameHashTable, name);

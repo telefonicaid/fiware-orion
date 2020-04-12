@@ -193,7 +193,7 @@ typedef struct OrionldConnectionState
   //
   // Array of KjNode trees that are to freed when the request thread ends
   //
-  KjNode*                 delayedKjFreeVec[50];
+  KjNode*                 delayedKjFreeVec[500];
   int                     delayedKjFreeVecIndex;
   int                     delayedKjFreeVecSize;
 

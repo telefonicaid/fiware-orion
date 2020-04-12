@@ -92,12 +92,12 @@ Date: REGEX(.*)
 02. GET entity, accepting application/ld+json, and with same context as the entity creation
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 635
+Content-Length: 639
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
   "id": "urn:ngsi-ld:T:00:00:00",
   "type": "T",
   "P1": {

@@ -256,7 +256,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [ ],
 	"metadata" : [ ],
 	"blacklist" : false,
-	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 	"timeInterval" : -1,
 	"conditions" : [ ],
 	"expression" : {
@@ -305,7 +305,7 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [ ],
 	"metadata" : [ ],
 	"blacklist" : false,
-	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 	"timeInterval" : -1,
 	"conditions" : [ ],
 	"expression" : {

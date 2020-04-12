@@ -51,9 +51,6 @@ extern "C"
 //
 KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
 {
-  if (contextTreeP->type != KjArray)
-    return contextTreeP;
-
   KjNode* nodeP       = contextTreeP->value.firstChildP;
   int    itemsInArray = 0;
 
@@ -71,11 +68,6 @@ KjNode* orionldContextSimplify(KjNode* contextTreeP, int* itemsInArrayP)
 
   if (itemsInArrayP != 0)
     *itemsInArrayP = itemsInArray;
-
-  if (itemsInArray == 0)
-    return NULL;
-  else if (itemsInArray == 1)
-    return contextTreeP->value.firstChildP;
 
   return contextTreeP;
 }

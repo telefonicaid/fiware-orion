@@ -39,6 +39,7 @@ brokerStart CB 212-249
 # 03. Create entity store003, with type Byggnad
 # 04. GET entities with type Building, see stores 1 and 2
 # 05. GET entities with type Byggnad, see Store 3
+# 06. GET Building-typed entities, using context https://fiware.github.io/data-models/full-context.jsonld
 #
 
 
@@ -213,7 +214,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 829
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -287,7 +288,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 408
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -330,7 +331,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 829
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [

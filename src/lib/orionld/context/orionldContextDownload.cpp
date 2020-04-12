@@ -93,6 +93,7 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
     OrionldHttpHeader headerV[1];
     headerV[0].type = HttpHeaderNone;
 
+    LM_TMP(("CC: Downloading context '%s'", urlPath));
     reqOk = orionldRequestSend(&orionldState.httpResponse,
                                protocol,
                                ip,

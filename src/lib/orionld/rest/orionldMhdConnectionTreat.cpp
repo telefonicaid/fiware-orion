@@ -63,6 +63,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
+#include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
@@ -527,6 +528,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   char*                  url = kaStrdup(&kalloc, orionldState.link);
   OrionldProblemDetails  pd;
 
+  LM_TMP(("CC: Calling orionldContextFromUrl (for Link) for '%s'", url));
   orionldState.contextP = orionldContextFromUrl(url, &pd);
   if (orionldState.contextP == NULL)
   {
@@ -764,12 +766,32 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     OrionldProblemDetails pd = { OrionldBadRequestData, (char*) "naught", (char*) "naught", 0 };
 
-    orionldState.contextP = orionldContextFromTree(NULL, true, orionldState.payloadContextNode, &pd);
+    char* id  = NULL;
+    char* url = NULL;
+
+    if (orionldState.payloadContextNode->type == KjString)
+      url = NULL;  // orionldState.payloadContextNode->value.s
+    else
+      url = orionldContextUrlGenerate(&id);
+
+    LM_TMP(("CC: Calling orionldContextFromTree for inline context"));
+    orionldState.contextP = orionldContextFromTree(url, true, orionldState.payloadContextNode, &pd);
+    if (orionldState.contextP == NULL)
+    {
+      LM_W(("Bad Input (invalid inline context. %s: %s)", pd.title, pd.detail));
+      orionldErrorResponseFromProblemDetails(&pd);
+      orionldState.httpStatusCode = (HttpStatusCode) pd.status;
+
+      goto respond;
+    }
+
+    if (id != NULL)
+      orionldState.contextP->id = id;
 
     if (pd.status == 200)  // got an array with only Core Context
       orionldState.contextP = orionldCoreContextP;
 
-    if (orionldState.contextP == NULL)
+    if ((orionldState.contextP == NULL) || (pd.status >= 400))
     {
       LM_W(("Bad Input? (%s: %s (type == %d, status = %d))", pd.title, pd.detail, pd.type, pd.status));
       orionldErrorResponseFromProblemDetails(&pd);
@@ -892,7 +914,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     orionldState.responsePayload = (char*) malloc(bufLen);
     if (orionldState.responsePayload != NULL)
     {
-      LM_TMP(("Allocated 32MB foir the response"));
+      LM_TMP(("Allocated 32 MB for the response"));
       orionldState.responsePayloadAllocated = true;
       kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, bufLen);
       LM_TMP(("orionldState.responsePayload: '%s'", orionldState.responsePayload));

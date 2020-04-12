@@ -72,7 +72,7 @@ bool entityIdAndTypeGet(KjNode* entityNodeP, char** idP, char** typeP, KjNode* e
 
   if (entityIdCheck(idNodeP, idDuplicated, errorsArrayP) == false)
   {
-    LM_E(("CREATE/UPSERT: entityIdCheck flagged error"));
+    LM_E(("entityIdCheck flagged error"));
     return false;
   }
 
@@ -82,14 +82,12 @@ bool entityIdAndTypeGet(KjNode* entityNodeP, char** idP, char** typeP, KjNode* e
   {
     if (entityTypeCheck(typeNodeP, typeDuplicated, idNodeP->value.s, false, errorsArrayP) == false)
     {
-      LM_E(("CREATE/UPSERT: entityTypeCheck flagged error"));
+      LM_E(("entityTypeCheck flagged error"));
       return false;
     }
 
     *typeP = typeNodeP->value.s;
   }
-
-  LM_E(("CREATE/UPSERT: OK"));
 
   return true;
 }

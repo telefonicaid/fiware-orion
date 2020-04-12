@@ -101,7 +101,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 454
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

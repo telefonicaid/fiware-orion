@@ -160,12 +160,12 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 554
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
   "DateProp": {

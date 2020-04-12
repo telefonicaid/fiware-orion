@@ -101,15 +101,6 @@ Date: REGEX(.*)
     }
   },
   {
-    "url": REGEX(.*),
-    "id": REGEX(.*),
-    "type": "array",
-    "URLs": [
-      "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
-      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
-    ]
-  },
-  {
     "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "None",
     "type": "hash-table",
@@ -132,6 +123,15 @@ Date: REGEX(.*)
       "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount",
       "industrial": "https://uri.fiware.org/ns/data-models#industrial"
     }
+  },
+  {
+    "url": "REGEX(.*)",
+    "id": "REGEX(.*)",
+    "type": "array",
+    "URLs": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+    ]
   }
 ]
 

@@ -43,12 +43,13 @@ extern "C"
 //
 OrionldContext* orionldContextCreate(const char* url, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
 {
+  LM_TMP(("BUG: Creating a context for URL '%s'", url));
   OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
   if (contextP == NULL)
     LM_X(1, ("out of memory - trying to allocate a OrionldContext of %d bytes", sizeof(OrionldContext)));
 
-  contextP->url       = kaStrdup(&kalloc, url);
+  contextP->url       = (url == NULL)? (char*) "no URL" : kaStrdup(&kalloc, url);
   contextP->id        = (id == NULL)? NULL : kaStrdup(&kalloc, id);
   contextP->tree      = (toBeCloned == true)? kjClone(tree) : NULL;
   contextP->keyValues = keyValues;

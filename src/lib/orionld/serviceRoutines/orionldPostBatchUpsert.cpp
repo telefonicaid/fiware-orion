@@ -241,12 +241,20 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
     if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
     {
+      LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400);
       kjChildRemove(incomingTree, entityP);
     }
     else if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
     {
+      LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400);
+      kjChildRemove(incomingTree, entityP);
+    }
+    else if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
+    {
+      LM_W(("Bad Input (@context present bot in Link header and in payload data)"));
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present bot in Link header and in payload data", 400);
       kjChildRemove(incomingTree, entityP);
     }
 
@@ -295,6 +303,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
       if (contextNodeP != NULL)
         contextP = orionldContextFromTree(NULL, true, contextNodeP, &pd);
+
       if (contextP == NULL)
         contextP = orionldState.contextP;
 

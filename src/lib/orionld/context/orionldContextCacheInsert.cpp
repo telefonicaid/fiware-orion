@@ -42,6 +42,12 @@
 //
 void orionldContextCacheInsert(OrionldContext* contextP)
 {
+  if (contextP == NULL)
+  {
+    LM_W(("contextP == NULL !!!     FIX IT !!!"));
+    return;
+  }
+
   sem_wait(&orionldContextCacheSem);
 
   //
@@ -66,4 +72,5 @@ void orionldContextCacheInsert(OrionldContext* contextP)
   ++orionldContextCacheSlotIx;
 
   sem_post(&orionldContextCacheSem);
+  LM_TMP(("CC: Inserted context '%s' in the cache", contextP->url));
 }

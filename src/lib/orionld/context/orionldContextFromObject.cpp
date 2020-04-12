@@ -108,6 +108,7 @@ OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* con
     url  = orionldContextUrlGenerate(&id);
 
   contextP = orionldContextCreate(url, id, contextObjectP, true, toBeCloned);
+  LM_TMP(("CC: Calling orionldContextCacheInsert for '%s'", contextP->url));
   orionldContextCacheInsert(contextP);
 
   contextP->context.hash.nameHashTable  = khashTableCreate(&kalloc, hashCode, nameCompareFunction,  ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);

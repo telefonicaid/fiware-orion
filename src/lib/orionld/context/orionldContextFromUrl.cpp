@@ -30,6 +30,7 @@
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
 #include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
 #include "orionld/context/orionldContextDownload.h"              // orionldContextDownload
+#include "orionld/context/orionldContextCacheInsert.h"           // orionldContextCacheInsert
 #include "orionld/context/orionldContextFromUrl.h"               // Own interface
 
 
@@ -55,5 +56,7 @@ OrionldContext* orionldContextFromUrl(char* url, OrionldProblemDetails* pdP)
     return NULL;
   }
 
-  return orionldContextFromBuffer(url, buffer, pdP);
+  contextP = orionldContextFromBuffer(url, buffer, pdP);
+
+  return contextP;
 }

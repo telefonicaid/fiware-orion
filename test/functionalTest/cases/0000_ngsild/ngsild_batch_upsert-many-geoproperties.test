@@ -212,7 +212,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 758
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -266,7 +266,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1117
 Content-Type: application/json
-Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -325,4 +325,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
