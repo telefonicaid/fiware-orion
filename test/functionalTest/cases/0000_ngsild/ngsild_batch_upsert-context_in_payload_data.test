@@ -34,10 +34,11 @@ brokerStart CB
 # 01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error
 # 02. Batch Upsert, Content-Type is LD+JSON, no @context present in an item of the array - see error
 # 03. Batch Upsert, Content-Type is JSON, and no @context present in an item of the array - OK
+# 04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header
 #
-# Now testing thateach Entity is created with the @context of its array item
-# 04. Issue a Batch upsert command, creating 3 new entities, each with a different context
-# 05. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context
+# Now testing that each Entity is created with the @context of its array item
+# 05. Issue a Batch upsert command, creating 3 new entities, each with a different context
+# 06. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context
 #
 
 echo "01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error"
@@ -92,7 +93,33 @@ echo
 echo
 
 
-echo "04. Issue a Batch upsert command, creating 3 new entities, each with a different context"
+echo "04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header"
+echo "================================================================================================"
+payload='[
+  {
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "urn:E1",
+    "type": "Tx",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  },
+  {
+    "id": "urn:E2",
+    "type": "Tx",
+    "P1": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Content-Type: application/ld+json" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; ""'
+echo
+echo
+
+
+echo "05. Issue a Batch upsert command, creating 3 new entities, each with a different context"
 echo "========================================================================================"
 payload='[
   {
@@ -110,7 +137,7 @@ echo
 echo
 
 
-echo "05. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context"
+echo "06. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context"
 echo "=========================================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities?type=Tx
 echo
@@ -181,7 +208,40 @@ Date: REGEX(.*)
 
 
 
-04. Issue a Batch upsert command, creating 3 new entities, each with a different context
+04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header
+================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 483
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E1",
+            "error": {
+                "detail": "@context present bot in Link header and in payload data",
+                "status": 400,
+                "title": "Inconsistency between HTTP headers and payload data",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:E2",
+            "error": {
+                "detail": "Content-Type is 'application/ld+json', but no @context in payload data array item",
+                "status": 400,
+                "title": "Invalid payload",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+05. Issue a Batch upsert command, creating 3 new entities, each with a different context
 ========================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -189,7 +249,7 @@ Date: REGEX(.*)
 
 
 
-05. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context
+06. GET all entities without context, see long names for all entity-types and attribute names that weren't expanded using the Core Context
 ==========================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 151
