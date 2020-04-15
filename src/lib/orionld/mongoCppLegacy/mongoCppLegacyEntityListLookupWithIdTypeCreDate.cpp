@@ -108,7 +108,7 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
     mongo::BSONObj     idField      = getObjectFieldF(bsonObj, "_id");
     std::string        idString     = getStringFieldF(idField, "id");
     std::string        typeString   = getStringFieldF(idField, "type");
-    int                creDate      = getIntFieldF(bsonObj, "creDate");
+    long long          creDate      = getIntOrLongFieldAsLongF(bsonObj, "creDate");
     KjNode*            entityTree   = kjObject(orionldState.kjsonP, NULL);
     KjNode*            idNodeP      = kjString(orionldState.kjsonP,  "id",      idString.c_str());
     KjNode*            typeNodeP    = kjString(orionldState.kjsonP,  "type",    typeString.c_str());

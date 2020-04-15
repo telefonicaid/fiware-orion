@@ -211,7 +211,7 @@ Date: REGEX(.*)
 04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header
 ================================================================================================
 HTTP/1.1 207 Multi Status
-Content-Length: 483
+Content-Length: 484
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -221,7 +221,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:E1",
             "error": {
-                "detail": "@context present bot in Link header and in payload data",
+                "detail": "@context present both in Link header and in payload data",
                 "status": 400,
                 "title": "Inconsistency between HTTP headers and payload data",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

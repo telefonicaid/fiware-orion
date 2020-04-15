@@ -253,8 +253,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     }
     else if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
     {
-      LM_W(("Bad Input (@context present bot in Link header and in payload data)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present bot in Link header and in payload data", 400);
+      LM_W(("Bad Input (@context present both in Link header and in payload data)"));
+      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400);
       kjChildRemove(incomingTree, entityP);
     }
 
