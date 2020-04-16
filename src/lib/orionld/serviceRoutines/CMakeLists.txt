@@ -46,8 +46,9 @@ SET (SOURCES
     orionldGetVersion.cpp
     orionldNotImplemented.cpp
     orionldNotify.cpp
-    orionldPostBatchUpsert.cpp
     orionldPostBatchCreate.cpp
+    orionldPostBatchUpsert.cpp
+    orionldPostBatchUpdate.cpp
     orionldGetEntityTypes.cpp
     orionldGetTenants.cpp
     orionldGetDbIndexes.cpp
