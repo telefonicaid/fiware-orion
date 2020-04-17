@@ -1,0 +1,199 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert Crash - for request with context in both payload and Link header
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB smartmaas001
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header
+# 02. UPDATE the entity by re-executing the same UPSERT operation (but now WITH additional Context in Link header)
+# 03. GET version (just to see that the broker is still alive
+#
+
+echo "01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header"
+echo "====================================================================================="
+payload='[
+    {
+        "type": "WeatherObserved",
+        "dataProvider": {
+            "type": "Property",
+            "value": "sensor.community"
+        },
+        "source": {
+            "type": "Property",
+            "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+        },
+        "stationName": {
+            "type": "Property",
+            "value": "BMP180:22828"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "type": "Point",
+                "coordinates": [
+                    13.418,
+                    52.562
+                ]
+            }
+        },
+        "@context": [
+            "https://schema.lab.fiware.org/ld/context",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        ],
+        "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+        "temperature": {
+            "observedAt": "2020-04-09T14:33:38Z",
+            "type": "Property",
+            "value": 21.9
+        },
+        "atmosphericPressure": {
+            "observedAt": "2020-04-09T14:33:38Z",
+            "type": "Property",
+            "value": 1014.96
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?prettyPrint=yes' --payload "$payload" --noPayloadCheck -H 'Fiware-Service: smartmaas001' --in jsonld -H "Fiware-Servicepath: /"
+echo
+echo
+
+
+echo "02. UPDATE the entity by re-executing the same UPSERT operation (but now WITH additional Context in Link header)"
+echo "================================================================================================================"
+payload='[
+    {
+        "type": "WeatherObserved",
+        "dataProvider": {
+            "type": "Property",
+            "value": "sensor.community"
+        },
+        "source": {
+            "type": "Property",
+            "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+        },
+        "stationName": {
+            "type": "Property",
+            "value": "BMP180:22828"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "type": "Point",
+                "coordinates": [
+                    13.418,
+                    52.562
+                ]
+            }
+        },
+        "@context": [
+            "https://schema.lab.fiware.org/ld/context",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        ],
+        "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+        "temperature": {
+            "observedAt": "2020-04-09T14:33:38Z",
+            "type": "Property",
+            "value": 21.9
+        },
+        "atmosphericPressure": {
+            "observedAt": "2020-04-09T14:33:38Z",
+            "type": "Property",
+            "value": 1014.96
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?prettyPrint=yes' --payload "$payload" --noPayloadCheck -H 'Fiware-Service: smartmaas001' --in jsonld  -H "Fiware-Servicepath: /" -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' 
+echo
+echo
+
+
+echo "03. GET version (just to see that the broker is still alive"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/ex/v1/version?prettyPrint=yes
+echo
+echo
+
+
+--REGEXPECT--
+01. CREATE a single entity using UPSERT and WITHOUT additional Context in Link header
+=====================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+
+02. UPDATE the entity by re-executing the same UPSERT operation (but now WITH additional Context in Link header)
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 233
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "invalid combination of HTTP headers Content-Type and Link",
+  "detail": "Content-Type is 'application/ld+json' AND Link header is present - not allowed"
+}
+
+
+
+03. GET version (just to see that the broker is still alive
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "Next File Descriptor": REGEX(.*),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
+    "boost version": "REGEX(.*)",
+    "branch": "REGEX(.*)",
+    "kalloc version": "REGEX(.*)",
+    "kbase version": "REGEX(.*)",
+    "khash version": "REGEX(.*)",
+    "kjson version": "REGEX(.*)",
+    "libcurl version": "REGEX(.*)",
+    "libuuid version": "REGEX(.*)",
+    "microhttpd version": "REGEX(.*)",
+    "mongo version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB smartmaas001

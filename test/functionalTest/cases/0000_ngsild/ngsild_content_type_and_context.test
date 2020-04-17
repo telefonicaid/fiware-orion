@@ -217,13 +217,13 @@ Date: REGEX(.*)
 06. Content-Type: application/ld+json + context in HTTP Header - see error
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 189
+Content-Length: 233
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "For application/ld+json, the @context must be present in the JSON payload",
-    "title": "@context missing in JSON payload",
+    "detail": "Content-Type is 'application/ld+json' AND Link header is present - not allowed",
+    "title": "invalid combination of HTTP headers Content-Type and Link",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -231,13 +231,13 @@ Date: REGEX(.*)
 07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 203
+Content-Length: 233
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "For application/ld+json, the @context must come inside the JSON payload, NOT in HTTP Header",
-    "title": "@context in Link HTTP Header",
+    "detail": "Content-Type is 'application/ld+json' AND Link header is present - not allowed",
+    "title": "invalid combination of HTTP headers Content-Type and Link",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

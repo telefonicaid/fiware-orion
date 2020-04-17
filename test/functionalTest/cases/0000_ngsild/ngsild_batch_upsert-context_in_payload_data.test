@@ -210,34 +210,15 @@ Date: REGEX(.*)
 
 04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header
 ================================================================================================
-HTTP/1.1 207 Multi Status
-Content-Length: 484
+HTTP/1.1 400 Bad Request
+Content-Length: 233
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "errors": [
-        {
-            "entityId": "urn:E1",
-            "error": {
-                "detail": "@context present both in Link header and in payload data",
-                "status": 400,
-                "title": "Inconsistency between HTTP headers and payload data",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:E2",
-            "error": {
-                "detail": "Content-Type is 'application/ld+json', but no @context in payload data array item",
-                "status": 400,
-                "title": "Invalid payload",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        }
-    ],
-    "success": []
+    "detail": "Content-Type is 'application/ld+json' AND Link header is present - not allowed",
+    "title": "invalid combination of HTTP headers Content-Type and Link",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

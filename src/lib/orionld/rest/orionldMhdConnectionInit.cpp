@@ -377,6 +377,13 @@ int orionldMhdConnectionInit
   // 5.  Get HTTP Headers
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: to be reimplemented in C !!!
 
+  if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
+    orionldState.httpStatusCode  = SccBadRequest;
+    return MHD_YES;
+  }
+
   // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
   ciP->servicePathV.push_back((orionldState.verb == GET)? "/#" : "/");
 
