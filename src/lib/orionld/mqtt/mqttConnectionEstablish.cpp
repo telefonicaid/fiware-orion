@@ -37,8 +37,6 @@
 //
 bool mqttConnectionEstablish(bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
 {
-  LM_TMP(("MQTT: Getting connection for MQTT server on '%s', port %d", host, port));
-
   if (mqttConnectionLookup(host, port) != NULL)
     return true;  // Already connected
 

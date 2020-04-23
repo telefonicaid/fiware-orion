@@ -301,7 +301,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   UpdateContextResponse     ucResponse;
 
   ucr.updateActionType = ActionTypeAppend;
-  LM_TMP(("Calling mongoUpdateContext for tenant '%s'", orionldState.tenant));
   status = mongoUpdateContext(&ucr,
                               &ucResponse,
                               orionldState.tenant,

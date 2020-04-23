@@ -84,10 +84,7 @@ static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
     if (cmp < 0)
       prev = itemP;
     else if (cmp == 0)
-    {
-      LM_TMP(("ET: Trowing away a '%s' as it's already present", newItemP->value.s));
       return;  // We skip values that are already present
-    }
 
     itemP = itemP->next;
   }
@@ -136,9 +133,6 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   if (local != NULL)
     local = typesExtract(local);
 
-  LM_TMP(("ET: remote at %p", remote));
-  LM_TMP(("ET: local  at %p", local));
-
   if ((remote == NULL) && (local == NULL))
   {
     KjNode* emptyArray = kjArray(orionldState.kjsonP, NULL);
@@ -158,10 +152,6 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
   // Sort
   KjNode* sortedArrayP = kjArray(orionldState.kjsonP, NULL);
-
-  char buf[1024];
-  kjRender(orionldState.kjsonP, arrayP, buf, 1024);
-  LM_TMP(("ET: In-Array: %s", buf));
 
   //
   // The very first item can be inserted directly, without caring about sorting
@@ -184,15 +174,8 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     kjChildRemove(arrayP, nodeP);
     kjStringArraySortedInsert(sortedArrayP, nodeP);
 
-    kjRender(orionldState.kjsonP, sortedArrayP, buf, 1024);
-    LM_TMP(("ET: Sorted Array: %s", buf));
-
     nodeP = next;
   }
-  LM_TMP(("ET: Done"));
-
-  kjRender(orionldState.kjsonP, sortedArrayP, buf, 1024);
-  LM_TMP(("ET: Out-Array: %s", buf));
 
   return sortedArrayP;
 }

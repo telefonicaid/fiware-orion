@@ -57,7 +57,6 @@ OrionldContext* orionldContextFromArray(char* url, bool toBeCloned, int itemsInA
     url = orionldContextUrlGenerate(&id);
 
   contextP = orionldContextCreate(url, id, contextArrayP, false, toBeCloned);
-  LM_TMP(("CC: Calling orionldContextCacheInsert for '%s'", contextP->url));
   orionldContextCacheInsert(contextP);
 
   contextP->context.array.items    = itemsInArray;

@@ -528,7 +528,6 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   char*                  url = kaStrdup(&kalloc, orionldState.link);
   OrionldProblemDetails  pd;
 
-  LM_TMP(("CC: Calling orionldContextFromUrl (for Link) for '%s'", url));
   orionldState.contextP = orionldContextFromUrl(url, &pd);
   if (orionldState.contextP == NULL)
   {
@@ -552,8 +551,6 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
 static void contextToPayload(void)
 {
   // If no contest node exists, create it with the default context
-
-  LM_TMP(("In contextToPayload"));
   if (orionldState.payloadContextNode == NULL)
   {
     if (orionldState.link == NULL)
@@ -561,7 +558,6 @@ static void contextToPayload(void)
     else
       orionldState.payloadContextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
   }
-  LM_TMP(("Got the payloadContextNode"));
 
   if (orionldState.payloadContextNode == NULL)
   {
@@ -582,7 +578,6 @@ static void contextToPayload(void)
   }
   else if (orionldState.responseTree->type == KjArray)
   {
-    LM_TMP(("In contextToPayload - it's an array!"));
     for (KjNode* rTreeItemP = orionldState.responseTree->value.firstChildP; rTreeItemP != NULL; rTreeItemP = rTreeItemP->next)
     {
       KjNode* contextNode;
@@ -774,7 +769,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     else
       url = orionldContextUrlGenerate(&id);
 
-    LM_TMP(("CC: Calling orionldContextFromTree for inline context"));
     orionldState.contextP = orionldContextFromTree(url, true, orionldState.payloadContextNode, &pd);
     if (orionldState.contextP == NULL)
     {
@@ -812,7 +806,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   LM_T(LmtServiceRoutine, ("Calling Service Routine %s (context at %p)", orionldState.serviceP->url, orionldState.contextP));
 
-  LM_TMP(("Calling serviceRoutine(tenant==%s)", orionldState.tenant));
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
   LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
 
@@ -827,7 +820,6 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
   else  // Service Routine worked
   {
-    LM_TMP(("Service Routine worked - dbGeoIndexes ?"));
     dbGeoIndexes();
 
     // New tenant?
@@ -914,10 +906,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     orionldState.responsePayload = (char*) malloc(bufLen);
     if (orionldState.responsePayload != NULL)
     {
-      LM_TMP(("Allocated 32 MB for the response"));
       orionldState.responsePayloadAllocated = true;
       kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, bufLen);
-      LM_TMP(("orionldState.responsePayload: '%s'", orionldState.responsePayload));
     }
     else
     {
@@ -934,10 +924,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
-  {
-    LM_TMP(("No payload for the response"));
     restReply(ciP, "");
-  }
+
   //
   // Calling Temporal Routine to save the temporal data (if applicable)
   // Only if the Service Routine was successful, of course

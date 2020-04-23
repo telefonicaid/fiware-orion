@@ -51,17 +51,13 @@ bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const ch
   connectOptions.password          = password;
 
   if (mqtts)
-  {
     LM_W(("WARNING - MQTT/SSL is not implemented yet - using unsecure MQTT for now. Sorry ... "));
-  }
 
-  LM_TMP(("MQTT: Connecting to MQTT server on '%s'", address));
   if ((status = MQTTClient_connect(mqP->client, &connectOptions)) != MQTTCLIENT_SUCCESS)
   {
     LM_E(("Internal Error (unable to connect to MQTT server (%s:%d): MQTTClient_connect error %d", host, port, status));
     return false;
   }
 
-  LM_TMP(("MQTT: Connected to the MQTT Server at %s:%d", host, port));
   return true;
 }

@@ -45,8 +45,6 @@ void dbGeoIndexAdd(const char* tenant, const char* attrName)
 {
   OrionldGeoIndex* geoNodeP = (OrionldGeoIndex*) kaAlloc(&kalloc, sizeof(OrionldGeoIndex));
 
-  LM_TMP(("GEOI: Adding a geo-index to the list: '%s' - '%s'", tenant, attrName));
-
   geoNodeP->tenant   = kaStrdup(&kalloc, tenant);
   geoNodeP->attrName = kaStrdup(&kalloc, attrName);
 

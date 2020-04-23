@@ -345,9 +345,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
       char*             valueFieldName;
       bool              valueMayBeCompacted  = false;
 
-      LM_TMP(("GEO: Calling orionldContextItemAliasLookup for '%s', context: '%s'", attrLongName, orionldState.contextP->url));
       attrName = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, &valueMayBeCompacted, NULL);
-      LM_TMP(("GEO: orionldContextItemAliasLookup got: '%s'", attrName));
+
       //
       // If URI param attrList has been used, only matching attributes should be included in the response
       //
@@ -406,7 +405,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         //
         // NOT keyValues - create entire attribute tree
         //
-        LM_TMP(("GEO: NOT keyValues - create entire attribute tree for att '%s'", attrName));
         aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {

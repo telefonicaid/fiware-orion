@@ -38,7 +38,6 @@
 //
 MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* password, const char* host, unsigned short port)
 {
-  LM_TMP(("MQTT: Adding connection for MQTT server on '%s', port %d (index %d)", host, port, mqttConnectionListIx));
   if (mqttConnectionListIx >= mqttConnectionListSize)
   {
     mqttConnectionListSize += 20;

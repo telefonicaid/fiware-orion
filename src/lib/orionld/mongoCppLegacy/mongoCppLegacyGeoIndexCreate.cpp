@@ -48,9 +48,6 @@ extern "C"
 //
 bool mongoCppLegacyGeoIndexCreate(const char* tenant, const char* attrLongName)
 {
-  LM_TMP(("GEOI: tenant: '%s'", tenant));
-  LM_TMP(("GEOI: attr:   '%s'", attrLongName));
-
   int         len          = 6 + strlen(attrLongName) + 6 + 1;              // "attrs." == 6, ".value" == 6, 1 for string-termination
   char*       index        = kaAlloc(&orionldState.kalloc, len);
   char*       attrNameCopy = kaStrdup(&orionldState.kalloc, attrLongName);  // To not destroy the original attrName
@@ -69,8 +66,7 @@ bool mongoCppLegacyGeoIndexCreate(const char* tenant, const char* attrLongName)
     return false;
   }
 
-  LM_TMP(("GEOI: Creating a Geo-Index for %s-%s", tenant, attrNameCopy));
   dbGeoIndexAdd(tenant, attrNameCopy);
-  LM_TMP(("GEOI: Created a Geo-Index for %s-%s", tenant, attrNameCopy));
+
   return true;
 }

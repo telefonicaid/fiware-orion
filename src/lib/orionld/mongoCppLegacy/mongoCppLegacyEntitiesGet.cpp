@@ -58,7 +58,7 @@ KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields)
   for (int ix = 0; ix < fields; ix++)
   {
     dbFields.append(fieldV[ix], 1);
-    LM_TMP(("ET: Added field '%s'", fieldV[ix]));
+
     if (strcmp(fieldV[ix], "_id") == 0)
       idPresent = true;
   }

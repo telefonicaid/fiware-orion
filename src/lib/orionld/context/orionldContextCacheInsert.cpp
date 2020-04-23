@@ -72,5 +72,4 @@ void orionldContextCacheInsert(OrionldContext* contextP)
   ++orionldContextCacheSlotIx;
 
   sem_post(&orionldContextCacheSem);
-  LM_TMP(("CC: Inserted context '%s' in the cache", contextP->url));
 }

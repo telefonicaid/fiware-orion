@@ -51,8 +51,6 @@ OrionldContextItem* orionldContextItemLookup(OrionldContext* contextP, const cha
   if (contextP == NULL)
     contextP = orionldCoreContextP;
 
-  LM_TMP(("CTX: Looking for '%s' in context '%s'", name, contextP->url));
-
   if (contextP->keyValues == true)
     itemP = (OrionldContextItem*) khashItemLookup(contextP->context.hash.nameHashTable, name);
   else

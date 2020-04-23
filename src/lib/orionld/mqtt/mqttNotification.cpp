@@ -69,12 +69,8 @@ int mqttNotification(const char* host, unsigned short port, const char* topic, c
     return -1;
   }
 
-  LM_TMP(("MQTT: In mqttNotification"));
   kjChildAdd(metadataNodeP, contentTypeNodeP);
-  LM_TMP(("MQTT: Calling kjRender"));
   kjRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 1024);
-  LM_TMP(("MQTT: After kjRender"));
-  LM_TMP(("MQTT: metadataBuf: '%s'", metadataBuf));
 
   totalLen = strlen(body) + strlen(metadataBuf) + 50;
   totalBuf = kaAlloc(&orionldState.kalloc, totalLen);
@@ -91,17 +87,13 @@ int mqttNotification(const char* host, unsigned short port, const char* topic, c
     return -1;
   }
 
-  LM_TMP(("MQTT: Found MQTT connection for %s:%d", mqttP->host, mqttP->port));
-
   mqttMsg.payload    = (void*) totalBuf;
   mqttMsg.payloadlen = strlen(totalBuf);
   mqttMsg.qos        = mqttQos;
   mqttMsg.retained   = 0;
 
-  LM_TMP(("MQTT: Sending MQTT notification to %s:%d (on topic: %s): %s", host, port, topic, totalBuf));
   MQTTClient_publishMessage(mqttP->client, topic, &mqttMsg, &mqttToken);
 
-  LM_TMP(("MQTT: Waiting for (up to) %d milliseconds for topic '%s' meesage", mqttTimout, topic));
   int rc = MQTTClient_waitForCompletion(mqttP->client, mqttToken, mqttTimout);
   if (rc != 0)
   {
@@ -109,6 +101,5 @@ int mqttNotification(const char* host, unsigned short port, const char* topic, c
     return -1;
   }
 
-  LM_TMP(("MQTT: All OK"));
   return 0;
 }

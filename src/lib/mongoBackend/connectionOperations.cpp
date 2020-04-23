@@ -166,8 +166,6 @@ bool collectionRangedQuery
 
     if (orionldState.onlyCount == false)
     {
-      LM_TMP(("COUNT: limit == %d", limit));
-
       *cursor = connection->query(col.c_str(), q, limit, offset);
 
       //

@@ -255,7 +255,6 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (SCOMPARE10(key, 'd', 'a', 't', 'a', 's', 'e', 't', 'I', 'd', 0))
   {
     orionldState.uriParams.datasetId = (char*) value;
-    LM_TMP(("NQ: URI param datasetId == %s", orionldState.uriParams.datasetId));
     // Check that it's a URI
   }
 

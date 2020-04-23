@@ -140,8 +140,6 @@ static void* workerFunc(void* pSyncQ)
         char* topic = (char*) params->resource.c_str();
 
         ++topic;  // step over the initial '/'
-        LM_TMP(("MQTT: Preparing to send an MQTT notification to '%s', port %d, topic '%s'", params->ip.c_str(), params->port, topic));
-        LM_TMP(("MQTT: Payload Data: %s", params->content.c_str()));
 
         r = mqttNotification(params->ip.c_str(), params->port, topic, params->content.c_str(), params->content_type.c_str());
       }

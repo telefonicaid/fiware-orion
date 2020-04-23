@@ -39,7 +39,6 @@
 //
 MqttConnection* mqttConnectionLookup(const char* host, unsigned short port)
 {
-  LM_TMP(("MQTT: Looking up connection for MQTT server on '%s', port %d", host, port));
   for (int ix = 0; ix < mqttConnectionListIx; ix++)
   {
     MqttConnection* mqP = &mqttConnectionList[ix];

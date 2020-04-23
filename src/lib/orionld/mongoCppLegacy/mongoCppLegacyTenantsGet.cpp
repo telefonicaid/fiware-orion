@@ -64,8 +64,6 @@ bool mongoCppLegacyTenantsGet(void)
       mongo::BSONObj  db   = dbV[ix].Obj();
       char*           name = mongoCppLegacyDbStringFieldGet(&db, "name");
 
-      LM_TMP(("TEN: Found an initial DB '%s'", name));
-
       if (strncmp(name, dbName, dbNameLen) == 0)
         orionldTenantCreate(name);
     }

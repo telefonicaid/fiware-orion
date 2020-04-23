@@ -50,15 +50,11 @@ extern "C"
 void mongoCppLegacyGeoIndexInit(void)
 {
   // Foreach tenant
-  LM_TMP(("TEN: Looping over all tenants"));
-
   for (unsigned int ix = 0; ix < tenants; ix++)
   {
-    LM_TMP(("TEN: Tenant '%s'", tenantV[ix]));
     char collectionPath[256];
 
     dbCollectionPathGetWithTenant(collectionPath, sizeof(collectionPath), tenantV[ix], "entities");
-    LM_TMP(("dbCollectionPath: '%s'", collectionPath));
 
     // Foreach ENTITY (only attrs)
     mongo::BSONObjBuilder  dbFields;
@@ -103,19 +99,10 @@ void mongoCppLegacyGeoIndexInit(void)
 
         if (strcmp(typeP->value.s, "GeoProperty") == 0)
         {
-          LM_TMP(("GEOI: looking up geoindex %s-%s", tenantV[ix], attrP->name));
           if (dbGeoIndexLookup(tenantV[ix], attrP->name) == NULL)
-          {
-            LM_TMP(("GEOI: Not found - creating a new geoindex"));
             mongoCppLegacyGeoIndexCreate(tenantV[ix], attrP->name);
-            LM_TMP(("GEOI: New geoindex created"));
-          }
-          else
-            LM_TMP(("GEOI: Already existng"));
         }
       }
     }
   }
-
-  LM_TMP(("Foreach tenant DONE"));
 }

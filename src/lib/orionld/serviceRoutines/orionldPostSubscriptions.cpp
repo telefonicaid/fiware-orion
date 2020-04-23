@@ -129,7 +129,6 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
       char*           detail        = NULL;
       char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
 
-      LM_TMP(("MQTT: this is an MQTT subscription - I need to connect (if not alreadt connected)"));
       if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
       {
         LM_W(("Bad Input (invalid MQTT endpoint)"));

@@ -1336,7 +1336,6 @@ bool entitiesQuery
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
 
-  LM_TMP(("GEO: In entitiesQuery: geoproperty == '%s'", orionldState.uriParams.geoproperty));
   /* Part 1: entities */
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
@@ -1432,22 +1431,18 @@ bool entitiesQuery
             //
             if (orionldState.uriParams.geoproperty != NULL)
             {
-              LM_TMP(("GEO: special geoproperty: '%s'", orionldState.uriParams.geoproperty));
               attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, NULL, true, NULL);
               dotForEq(attrNameP);
             }
-            else
-              LM_TMP(("GEO: default geoproperty: '%s'", attrNameP));
 
             snprintf(locationCoordinates, sizeof(locationCoordinates), "attrs.%s.value", attrNameP);
 
-            LM_TMP(("GEO: Using geo attribute path '%s'", locationCoordinates));
             finalQuery.append(locationCoordinates, areaQuery);
           }
           else
           {
             std::string locationCoordinates;
-            LM_TMP(("GEO: Using hardcoded geo attribute name 'location'"));
+
             locationCoordinates = ENT_LOCATION "." ENT_LOCATION_COORDS;
             finalQuery.append(locationCoordinates, areaQuery);
           }
@@ -1556,15 +1551,13 @@ bool entitiesQuery
     try
     {
       // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
-      LM_TMP(("GEO: Getting a result"));
       r = cursor->nextSafe();
-      LM_TMP(("GEO: Got a result"));
     }
     catch (const AssertionException &e)
     {
       std::string              exErr = e.what();
       ContextElementResponse*  cer   = new ContextElementResponse();
-      LM_TMP(("GEO: DB Error: %s", e.what()));
+
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
       // So, we can just match the error and send a less descriptive text.
@@ -1618,7 +1611,6 @@ bool entitiesQuery
     }
     catch (const std::exception &e)
     {
-      LM_TMP(("GEO: DB Error: %s", e.what()));
       *err = e.what();
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", e.what(), query.toString().c_str()));
       releaseMongoConnection(connection);
@@ -1626,7 +1618,6 @@ bool entitiesQuery
     }
     catch (...)
     {
-      LM_TMP(("GEO: Generic DB Error - no info ... :("));
       *err = "generic exception at nextSafe()";
       LM_E(("Runtime Error (generic exception in nextSafe() - query: %s)", query.toString().c_str()));
       releaseMongoConnection(connection);
@@ -1637,7 +1628,7 @@ bool entitiesQuery
 
     // Build CER from BSON retrieved from DB
     docs++;
-    LM_TMP(("GEO: Got a result!!!"));
+
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
@@ -1676,7 +1667,6 @@ bool entitiesQuery
   }
 
  release:
-  LM_TMP(("GEO: Got %d results", docs));
   releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
@@ -1684,11 +1674,9 @@ bool entitiesQuery
    * FIXME P10 (it is easy :) limit should be unsigned int */
   if (limitReached != NULL)
   {
-    LM_TMP(("GEO: limitReached?  cerV->size == %d, limit == %d", cerV->size(), limit));
     *limitReached = (cerV->size() >= (unsigned int) limit);
     if (*limitReached)
     {
-      LM_TMP(("GEO: limitReached :(("));
       LM_T(LmtMongo, ("entities limit reached"));
       return true;
     }

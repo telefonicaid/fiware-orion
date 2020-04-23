@@ -115,8 +115,6 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (valueP == NULL)
       valueP = kjLookup(attrP, "object");
 
-
-    LM_TMP(("kjLookup returned %p", valueP));
     if (valueP == NULL)
     {
       LM_E(("Database Error (the %s '%s' has no value)", typeP->value.s, attrP->name));
@@ -247,7 +245,6 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
       //
       if (strcmp(metadataP->name, "observedAt") == 0)
       {
-        LM_TMP(("NQ: observedAt is of type: %s", kjValueType(metadataP->type)));
         if (metadataP->type == KjObject)
         {
           metadataP->type  = metadataP->value.firstChildP->type;
@@ -261,7 +258,6 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
       }
       else if (strcmp(metadataP->name, "unitCode") == 0)
       {
-        LM_TMP(("NQ: unitCode is of type: %s", kjValueType(metadataP->type)));
         if (metadataP->type == KjObject)
         {
           metadataP->type  = metadataP->value.firstChildP->type;
@@ -276,7 +272,6 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
       metadataP->name = orionldContextItemAliasLookup(orionldState.contextP, mdName, NULL, NULL);
 
       // If Relationship - change 'value' for 'object'
-      LM_TMP(("NQ: Getting 'type' of metadata '%s'", metadataP->name));
       KjNode* typeP = kjLookup(metadataP, "type");
       if (typeP == NULL)
       {
@@ -368,18 +363,14 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   //
   // Querying mongo and retrieving the results
   //
-  LM_TMP(("NQ: Making the query"));
   cursorP = connectionP->query(collectionPath, query, 0, 0, &retFieldsObj);
-  LM_TMP(("NQ: Retrieving the results"));
 
   while (cursorP->more())
   {
-    LM_TMP(("NQ: Calling nextSafe"));
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
 
-    LM_TMP(("NQ: Calling dbDataToKjTree"));
     dbTree = dbDataToKjTree(&bsonObj, &title, &details);
     if (dbTree == NULL)
       LM_E(("%s: %s", title, details));
@@ -529,23 +520,16 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
       bool  valueMayBeCompacted = false;
       eqForDot(attrName);
 
-      LM_TMP(("NQ: Looking up alias for attribute '%s'", attrName));
       attrP->name = orionldContextItemAliasLookup(orionldState.contextP, attrName, &valueMayBeCompacted, NULL);
-      LM_TMP(("NQ: Got alias for attribute '%s' (valueMayBeCompacted=%s)", attrP->name, K_FT(valueMayBeCompacted)));
 
       if (valueMayBeCompacted == true)
       {
-        LM_TMP(("NQ: valueMayBeCompacted == true for '%s' (type: %s)", attrP->name, kjValueType(attrP->type)));
         KjNode* valueP = kjLookup(attrP, "value");
 
         if (valueP != NULL)
         {
           if (valueP->type == KjString)
-          {
-            LM_TMP(("NQ: value '%s' may be compacted for attribute '%s'", valueP->value.s, attrP->name));
             valueP->value.s = orionldContextItemAliasLookup(orionldState.contextP, valueP->value.s, NULL, NULL);
-            LM_TMP(("NQ: Compacted value: '%s'", valueP->value.s));
-          }
           else if (valueP->type == KjArray)
           {
             for (KjNode* arrItemP = valueP->value.firstChildP; arrItemP != NULL; arrItemP = arrItemP->next)
@@ -562,17 +546,15 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     {
       if (presentationAttributeFix(attrP, entityId, sysAttrs, keyValues) == false)
       {
-        LM_E(("presentationAttributeFix failed"));
+        LM_E(("Internal Error (presentationAttributeFix failed)"));
         return NULL;
       }
     }
     else  // KjArray
     {
-      LM_TMP(("NQ: It's an Array"));
       int instances = 0;
       for (KjNode* aP = attrP->value.firstChildP; aP != NULL; aP = aP->next)
       {
-        LM_TMP(("NQ: fixing instance %d", instances));
         if (presentationAttributeFix(aP, entityId, sysAttrs, keyValues) == false)
         {
           LM_E(("presentationAttributeFix failed"));
@@ -580,11 +562,9 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
         }
         ++instances;
       }
-      LM_TMP(("NQ: %d instances of the array '%s'", instances, attrP->name));
 
       if (instances == 1)  // No array needed
       {
-        LM_TMP(("NQ: Only one instance - simplifying Array to object"));
         attrP->value.firstChildP = attrP->value.firstChildP->value.firstChildP;
         attrP->lastChild         = attrP->value.firstChildP->lastChild;
         attrP->type              = KjObject;
@@ -613,18 +593,12 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   if (servicePathP != NULL)
     kjChildRemove(idP, servicePathP);
 
-  LM_TMP(("NQ: Looking up alias for entity type '%s'", typeP->value.s));
   typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
-  LM_TMP(("NQ: Got alias for entity type '%s'", typeP->value.s));
 
   if (sysAttrs == true)
   {
-    LM_TMP(("NQ: sysAttrs == true"));
     KjNode*  creDateP = kjLookup(dbTree, "creDate");
     KjNode*  modDateP = kjLookup(dbTree, "modDate");
-
-    LM_TMP(("NQ: creDate at %p", creDateP));
-    LM_TMP(("NQ: modDate at %p", modDateP));
 
     if (creDateP != NULL)
     {
@@ -646,7 +620,6 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   // Merge idP and attrTree
   if ((attrTree != NULL) && (attrTree->value.firstChildP != NULL))
   {
-    LM_TMP(("Merging idP and attrTree (%p and %p)", idP, attrTree));
     idP->lastChild->next = attrTree->value.firstChildP;
     idP->lastChild       = attrTree->lastChild;
   }

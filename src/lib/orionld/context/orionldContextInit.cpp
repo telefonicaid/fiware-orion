@@ -194,10 +194,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
     if (contextP == NULL)
       LM_E(("error creating context from file system file '%s'", path));
     else
-    {
-      LM_TMP(("CC: Calling orionldContextCacheInsert for '%s'", contextP->url));
       orionldContextCacheInsert(contextP);
-    }
   }
 }
 
