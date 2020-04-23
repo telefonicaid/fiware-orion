@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 
@@ -34,6 +33,6 @@
 //
 // kjTreeFromQueryContextResponse -
 //
-extern KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP);
+extern KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMQUERYCONTEXTRESPONSE_H_

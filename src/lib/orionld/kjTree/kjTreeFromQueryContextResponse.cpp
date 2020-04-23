@@ -35,7 +35,6 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "common/string.h"                                     // FT
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "ngsi10/QueryContextResponse.h"                       // QueryContextResponse
 
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType, orionldErrorResponse
@@ -191,7 +190,6 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 // kjTreeFromQueryContextResponse -
 //
 // PARAMETERS
-//   ciP        - ConnectionInfo, where all info about each request is stored
 //   oneHit     - if TRUE, create a JSON object, else a JSON Array
 //   keyValues  - if TRUE, omit details of the attributes
 //   responseP  - The binary struct that is being converted to a KjNode tree
@@ -202,10 +200,10 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
 // The context for the entity is found in the context-cache.
 // If not present, it is retreived from the "@context" attribute of the entity and put in the cache
 //
-KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP)
+KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValues, QueryContextResponse* responseP)
 {
   char* details  = NULL;
-  bool  sysAttrs = ciP->uriParamOptions["sysAttrs"];
+  bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
 
 
   //

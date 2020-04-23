@@ -443,7 +443,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   if ((response.errorCode.code == SccOk) || (response.errorCode.code == 0))
   {
     // Create response by converting "QueryContextResponse response" into a KJson tree
-    orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, orionldState.uriParams.attrs, keyValues, &response);
+    orionldState.responseTree = kjTreeFromQueryContextResponse(true, orionldState.uriParams.attrs, keyValues, &response);
   }
 #else
   char*  attrs[100];

@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>                                                // std::string  - for servicePath only
+#include <vector>                                                // std::vector  - for servicePath only
+
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
@@ -78,14 +81,17 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("Deleting attribute '%s' of entity '%s'", orionldState.wildcard[1], orionldState.wildcard[0]));
 
-  UpdateContextRequest  ucr;
-  UpdateContextResponse ucResponse;
+  UpdateContextRequest     ucr;
+  UpdateContextResponse    ucResponse;
+  std::vector<std::string> servicePath;
+
+  servicePath.push_back("/");
 
   ucr.fill(&entity, ActionTypeDelete);
   orionldState.httpStatusCode = mongoUpdateContext(&ucr,
                                                    &ucResponse,
                                                    orionldState.tenant,
-                                                   ciP->servicePathV,
+                                                   servicePath,
                                                    ciP->uriParam,
                                                    ciP->httpHeaders.xauthToken,
                                                    ciP->httpHeaders.correlator,

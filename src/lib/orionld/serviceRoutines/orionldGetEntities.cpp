@@ -375,7 +375,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
 
-  orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, false, NULL, keyValues, &mongoResponse);
+  orionldState.responseTree = kjTreeFromQueryContextResponse(false, NULL, keyValues, &mongoResponse);
 
   if (orionldState.responseTree->value.firstChildP == NULL)
     orionldState.noLinkHeader = true;

@@ -92,7 +92,7 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   //
   // sysAttrs - createdAt and modifiedAt
   //
-  if (ciP->uriParamOptions["sysAttrs"] == true)
+  if (orionldState.uriParamOptions.sysAttrs == true)
   {
     if (registrationP->createdAt != -1)
     {
