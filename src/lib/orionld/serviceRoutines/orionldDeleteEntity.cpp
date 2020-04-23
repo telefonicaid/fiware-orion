@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin and Gabriel Quaresma
 */
 #include <string>
 #include <vector>
@@ -29,14 +29,12 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
-#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/db/dbConfiguration.h"                          // dbEntityDelete, dbEntityLookup
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
 
@@ -47,56 +45,32 @@
 //
 bool orionldDeleteEntity(ConnectionInfo* ciP)
 {
-  LM_T(LmtServiceRoutine, ("In orionldDeleteEntity"));
-
-  // Check that the Entity ID is a valid URI
+  char* entityId = orionldState.wildcard[0];
   char* details;
 
-  if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
+  // Make sure the Entity ID is a valid URI
+  if ((urlCheck(entityId, &details) == false) && (urnCheck(entityId, &details) == false))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details);
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
-  // Fill in mongoRequest with the entity-id from the URL and Deleteas Action Type
-  UpdateContextRequest   mongoRequest;
-  UpdateContextResponse  mongoResponse;
-  ContextElement         ce;
-  HttpStatusCode         status;
-
-  ce.entityId.id = orionldState.wildcard[0];
-  mongoRequest.contextElementVector.push_back(&ce);
-  mongoRequest.updateActionType = ActionTypeDelete;
-
-  // Call mongoBackend
-  status = mongoUpdateContext(&mongoRequest,
-                              &mongoResponse,
-                              orionldState.tenant,
-                              ciP->servicePathV,
-                              ciP->uriParam,
-                              ciP->httpHeaders.xauthToken,
-                              ciP->httpHeaders.correlator,
-                              ciP->httpHeaders.ngsiv2AttrsFormat,
-                              ciP->apiVersion,
-                              NGSIV2_NO_FLAVOUR);
-
-  // Check result
-  if (status != SccOk)
-    LM_E(("mongoUpdateContext: %d", status));
-
-  if (mongoResponse.oe.code != SccNone)
+  if (dbEntityLookup(entityId) == NULL)
   {
-    OrionldResponseErrorType eType = (mongoResponse.oe.code == SccContextElementNotFound)? OrionldResourceNotFound : OrionldBadRequestData;
-
-    orionldErrorResponseCreate(eType, mongoResponse.oe.details.c_str(), orionldState.wildcard[0]);
-    orionldState.httpStatusCode = (mongoResponse.oe.code == SccContextElementNotFound)? SccContextElementNotFound : SccBadRequest;
-
+    orionldErrorResponseCreate(OrionldResourceNotFound, "The requested entity has not been found. Check its id", entityId);
+    orionldState.httpStatusCode = SccNotFound;  // 404
     return false;
   }
 
-  // HTTP Response Code is 204 - No Content
-  orionldState.httpStatusCode = SccNoContent;
+  if (dbEntityDelete(entityId) == false)
+  {
+    LM_E(("dbEntityDelete failed"));
+    orionldState.httpStatusCode = SccBadRequest;  // 400
+    return false;
+  }
+
+  orionldState.httpStatusCode = SccNoContent;  // 204
 
   return true;
 }

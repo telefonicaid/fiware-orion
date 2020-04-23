@@ -117,7 +117,7 @@ MongoDB server version: REGEX(.*)
 	},
 	"attrNames" : [ ],
 	"attrs" : {
-
+		
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
@@ -167,13 +167,13 @@ Date: REGEX(.*)
 06. DELETE the entity - see error
 =================================
 HTTP/1.1 404 Not Found
-Content-Length: 166
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:ngsi-ld:T:12:13:14",
-    "title": "The requested entity has not been found. Check type and id",
+    "title": "The requested entity has not been found. Check its id",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
