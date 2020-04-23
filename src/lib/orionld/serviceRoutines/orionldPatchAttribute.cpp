@@ -399,7 +399,10 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   mongoRequest.contextElementVector.push_back(ceP);
 
   if (kjTreeToEntity(&mongoRequest, mergedP) == false)
+  {
+    mongoRequest.release();
     return false;
+  }
 
 
   //
@@ -423,8 +426,10 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   {
     LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
     orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
+    mongoRequest.release();
     return false;
   }
 
+  mongoRequest.release();
   return true;
 }

@@ -157,7 +157,7 @@ Date: REGEX(.*)
 05. GET the entity E1 from CP1 - see A1 changed
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 299
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

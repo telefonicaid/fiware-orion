@@ -53,12 +53,13 @@
 #ifdef ORIONLD
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode, kjValueType
-#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/KjNode.h"                                          // KjNode, kjValueType
+#include "kjson/kjLookup.h"                                        // kjLookup
 }
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/geoJsonCreate.h"                      // geoJsonCreate
+#include "orionld/common/orionldState.h"                           // orionldState
+#include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #endif
 
 #include "mongoBackend/connectionOperations.h"
@@ -2962,10 +2963,13 @@ static bool createEntity
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
+  if (orionldState.apiVersion != NGSI_LD_V1)
   {
-    // oe->fill() already managed by processLocationAtEntityCreation()
-    return false;
+    if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
+    {
+      // oe->fill() already managed by processLocationAtEntityCreation()
+      return false;
+    }
   }
 
   /* Search for a potential date expiration attribute */
@@ -3090,6 +3094,15 @@ static bool createEntity
 
   // Correlator (for notification loop detection logic)
   insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+
+  if (orionldState.datasets != NULL)
+  {
+    mongo::BSONObj  datasetsObj;
+
+    mongoCppLegacyKjTreeToBsonObj(orionldState.datasets, &datasetsObj);
+    insertedDoc.append(orionldState.datasets->name, datasetsObj);
+  }
+
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {

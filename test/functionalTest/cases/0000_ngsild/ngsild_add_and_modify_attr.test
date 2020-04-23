@@ -143,12 +143,12 @@ Date: REGEX(.*)
   "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
   "type": "T",
   "P1": {
-    "type": "Property",
-    "value": "new"
+    "value": "new",
+    "type": "Property"
   },
   "P2": {
-    "type": "Property",
-    "value": true
+    "value": true,
+    "type": "Property"
   }
 }
 

@@ -37,6 +37,7 @@ extern "C"
 // Function pointers for the DB interface
 //
 DbEntityLookupFunction                    dbEntityLookup;
+DbEntityRetrieveFunction                  dbEntityRetrieve;
 DbEntityLookupManyFunction                dbEntityLookupMany;
 DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
 DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;

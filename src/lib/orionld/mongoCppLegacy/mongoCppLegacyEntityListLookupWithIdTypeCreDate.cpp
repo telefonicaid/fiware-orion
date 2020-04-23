@@ -29,7 +29,6 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                                // KjNode
-#include "kjson/kjRender.h"                                              // kjRender - TMP
 #include "kjson/kjBuilder.h"                                             // kjArray, ...
 }
 
@@ -117,9 +116,6 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
     kjChildAdd(entityTree, idNodeP);
     kjChildAdd(entityTree, typeNodeP);
     kjChildAdd(entityTree, creDateNodeP);
-
-    char debugBuffer[512];
-    kjRender(orionldState.kjsonP, entityTree, debugBuffer, sizeof(debugBuffer));
 
     // Create the entity array if it doesn't already exist
     if (entitiesArray == NULL)

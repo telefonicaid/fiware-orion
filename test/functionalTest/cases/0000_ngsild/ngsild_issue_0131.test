@@ -164,6 +164,10 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:Building:store00221",
   "type": "https://uri.fiware.org/ns/data-models#Building",
+  "https://uri.fiware.org/ns/data-models#category": {
+    "type": "Property",
+    "value": "https://uri.fiware.org/ns/data-models#commercial"
+  },
   "https://schema.org/address": {
     "type": "Property",
     "value": {
@@ -172,14 +176,6 @@ Date: REGEX(.*)
       "addressLocality": "Prenzlauer Berg",
       "postalCode": "10439"
     }
-  },
-  "name": {
-    "type": "Property",
-    "value": "Bösebrücke Einkauf"
-  },
-  "https://uri.fiware.org/ns/data-models#category": {
-    "type": "Property",
-    "value": "https://uri.fiware.org/ns/data-models#commercial"
   },
   "location": {
     "type": "GeoProperty",
@@ -190,6 +186,10 @@ Date: REGEX(.*)
         52.5547
       ]
     }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
   }
 }
 
@@ -206,6 +206,10 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:Building:store00221",
   "type": "Building",
+  "category": {
+    "type": "Property",
+    "value": "commercial"
+  },
   "address": {
     "type": "Property",
     "value": {
@@ -214,14 +218,6 @@ Date: REGEX(.*)
       "addressLocality": "Prenzlauer Berg",
       "postalCode": "10439"
     }
-  },
-  "name": {
-    "type": "Property",
-    "value": "Bösebrücke Einkauf"
-  },
-  "category": {
-    "type": "Property",
-    "value": "commercial"
   },
   "location": {
     "type": "GeoProperty",
@@ -232,6 +228,10 @@ Date: REGEX(.*)
         52.5547
       ]
     }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
   }
 }
 

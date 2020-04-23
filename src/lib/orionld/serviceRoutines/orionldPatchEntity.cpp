@@ -28,7 +28,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -308,11 +307,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     // Steal createdAt from dbAttrP?
 
     // Remove the attribute to be updated (from dbEntityP::inDbAttrsP) and insert the attribute from the payload data
-    // <DEBUG>
-    char buf[1024];
-    kjRender(orionldState.kjsonP, dbAttrP, buf, sizeof(buf));
-    kjRender(orionldState.kjsonP, newAttrP, buf, sizeof(buf));
-
     kjChildRemove(inDbAttrsP, dbAttrP);
     kjChildAdd(inDbAttrsP, newAttrP);
     attributeUpdated(updatedP, newAttrP->name);
@@ -356,14 +350,20 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
                                                    ciP->apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
+  ucRequest.release();
+
   // 9. Postprocess output from mongoBackend
   if (orionldState.httpStatusCode == SccOk)
   {
     //
     // 204 or 207?
+    //
+    // 204 if all went ok (== empty list of 'not updated')
+    // 207 if something went wrong (== non-empty list of 'not updated')
+    //
     // If 207 - prepare the response payload data
     //
-    if (notUpdatedP->value.firstChildP != NULL)
+    if (notUpdatedP->value.firstChildP != NULL)  // non-empty list of 'not updated'
     {
       orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 

@@ -193,6 +193,7 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "replace")     == 0)  orionldState.uriParamOptions.replace     = true;
       else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
       else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
+      else if (strcmp(optionStart, "sysAttrs")    == 0)  orionldState.uriParamOptions.sysAttrs    = true;
       else
       {
         LM_W(("Unknown 'options' value: %s", optionStart));
@@ -238,17 +239,11 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     optionsParse(value);
   }
   else if (SCOMPARE12(key, 'g', 'e', 'o', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
-  {
-    LM_TMP(("GEO: Got a geoproperty URI Param: %s", value));
     orionldState.uriParams.geoproperty = (char*) value;
-  }
   else if (SCOMPARE6(key, 'c', 'o', 'u', 'n', 't', 0))
   {
     if (strcmp(value, "true") == 0)
-    {
-      LM_TMP(("COUNT: the URI parameter 'count' is set to 'true'"));
       orionldState.uriParams.count = true;
-    }
     else if (strcmp(value, "false") != 0)
     {
       LM_W(("Bad Input (invalid value for URI parameter 'count': %s)", value));
@@ -256,6 +251,12 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
+  }
+  else if (SCOMPARE10(key, 'd', 'a', 't', 'a', 's', 'e', 't', 'I', 'd', 0))
+  {
+    orionldState.uriParams.datasetId = (char*) value;
+    LM_TMP(("NQ: URI param datasetId == %s", orionldState.uriParams.datasetId));
+    // Check that it's a URI
   }
 
   return MHD_YES;

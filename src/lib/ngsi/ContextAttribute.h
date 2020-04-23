@@ -79,7 +79,6 @@ public:
 
   bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
 
-  ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
   ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);

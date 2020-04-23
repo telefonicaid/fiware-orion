@@ -271,30 +271,6 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:Shelf:unit001",
   "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
-  "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
-    "type": "Relationship",
-    "object": "urn:ngsi-ld:Building:store001",
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
-      "type": "Relationship",
-      "object": "urn:ngsi-ld:Person:employee001"
-    },
-    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
-      "type": "Property",
-      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
-    }
-  },
-  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
-    "type": "Property",
-    "value": 50
-  },
-  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
-    "type": "Relationship",
-    "object": "urn:ngsi-ld:Product:001"
-  },
-  "name": {
-    "type": "Property",
-    "value": "Corner Unit"
-  },
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -304,6 +280,30 @@ Date: REGEX(.*)
         52.554699
       ]
     }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
+    "object": "urn:ngsi-ld:Building:store001",
+    "type": "Relationship",
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:employee001"
+    },
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
+      "type": "Property",
+      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
+    }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "object": "urn:ngsi-ld:Product:001",
+    "type": "Relationship"
   }
 }
 

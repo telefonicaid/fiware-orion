@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBOBJECTFIELDGET_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBOBJECTFIELDGET_H_
 
 /*
 *
@@ -25,25 +25,16 @@
 *
 * Author: Ken Zangelin
 */
+#include "mongo/client/dbclient.h"                             // mongo::BSONObj
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldResponseErrorType -
+// mongoCppLegacyDbObjectFieldGet -
 //
-typedef enum OrionldResponseErrorType
-{
-  OrionldOk,
-  OrionldInvalidRequest,
-  OrionldBadRequestData,
-  OrionldAlreadyExists,
-  OrionldOperationNotSupported,
-  OrionldResourceNotFound,
-  OrionldInternalError,
-  OrionldTooComplexQuery,
-  OrionldTooManyResults,
-  OrionldLdContextNotAvailable
-} OrionldResponseErrorType;
+// FIXME: avoid to send object on the stack!!!
+//
+extern mongo::BSONObj mongoCppLegacyDbObjectFieldGet(const mongo::BSONObj* boP, const char* fieldName);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBOBJECTFIELDGET_H_

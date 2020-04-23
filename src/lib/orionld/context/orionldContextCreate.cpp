@@ -43,7 +43,6 @@ extern "C"
 //
 OrionldContext* orionldContextCreate(const char* url, const char* id, KjNode* tree, bool keyValues, bool toBeCloned)
 {
-  LM_TMP(("BUG: Creating a context for URL '%s'", url));
   OrionldContext* contextP = (OrionldContext*) kaAlloc(&kalloc, sizeof(OrionldContext));
 
   if (contextP == NULL)

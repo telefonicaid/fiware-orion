@@ -229,11 +229,9 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:Building:E1",
   "type": "Building",
-  "furniture": {
-    "type": "Relationship",
-    "object": [
-      "urn:ngsi-ld:Shelf:unit009"
-    ]
+  "category": {
+    "type": "Property",
+    "value": "commercial"
   },
   "address": {
     "type": "Property",
@@ -248,14 +246,6 @@ Date: REGEX(.*)
       "value": false
     }
   },
-  "name": {
-    "type": "Property",
-    "value": "Tower Trodelmarkt"
-  },
-  "category": {
-    "type": "Property",
-    "value": "commercial"
-  },
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -265,6 +255,16 @@ Date: REGEX(.*)
         52.5208
       ]
     }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Tower Trodelmarkt"
+  },
+  "furniture": {
+    "type": "Relationship",
+    "object": [
+      "urn:ngsi-ld:Shelf:unit009"
+    ]
   }
 }
 
@@ -281,24 +281,24 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:Building:E1",
   "type": "Building",
-  "furniture": [
-    "urn:ngsi-ld:Shelf:unit009"
-  ],
+  "category": "commercial",
   "address": {
     "streetAddress": "Panoramastrasse 1A",
     "addressRegion": "Berlin",
     "addressLocality": "Mitte",
     "postalCode": "10178"
   },
-  "name": "Tower Trodelmarkt",
-  "category": "commercial",
   "location": {
     "type": "Point",
     "coordinates": [
       13.4094,
       52.5208
     ]
-  }
+  },
+  "name": "Tower Trodelmarkt",
+  "furniture": [
+    "urn:ngsi-ld:Shelf:unit009"
+  ]
 }
 
 

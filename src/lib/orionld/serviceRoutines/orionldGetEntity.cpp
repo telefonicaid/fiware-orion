@@ -28,6 +28,7 @@ extern "C"
 #include "kbase/kStringSplit.h"                                  // kStringSplit
 #include "kbase/kStringArrayJoin.h"                              // kStringArrayJoin
 #include "kbase/kStringArrayLookup.h"                            // kStringArrayLookup
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, ...
 #include "kjson/kjParse.h"                                       // kjParse
@@ -45,8 +46,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
+#include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
+#include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
@@ -321,8 +323,9 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
       {
         next = nodeP->next;
 
-        if      (SCOMPARE3(nodeP->name, 'i', 'd', 0))
-        {}
+        if (SCOMPARE3(nodeP->name, 'i', 'd', 0))
+        {
+        }
         else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
         {
           if (needEntityType)
@@ -330,7 +333,7 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
             //
             // We're taking the entity::type from the Response to the forwarded request
             // because no local entity was found.
-            // It could also betaken from the registration.
+            // It could also be taken from the registration.
             //
             kjChildAdd(responseP, nodeP);
             needEntityType = false;
@@ -349,6 +352,25 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
 
 
 
+static char** attrsListToArray(char* attrList, char* attrV[], int attrVecLen)
+{
+  int items = kStringSplit(attrList, ',', attrV, attrVecLen);
+
+  attrV[items] = NULL;
+
+  for (int ix = 0; ix < items; ix++)
+  {
+    attrV[ix] = orionldContextItemExpand(orionldState.contextP, attrV[ix], NULL, true, NULL);
+    attrV[ix] = kaStrdup(&orionldState.kalloc, attrV[ix]);
+    dotForEq(attrV[ix]);
+  }
+
+  return attrV;
+}
+
+
+
+// #define USE_MONGO_BACKEND 0
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntity -
@@ -369,8 +391,9 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
 //
 bool orionldGetEntity(ConnectionInfo* ciP)
 {
-  char*                 detail;
-  KjNode*               regArray;
+  char*    detail;
+  KjNode*  regArray;
+  // bool     keyValues = orionldState.uriParamOptions.keyValues;
 
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
@@ -386,8 +409,8 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
 
-#if 1
-  bool                  keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+#ifdef USE_MONGO_BACKEND
+  bool                  keyValues = orionldState.uriParamOptions.keyValues;
   EntityId              entityId(orionldState.wildcard[0], "", "false", false);
   QueryContextRequest   request;
   QueryContextResponse  response;
@@ -423,61 +446,13 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     orionldState.responseTree = kjTreeFromQueryContextResponse(ciP, true, orionldState.uriParams.attrs, keyValues, &response);
   }
 #else
-  //
-  // Use dbEntityLookup() instead of mongoQueryContext()
-  //
-  //
-  // FIXME
-  // dbEntityLookup (mongoCppLegacyEntityLookup) uses dbDataToKjTree, which makes a complete copy of the tree in mongo:
-  // {
-  //   "_id": {
-  //     "id": "urn:ngsi-ld:E09",
-  //     "type": "https://uri.etsi.org/ngsi-ld/default-context/T",
-  //     "servicePath": "/"
-  //   },
-  //   "attrNames": [
-  //     "https://uri.etsi.org/ngsi-ld/default-context/P1"
-  //   ],
-  //   "attrs": {
-  //     "https://uri=etsi=org/ngsi-ld/default-context/P1": {
-  //       "type": "Property",
-  //       "creDate": 1579884546,
-  //       "modDate": 1579884546,
-  //       "value": {
-  //         "@type": "DateTime",
-  //         "@value": "2018-12-04T12:00:00"
-  //       },
-  //       "mdNames": []
-  //     }
-  //   },
-  //   "creDate": 1579884546,
-  //   "modDate": 1579884546,
-  //   "lastCorrelator": ""
-  // }
-  //
-  // Instead of:
-  // {
-  //   "id": "urn:ngsi-ld:E09",
-  //   "type": "T",
-  //   "P1": {
-  //     "type": "Property",
-  //     "value": {
-  //     "@type": "DateTime",
-  //     "@value": "2018-12-04T12:00:00"
-  //   }
-  // }
-  //
-  // To fix this:
-  // - Call a less generic function to create the KjNode tree (dbEntityDataToKjTree) that
-  //   - Removes "_id", "servicePath", "attrNames", "mdNames", "creDate", "modDate", "lastCorrelator"
-  // - Compact the attribute names and the entity id
-  // - keyValues
-  // - sysAttrs
-  //
-  // With all this done, I could stop using mongoBackend for this (and similar with all GET operations)
-  //
-  KjNode* entityWithDatabaseStructure = dbEntityLookup(orionldState.wildcard[0]);
-  orionldState.responseTree = kjTreeFromEntityWithDatabaseStructure(entityWithDatabaseStructure, keyValues, sysAttrs);
+  char*  attrs[100];
+  char** attrsP = NULL;
+
+  if (orionldState.uriParams.attrs != NULL)
+    attrsP = (char**) attrsListToArray(orionldState.uriParams.attrs, attrs, 100);
+
+  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0], attrsP, false, orionldState.uriParamOptions.sysAttrs, orionldState.uriParamOptions.keyValues, orionldState.uriParams.datasetId);
 #endif
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))

@@ -256,9 +256,9 @@ echo "02. Make sure the upsert took less than 5 seconds (to see that the context
 echo "======================================================================================================"
 typeset -i diffTime
 diffTime=$endTime-$startTime
-if [ $diffTime -gt 4 ]
+if [ $diffTime -gt 5 ]
 then
-  echo "The creation of the 5 entities took TOO LONG (%diffTime seconds)"
+  echo "The creation of the 5 entities took TOO LONG ($diffTime seconds)"
 else
   echo "Good - the creation of the 5 entities took less than 5 seconds"
 fi

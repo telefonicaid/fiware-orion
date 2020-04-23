@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYRETRIEVE_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYRETRIEVE_H_
 
 /*
 *
@@ -25,25 +25,31 @@
 *
 * Author: Ken Zangelin
 */
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldResponseErrorType -
-//
-typedef enum OrionldResponseErrorType
+extern "C"
 {
-  OrionldOk,
-  OrionldInvalidRequest,
-  OrionldBadRequestData,
-  OrionldAlreadyExists,
-  OrionldOperationNotSupported,
-  OrionldResourceNotFound,
-  OrionldInternalError,
-  OrionldTooComplexQuery,
-  OrionldTooManyResults,
-  OrionldLdContextNotAvailable
-} OrionldResponseErrorType;
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+
+
+// ----------------------------------------------------------------------------
+//
+// mongoCppLegacyEntityRetrieve -
+//
+// PARAMERTERS
+//   entityId        ID of the entity to be retrieved
+//   attrs           array of attribute names, terminated by a NULL pointer
+//   attrMandatory   If true - the entity is found only if any of the attributes in 'attrs'
+//                   is present in the entity
+//
+extern KjNode* mongoCppLegacyEntityRetrieve
+(
+  const char*  entityId,
+  char**       attrs,
+  bool         attrMandatory,
+  bool         sysAttrs,
+  bool         keyValues,
+  const char*  datasetId
+);
+
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYRETRIEVE_H_

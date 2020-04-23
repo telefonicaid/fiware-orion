@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+#ifndef SRC_LIB_ORIONLD_MQTT_MQTTRELEASE_H_
+#define SRC_LIB_ORIONLD_MQTT_MQTTRELEASE_H_
 
 /*
 *
@@ -25,25 +25,16 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/mqtt/mqttConnectionList.h"                   // mqttConnectionList
+#include "orionld/mqtt/mqttRelease.h"                          // Own Interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldResponseErrorType -
+// mqttRelease -
 //
-typedef enum OrionldResponseErrorType
-{
-  OrionldOk,
-  OrionldInvalidRequest,
-  OrionldBadRequestData,
-  OrionldAlreadyExists,
-  OrionldOperationNotSupported,
-  OrionldResourceNotFound,
-  OrionldInternalError,
-  OrionldTooComplexQuery,
-  OrionldTooManyResults,
-  OrionldLdContextNotAvailable
-} OrionldResponseErrorType;
+extern void mqttRelease(void);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+#endif  // SRC_LIB_ORIONLD_MQTT_MQTTRELEASE_H_

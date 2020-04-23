@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // mongo legacy driver
+#include "mongo/client/dbclient.h"                             // mongo::BSONElement
 
 
 

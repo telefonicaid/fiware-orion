@@ -91,29 +91,34 @@ static bool checkEntityIdFieldExists(void)
 //
 bool pcheckEntity
 (
-  KjNode*          kNodeP,
-  KjNode**         locationNodePP,
-  KjNode**         observationSpaceNodePP,
-  KjNode**         operationSpaceNodePP,
-  KjNode**         createdAtPP,
-  KjNode**         modifiedAtPP,
-  bool             isBatchOperation
+  KjNode*   kNodeP,
+  KjNode**  locationNodePP,
+  KjNode**  observationSpaceNodePP,
+  KjNode**  operationSpaceNodePP,
+  KjNode**  createdAtPP,
+  KjNode**  modifiedAtPP,
+  bool      isBatchOperation
 )
 {
   if (isBatchOperation == false)
   {
     OBJECT_CHECK(orionldState.requestTree, "toplevel");
+
     //
-    // Check presence of mandatory fields
+    // Check presence of mandatory fields "id" and "type"
     //
-    if (checkEntityIdFieldExists() == false) return false;
+    if (checkEntityIdFieldExists() == false)
+      return false;
   }
+
   char*    detailsP;
   KjNode*  locationNodeP          = NULL;
   KjNode*  observationSpaceNodeP  = NULL;
   KjNode*  operationSpaceNodeP    = NULL;
   KjNode*  createdAtP             = NULL;
   KjNode*  modifiedAtP            = NULL;
+  KjNode*  batchIdP               = NULL;
+  KjNode*  batchTypeP             = NULL;
 
   //
   // Check for duplicated items and that data types are correct
@@ -124,38 +129,16 @@ bool pcheckEntity
     {
       if (strcmp(kNodeP->name, "id") == 0)
       {
-        orionldState.payloadIdNode = kNodeP;
-
-        if (orionldState.payloadIdNode->type != KjString)
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity Id", "Must be a JSON String");
-          return false;
-        }
-
-        if ((urlCheck(orionldState.payloadIdNode->value.s, &detailsP) == false) && (urnCheck(orionldState.payloadIdNode->value.s, &detailsP) == false))
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");
-          return false;
-        }
-        //
-        // If the entity already exists, an error should be returned
-        //
-        // if (mongoEntityExists(orionldState.payloadIdNode->value.s, orionldState.tenant) == true)
-        // {
-        //   orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", orionldState.payloadIdNode->value.s);
-        //   orionldState.httpStatusCode = SccConflict;
-        //   return false;
-        // }
+        DUPLICATE_CHECK(batchIdP, "id", kNodeP);
+        STRING_CHECK(batchIdP, "id");
+        URI_CHECK(batchIdP, "id");
+        orionldState.payloadIdNode = kNodeP;  // FIXME: Is this necessary?
       }
       else if (strcmp(kNodeP->name, "type") == 0)
       {
-        orionldState.payloadTypeNode = kNodeP;
-
-        if (orionldState.payloadTypeNode->type != KjString)
-        {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity Type", "Must be a JSON String");
-          return false;
-        }
+        DUPLICATE_CHECK(batchTypeP, "type", kNodeP);
+        STRING_CHECK(batchTypeP, "type");
+        orionldState.payloadTypeNode = kNodeP;  // FIXME: Is this necessary?
       }
     }
 

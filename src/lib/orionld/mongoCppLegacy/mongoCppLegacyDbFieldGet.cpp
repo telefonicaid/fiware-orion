@@ -47,3 +47,30 @@ mongo::BSONElement mongoCppLegacyDbFieldGet(const mongo::BSONObj* boP, const cha
 
   return boP->getField(fieldName);
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongoCppLegacyDbObjectFieldGet -
+//
+// FIXME: avoid to send object on the stack!!!
+//
+mongo::BSONObj mongoCppLegacyDbObjectFieldGet(const mongo::BSONObj* boP, const char* fieldName)
+{
+  bool present = boP->hasField(fieldName);
+
+  if (present == false)
+  {
+    LM_E(("Runtime Error (field '%s' is missing in BSONObj '%s'", fieldName, boP->toString().c_str()));
+    return mongo::BSONObj();
+  }
+
+  mongo::BSONType type = boP->getField(fieldName).type();
+
+  if (type == mongo::Object)
+    return boP->getObjectField(fieldName);
+
+  LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d", type));
+  return mongo::BSONObj();
+}

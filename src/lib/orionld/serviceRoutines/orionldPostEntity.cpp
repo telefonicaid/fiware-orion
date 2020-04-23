@@ -272,11 +272,11 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   // 9. Convert the remaining attributes in orionldState.requestTree to an UpdateContextRequest to prepare for call to mongoBackend
   //
   UpdateContextRequest ucr;
-  ContextElement       ce;
+  ContextElement*      ceP = new ContextElement();
 
-  ce.entityId.id = entityId;
+  ceP->entityId.id = entityId;
 
-  ucr.contextElementVector.push_back(&ce);
+  ucr.contextElementVector.push_back(ceP);
 
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -287,11 +287,13 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     {
       LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
       attributeNotUpdated(notUpdatedP, attrP->name, detail);
+      caP->release();
+      free(caP);
       continue;
     }
 
     attributeUpdated(updatedP, attrP->name);
-    ce.contextAttributeVector.push_back(caP);
+    ceP->contextAttributeVector.push_back(caP);
   }
 
   // 10. Call mongoBackend to do the Update
@@ -328,5 +330,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccMultiStatus;
   }
 
+  ucr.release();
   return true;
 }

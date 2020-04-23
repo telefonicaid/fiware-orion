@@ -194,17 +194,6 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& at
 
 /* ****************************************************************************
 *
-* ContextAttribute::~ContextAttribute - 
-*/
-ContextAttribute::~ContextAttribute()
-{
-  release();
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttribute::ContextAttribute - 
 */
 ContextAttribute::ContextAttribute()

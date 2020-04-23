@@ -54,16 +54,16 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
 
 
   //
-  // Populate filter - only Entity ID for this operation
+  // Populate 'queryBuilder' - only Entity ID for this operation
   //
-  mongo::BSONObjBuilder  filter;
-  filter.append("_id.id", entityId);
+  mongo::BSONObjBuilder  queryBuilder;
+  queryBuilder.append("_id.id", entityId);
 
 
   // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
-  mongo::Query                          query(filter.obj());
+  mongo::Query                          query(queryBuilder.obj());
 
   cursorP = connectionP->query(collectionPath, query);
 
@@ -79,6 +79,7 @@ KjNode* mongoCppLegacyEntityLookup(const char* entityId)
     kjTree = dbDataToKjTree(&bsonObj, &title, &details);
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
+    break;
   }
 
   releaseMongoConnection(connectionP);

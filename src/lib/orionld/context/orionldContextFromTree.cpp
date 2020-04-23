@@ -27,6 +27,7 @@ extern "C"
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjFree.h"                                        // kjFree
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -80,15 +81,12 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
 {
   int itemsInArray;
 
-  LM_TMP(("CC: contextTreeP (%s) is a JSON %s", url, kjValueType(contextTreeP->type)));
   if (contextTreeP->type == KjArray)
   {
-    LM_TMP(("CTX: @context is an array to be simplified"));
     contextTreeP = orionldContextSimplify(contextTreeP, &itemsInArray);
     if ((contextTreeP == NULL) || (contextTreeP->value.firstChildP == NULL))
     {
       // Nothing left in  the array - only Core Context was there but has been removed?
-      LM_TMP(("BUG: orionldContextSimplify returned a NULL or empty tree"));
       pdP->status = 200;
 
       return orionldCoreContextP;
@@ -101,8 +99,8 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
       insert = false;
     }
 
-    // Need to clone the array and add it to cache before it is destroyed
-    OrionldContext* contextP = orionldContextCreate(url, NULL, contextTreeP, false, true);
+    // Need to clone the array and add it to the cache before it is destroyed
+    OrionldContext* contextP = orionldContextCreate(url, NULL, contextTreeP, false, insert);
 
     contextP->context.array.items     = itemsInArray;
     contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, itemsInArray * sizeof(OrionldContext*));
@@ -113,7 +111,7 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
       OrionldContext* cachedContextP = NULL;
 
       if (ctxItemP->type == KjString)
-        orionldContextCacheLookup(ctxItemP->value.s);
+        cachedContextP = orionldContextCacheLookup(ctxItemP->value.s);
       else if ((ctxItemP->type != KjObject) && (ctxItemP->type != KjArray))
       {
         LM_E(("invalid type of @context array item: %s", kjValueType(ctxItemP->type)));
@@ -122,6 +120,8 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
         pdP->detail = (char*) kjValueType(ctxItemP->type);
         pdP->status = 400;
 
+        if (insert == true)
+          kjFree(contextP->tree);
         return NULL;
       }
 
@@ -133,10 +133,7 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
     }
 
     if (insert)
-    {
-      LM_TMP(("CC: Calling orionldContextCacheInsert for '%s'", contextP->url));
       orionldContextCacheInsert(contextP);
-    }
 
     return contextP;
   }
@@ -152,28 +149,19 @@ OrionldContext* orionldContextFromTree(char* url, bool toBeCloned, KjNode* conte
 
         contextP->context.array.items     = 1;
         contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, 1 * sizeof(OrionldContext*));
-        LM_TMP(("CC: Calling orionldContextFromUrl for '%s' (url == '%s')", contextTreeP->value.s, url));
         contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, pdP);
-
-        LM_TMP(("CC: Calling orionldContextCacheInsert for '%s'", contextP->url));
-        // orionldContextCacheInsert(contextP);
       }
       return contextP;
     }
     else
     {
       OrionldContext* contextP;
-      LM_TMP(("CC: Calling orionldContextFromUrl for '%s'", contextTreeP->value.s));
       contextP = orionldContextFromUrl(contextTreeP->value.s, pdP);
-      LM_TMP(("CC: After orionldContextFromUrl for '%s'", contextTreeP->value.s));
       return contextP;
     }
   }
   else if (contextTreeP->type == KjObject)
-  {
-    LM_TMP(("CC: The tree is an object, so, we call orionldContextFromObject"));
     return orionldContextFromObject(url, toBeCloned, contextTreeP, pdP);
-  }
 
 
   //

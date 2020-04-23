@@ -112,6 +112,7 @@ extern "C"
 #include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
+#include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -566,6 +567,9 @@ void exitFunc(void)
   // Free the tenant list
   for (unsigned int ix = 0; ix < tenants; ix++)
     free(tenantV[ix]);
+
+  // Disconnect from all MQTT btokers and free the connections
+  mqttRelease();
 }
 
 

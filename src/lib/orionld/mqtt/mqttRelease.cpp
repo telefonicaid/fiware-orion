@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,25 +22,31 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdlib.h>                                            // free
+
+#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/mqtt/mqttConnectionList.h"                   // mqttConnectionList
+#include "orionld/mqtt/mqttRelease.h"                          // Own Interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldResponseErrorType -
+// mqttRelease -
 //
-typedef enum OrionldResponseErrorType
+void mqttRelease(void)
 {
-  OrionldOk,
-  OrionldInvalidRequest,
-  OrionldBadRequestData,
-  OrionldAlreadyExists,
-  OrionldOperationNotSupported,
-  OrionldResourceNotFound,
-  OrionldInternalError,
-  OrionldTooComplexQuery,
-  OrionldTooManyResults,
-  OrionldLdContextNotAvailable
-} OrionldResponseErrorType;
+  if (mqttConnectionList == NULL)
+    return;
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_
+  for (int ix = 0; ix < mqttConnectionListIx; ix++)
+  {
+    MqttConnection* mcP = &mqttConnectionList[ix];
+
+    MQTTClient_disconnect(&mcP->client, 10000);
+    MQTTClient_destroy(&mcP->client);
+  }
+
+  free(mqttConnectionList);
+  mqttConnectionList = NULL;
+}

@@ -42,6 +42,7 @@ extern "C"
 //
 static const char* errorTypeStringV[] =
 {
+  "https://uri.etsi.org/ngsi-ld/errors/OK",
   "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
   "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",

@@ -30,6 +30,7 @@ SET (SOURCES
     mqttConnectionList.cpp
     mqttConnectionLookup.cpp
     mqttNotification.cpp
+    mqttRelease.cpp
 )
 
 # Include directories

@@ -100,9 +100,9 @@ Date: REGEX(.*)
   "modifiedAt": "REGEX(.*)",
   "P1": {
     "type": "Property",
-    "value": 1,
     "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
+    "modifiedAt": "REGEX(.*)",
+    "value": 1
   }
 }
 
@@ -123,9 +123,9 @@ Date: REGEX(.*)
   "modifiedAt": "REGEX(.*)",
   "P1": {
     "type": "Property",
-    "value": 1,
     "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
+    "modifiedAt": "REGEX(.*)",
+    "value": 1
   }
 }
 

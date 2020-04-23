@@ -103,8 +103,11 @@ char* orionldContextPrefixExpand(OrionldContext* contextP, const char* str, char
     return (char*) str;
 
   // Never expand anything xxx://
-  if ((colonP[1] == '/') && (colonP[2] == '/'))  // takes care of http:// and https:// and any other "xxx://"
-    return (char*) str;
+  if (colonP != NULL)
+  {
+    if ((colonP[1] == '/') && (colonP[2] == '/'))  // takes care of http:// and https:// and any other "xxx://"
+      return (char*) str;
+  }
 
   //
   // "Valid" colon found - need to replace a prefix

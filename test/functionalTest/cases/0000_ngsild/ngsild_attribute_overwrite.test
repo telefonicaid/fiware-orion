@@ -113,13 +113,13 @@ Date: REGEX(.*)
 {
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
-  "P1": {
-    "type": "Property",
-    "value": "Hola"
-  },
   "P2": {
     "type": "Property",
     "value": "intocable"
+  },
+  "P1": {
+    "value": "Hola",
+    "type": "Property"
   }
 }
 

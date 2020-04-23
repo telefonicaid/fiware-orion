@@ -177,15 +177,15 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12,
-    "P1_P1": {
-      "type": "Property",
-      "value": 0.79
-    },
+    "observedAt": "2018-12-04T12:00:00Z",
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "observedAt": "2018-12-04T12:00:00Z"
+    "P1_P1": {
+      "type": "Property",
+      "value": 0.79
+    }
   }
 }
 
@@ -241,8 +241,8 @@ Date: REGEX(.*)
   "id": "urn:ngsi-ld:T:00.00.00",
   "type": "T",
   "P1": {
-    "type": "Property",
-    "value": "Hola"
+    "value": "Hola",
+    "type": "Property"
   }
 }
 

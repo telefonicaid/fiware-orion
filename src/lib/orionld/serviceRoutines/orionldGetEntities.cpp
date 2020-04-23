@@ -389,5 +389,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     ciP->httpHeaderValue.push_back(cV);
   }
 
+  mongoRequest.release();
+
   return true;
 }

@@ -318,13 +318,13 @@ Date: REGEX(.*)
 08. POST /ngsi-ld/v1/entities, with an attribute without a type - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 134
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "name",
-    "title": "Attribute found, but the type field is missing",
+    "title": "Attribute without type",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -332,13 +332,13 @@ Date: REGEX(.*)
 09. POST /ngsi-ld/v1/entities, with an attribute with type that is not a string - see error
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "attribute type",
-    "title": "Not a JSON String",
+    "detail": "name",
+    "title": "Attribute type must be a JSON string",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

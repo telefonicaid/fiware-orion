@@ -218,8 +218,8 @@ Date: REGEX(.*)
     "value": 11
   },
   "P2": {
-    "type": "Property",
-    "value": 42
+    "value": 42,
+    "type": "Property"
   }
 }
 

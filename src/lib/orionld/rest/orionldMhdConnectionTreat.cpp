@@ -791,7 +791,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     if (pd.status == 200)  // got an array with only Core Context
       orionldState.contextP = orionldCoreContextP;
 
-    if ((orionldState.contextP == NULL) || (pd.status >= 400))
+    if (pd.status >= 400)
     {
       LM_W(("Bad Input? (%s: %s (type == %d, status = %d))", pd.title, pd.detail, pd.type, pd.status));
       orionldErrorResponseFromProblemDetails(&pd);

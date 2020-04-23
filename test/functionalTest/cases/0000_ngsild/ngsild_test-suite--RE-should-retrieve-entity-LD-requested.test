@@ -103,26 +103,26 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12,
-    "P1_P1": {
-      "type": "Property",
-      "value": 0.79
-    },
+    "observedAt": "2018-12-04T12:00:00Z",
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
     },
-    "observedAt": "2018-12-04T12:00:00Z"
+    "P1_P1": {
+      "type": "Property",
+      "value": 0.79
+    }
   },
   "R1": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789",
-    "R1_P1": {
-      "type": "Property",
-      "value": false
-    },
     "R1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T3:A2345"
+    },
+    "R1_P1": {
+      "type": "Property",
+      "value": false
     }
   }
 }

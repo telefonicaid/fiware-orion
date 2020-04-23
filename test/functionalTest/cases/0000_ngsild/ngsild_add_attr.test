@@ -147,12 +147,12 @@ Date: REGEX(.*)
     "value": 1
   },
   "P2": {
-    "type": "Property",
-    "value": "new"
+    "value": "new",
+    "type": "Property"
   },
   "P3": {
-    "type": "Property",
-    "value": false
+    "value": false,
+    "type": "Property"
   }
 }
 

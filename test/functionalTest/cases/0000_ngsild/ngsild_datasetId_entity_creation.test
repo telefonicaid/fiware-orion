@@ -1,0 +1,172 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attributes with datasetId - creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an entity with 4 attributes (name, name2, name3, and name4) with a mix of datasetIds
+# 02. See the entity in the 'entities' collection - see zero 'normal' attributes and two datasetId attributes - name and name2	- name with TWO	instances
+#
+
+echo "01. Create an entity with 4 attributes (name, name2, name3, and name4) with a mix of datasetIds"
+echo "==============================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "name": [
+    {
+      "type": "Property",
+      "value": "no dataset id"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:2",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    }
+  ],
+  "name2": [
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    }
+  ],
+  "name3": {
+    "type": "Property",
+    "value": "no dataset id"
+  },
+  "name4": {
+    "type": "Property",
+    "value": "dataset urn:ngsi-ld/dataset:1",
+    "datasetId": "urn:ngsi-ld/dataset:1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in the 'entities' collection - see zero 'normal' attributes and two datasetId attributes - name and name2	- name with TWO	instances"
+echo "======================================================================================================================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with 4 attributes (name, name2, name3, and name4) with a mix of datasetIds
+===============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in the 'entities' collection - see zero 'normal' attributes and two datasetId attributes - name and name2	- name with TWO	instances
+=======================================================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri=etsi=org/ngsi-ld/name",
+		"https://uri.etsi.org/ngsi-ld/default-context/name3"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "no dataset id",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/name3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "no dataset id",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/name" : [
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:1",
+				"datasetId" : "urn:ngsi-ld/dataset:1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:2",
+				"datasetId" : "urn:ngsi-ld/dataset:2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/name2" : [
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:1",
+				"datasetId" : "urn:ngsi-ld/dataset:1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		],
+		"https://uri=etsi=org/ngsi-ld/default-context/name4" : {
+			"type" : "Property",
+			"value" : "dataset urn:ngsi-ld/dataset:1",
+			"datasetId" : "urn:ngsi-ld/dataset:1",
+			"createdAt" : REGEX(.*),
+			"modifiedAt" : REGEX(.*)
+		}
+	}
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

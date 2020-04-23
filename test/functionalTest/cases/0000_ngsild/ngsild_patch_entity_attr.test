@@ -166,8 +166,8 @@ Date: REGEX(.*)
   "id": "urn:ngsi-ld:entity:E1",
   "type": "http://example.org/T",
   "http://a.b.c/A1": {
-    "type": "Property",
-    "value": "30"
+    "value": "30",
+    "type": "Property"
   },
   "http://a.b.c/A2": {
     "type": "Property",
@@ -206,8 +206,8 @@ Date: REGEX(.*)
   "id": "urn:ngsi-ld:entity:E2",
   "type": "http://example.org/T",
   "http://a.b.c/A3": {
-    "type": "Relationship",
-    "object": "urn:ngsi-ld:entity:E3"
+    "object": "urn:ngsi-ld:entity:E3",
+    "type": "Relationship"
   }
 }
 

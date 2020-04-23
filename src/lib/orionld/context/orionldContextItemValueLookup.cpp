@@ -40,7 +40,9 @@ OrionldContextItem* orionldContextItemValueLookup(OrionldContext* contextP, cons
 {
   OrionldContextItem* itemP = NULL;
 
-  if (contextP->keyValues == true)
+  if (contextP == NULL)
+    return NULL;
+  else if (contextP->keyValues == true)
     itemP = (OrionldContextItem*) khashItemLookup(contextP->context.hash.valueHashTable, longname);
   else
   {

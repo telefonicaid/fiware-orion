@@ -63,6 +63,7 @@ typedef bool    (*DbSubscriptionMatchCallback)(const char* entityId, KjNode* sub
 // Function pointer types for the DB interface
 //
 typedef KjNode* (*DbEntityLookupFunction)(const char* entityId);
+typedef KjNode* (*DbEntityRetrieveFunction)(const char* entityId, char** attrs, bool attrMandatory, bool sysAttrs, bool keyValues, const char* datasetId);
 typedef KjNode* (*DbEntityLookupManyFunction)(KjNode* requestTree);
 typedef KjNode* (*DbEntityAttributeLookupFunction)(const char* entityId, const char* attributeName);
 typedef bool    (*DbEntityAttributesDeleteFunction)(const char* entityId, char** attrNameV, int vecSize);
@@ -90,6 +91,7 @@ typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
 // Function pointers for the DB interface
 //
 extern DbEntityLookupFunction                    dbEntityLookup;
+extern DbEntityRetrieveFunction                  dbEntityRetrieve;
 extern DbEntityLookupManyFunction                dbEntityLookupMany;
 extern DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
 extern DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;

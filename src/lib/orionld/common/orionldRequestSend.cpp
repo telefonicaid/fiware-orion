@@ -280,7 +280,6 @@ bool orionldRequestSend
   }
 
   // The downloaded buffer is in rBufP->buf
-  LM_T(LmtRequestSend, ("Got response: %s", rBufP->buf));
 
   release_curl_context(&cc);
 
