@@ -470,7 +470,6 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
       {
         if (keyValues == false)
           datamodelAttributeFix(attrP, entityId, sysAttrs);
-        ++includedAttributes;
       }
 
       if ((datasetP != NULL) && (attrP != NULL))
@@ -480,16 +479,19 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
 
         kjChildRemove(dbAttrsP, attrP);
         kjChildPrepend(datasetP, attrP);
+        ++includedAttributes;
       }
       else if (attrP != NULL)
       {
         kjChildRemove(dbAttrsP, attrP);
         kjChildAdd(attrTree, attrP);
+        ++includedAttributes;
       }
       else if (datasetP != NULL)
       {
         kjChildRemove(dbDataSetsP, datasetP);
         kjChildAdd(attrTree, datasetP);
+        ++includedAttributes;
       }
 
       ++ix;

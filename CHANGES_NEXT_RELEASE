@@ -13,3 +13,4 @@
 # Issue #280  New DB layer for GET /entities/{EID}
 # Issue #280  datasetId supported for creation of entities
 # Issue	#280  datasetId	supported for retrieval of entities
+# Issue #451  When retrieving an entity, if attrs URI param 'attrs' is given and the entity doesn't have any of those attributes, a 404 is to be returned

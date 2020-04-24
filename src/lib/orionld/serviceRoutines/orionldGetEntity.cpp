@@ -447,18 +447,26 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   }
 #else
   char*  attrs[100];
-  char** attrsP = NULL;
+  char** attrsP         = NULL;
+  bool   attrsMandatory = false;
 
   if (orionldState.uriParams.attrs != NULL)
+  {
     attrsP = (char**) attrsListToArray(orionldState.uriParams.attrs, attrs, 100);
+    if (regArray == NULL)  // No matching registrations
+      attrsMandatory = true;
+  }
 
-  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0], attrsP, false, orionldState.uriParamOptions.sysAttrs, orionldState.uriParamOptions.keyValues, orionldState.uriParams.datasetId);
+  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0], attrsP, attrsMandatory, orionldState.uriParamOptions.sysAttrs, orionldState.uriParamOptions.keyValues, orionldState.uriParams.datasetId);
 #endif
 
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
-    orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
-    orionldState.httpStatusCode = SccContextElementNotFound;
+    if (attrsMandatory == true)
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Combination Entity/Attributes Not Found", orionldState.wildcard[0]);
+    else
+      orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
+    orionldState.httpStatusCode = SccContextElementNotFound;  // 404
     return false;
   }
 

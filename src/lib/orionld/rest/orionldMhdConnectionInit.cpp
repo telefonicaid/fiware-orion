@@ -294,7 +294,8 @@ int orionldMhdConnectionInit
   ++requestNo;
 
   //
-  // This call to LM_TMP should not be removed. Only commented out
+  // This call to LM_TMP should not be removed.
+  // At most, commented out
   //
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
 
@@ -366,20 +367,20 @@ int orionldMhdConnectionInit
     return MHD_YES;
   }
 
-  // 4.  Check payload too big
-  if (ciP->httpHeaders.contentLength > 2000000)
-  {
-    orionldState.responsePayload = (char*) payloadTooLargePayload;
-    orionldState.httpStatusCode  = SccBadRequest;
-    return MHD_YES;
-  }
-
-  // 5.  Get HTTP Headers
+  // 4.  Get HTTP Headers
   MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: to be reimplemented in C !!!
 
   if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
+    orionldState.httpStatusCode  = SccBadRequest;
+    return MHD_YES;
+  }
+
+  // 5.  Check payload too big
+  if (ciP->httpHeaders.contentLength > 2000000)
+  {
+    orionldState.responsePayload = (char*) payloadTooLargePayload;
     orionldState.httpStatusCode  = SccBadRequest;
     return MHD_YES;
   }

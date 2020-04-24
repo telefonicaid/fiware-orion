@@ -32,7 +32,7 @@ brokerStart CB 212-249
 
 #
 # 01. POST /ngsi-ld/v1/entities::http://a.b.c/entity/E1, with attributes A1 and A2
-# 02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes
+# 02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see 404 Not Found
 # 03. GET all entities with attr A3 - see no matching entities
 #
 
@@ -82,15 +82,15 @@ Date: REGEX(.*)
 
 02. GET /ngsi-ld/v1/entities/http://a.b.c/entity/E1 with URI param 'attrs' set to 'A3' - see E1 but without any attributes
 ==========================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/ld+json
+HTTP/1.1 404 Not Found
+Content-Length: 161
+Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-  "id": "http://a.b.c/entity/E1",
-  "type": "T"
+  "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
+  "title": "Combination Entity/Attributes Not Found",
+  "detail": "http://a.b.c/entity/E1"
 }
 
 

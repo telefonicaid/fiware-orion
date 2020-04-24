@@ -33,6 +33,7 @@ brokerStart CB 0-255 --prettyPrint
 #
 # 01. Create entity E1 with 5 attributes
 # 02. GET entity with the first three attributes only, using URI param 'attrs'
+# 03. GET entity with attrs URI param == 'P11' - see 404 Not Found
 #
 
 echo "01. Create entity E1 with 5 attributes"
@@ -73,6 +74,13 @@ echo
 echo
 
 
+echo "03. GET entity with attrs URI param == 'P11' - see 404 Not Found"
+echo "================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14?prettyPrint=yes&spaces=2&attrs=P11' --noPayloadCheck
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entity E1 with 5 attributes
 ======================================
@@ -106,6 +114,21 @@ Date: REGEX(.*)
     "type": "Property",
     "value": 3
   }
+}
+
+
+
+03. GET entity with attrs URI param == 'P11' - see 404 Not Found
+================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
+  "title": "Combination Entity/Attributes Not Found",
+  "detail": "urn:ngsi-ld:T:12:13:14"
 }
 
 
