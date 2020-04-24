@@ -51,7 +51,9 @@ static const char* errorTypeStringV[] =
   "https://uri.etsi.org/ngsi-ld/errors/InternalError",
   "https://uri.etsi.org/ngsi-ld/errors/TooComplexQuery",
   "https://uri.etsi.org/ngsi-ld/errors/TooManyResults",
-  "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
+  "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable",
+  "https://uri.etsi.org/ngsi-ld/errors/NoMultiTenantSupport",
+  "https://uri.etsi.org/ngsi-ld/errors/NonExistingTenant"
 };
 
 

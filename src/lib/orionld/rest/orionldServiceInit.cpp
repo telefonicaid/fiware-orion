@@ -202,7 +202,9 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //
   // Set options for the OrionLdRestService
   //
-  // 1. For POST /ngsi-ld/v1/entities:
+  // Most services needs the tenant to exist
+  //
+  // For POST /ngsi-ld/v1/entities:
   //    - The context may have to be saved in the context cache (if @context is non-string in payload)
   //      - Why?  The broker needs to be able to serve it later
   //    - The Entity ID and type must be looked up and removed from the payload (pointers to the trees in orionldState
@@ -210,44 +212,66 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //      - The Entity Type is removed and saved to save time in the service routine (all on level 1 are attributes)
   //
   //
+
+  serviceP->options = ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS;
+
+
   if (serviceP->serviceRoutine == orionldPostEntities)
   {
+    serviceP->options  = 0;
+
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldPostSubscriptions)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options  = 0;
+
+    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldGetSubscriptions)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldGetSubscription)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchCreate)
+  {
+    serviceP->options  = 0;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+  {
+    serviceP->options  = 0;
   }
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
+    serviceP->options  = 0;
+
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostRegistrations)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options  = 0;
+
+    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldGetTenants)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options  = 0;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldGetDbIndexes)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options  = 0;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
 
   if (temporal)  // CLI Option to turn on Temporal Evolution of Entities

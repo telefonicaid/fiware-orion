@@ -24,6 +24,9 @@
 */
 #include <string.h>                                            // strcpy
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "orionld/common/orionldState.h"                       // tenantV, tenants
 #include "orionld/common/orionldTenantLookup.h"                // Own interface
 
@@ -37,7 +40,9 @@ char* orionldTenantLookup(const char* tenant)
 {
   for (unsigned int ix = 0; ix < tenants; ix++)
   {
-    if (strcmp(tenant, tenantV[ix]) == 0)
+    char* withoutPrefix = &tenantV[ix][dbNameLen + 1];
+
+    if (strcmp(tenant, withoutPrefix) == 0)
       return tenantV[ix];
   }
 

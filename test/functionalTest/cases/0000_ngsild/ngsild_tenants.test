@@ -41,6 +41,7 @@ brokerStart CB 0-255 IPv4 -multiservice
 # 07. Get all subscriptions from default tenant using mongo - see only S1
 # 08. Get all subscriptions from tenant tn1 using mongo - see only S2
 # 09. Get all tenants - see 'ftest' and 'tn1'
+# 10. Attempt to GET from a tenant that doesn't exist - see error
 #
 
 echo "01. Create an entity urn:ngsi-ld:entity:E1 in default tenant"
@@ -150,6 +151,13 @@ echo
 echo "09. Get all tenants - see 'ftest' and 'tn1'"
 echo "==========================================="
 orionCurl --url "/ngsi-ld/ex/v1/tenants?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "10. Attempt to GET from a tenant that doesn't exist - see error"
+echo "==============================================================="
+orionCurl --url "/ngsi-ld/v1/entities?type=T&prettyPrint=yes" --noPayloadCheck --tenant tn13
 echo
 echo
 
@@ -332,6 +340,21 @@ Date: REGEX(.*)
   "ftest",
   "ftest-tn1"
 ]
+
+
+
+10. Attempt to GET from a tenant that doesn't exist - see error
+===============================================================
+HTTP/1.1 404 Not Found
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/NonExistingTenant",
+  "title": "No such tenant",
+  "detail": "tn13"
+}
 
 
 

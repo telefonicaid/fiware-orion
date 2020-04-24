@@ -214,6 +214,18 @@ static void optionsParse(const char* options)
 }
 
 
+#if 0
+// -----------------------------------------------------------------------------
+//
+// orionldHttpHeaderGet -
+//
+static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+{
+  if (strcmp(key, "NGSILD-Tenant") == 0)
+    orionldState.httpHeaders.tenant = value;
+}
+#endif
+
 
 // -----------------------------------------------------------------------------
 //
@@ -356,7 +368,7 @@ int orionldMhdConnectionInit
     }
   }
 
-  // 3.  Check invalid verb
+  // 3. Check invalid verb
   orionldState.verb = verbGet(method);
   ciP->verb = orionldState.verb;  // FIXME: to be removed
   if (orionldState.verb == NOVERB)
@@ -367,8 +379,8 @@ int orionldMhdConnectionInit
     return MHD_YES;
   }
 
-  // 4.  Get HTTP Headers
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: to be reimplemented in C !!!
+  // 4. Get HTTP Headers
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: implement orionldHttpHeaderGet in C !!!
 
   if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
   {
@@ -377,7 +389,7 @@ int orionldMhdConnectionInit
     return MHD_YES;
   }
 
-  // 5.  Check payload too big
+  // 5. Check payload too big
   if (ciP->httpHeaders.contentLength > 2000000)
   {
     orionldState.responsePayload = (char*) payloadTooLargePayload;

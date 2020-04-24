@@ -43,7 +43,9 @@ typedef enum OrionldResponseErrorType
   OrionldInternalError,
   OrionldTooComplexQuery,
   OrionldTooManyResults,
-  OrionldLdContextNotAvailable
+  OrionldLdContextNotAvailable,
+  OrionldNoMultiTenantSupport,
+  OrionldNonExistingTenant
 } OrionldResponseErrorType;
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDRESPONSEERRORTYPE_H_

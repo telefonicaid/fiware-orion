@@ -712,6 +712,28 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     goto respond;
 
   //
+  // If a tenant is used (HTTP Header NGSILD-Tenant) and it's not any of:
+  //   * POST /ngsi-ld/v1/entities
+  //   * POST /ngsi-ld/v1/entityOperations/create
+  //   * POST /ngsi-ld/v1/entityOperations/upsert
+  // then if the tenant doesn't exist, an error must be returned (404)
+  //
+  if ((orionldState.tenant != NULL) && (*orionldState.tenant != 0))
+  {
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS) == ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS)
+    {
+      if (orionldTenantLookup(orionldState.tenant) == NULL)
+      {
+        LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenant));
+        orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenant);
+        orionldState.httpStatusCode = SccContextElementNotFound;  // 404
+        goto respond;
+      }
+    }
+  }
+
+
+  //
   // 03. Check for empty payload for POST/PATCH/PUT
   //
   if (((ciP->verb == POST) || (ciP->verb == PATCH) || (ciP->verb == PUT)) && (payloadEmptyCheck(ciP) == false))
@@ -827,12 +849,12 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
       {
-        char prefixed[64];
-
-        snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
-
-        if (orionldTenantLookup(prefixed) == NULL)
+        if (orionldTenantLookup(orionldState.tenant) == NULL)
+        {
+          char prefixed[64];
+          snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
           orionldTenantCreate(prefixed);
+        }
       }
     }
   }
