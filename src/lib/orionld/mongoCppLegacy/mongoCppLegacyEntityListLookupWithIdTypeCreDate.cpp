@@ -126,9 +126,9 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
 
     // A limit of 100 entities has been established.
     ++entities;
-    if (entities >= 100)
+    if (entities >= 200)
     {
-      LM_W(("Too many entities - breaking loop at 100"));
+      LM_W(("Too many entities - breaking loop at 200"));
       break;
     }
   }

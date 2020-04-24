@@ -60,7 +60,7 @@ bool entityTypeCheck(KjNode* entityTypeNodeP, bool duplicatedType, char* entityI
   }
 
   // Entity TYPE must be a string
-  if (entityTypeNodeP->type != KjString)
+  if ((entityTypeNodeP != NULL) && (entityTypeNodeP->type != KjString))
   {
     LM_W(("Bad Input (UPSERT: entity::type not a string)"));
     entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "field with invalid type", "entity::type", 400);

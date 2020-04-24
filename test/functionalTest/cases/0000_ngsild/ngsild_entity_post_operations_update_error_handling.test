@@ -363,7 +363,7 @@ echo
 --REGEXPECT--
 01. Attempt to update with an entity having an ID that is not a string - see error
 ==================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 499
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -396,7 +396,7 @@ Date: REGEX(.*)
 
 02. Attempt to update with an entity without ID field - see error
 =================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 494
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -429,7 +429,7 @@ Date: REGEX(.*)
 
 03. Attempt to update with an entity having an ID with URI invalid - see error
 ==============================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 461
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -462,7 +462,7 @@ Date: REGEX(.*)
 
 04. Attempt to update with an entity having a TYPE that is not a string - see error
 ===================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 504
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -495,7 +495,7 @@ Date: REGEX(.*)
 
 05. Attempt to update with an entity without TYPE field - see error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 468
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -527,7 +527,7 @@ Date: REGEX(.*)
 
 06. Attempt to update with an entity with 2 ID fields - see error
 =================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 495
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -560,7 +560,7 @@ Date: REGEX(.*)
 
 07. Attempt to update with an entity with 2 TYPE fields - see error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 497
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -608,7 +608,7 @@ Date: REGEX(.*)
 
 09. Attempt to update with an empty without @context field - see error
 ======================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 468
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -658,7 +658,7 @@ Date: REGEX(.*)
 
 11. Try to update entity which not exists POST /ngsi-ld/v1/entityOperations/update
 ==================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 207 Multi Status
 Content-Length: 284
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

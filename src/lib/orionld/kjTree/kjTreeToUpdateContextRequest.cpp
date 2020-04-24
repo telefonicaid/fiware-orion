@@ -115,7 +115,7 @@ static bool kjTreeToContextElementAttributes
       continue;
     else if (itemP->type != KjObject)  // No key-values in batch ops - all attrs must be objects (except special fields 'creDate' and 'modDate')
     {
-      LM_E(("UPSERT: item '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
+      LM_E(("Attribute '%s' is not a KjObject, but a '%s'", itemP->name, kjValueType(itemP->type)));
       *titleP  = (char*) "invalid entity";
       *detailP = (char*) "attribute must be a JSON object";
 

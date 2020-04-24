@@ -322,7 +322,7 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
   char*     shortName       = orionldContextItemAliasLookup(orionldState.contextP, nodeP->name, NULL, NULL);
 
   //
-  // FIXME: 'observedAt' is an API observed word and should NEVER be expanded!
+  // FIXME: 'observedAt' is an API reserved word and should NEVER be expanded!
   //
 
   LM_T(LmtMetadata, ("'%s' ALIAS: '%s'", nodeP->name, shortName));
