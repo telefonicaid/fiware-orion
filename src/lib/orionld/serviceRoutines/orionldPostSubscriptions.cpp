@@ -157,6 +157,7 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
     ngsiv2::Subscription  subscription;
     char*                 details;
 
+    // mongoGetLdSubscription takes the req semaphore
     if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &orionldState.httpStatusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "A subscription with that ID already exists", subIdP);

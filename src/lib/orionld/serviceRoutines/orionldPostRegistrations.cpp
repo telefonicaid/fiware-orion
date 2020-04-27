@@ -63,6 +63,7 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
     HttpStatusCode  statusCode;
     char*           details;
 
+    // mongoLdRegistrationGet takes the req semaphore
     if (mongoLdRegistrationGet(NULL, regId, orionldState.tenant, &statusCode, &details) == true)
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Registration already exists", regId);

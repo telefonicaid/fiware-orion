@@ -45,11 +45,22 @@ extern "C"
 //
 bool orionldGetTenants(ConnectionInfo* ciP)
 {
+  KjNode* tenantP;
+
   orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
 
+  //
+  // First the default tenant
+  //
+  tenantP = kjString(orionldState.kjsonP, NULL, dbName);
+  kjChildAdd(orionldState.responseTree, tenantP);
+
+  //
+  // Then the other tenants
+  //
   for (unsigned int ix = 0; ix < tenants; ix++)
   {
-    KjNode* tenantP = kjString(orionldState.kjsonP, NULL, tenantV[ix]);
+    tenantP = kjString(orionldState.kjsonP, NULL, tenantV[ix]);
     kjChildAdd(orionldState.responseTree, tenantP);
   }
 

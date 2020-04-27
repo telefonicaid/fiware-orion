@@ -166,7 +166,6 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
       KjNode*  contextNodeP  = kjLookup(entityP, "@context");
 
-      LM_TMP(("BUPD: @context of entity '%s': at %p", entityId, contextNodeP));
       if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
       {
         LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
@@ -194,10 +193,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
       OrionldProblemDetails  pd;
 
       if (contextNodeP != NULL)
-      {
-        LM_TMP(("BUPD: Creating the @context from the tree"));
         contextP = orionldContextFromTree(NULL, false, contextNodeP, &pd);
-      }
       else
         contextP = orionldCoreContextP;
 
@@ -237,8 +233,6 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, NULL, true, NULL);
         if (strcmp(expandedType, dbTypeP->value.s) != 0)
         {
-          LM_TMP(("BUPD: inTypeP->value.s: '%s'", inTypeP->value.s));
-          LM_TMP(("BUPD: idbTypeP->value.s: '%s'", dbTypeP->value.s));
           entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", inTypeP->value.s, 400);
           kjChildRemove(incomingTree, entityP);
           continue;

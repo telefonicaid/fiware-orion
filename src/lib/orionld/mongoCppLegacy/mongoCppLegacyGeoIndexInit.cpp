@@ -49,12 +49,16 @@ extern "C"
 //
 void mongoCppLegacyGeoIndexInit(void)
 {
-  // Foreach tenant
-  for (unsigned int ix = 0; ix < tenants; ix++)
+  //
+  // Loop over all tenants
+  // Index -1 is used for the default tenant
+  //
+  for (int ix = -1; ix < (int) tenants; ix++)
   {
-    char collectionPath[256];
+    char  collectionPath[256];
+    char* tenant = (ix == -1)? dbName : tenantV[ix];
 
-    dbCollectionPathGetWithTenant(collectionPath, sizeof(collectionPath), tenantV[ix], "entities");
+    dbCollectionPathGetWithTenant(collectionPath, sizeof(collectionPath), tenant, "entities");
 
     // Foreach ENTITY (only attrs)
     mongo::BSONObjBuilder  dbFields;
@@ -99,8 +103,8 @@ void mongoCppLegacyGeoIndexInit(void)
 
         if (strcmp(typeP->value.s, "GeoProperty") == 0)
         {
-          if (dbGeoIndexLookup(tenantV[ix], attrP->name) == NULL)
-            mongoCppLegacyGeoIndexCreate(tenantV[ix], attrP->name);
+          if (dbGeoIndexLookup(tenant, attrP->name) == NULL)
+            mongoCppLegacyGeoIndexCreate(tenant, attrP->name);
         }
       }
     }
