@@ -47,7 +47,7 @@ jobs:
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e " \033[1;33mBuilding Debian Docker image for Release";
-          travis_wait 30 docker build --quiet \
+          travis_wait 30 docker build --no-cache --quiet \
             --build-arg TOKEN=${TOKEN} \
             --build-arg REV=${TRAVIS_COMMIT} \
             --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
@@ -64,7 +64,7 @@ jobs:
       stage: deploy
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
-          travis_wait 30 docker build --quiet \
+          travis_wait 30 docker build --no-cache --quiet \
             --build-arg TOKEN=${TOKEN} \
             --build-arg REV=${TRAVIS_COMMIT} \
             --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
@@ -107,7 +107,7 @@ before_install: >
 
 install: >
   echo -e " \033[1;33mRebuilding Debian Docker Images (with deps)";
-  travis_wait 30 docker build --quiet \
+  travis_wait 30 docker build --no-cache --quiet \
     --build-arg TOKEN=${TOKEN} \
     --build-arg REV=${TRAVIS_COMMIT} \
     --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
@@ -128,10 +128,6 @@ notifications:
   email:
     recipients:
     - ken.zangelin@fiware.org
-    - jorgepereirasb@gmail.com
-    - icazevedo10@gmail.com
-    - douglasrolim@gmail.com
-    - larysse.izidio@gmail.com
     on_success: never
     on_failure: always
   webhooks:
