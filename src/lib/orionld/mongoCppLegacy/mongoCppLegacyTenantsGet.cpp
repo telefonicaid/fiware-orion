@@ -58,7 +58,16 @@ bool mongoCppLegacyTenantsGet(void)
 
     connection->runCommand("admin", command, result);
 
-    std::vector<mongo::BSONElement> dbV = mongoCppLegacyDbFieldGet(&result, "databases").Array();
+    mongo::BSONElement              bsonElement;
+    std::vector<mongo::BSONElement> dbV;
+
+    if (mongoCppLegacyDbFieldGet(&result, "databases", &bsonElement) == false)
+    {
+      LM_E(("Database Error (mongoCppLegacyDbFieldGet('databases') failed)"));
+      return false;
+    }
+    dbV = bsonElement.Array();
+
     for (unsigned int ix = 0; ix < dbV.size(); ix++)
     {
       mongo::BSONObj  db   = dbV[ix].Obj();

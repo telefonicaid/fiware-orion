@@ -40,6 +40,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                                 // orionldState, dbName, mongoEntitiesCollectionP
 #include "orionld/db/dbCollectionPathGet.h"                              // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                                  // dbDataToKjTree, dbDataFromKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbNumberFieldGet.h"       // mongoCppLegacyDbNumberFieldGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"       // mongoCppLegacyDbStringFieldGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbObjectFieldGet.h"       // mongoCppLegacyDbObjectFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"  // Own interface
 
 
@@ -104,18 +107,43 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
       continue;
     }
 
-    mongo::BSONObj     idField      = getObjectFieldF(bsonObj, "_id");
-    std::string        idString     = getStringFieldF(idField, "id");
-    std::string        typeString   = getStringFieldF(idField, "type");
-    long long          creDate      = getIntOrLongFieldAsLongF(bsonObj, "creDate");
-    KjNode*            entityTree   = kjObject(orionldState.kjsonP, NULL);
-    KjNode*            idNodeP      = kjString(orionldState.kjsonP,  "id",      idString.c_str());
-    KjNode*            typeNodeP    = kjString(orionldState.kjsonP,  "type",    typeString.c_str());
-    KjNode*            creDateNodeP = kjInteger(orionldState.kjsonP, "creDate", creDate);
+    mongo::BSONObj  idField;
+    if (mongoCppLegacyDbObjectFieldGet(&bsonObj, "_id", &idField) == false)
+    {
+      LM_E(("Internal Error (unable to extract the field '_id' from an entity"));
+      continue;
+    }
+
+    char* idString = mongoCppLegacyDbStringFieldGet(&idField, "id");
+    if (idString == NULL)
+    {
+      LM_E(("Internal Error (unable to extract the field '_id.id' from an entity"));
+      continue;
+    }
+
+    char* typeString = mongoCppLegacyDbStringFieldGet(&idField, "type");
+    if (typeString == NULL)
+    {
+      LM_E(("Internal Error (unable to extract the field '_id.type' from the entity '%s'", idString));
+      continue;
+    }
+
+    int creDate;
+    if (mongoCppLegacyDbNumberFieldGet(&bsonObj, "creDate", &creDate) == false)
+    {
+      LM_E(("Internal Error (unable to extract the field 'creDate' from the entity '%s'", idString));
+      continue;
+    }
+
+    KjNode* entityTree   = kjObject(orionldState.kjsonP, NULL);
+    KjNode* idNodeP      = kjString(orionldState.kjsonP,  "id",      idString);
+    KjNode* typeNodeP    = kjString(orionldState.kjsonP,  "type",    typeString);
+    KjNode* creDateNodeP = kjInteger(orionldState.kjsonP, "creDate", creDate);
 
     kjChildAdd(entityTree, idNodeP);
     kjChildAdd(entityTree, typeNodeP);
     kjChildAdd(entityTree, creDateNodeP);
+
 
     // Create the entity array if it doesn't already exist
     if (entitiesArray == NULL)

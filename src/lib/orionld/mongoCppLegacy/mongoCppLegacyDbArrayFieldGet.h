@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // mongo legacy driver
+#include "mongo/client/dbclient.h"                             // mongo::BSONArray
 
 
 
@@ -33,8 +33,6 @@
 //
 // mongoCppLegacyDbArrayFieldGet -
 //
-// FIXME: avoid to send object on the stack!!!
-//
-extern mongo::BSONArray mongoCppLegacyDbArrayFieldGet(const mongo::BSONObj* boP, const char* fieldName);
+extern bool mongoCppLegacyDbArrayFieldGet(const mongo::BSONObj* boP, const char* fieldName, mongo::BSONArray* arrayP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBARRAYFIELDGET_H_

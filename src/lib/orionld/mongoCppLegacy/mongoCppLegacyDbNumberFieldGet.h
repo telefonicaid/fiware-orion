@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBSTRINGFIELDGET_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBSTRINGFIELDGET_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBNUMBERFIELDGET_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBNUMBERFIELDGET_H_
 
 /*
 *
@@ -31,8 +31,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyDbStringFieldGet -
+// mongoCppLegacyDbNumberFieldGet -
 //
-extern char* mongoCppLegacyDbStringFieldGet(const mongo::BSONObj* boP, const char* fieldName);
+extern bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* fieldName, int* iP);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBSTRINGFIELDGET_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBNUMBERFIELDGET_H_

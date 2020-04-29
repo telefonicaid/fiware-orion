@@ -27,22 +27,40 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/mongoCppLegacy/mongoCppLegacyDbFieldGet.h"   // Own interface
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbNumberFieldGet.h"   // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyDbFieldGet -
+// mongoCppLegacyDbNumberFieldGet -
 //
-bool mongoCppLegacyDbFieldGet(const mongo::BSONObj* boP, const char* fieldName, mongo::BSONElement* elementP)
+bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* fieldName, int* iP)
 {
   if (boP->hasField(fieldName) == false)
+    return false;
+
+  mongo::BSONType valueType = boP->getField(fieldName).type();
+
+  LM_TMP(("CRED: The value type of '%s' is %d", fieldName, valueType));
+  switch (valueType)
   {
-    LM_E(("Runtime Error (field '%s' is missing in BSONObj '%s'", fieldName, boP->toString().c_str()));
+  case mongo::NumberDouble:
+    *iP = (int) boP->getField(fieldName).Number();
+    break;
+
+  case mongo::NumberInt:
+    *iP = (int) boP->getIntField(fieldName);
+    break;
+
+  case mongo::NumberLong:
+    *iP = (int) boP->getField(fieldName).Long();
+    break;
+
+  default:
+    LM_E(("Runtime Error (field '%s' not a number (type=%d) in BSONObj '%s'", fieldName, boP->getField(fieldName).type(), boP->toString().c_str()));
     return false;
   }
 
-  *elementP = boP->getField(fieldName);
   return true;
 }

@@ -16,3 +16,4 @@
 # Issue #451  When retrieving an entity, if attrs URI param 'attrs' is given and the entity doesn't have any of those attributes, a 404 is to be returned
 # Issue #280  Two new NGSI-LD error codes: NoMultiTenantSupport and NonExistingTenant
 # Issue #280  Giving error when non-existinf tenant is used (except for creation)
+# Issue #457  creDate can now be either a float, an int or a long in some functions (e.g. batch upsert)

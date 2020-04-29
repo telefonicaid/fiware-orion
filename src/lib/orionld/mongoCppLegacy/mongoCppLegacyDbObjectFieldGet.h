@@ -33,8 +33,6 @@
 //
 // mongoCppLegacyDbObjectFieldGet -
 //
-// FIXME: avoid to send object on the stack!!!
-//
-extern mongo::BSONObj mongoCppLegacyDbObjectFieldGet(const mongo::BSONObj* boP, const char* fieldName);
+extern bool mongoCppLegacyDbObjectFieldGet(const mongo::BSONObj* boP, const char* fieldName, mongo::BSONObj* objectP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBOBJECTFIELDGET_H_

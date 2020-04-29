@@ -42,8 +42,6 @@ extern "C"
 #include "orionld/db/dbCollectionPathGet.h"                         // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
-#include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"  // mongoCppLegacyDbStringFieldGet
-#include "orionld/mongoCppLegacy/mongoCppLegacyDbObjectFieldGet.h"  // mongoCppLegacyDbObjectFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"    // Own interface
 
 

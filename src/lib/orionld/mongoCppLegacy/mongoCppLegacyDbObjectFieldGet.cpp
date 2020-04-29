@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBSTRINGFIELDGET_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBSTRINGFIELDGET_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,14 +22,37 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // mongo::BSONObj
+#include "mongo/client/dbclient.h"                             // mongo legacy driver
+
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbObjectFieldGet.h"   // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyDbStringFieldGet -
+// mongoCppLegacyDbObjectFieldGet -
 //
-extern char* mongoCppLegacyDbStringFieldGet(const mongo::BSONObj* boP, const char* fieldName);
+bool mongoCppLegacyDbObjectFieldGet(const mongo::BSONObj* boP, const char* fieldName, mongo::BSONObj* objectP)
+{
+  bool present = boP->hasField(fieldName);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBSTRINGFIELDGET_H_
+  if (present == false)
+  {
+    LM_E(("Runtime Error (field '%s' is missing in BSONObj '%s'", fieldName, boP->toString().c_str()));
+    return false;
+  }
+
+  mongo::BSONType type = boP->getField(fieldName).type();
+
+  if (type == mongo::Object)
+  {
+    *objectP = boP->getObjectField(fieldName);
+    return true;
+  }
+
+  LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d", type));
+  return false;
+}

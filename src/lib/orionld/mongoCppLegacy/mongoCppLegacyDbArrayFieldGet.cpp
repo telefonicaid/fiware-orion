@@ -35,21 +35,20 @@
 //
 // mongoCppLegacyDbArrayFieldGet -
 //
-// FIXME: avoid to send object on the stack!!!
-//
-mongo::BSONArray mongoCppLegacyDbArrayFieldGet(const mongo::BSONObj* boP, const char* fieldName)
+bool mongoCppLegacyDbArrayFieldGet(const mongo::BSONObj* boP, const char* fieldName, mongo::BSONArray* arrayP)
 {
   if (boP->hasField(fieldName) == false)
   {
     LM_E(("Runtime Error (field '%s' is missing in BSONObj '%s'", fieldName, boP->toString().c_str()));
-    return mongo::BSONArray();
+    return false;
   }
 
   if (boP->getField(fieldName).type() != mongo::Array)
   {
     LM_E(("Runtime Error (field '%s' not an array (type=%d) in BSONObj '%s'", fieldName, boP->getField(fieldName).type(), boP->toString().c_str()));
-    return mongo::BSONArray();
+    return false;
   }
 
-  return (mongo::BSONArray) boP->getObjectField(fieldName);
+  *arrayP = (mongo::BSONArray) boP->getObjectField(fieldName);
+  return true;
 }
