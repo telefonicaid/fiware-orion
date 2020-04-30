@@ -1,67 +1,83 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
 #ifdef DEBUG
-#include <sys/types.h>                                         // DIR, dirent
-#include <fcntl.h>                                             // O_RDONLY
-#include <dirent.h>                                            // opendir(), readdir(), closedir()
-#include <sys/stat.h>                                          // statbuf
-#include <unistd.h>                                            // stat()
+#include <sys/types.h>                                              // DIR, dirent
+#include <fcntl.h>                                                  // O_RDONLY
+#include <dirent.h>                                                 // opendir(), readdir(), closedir()
+#include <sys/stat.h>                                               // statbuf
+#include <unistd.h>                                                 // stat()
 #endif
 
 #include <microhttpd.h>
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                          // LM_*
+#include "logMsg/traceLevels.h"                                     // Lmt*
 
 extern "C"
 {
-#include "kalloc/kaBufferInit.h"                               // kaBufferInit
-#include "kjson/kjInit.h"                                      // kjInit
-#include "kjson/kjBufferCreate.h"                              // kjBufferCreate
-#include "kjson/kjParse.h"                                     // kjParse
+#include "kbase/kInit.h"                                             // kInit
+#include "kalloc/kaInit.h"                                           // kaInit
+#include "kalloc/kaBufferInit.h"                                     // kaBufferInit
+#include "kjson/kjBufferCreate.h"                                    // kjBufferCreate
+#include "kjson/kjParse.h"                                           // kjParse
 }
 
-#include "orionld/common/OrionldConnection.h"                  // Global vars: orionldState, kjson, kalloc, kallocBuffer, ...
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/context/orionldContextDownloadAndParse.h"    // orionldContextDownloadAndParse
-#include "orionld/context/orionldCoreContext.h"                // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
-#include "orionld/context/orionldContextListInsert.h"          // orionldContextListInit, orionldContextListInsert
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
-#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
-#include "orionld/serviceRoutines/orionldPostEntities.h"       // orionldPostEntities
-#include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
-#include "orionld/rest/orionldMhdConnection.h"                 // Own Interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldHostName
-//
-char orionldHostName[1024];
-int  orionldHostNameLen = -1;
+#include "orionld/common/orionldState.h"                             // orionldState
+#include "orionld/common/urlCheck.h"                                 // urlCheck
+#include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL
+#include "orionld/context/orionldContextInit.h"                      // orionldContextInit
+#include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
+#include "orionld/rest/temporaryErrorPayloads.h"                     // Temporary Error Payloads
+#include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
+#include "orionld/serviceRoutines/orionldPostEntity.h"               // orionldPostEntity
+#include "orionld/serviceRoutines/orionldPatchEntity.h"              // orionldPatchEntity
+#include "orionld/serviceRoutines/orionldDeleteEntity.h"             // orionldDeleteEntity
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"           // orionldPatchAttribute
+#include "orionld/serviceRoutines/orionldDeleteAttribute.h"          // orionldDeleteAttribute
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"        // orionldPostSubscriptions
+#include "orionld/serviceRoutines/orionldGetSubscriptions.h"         // orionldGetSubscriptions
+#include "orionld/serviceRoutines/orionldGetSubscription.h"          // orionldGetSubscription
+#include "orionld/serviceRoutines/orionldPostRegistrations.h"        // orionldPostRegistrations
+#include "orionld/serviceRoutines/orionldGetVersion.h"               // orionldGetVersion
+#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
+#include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
+#include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
+#include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
+#include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
+#include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
+#include "orionld/temporal/temporalPostBatchDelete.h"                // temporalPostBatchDelete
+#include "orionld/temporal/temporalDeleteAttribute.h"                // temporalDeleteAttribute
+#include "orionld/temporal/temporalDeleteEntity.h"                   // temporalDeleteEntity
+#include "orionld/temporal/temporalPatchAttribute.h"                 // temporalPatchAttribute
+#include "orionld/temporal/temporalPatchEntity.h"                    // temporalPatchEntity
+#include "orionld/temporal/temporalPostBatchCreate.h"                // temporalPostBatchCreate
+#include "orionld/temporal/temporalPostBatchUpsert.h"                // temporalPostBatchUpsert
+#include "orionld/temporal/temporalPostBatchUpdate.h"                // temporalPostBatchUpdate
+#include "orionld/temporal/temporalPostEntity.h"                     // temporalPostEntity
+#include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
+#include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
 
 
@@ -186,7 +202,9 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //
   // Set options for the OrionLdRestService
   //
-  // 1. For POST /ngsi-ld/v1/entities:
+  // Most services needs the tenant to exist
+  //
+  // For POST /ngsi-ld/v1/entities:
   //    - The context may have to be saved in the context cache (if @context is non-string in payload)
   //      - Why?  The broker needs to be able to serve it later
   //    - The Entity ID and type must be looked up and removed from the payload (pointers to the trees in orionldState
@@ -194,192 +212,94 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //      - The Entity Type is removed and saved to save time in the service routine (all on level 1 are attributes)
   //
   //
+
+  serviceP->options = ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS;
+
+
   if (serviceP->serviceRoutine == orionldPostEntities)
   {
+    serviceP->options  = 0;
+
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
   else if (serviceP->serviceRoutine == orionldPostSubscriptions)
   {
-    serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options  = 0;
+
+    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
-}
-
-
-
-#ifdef DEBUG
-// -----------------------------------------------------------------------------
-//
-// contextFileParse -
-//
-int contextFileParse(char* fileBuffer, int bufLen, char** urlP, char** jsonP, char** errorStringP)
-{
-  //
-  // 1. Skip initial whitespace
-  // Note: 0xD (13) is the Windows 'carriage ret' character
-  //
-  while ((*fileBuffer != 0) && ((*fileBuffer == ' ') || (*fileBuffer == '\t') || (*fileBuffer == '\n') || (*fileBuffer == 0xD)))
-    ++fileBuffer;
-
-  if (*fileBuffer == 0)
+  else if (serviceP->serviceRoutine == orionldGetSubscriptions)
   {
-    *errorStringP = (char*) "empty context file (or, only whitespace)";
-    return -1;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldGetSubscription)
+  {
+    serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+  {
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchCreate)
+  {
+    serviceP->options  = 0;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+  {
+    serviceP->options  = 0;
+  }
+  else if (serviceP->serviceRoutine == orionldGetVersion)
+  {
+    serviceP->options  = 0;
+
+    serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldPostRegistrations)
+  {
+    serviceP->options  = 0;
+
+    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+  }
+  else if (serviceP->serviceRoutine == orionldGetTenants)
+  {
+    serviceP->options  = 0;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+  }
+  else if (serviceP->serviceRoutine == orionldGetDbIndexes)
+  {
+    serviceP->options  = 0;
+    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
 
-
-  //
-  // 2. The URL is on the first line of the buffer
-  //
-  *urlP = fileBuffer;
-  LM_T(LmtPreloadedContexts, ("Parsing fileBuffer. URL is %s", *urlP));
-
-
-  //
-  // 3. Find the '\n' that ends the URL
-  //
-  while ((*fileBuffer != 0) && (*fileBuffer != '\n'))
-    ++fileBuffer;
-
-  if (*fileBuffer == 0)
+  if (temporal)  // CLI Option to turn on Temporal Evolution of Entities
   {
-    *errorStringP = (char*) "can't find the end of the URL line";
-    return -1;
-  }
-
-
-  //
-  // 4. Zero-terminate URL
-  //
-  *fileBuffer = 0;
-
-
-  //
-  // 5. Jump over the \n and onto the first char of the next line
-  //
-  ++fileBuffer;
-
-
-  //
-  // 1. Skip initial whitespace
-  // Note: 0xD (13) is the Windows 'carriage ret' character
-  //
-  while ((*fileBuffer != 0) && ((*fileBuffer == ' ') || (*fileBuffer == '\t') || (*fileBuffer == '\n') || (*fileBuffer == 0xD)))
-    ++fileBuffer;
-
-  if (*fileBuffer == 0)
-  {
-    *errorStringP = (char*) "no JSON Context found";
-    return -1;
-  }
-
-  *jsonP = fileBuffer;
-  LM_T(LmtPreloadedContexts, ("Parsing fileBuffer. JSON is %s", *jsonP));
-
-  return 0;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// contextFileTreat -
-//
-static void contextFileTreat(char* dir, struct dirent* dirItemP)
-{
-  char*        fileBuffer;
-  struct stat  statBuf;
-  char         path[512];
-
-  snprintf(path, sizeof(path), "%s/%s", dir, dirItemP->d_name);
-  LM_T(LmtPreloadedContexts, ("Treating 'preloaded' context file '%s'", path));
-
-  if (stat(path, &statBuf) != 0)
-    LM_X(1, ("stat(%s): %s", path, strerror(errno)));
-
-  fileBuffer = (char*) malloc(statBuf.st_size + 1);
-  if (fileBuffer == NULL)
-    LM_X(1, ("Out of memory"));
-
-  int fd;
-  fd = open(path, O_RDONLY);
-  if (fd == -1)
-    LM_X(1, ("open(%s): %s", path, strerror(errno)));
-
-  int nb;
-  nb = read(fd, fileBuffer, statBuf.st_size);
-  if (nb != statBuf.st_size)
-    LM_X(1, ("read(%s): %s", path, strerror(errno)));
-  fileBuffer[statBuf.st_size] = 0;
-  close(fd);
-
-  //
-  // OK, the entire buffer is in 'fileBuffer'
-  // Now let's parse the buffer to extract URL (first line)
-  // and the "payload" that is the JSON of the context
-  //
-  char* url;
-  char* json;
-  char* errorString;
-
-  if (contextFileParse(fileBuffer, statBuf.st_size, &url, &json, &errorString) != 0)
-    LM_X(1, ("error parsing the context file '%s': %s", path, errorString));
-
-  //
-  // We have both the URL and the 'JSON Context'.
-  // Time to parse the 'JSON Context', create the OrionldContext, and insert it into the list of contexts
-  //
-  KjNode* tree = kjParse(kjsonP, json);
-
-  if (tree == NULL)
-    LM_X(1, ("error parsing the JSON context of context file '%s'", path));
-
-  LM_T(LmtPreloadedContexts, ("Successfully parsed the preloaded JSON of context '%s'", url));
-
-  //
-  // Is it any of the three special contexts?
-  //
-  if (strcmp(url, ORIONLD_CORE_CONTEXT_URL) == 0)
-  {
-    orionldCoreContext.type   = OrionldCoreContext;
-    orionldCoreContext.url    = url;
-    orionldCoreContext.tree   = tree;
-    orionldCoreContext.ignore = true;
-    orionldCoreContext.next   = NULL;
-  }
-  else if (strcmp(url, ORIONLD_DEFAULT_URL_CONTEXT_URL) == 0)
-  {
-    orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
-    orionldDefaultUrlContext.url     = url;
-    orionldDefaultUrlContext.tree    = tree;
-    orionldDefaultUrlContext.ignore  = true;
-    orionldDefaultUrlContext.next    = NULL;
-  }
-  else if (strcmp(url, ORIONLD_DEFAULT_CONTEXT_URL) == 0)
-  {
-    orionldDefaultContext.type   = OrionldDefaultContext;
-    orionldDefaultContext.url    = url;
-    orionldDefaultContext.tree   = tree;
-    orionldDefaultContext.ignore = true;
-    orionldDefaultContext.next   = NULL;
-  }
-  else
-  {
-    OrionldContext* contextP = (OrionldContext*) malloc(sizeof(OrionldContext));
-
-    if (contextP == NULL)
-      LM_X(1, ("Out of memory"));
-
-    contextP->url    = url;
-    contextP->tree   = tree;
-    contextP->ignore = false;
-    contextP->type   = OrionldUserContext;
-
-    orionldContextListInsert(contextP, true);  // true: sem not taken, just not needed here
-  }
-}
+    if (serviceP->serviceRoutine == orionldPostEntities)
+      serviceP->temporalRoutine  = temporalPostEntities;
+    else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+      serviceP->temporalRoutine   = temporalPostBatchDelete;
+    else if (serviceP->serviceRoutine == orionldPostEntity)
+      serviceP->temporalRoutine = temporalPostEntity;
+    else if (serviceP->serviceRoutine == orionldDeleteAttribute)
+      serviceP->temporalRoutine = temporalDeleteAttribute;
+    else if (serviceP->serviceRoutine == orionldDeleteEntity)
+      serviceP->temporalRoutine = temporalDeleteEntity;
+    else if (serviceP->serviceRoutine == orionldPatchAttribute)
+      serviceP->temporalRoutine = temporalPatchAttribute;
+    else if (serviceP->serviceRoutine == orionldPatchEntity)
+      serviceP->temporalRoutine = temporalPatchEntity;
+    else if (serviceP->serviceRoutine == orionldPostBatchCreate)
+      serviceP->temporalRoutine = temporalPostBatchCreate;
+    else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+      serviceP->temporalRoutine = temporalPostBatchUpsert;
+#if 0
+    else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
+      serviceP->temporalRoutine = temporalPostBatchUpdate;
 #endif
+  }
+}
 
 
 
@@ -391,8 +311,7 @@ static void contextFileTreat(char* dir, struct dirent* dirItemP)
 //
 void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, char* cachedContextDir)
 {
-  int    svIx;    // Service Vector Index
-  char*  details;
+  int svIx;    // Service Vector Index
 
   bzero(orionldRestServiceV, sizeof(orionldRestServiceV));
 
@@ -418,155 +337,47 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
     }
   }
 
-  //
-  // Initialize the KSON library
-  //
-  kjInit(libLogFunction);
 
-  // Set up the global kjson instance with preallocated kalloc buffer
-  kaBufferInit(&kalloc, kallocBuffer, sizeof(kallocBuffer), 2 * 1024, NULL, "Global KAlloc buffer");
+  //
+  // Initialize the KBASE library
+  // This call redirects all log messaghes from the K-libs to the brokers log file.
+  //
+  kInit(libLogFunction);
+
+
+  //
+  // Initialize the KALLOC library
+  //
+  kaInit(libLogFunction);
+  kaBufferInit(&kalloc, kallocBuffer, sizeof(kallocBuffer), 32 * 1024, NULL, "Global KAlloc buffer");
+
+
+  //
+  // Initialize the KJSON library
+  // This sets up the global kjson instance with preallocated kalloc buffer
+  //
   kjsonP = kjBufferCreate(&kjson, &kalloc);
 
 
   //
-  // Initialize the global Context List
+  // Get the hostname - needed for contexts created by the broker
   //
-  if (orionldContextListInit(&details) != 0)
-    LM_X(1, ("Internal Error (orionldContextListInit failed: %s)", details));
-
-
-  //
-  // Now download the default context
-  // FIXME: Save the default context in mongo?
-  //
-  details  = (char*) "OK";
-
-#ifdef DEBUG
-  if (cachedContextDir != NULL)
-  {
-    DIR*            dirP;
-    struct  dirent  dirItem;
-    struct  dirent* result;
-
-    dirP = opendir(cachedContextDir);
-    if (dirP == NULL)
-      LM_X(1, ("opendir(%s): %s", cachedContextDir, strerror(errno)));
-
-    while (readdir_r(dirP, &dirItem, &result) == 0)
-    {
-      if (result == NULL)
-        break;
-
-      if (dirItem.d_name[0] == '.')  // skip hidden files and '.'/'..'
-        continue;
-
-      contextFileTreat(cachedContextDir, &dirItem);
-    }
-    closedir(dirP);
-  }
-  else
-#endif
-  {
-    int    retries = 0;
-
-    orionldCoreContext.url           = ORIONLD_CORE_CONTEXT_URL;
-    orionldCoreContext.next          = NULL;
-    orionldCoreContext.tree          = NULL;
-    orionldCoreContext.type          = OrionldCoreContext;
-    orionldCoreContext.ignore        = true;
-
-    orionldDefaultUrlContext.url     = ORIONLD_DEFAULT_URL_CONTEXT_URL;
-    orionldDefaultUrlContext.next    = NULL;
-    orionldDefaultUrlContext.tree    = NULL;
-    orionldDefaultUrlContext.type    = OrionldDefaultUrlContext;
-    orionldDefaultUrlContext.ignore  = true;
-
-    orionldDefaultContext.url        = ORIONLD_DEFAULT_CONTEXT_URL;
-    orionldDefaultContext.next       = NULL;
-    orionldDefaultContext.tree       = NULL;
-    orionldDefaultContext.type       = OrionldDefaultContext;
-    orionldDefaultContext.ignore     = true;
-
-    // Download the Core Context
-    while ((orionldCoreContext.tree == NULL) && (retries < 5))
-    {
-      orionldCoreContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_CORE_CONTEXT_URL, false, &details);
-      if (orionldCoreContext.tree != NULL)
-        break;
-
-      ++retries;
-      LM_E(("Error %d downloading Core Context %s: %s", retries, ORIONLD_CORE_CONTEXT_URL, details));
-    }
-
-    // Download the "Default URL" context
-    retries = 0;
-    while ((orionldDefaultUrlContext.tree == NULL) && (retries < 5))
-    {
-      orionldDefaultUrlContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_URL_CONTEXT_URL, false, &details);
-      if (orionldDefaultUrlContext.tree != NULL)
-        break;
-
-      ++retries;
-      LM_E(("Error %d downloading Default URI Context %s: %s", retries, ORIONLD_DEFAULT_URL_CONTEXT_URL, details));
-    }
-
-    // Download the "Default" context
-    retries = 0;
-
-    while ((orionldDefaultContext.tree == NULL) && (retries < 5))
-    {
-      orionldDefaultContext.tree = orionldContextDownloadAndParse(kjsonP, ORIONLD_DEFAULT_CONTEXT_URL, false, &details);
-
-      if (orionldDefaultContext.tree != NULL)
-        break;
-
-      ++retries;
-      LM_E(("Error %d downloading Default Context %s: %s", retries, ORIONLD_DEFAULT_CONTEXT_URL, details));
-    }
-  }
-
-  if ((orionldCoreContext.tree == NULL) || (orionldDefaultUrlContext.tree == NULL) || (orionldDefaultContext.tree == NULL))
-    LM_X(1, ("EXITING - Without default context, orionld cannot function - error downloading default context '%s': %s", ORIONLD_CORE_CONTEXT_URL, details));
-
-
-  // Adding the core context to the list of contexts
-  orionldContextListInsert(&orionldCoreContext, false);
-
-  // Adding the Default URL context to the list of contexts
-  orionldContextListInsert(&orionldDefaultUrlContext, false);
-
-  //
-  // Checking the "Default URL Context" and extracting the Default URL path.
-  //
-  KjNode* contextNodeP = orionldDefaultUrlContext.tree->value.firstChildP;
-
-  if (contextNodeP == NULL)
-    LM_X(1, ("Invalid Default URL Context - Empty JSON object"));
-
-  if (strcmp(contextNodeP->name, "@context") != 0)
-    LM_X(1, ("Invalid Default URL Context - first (and only) member must be called '@context'"));
-
-  if (contextNodeP->type != KjObject)
-    LM_X(1, ("Invalid Default URL Context - not a JSON object"));
-
-  if (contextNodeP->next != NULL)
-    LM_X(1, ("Invalid Default URL Context - '@context' must be the only member of the toplevel object"));
-
-  KjNode* vocabNodeP = contextNodeP->value.firstChildP;
-
-  if (strcmp(vocabNodeP->name, "@vocab") != 0)
-    LM_X(1, ("Invalid Default URL Context - first (and only) member of '@context' must be called '@vocab' - not '%s'", vocabNodeP->name));
-
-  if (vocabNodeP->type != KjString)
-    LM_X(1, ("Invalid Default URL Context - the member '@vocab' must be of 'String' type"));
-
-  orionldDefaultUrl    = strdup(vocabNodeP->value.s);
-  orionldDefaultUrlLen = strlen(orionldDefaultUrl);
-
-  if (urlCheck(orionldDefaultUrl, &details) == false)
-    LM_X(1, ("Invalid Default URL Context - the value (%s) of the only member '@vocab' must be a valid URL: %s", orionldDefaultUrl, details));
-
-  // Finally, get the hostname
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);
+
+  orionldStateInit();
+
+  //
+  // Initialize the @context handling
+  //
+  OrionldProblemDetails pd;
+
+  if (orionldContextInit(&pd) == false)
+    LM_X(1, ("orionldContextInit failed: %s %s", pd.title, pd.detail));
+
+
+  //
+  // Initialize NQTT notifications
+  //
+  mqttConnectionInit();
 }

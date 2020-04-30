@@ -53,11 +53,13 @@
 #ifdef ORIONLD
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode, kjValueType
+#include "kjson/KjNode.h"                                          // KjNode, kjValueType
+#include "kjson/kjLookup.h"                                        // kjLookup
 }
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/geoJsonCreate.h"                      // geoJsonCreate
+#include "orionld/common/orionldState.h"                           // orionldState
+#include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #endif
 
 #include "mongoBackend/connectionOperations.h"
@@ -754,7 +756,6 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
 
     toSet->append(effectiveName, newAttr.obj());
-    LM_TMP(("AppendAttributes: adding attribute '%s' to the 'toSet' collection (replace)", effectiveName.c_str()));
     toPush->append(caP->name);
   }
   else
@@ -772,7 +773,6 @@ static bool updateAttribute
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
       toSet->append(composedName, newAttr);
-      LM_TMP(("AppendAttributes: adding attribute '%s' (effectiveName: '%s') to the 'toSet' collection (NOT replace)", caP->name.c_str(), effectiveName.c_str()));
     }
   }
 
@@ -818,11 +818,8 @@ static bool appendAttribute
   {
     if (orionldState.uriParamOptions.noOverwrite == true)
     {
-      LM_TMP(("AppendAttributes: attribute '%s' already exists, and URI param noOverwrite is set so ... skipping",  caP->name.c_str()));
       return false;
     }
-
-    LM_TMP(("AppendAttributes: attribute '%s' already exists, so it is Updated", caP->name.c_str()));
 
     //
     // If updateAttribute fails, the name of the attribute caP is added to the list of erroneous attributes
@@ -872,6 +869,7 @@ static bool appendAttribute
 
   /* 4. Dates */
   int now = getCurrentTime();
+
   ab.append(ENT_ATTRS_CREATION_DATE, now);
   ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
@@ -1746,11 +1744,8 @@ static bool processOnChangeConditionForUpdateContext
          * notification (see deleteAttrInNotifyCer function for details) */
         if (caP->name == attrL[jx] && !caP->skip)
         {
-          LM_TMP(("AppendAttributes: adding attribute '%s' as it is NOT marked as skipped", caP->name.c_str()));
           cer.contextElement.contextAttributeVector.push_back(caP);
         }
-        else
-          LM_TMP(("AppendAttributes: not adding attribute '%s' as it is marked as skipped", caP->name.c_str()));
       }
     }
   }
@@ -2460,6 +2455,7 @@ static void updateAttrInNotifyCer
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
   int now = getCurrentTime();
+
   caP->creDate = now;
   caP->modDate = now;
 
@@ -2586,7 +2582,6 @@ static bool updateContextAttributeItem
 /* ****************************************************************************
 *
 * appendContextAttributeItem -
-*
 */
 static bool appendContextAttributeItem
 (
@@ -2782,7 +2777,6 @@ static bool processContextAttributeVector
 
     if (targetAttr->skip == true)
     {
-      LM_TMP(("AppendAttributes: skipping attribute '%s' as it is marked as skipped", targetAttr->name.c_str()));
       continue;
     }
 
@@ -2820,7 +2814,6 @@ static bool processContextAttributeVector
     }
     else if ((action == ActionTypeAppend) || (action == ActionTypeAppendStrict))
     {
-      LM_TMP(("AppendAttributes: action == %s for attribute '%s'", (action == ActionTypeAppend)? "Append" : "AppendStrict", targetAttr->name.c_str()));
       if (!appendContextAttributeItem(cerP,
                                       attrs,
                                       targetAttr,
@@ -2916,18 +2909,6 @@ static bool processContextAttributeVector
     return false;
   }
 
-#if 0
-  if (!entityModified)
-  {
-    /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
-     * do a 'continue' without setting it.
-     */
-
-    // FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
-
-    cerP->statusCode.fill(SccOk);
-  }
-#endif
 
   /* If the status code was not touched (filled with an error), then set it with Ok */
   if (cerP->statusCode.code == SccNone)
@@ -2943,7 +2924,6 @@ static bool processContextAttributeVector
 /* ****************************************************************************
 *
 * createEntity -
-*
 */
 static bool createEntity
 (
@@ -2962,8 +2942,11 @@ static bool createEntity
 
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
-   * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
-  ensureLocationIndex(tenant);
+   * exist (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
+
+  if (orionldState.apiVersion != NGSI_LD_V1)
+    ensureLocationIndex(tenant);
+
   ensureDateExpirationIndex(tenant);
 
   if (!legalIdUsage(attrsV))
@@ -2980,10 +2963,13 @@ static bool createEntity
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
+  if (orionldState.apiVersion != NGSI_LD_V1)
   {
-    // oe->fill() already managed by processLocationAtEntityCreation()
-    return false;
+    if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
+    {
+      // oe->fill() already managed by processLocationAtEntityCreation()
+      return false;
+    }
   }
 
   /* Search for a potential date expiration attribute */
@@ -3077,19 +3063,20 @@ static bool createEntity
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
 
 #ifdef ORIONLD
-  if (orionldState.overriddenCreationDate != 0)
-    insertedDoc.append(ENT_CREATION_DATE, (long long) orionldState.overriddenCreationDate);
+  KjNode* savedCreDateP;
+
+  if ((orionldState.creDatesP != NULL) && ((savedCreDateP = kjLookup(orionldState.creDatesP, eP->id.c_str())) != NULL))
+  {
+    eP->creDate = (double) savedCreDateP->value.i;
+    insertedDoc.append(ENT_CREATION_DATE, eP->creDate);
+  }
   else
     insertedDoc.append(ENT_CREATION_DATE, now);
-
-  if (orionldState.overriddenModificationDate != 0)
-    insertedDoc.append(ENT_MODIFICATION_DATE, (long long) orionldState.overriddenModificationDate);
-  else
-    insertedDoc.append(ENT_MODIFICATION_DATE, now);
 #else
   insertedDoc.append(ENT_CREATION_DATE, now);
-  insertedDoc.append(ENT_MODIFICATION_DATE, now);
 #endif
+
+  insertedDoc.append(ENT_MODIFICATION_DATE, now);
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
@@ -3098,24 +3085,6 @@ static bool createEntity
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
-  //
-  // Location attributes for NGSI-LD
-  //
-#ifdef ORIONLD
-  if (orionldState.locationAttributeP != NULL)
-  {
-    char* errorString;
-
-    if (geoJsonCreate(orionldState.locationAttributeP, &geoJson, &errorString) ==  false)
-    {
-      oeP->fill(SccReceiverInternalError, errorString, "InternalError");
-      return false;
-    }
-
-    insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << orionldState.locationAttributeP->name <<
-                                          ENT_LOCATION_COORDS   << geoJson.obj()));
-  }
-#endif
 
   /* Add date expiration in the case it was found */
   if (dateExpiration != NO_EXPIRATION_DATE)
@@ -3126,8 +3095,18 @@ static bool createEntity
   // Correlator (for notification loop detection logic)
   insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
 
+  if (orionldState.datasets != NULL)
+  {
+    mongo::BSONObj  datasetsObj;
+
+    mongoCppLegacyKjTreeToBsonObj(orionldState.datasets, &datasetsObj);
+    insertedDoc.append(orionldState.datasets->name, datasetsObj);
+  }
+
+
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
+    LM_E(("Internal Error (%s)", errDetail->c_str()));
     oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
   }
@@ -3385,14 +3364,10 @@ static void updateEntity
   //
   if (action == ActionTypeAppendStrict)
   {
-    LM_TMP(("AppendAttributes: append-only check"));
-
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
-      LM_TMP(("AppendAttributes: Checking attr '%s'", ceP->contextAttributeVector[ix]->name.c_str()));
       if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
       {
-        LM_TMP(("AppendAttributes: attribute '%s' already exists", ceP->contextAttributeVector[ix]->name.c_str()));
         alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
 
@@ -3401,7 +3376,6 @@ static void updateEntity
         // processContextAttributeVector looks at the 'skip' field
         //
         ceP->contextAttributeVector[ix]->skip = true;
-        LM_TMP(("AppendAttributes: marked attribute '%s' as skipped", ceP->contextAttributeVector[ix]->name.c_str()));
         // Add to the list of existing attributes - for the error response
         if (*attributeAlreadyExistsList != "[ ")
         {
@@ -3532,11 +3506,8 @@ static void updateEntity
   BSONArray       toPushArr   = toPush.arr();
   BSONArray       toPullArr   = toPull.arr();
 
-  LM_TMP(("AppendAttributes: here we actually touch mongo ..."));
-
   if (action == ActionTypeReplace)
   {
-    LM_TMP(("AppendAttributes: action == ActionTypeReplace"));
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
     int            now = getCurrentTime();
@@ -3565,7 +3536,6 @@ static void updateEntity
   }
   else
   {
-    LM_TMP(("AppendAttributes: action != ActionTypeReplace"));
     // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
     if (toSetObj.nFields() > 0)
     {
@@ -4012,6 +3982,7 @@ void processContextElement
 
       if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
+        LM_E(("Internal Error (createEntity failed)"));
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->oe is not filled, as createEntity() deals internally with that
       }
@@ -4053,7 +4024,7 @@ void processContextElement
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
-        // Set creaDate and modDate times
+        // Set creDate and modDate times
         notifyCerP->contextElement.entityId.creDate = now;
         notifyCerP->contextElement.entityId.modDate = now;
 

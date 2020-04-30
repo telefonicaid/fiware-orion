@@ -1,0 +1,149 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #310 - Arrays of one element are not reduced to a single item
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with an attribute with an array value with one single item
+# 02. GET the entity - see the single item array is no longer an array
+# 03. Repeat step 1, but with an @context that suppressed the array reduction
+# 04. Get the Entity from step 3 and make sure the array is intact
+#
+
+echo "01. Create an entity with an attribute with an array value with one single item"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Entity01",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": [ 12 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entity - see the single item array is no longer an array"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entity01
+echo
+echo
+
+
+echo "03. Repeat step 1, but with an @context that suppressed the array reduction"
+echo "==========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Entity02",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": [ 12 ]
+  },
+  "@context": {
+    "P1": {
+      "@id": "urn:ngsi-ld:attrs:P1",
+      "@type": "@set"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. Get the Entity from step 3 and make sure the array is intact"
+echo "================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Entity02
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with an attribute with an array value with one single item
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity01
+Date: REGEX(.*)
+
+
+
+02. GET the entity - see the single item array is no longer an array
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 77
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 12
+    },
+    "id": "urn:ngsi-ld:Entity01",
+    "type": "T1"
+}
+
+
+03. Repeat step 1, but with an @context that suppressed the array reduction
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity02
+Date: REGEX(.*)
+
+
+
+04. Get the Entity from step 3 and make sure the array is intact
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:Entity02",
+    "type": "T1",
+    "urn:ngsi-ld:attrs:P1": {
+        "type": "Property",
+        "value": [
+            12
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

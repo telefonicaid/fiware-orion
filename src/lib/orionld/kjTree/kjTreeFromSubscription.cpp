@@ -1,139 +1,50 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
+#include <strings.h>                                             // bzero
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
-#include "kjson/kjParse.h"                                     // kjParse
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjObject, kjString, kjBoolean, ...
+#include "kjson/kjParse.h"                                       // kjParse
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                // httpHeaderAdd, httpHeaderLinkAdd
-#include "apiTypesV2/Subscription.h"                           // Subscription
-#include "orionld/context/orionldContextLookup.h"              // orionldContextLookup
-#include "orionld/context/orionldAliasLookup.h"                // orionldAliasLookup
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultContext
-#include "orionld/common/numberToDate.h"                       // numberToDate
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate, OrionldInternalError
-#include "orionld/common/OrionldConnection.h"                  // orionldState
-#include "orionld/kjTree/kjTreeFromSubscription.h"             // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// qAliasCompress - replace long attr names to their corresponding aliases
-//
-// Possibilities:
-//   var
-//   !var
-//   var!=XXX
-//   var==XXX
-//   var<=XXX
-//   var>=XXX
-//   var>XXX
-//   var<XXX
-//
-static bool qAliasCompress(char* qString)
-{
-  char* cP       = qString;
-  char* varStart = qString;
-  char  out[512];
-  int   outIx = 0;
-  bool  insideVarName = true;
-
-  LM_TMP(("SUB: In qAliasCompress: '%s'", qString));
-  while (*cP != 0)
-  {
-    if (*cP == '!')
-    {
-      varStart = &cP[1];
-      out[outIx] = '!';
-      ++outIx;
-    }
-    else if (((cP[1] == '=') && ((cP[0] == '=') || (cP[0] == '!') || (cP[0] == '<') || (cP[0] == '>'))) || (cP[0] == '<') || (cP[0] == '>'))
-    {
-      char  savedCp0 = cP[0];
-      char* alias;
-      char* eqP;
-
-      cP[0] = 0;
-
-      LM_TMP(("SUB: Looking for alias for '%s'", varStart));
-
-      eqP = varStart;
-      while (*eqP != 0)
-      {
-        if (*eqP == '=')
-          *eqP = '.';
-        ++eqP;
-      }
-
-      alias = orionldAliasLookup(orionldState.contextP, varStart);
-
-      if (alias != NULL)
-      {
-        strcpy(&out[outIx], alias);
-        outIx += strlen(alias);
-      }
-      else
-      {
-        strcpy(&out[outIx], varStart);
-        outIx += strlen(varStart);
-      }
-
-      out[outIx++] = savedCp0;
-      if (cP[1] == '=')
-      {
-        out[outIx++] = cP[1];
-        ++cP;
-      }
-
-      insideVarName = false;
-    }
-    else if (*cP == ';')
-    {
-      insideVarName = true;
-      out[outIx++] = ';';
-    }
-    else if (insideVarName == false)
-    {
-      out[outIx++] = *cP;
-    }
-
-    ++cP;
-  }
-
-  out[outIx] = 0;
-  strcpy(qString, out);
-  LM_TMP(("SUB: From qAliasCompress: '%s'", qString));
-  return true;
-}
+#include "apiTypesV2/Subscription.h"                             // Subscription
+#include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/qAliasCompact.h"                        // qAliasCompact
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
+#include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeFromSubscription.h"               // Own interface
 
 
 
@@ -179,16 +90,15 @@ void coordinateTransform(const char* geometry, char* to, int toLen, char* from)
 //
 // kjTreeFromSubscription -
 //
-KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscriptionP)
+KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
 {
   KjNode*          topP = kjObject(orionldState.kjsonP, NULL);
   KjNode*          objectP;
   KjNode*          arrayP;
   KjNode*          nodeP;
-  bool             watchedAttributesPresent = false;
   unsigned int     size;
   unsigned int     ix;
-  OrionldContext*  contextP = orionldContextLookup(subscriptionP->ldContext.c_str());
+  OrionldContext*  contextP = orionldContextCacheLookup(subscriptionP->ldContext.c_str());
 
   // id
   nodeP = kjString(orionldState.kjsonP, "id", subscriptionP->id.c_str());
@@ -233,13 +143,13 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
         kjChildAdd(objectP, nodeP);
       }
 
-      if (eP->idPattern != "")
+      if ((eP->idPattern != "") && (eP->idPattern != ".*"))
       {
         nodeP = kjString(orionldState.kjsonP, "idPattern", eP->idPattern.c_str());
         kjChildAdd(objectP, nodeP);
       }
 
-      char* alias = orionldAliasLookup(contextP, eP->type.c_str());
+      char* alias = orionldContextItemAliasLookup(contextP, eP->type.c_str(), NULL, NULL);
 
       nodeP = kjString(orionldState.kjsonP, "type", alias);
       kjChildAdd(objectP, nodeP);
@@ -253,13 +163,13 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   size = subscriptionP->subject.condition.attributes.size();
   if (size > 0)
   {
-    watchedAttributesPresent = true;
+    // watchedAttributesPresent = true;
     arrayP = kjArray(orionldState.kjsonP, "watchedAttributes");
 
     for (ix = 0; ix < size; ix++)
     {
       char* attrName = (char*) subscriptionP->subject.condition.attributes[ix].c_str();
-      char* alias    = orionldAliasLookup(contextP, attrName);
+      char* alias    = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
@@ -268,22 +178,11 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   }
 
 
-  // timeInterval - FIXME: Implement?
-  if (watchedAttributesPresent == false)
+  // timeInterval (it's not in use ...)
+  if ((subscriptionP->timeInterval != -1) && (subscriptionP->timeInterval != 0))
   {
-#if 0
-    char*            details;
-    char             date[64];
-
-    if (numberToDate((time_t) subscriptionP->timeInterval, date, sizeof(date), &details) == false)
-    {
-      LM_E(("Error creating a stringified date for 'timeInterval'"));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified date", details, OrionldDetailsEntity);
-      return NULL;
-    }
-    nodeP = kjString(orionldState.kjsonP, "timeInterval", date);
+    nodeP = kjInteger(orionldState.kjsonP, "timeInterval", subscriptionP->timeInterval);
     kjChildAdd(topP, nodeP);
-#endif
   }
 
 
@@ -292,7 +191,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
   if (q[0] != 0)
   {
     nodeP = kjString(orionldState.kjsonP, "q", q);
-    qAliasCompress(nodeP->value.s);
+    qAliasCompact(nodeP, true);
     kjChildAdd(topP, nodeP);
   }
 
@@ -324,7 +223,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
       if (coordValueP == NULL)
       {
         LM_E(("error parsing coordinates: '%s'", coordinateString));
-        orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to parse coordinates string", coordinateString, OrionldDetailsEntity);
+        orionldErrorResponseCreate(OrionldInternalError, "Unable to parse coordinates string", coordinateString);
         return NULL;
       }
 
@@ -341,18 +240,42 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     nodeP = kjString(orionldState.kjsonP, "georel", subscriptionP->subject.condition.expression.georel.c_str());
     kjChildAdd(objectP, nodeP);
 
-    // FIXME: geoproperty not supported for now
+    if ( subscriptionP->subject.condition.expression.geoproperty != "")
+    {
+      nodeP = kjString(orionldState.kjsonP, "geoproperty", subscriptionP->subject.condition.expression.geoproperty.c_str());
+      kjChildAdd(objectP, nodeP);
+    }
+
     kjChildAdd(topP, objectP);
   }
 
-  // csf - FIXME: Implement!
+  // csf
+  if (subscriptionP->csf != "")
+  {
+    nodeP = kjString(orionldState.kjsonP, "csf", subscriptionP->csf.c_str());
+    kjChildAdd(topP, nodeP);
+  }
 
   // isActive
   bool isActive = (subscriptionP->status == "active")? true : false;
-
   if (isActive == false)
   {
-    nodeP = kjBoolean(orionldState.kjsonP, "isActive", isActive);
+    nodeP = kjBoolean(orionldState.kjsonP, "isActive", false);
+    kjChildAdd(topP, nodeP);
+  }
+
+  // status
+  time_t now    = time(NULL);
+  char*  status = NULL;
+
+  if (subscriptionP->expires < now)
+    status = (char*) "expired";
+  else if (subscriptionP->status != "active")
+    status = (char*) "paused";
+
+  if (status != NULL)
+  {
+    nodeP = kjString(orionldState.kjsonP, "status", status);
     kjChildAdd(topP, nodeP);
   }
 
@@ -367,7 +290,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     for (ix = 0; ix < size; ++ix)
     {
       char* attrName = (char*) subscriptionP->notification.attributes[ix].c_str();
-      char* alias    = orionldAliasLookup(contextP, attrName);
+      char* alias    = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
       nodeP = kjString(orionldState.kjsonP, NULL, alias);
       kjChildAdd(arrayP, nodeP);
@@ -438,7 +361,7 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     if (numberToDate((time_t) subscriptionP->expires, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'expires'"));
-      orionldErrorResponseCreate(ciP, OrionldInternalError, "Unable to create a stringified expires date", details, OrionldDetailsEntity);
+      orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", details);
       return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "expires", date);
@@ -452,20 +375,13 @@ KjNode* kjTreeFromSubscription(ConnectionInfo* ciP, ngsiv2::Subscription* subscr
     kjChildAdd(topP, nodeP);
   }
 
-  // status
-  if (subscriptionP->status != "active")
-  {
-    nodeP = kjString(orionldState.kjsonP, "status", subscriptionP->status.c_str());
-    kjChildAdd(topP, nodeP);
-  }
-
   // @context - in payload if Mime Type is application/ld+json, else in Link header
   if (orionldState.acceptJsonld)
   {
     if (subscriptionP->ldContext != "")
       nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());
     else
-      nodeP = kjString(orionldState.kjsonP, "@context", orionldDefaultContext.url);
+      nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContextP->url);
 
     kjChildAdd(topP, nodeP);
   }

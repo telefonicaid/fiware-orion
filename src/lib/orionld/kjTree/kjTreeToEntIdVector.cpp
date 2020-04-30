@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -32,7 +32,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/EntID.h"                                  // EntID
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECKx(U)
@@ -40,7 +39,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // Own interface
 
 
@@ -54,7 +53,7 @@ extern "C"
 // - idPattern
 // - type
 //
-bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
+bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
 {
   KjNode* entityP;
 
@@ -62,7 +61,7 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
   {
     if (entityP->type != KjObject)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "EntityInfo array member not a JSON Object", NULL);
       return false;
     }
 
@@ -90,20 +89,20 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
       }
       else
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unknown EntityInfo field", itemP->name, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown EntityInfo field", itemP->name);
         return false;
       }
     }
 
     if ((idP == NULL) && (idPatternP == NULL) && (typeP == NULL))
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Empty EntityInfo object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Empty EntityInfo object", NULL);
       return false;
     }
 
     if ((idP != NULL) && (idPatternP != NULL))
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Both 'id' and 'idPattern' given in EntityInfo object", NULL);
       return false;
     }
 
@@ -114,34 +113,24 @@ bool kjTreeToEntIdVector(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<ngsiv2
 
       if ((urlCheck(idP, &details) == false) && (urnCheck(idP, &details) == false))
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity ID", details, OrionldDetailsString);
-        ciP->httpStatusCode = SccBadRequest;
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details);
+        orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
     }
 
     if (typeP == NULL)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Missing field in EntityInfo object", "type", OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Missing field in EntityInfo object", "type");
       return false;
     }
-
-    char  typeExpanded[256];
-    char* details;
-
-    if (orionldUriExpand(orionldState.contextP, typeP, typeExpanded, sizeof(typeExpanded), &details) == false)
-    {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
-      return false;
-    }
-    typeP = typeExpanded;
 
     ngsiv2::EntID entityInfo;
 
     if (idP)        entityInfo.id        = idP;
     if (idPatternP) entityInfo.idPattern = idPatternP;
-    if (typeP)      entityInfo.type      = typeP;
 
+    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, NULL, true, NULL);
     entitiesP->push_back(entityInfo);
   }
 

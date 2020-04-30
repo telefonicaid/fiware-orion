@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -73,6 +73,7 @@
 extern "C"
 {
 #include "kalloc/kaBufferReset.h"                           // kaBufferReset
+#include "kjson/kjFree.h"                                   // kjFree
 }
 
 #include "parseArgs/parseArgs.h"
@@ -107,8 +108,11 @@ extern "C"
 #include "metricsMgr/metricsMgr.h"
 #include "logSummary/logSummary.h"
 
-#include "orionld/common/OrionldConnection.h"               // kjFree - FIXME: call instead orionldGlobalFree();
+#include "orionld/common/orionldState.h"                    // orionldStateRelease, kalloc, ...
+#include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
+#include "orionld/db/dbInit.h"                              // dbInit
+#include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -144,8 +148,8 @@ int             port;
 char            dbHost[64];
 char            rplSet[64];
 char            dbName[64];
-char            user[64];
-char            pwd[64];
+char            dbUser[64];
+char            dbPwd[64];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -153,7 +157,7 @@ bool            useOnlyIPv6;
 char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
-bool            mtenant;
+bool            multitenancy;
 char            rush[256];
 char            allowedOrigin[64];
 int             maxAge;
@@ -185,7 +189,9 @@ bool            disableMetrics;
 int             reqTimeout;
 bool            insecureNotif;
 bool            ngsiv1Autocast;
-
+int             contextDownloadAttempts;
+int             contextDownloadTimeout;
+bool            temporal;
 
 
 
@@ -198,6 +204,8 @@ bool            ngsiv1Autocast;
 #define LOCALHOST              _i "localhost"
 #define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
+#define CTX_TMO_DESC           "Timeout in milliseconds for downloading of contexts"
+#define CTX_ATT_DESC           "Number of attempts for downloading of contexts"
 #define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
 #define PORT_DESC              "port to receive new connections"
@@ -245,6 +253,7 @@ bool            ngsiv1Autocast;
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
+#define TEMPORAL_DESC          "enable temporal evolution of entities"
 
 
 
@@ -259,64 +268,54 @@ bool            ngsiv1Autocast;
 */
 PaArgument paArgs[] =
 {
-  { "-fg",            &fg,           "FOREGROUND",     PaBool,   PaOpt, false,      false,  true,  FG_DESC            },
-  { "-localIp",       bindAddress,   "LOCALIP",        PaString, PaOpt, IP_ALL,     PaNL,   PaNL,  LOCALIP_DESC       },
-  { "-port",          &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
-  { "-pidpath",       pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
-
-  { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
-  { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
-  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
-  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
-  { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
-  { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
-  { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
-
-  { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
-  { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
-  { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
-
-  { "-https",         &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
-  { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
-  { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
-
-  { "-rush",          rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
-  { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
-
-  { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt,  0,          0,     PaNL,  REQ_TMO_DESC       },
-  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
-
-  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
-  { "-corsMaxAge",       &maxAge,           "CORS_MAX_AGE",      PaInt,    PaOpt, 86400,          -1,    86400,    CORS_MAX_AGE_DESC      },
-  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,              0,     3600,     SUB_CACHE_IVAL_DESC    },
-  { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
-  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 1020,           1,     PaNL,     MAX_CONN_DESC          },
-  { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
-
-  { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
-  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
-
-  { "-statCounters",   &statCounters,   "STAT_COUNTERS",    PaBool, PaOpt, false, false, true, STAT_COUNTERS     },
-  { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
-  { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
-  { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
-
-  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,  PaOpt, 0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
-  { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
-
-  { "-strictNgsiv1Ids",             &strictIdv1,      "CHECK_ID_V1",           PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC      },
-  { "-disableCustomNotifications",  &disableCusNotif, "DISABLE_CUSTOM_NOTIF",  PaBool, PaOpt, false, false, true, DISABLE_CUSTOM_NOTIF  },
-
-  { "-logForHumans",   &logForHumans,    "LOG_FOR_HUMANS",     PaBool, PaOpt, false, false, true,             LOG_FOR_HUMANS_DESC },
-  { "-disableMetrics", &disableMetrics,  "DISABLE_METRICS",    PaBool, PaOpt, false, false, true,             METRICS_DESC        },
-
-  { "-insecureNotif", &insecureNotif, "INSECURE_NOTIF", PaBool, PaOpt, false, false, true, INSECURE_NOTIF },
-
-  { "-ngsiv1Autocast", &ngsiv1Autocast, "NGSIV1_AUTOCAST", PaBool, PaOpt, false, false, true, NGSIV1_AUTOCAST },
+  { "-fg",                    &fg,                      "FOREGROUND",                PaBool,    PaOpt,  false,           false,  true,             FG_DESC                },
+  { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC           },
+  { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            PaNL,   PaNL,             PORT_DESC              },
+  { "-pidpath",               pidPath,                  "PID_PATH",                  PaString,  PaOpt,  PIDPATH,         PaNL,   PaNL,             PIDPATH_DESC           },
+  { "-dbhost",                dbHost,                   "DB_HOST",                   PaString,  PaOpt,  LOCALHOST,       PaNL,   PaNL,             DBHOST_DESC            },
+  { "-rplSet",                rplSet,                   "RPL_SET",                   PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RPLSET_DESC            },
+  { "-dbuser",                dbUser,                   "DB_USER",                   PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBUSER_DESC            },
+  { "-dbpwd",                 dbPwd,                    "DB_PASSWORD",               PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBPASSWORD_DESC        },
+  { "-db",                    dbName,                   "DB",                        PaString,  PaOpt,  _i "orion",      PaNL,   PaNL,             DB_DESC                },
+  { "-dbTimeout",             &dbTimeout,               "DB_TIMEOUT",                PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC            },
+  { "-dbPoolSize",            &dbPoolSize,              "DB_POOL_SIZE",              PaInt,     PaOpt,  10,              1,      10000,            DBPS_DESC              },
+  { "-ipv4",                  &useOnlyIPv4,             "USEIPV4",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV4_DESC           },
+  { "-ipv6",                  &useOnlyIPv6,             "USEIPV6",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV6_DESC           },
+  { "-harakiri",              &harakiri,                "HARAKIRI",                  PaBool,    PaHid,  false,           false,  true,             HARAKIRI_DESC          },
+  { "-https",                 &https,                   "HTTPS",                     PaBool,    PaOpt,  false,           false,  true,             HTTPS_DESC             },
+  { "-key",                   httpsKeyFile,             "HTTPS_KEYFILE",             PaString,  PaOpt,  _i "",           PaNL,   PaNL,             HTTPSKEYFILE_DESC      },
+  { "-cert",                  httpsCertFile,            "HTTPS_CERTFILE",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             HTTPSCERTFILE_DESC     },
+  { "-rush",                  rush,                     "RUSH",                      PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RUSH_DESC              },
+  { "-multiservice",          &multitenancy,            "MULTI_SERVICE",             PaBool,    PaOpt,  false,           false,  true,             MULTISERVICE_DESC      },
+  { "-httpTimeout",           &httpTimeout,             "HTTP_TIMEOUT",              PaLong,    PaOpt,  -1,              -1,     MAX_L,            HTTP_TMO_DESC          },
+  { "-reqTimeout",            &reqTimeout,              "REQ_TIMEOUT",               PaLong,    PaOpt,   0,              0,      PaNL,             REQ_TMO_DESC           },
+  { "-reqMutexPolicy",        reqMutexPolicy,           "MUTEX_POLICY",              PaString,  PaOpt,  _i "all",        PaNL,   PaNL,             MUTEX_POLICY_DESC      },
+  { "-writeConcern",          &writeConcern,            "WRITE_CONCERN",             PaInt,     PaOpt,  1,               0,      1,                WRITE_CONCERN_DESC     },
+  { "-corsOrigin",            allowedOrigin,            "ALLOWED_ORIGIN",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             ALLOWED_ORIGIN_DESC    },
+  { "-corsMaxAge",            &maxAge,                  "CORS_MAX_AGE",              PaInt,     PaOpt,  86400,           -1,     86400,            CORS_MAX_AGE_DESC      },
+  { "-cprForwardLimit",       &cprForwardLimit,         "CPR_FORWARD_LIMIT",         PaUInt,    PaOpt,  1000,            0,      UINT_MAX,         CPR_FORWARD_LIMIT_DESC },
+  { "-subCacheIval",          &subCacheInterval,        "SUBCACHE_IVAL",             PaInt,     PaOpt,  0,               0,      3600,             SUB_CACHE_IVAL_DESC    },
+  { "-noCache",               &noCache,                 "NOCACHE",                   PaBool,    PaOpt,  false,           false,  true,             NO_CACHE               },
+  { "-connectionMemory",      &connectionMemory,        "CONN_MEMORY",               PaUInt,    PaOpt,  64,              0,      1024,             CONN_MEMORY_DESC       },
+  { "-maxConnections",        &maxConnections,          "MAX_CONN",                  PaUInt,    PaOpt,  1020,            1,      PaNL,             MAX_CONN_DESC          },
+  { "-reqPoolSize",           &reqPoolSize,             "TRQ_POOL_SIZE",             PaUInt,    PaOpt,  0,               0,      1024,             REQ_POOL_SIZE          },
+  { "-notificationMode",      &notificationMode,        "NOTIF_MODE",                PaString,  PaOpt,  _i "transient",  PaNL,   PaNL,             NOTIFICATION_MODE_DESC },
+  { "-simulatedNotification", &simulatedNotification,   "DROP_NOTIF",                PaBool,    PaOpt,  false,           false,  true,             SIMULATED_NOTIF_DESC   },
+  { "-statCounters",          &statCounters,            "STAT_COUNTERS",             PaBool,    PaOpt,  false,           false,  true,             STAT_COUNTERS          },
+  { "-statSemWait",           &statSemWait,             "STAT_SEM_WAIT",             PaBool,    PaOpt,  false,           false,  true,             STAT_SEM_WAIT          },
+  { "-statTiming",            &statTiming,              "STAT_TIMING",               PaBool,    PaOpt,  false,           false,  true,             STAT_TIMING            },
+  { "-statNotifQueue",        &statNotifQueue,          "STAT_NOTIF_QUEUE",          PaBool,    PaOpt,  false,           false,  true,             STAT_NOTIF_QUEUE       },
+  { "-logSummary",            &lsPeriod,                "LOG_SUMMARY_PERIOD",        PaInt,     PaOpt,  0,               0,      ONE_MONTH_PERIOD, LOG_SUMMARY_DESC       },
+  { "-relogAlarms",           &relogAlarms,             "RELOG_ALARMS",              PaBool,    PaOpt,  false,           false,  true,             RELOGALARMS_DESC       },
+  { "-strictNgsiv1Ids",       &strictIdv1,              "CHECK_ID_V1",               PaBool,    PaOpt,  false,           false,  true,             CHECK_v1_ID_DESC       },
+  { "-disableCustomNotifications",  &disableCusNotif,   "DISABLE_CUSTOM_NOTIF",      PaBool,    PaOpt,  false,           false,  true,             DISABLE_CUSTOM_NOTIF   },
+  { "-logForHumans",          &logForHumans,            "LOG_FOR_HUMANS",            PaBool,    PaOpt,  false,           false,  true,             LOG_FOR_HUMANS_DESC    },
+  { "-disableMetrics",        &disableMetrics,          "DISABLE_METRICS",           PaBool,    PaOpt,  false,           false,  true,             METRICS_DESC           },
+  { "-insecureNotif",         &insecureNotif,           "INSECURE_NOTIF",            PaBool,    PaOpt,  false,           false,  true,             INSECURE_NOTIF         },
+  { "-ngsiv1Autocast",        &ngsiv1Autocast,          "NGSIV1_AUTOCAST",           PaBool,    PaOpt,  false,           false,  true,             NGSIV1_AUTOCAST        },
+  { "-ctxTimeout",            &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,     PaOpt,  5000,            0,      20000,            CTX_TMO_DESC           },
+  { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC           },
+  { "-temporal",              &temporal,                "TEMPORAL",                  PaBool,    PaOpt,  false,           false,  true,             TEMPORAL_DESC          },
 
   PA_END_OF_ARGS
 };
@@ -513,6 +512,13 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
+  orionldStateRelease();
+
+  //
+  // Contexts that have been cloned must be freed
+  //
+  orionldContextCacheRelease();
+
   exit(code);
 }
 
@@ -543,6 +549,14 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  //
+  // Free the context cache ?
+  // Or, is freeing up the global KAlloc instance sufficient ... ?
+  //
+
+  //
+  // Free the kalloc buffer
+  //
   kaBufferReset(&kalloc, false);
 
   if (unlink(pidPath) != 0)
@@ -550,12 +564,12 @@ void exitFunc(void)
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
   }
 
-  if ((orionldState.contextP != NULL) && (orionldState.contextP->temporary == true))
-  {
-    free(orionldState.contextP->url);
-    free(orionldState.contextP);
-    orionldState.contextP = NULL;
-  }
+  // Free the tenant list
+  for (unsigned int ix = 0; ix < tenants; ix++)
+    free(tenantV[ix]);
+
+  // Disconnect from all MQTT btokers and free the connections
+  mqttRelease();
 }
 
 
@@ -566,8 +580,9 @@ void exitFunc(void)
 */
 const char* description =
   "\n"
-  "Orion context broker version details:\n"
-  "  version:            " ORION_VERSION   "\n"
+  "Orion-LD context broker version details:\n"
+  "  orionld version:    " ORIONLD_VERSION "\n"
+  "  orion version:      " ORION_VERSION   "\n"
   "  git hash:           " GIT_HASH        "\n"
   "  compile time:       " COMPILE_TIME    "\n"
   "  compiled by:        " COMPILED_BY     "\n"
@@ -830,7 +845,7 @@ int main(int argC, char* argV[])
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
-  paConfig("man author",                    (void*) "Telefonica I+D");
+  paConfig("man author",                    (void*) "Telefonica I+D and FIWARE Foundation");
   paConfig("man version",                   (void*) versionString.c_str());
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
@@ -867,6 +882,19 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+
+  //
+  // Set portNo
+  //
+  portNo = port;
+
+
+  //
+  // Set global variables from the arguments
+  //
+  dbNameLen = strlen(dbName);
+
 
   //
   // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
@@ -925,17 +953,6 @@ int main(int argC, char* argV[])
     daemonize();
   }
 
-  //
-  // Get host name
-  //
-  char hname[128];
-  gethostname(hname, sizeof(hname));
-  hostname = hname;
-
-  //
-  // Set portNo
-  //
-  portNo = port;
 
   if ((s = pidFile(false)) != 0)
   {
@@ -954,20 +971,17 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  IpVersion    ipVersion        = IPDUAL;
+  IpVersion ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
-  {
     ipVersion = IPV4;
-  }
   else if (useOnlyIPv6)
-  {
     ipVersion = IPV6;
-  }
 
   SemOpType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+
+  mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
@@ -990,7 +1004,7 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
-    subCacheInit(mtenant);
+    subCacheInit(multitenancy);
 
     if (subCacheInterval == 0)
     {
@@ -1013,7 +1027,7 @@ int main(int argC, char* argV[])
   // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
   // Otherwise, we have empirically checked that CB may randomly crash
   //
-  contextBrokerInit(dbName, mtenant);
+  contextBrokerInit(dbName, multitenancy);
 
 
   //
@@ -1027,7 +1041,12 @@ int main(int argC, char* argV[])
   // Actually, another interesting usage is that a functional test case could create a context before starting the broker and
   // use that conext during the test.
   //
+
+  //
+  // Initialize orionld
+  //
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
+  dbInit(dbHost, dbName);
 
   if (https)
   {
@@ -1049,7 +1068,7 @@ int main(int argC, char* argV[])
     orionRestServicesInit(ipVersion,
                           bindAddress,
                           port,
-                          mtenant,
+                          multitenancy,
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
@@ -1060,7 +1079,7 @@ int main(int argC, char* argV[])
                           reqTimeout,
                           httpsPrivateServerKey,
                           httpsCertificate);
-    
+
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
@@ -1069,7 +1088,7 @@ int main(int argC, char* argV[])
     orionRestServicesInit(ipVersion,
                           bindAddress,
                           port,
-                          mtenant,
+                          multitenancy,
                           connectionMemory,
                           maxConnections,
                           reqPoolSize,
@@ -1082,15 +1101,13 @@ int main(int argC, char* argV[])
                           NULL);
   }
 
-  // orionldServiceInitPresent();
-  
   LM_I(("Startup completed"));
   if (simulatedNotification)
   {
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_F(("Initialization Ready - Accepting Requests on Port %d", port));
+  LM_TMP(("Initialization ready - accepting requests on port %d", port));
 
   while (1)
   {

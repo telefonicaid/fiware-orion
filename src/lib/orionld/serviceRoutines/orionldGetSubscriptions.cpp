@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -58,9 +58,9 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
 
   mongoGetLdSubscriptions(ciP, &subVec, orionldState.tenant, (long long*) &count, &oe);
 
-  if ((ciP->uriParamOptions["count"]))
+  if (orionldState.uriParams.count == true)
   {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeader.push_back("NGSILD-Results-Count");
     ciP->httpHeaderValue.push_back(toString(count));
   }
 
@@ -68,7 +68,7 @@ bool orionldGetSubscriptions(ConnectionInfo* ciP)
 
   for (unsigned int ix = 0; ix < subVec.size(); ix++)
   {
-    KjNode* subscriptionNodeP = kjTreeFromSubscription(ciP, &subVec[ix]);
+    KjNode* subscriptionNodeP = kjTreeFromSubscription(&subVec[ix]);
 
     kjChildAdd(orionldState.responseTree, subscriptionNodeP);
   }

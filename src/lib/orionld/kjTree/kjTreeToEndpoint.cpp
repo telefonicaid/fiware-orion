@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "apiTypesV2/HttpInfo.h"                               // HttpInfo
 
 #include "orionld/common/CHECK.h"                              // CHECKx()
@@ -39,6 +38,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/mqtt/mqttCheck.h"                            // mqttCheck
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // Own interface
 
 
@@ -47,11 +47,11 @@ extern "C"
 //
 // kjTreeToEndpoint -
 //
-bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
+bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
 {
   char* uriP    = NULL;
   char* acceptP = NULL;
-  char* details;
+  char* detail;
 
   // Set default values
   httpInfoP->mimeType = JSON;
@@ -63,9 +63,19 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
       DUPLICATE_CHECK(uriP, "Endpoint::uri", itemP->value.s);
       STRING_CHECK(itemP, "Endpoint::uri");
 
-      if (!urlCheck(uriP, &details) && !urnCheck(uriP, &details))
+      if (strncmp(uriP, "mqtt://", 7) == 0)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is neither a URL nor a URN", OrionldDetailsString);
+        if (mqttCheck(uriP, &detail) == false)
+        {
+          LM_W(("Bad Input (endpoint is not a valid MQTT endpoint)"));
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid MQTT endpoint");
+          return false;
+        }
+      }
+      else if (!urlCheck(uriP, &detail) && !urnCheck(uriP, &detail))
+      {
+        LM_W(("Bad Input (endpoint is not a valid URI)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::uri", "Endpoint is not a valid URI");
         return false;
       }
 
@@ -79,7 +89,7 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
 
       if (!SCOMPARE12(mimeType, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", mimeType);
         return false;
       }
 
@@ -91,20 +101,20 @@ bool kjTreeToEndpoint(ConnectionInfo* ciP, KjNode* kNodeP, ngsiv2::HttpInfo* htt
         httpInfoP->mimeType = JSONLD;
       else
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, OrionldDetailsString);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s);
         return false;
       }
     }
     else
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Unrecognized field in Endpoint", itemP->name);
       return false;
     }
   }
 
   if (uriP == NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Endpoint::uri");
     return false;
   }
 

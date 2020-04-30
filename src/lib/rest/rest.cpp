@@ -35,6 +35,7 @@
 extern "C"
 {
 #include "kalloc/kaBufferReset.h"                                // kaBufferReset
+#include "kjson/kjFree.h"                                        // kjFree
 }
 
 #include "logMsg/logMsg.h"
@@ -56,10 +57,12 @@ extern "C"
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/rest/orionldMhdConnectionInit.h"
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"
 #include "orionld/rest/orionldMhdConnectionTreat.h"
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
 #endif
 
 #include "rest/Verb.h"
@@ -134,8 +137,6 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
 
-  LM_TMP(("URI PARAM: '%s': '%s'", ckey, val));
-
   if ((val == NULL) || (*val == 0))
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
@@ -145,11 +146,19 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Empty right-hand-side for URI param", ckey);
+#endif
     }
     else if (ciP->apiVersion == ADMIN_API)
     {
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Error in URI param", errorString.c_str());
+#endif
     }
 
     return MHD_YES;
@@ -169,6 +178,10 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = error.code;
         ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /offset/", "must be an integer value >= 0");
+#endif
         return MHD_YES;
       }
 
@@ -186,6 +199,12 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
         OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = error.code;
         ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+        LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1");
+        orionldState.httpStatusCode = SccBadRequest;
+#endif
         return MHD_YES;
       }
 
@@ -198,13 +217,22 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [max: " + MAX_PAGINATION_LIMIT + "]");
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+        LM_E(("Invalid value for URI parameter 'limit': '%s'", val));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
+        orionldState.httpStatusCode = SccBadRequest;
+#endif
       return MHD_YES;
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
-      ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      if (orionldState.apiVersion != NGSI_LD_V1)
+      {
+        OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
+        ciP->httpStatusCode = error.code;
+        ciP->answer         = error.smartRender(ciP->apiVersion);
+      }
       return MHD_YES;
     }
   }
@@ -215,6 +243,10 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
       OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for /details/ - accepted: /on/, /ON/, /off/, /OFF/. Default is /off/", val);
+#endif
       return MHD_YES;
     }
   }
@@ -235,8 +267,14 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
     if (uriParamOptionsParse(ciP, val) != 0)
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+
+      LM_W(("Bad Input (Invalid value for URI param /options/)"));
       ciP->httpStatusCode = error.code;
       ciP->answer         = error.smartRender(ciP->apiVersion);
+
+#ifdef ORIONLD
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /options/", val);
+#endif
     }
   }
   else if (key == URI_PARAM_TYPE)
@@ -310,6 +348,9 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
+#ifdef ORIONLD
+    orionldErrorResponseCreate(OrionldBadRequestData, "found a forbidden character in URI param", key.c_str());
+#endif
     alarmMgr.badInput(clientIp, details);
     ciP->httpStatusCode = error.code;
     ciP->answer         = error.smartRender(ciP->apiVersion);
@@ -547,7 +588,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   HttpHeaders*     headerP = &ciP->httpHeaders;
   std::string      key     = ckey;
 
-  LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", key.c_str(), value));
+  LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", ckey, value));
 
   if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
   else if (strcasecmp(key.c_str(), HTTP_HOST) == 0)              headerP->host           = value;
@@ -575,8 +616,17 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
     orionldState.tenant = (char*) value;
 #endif
     headerP->tenant = value;
+    ciP->tenant     = value;
     toLowercase((char*) headerP->tenant.c_str());
   }
+#ifdef ORIONLD
+  else if (strcasecmp(ckey, "NGSILD-Tenant") == 0)
+  {
+    orionldState.tenant = (char*) value;
+  }
+  else if (strcasecmp(ckey, "NGSILD-Path") == 0)
+    orionldState.servicePath = (char*) value;
+#endif
   else if (strcasecmp(key.c_str(), HTTP_X_AUTH_TOKEN) == 0)        headerP->xauthToken         = value;
   else if (strcasecmp(key.c_str(), HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
   else if (strcasecmp(key.c_str(), HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
@@ -586,11 +636,15 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
+#ifdef ORIONLD
+    orionldState.servicePath = (char*) value;
+#endif
   }
 #ifdef ORIONLD
   else if (strcasecmp(key.c_str(), HTTP_LINK) == 0)
   {
-    orionldState.link = (char*) value;
+    orionldState.link                  = (char*) value;
+    orionldState.linkHttpHeaderPresent = true;
   }
 #endif
   else
@@ -636,7 +690,8 @@ static void requestCompleted
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
-  LM_TMP(("IN requestCompleted"));
+  if (orionldState.notify == true)
+    orionldNotify();
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
@@ -726,10 +781,12 @@ static void requestCompleted
 
 #ifdef ORIONLD
   kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
+
+  if ((orionldState.responseTree != NULL) && (orionldState.kjsonP == NULL))
+    kjFree(orionldState.responseTree);
 #endif
 
   *con_cls = NULL;
-  LM_TMP(("FROM requestCompleted"));
 }
 
 
@@ -1226,6 +1283,12 @@ ConnectionInfo* connectionTreatInit
 {
   struct timeval   transactionStart;
   ConnectionInfo*  ciP;
+
+  //
+  // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
+  //
+  orionldState.responseTree = NULL;
+  orionldState.notify       = false;
 
   *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 

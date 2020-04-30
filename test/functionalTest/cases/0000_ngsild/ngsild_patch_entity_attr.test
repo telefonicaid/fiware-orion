@@ -1,0 +1,218 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity attribute using PATCH
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+#
+# 01. Create an entity E1 with properties attr_A1 and attr_A2
+# 02. Update the E1 property attr_A1
+# 03. GET the entity E1, make sure that the attr_A1 value was changed  (attrs as long name)
+# 04. Create an entity E2 with relationship attr_A3
+# 05. Update the E2 relashionship attr_A3
+# 06. GET the entity E2, make sure that the attr_A3 value was changed  (attrs as short name)
+#
+
+echo "01. Create an entity E1 with properties attr_A1 and attr_A2"
+echo "==========================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "attr_A1": {
+    "type": "Property",
+    "value": "Attribute 1"
+  },
+  "attr_A2": {
+    "type": "Property",
+    "value": "Attribute 2"
+  },
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    {
+      "attr_A1": "http://a.b.c/A1",
+      "attr_A2": "http://a.b.c/A2",
+      "type_T": "http://a.b.c/T"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. Update the E1 property attr_A1"
+echo "=================================="
+payload='{
+  "@context": [
+    {
+      "attr_A1": "http://a.b.c/A1",
+      "type_T": "http://a.b.c/T"
+    }
+  ],
+  "value": "30"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs/attr_A1 -X PATCH --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "03. GET the entity E1, make sure that the attr_A1 value was changed   (attrs as long name)"
+echo "=========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
+echo
+echo
+
+
+echo "04. Create an entity E2 with relationship attr_A3"
+echo "================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "T",
+  "attr_A3": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entity:E1"
+  },
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    {
+      "attr_A3": "http://a.b.c/A3",
+      "type_T": "http://a.b.c/T"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "05. Update the E2 relationship attr_A3"
+echo "======================================"
+payload='{
+"@context": [
+    {
+      "attr_A3": "http://a.b.c/A3",
+      "type_T": "http://a.b.c/T"
+    }
+    ],
+
+  "object": "urn:ngsi-ld:entity:E3"
+ 
+ }'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2/attrs/attr_A3 -X PATCH --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "06. GET the entity E2, make sure that the attr_A3 value was changed"
+echo "==================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2?prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create an entity E1 with properties attr_A1 and attr_A2
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+02. Update the E1 property attr_A1
+==================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. GET the entity E1, make sure that the attr_A1 value was changed   (attrs as long name)
+==========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 219
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "http://example.org/T",
+  "http://a.b.c/A1": {
+    "value": "30",
+    "type": "Property"
+  },
+  "http://a.b.c/A2": {
+    "type": "Property",
+    "value": "Attribute 2"
+  }
+}
+
+
+
+04. Create an entity E2 with relationship attr_A3
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+Date: REGEX(.*)
+
+
+
+05. Update the E2 relationship attr_A3
+======================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET the entity E2, make sure that the attr_A3 value was changed
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 164
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "http://example.org/T",
+  "http://a.b.c/A3": {
+    "object": "urn:ngsi-ld:entity:E3",
+    "type": "Relationship"
+  }
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

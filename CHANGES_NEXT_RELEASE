@@ -1,0 +1,19 @@
+# Issue #280  MQTT Notifications
+# Issue #409  Removed an incorrect warning about options=keyValues not supported
+# Issue #XXX  'location' not to be expanded - fixed for PATCH ops
+# Issue #280  Implemented POST /ngsi-ld/v1/entityOperations/create
+# Issue #280  Added the option to use username:password for MQTT subscriptions
+# Issue #419  Implemented GET /ngsi-ld/v1/types
+# Issue #XXX  Fixed a bug that impeded the creation of reistrations with only entity-type in the entities array
+# Issue #280  Entities can now have more than one GeoProperty
+# Issue #280  Turned off initial notifications (when creating NGSI-LD subscriptions)
+# Issue #280  New version for the 'count' URI parameter - in NGSI-LD 'options' isn't used for 'count
+# Issue #280  Implemented POST /ngsi-ld/v1/entityOperations/update
+# Issue #XXX  Fixed bug in context cache that didn't save some contexts in the cache and made them downloading each and every time
+# Issue #280  New DB layer for GET /entities/{EID}
+# Issue #280  datasetId supported for creation of entities
+# Issue	#280  datasetId	supported for retrieval of entities
+# Issue #451  When retrieving an entity, if attrs URI param 'attrs' is given and the entity doesn't have any of those attributes, a 404 is to be returned
+# Issue #280  Two new NGSI-LD error codes: NoMultiTenantSupport and NonExistingTenant
+# Issue #280  Giving error when non-existinf tenant is used (except for creation)
+# Issue #457  creDate can now be either a float, an int or a long in some functions (e.g. batch upsert)

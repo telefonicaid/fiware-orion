@@ -304,8 +304,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "b",
-                "a"
+                "REGEX((a|b))",
+                "REGEX((a|b))"
             ],
             "name": "T"
         }
@@ -359,8 +359,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "c",
-                "b"
+                "REGEX((c|b))",
+                "REGEX((c|b))"
             ],
             "name": "T"
         }
@@ -413,8 +413,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "d",
-                "c"
+                "REGEX((c|d))",
+                "REGEX((c|d))"
             ],
             "name": "T"
         }
@@ -438,8 +438,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "d",
-                "c"
+                "REGEX((c|d))",
+                "REGEX((c|d))"
             ],
             "name": "T"
         }

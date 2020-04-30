@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -27,9 +27,12 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
-#include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "common/globals.h"                                      // parse8601Time
@@ -41,7 +44,6 @@ extern "C"
 #include "ngsi/ContextAttribute.h"                               // ContextAttribute
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
-#include "mongoBackend/mongoEntityExists.h"                      // mongoEntityExists
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
@@ -51,55 +53,23 @@ extern "C"
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldAttributeTreat.h"                // orionldAttributeTreat
-#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
-#include "orionld/context/orionldContextAdd.h"                   // Add a context to the context list
-#include "orionld/context/orionldContextLookup.h"                // orionldContextLookup
-#include "orionld/context/orionldContextItemLookup.h"            // orionldContextItemLookup
-#include "orionld/context/orionldContextList.h"                  // orionldContextHead, orionldContextTail
-#include "orionld/context/orionldContextListInsert.h"            // orionldContextListInsert
-#include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
-#include "orionld/context/orionldUserContextKeyValuesCheck.h"    // orionldUserContextKeyValuesCheck
-#include "orionld/context/orionldUriExpand.h"                    // orionldUriExpand
+#include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
+#include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldValidName -
+// pcheckAttribute -
 //
-bool orionldValidName(char* name, char** detailsPP)
+// FIXME: Implement and move to orionld/payloadCheck/pcheckAttribute.cpp
+//
+static bool pcheckAttribute(KjNode* attributeP, OrionldProblemDetails* pdP)
 {
-  if (name == NULL)
-  {
-    *detailsPP = (char*) "empty name";
-    return false;
-  }
-
-  for (; *name != 0; ++name)
-  {
-    //
-    // Valid chars:
-    //   o a-z: 97-122
-    //   o A-Z: 65-90
-    //   o 0-9: 48-57
-    //   o '_': 95
-    //
-
-    if ((*name >= 'a') && (*name <= 'z'))
-      continue;
-    if ((*name >= 'A') && (*name <= 'Z'))
-      continue;
-    if ((*name >= '0') && (*name <= '9'))
-      continue;
-    if (*name == '_')
-      continue;
-
-    *detailsPP = (char*) "invalid character in name";
-    return false;
-  }
-
   return true;
 }
 
@@ -107,98 +77,126 @@ bool orionldValidName(char* name, char** detailsPP)
 
 // -----------------------------------------------------------------------------
 //
-// payloadCheck -
+// datasetInstances -
 //
-static bool payloadCheck
-(
-  ConnectionInfo*  ciP,
-  KjNode**         locationNodePP,
-  KjNode**         observationSpaceNodePP,
-  KjNode**         operationSpaceNodePP,
-  KjNode**         createdAtPP,
-  KjNode**         modifiedAtPP
-)
+KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, double timestamp, OrionldProblemDetails* pdP)
 {
-  OBJECT_CHECK(orionldState.requestTree, "toplevel");
+  // Loop over all instances and remove all without datasetId and with default datasetId
+  KjNode*          next;
+  KjNode*          instanceP         = attrV->value.firstChildP;
+  KjNode*          defaultInstanceP  = NULL;
+  KjNode*          modifiedAt;
+  KjNode*          createdAt;
+  char*            longName = NULL;
+  bool             valueMayBeExpanded;
 
-  KjNode*  kNodeP                 = orionldState.requestTree->value.firstChildP;
-  KjNode*  locationNodeP          = NULL;
-  KjNode*  observationSpaceNodeP  = NULL;
-  KjNode*  operationSpaceNodeP    = NULL;
-  KjNode*  createdAtP             = NULL;
-  KjNode*  modifiedAtP            = NULL;
+  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, &valueMayBeExpanded, true, NULL);
+  attributeName = kaStrdup(&orionldState.kalloc, longName);
+  dotForEq(attributeName);
 
-  //
-  // Check presence of mandatory fields
-  //
-  if (orionldState.payloadIdNode == NULL)
+  int instanceIx = 0;
+  while (instanceP != NULL)
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory", OrionldDetailsString);
-    return false;
-  }
+    if (pcheckAttribute(instanceP, pdP) != true)
+      return NULL;  // pdP->status has been set by pcheckAttribute. Also, orionldErrorResponseCreate has been called
 
-  if (orionldState.payloadTypeNode == NULL)
-  {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Entity type is missing", "The type field is mandatory", OrionldDetailsString);
-    return false;
-  }
+    next = instanceP->next;
 
+    KjNode* datasetIdP = kjLookup(instanceP, "datasetId");
 
-  //
-  // Check for duplicated items and that data types are correct
-  //
-  while (kNodeP != NULL)
-  {
-    char* detailsP;
-
-    if (SCOMPARE9(kNodeP->name, 'l', 'o', 'c', 'a', 't', 'i', 'o', 'n', 0))
+    if (datasetIdP != NULL)
     {
-      DUPLICATE_CHECK(locationNodeP, "location", kNodeP);
-      // FIXME: check validity of location - GeoProperty
-    }
-    else if (SCOMPARE17(kNodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-    {
-      DUPLICATE_CHECK(observationSpaceNodeP, "observationSpace", kNodeP);
-      // FIXME: check validity of observationSpace - GeoProperty
-    }
-    else if (SCOMPARE15(kNodeP->name, 'o', 'p', 'e', 'r', 'a', 't', 'i', 'o', 'n', 'S', 'p', 'a', 'c', 'e', 0))
-    {
-      DUPLICATE_CHECK(operationSpaceNodeP, "operationSpace", kNodeP);
-      // FIXME: check validity of operationSpaceP - GeoProperty
-    }
-    else if (SCOMPARE10(kNodeP->name, 'c', 'r', 'e', 'a', 't', 'e', 'd', 'A', 't', 0))
-    {
-      DUPLICATE_CHECK(createdAtP, "createdAt", kNodeP);
-      STRING_CHECK(kNodeP, "createdAt");
-    }
-    else if (SCOMPARE11(kNodeP->name, 'm', 'o', 'd', 'i', 'f', 'i', 'e', 'd', 'A', 't', 0))
-    {
-      DUPLICATE_CHECK(modifiedAtP, "modifiedAt", kNodeP);
-      STRING_CHECK(kNodeP, "modifiedAt");
-    }
-    else  // Property/Relationshiop - must check chars in the name of the attribute
-    {
-      // FIXME: Make sure the type is either Property or Relationship
-      if (orionldValidName(kNodeP->name, &detailsP) == false)
+      if (datasetIdP->type != KjString)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Property/Relationship name", detailsP, OrionldDetailsString);
-        return false;
+        orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON String", "datasetId");
+        orionldState.httpStatusCode = SccBadRequest;
+        pdP->status = 400;
+        return NULL;
+      }
+
+      if (!urlCheck(datasetIdP->value.s, &pdP->detail) && !urnCheck(datasetIdP->value.s, &pdP->detail))
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId");
+        orionldState.httpStatusCode = SccBadRequest;
+        pdP->status = 400;
+        return NULL;
       }
     }
 
-    kNodeP = kNodeP->next;
+    if (datasetIdP == NULL)  // No datasetId
+    {
+      if (defaultInstanceP != NULL)  // Already found an instance without datasetId ?
+      {
+        LM_W(("Bad Input (more that one instance without datasetId"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload data", "more that one instance without datasetId");
+        pdP->status = 400;
+        return NULL;
+      }
+
+      defaultInstanceP = instanceP;
+
+      // This is an instance with the default datasetId - we don't want it!
+      if (datasetIdP != NULL)
+        kjChildRemove(defaultInstanceP, datasetIdP);
+
+      //
+      // Remove the instance from 'attrV', where we only want datasetId attr
+      //
+      kjChildRemove(attrV, defaultInstanceP);
+    }
+    else
+    {
+      // Add createdAt and modifiedAt to the instance
+      createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  timestamp);
+      modifiedAt = kjFloat(orionldState.kjsonP, "modifiedAt", timestamp);
+      kjChildAdd(instanceP, createdAt);
+      kjChildAdd(instanceP, modifiedAt);
+    }
+
+    instanceP = next;
+    ++instanceIx;
   }
 
+  // Create an array for the attribute and put all remaining instances in the array
+  KjNode* attrArray = kjArray(orionldState.kjsonP, attributeName);
+  attrArray->value.firstChildP = attrV->value.firstChildP;
+  attrArray->lastChild         = attrV->lastChild;
 
+  // Then, add the array to 'datasets'
+  kjChildAdd(datasets, attrArray);
 
   //
-  // Prepare output
+  // The object returned was part of an array and thus has no name.
+  // But, the array had a name, and that's the name we need to give the object before returning it.
   //
-  *locationNodePP         = locationNodeP;
-  *observationSpaceNodePP = observationSpaceNodeP;
-  *operationSpaceNodePP   = operationSpaceNodeP;
-  *createdAtPP            = createdAtP;
-  *modifiedAtPP           = modifiedAtP;
+  if (defaultInstanceP != NULL)
+    defaultInstanceP->name = (char*) attributeName;
+
+  return defaultInstanceP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pcheckAttributeType -
+//
+bool pcheckAttributeType(KjNode* attrTypeP, const char* attrName)
+{
+  if (attrTypeP == NULL)
+  {
+    LM_W(("Bad Input (attribute without type)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute without type", attrName);
+    orionldState.httpStatusCode = SccBadRequest;
+    return false;
+  }
+  if (attrTypeP->type != KjString)
+  {
+    LM_W(("Bad Input (attribute type must be a JSON string)"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type must be a JSON string", attrName);
+    orionldState.httpStatusCode = SccBadRequest;
+    return false;
+  }
 
   return true;
 }
@@ -213,25 +211,26 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 {
   OBJECT_CHECK(orionldState.requestTree, "toplevel");
 
-  char*    details;
+  char*    detail;
   KjNode*  locationP          = NULL;
   KjNode*  observationSpaceP  = NULL;
   KjNode*  operationSpaceP    = NULL;
   KjNode*  createdAtP         = NULL;
   KjNode*  modifiedAtP        = NULL;
 
-  if (payloadCheck(ciP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP) == false)
+  if (pcheckEntity(orionldState.requestTree->value.firstChildP, &locationP, &observationSpaceP, &operationSpaceP, &createdAtP, &modifiedAtP, false) == false)
     return false;
-
-  LM_TMP(("In orionldPostEntities. orionldState.payloadIdNode at %p", orionldState.payloadIdNode));
-  LM_TMP(("In orionldPostEntities. orionldState.payloadTypeNode at %p", orionldState.payloadTypeNode));
 
   char*    entityId           = orionldState.payloadIdNode->value.s;
   char*    entityType         = orionldState.payloadTypeNode->value.s;
 
-  if ((urlCheck(entityId, &details) == false) && (urnCheck(entityId, &details) == false))
+
+  //
+  // Entity ID
+  //
+  if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
   {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN", OrionldDetailsString);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");
     return false;
   }
 
@@ -239,194 +238,179 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   // If the entity already exists, an error should be returned
   //
-  LM_TMP(("In orionldPostEntities"));
   if (mongoEntityExists(entityId, orionldState.tenant) == true)
   {
-    orionldErrorResponseCreate(ciP, OrionldAlreadyExists, "Entity already exists", entityId, OrionldDetailsString);
-    ciP->httpStatusCode = SccConflict;
+    orionldErrorResponseCreate(OrionldAlreadyExists, "Entity already exists", entityId);
+    orionldState.httpStatusCode = SccConflict;
     return false;
   }
 
-  LM_TMP(("In orionldPostEntities"));
   orionldState.entityId = entityId;
 
-  LM_TMP(("In orionldPostEntities"));
   UpdateContextRequest   mongoRequest;
   UpdateContextResponse  mongoResponse;
   ContextElement*        ceP       = new ContextElement();  // FIXME: Any way I can avoid to allocate ?
   EntityId*              entityIdP;
 
-  LM_TMP(("In orionldPostEntities"));
   mongoRequest.contextElementVector.push_back(ceP);
   entityIdP = &mongoRequest.contextElementVector[0]->entityId;
   mongoRequest.updateActionType = ActionTypeAppend;
-  LM_TMP(("In orionldPostEntities"));
 
-  entityIdP->id        = entityId;
-  entityIdP->type      = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
-  entityIdP->isPattern = "false";
-  entityIdP->creDate   = getCurrentTime();
-  entityIdP->modDate   = getCurrentTime();
-  LM_TMP(("In orionldPostEntities"));
-
-  //
-  // Entity TYPE
-  //
+  entityIdP->id            = entityId;
+  entityIdP->isPattern     = "false";
+  entityIdP->creDate       = getCurrentTime();
+  entityIdP->modDate       = getCurrentTime();
   entityIdP->isTypePattern = false;
+  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
 
-  LM_T(LmtUriExpansion, ("Looking up uri expansion for the entity type '%s'", entityType));
-  LM_T(LmtUriExpansion, ("------------- uriExpansion for Entity Type starts here ------------------------------"));
 
-  char*  expandedName;
-  char*  expandedType;
+  //
+  // Attributes
+  //
+  KjNode*          datasets = kjObject(orionldState.kjsonP, "@datasets");
+  KjNode*          kNodeP   = orionldState.requestTree->value.firstChildP;
+  KjNode*          next;
+  struct timespec  now;
+  double           timestamp;
 
-  // FIXME: Call orionldUriExpand() - this here is a "copy" of what orionldUriExpand does
-  extern int uriExpansion(OrionldContext* contextP, const char* name, char** expandedNameP, char** expandedTypeP, char** detailsPP);
-  int    expansions = uriExpansion(orionldState.contextP, entityType, &expandedName, &expandedType, &details);
-  LM_T(LmtUriExpansion, ("URI Expansion for type '%s': '%s'", entityType, expandedName));
-  LM_T(LmtUriExpansion, ("Got %d expansions", expansions));
+  kTimeGet(&now);
+  timestamp = now.tv_sec + ((double) now.tv_nsec / 1000000000);
 
-  if (expansions == 0)
+  while (kNodeP != NULL)
   {
-    // Expansion found in Core Context - perform no expansion
-  }
-  else if (expansions == 1)
-  {
-    // Take the long name, just ... NOT expandedType but expandedName. All good
-    entityIdP->type = expandedName;
-  }
-  else if (expansions == -2)
-  {
-    // No expansion found in Core Context, and in no other contexts either - use default URL
-    LM_T(LmtUriExpansion, ("EXPANSION: use default URL for entity type '%s'", entityType));
-    entityIdP->type = orionldDefaultUrl;
-    entityIdP->type += entityType;
-  }
-  else if (expansions == -1)
-  {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid context item for 'entity type'", details, OrionldDetailsString);
-    mongoRequest.release();
-    return false;
-  }
-  else  // expansions == 2 ... may be an incorrect context
-  {
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value of context item 'entity type'", orionldState.contextP->url, OrionldDetailsString);
-    mongoRequest.release();
-    return false;
-  }
+    next = kNodeP->next;
 
-
-
-  // Treat the entire payload
-  for (KjNode* kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    LM_T(LmtUriExpansion, ("treating entity node '%s'", kNodeP->name));
-
-    if (kNodeP == createdAtP)
+    //
+    // If the attribute is an array ( "attr": [] ), then special treatment is necessary
+    // One of the instances in the array may be without datasetId, or with the default datasetId ...
+    // If so, that instance must be treated as a "normal" attribute.
+    // It must be remved from the array and returned as kNodeP;
+    if (kNodeP->type == KjArray)
     {
-      // FIXME: Make sure the value is a valid timestamp?
+      OrionldProblemDetails pd = { OrionldOk, NULL, NULL, 0 };
 
-      // Ignore the 'createdAt' - See issue #43 (orionld)
-#if 0
-      // 2. Save it for future use (when creating the entity)
-      if ((orionldState.overriddenCreationDate = parse8601Time(createdAtP->value.s)) == -1)
+      kNodeP = datasetInstances(datasets, kNodeP, kNodeP->name, timestamp, &pd);
+
+      if (kNodeP == NULL)
       {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for 'createdAt' attribute", createdAtP->value.s, OrionldDetailsString);
-        mongoRequest.release();
-        return false;
-      }
-#endif
-    }
-    else if (kNodeP == modifiedAtP)
-    {
-      // FIXME: Make sure the value is a valid timestamp?
-
-      // Ignore the 'createdAt' - See issue #43 (orionld)
-#if 0
-      // 2. Save it for future use (when creating the entity)
-      if ((orionldState.overriddenModificationDate = parse8601Time(modifiedAtP->value.s)) == -1)
-      {
-        orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Invalid value for 'modifiedAt' attribute", modifiedAtP->value.s, OrionldDetailsString);
-        mongoRequest.release();
-        return false;
-      }
-#endif
-    }
-    else  // Must be an attribute
-    {
-      LM_T(LmtPayloadCheck, ("Not createdAt/modifiedAt: '%s' - treating as ordinary attribute", kNodeP->name));
-
-      ContextAttribute* caP            = new ContextAttribute();
-      KjNode*           attrTypeNodeP  = NULL;
-
-      if (orionldAttributeTreat(ciP, kNodeP, caP, &attrTypeNodeP) == false)
-      {
-        LM_E(("orionldAttributeTreat failed"));
-        delete caP;
-        mongoRequest.release();
-        return false;
-      }
-
-
-      //
-      // URI Expansion for Attribute NAME - except if its name is one of the following three:
-      // 1. location
-      // 2. observationSpace
-      // 3. operationSpace
-      //
-      if ((strcmp(kNodeP->name, "location") == 0) || (strcmp(kNodeP->name, "observationSpace") == 0) || (strcmp(kNodeP->name, "operationSpace") == 0))
-      {
-        caP->name = kNodeP->name;
-      }
-      else
-      {
-        char longName[256];
-
-        if (orionldUriExpand(orionldState.contextP, kNodeP->name, longName, sizeof(longName), &details) == false)
+        if (pd.status != 0)  // Error in datasetInstances
         {
-          LM_E(("orionldUriExpand failed"));
-          delete caP;
           mongoRequest.release();
-          orionldErrorResponseCreate(ciP, OrionldBadRequestData, details, kNodeP->name, OrionldDetailsAttribute);
           return false;
         }
 
-        caP->name = longName;
+        kNodeP = next;
+        continue;
       }
 
-
       //
-      // NO URI Expansion for Attribute TYPE
+      // NOTE
+      //   kNode != NULL means that datasetInstances has identified an instance that has no datasetId OR
+      //   the default datasetId (which has been removed) and the "new" kNodeP is treated as if there was no JSON Array
+      //   as RHS for the attribute, just a normal JSON object ...
       //
-      caP->type = attrTypeNodeP->value.s;
-
-      ceP->contextAttributeVector.push_back(caP);
     }
+
+    KjNode* attrType = kjLookup(kNodeP, "type");
+
+    LM_T(LmtUriExpansion, ("treating attribute '%s'", kNodeP->name));
+
+    if ((kNodeP == createdAtP) || (kNodeP == modifiedAtP))
+    {
+      kNodeP = next;
+      continue;
+    }
+
+    if (pcheckAttributeType(attrType, kNodeP->name) == false)
+    {
+      mongoRequest.release();
+      return false;
+    }
+
+    //
+    // If a datasetId member is present, and it's not the default datasetId, then the
+    // attribute is removed from the entity and added to the 'datasets' object
+    //
+    // If the datasetId is the default datasetId, then the field is simply removed
+    //
+    KjNode* datasetIdP = kjLookup(kNodeP, "datasetId");
+    if (datasetIdP != NULL)
+    {
+      STRING_CHECK(datasetIdP, "datasetId");
+      URI_CHECK(datasetIdP, "datasetId");
+
+      kjChildRemove(orionldState.requestTree, kNodeP);
+      kjChildAdd(datasets, kNodeP);
+
+      // Add createdAt and modifiedAt to the instance
+      KjNode* createdAt  = kjFloat(orionldState.kjsonP, "createdAt",  timestamp);
+      KjNode* modifiedAt = kjFloat(orionldState.kjsonP, "modifiedAt", timestamp);
+      kjChildAdd(kNodeP, createdAt);
+      kjChildAdd(kNodeP, modifiedAt);
+
+      // Change to longName
+      bool   valueMayBeExpanded;
+      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, NULL);
+
+      longName = kaStrdup(&orionldState.kalloc, longName);
+      dotForEq(longName);
+      kNodeP->name = longName;
+
+      kNodeP = next;
+
+      continue;
+    }
+
+    ContextAttribute* caP            = new ContextAttribute();
+    KjNode*           attrTypeNodeP  = NULL;
+    char*             detail         = (char*) "none";
+
+    if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
+    {
+      // kjTreeToContextAttribute calls orionldErrorResponseCreate
+      LM_E(("kjTreeToContextAttribute failed: %s", detail));
+      caP->release();
+      delete caP;
+      mongoRequest.release();
+      return false;
+    }
+
+    if (attrTypeNodeP != NULL)
+      ceP->contextAttributeVector.push_back(caP);
+    else
+      delete caP;
+
+    kNodeP = next;
   }
 
-  ciP->httpStatusCode = mongoUpdateContext(&mongoRequest,
-                                           &mongoResponse,
-                                           orionldState.tenant,
-                                           ciP->servicePathV,
-                                           ciP->uriParam,
-                                           ciP->httpHeaders.xauthToken,
-                                           ciP->httpHeaders.correlator,
-                                           ciP->httpHeaders.ngsiv2AttrsFormat,
-                                           ciP->apiVersion,
-                                           NGSIV2_NO_FLAVOUR);
+  //
+  // Mongo
+  //
+  if (datasets->value.firstChildP != NULL)  // Not Empty
+    orionldState.datasets = datasets;
+  orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
+                                                   &mongoResponse,
+                                                   orionldState.tenant,
+                                                   ciP->servicePathV,
+                                                   ciP->uriParam,
+                                                   ciP->httpHeaders.xauthToken,
+                                                   ciP->httpHeaders.correlator,
+                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                   ciP->apiVersion,
+                                                   NGSIV2_NO_FLAVOUR);
 
   mongoRequest.release();
   mongoResponse.release();
 
-  if (ciP->httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != SccOk)
   {
-    LM_E(("mongoUpdateContext: HTTP Status Code: %d", ciP->httpStatusCode));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend", OrionldDetailsString);
+    LM_E(("mongoUpdateContext: HTTP Status Code: %d", orionldState.httpStatusCode));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Internal Error", "Error from Mongo-DB backend");
     return false;
   }
 
-  ciP->httpStatusCode = SccCreated;
-  orionldState.entityCreated = true;
+  orionldState.httpStatusCode = SccCreated;
+  orionldState.entityCreated  = true;
 
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", entityId);
 

@@ -1,0 +1,207 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with q filter containing AND
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create E1 with type T and attr A=1 and B=1
+# 02. Create E2 with type T and attr A=2 and B=2
+# 03. Create E3 with type T and attr A=3 and B=1
+# 04. Create E4 with type T and attr A=4 and B=2
+# 05. GET all entities that have an attribute A == 1 and B == 1 - see E1
+# 06. GET all entities that have an attribute A == 1 and B == 2 - see nothing
+#
+
+echo '01. Create E1 with type T and attr A=1 and B=1'
+echo '=============================================='
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  },
+  "B": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '02. Create E2 with type T and attr A=2 and B=2'
+echo '=============================================='
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 2
+  },
+  "B": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '03. Create E3 with type T and attr A=3 and B=1'
+echo '=============================================='
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 3
+  },
+  "B": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '04. Create E4 with type T and attr A=4 and B=2'
+echo '=============================================='
+payload='{
+  "id": "http://a.b.c/entity/E4",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 4
+  },
+  "B": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '05. GET all entities that have an attribute A == 1 and B == 1 - see E1'
+echo '======================================================================'
+orionCurl --url "/ngsi-ld/v1/entities?q=A==1;B==1&prettyPrint=yes&type=T" --noPayloadCheck
+echo
+echo
+
+
+echo '06. GET all entities that have an attribute A == 1 and B == 2 - see nothing'
+echo '==========================================================================='
+orionCurl --url "/ngsi-ld/v1/entities?q=A==1;B==2&prettyPrint=yes&type=T" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with type T and attr A=1 and B=1
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Create E2 with type T and attr A=2 and B=2
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+Date: REGEX(.*)
+
+
+
+03. Create E3 with type T and attr A=3 and B=1
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
+Date: REGEX(.*)
+
+
+
+04. Create E4 with type T and attr A=4 and B=2
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
+Date: REGEX(.*)
+
+
+
+05. GET all entities that have an attribute A == 1 and B == 1 - see E1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 186
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T",
+    "A": {
+      "type": "Property",
+      "value": 1
+    },
+    "B": {
+      "type": "Property",
+      "value": 1
+    }
+  }
+]
+
+
+
+06. GET all entities that have an attribute A == 1 and B == 2 - see nothing
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,0 +1,118 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration according to issue #370
+# 02. GET all registrations, accepting application/ld+json
+#
+
+echo "01. Create a registration according to issue #370"
+echo "================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Building",
+          "id": "urn:ngsi-ld:Building:store001"
+        }
+      ],
+      "properties": [
+        "tweets"
+      ],
+      "relationships": [
+        "tweets"
+      ]
+    }
+  ],
+  "endpoint": "http://context-provider:3000/static/tweets"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json" -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. GET all registrations, accepting application/ld+json"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Accept: application/ld+json' -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration according to issue #370
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. GET all registrations, accepting application/ld+json
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 575
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+  {
+    "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
+    "type": "ContextSourceRegistration",
+    "endpoint": "http://context-provider:3000/static/tweets",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Building:store001",
+            "type": "Building"
+          }
+        ],
+        "properties": [
+          "tweets"
+        ],
+        "relationships": [
+          "tweets"
+        ]
+      }
+    ]
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

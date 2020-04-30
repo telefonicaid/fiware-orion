@@ -1,0 +1,800 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# FIXME: Due to the fact that the NGSI-LD data model doesn't follow the Orion APIv2 data model
+#        in terms of registrations, we have decided to restrict NGSI-LD registrations to only allow
+#        ONE item in the information vector.
+#        Once this is fixed (possibly some time 2020), this test should include an "information" vector
+#        with more than one item.
+#
+# 01. Create a registration with ALL fields
+# 02. See the registration in mongo
+# 03. GET the registration, with sysAttrs included
+# 04. Create R1 registration with embedded context
+# 05. See the R1 registration in mongo
+# 06. Create R2 registration without @Context Attribute
+# 07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error
+# 08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error
+# 09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error
+#
+
+echo "01. Create a registration with ALL fields"
+echo "========================================="
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+  "type": "ContextSourceRegistration",
+  "name": "reg_csr1a341",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration, with sysAttrs included"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341?options=sysAttrs&prettyPrint=yes&spaces=2' --noPayloadCheck -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo '04. Create R1 registration with embedded context'
+echo '================================================'
+payload='{
+  "@context": {
+    "myT": "http://example.org/T1",
+    "myP1": "http://example.org/P1",
+    "myP2": "http://example.org/P2",
+    "myRel1": "http://example.org/Rel1",
+    "myRel2": "http://example.org/Rel2"
+  },
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "reg_1",
+  "description": "description of registration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E1",
+          "type": "myT"
+        }
+      ],
+      "properties": [ "myP1", "myP2" ],
+      "relationships": [ "myRel1", "myRel2" ]
+    }
+  ],
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "05. See the R1 registration in mongo"
+echo "===================================="
+mongoCmd2 ftest "db.registrations.findOne({'_id': 'urn:ngsi-ld:ContextSourceRegistration:R1'})"
+echo
+echo
+
+
+echo '06. Create R2 registration without @Context Attribute'
+echo '====================================================='
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+  "type": "ContextSourceRegistration",
+  "information": [{
+      "entities": [{
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+      }],
+      "properties": ["p1", "p2"],
+      "relationships": ["rel1"]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error"
+echo "=========================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [],
+      "relationships": ["rel1"]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error"
+echo "=============================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "prop1" ],
+      "relationships": []
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [ ],
+      "properties": [ "prop1" ],
+      "relationships": ["rel1"]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with ALL fields
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a341
+Date: REGEX(.*)
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+	"description" : "description of reg 1",
+	"name" : "reg_csr1a341",
+	"expiration" : NumberLong(1861869600),
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"observationInterval" : {
+		"start" : NumberLong(1546250400),
+		"end" : NumberLong(1861869600)
+	},
+	"managementInterval" : {
+		"start" : NumberLong(1514714400),
+		"end" : NumberLong(1830247200)
+	},
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					200,
+					0
+				],
+				[
+					201,
+					0
+				],
+				[
+					201,
+					1
+				],
+				[
+					200,
+					1
+				],
+				[
+					200,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					300,
+					0
+				],
+				[
+					301,
+					0
+				],
+				[
+					301,
+					1
+				],
+				[
+					300,
+					1
+				],
+				[
+					300,
+					0
+				]
+			]
+		]
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : true,
+		"https://uri.etsi.org/ngsi-ld/default-context/P4" : 4.5,
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"object" : 6
+		},
+		"https://uri.etsi.org/ngsi-ld/default-context/P6" : [
+			7,
+			8
+		]
+	}
+}
+bye
+
+
+03. GET the registration, with sysAttrs included
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1964
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
+  "type": "ContextSourceRegistration",
+  "name": "reg_csr1a341",
+  "description": "description of reg 1",
+  "createdAt": REGEX(.*),
+  "modifiedAt": REGEX(.*),
+  "expires": "2028-12-31T10:00:00Z",
+  "endpoint": "http://my.csource.org:1026",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [
+        "brandName",
+        "speed"
+      ],
+      "relationships": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00Z",
+    "end": "2028-12-31T10:00:00Z"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00Z",
+    "end": "2027-12-31T10:00:00Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          100,
+          0
+        ],
+        [
+          101,
+          0
+        ],
+        [
+          101,
+          1
+        ],
+        [
+          100,
+          1
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          200,
+          0
+        ],
+        [
+          201,
+          0
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          200,
+          1
+        ],
+        [
+          200,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          300,
+          0
+        ],
+        [
+          301,
+          0
+        ],
+        [
+          301,
+          1
+        ],
+        [
+          300,
+          1
+        ],
+        [
+          300,
+          0
+        ]
+      ]
+    ]
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ]
+}
+
+
+
+04. Create R1 registration with embedded context
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Date: REGEX(.*)
+
+
+
+05. See the R1 registration in mongo
+====================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"description" : "description of registration",
+	"name" : "reg_1",
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:E1",
+					"type" : "http://example.org/T1"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "http://example.org/P1",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "http://example.org/P2",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "http://example.org/Rel1",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "http://example.org/Rel2",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					100,
+					0
+				],
+				[
+					101,
+					0
+				],
+				[
+					101,
+					1
+				],
+				[
+					100,
+					1
+				],
+				[
+					100,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					200,
+					0
+				],
+				[
+					201,
+					0
+				],
+				[
+					201,
+					1
+				],
+				[
+					200,
+					1
+				],
+				[
+					200,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					300,
+					0
+				],
+				[
+					301,
+					0
+				],
+				[
+					301,
+					1
+				],
+				[
+					300,
+					1
+				],
+				[
+					300,
+					0
+				]
+			]
+		]
+	}
+}
+bye
+
+
+06. Create R2 registration without @Context Attribute
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R2
+Date: REGEX(.*)
+
+
+
+07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information::properties",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information::relationships",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information::entities",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

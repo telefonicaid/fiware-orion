@@ -1,0 +1,134 @@
+# Copyright 2018 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an Entity store005 with attribute names using Japanese chars
+# 02. GET the entity store005
+#
+
+echo "01. Create an Entity store005 with attribute names using Japanese chars"
+echo "======================================================================="
+payload='{
+    "id": "urn:ngsi-ld:Building:store005",
+    "type": "る建物",
+    "種類": {
+    	"type": "Property",
+        "value": ["commercial"]
+    },
+    "住所": {
+        "type": "Property",
+        "value": {
+            "streetAddress": "Eisenacher Straße 98",
+            "addressRegion": "Berlin",
+            "addressLocality": "Marzahn",
+            "postalCode": "12685"
+        }
+    },
+    "場所": {
+        "type": "GeoProperty",
+        "value": {
+             "type": "Point",
+             "coordinates": [13.5646, 52.5435]
+        }
+    },
+    "名前": {
+        "type": "Property",
+        "value": "Yuusui-en"
+    },
+    "@context":"https://schema.lab.fiware.org/ld/context"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. GET the entity store005"
+echo "==========================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store005
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Entity store005 with attribute names using Japanese chars
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store005
+Date: REGEX(.*)
+
+
+
+02. GET the entity store005
+===========================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:Building:store005",
+    "type": "\u308b\u5efa\u7269",
+    "\u4f4f\u6240": {
+        "type": "Property",
+        "value": {
+            "addressLocality": "Marzahn",
+            "addressRegion": "Berlin",
+            "postalCode": "12685",
+            "streetAddress": "Eisenacher Stra\u00dfe 98"
+        }
+    },
+    "\u540d\u524d": {
+        "type": "Property",
+        "value": "Yuusui-en"
+    },
+    "\u5834\u6240": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.5646,
+                52.5435
+            ],
+            "type": "Point"
+        }
+    },
+    "\u7a2e\u985e": {
+        "type": "Property",
+        "value": "commercial"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

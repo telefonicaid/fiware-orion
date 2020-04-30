@@ -1,0 +1,426 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Add attributes to existing entity with and without options=noOverwrite
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes P1=11, P2=12, P3=13, and P4=14
+# 02. See the entity in mongo, see P1==11 and P2==12
+# 03. Overwrite P1 and P2 using POST /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs
+# 04. See the entity in mongo, see that P1 has changed
+# 05. Attempt to modify the attribute P2=22 with noOverwrite set, see it fail
+# 06. See the entity in mongo, see that	P2 is still 12
+# 07. Add the attribute P5 and attempt to modify P1 with noOverwrite set. P1: error, P3: ok - see that in the 207 response
+#
+# Error Handling
+# 08. Invalid URI as entity id - see error
+# 09. Entity not found - see error
+#
+
+echo "01. Create an entity E1 with attributes P1=11 and P2=12"
+echo "======================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 11
+  },
+  "P2": {
+    "type": "Property",
+    "value": 12
+  },
+  "P3": {
+    "type": "Property",
+    "value": 13
+  },
+  "P4": {
+    "type": "Property",
+    "value": 14
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in mongo, see P1==11 and P2==12"
+echo "=================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Overwrite P1 and P2 using POST /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs"
+echo "====================================================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 31
+  },
+  "P2": {
+    "type": "Property",
+    "value": 32
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "04. See the entity in mongo, see that P1 has changed"
+echo "===================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. Attempt to modify the attribute P2=22 with noOverwrite set, see it fail"
+echo "==========================================================================="
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": 22
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+echo "06. See the entity in mongo, see that	P2 is still 12"
+echo "===================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "07. Add the attribute P5 and attempt to modify P1 with noOverwrite set. P1: error, P3: ok - see that in the 207 response"
+echo "========================================================================================================================"
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 71
+  },
+  "P5": {
+    "type": "Property",
+    "value": 75
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+echo "08. Invalid URI as entity id - see error"
+echo "========================================"
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 71
+  },
+  "P5": {
+    "type": "Property",
+    "value": 75
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "09. Entity not found - see error"
+echo "================================"
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 71
+  },
+  "P5": {
+    "type": "Property",
+    "value": 75
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2/attrs?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attributes P1=11 and P2=12
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in mongo, see P1==11 and P2==12
+==================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 11,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 12,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 13,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 14,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Overwrite P1 and P2 using POST /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs
+=====================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. See the entity in mongo, see that P1 has changed
+====================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 13,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 14,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"value" : 31,
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"value" : 32,
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. Attempt to modify the attribute P2=22 with noOverwrite set, see it fail
+===========================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 162
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P2",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": []
+}
+
+
+06. See the entity in mongo, see that	P2 is still 12
+====================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 13,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 14,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"value" : 31,
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"value" : 32,
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+07. Add the attribute P5 and attempt to modify P1 with noOverwrite set. P1: error, P3: ok - see that in the 207 response
+========================================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 211
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "reason": "attribute already exists and overwrite is not allowed"
+        }
+    ],
+    "updated": [
+        "https://uri.etsi.org/ngsi-ld/default-context/P5"
+    ]
+}
+
+
+08. Invalid URI as entity id - see error
+========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "E1",
+    "title": "Entity ID must be a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Entity not found - see error
+================================
+HTTP/1.1 404 Not Found
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:entities:E2",
+    "title": "Entity does not exist",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

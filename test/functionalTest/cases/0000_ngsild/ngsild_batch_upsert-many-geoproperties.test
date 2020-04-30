@@ -1,0 +1,328 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert with a single GeoProperty in two entities
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+#
+# 01. Batch Creation via UPSERT of two entities with a single GeoProperty each
+# 02. GET the entities
+# 03. New Batch Upsert, modifying one of the two entities and adding another entity (also with one GeoProperty)
+# 04. GET the entities
+#
+
+echo "01. Batch Creation via UPSERT of two entities with a single GeoProperty each"
+echo "============================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
+    "type": "GtfsStation",
+    "name": {
+      "type": "Property",
+      "value": "Rangsdorf, Bahnhof",
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.431112,
+          52.294125
+        ]
+      },
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "hasStop": {
+      "type": "Relationship",
+      "object": [
+        "urn:ngsi-ld:GtfsStop:000008012713:MS",
+        "urn:ngsi-ld:GtfsStop:300000005271:MS",
+        "urn:ngsi-ld:GtfsStop:300000005273:MS"
+      ],
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+  },
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
+    "type": "GtfsStation",
+    "name": {
+      "type": "Property",
+      "value": "Leipzig, Hauptbahnhof",
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          12.381321,
+          51.344817
+        ]
+      },
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "hasStop": {
+      "type": "Relationship",
+      "object": [
+        "urn:ngsi-ld:GtfsStop:000008010205:MS",
+        "urn:ngsi-ld:GtfsStop:000008098205:MS"
+      ],
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. GET the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "03. New Batch Upsert, modifying one of the two entities and adding another entity (also with one GeoProperty)"
+echo "============================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
+    "type": "GtfsStation",
+    "name": {
+      "type": "Property",
+      "value": "Rangsdorf, Bahnhof II",
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.431112,
+          52.294125
+        ]
+      },
+      "observedAt": "2020-04-07T20:40:02.260Z"
+    },
+    "hasStop": {
+      "type": "Relationship",
+      "object": [
+        "urn:ngsi-ld:GtfsStop:000008012713:MS",
+        "urn:ngsi-ld:GtfsStop:300000005271:MS",
+        "urn:ngsi-ld:GtfsStop:300000005273:MS"
+      ],
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+  },
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000550091:MS",
+    "type": "GtfsStation",
+    "name": {
+      "type": "Property",
+      "value": "Leipzig, Hauptbahnhof",
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          12.381321,
+          51.344817
+        ]
+      },
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "hasStop": {
+      "type": "Relationship",
+      "object": [
+        "urn:ngsi-ld:GtfsStop:000008010205:MS",
+        "urn:ngsi-ld:GtfsStop:000008098205:MS"
+      ],
+      "observedAt": "2020-04-06T20:40:02.260Z"
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert" -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. GET the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Creation via UPSERT of two entities with a single GeoProperty each
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. GET the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 758
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
+    "type": "GtfsStation",
+    "name": "Rangsdorf, Bahnhof",
+    "hasStop": [
+      "urn:ngsi-ld:GtfsStop:000008012713:MS",
+      "urn:ngsi-ld:GtfsStop:300000005271:MS",
+      "urn:ngsi-ld:GtfsStop:300000005273:MS"
+    ],
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        13.431112,
+        52.294125
+      ]
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
+    "type": "GtfsStation",
+    "name": "Leipzig, Hauptbahnhof",
+    "hasStop": [
+      "urn:ngsi-ld:GtfsStop:000008010205:MS",
+      "urn:ngsi-ld:GtfsStop:000008098205:MS"
+    ],
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        12.381321,
+        51.344817
+      ]
+    }
+  }
+]
+
+
+
+03. New Batch Upsert, modifying one of the two entities and adding another entity (also with one GeoProperty)
+=============================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. GET the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 1117
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
+    "type": "GtfsStation",
+    "name": "Leipzig, Hauptbahnhof",
+    "hasStop": [
+      "urn:ngsi-ld:GtfsStop:000008010205:MS",
+      "urn:ngsi-ld:GtfsStop:000008098205:MS"
+    ],
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        12.381321,
+        51.344817
+      ]
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
+    "type": "GtfsStation",
+    "name": "Rangsdorf, Bahnhof II",
+    "hasStop": [
+      "urn:ngsi-ld:GtfsStop:000008012713:MS",
+      "urn:ngsi-ld:GtfsStop:300000005271:MS",
+      "urn:ngsi-ld:GtfsStop:300000005273:MS"
+    ],
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        13.431112,
+        52.294125
+      ]
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:GtfsStation:900000550091:MS",
+    "type": "GtfsStation",
+    "name": "Leipzig, Hauptbahnhof",
+    "hasStop": [
+      "urn:ngsi-ld:GtfsStop:000008010205:MS",
+      "urn:ngsi-ld:GtfsStop:000008098205:MS"
+    ],
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        12.381321,
+        51.344817
+      ]
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

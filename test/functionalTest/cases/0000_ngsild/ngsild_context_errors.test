@@ -1,22 +1,22 @@
-# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -38,16 +38,17 @@ brokerStart CB 212-249
 # 04. @context is an empty string
 # 05. URL in context is an invalid URL
 # 06. URL in context is a valid URL but it doesn't exist
+# 07. Ugly Parse Error: @context: { 'https://...' ]
 #
-# Need Cantera for the rest:
-# 07. Parse Error in the resulting context
-# 08. resulting payload not a JSON object?
-# 09. resulting payload is an empty object
-# 10. Not a single member
-# 11. Single member not called '@context
-# 12. Single member not object or array
-# 13. Array with member that is not a string
-# 14. Array with member that is not a valid URL
+# Need Cantera for the rest (no longer true - have inline contexts now ...):
+# 08. Parse Error in the resulting context
+# 09. resulting payload not a JSON object?
+# 10. resulting payload is an empty object
+# 11. Not a single member
+# 12. Single member not called '@context
+# 13. Single member not object or array
+# 14. Array with member that is not a string
+# 15. Array with member that is not a valid URL
 # 
 
 echo "01. @context is a Boolean"
@@ -109,7 +110,7 @@ payload='{
   },
   "@context": ""
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+orionCurl --url "/ngsi-ld/v1/entities?prettyPrint=yes" -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --noPayloadCheck
 echo
 echo
 
@@ -123,7 +124,7 @@ payload='{
     "type": "Property",
     "value": "John 2"
   },
-  "@context": "not an URL"
+  "@context": "This @context-value is not a URL"
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
 echo
@@ -146,6 +147,20 @@ echo
 echo
 
 
+echo "07. Ugly Parse Error: @context: { 'https://...' ]"
+echo "================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "@context": { "http://valid.url/oh/yes" ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
 
 --REGEXPECT--
 01. @context is a Boolean
@@ -156,9 +171,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@context",
+    "detail": "@context",
     "title": "Not a JSON Array nor Object nor a String",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -170,9 +185,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "@context",
+    "detail": "@context",
     "title": "Not a JSON Array nor Object nor a String",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -184,51 +199,66 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "a",
+    "detail": "a",
     "title": "Invalid key-value in @context",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 04. @context is an empty string
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 182
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "URL parse error - no colon found - cannot determine the protocol",
-    "title": "Failure to create context from URL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Invalid @context",
+  "detail": "Empty @context"
 }
+
 
 
 05. URL in context is an invalid URL
 ====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 182
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "URL parse error - no colon found - cannot determine the protocol",
-    "title": "Failure to create context from URL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "Not a URI",
+    "title": "Invalid @context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. URL in context is a valid URL but it doesn't exist
 ======================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 141
+HTTP/1.1 503 Service Unavailable
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://valid.url/oh/yes",
-    "title": "Failure to create context from URL",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "http://valid.url/oh/yes",
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
+}
+
+
+07. Ugly Parse Error: @context: { 'https://...' ]
+=================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "JSON Parse Error: no colon found after name of member",
+    "title": "JSON Parse Error",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
 

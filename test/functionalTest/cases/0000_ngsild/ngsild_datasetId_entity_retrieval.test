@@ -1,0 +1,349 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attributes with datasetId - entity retrieval without specific datasetId
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Without using datasetId URI param
+# 01. Create an entity E1 with 3 properties (prop, prop2, and prop3) with a mix of datasetIds
+# 02. GET E1 with attr 'prop' - see 3 instances of 'prop'
+# 03. GET E1 with attr 'prop2' - see 1 instance of 'prop2'
+# 04. GET E1 with attr 'prop3' - see 1 instance of 'prop3'
+# 05. Create an entity E1 with 3 relationships (rel, rel2, and rel3) with a mix of datasetIds
+# 06. GET E1 with attr 'rel' - see 3 instances of 'rel'
+# 07. GET E1 with attr 'rel2' - see 1 instance of 'rel2'
+# 08. GET E1 with attr 'rel3' - see 1 instance of 'rel3'
+#
+# Key Values
+# 09. GET E1 with attr 'prop' and options=keyValues - see 'prop' as an array with three values
+# 10. GET E2 with attr 'rel' and options=keyValues - see 'rel' as an array with three values
+#
+
+echo "01. Create an entity E1 with 3 properties (prop, prop2, and prop3) with a mix of datasetIds"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "prop": [
+    {
+      "type": "Property",
+      "value": "no dataset id"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:2",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    }
+  ],
+  "prop2": [
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    }
+  ],
+  "prop3": {
+    "type": "Property",
+    "value": "no dataset id"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET E1 with attr 'prop' - see 3 instances of 'prop'"
+echo "======================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=prop&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "03. GET E1 with attr 'prop2' - see 1 instance of 'prop2'"
+echo "======================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=prop2&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET E1 with attr 'prop3' - see 1 instance of 'prop3'"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=prop3&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "05. Create an entity E2 with 3 relationships (rel, rel2, and rel3) with a mix of datasetIds"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "rel": [
+    {
+      "type": "Relationship",
+      "object": "urn:no_dataset_id"
+    },
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld/dataset:2",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    }
+  ],
+  "rel2": [
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    }
+  ],
+  "rel3": {
+    "type": "Relationship",
+    "object": "urn:no_dataset_id"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET E2 with attr 'rel' - see 3 instances of 'rel'"
+echo "====================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?attrs=rel&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "07. GET E2 with attr 'rel2' - see 1 instance of 'rel2'"
+echo "======================================================"
+echo
+echo
+
+
+echo "08. GET E2 with attr 'rel3' - see 1 instance of 'rel3'"
+echo "======================================================"
+echo
+echo
+
+
+echo "09. GET E1 with attr 'prop' and options=keyValues - see 'prop' as an array with three values"
+echo "============================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=prop&prettyPrint=yes&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+echo "10. GET E2 with attr 'rel' and options=keyValues - see 'rel' as an array with three values"
+echo "=========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2?attrs=rel&prettyPrint=yes&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with 3 properties (prop, prop2, and prop3) with a mix of datasetIds
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET E1 with attr 'prop' - see 3 instances of 'prop'
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 399
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "prop": [
+    {
+      "type": "Property",
+      "value": "no dataset id"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:2",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    }
+  ]
+}
+
+
+
+03. GET E1 with attr 'prop2' - see 1 instance of 'prop2'
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 182
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "prop2": {
+    "type": "Property",
+    "value": "dataset urn:ngsi-ld/dataset:1",
+    "datasetId": "urn:ngsi-ld/dataset:1"
+  }
+}
+
+
+
+04. GET E1 with attr 'prop3' - see 1 instance of 'prop3'
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 124
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "prop3": {
+    "type": "Property",
+    "value": "no dataset id"
+  }
+}
+
+
+
+05. Create an entity E2 with 3 relationships (rel, rel2, and rel3) with a mix of datasetIds
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+06. GET E2 with attr 'rel' - see 3 instances of 'rel'
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 401
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "rel": [
+    {
+      "type": "Relationship",
+      "object": "urn:no_dataset_id"
+    },
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld/dataset:1",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld/dataset:2",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    }
+  ]
+}
+
+
+
+07. GET E2 with attr 'rel2' - see 1 instance of 'rel2'
+======================================================
+
+
+08. GET E2 with attr 'rel3' - see 1 instance of 'rel3'
+======================================================
+
+
+09. GET E1 with attr 'prop' and options=keyValues - see 'prop' as an array with three values
+============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 164
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "prop": [
+    "no dataset id",
+    "dataset urn:ngsi-ld/dataset:1",
+    "dataset urn:ngsi-ld/dataset:2"
+  ]
+}
+
+
+
+10. GET E2 with attr 'rel' and options=keyValues - see 'rel' as an array with three values
+==========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "rel": [
+    "urn:no_dataset_id",
+    "urn:ngsi-ld/dataset:1",
+    "urn:ngsi-ld/dataset:2"
+  ]
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

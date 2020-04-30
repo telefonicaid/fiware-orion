@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldUriExpand.h"                  // orionldUriExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToStringList.h"                 // Own interface
 
 
@@ -45,27 +45,16 @@ extern "C"
 //
 // kjTreeToStringList -
 //
-bool kjTreeToStringList(ConnectionInfo* ciP, KjNode* kNodeP, std::vector<std::string>* stringListP)
+bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP)
 {
-  KjNode* attributeP;
-
-  for (attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
+  for (KjNode* attributeP = kNodeP->value.firstChildP; attributeP != NULL; attributeP = attributeP->next)
   {
-    char  expanded[256];
-    char* details;
+    char*   expanded;
 
     STRING_CHECK(attributeP, "String-List item");
-
-    if (orionldUriExpand(orionldState.contextP, attributeP->value.s, expanded, sizeof(expanded), &details) == false)
-    {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Error during URI expansion of entity type", details, OrionldDetailsString);
-      delete stringListP;  // ?
-      return false;
-    }
-
+    expanded = orionldContextItemExpand(orionldState.contextP, attributeP->value.s, NULL, true, NULL);
     stringListP->push_back(expanded);
   }
 
   return true;
 }
-

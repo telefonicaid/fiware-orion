@@ -1,0 +1,378 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Creation and Retrieval
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
+# 02. See the two entities in mongo
+# 03. T3: Extract creDate and modDate of E1 and E2 from mongo (E1_T3_creDate, E1_T3_modDate, E2_T3_creDate, E2_T3_modDate)
+# 04. Sleep 3 secs - to force E2::creDate to be 3 secs older than E2::modDate after step 05
+# 05. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
+# 06. T6: Extract creDate and modDate of E1, E2 and E3 from mongo
+# 07. Make sure all creDate/modDates are correct
+# 08. See E1-E3 in mongo. E1::P2: STEP 01, E2/E3::P2: STEP 05
+#
+
+echo "01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace"
+echo "============================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=replace" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. See the two entities in mongo"
+echo "================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})'
+echo
+echo
+
+
+echo "03. T3: Extract creDate and modDate of E1 and E2 from mongo (E1_T3_creDate, E1_T3_modDate, E2_T3_creDate, E2_T3_modDate)"
+echo "========================================================================================================================"
+E1_T3_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})' | grep '^	"creDate"')
+E1_T3_modDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})' | grep '^	"modDate"')
+E2_T3_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})' | grep '^	"creDate"')
+E2_T3_modDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})' | grep '^	"modDate"')
+echo $E1_T3_creDate
+echo $E1_T3_modDate
+echo $E2_T3_creDate
+echo $E2_T3_modDate
+echo
+echo
+
+
+#
+# Sleep 3 secs to provoke a modDate different from creDate - creDate should stay intact in step 05
+#
+echo "04. Sleep 3 secs - to force E2::creDate to be 3 secs older than E2::modDate after step 05"
+echo "========================================================================================="
+sleep 3
+echo Slept 3 seconds
+echo
+echo
+
+
+echo "05. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace"
+echo "======================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=replace" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. T6: Extract creDate and modDate of E1, E2 and E3 from mongo"
+echo "==============================================================="
+E1_T6_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})' | grep '^	"creDate"')
+E1_T6_modDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})' | grep '^	"modDate"')
+E2_T6_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})' | grep '^	"creDate"')
+E2_T6_modDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})' | grep '^	"modDate"')
+E3_T6_creDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E3"})' | grep '^	"creDate"')
+E3_T6_modDate=$(mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E3"})' | grep '^	"modDate"')
+echo E1: $E1_T6_creDate
+echo E1: $E1_T6_modDate
+echo E2: $E2_T6_creDate
+echo E2: $E2_T6_modDate
+echo E3: $E3_T6_creDate
+echo E3: $E3_T6_modDate
+echo
+echo
+
+
+echo "07. Make sure all creDate/modDates are correct"
+echo "=============================================="
+if [ "$E1_T6_creDate" != "$E1_T3_creDate" ]
+then
+  echo "E1::creDate has changed!!"
+else
+  echo "E1::creDate is OK"
+fi
+
+if [ "$E1_T6_modDate" != "$E1_T3_modDate" ]
+then
+  echo "E1::modDate has changed without the entity being updated!!"
+else
+  echo "E1::modDate is OK"
+fi
+
+if [ "$E2_T6_creDate" != "$E2_T3_creDate" ]
+then
+  echo "E2::creDate has changed!!!"
+  echo $E2_T3_creDate
+  echo $E2_T6_creDate
+else
+  echo "E2::creDate is OK"
+fi
+
+if [ "$E2_T6_modDate" == "$E2_T3_modDate" ]
+then
+  echo "E2::modDate has NOT changed!!!"
+else
+  echo "E2::modDate is OK"
+fi
+
+echo
+echo
+
+
+echo "08. See E1-E3 in mongo. E1::P2: STEP 01, E2/E3::P2: STEP 05"
+echo "==========================================================="
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E1"})'
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E2"})'
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entity:E3"})'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
+============================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. See the two entities in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "STEP 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "STEP 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. T3: Extract creDate and modDate of E1 and E2 from mongo (E1_T3_creDate, E1_T3_modDate, E2_T3_creDate, E2_T3_modDate)
+========================================================================================================================
+"creDate" : REGEX(.*),
+"modDate" : REGEX(.*),
+"creDate" : REGEX(.*),
+"modDate" : REGEX(.*),
+
+
+04. Sleep 3 secs - to force E2::creDate to be 3 secs older than E2::modDate after step 05
+=========================================================================================
+Slept 3 seconds
+
+
+05. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
+=======================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. T6: Extract creDate and modDate of E1, E2 and E3 from mongo
+===============================================================
+E1: "creDate" : REGEX(.*),
+E1: "modDate" : REGEX(.*),
+E2: "creDate" : REGEX(.*),
+E2: "modDate" : REGEX(.*),
+E3: "creDate" : REGEX(.*),
+E3: "modDate" : REGEX(.*),
+
+
+07. Make sure all creDate/modDates are correct
+==============================================
+E1::creDate is OK
+E1::modDate is OK
+E2::creDate is OK
+E2::modDate is OK
+
+
+08. See E1-E3 in mongo. E1::P2: STEP 01, E2/E3::P2: STEP 05
+===========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "STEP 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E2",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "STEP 05",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E3",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "STEP 05",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

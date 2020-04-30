@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -66,7 +66,8 @@ bool urlParse
       protocol[toIx] = url[urlIx];
     else
     {
-      *detailsPP = (char*) "not enough room in protocol char vector";
+      LM_W(("Bad Input (not enough room in protocol char vector: url='%s')", url));
+      *detailsPP = (char*) "Not a URI";
       protocol[toIx] = 0;
       return false;
     }
@@ -99,7 +100,7 @@ bool urlParse
   // 3. Getting the IP address
   //
   toIx = 0;
-  while ((url[urlIx] != 0) && (url[urlIx] != '/'))
+  while ((url[urlIx] != 0) && (url[urlIx] != '/') && (url[urlIx] != ':'))
   {
     if (toIx < ipSize - 1)
       ip[toIx] = url[urlIx];
@@ -114,12 +115,10 @@ bool urlParse
     ++urlIx;
   }
 
-  if (url[urlIx] == 0)
-  {
-    *detailsPP = (char*) "URL parse error - no slash found after IP address";
-    return false;
-  }
   ip[toIx] = 0;
+
+  if (url[urlIx] == 0)
+    return true;
 
 
   //
@@ -131,19 +130,18 @@ bool urlParse
 
     toIx = 0;
 
-    urlIx += 1;  // Step over the ':'
+    urlIx += 1;     // Step over the ':'
 
     while ((url[urlIx] != 0) && (url[urlIx] != '/'))
     {
       portNumberString[toIx++] = url[urlIx++];
     }
-    if (url[urlIx] == 0)
-    {
-      *detailsPP = (char*) "URL parse error - no slash found after port number";
-      return false;
-    }
+
     portNumberString[toIx] = 0;
     *portP = atoi(portNumberString);
+
+    if (url[urlIx] == 0)
+      return true;
   }
 
   //

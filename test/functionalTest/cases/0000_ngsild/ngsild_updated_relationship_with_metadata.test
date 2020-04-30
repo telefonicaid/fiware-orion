@@ -1,0 +1,421 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Adding a Relationship with metadata, then changing+adding metadata
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity without relationship 'locatedIn'
+# 02. GET the entity, make sure all props/rels are present
+# 03. Add the Relationship 'locatedIn', with metadata
+# 04. GET the entity, make sure all metadata of 'locatedIn' are present
+# 05. Update 'locatedIn', changing its value
+# 06. GET the entity, make sure the value of 'locatedIn' has changed
+# 07. Update 'locatedIn', adding another metadata
+# 08. GET the entity, make sure only new metadata of 'locatedIn' are present
+# 09. GET the entity, with tutorials.Step-by-Step context - see shortnames
+#
+
+echo "01. Create an entity without relationship 'locatedIn'"
+echo "====================================================="
+payload='{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "Shelf",
+  "location": {
+    "type": "GeoProperty",
+    "value": {"type": "Point","coordinates": [13.3986112,52.554699]}
+  },
+  "maxCapacity": {"type": "Property","value": 50},
+  "name": {"type": "Property","value": "Corner Unit"},
+  "stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "@context": [
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. GET the entity, make sure all props/rels are present"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
+echo
+echo
+
+
+echo "03. Add the Relationship 'locatedIn',	with metadata"
+echo "==================================================="
+payload='{
+  "locatedIn" : {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store001",
+    "installedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:employee001"
+    },
+    "statusOfWork": {
+      "type": "Property",
+      "value": "completed"
+    }
+  },
+  "@context": [
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001/attrs --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "04. GET the entity, make sure all metadata of 'locatedIn' are present"
+echo "====================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
+echo
+echo
+
+
+echo "05. Update 'locatedIn', changing its value"
+echo "=========================================="
+payload='{
+  "locatedIn" : {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store002"
+  },
+  "@context": [
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001/attrs --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "06. GET the entity, make sure the value of 'locatedIn' has changed"
+echo "=================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
+echo
+echo
+
+
+echo "07. Update 'locatedIn', adding another metadata"
+echo "==============================================="
+payload='{
+  "locatedIn" : {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:store002",
+    "xtraMdata": {
+      "type": "Property",
+      "value": "urn:ngsi-ld:Building:store005"
+    }
+  },
+  "@context": [
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001/attrs --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "08. GET the entity, make sure only new metadata of 'locatedIn' are present"
+echo "=========================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix
+echo
+echo
+
+
+echo "09. GET the entity, with tutorials.Step-by-Step context - see shortnames"
+echo "========================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001?prettyPrint=yes' --noPayloadCheck --linkHeaderFix -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity without relationship 'locatedIn'
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Shelf:unit001
+Date: REGEX(.*)
+
+
+
+02. GET the entity, make sure all props/rels are present
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 603
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  }
+}
+
+
+
+03. Add the Relationship 'locatedIn',	with metadata
+===================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. GET the entity, make sure all metadata of 'locatedIn' are present
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 1108
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
+    "object": "urn:ngsi-ld:Building:store001",
+    "type": "Relationship",
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/installedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:employee001"
+    },
+    "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
+      "type": "Property",
+      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
+    }
+  }
+}
+
+
+
+05. Update 'locatedIn', changing its value
+==========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET the entity, make sure the value of 'locatedIn' has changed
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 754
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
+    "object": "urn:ngsi-ld:Building:store002",
+    "type": "Relationship"
+  }
+}
+
+
+
+07. Update 'locatedIn', adding another metadata
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. GET the entity, make sure only new metadata of 'locatedIn' are present
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 853
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn": {
+    "object": "urn:ngsi-ld:Building:store002",
+    "type": "Relationship",
+    "xtraMdata": {
+      "type": "Property",
+      "value": "urn:ngsi-ld:Building:store005"
+    }
+  }
+}
+
+
+
+09. GET the entity, with tutorials.Step-by-Step context - see shortnames
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 633
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Shelf:unit001",
+  "type": "Shelf",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.398611,
+        52.554699
+      ]
+    }
+  },
+  "maxCapacity": {
+    "type": "Property",
+    "value": 50
+  },
+  "name": {
+    "type": "Property",
+    "value": "Corner Unit"
+  },
+  "stocks": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Product:001"
+  },
+  "locatedIn": {
+    "object": "urn:ngsi-ld:Building:store002",
+    "type": "Relationship",
+    "xtraMdata": {
+      "type": "Property",
+      "value": "urn:ngsi-ld:Building:store005"
+    }
+  }
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

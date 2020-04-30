@@ -24,6 +24,8 @@
 #
 date
 export BROKER=${BROKER:-orionld}
+export ORIONLD_SUPPRESS_LOG_FILE_OUTPUT=${ORIONLD_SUPPRESS_LOG_FILE_OUTPUT:-NO}
+
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 
@@ -48,7 +50,7 @@ function logMsg()
   now=$(date)
   echo $now: $* >> $LOG_FILE
 }
-
+export -f logMsg
 
 
 # -----------------------------------------------------------------------------
@@ -76,6 +78,7 @@ then
   dirname="."
 fi
 
+export REPO_HOME=$PWD
 cd $dirname
 export SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
@@ -140,8 +143,10 @@ function usage()
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
-  echo "$empty [-s (silent)]"
+  echo "$empty [--loud (loud - see travis extra info)]"
   echo "$empty [-ld (only ngsild tests)]"
+  echo "$empty [-eb (external broker)]"
+  echo "$empty [-tk (on error, show the diff ising tkdiff)]"
   echo "$empty [--filter <test filter>]"
   echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
@@ -192,6 +197,30 @@ function vMsg()
 
 # -----------------------------------------------------------------------------
 #
+# If in TRAVIS, a few functests must be disabled
+#
+if [ "$TRAVIS" != "" ]
+then
+    echo "==========================================================================================="
+    echo "==                                                                                       =="
+    echo "==    RUNNING INSIDE TRAVIS                                                              =="
+    echo "==                                                                                       =="
+    echo "==========================================================================================="
+    CB_SKIP_FUNC_TESTS="0000_large_requests/notification_different_sizes.test"
+    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0000_ipv6_support/ipv4_ipv6_both.test"
+    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0706_direct_https_notifications/direct_https_notifications.test"
+    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test"
+    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 2015_notification_templates/notification_templates_cache_refresh.test"
+    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 2015_notification_templates/notification_templates_many_notifications.test"
+    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0000_ngsild/ngsild_subscription_with_mqtt_notification_01.test"
+    echo TRAVIS: $TRAVIS
+    echo TRAVIS run skips tests $CB_SKIP_FUNC_TESTS
+fi
+
+
+
+# -----------------------------------------------------------------------------
+#
 # exitFunction
 #
 function exitFunction()
@@ -208,14 +237,7 @@ function exitFunction()
   logMsg "FAILURE $exitCode for test $testFile: $errorText"
   echo -n "(FAILURE $exitCode - $errorText) "
 
-  #
-  # To only run this verbose output under Travis/Jenkins, I need an env var or a CLI option here ...
-  #
-  # if [ "$TRAVIS" == "YES" ]
-  # then
-  # ...
-
-  if [ "$silent" == "off" ]
+  if [ "$TRAVIS" != "" ] || [ "$loud" == "on" ]
   then
       #
       # Error 9 - output not as expected
@@ -232,7 +254,7 @@ function exitFunction()
           echo
 
           cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-          if [ -s /tmp/orionld.err-warn.log ]
+          if [ "$ORIONLD_SUPPRESS_LOG_FILE_OUTPUT" != "YES" ] && [ -s /tmp/orionld.err-warn.log ]
           then
               echo "Errors and warnings from the orionld log file"
               echo "-------------------------------------------------"
@@ -370,7 +392,7 @@ logMsg "$ME, in directory $SCRIPT_HOME"
 typeset -i fromIx
 typeset -i toIx
 verbose=off
-silent=off
+loud=off
 dryrun=off
 keep=off
 stopOnError=off
@@ -387,14 +409,17 @@ ixList=""
 noCache=""
 threadpool=ON
 ngsild=OFF
+externalBroker=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
-  elif [ "$1" == "-s" ];             then silent=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
+  elif [ "$1" == "-eb" ];            then externalBroker=ON;
+  elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
+  elif [ "$1" == "--loud" ];         then loud=on;
   elif [ "$1" == "--dryrun" ];       then dryrun=on;
   elif [ "$1" == "--keep" ];         then keep=on;
   elif [ "$1" == "--stopOnError" ];  then stopOnError=on;
@@ -423,6 +448,17 @@ do
 done
 
 logMsg "options parsed"
+
+
+
+# -----------------------------------------------------------------------------
+#
+# If -eb is set, then the env var EXTERNAL_BROKER is set to "ON"
+#
+if [ "$externalBroker" == "ON" ]
+then
+  export CB_EXTERNAL_BROKER=ON
+fi
 
 
 

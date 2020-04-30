@@ -30,9 +30,7 @@
 #include "rest/ConnectionInfo.h"
 
 #ifdef ORIONLD
-#include "orionld/context/orionldCoreContext.h"
-#include "orionld/context/orionldContextFree.h"
-#include "orionld/common/OrionldConnection.h"                    // orionldState
+#include "orionld/common/orionldState.h"                    // orionldState
 #endif
 
 
@@ -58,6 +56,8 @@ static const char* validOptions[] =
 #ifdef ORIONLD
   , OPT_SYS_ATTRS
   , OPT_NO_OVERWRITE
+  , OPT_UPDATE
+  , OPT_REPLACE
 #endif
 };
 
@@ -226,10 +226,13 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
 #ifdef ORIONLD
     if (strcmp(vec[ix].c_str(), "noOverwrite") == 0)
-    {
-      LM_TMP(("AppendAttributes: Setting orionldState.uriParamOptions.noOverwrite to TRUE"));
       orionldState.uriParamOptions.noOverwrite = true;
-    }
+    else if (strcmp(vec[ix].c_str(), "update") == 0)
+      orionldState.uriParamOptions.update = true;
+    else if (strcmp(vec[ix].c_str(), "replace") == 0)
+      orionldState.uriParamOptions.replace = true;
+    else if (strcmp(vec[ix].c_str(), "keyValues") == 0)
+      orionldState.uriParamOptions.keyValues = true;
 #endif
   }
 

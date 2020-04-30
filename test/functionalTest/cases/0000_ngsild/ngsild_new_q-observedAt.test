@@ -1,0 +1,150 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with q filter over observedAt
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# FIXME:  Really it's a DOUBT
+#         In step 10 and 11, why don't "String 1" and "String 2" match   != 2..6 ?
+#
+#
+# 01. Create E1 with type T and attr A=1, and observedAt="2018-01-13"
+# 02. Create E2 with type T and attr A=2, and observedAt="2018-01-14"
+# 03. Create E3 with type T and attr A="String 1", and observedAt="2018-01-15"
+# 04. GET all entities with observedAt==2018-01-13 - see E1
+#
+
+echo '01. Create E1 with type T and attr A=1, and observedAt="2018-01-13"'
+echo '==================================================================='
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "A": {
+    "observedAt": "2018-01-13",
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '02. Create E2 with type T and attr A=2, and observedAt="2018-01-14"'
+echo '==================================================================='
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T",
+  "A": {
+    "observedAt": "2018-01-14",
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '03. Create E3 with type T and attr A="String 1", and observedAt="2018-01-15"'
+echo '============================================================================'
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T",
+  "A": {
+    "observedAt": "2018-01-15",
+    "type": "Property",
+    "value": "String 1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo '04. GET all entities with observedAt==2018-01-13 - see E1'
+echo '========================================================='
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=A.observedAt==2018-01-13'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with type T and attr A=1, and observedAt="2018-01-13"
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Create E2 with type T and attr A=2, and observedAt="2018-01-14"
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+Date: REGEX(.*)
+
+
+
+03. Create E3 with type T and attr A="String 1", and observedAt="2018-01-15"
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
+Date: REGEX(.*)
+
+
+
+04. GET all entities with observedAt==2018-01-13 - see E1
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 114
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A": {
+            "observedAt": "2018-01-13T00:00:00Z",
+            "type": "Property",
+            "value": 1
+        },
+        "id": "http://a.b.c/entity/E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

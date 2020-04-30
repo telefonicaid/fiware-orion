@@ -1,22 +1,22 @@
-# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -158,7 +158,19 @@ echo
 echo "11. POST /ngsi-ld/v1/csourceRegistrations"
 echo "========================================="
 payload='{
-  "expiration": "now"
+  "type": "ContextSourceRegistration",
+  "expires": "2028-12-31T10:00:00",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "http://a.b.c/E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -212,7 +224,7 @@ echo
 
 echo "18. DELETE /ngsi-ld/v1/csourceRegistrations/R1"
 echo "=============================================="
-orionCurl --url /ngsi-ld/v1/csourceRegistrations/R1 -X DELETE
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 -X DELETE
 echo
 echo
 
@@ -230,7 +242,6 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -239,14 +250,14 @@ Date: REGEX(.*)
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 404 Not Found
-Content-Length: 120
+Content-Length: 138
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "no details",
-    "title": "No context element found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
@@ -255,7 +266,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -269,37 +280,34 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "S1",
+    "detail": "S1",
     "title": "subscription not found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
 05. GET /ngsi-ld/v1/csourceRegistrations
 ========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 148
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-{
-    "details": "no details",
-    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
+[]
 
 
 06. GET /ngsi-ld/v1/csourceRegistrations/R1
 ===========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 142
+HTTP/1.1 404 Not Found
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "R1",
-    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "R1",
+    "title": "registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
@@ -311,9 +319,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "C1",
+    "detail": "C1",
     "title": "Context Not Found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -334,9 +342,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://a.b.c/list/of/entities/E9.xxx",
+    "detail": "http://a.b.c/list/of/entities/E9.xxx",
     "title": "Entity does not exist",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -351,16 +359,11 @@ Date: REGEX(.*)
 
 11. POST /ngsi-ld/v1/csourceRegistrations
 =========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 148
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)
 Date: REGEX(.*)
 
-{
-    "details": "no details",
-    "title": "Not implemented - GET /ngsi-ld/v1/csourceRegistrations",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
 
 
 12. PATCH /ngsi-ld/v1/entities/E1/attrs
@@ -371,65 +374,65 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://a.b.c/list/of/entities/E1.xxx",
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
     "title": "Entity does not exist",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 13. PATCH /ngsi-ld/v1/subscriptions/S1
 ======================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 137
+HTTP/1.1 400 Bad Request
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "S1",
-    "title": "Not implemented - PATCH /ngsi-ld/v1/subscriptions/*",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "S1",
+    "title": "Subscription ID must be a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 14. PATCH /ngsi-ld/v1/csourceRegistrations/R1
 =============================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 144
+HTTP/1.1 400 Bad Request
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "R1",
-    "title": "Not implemented - PATCH /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "R1",
+    "title": "Registration ID must be a valid URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 15. DELETE /ngsi-ld/v1/entities/E9
 ==================================
 HTTP/1.1 404 Not Found
-Content-Length: 180
+Content-Length: 175
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://a.b.c/list/of/entities/E9.xxx",
-    "title": "The requested entity has not been found. Check type and id",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+    "detail": "http://a.b.c/list/of/entities/E9.xxx",
+    "title": "The requested entity has not been found. Check its id",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
 16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
 ===========================================
 HTTP/1.1 404 Not Found
-Content-Length: 176
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/http://a.b.c/list/of/attributes/A1.xxx",
+    "detail": "http://a.b.c/list/of/attributes/A1.xxx",
     "title": "Attribute Not Found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -441,23 +444,23 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "S1",
+    "detail": "S1",
     "title": "The requested subscription has not been found. Check id",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
 ==============================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 145
+HTTP/1.1 404 Not Found
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "R1",
-    "title": "Not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "urn:R1",
+    "title": "Context Source Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -469,9 +472,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "/ngsi-ld/nada",
+    "detail": "/ngsi-ld/nada",
     "title": "Service Not Found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
 

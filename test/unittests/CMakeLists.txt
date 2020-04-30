@@ -65,8 +65,6 @@ SET (SOURCES
     testInit.cpp
     unittest.cpp
 
-    orionld/partialUpdate_test.cpp
-
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
@@ -219,6 +217,7 @@ SET (STATIC_LIBS
     ${GMOCKMAIN_LIBRARY}
     ${ORION_LIBS}
     ${COMMON_STATIC_LIBS}
+    ${ORION_LIBS}
 )
 
 # Include directories
@@ -238,6 +237,8 @@ link_directories("/usr/lib/x86_64-linux-gnu")
 link_directories("${PROJECT_SOURCE_DIR}/../kjson")
 link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
+link_directories("${PROJECT_SOURCE_DIR}/../khash")
+link_directories("${PROJECT_SOURCE_DIR}/../klog")
 
 
 

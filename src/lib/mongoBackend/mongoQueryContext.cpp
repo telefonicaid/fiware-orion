@@ -35,6 +35,7 @@
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 
+#include "orionld/common/orionldState.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 
@@ -387,69 +388,75 @@ HttpStatusCode mongoQueryContext
     return SccOk;
   }
 
-  ContextRegistrationResponseVector crrV;
-
-  /* In the case of empty response, if only generic processing is needed */
-  if (rawCerV.size() == 0)
+  //
+  // NGSI-LD doesn't use NGSIv1/2 forwarding so all these strange lookups in the registration collection can be avoided
+  //
+  if (orionldState.apiVersion != NGSI_LD_V1)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    ContextRegistrationResponseVector crrV;
+
+    /* In the case of empty response, if only generic processing is needed */
+    if (rawCerV.size() == 0)
     {
-      if (crrV.size() > 0)
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
       {
-        processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
+        if (crrV.size() > 0)
+        {
+          processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
+        }
       }
+
+      crrV.release();
     }
 
-    crrV.release();
-  }
-
-  /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
-  if (someContextElementNotFound(rawCerV))
-  {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
+    if (someContextElementNotFound(rawCerV))
     {
-      if (crrV.size() > 0)
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
       {
-        fillContextProviders(rawCerV, crrV);
-        processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
+        if (crrV.size() > 0)
+        {
+          fillContextProviders(rawCerV, crrV);
+          processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
+        }
       }
+
+      crrV.release();
     }
 
-    crrV.release();
-  }
+    /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
+    StringList attrNullList;
 
-  /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
-  StringList attrNullList;
-
-  if (someContextElementNotFound(rawCerV))
-  {
-    if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (someContextElementNotFound(rawCerV))
     {
-      if (crrV.size() > 0)
+      if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
       {
-        fillContextProviders(rawCerV, crrV);
+        if (crrV.size() > 0)
+        {
+          fillContextProviders(rawCerV, crrV);
+        }
       }
+
+      crrV.release();
     }
 
-    crrV.release();
-  }
-
-  /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
-   * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
-   * so we efficient not invoking registrationQuery() too much times
-   */
-  if (requestP->attributeList.size() == 0)
-  {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
+     * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
+     * so we efficient not invoking registrationQuery() too much times
+     */
+    if (requestP->attributeList.size() == 0)
     {
-      if (crrV.size() > 0)
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
       {
-        addContextProviders(rawCerV, crrV, limitReached);
+        if (crrV.size() > 0)
+        {
+          addContextProviders(rawCerV, crrV, limitReached);
+        }
       }
-    }
 
-    crrV.release();
-  }
+      crrV.release();
+    }
+  }  // NOT NGSI-LD
 
   /* Prune "not found" CERs */
   pruneContextElements(rawCerV, &responseP->contextElementResponseVector);

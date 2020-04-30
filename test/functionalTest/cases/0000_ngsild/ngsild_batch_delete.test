@@ -1,0 +1,340 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Delete for Mongo Cpp Legacy
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. POST /ngsi-ld/v1/entityOperations/delete, with a JSON object as payload - see error
+# 02. POST /ngsi-ld/v1/entityOperations/delete, with a JSON Array of 2 strings and a boolean as payload - see error
+# 03. POST /ngsi-ld/v1/entityOperations/delete, with a JSON Array of 2 strings of  which the first is a URN and the seconds is not a valid URI - see error
+# 04. Create 4 entities: E1, E2, E3, and E4
+# 05. Get all entities - see E1-E4
+# 06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete
+# 07. Get all entities - see E4
+# 08. Remove entities E10 and E11 that do not exist in database. - see error
+# 09. Remove entities E4 (exists in database) and E5 (does not exist in database) 
+#
+
+echo "01. POST /ngsi-ld/v1/entityOperations/delete, with a JSON object as payload - see error"
+echo "======================================================================================="
+payload='{
+  "id1": "id2"
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /ngsi-ld/v1/entityOperations/delete, with a JSON Array of 2 strings and a boolean as payload - see error"
+echo "================================================================================================================="
+payload='[
+  "urn:ngsi-ld:entity:E1",
+  "urn:ngsi-ld:entity:E2",
+  true
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. POST /ngsi-ld/v1/entityOperations/delete, with a JSON Array of 2 strings of  which the first is a URN and the seconds is not a valid URI - see error"
+echo "========================================================================================================================================================"
+payload='[
+  "urn:ngsi-ld:entity:E1",
+  "mal"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Create 4 entities: E1, E2, E3, and E4"
+echo "========================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:ngsi-ld:entity:E3",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:ngsi-ld:entity:E4",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 4
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Get all entities - see E1-E4"
+echo "================================"
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&type=T"
+echo
+echo
+
+
+echo "06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete"
+echo "========================================================================"
+payload='[
+  "urn:ngsi-ld:entity:E1",
+  "urn:ngsi-ld:entity:E2",
+  "urn:ngsi-ld:entity:E3"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "07. Get all entities - see E4"
+echo "================================"
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&type=T"
+echo
+echo
+
+
+echo "08. Remove entities that do not exist in the database. - see error"
+echo "=================================================================="
+payload='[
+  "urn:ngsi-ld:entity:E10",
+  "urn:ngsi-ld:entity:E11"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "09. Remove entities E4 (exists in database) and E5 (does not exist in database)"
+echo "==============================================================================="
+payload='[
+  "urn:ngsi-ld:entity:E4",
+  "urn:ngsi-ld:entity:E5"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /ngsi-ld/v1/entityOperations/delete, with a JSON object as payload - see error
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Must be a JSON Array",
+    "title": "Invalid payload",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. POST /ngsi-ld/v1/entityOperations/delete, with a JSON Array of 2 strings and a boolean as payload - see error
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Array items must be JSON Strings",
+    "title": "Invalid payload",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. POST /ngsi-ld/v1/entityOperations/delete, with a JSON Array of 2 strings of  which the first is a URN and the seconds is not a valid URI - see error
+========================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Array items must be valid URIs",
+    "title": "Invalid payload",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Create 4 entities: E1, E2, E3, and E4
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E3
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E4
+Date: REGEX(.*)
+
+
+
+05. Get all entities - see E1-E4
+================================
+HTTP/1.1 200 OK
+Content-Length: 193
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A": 1,
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "A": 2,
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    },
+    {
+        "A": 3,
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "T"
+    },
+    {
+        "A": 4,
+        "id": "urn:ngsi-ld:entity:E4",
+        "type": "T"
+    }
+]
+
+
+06. Remove entities E1-E3 using POST /ngsi-ld/v1/entityOperations/delete
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
+
+
+07. Get all entities - see E4
+================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A": 4,
+        "id": "urn:ngsi-ld:entity:E4",
+        "type": "T"
+    }
+]
+
+
+08. Remove entities that do not exist in the database. - see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entities were not found in database.",
+    "title": "Entities not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Remove entities E4 (exists in database) and E5 (does not exist in database)
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 125
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E5",
+            "error": "Entity not found in database."
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entity:E4"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

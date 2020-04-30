@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -111,22 +111,22 @@ Date: REGEX(.*)
 02. See E1 in mongo
 ===================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : {
 		"id" : "urn:ngsi-ld:T_Query:EntityForQuery2345",
-		"type" : "http://example.org/ngsi-ld/default/T_Query",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T_Query",
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"http://example.org/ngsi-ld/default/P100",
-		"http://example.org/ngsi-ld/default/P1",
-		"http://example.org/ngsi-ld/default/R100",
+		"https://uri.etsi.org/ngsi-ld/default-context/P100",
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R100",
 		"location"
 	],
 	"attrs" : {
-		"http://example=org/ngsi-ld/default/P100" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P100" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -135,46 +135,46 @@ MongoDB server version: REGEX(.*)
 				"observedAt" : {
 					"value" : 1543924800
 				},
-				"P1_R1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_R1" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T2:6789"
 				},
-				"P1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/P1_P1" : {
 					"type" : "Property",
 					"value" : 0.79
 				}
 			},
 			"mdNames" : [
 				"observedAt",
-				"P1_R1",
-				"P1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/P1_P1"
 			]
 		},
-		"http://example=org/ngsi-ld/default/P1" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : 45,
 			"mdNames" : [ ]
 		},
-		"http://example=org/ngsi-ld/default/R100" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/R100" : {
 			"type" : "Relationship",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:T2:6789",
 			"md" : {
-				"R1_R1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_R1" : {
 					"type" : "Relationship",
 					"value" : "urn:ngsi-ld:T3:A2345"
 				},
-				"R1_P1" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/R1_P1" : {
 					"type" : "Property",
 					"value" : false
 				}
 			},
 			"mdNames" : [
-				"R1_R1",
-				"R1_P1"
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_R1",
+				"https://uri.etsi.org/ngsi-ld/default-context/R1_P1"
 			]
 		},
 		"location" : {
@@ -193,16 +193,6 @@ MongoDB server version: REGEX(.*)
 	},
 	"creDate" : REGEX(.*),
 	"modDate" : REGEX(.*),
-	"location" : {
-		"attrName" : "location",
-		"coords" : {
-			"type" : "Point",
-			"coordinates" : [
-				75.01,
-				-30.01
-			]
-		}
-	},
 	"lastCorrelator" : ""
 }
 bye
@@ -213,7 +203,6 @@ bye
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []

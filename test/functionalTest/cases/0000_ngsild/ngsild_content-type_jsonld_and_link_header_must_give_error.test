@@ -1,0 +1,100 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Context in HTTP Link header AND Content-Type == application/ld+json must give error for all requests
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Attempt to create an entity E1 with a context in HTTP header 'Link' AND Content-Type ==	application/ld+json + @content in payload
+# 02. Attempt to create two entities, using batch upsert, with a context in HTTP header 'Link' AND Content-Type == application/ld+json + @content in payload
+#
+
+echo "01. Attempt to create an entity E1 with a context in HTTP header 'Link' AND Content-Type ==	application/ld+json + @content in payload"
+echo "====================================================================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T1",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --in jsonld -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "02. Attempt to create two entities, using batch upsert, with a context in HTTP header 'Link' AND Content-Type == application/ld+json + @content in payload"
+echo "=========================================================================================================================================================="
+payload='[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "T1",
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "T1",
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" --in jsonld -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an entity E1 with a context in HTTP header 'Link' AND Content-Type ==	application/ld+json + @content in payload
+=====================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 233
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Content-Type is 'application/ld+json' AND Link header is present - not allowed",
+    "title": "invalid combination of HTTP headers Content-Type and Link",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create two entities, using batch upsert, with a context in HTTP header 'Link' AND Content-Type == application/ld+json + @content in payload
+==========================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 233
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Content-Type is 'application/ld+json' AND Link header is present - not allowed",
+    "title": "invalid combination of HTTP headers Content-Type and Link",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

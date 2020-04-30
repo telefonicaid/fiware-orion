@@ -133,6 +133,8 @@
 #ifdef ORIONLD
 #define OPT_SYS_ATTRS       "sysAttrs"
 #define OPT_NO_OVERWRITE    "noOverwrite"
+#define OPT_UPDATE          "update"
+#define OPT_REPLACE         "replace"
 #endif
 
 

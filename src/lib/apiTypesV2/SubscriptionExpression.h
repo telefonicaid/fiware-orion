@@ -30,8 +30,7 @@
 #include "rest/StringFilter.h"
 
 
-
-/* ***********************************************
+/* ****************************************************************************
 *
 * SubscriptionExpression -
 *
@@ -50,6 +49,9 @@ struct SubscriptionExpression
   std::string               geometry;
   std::string               coords;
   std::string               georel;
+#ifdef ORIONLD
+  std::string               geoproperty;
+#endif
 
   StringFilter              stringFilter;
   StringFilter              mdStringFilter;

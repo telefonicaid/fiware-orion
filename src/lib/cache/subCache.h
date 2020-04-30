@@ -212,6 +212,9 @@ extern void subCacheItemInsert
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
+#ifdef ORIONLD
+  const std::string&                 geoproperty,
+#endif
   bool                               blacklist
 );
 

@@ -348,8 +348,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "A2",
-                "A1"
+                "REGEX((A1|A2))",
+                "REGEX((A1|A2))"
             ],
             "name": "T1"
         },
@@ -361,8 +361,8 @@ Date: REGEX(.*)
         },
         {
             "attributes": [
-                "A2",
-                "A1"
+                "REGEX((A1|A2))",
+                "REGEX((A1|A2))"
             ],
             "name": "T3"
         }
@@ -498,8 +498,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "A2",
-                "A1"
+                "REGEX((A1|A2))",
+                "REGEX((A1|A2))"
             ],
             "name": "T1"
         },
@@ -511,8 +511,8 @@ Date: REGEX(.*)
         },
         {
             "attributes": [
-                "A2",
-                "A1"
+                "REGEX((A1|A2))",
+                "REGEX((A1|A2))"
             ],
             "name": "T3"
         },

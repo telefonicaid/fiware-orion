@@ -373,7 +373,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   //
   // Ensuring the scheme is present
   //
-  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:")))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
   {
     return false;
   }

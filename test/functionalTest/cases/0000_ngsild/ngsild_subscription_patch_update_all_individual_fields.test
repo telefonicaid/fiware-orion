@@ -1,0 +1,1892 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Patch
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# "id" and "type" cannot be altered, nor "status" that is Read-Only.
+# All other fields are altered in this test.
+#
+# 01. Create a subscription with all fields (except timeInterval)
+# 02. MONGO: see expansions of: entities:type:T1, watchedAttributes:P2, q:P2, notification:attributes:P1,P2,A3, condition:P2
+# 03. GET subscription from the broker
+#
+# 04. PATCH 'name'
+# 05. GET subscription and see the new 'name'
+# 06. PATCH 'description'
+# 07. GET subscription and see the new 'description'
+# 08. PATCH 'entities'
+# 09. MONGO: see the expanded entity types
+# 10. GET subscription and see the new 'entities'
+# 11. PATCH 'watchedAttributes'
+# 12. MONGO: see the expanded attrs in 'conditions'
+# 13. GET subscription and see the new 'watchedAttributes'
+# 14. PATCH 'timeInterval' and see error
+# 15. PATCH 'q'
+# 16. MONGO: see the expanded attributes in 'q'
+# 17. GET subscription and see the new 'q'
+# 18. PATCH 'geoQ'
+# 19. MONGO: see 'geoQ'
+# 20. GET subscription and see the new 'geoQ'
+# 21. PATCH 'csf'
+# 22. GET subscription and see the new 'csf'
+# 23. PATCH 'isActive'
+# 24. MONGO: see 'status == paused'
+# 25. GET subscription and see the new 'isActive'
+# 26. PATCH 'notification'
+# 27. MONGO: see the expanded attributes in 'notification'
+# 28. GET subscription and see the new 'notification'
+# 29. PATCH 'expires'
+# 30. GET subscription and see the new 'expires'
+# 31. PATCH 'throttling'
+# 32. GET subscription and see the new 'throttling'
+# 33. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
+# 34. PATCH all patchable fields
+# 35. GET subscription and see all the fields
+# 36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
+#
+
+echo "01. Create a subscription with all fields (except timeInterval)"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "Test subscription S01",
+  "description": "Description of Test subscription S01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [ 1, 2 ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "isActive": true,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. MONGO: see expansions of: entities:type:T1, watchedAttributes:P2, q:P2, notification:attributes:P1,P2,A3, condition:P2"
+echo "=========================================================================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET subscription from the broker"
+echo "===================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. PATCH 'name'"
+echo "================"
+payload='{
+  "name": "New Name"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET subscription and see the new 'name'"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "06. PATCH 'description'"
+echo "======================="
+payload='{
+  "description": "New Description"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. GET subscription and see the new 'description'"
+echo "=================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "08. PATCH 'entities'"
+echo "===================="
+payload='{
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }    
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. MONGO: see the expanded entity types"
+echo "========================================"
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "10. GET subscription and see the new 'entities'"
+echo "==============================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "11. PATCH 'watchedAttributes'"
+echo "============================="
+payload='{
+  "watchedAttributes": [ "W1" ]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "12. MONGO: see the expanded attrs in 'conditions'"
+echo "================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "13. GET subscription and see the new 'watchedAttributes'"
+echo "========================================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+
+echo "14. PATCH 'timeInterval' and see error"
+echo "======================================"
+payload='{
+  "timeInterval": 5
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "15. PATCH 'q'"
+echo "============="
+payload='{
+  "q": "A11>12;P1~=abc"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "16. MONGO: see the expanded attributes in 'q'"
+echo "============================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "17. GET subscription and see the new 'q'"
+echo "========================================"
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "18. PATCH 'geoQ'"
+echo "================"
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [[[0,0], [0,1], [-1,1], [-1,0], [0,0]]],
+    "georel": "within",
+    "geoproperty": "geo1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "19. MONGO: see 'geoQ'"
+echo "====================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "20. GET subscription and see the new 'geoQ'"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "21. PATCH 'csf'"
+echo "==============="
+payload='{
+  "csf": "CSF is not implemented yet ..."
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "22. GET subscription and see the new 'csf'"
+echo "=========================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "23. PATCH 'isActive'"
+echo "===================="
+payload='{
+  "isActive": false
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "24. MONGO: see 'status == paused'"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "25. GET subscription and see the new 'isActive'"
+echo "==============================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "26. PATCH 'notification'"
+echo "========================"
+payload='{
+  "notification": {
+    "attributes": [ "R1", "R2", "P3" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:1234/notify2",
+      "accept": "application/json"
+    }  
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "27. MONGO: see the expanded attributes in 'notification'"
+echo "========================================================"
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "28. GET subscription and see the new 'notification'"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "29. PATCH 'expires'"
+echo "==================="
+payload='{
+  "expires": "2026-04-01T12:34:56"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "30. GET subscription and see the new 'expires'"
+echo "=============================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "31. PATCH 'throttling'"
+echo "======================"
+payload='{
+  "throttling": 12
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "32. GET subscription and see the new 'throttling'"
+echo "================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "33. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition"
+echo "===================================================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "34. PATCH all patchable fields"
+echo "=============================="
+payload='{
+  "name": "Name 34",
+  "description": "Description 34",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E34",
+      "type": "T34"
+    },
+    {
+      "id": "urn:ngsi-ld:E34-2",
+      "type": "T34-2"
+    }    
+  ],
+  "watchedAttributes": [ "P34" ],
+  "q": "P34>34",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [ 34, 34 ],
+    "georel": "near;maxDistance==34",
+    "geoproperty": "geo34"
+  },
+  "csf": "34",
+  "isActive": true,
+  "notification": {
+    "attributes": [ "P34", "R34", "A34" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:3434/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:34:34",
+  "throttling": 34
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "35. GET subscription and see all the fields"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition"
+echo "===================================================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with all fields (except timeInterval)
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01
+Date: REGEX(.*)
+
+
+
+02. MONGO: see expansions of: entities:type:T1, watchedAttributes:P2, q:P2, notification:attributes:P1,P2,A3, condition:P2
+==========================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : NumberLong(5),
+	"servicePath" : "/",
+	"description" : "Description of Test subscription S01",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E01",
+			"isPattern" : "false",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Test subscription S01",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"expression" : {
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
+		"mq" : "",
+		"geometry" : "Point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance==2000",
+		"geoproperty" : "geo0"
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+03. GET subscription from the broker
+====================================
+HTTP/1.1 200 OK
+Content-Length: 758
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "Test subscription S01",
+  "description": "Description of Test subscription S01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+04. PATCH 'name'
+================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET subscription and see the new 'name'
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 745
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "Description of Test subscription S01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+06. PATCH 'description'
+=======================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. GET subscription and see the new 'description'
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 724
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+08. PATCH 'entities'
+====================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. MONGO: see the expanded entity types
+========================================
+MongoDB shell REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861869600,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "active",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"expression" : {
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
+		"mq" : "",
+		"geometry" : "Point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance==2000",
+		"geoproperty" : "geo0"
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+10. GET subscription and see the new 'entities'
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 725
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "P2"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+11. PATCH 'watchedAttributes'
+=============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+12. MONGO: see the expanded attrs in 'conditions'
+=================================================
+MongoDB shell REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861869600,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "active",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"expression" : {
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
+		"mq" : "",
+		"geometry" : "Point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance==2000",
+		"geoproperty" : "geo0"
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+13. GET subscription and see the new 'watchedAttributes'
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 725
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+14. PATCH 'timeInterval' and see error
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'",
+    "title": "Invalid Subscription Payload Data",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. PATCH 'q'
+=============
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+16. MONGO: see the expanded attributes in 'q'
+=============================================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861869600,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "active",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"expression" : {
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc",
+		"mq" : "",
+		"geometry" : "Point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance==2000",
+		"geoproperty" : "geo0"
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+17. GET subscription and see the new 'q'
+========================================
+HTTP/1.1 200 OK
+Content-Length: 734
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      1,
+      2
+    ],
+    "georel": "near;maxDistance==2000",
+    "geoproperty": "geo0"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+18. PATCH 'geoQ'
+================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+19. MONGO: see 'geoQ'
+=====================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861869600,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "active",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"format" : "keyValues",
+	"expression" : {
+		"geometry" : "Polygon",
+		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
+		"georel" : "within",
+		"geoproperty" : "geo1",
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
+	}
+}
+bye
+
+
+20. GET subscription and see the new 'geoQ'
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 1010
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [
+      [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    ],
+    "georel": "within",
+    "geoproperty": "geo1"
+  },
+  "csf": "not implemented",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+21. PATCH 'csf'
+===============
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+22. GET subscription and see the new 'csf'
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 1025
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [
+      [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    ],
+    "georel": "within",
+    "geoproperty": "geo1"
+  },
+  "csf": "CSF is not implemented yet ...",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+23. PATCH 'isActive'
+====================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+24. MONGO: see 'status == paused'
+=================================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861869600,
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "inactive",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "CSF is not implemented yet ...",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"format" : "keyValues",
+	"expression" : {
+		"geometry" : "Polygon",
+		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
+		"georel" : "within",
+		"geoproperty" : "geo1",
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
+	}
+}
+bye
+
+
+25. GET subscription and see the new 'isActive'
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 1068
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [
+      [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    ],
+    "georel": "within",
+    "geoproperty": "geo1"
+  },
+  "csf": "CSF is not implemented yet ...",
+  "isActive": false,
+  "status": "paused",
+  "notification": {
+    "attributes": [
+      "P1",
+      "P2",
+      "A3"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:9997/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+26. PATCH 'notification'
+========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+27. MONGO: see the expanded attributes in 'notification'
+========================================================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861869600,
+	"reference" : "http://localhost:1234/notify2",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 5,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "inactive",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/R1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "CSF is not implemented yet ...",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"format" : "normalized",
+	"expression" : {
+		"geometry" : "Polygon",
+		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
+		"georel" : "within",
+		"geoproperty" : "geo1",
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
+	}
+}
+bye
+
+
+28. GET subscription and see the new 'notification'
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 1067
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [
+      [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    ],
+    "georel": "within",
+    "geoproperty": "geo1"
+  },
+  "csf": "CSF is not implemented yet ...",
+  "isActive": false,
+  "status": "paused",
+  "notification": {
+    "attributes": [
+      "R1",
+      "R2",
+      "P3"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:1234/notify2",
+      "accept": "application/json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00Z",
+  "throttling": 5
+}
+
+
+
+29. PATCH 'expires'
+===================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+30. GET subscription and see the new 'expires'
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 1067
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [
+      [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    ],
+    "georel": "within",
+    "geoproperty": "geo1"
+  },
+  "csf": "CSF is not implemented yet ...",
+  "isActive": false,
+  "status": "paused",
+  "notification": {
+    "attributes": [
+      "R1",
+      "R2",
+      "P3"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:1234/notify2",
+      "accept": "application/json"
+    }
+  },
+  "expires": "2026-04-01T12:34:56Z",
+  "throttling": 5
+}
+
+
+
+31. PATCH 'throttling'
+======================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+32. GET subscription and see the new 'throttling'
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 1068
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "New Name",
+  "description": "New Description",
+  "entities": [
+    {
+      "type": "T2"
+    },
+    {
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [
+    "W1"
+  ],
+  "q": "A11>12;P1~=abc",
+  "geoQ": {
+    "geometry": "Polygon",
+    "coordinates": [
+      [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    ],
+    "georel": "within",
+    "geoproperty": "geo1"
+  },
+  "csf": "CSF is not implemented yet ...",
+  "isActive": false,
+  "status": "paused",
+  "notification": {
+    "attributes": [
+      "R1",
+      "R2",
+      "P3"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://localhost:1234/notify2",
+      "accept": "application/json"
+    }
+  },
+  "expires": "2026-04-01T12:34:56Z",
+  "throttling": 12
+}
+
+
+
+33. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
+====================================================================================================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1775046896,
+	"reference" : "http://localhost:1234/notify2",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 12,
+	"servicePath" : "/",
+	"description" : "New Description",
+	"status" : "inactive",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		},
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/R1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "New Name",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "CSF is not implemented yet ...",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"format" : "normalized",
+	"expression" : {
+		"geometry" : "Polygon",
+		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
+		"georel" : "within",
+		"geoproperty" : "geo1",
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
+	}
+}
+bye
+
+
+34. PATCH all patchable fields
+==============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+35. GET subscription and see all the fields
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 785
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S01",
+  "type": "Subscription",
+  "name": "Name 34",
+  "description": "Description 34",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E34",
+      "type": "T34"
+    },
+    {
+      "id": "urn:ngsi-ld:E34-2",
+      "type": "T34-2"
+    }
+  ],
+  "watchedAttributes": [
+    "P34"
+  ],
+  "q": "P34>34",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [
+      34,
+      34
+    ],
+    "georel": "near;maxDistance==34",
+    "geoproperty": "geo34"
+  },
+  "csf": "34",
+  "notification": {
+    "attributes": [
+      "P34",
+      "R34",
+      "A34"
+    ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://localhost:3434/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:34:34Z",
+  "throttling": 34
+}
+
+
+
+36. MONGO: check expansions of: entities:type, watchedAttributes, notification:attributes, condition
+====================================================================================================
+MongoDB shell version REGEX(.)
+connecting to: REGEX(.)
+MongoDB server version: REGEX(.)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S01",
+	"expiration" : 1861871674,
+	"reference" : "http://localhost:3434/notify",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : 34,
+	"servicePath" : "/",
+	"description" : "Description 34",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:E34",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T34",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "urn:ngsi-ld:E34-2",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T34-2",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P34",
+		"https://uri.etsi.org/ngsi-ld/default-context/R34",
+		"https://uri.etsi.org/ngsi-ld/default-context/A34"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Name 34",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"csf" : "34",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P34"
+	],
+	"format" : "keyValues",
+	"expression" : {
+		"geometry" : "Point",
+		"coords" : "34.000000,34.000000",
+		"georel" : "near;maxDistance==34",
+		"geoproperty" : "geo34",
+		"q" : "https://uri.etsi.org/ngsi-ld/default-context/P34>34"
+	}
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

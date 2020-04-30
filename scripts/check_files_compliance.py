@@ -47,7 +47,30 @@ header.append('\s*$')
 header.append('\s*For those usages not covered by this license please contact with$')
 header.append('\s*iot_support at tid dot es$')
 
-verbose = True
+header2 = []
+header2.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
+header2.append('\s*$')
+header2.append('\s*This file is part of Orion-LD Context Broker.$')
+header2.append('\s*$')
+header2.append('\s*Orion-LD Context Broker is free software: you can redistribute it and/or$')
+header2.append('\s*modify it under the terms of the GNU Affero General Public License as$')
+header2.append('\s*published by the Free Software Foundation, either version 3 of the$')
+header2.append('\s*License, or \(at your option\) any later version.$')
+header2.append('\s*$')
+header2.append('\s*Orion-LD Context Broker is distributed in the hope that it will be useful,$')
+header2.append('\s*but WITHOUT ANY WARRANTY; without even the implied warranty of$')
+header2.append('\s*MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero$')
+header2.append('\s*General Public License for more details.$')
+header2.append('\s*$')
+header2.append('\s*You should have received a copy of the GNU Affero General Public License$')
+header2.append('\s*along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.$')
+header2.append('\s*$')
+header2.append('\s*For those usages not covered by this license please contact with$')
+header2.append('\s*orionld at fiware dot org$')
+
+verbose    = True
+is_orionld = False
+
 
 # check_file returns an error string in the case of error or empty string if everything goes ok
 def check_file(file):
@@ -68,6 +91,33 @@ def check_file(file):
                     return 'mismatch: header <' + header[i] + '> : line <' + line + '>'
                 i += 1
                 if i == len(header):
+                    # We have reach the end of the header, so the complete check passes
+                    return ''
+
+    # We reach this point if the first header line was not found or if we reach the end of the file before
+    # reaching the end of the header. Both cases means false
+    return 'end of file reached without finding header beginning'
+
+
+# check_file_orionld returns an error string in the case of error or empty string if everything goes ok
+def check_file_orionld(file):
+    # The license header doesn't necessarily start on the first line, e.g. due to a #define in a .h file
+    # or a hashbang (#!/usr/bin/python...). Thus, we locate the starting line and start the comparison from
+    # that line
+
+    searching_first_line = True
+    with open(file) as f:
+        for line in f:
+            line = line.rstrip()
+            if searching_first_line:
+                if re.search(header2[0], line):
+                    searching_first_line = False
+                    i = 1
+            else:
+                if not re.search(header2[i], line):
+                    return 'mismatch: header <' + header2[i] + '> : line <' + line + '>'
+                i += 1
+                if i == len(header2):
                     # We have reach the end of the header, so the complete check passes
                     return ''
 
@@ -200,16 +250,36 @@ for root, dirs, files in os.walk(dir):
             bad += 1
             continue
 
+        error = ''
         filename = os.path.join(root, file)
-        error = check_file(filename)
+
+        if os.path.islink(filename):
+            continue
+
+        if 'src/app/orionld/' in filename:
+            is_orionld = True
+        elif 'src/lib/orionld/' in filename:
+            is_orionld = True
+        elif 'test/functionalTest/cases/0000_ngsild' in filename:
+            is_orionld = True
+        elif 'test/unittests/orionld' in filename:
+            is_orionld = True
+        else:
+            is_orionld = False
+
+        if is_orionld:
+            error = check_file_orionld(filename)
+        else:
+            error = check_file(filename)
+
         if len(error) > 0:
             print filename + ': ' + error
             bad += 1
         else:
-            # DEBUG
-            # print filename + ': OK'
             good += 1
 
+# src/lib/orionld/
+# src/app/orionld
 print '--------------'
 print 'Summary:'
 print '   good:    {good}'.format(good=str(good))

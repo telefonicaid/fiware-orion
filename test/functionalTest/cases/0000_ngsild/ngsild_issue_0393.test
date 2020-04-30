@@ -1,0 +1,236 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert complains about correct entity type
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity 'urn:ngsi-ld:testunit:125' using batch upsert
+# 02. See the entity in the database
+# 03. Update the entity 'urn:ngsi-ld:testunit:125' using batch upsert
+# 04. GET the entity, see the updated values
+#
+
+echo "01. Create an entity 'urn:ngsi-ld:testunit:125' using batch upsert"
+echo "=================================================================="
+payload=' [
+  {
+    "id": "urn:ngsi-ld:testunit:125",
+    "type": "AirQualityObserved",
+    "dateObserved": {
+      "type": "Property",
+      "value": {
+        "@type": "DateTime",
+        "@value": "2018-08-12T12:00:00Z"
+      }
+    },
+    "airQualityLevel": {
+      "type": "Property",
+      "value": "moderate"
+    },
+    "CO_Level": {
+      "type": "Property",
+      "value": "unhealthy"
+    },
+    "refPointOfInterest": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict"
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+
+echo "02. See the entity in the database"
+echo "=================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Update the entity 'urn:ngsi-ld:testunit:125' using batch upsert"
+echo "==================================================================="
+payload=' [
+  {
+    "id": "urn:ngsi-ld:testunit:125",
+    "type": "AirQualityObserved",
+    "dateObserved": {
+      "type": "Property",
+      "value": {
+        "@type": "DateTime",
+        "@value": "2018-08-12T12:00:00Z"
+      }
+    },
+    "airQualityLevel": {
+      "type": "Property",
+      "value": "BAD"
+    },
+    "CO_Level": {
+      "type": "Property",
+      "value": "unhealthy"
+    },
+    "refPointOfInterest": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict"
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ]
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=replace --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. GET the entity, see the updated values"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:testunit:125
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity 'urn:ngsi-ld:testunit:125' using batch upsert
+==================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. See the entity in the database
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:testunit:125",
+		"type" : "https://uri.fiware.org/ns/data-models#AirQualityObserved",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.fiware.org/ns/data-models#dateObserved",
+		"https://uri.fiware.org/ns/data-models#airQualityLevel",
+		"https://uri.etsi.org/ngsi-ld/default-context/CO_Level",
+		"https://uri.fiware.org/ns/data-models#refPointOfInterest"
+	],
+	"attrs" : {
+		"https://uri=fiware=org/ns/data-models#dateObserved" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"@type" : "DateTime",
+				"@value" : "2018-08-12T12:00:00Z"
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#airQualityLevel" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "moderate",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/CO_Level" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "unhealthy",
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#refPointOfInterest" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Update the entity 'urn:ngsi-ld:testunit:125' using batch upsert
+===================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. GET the entity, see the updated values
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 515
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "CO_Level": {
+        "type": "Property",
+        "value": "unhealthy"
+    },
+    "https://uri.fiware.org/ns/data-models#airQualityLevel": {
+        "type": "Property",
+        "value": "BAD"
+    },
+    "https://uri.fiware.org/ns/data-models#dateObserved": {
+        "type": "Property",
+        "value": {
+            "@type": "DateTime",
+            "@value": "2018-08-12T12:00:00Z"
+        }
+    },
+    "https://uri.fiware.org/ns/data-models#refPointOfInterest": {
+        "object": "urn:ngsi-ld:PointOfInterest:RZ:HarbourDistrict",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:testunit:125",
+    "type": "https://uri.fiware.org/ns/data-models#AirQualityObserved"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

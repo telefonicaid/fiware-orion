@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -47,17 +47,17 @@ brokerStart CB 0-255
 #
 
 #
-# 01. Create entity E1 as Rectangle Geo-polygon 0,0 -> 0,4 -2,4 -> -2,0 -> 0,0
-# 02. Create entity E2 as a Geo-point { -1, 3 } i.e. inside E1
-# 03. Query all entities using a point inside the rectangle: -1,2 - see E1
-# 04. Query all entities using a point outside the rectangle: 1,2 - see nothing
+# 01. Create entity E1 as Rectangle Geo-polygon 0,0 ->  4,0 4,-2 -> 0,-2 -> 0,0
+# 02. Create entity E2 as a Geo-point { 3, -1 } i.e. inside E1
+# 03. Query all entities using a point inside the rectangle: 2,-1 - see E1
+# 04. Query all entities using a point outside the rectangle: 2,1 - see nothing
 # 05. Query all entities using a rectangle covering E2 and WITHIN:  - see E2
 # 06. Query all entities using a rectangle NOT covering E2 and WITHIN:  - see nothing
 # 07. Query all entities using a rectangle covering E2 and OUTSIDE:  - see nothing     [Postponed]
 # 08. Query all entities using a rectangle NOT covering E2 and OUTSIDE:  - see E2      [Postponed]
 #
 
-echo "01. Create entity E1 as Rectangle Geo-polygon 0,0 ->  0,4 -2,4 -> -2,0 -> 0,0"
+echo "01. Create entity E1 as Rectangle Geo-polygon 0,0 ->  4,0 4,-2 -> 0,-2 -> 0,0"
 echo "============================================================================="
 payload='{
   "id": "urn:ngsi-ld:geo:E1",
@@ -66,7 +66,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "Polygon",
-      "coordinates": [[ [0,0], [0,4], [-2,4], [-2,0], [0,0] ]]
+      "coordinates": [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]]
     }
   }
 }'
@@ -75,7 +75,7 @@ echo
 echo
 
 
-echo "02. Create entity E2 as a Geo-point { -1, 3 } i.e. inside E1"
+echo "02. Create entity E2 as a Geo-point { 3, -1 } i.e. inside E1"
 echo "============================================================"
 payload='{
   "id": "urn:ngsi-ld:geo:E2",
@@ -84,7 +84,7 @@ payload='{
     "type": "GeoProperty",
     "value": {
       "type": "Point",
-      "coordinates": [ -1, 3 ]
+      "coordinates": [ 3, -1 ]
     }
   }
 }'
@@ -93,30 +93,30 @@ echo
 echo
 
 
-echo "03. Query all entities with a point inside the rectangle: -1,2 - see E1"
-echo "======================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[-1,2\]&georel=near;maxDistance==1'
+echo "03. Query all entities using a point inside the rectangle: 2,-1 - see E1"
+echo "========================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[2,-1\]&georel=near;maxDistance==1'
 echo
 echo
 
 
-echo "04. Query all entities with a point outside the rectangle: 1,2 - see nothing"
-echo "============================================================================"
-orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[1,2\]&georel=near;maxDistance==1'
+echo "04. Query all entities using a point outside the rectangle: 2,1 - see nothing"
+echo "============================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Point&coordinates=\[2,1\]&georel=near;maxDistance==1'
 echo
 echo
 
 
 echo "05. Query all entities using a rectangle covering E2 and WITHIN:  - see E2"
 echo "=========================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&coordinates=\[\[\[0,2\],\[0,5\],\[-2,5\],\[-2,2\],\[0,2\]\]\]&georel=within'
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&coordinates=\[\[\[2,0\],\[0,5\],\[5,-2\],\[2,-2\],\[2,0\]\]\]&georel=within'
 echo
 echo
 
 
 echo "06. Query all entities using a rectangle NOT covering E2 and WITHIN:  - see nothing"
 echo "==================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&coordinates=\[\[\[10,2\],\[10,5\],\[8,5\],\[8,2\],\[10,2\]\]\]&georel=within'
+orionCurl --url '/ngsi-ld/v1/entities?type=Geo&geometry=Polygon&coordinates=\[\[\[2,10\],\[5,10\],\[5,8\],\[2,8\],\[2,10\]\]\]&georel=within'
 echo
 echo
 
@@ -134,7 +134,7 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 as Rectangle Geo-polygon 0,0 ->  0,4 -2,4 -> -2,0 -> 0,0
+01. Create entity E1 as Rectangle Geo-polygon 0,0 ->  4,0 4,-2 -> 0,-2 -> 0,0
 =============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 
 
 
-02. Create entity E2 as a Geo-point { -1, 3 } i.e. inside E1
+02. Create entity E2 as a Geo-point { 3, -1 } i.e. inside E1
 ============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -152,12 +152,12 @@ Date: REGEX(.*)
 
 
 
-03. Query all entities with a point inside the rectangle: -1,2 - see E1
-=======================================================================
+03. Query all entities using a point inside the rectangle: 2,-1 - see E1
+========================================================================
 HTTP/1.1 200 OK
 Content-Length: 153
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -173,16 +173,16 @@ Date: REGEX(.*)
                             0
                         ],
                         [
-                            0,
-                            4
-                        ],
-                        [
-                            -2,
-                            4
-                        ],
-                        [
-                            -2,
+                            4,
                             0
+                        ],
+                        [
+                            4,
+                            -2
+                        ],
+                        [
+                            0,
+                            -2
                         ],
                         [
                             0,
@@ -198,12 +198,11 @@ Date: REGEX(.*)
 ]
 
 
-04. Query all entities with a point outside the rectangle: 1,2 - see nothing
-============================================================================
+04. Query all entities using a point outside the rectangle: 2,1 - see nothing
+=============================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []
@@ -214,7 +213,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 122
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -224,8 +223,8 @@ Date: REGEX(.*)
             "type": "GeoProperty",
             "value": {
                 "coordinates": [
-                    -1,
-                    3
+                    3,
+                    -1
                 ],
                 "type": "Point"
             }
@@ -240,7 +239,6 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 []

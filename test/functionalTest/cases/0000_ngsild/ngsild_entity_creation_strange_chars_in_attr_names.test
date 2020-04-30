@@ -1,0 +1,117 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Strange characters in attribute names during entity creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an entity with attributes that have strange characters
+# 02. GET the entity just to see the funny char in the attribute names
+# 03. GET All entities, just to see how GET /entities respond
+#
+echo "01. Create an entity with attributes that have strange characters"
+echo "================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "xxx",
+  "Straße": {
+    "type": "Property",
+    "value": "Strasse"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entity just to see the funny char in the attribute names"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+echo
+echo
+
+
+echo "03. GET All entities, just to see how GET /entities respond"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=xxx
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with attributes that have strange characters
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. GET the entity just to see the funny char in the attribute names
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "Stra\u00dfe": {
+        "type": "Property",
+        "value": "Strasse"
+    },
+    "id": "http://a.b.c/entity/E1",
+    "type": "xxx"
+}
+
+
+03. GET All entities, just to see how GET /entities respond
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "Stra\u00dfe": {
+            "type": "Property",
+            "value": "Strasse"
+        },
+        "id": "http://a.b.c/entity/E1",
+        "type": "xxx"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

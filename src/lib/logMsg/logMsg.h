@@ -561,9 +561,9 @@ do                                                                       \
 {                                                                        \
   char* text;                                                            \
                                                                          \
-  if (LM_MASK(LogLevelWarning) && (text = lmTextGet s) != NULL)          \
+  if ((text = lmTextGet s) != NULL)                                      \
   {                                                                      \
-    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+    lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
   }                                                                      \
 } while (0)

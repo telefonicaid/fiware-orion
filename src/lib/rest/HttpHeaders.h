@@ -141,10 +141,6 @@ typedef struct HttpHeaders
   bool          servicePathReceived;
   unsigned int  contentLength;
   std::string   connection;
-
-#ifdef ORIONLD
-  char*         linkUrl;        // FIXME: To be removed, perhaps moved to OrionldConnection
-#endif
 } HttpHeaders;
 
 #endif  // SRC_LIB_REST_HTTPHEADERS_H_

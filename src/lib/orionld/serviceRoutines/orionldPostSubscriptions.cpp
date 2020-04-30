@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -30,8 +30,11 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
+
 #include "common/globals.h"                                    // parse8601Time
 #include "rest/OrionError.h"                                   // OrionError
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
@@ -49,6 +52,8 @@ extern "C"
 #include "orionld/kjTree/kjTreeToEndpoint.h"                   // kjTreeToEndpoint
 #include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
+#include "orionld/mqtt/mqttParse.h"                            // mqttParse
+#include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
 
 
@@ -87,31 +92,76 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
   if (orionldState.contextP != NULL)
     sub.ldContext = orionldState.contextP->url;
   else
-    sub.ldContext = ORIONLD_DEFAULT_CONTEXT_URL;
+    sub.ldContext = ORIONLD_CORE_CONTEXT_URL;
 
-  // FIXME: attrsFormat should be set to default by constructor
+  //
+  // FIXME: attrsFormat etc. should be set to default by constructor
+  //        only ... there is no constructor ...
+  //
   sub.attrsFormat = DEFAULT_RENDER_FORMAT;
+  sub.expires             = -1;  // 0?
+  sub.throttling          = -1;  // 0?
+  sub.timeInterval        = -1;  // 0?
 
   LM_T(LmtServiceRoutine, ("In orionldPostSubscriptions - calling kjTreeToSubscription"));
-  char* subIdP = NULL;
-  if (kjTreeToSubscription(ciP, &sub, &subIdP) == false)
+  char*    subIdP    = NULL;
+  KjNode*  endpointP = NULL;
+
+  if (kjTreeToSubscription(&sub, &subIdP, &endpointP) == false)
   {
     LM_E(("kjTreeToSubscription FAILED"));
     // orionldErrorResponseCreate is invoked by kjTreeToSubscription
     return false;
   }
 
+  if (endpointP != NULL)
+  {
+    KjNode* uriP = kjLookup(endpointP, "uri");
+
+    if (strncmp(uriP->value.s, "mqtt://", 7) == 0)
+    {
+      bool            mqtts         = false;
+      char*           mqttUser      = NULL;
+      char*           mqttPassword  = NULL;
+      char*           mqttHost      = NULL;
+      unsigned short  mqttPort      = 0;
+      char*           mqttTopic     = NULL;
+      char*           detail        = NULL;
+      char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
+
+      if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
+      {
+        LM_W(("Bad Input (invalid MQTT endpoint)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid MQTT endpoint", detail);
+        orionldState.httpStatusCode = SccBadRequest;
+        return false;
+      }
+
+      if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort) == false)
+      {
+        LM_E(("Internal Error (unable to connect to MQTT server)"));
+        orionldErrorResponseCreate(OrionldInternalError, "Unable to connect to MQTT server", "xxx");
+        orionldState.httpStatusCode = SccReceiverInternalError;
+        return false;
+      }
+    }
+  }
+
   //
   // Does the subscription already exist?
+  //
+  // FIXME: Implement a function to ONLY check for existence - much faster
   //
   if (subIdP != NULL)
   {
     ngsiv2::Subscription  subscription;
     char*                 details;
 
-    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &ciP->httpStatusCode, &details) == true)
+    // mongoGetLdSubscription takes the req semaphore
+    if (mongoGetLdSubscription(&subscription, subIdP, orionldState.tenant, &orionldState.httpStatusCode, &details) == true)
     {
-      orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Subscription already exists", subIdP, OrionldDetailsString);
+      orionldErrorResponseCreate(OrionldBadRequestData, "A subscription with that ID already exists", subIdP);
+      orionldState.httpStatusCode = SccConflict;
       return false;
     }
   }
@@ -127,7 +177,8 @@ bool orionldPostSubscriptions(ConnectionInfo* ciP)
                                   ciP->httpHeaders.correlator,
                                   sub.ldContext);
 
-  ciP->httpStatusCode = SccCreated;
+  // FIXME: Check oError for failure!
+  orionldState.httpStatusCode = SccCreated;
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/subscriptions/", subId.c_str());
 
   return true;

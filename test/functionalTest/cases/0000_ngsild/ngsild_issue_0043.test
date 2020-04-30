@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -34,8 +34,6 @@ brokerStart CB 212-254
 # 01. POST /ngsi-ld/v1/entities with forced values of 'createdAt' and 'modifiedAt'
 # 02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored
 #
-
-
 
 echo "01. POST /ngsi-ld/v1/entities with forced values of 'createdAt' and 'modifiedAt'"
 echo "================================================================================"
@@ -130,7 +128,7 @@ echo
 
 echo "02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored"
 echo "======================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4?options=sysAttrs&prettyPrint=yes' --noPayloadCheck -H 'Link: <https://raw.githubusercontent.com/GSMADeveloper/NGSI-LD-Entities/master/examples/Agri-Crop-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4?options=sysAttrs' -H 'Link: <https://raw.githubusercontent.com/GSMADeveloper/NGSI-LD-Entities/master/examples/Agri-Crop-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -140,7 +138,6 @@ echo
 ================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4
 Date: REGEX(.*)
 
@@ -149,114 +146,113 @@ Date: REGEX(.*)
 02. Getting the entity to see that the forced timestamps 'createdAt' and 'modifiedAt' have been ignored
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2777
+Content-Length: 2196
 Content-Type: application/json
 Link: <https://raw.githubusercontent.com/GSMADeveloper/NGSI-LD-Entities/master/examples/Agri-Crop-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-  "id": "urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4",
-  "type": "AgriCrop",
-  "createdAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)",
-  "modifiedAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)"
-  "agroVocConcept": {
-    "type": "Property",
-    "value": "http://aims.fao.org/aos/agrovoc/c_7951",
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "seeAlso": {
-    "type": "Property",
-    "value": [
-      "https://example.org/concept/wheat",
-      "https://datamodel.org/example/wheat"
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "alternateName": {
-    "type": "Property",
-    "value": "Triticum aestivum",
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "description": {
-    "type": "Property",
-    "value": "Spring wheat",
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "name": {
-    "type": "Property",
-    "value": "Wheat",
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "agriFertiliser": {
-    "type": "Relationship",
-    "object": [
-      "urn:ngsi-ld:AgriFertiliser:1b0d6cf7-320c-4a2b-b2f1-4575ea850c73",
-      "urn:ngsi-ld:AgriFertiliser:380973c8-4d3b-4723-a899-0c0c5cc63e7e"
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "agriPest": {
-    "type": "Relationship",
-    "object": [
-      "urn:ngsi-ld:AgriPest:1b0d6cf7-320c-4a2b-b2f1-4575ea850c73",
-      "urn:ngsi-ld:AgriPest:380973c8-4d3b-4723-a899-0c0c5cc63e7e"
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "agriSoil": {
-    "type": "Relationship",
-    "object": [
-      "urn:ngsi-ld:AgriSoil:00411b56-bd1b-4551-96e0-a6e7fde9c840",
-      "urn:ngsi-ld:AgriSoil:e8a8389a-edf5-4345-8d2c-b98ac1ce8e2a"
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "harvestingInterval": {
-    "type": "Property",
-    "value": [
-      {
-        "dateRange": "-03-21/-04-01",
-        "description": "Best Season"
-      },
-      {
-        "dateRange": "-04-02/-04-15",
-        "description": "Season OK"
-      }
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "plantingFrom": {
-    "type": "Property",
-    "value": [
-      {
-        "dateRange": "-09-28/-10-12",
-        "description": "Best Season"
-      },
-      {
-        "dateRange": "-10-11/-10-18",
-        "description": "Season OK"
-      }
-    ],
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  },
-  "wateringFrequency": {
-    "type": "Property",
-    "value": "daily",
-    "createdAt": "REGEX(.*)",
-    "modifiedAt": "REGEX(.*)"
-  }
+    "agriFertiliser": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "object": [
+            "urn:ngsi-ld:AgriFertiliser:1b0d6cf7-320c-4a2b-b2f1-4575ea850c73",
+            "urn:ngsi-ld:AgriFertiliser:380973c8-4d3b-4723-a899-0c0c5cc63e7e"
+        ],
+        "type": "Relationship"
+    },
+    "agriPest": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "object": [
+            "urn:ngsi-ld:AgriPest:1b0d6cf7-320c-4a2b-b2f1-4575ea850c73",
+            "urn:ngsi-ld:AgriPest:380973c8-4d3b-4723-a899-0c0c5cc63e7e"
+        ],
+        "type": "Relationship"
+    },
+    "agriSoil": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "object": [
+            "urn:ngsi-ld:AgriSoil:00411b56-bd1b-4551-96e0-a6e7fde9c840",
+            "urn:ngsi-ld:AgriSoil:e8a8389a-edf5-4345-8d2c-b98ac1ce8e2a"
+        ],
+        "type": "Relationship"
+    },
+    "agroVocConcept": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": "http://aims.fao.org/aos/agrovoc/c_7951"
+    },
+    "alternateName": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": "Triticum aestivum"
+    },
+    "createdAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)",
+    "description": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": "Spring wheat"
+    },
+    "harvestingInterval": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": [
+            {
+                "dateRange": "-03-21/-04-01",
+                "description": "Best Season"
+            },
+            {
+                "dateRange": "-04-02/-04-15",
+                "description": "Season OK"
+            }
+        ]
+    },
+    "id": "urn:ngsi-ld:AgriCrop:df72dc57-1eb9-42a3-88a9-8647ecc954b4",
+    "modifiedAt": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\dZ)"
+    "name": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": "Wheat"
+    },
+    "plantingFrom": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": [
+            {
+                "dateRange": "-09-28/-10-12",
+                "description": "Best Season"
+            },
+            {
+                "dateRange": "-10-11/-10-18",
+                "description": "Season OK"
+            }
+        ]
+    },
+    "seeAlso": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": [
+            "https://example.org/concept/wheat",
+            "https://datamodel.org/example/wheat"
+        ]
+    },
+    "type": "AgriCrop",
+    "wateringFrequency": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": "daily"
+    }
 }
-
 
 
 --TEARDOWN--

@@ -1,0 +1,123 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Alternative Context implementation - inline context that is an array with two items of which one is the core context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# This test makes sure that we have exactly two contexts in the Context-Cache after
+# creating an entity with an inline context (that is a key-value object).
+# Two contexts: the Core Context and the "entity context"
+#
+# After creating the entity, the broker is queried for the list of contexts in the cache
+#
+# 01. Create entity E1 with a context that is an array with one single item that is not the core context
+# 02. Ask for the entire list of contexts in the context cache
+#
+
+echo "01. Create entity E1 with a context that is an array with one single item that is not the core context"
+echo "======================================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T1",
+   "@context": [
+     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+   ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"  --linkHeaderFix
+echo
+echo
+
+
+echo "02. Ask for the entire list of contexts in the context cache"
+echo "============================================================"
+orionCurl --url "/ngsi-ld/ex/v1/contexts?prettyPrint=yes&spaces=2" --noPayloadCheck --linkHeaderFix
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with a context that is an array with one single item that is not the core context
+======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Ask for the entire list of contexts in the context cache
+============================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "None",
+    "type": "hash-table",
+    "hash-table": {
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+      "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+      "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+      "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+      "properties": "https://uri.etsi.org/ngsi-ld/properties"
+    }
+  },
+  {
+    "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "id": "None",
+    "type": "hash-table",
+    "hash-table": {
+      "T": "http://example.org/T",
+      "P1": "http://example.org/P1",
+      "P2": "http://example.org/P2",
+      "R1": "http://example.org/R1",
+      "P3": "http://example.org/P3"
+    }
+  },
+  {
+    "url": "REGEX(.*)",
+    "id": "REGEX(.*)",
+    "type": "array",
+    "URLs": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    ]
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,0 +1,283 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Deletion of a registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration R1
+# 02. Create a registration R2
+# 03. GET all registrations, see R1 and R2
+# 04. Delete the R1 registration
+# 05. GET all registrations, see only R2
+# 06. Attempt to delete the non-existent registration R3 - see 404 Not Found
+# 07. Attempt to delete a registration with an invalid Registration ID - see 400 Bad Request
+#
+
+echo "01. Create a registration R1"
+echo "============================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a registration R2"
+echo "============================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+  "type": "ContextSourceRegistration",
+  "name": "R2",
+  "description": "description of reg 2",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "03. GET all registrations, see R1 and R2"
+echo "========================================"
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations?prettyPrint=yes&spaces=2'
+echo
+echo
+
+
+echo "04. Delete the R1 registration"
+echo "=============================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X DELETE
+echo
+echo
+
+
+echo "05. GET all registrations, see only R2"
+echo "======================================"
+orionCurl --url '/ngsi-ld/v1/csourceRegistrations?prettyPrint=yes&spaces=2'
+echo
+echo
+
+
+echo "06. Attempt to delete the non-existent registration R3 - see 404 Not Found"
+echo "=========================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R3 -X DELETE
+echo
+echo
+
+
+echo "07. Attempt to delete a registration with an invalid Registration ID - see 400 Bad Request"
+echo "=========================================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/not-a-uri -X DELETE
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration R1
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Date: REGEX(.*)
+
+
+
+02. Create a registration R2
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R2
+Date: REGEX(.*)
+
+
+
+03. GET all registrations, see R1 and R2
+========================================
+HTTP/1.1 200 OK
+Content-Length: 1045
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "description": "description of reg 1",
+        "endpoint": "http://my.csource.org:1026",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Vehicle:A456",
+                        "type": "Vehicle"
+                    }
+                ],
+                "properties": [
+                    "brandName",
+                    "speed"
+                ],
+                "relationships": [
+                    "isParked"
+                ]
+            }
+        ],
+        "name": "R1",
+        "type": "ContextSourceRegistration"
+    },
+    {
+        "description": "description of reg 2",
+        "endpoint": "http://my.csource.org:1026",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Vehicle:A456",
+                        "type": "Vehicle"
+                    }
+                ],
+                "properties": [
+                    "brandName",
+                    "speed"
+                ],
+                "relationships": [
+                    "isParked"
+                ]
+            }
+        ],
+        "name": "R2",
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+04. Delete the R1 registration
+==============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET all registrations, see only R2
+======================================
+HTTP/1.1 200 OK
+Content-Length: 524
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "description": "description of reg 2",
+        "endpoint": "http://my.csource.org:1026",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Vehicle:A456",
+                        "type": "Vehicle"
+                    }
+                ],
+                "properties": [
+                    "brandName",
+                    "speed"
+                ],
+                "relationships": [
+                    "isParked"
+                ]
+            }
+        ],
+        "name": "R2",
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+06. Attempt to delete the non-existent registration R3 - see 404 Not Found
+==========================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R3",
+    "title": "Context Source Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to delete a registration with an invalid Registration ID - see 400 Bad Request
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "not-a-uri",
+    "title": "Invalid Context Source Registration Identifier",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

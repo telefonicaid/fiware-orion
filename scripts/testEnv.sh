@@ -39,17 +39,19 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 #
 # Ports
 #
-# o CB_PORT        - port where the main contextBroker listens for connections
+# o CB_PORT          - port where the main contextBroker listens for connections
 #
-# o CP1_PORT       - port where the first contextProvider listens for connections
-# o CP2_PORT       - port where the second contextProvider listens for connections
-# o CP3_PORT       - port where the third contextProvider listens for connections
-# o CP4_PORT       - port where the fourth contextProvider listens for connections
-# o CP5_PORT       - port where the fifth contextProvider listens for connections
+# o CP1_PORT         - port where the first contextProvider listens for connections
+# o CP2_PORT         - port where the second contextProvider listens for connections
+# o CP3_PORT         - port where the third contextProvider listens for connections
+# o CP4_PORT         - port where the fourth contextProvider listens for connections
+# o CP5_PORT         - port where the fifth contextProvider listens for connections
 #
-# o LISTENER_PORT  - port where listening (test) applications listen for connections
-# o LISTENER2_PORT - port where a second listening (test) application listens for connections
-# o LISTENER3_PORT - port where a third listening (test) application listens for connections
+# o LISTENER_PORT    - port where listening (test) applications listen for connections
+# o LISTENER2_PORT   - port where a second listening (test) application listens for connections
+# o LISTENER3_PORT   - port where a third listening (test) application listens for connections
+#
+# o MQTT_BROKER_PORT - port of the MQTT Broker
 #
 export CB_PORT=${CB_PORT:-9999}
 export CP1_PORT=${CP1_PORT:-9801}
@@ -60,6 +62,7 @@ export CP5_PORT=${CP5_PORT:-9805}
 export LISTENER_PORT=${LISTENER_PORT:-9997}
 export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 export LISTENER3_PORT=${LISTENER3_PORT:-9957}
+export MQTT_BROKER_PORT=${MQTT_BROKER_PORT:-1883}
 
 
 

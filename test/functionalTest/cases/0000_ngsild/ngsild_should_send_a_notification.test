@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -32,31 +32,12 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 --SHELL--
 
 #
-# 01. An entity urn:ngsi-ld:Vehicle:V1234 is created
-# 02. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234
+# 01. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234
+# 02. An entity urn:ngsi-ld:Vehicle:V1234 is created
 # 03. Dump accumulator to see one notification
 #
 
-echo "01. An entity urn:ngsi-ld:Vehicle:V1234 is created"
-echo "=================================================="
-payload='{
-  "id": "urn:ngsi-ld:Vehicle:V1234",
-  "type": "Vehicle",
-  "speed": {
-    "type": "Property",
-    "value": 34
-  },
-  "brandName": {
-    "type": "Property",
-    "value": "Mercedes"
-  }
-}'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
-echo
-echo
-
-
-echo "02. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234"
+echo "01. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234"
 echo "============================================================================"
 payload='{
   "id": "urn:ngsi-ld:Subscription:mySubscription:XXX",
@@ -78,6 +59,25 @@ echo
 echo
 
 
+echo "02. An entity urn:ngsi-ld:Vehicle:V1234 is created"
+echo "=================================================="
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:V1234",
+  "type": "Vehicle",
+  "speed": {
+    "type": "Property",
+    "value": 34
+  },
+  "brandName": {
+    "type": "Property",
+    "value": "Mercedes"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
 echo "03. Dump accumulator to see one notification"
 echo "============================================"
 accumulatorDump
@@ -86,20 +86,20 @@ echo
 
 
 --REGEXPECT--
-01. An entity urn:ngsi-ld:Vehicle:V1234 is created
-==================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
-Date: REGEX(.*)
-
-
-
-02. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234
+01. A Subscription is created, matching the entity urn:ngsi-ld:Vehicle:V1234
 ============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription:XXX
+Date: REGEX(.*)
+
+
+
+02. An entity urn:ngsi-ld:Vehicle:V1234 is created
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
 Date: REGEX(.*)
 
 
@@ -113,7 +113,7 @@ User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {

@@ -1,0 +1,275 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update Entity Attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# From the NGSI-LD spec:
+# For each of the Attributes included in the Fragment, if the target Entity includes a matching one (considering
+# term expansion rules as mandated by clause 5.5.7), then replace it by the one included by the Fragment.
+# In all other cases, the Attribute shall be ignored.
+#
+# 01. Create an Entity E1 with three attributes, P1 (with sub-property P1_P1), P2, and R1
+# 02. GET the entity - see P1 with sub-property P1_P1
+# 03. Attempt to patch a non-existing entity E2 - see 404
+# 04. Attempt to patch a non-existing attribute P3 of E1 - see 207
+# 05. Attempt to patch a non-existing attribute	P3 and an existing attribute P1 - see 207 MultiStatus
+# 06. Patch P1 - see 204 No Content
+# 07. GET P1 - make sure that P1 was completely replaced in step 4 - sub-property P1_P1 no longer there
+#
+
+echo "01. Create an Entity E1 with three attributes, P1 (with sub-property P1_P1), P2, and R1"
+echo "======================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": 1,
+    "P1_P1": {
+      "type": "Property",
+      "value": "should be removed during the patch"
+    }
+  },
+  "P2": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:relationship:R1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entity - see P1 with sub-property P1_P1"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "03. Attempt to patch a non-existing entity E2 - see 404"
+echo "======================================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2/attrs -X PATCH  --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to patch a non-existing attribute P3 of E1 - see 207"
+echo "================================================================"
+payload='{
+  "P3": {
+    "type": "Property",
+    "value": 4
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs -X PATCH  --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to patch a non-existing attribute	P3 and an existing attribute P2 - see 207 MultiStatus"
+echo "==================================================================================================="
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": "patched P2"
+  },
+  "P3": {
+    "type": "Property",
+    "value": 5
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs -X PATCH  --payload "$payload"
+echo
+echo
+
+
+echo "06. Patch P1 - see 204 No Content"
+echo "================================="
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "patched P1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs -X PATCH  --payload "$payload"
+echo
+echo
+
+
+echo "07. GET P1 - make sure that P1 was completely replaced in step 4 - sub-property P1_P1 no longer there"
+echo "====================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Entity E1 with three attributes, P1 (with sub-property P1_P1), P2, and R1
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET the entity - see P1 with sub-property P1_P1
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 247
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "P1_P1": {
+            "type": "Property",
+            "value": "should be removed during the patch"
+        },
+        "type": "Property",
+        "value": 1
+    },
+    "P2": {
+        "type": "Property",
+        "value": 1
+    },
+    "R1": {
+        "object": "urn:relationship:R1",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T1"
+}
+
+
+03. Attempt to patch a non-existing entity E2 - see 404
+=======================================================
+HTTP/1.1 404 Not Found
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:entities:E2",
+    "title": "Entity does not exist",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to patch a non-existing attribute P3 of E1 - see 207
+================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 132
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P3",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": []
+}
+
+
+05. Attempt to patch a non-existing attribute	P3 and an existing attribute P2 - see 207 MultiStatus
+===================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 181
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/P3",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": [
+        "https://uri.etsi.org/ngsi-ld/default-context/P2"
+    ]
+}
+
+
+06. Patch P1 - see 204 No Content
+=================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. GET P1 - make sure that P1 was completely replaced in step 4 - sub-property P1_P1 no longer there
+=====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 196
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "patched P1"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "patched P2"
+    },
+    "R1": {
+        "object": "urn:relationship:R1",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

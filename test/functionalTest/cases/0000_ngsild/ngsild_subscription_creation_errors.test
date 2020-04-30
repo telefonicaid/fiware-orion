@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -400,28 +400,28 @@ echo
 01.1. Attempt to create a subscription with an ID that is not a URI
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 155
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/sub01.1",
+    "detail": "sub01.1",
     "title": "Subscription::id is not a URI",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06.1. Attempt to create a subscription without ENTITIES array nor WATCHEDATTRIBUTES present
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 160
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "no details",
+    "detail": "no detail",
     "title": "At least one of 'entities' and 'watchedAttributes' must be present",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -433,9 +433,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::entities",
+    "detail": "Subscription::entities",
     "title": "Empty Array",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -447,23 +447,23 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Subscription::watchedAttributes",
+    "detail": "Subscription::watchedAttributes",
     "title": "Empty Array",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 145
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "no details",
+    "detail": "no detail",
     "title": "Both 'timeInterval' and 'watchedAttributes' present",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

@@ -1,0 +1,170 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Registration with an array of entity types, without entity ID
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a registration with only Entity Type
+# 02. See the registration in the DB
+# 03. GET the registration
+#
+
+echo "01. Create a registration with only Entity Type"
+echo "==============================================="
+payload='{
+  "id": "urn:ngsi-ld:reg:1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T1"
+        },
+        {
+          "type": "T2"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in the DB"
+echo "=================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with only Entity Type
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:1
+Date: REGEX(.*)
+
+
+
+02. See the registration in the DB
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:reg:1",
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*)
+}
+bye
+
+
+03. GET the registration
+========================
+HTTP/1.1 200 OK
+Content-Length: 224
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "endpoint": "http://my.csource.org:1026",
+    "id": "urn:ngsi-ld:reg:1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "type": "T1"
+                },
+                {
+                    "type": "T2"
+                }
+            ],
+            "properties": [
+                "brandName",
+                "speed"
+            ],
+            "relationships": [
+                "isParked"
+            ]
+        }
+    ],
+    "type": "ContextSourceRegistration"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

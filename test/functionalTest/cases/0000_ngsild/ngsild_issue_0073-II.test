@@ -1,0 +1,180 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Prefix Expansion inside Contexts
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create an entity with schema tutorials.Step-by-Step context that has prefix expansion inside the context, and with the attribute "maxCapacity"
+# 02. Check mongo, see the completely expanded name of attr "maxCapacity" as https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity
+# 03. Drop Database so that db.entities.findOne() can be used in Step 5
+# 04. Create another entity with same context, and with the attribute "owner", which is an object in the context ("owner": { "@id": "fiware:owner", "@type": "@id" })
+# 05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/data-models#owner
+#
+
+echo '01. Create an entity with schema tutorials.Step-by-Step context that has prefix expansion inside the context, and with the attribute "maxCapacity"'
+echo '=================================================================================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:EntityWithPrefixExpansion",
+  "type": "T1",
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+  "maxCapacity": {
+    "type": "Property",
+    "value": 1200
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo '02. Check mongo, see the completely expanded name of attr "maxCapacity" as https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity'
+echo '============================================================================================================================================='
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Drop Database so that db.entities.findOne() can be used in Step 5"
+echo "====================================================================="
+dbInit CB
+echo
+echo
+
+
+echo '04. Create another entity with same context, and with the attribute "owner", which is an object in the context ("owner": { "@id": "fiware:owner", "@type": "@id" })'
+echo '==================================================================================================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:Entity2WithPrefixExpansion",
+  "type": "T1",
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+  "owner": {
+    "type": "Property",
+    "value": "Raven"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo '05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/data-models#owner'
+echo '================================================================================================================'
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with schema tutorials.Step-by-Step context that has prefix expansion inside the context, and with the attribute "maxCapacity"
+==================================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:EntityWithPrefixExpansion
+Date: REGEX(.*)
+
+
+
+02. Check mongo, see the completely expanded name of attr "maxCapacity" as https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity
+=============================================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:EntityWithPrefixExpansion",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity"
+	],
+	"attrs" : {
+		"https://fiware=github=io/tutorials=Step-by-Step/schema/maxCapacity" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1200,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Drop Database so that db.entities.findOne() can be used in Step 5
+=====================================================================
+{ "dropped" : "ftest", "ok" : 1 }
+
+
+04. Create another entity with same context, and with the attribute "owner", which is an object in the context ("owner": { "@id": "fiware:owner", "@type": "@id" })
+===================================================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity2WithPrefixExpansion
+Date: REGEX(.*)
+
+
+
+05. Check mongo, see the completely expanded name of attr "owner" as https://uri.fiware.org/ns/data-models#owner
+================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:Entity2WithPrefixExpansion",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.fiware.org/ns/data-models#owner"
+	],
+	"attrs" : {
+		"https://uri=fiware=org/ns/data-models#owner" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Raven",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

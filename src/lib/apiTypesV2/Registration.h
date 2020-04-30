@@ -30,6 +30,12 @@
 
 #include "apiTypesV2/EntID.h"
 
+#ifdef ORIONLD
+#include "orionld/types/OrionldTimeInterval.h"
+#include "orionld/types/OrionldGeoLocation.h"
+#endif
+
+
 
 namespace ngsiv2
 {
@@ -114,6 +120,11 @@ struct DataProvided
   std::vector<EntID>        entities;
   std::vector<std::string>  attributes;
 
+#ifdef ORIONLD
+  std::vector<std::string>  propertyV;
+  std::vector<std::string>  relationshipV;
+#endif
+
   std::string               toJson();
 };
 
@@ -135,8 +146,22 @@ struct Registration
   Provider               provider;
   ForwardingInformation  forwardingInformation;
 
+#ifdef ORIONLD
+  std::string           name;
+  std::string           ldContext;
+  long long             createdAt;
+  long long             modifiedAt;
+  OrionldTimeInterval   observationInterval;
+  OrionldTimeInterval   managementInterval;
+  OrionldGeoLocation    location;
+  OrionldGeoLocation    observationSpace;
+  OrionldGeoLocation    operationSpace;
+  KjNode*               properties;
+#endif
+
   Registration();
   ~Registration();
+
   std::string            toJson();
 };
 }

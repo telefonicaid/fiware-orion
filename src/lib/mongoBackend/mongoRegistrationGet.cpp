@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
 #include <string>
 #include <vector>
@@ -30,6 +30,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "rest/ConnectionInfo.h"
+
+#include "common/idCheck.h"
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
@@ -40,202 +43,15 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoRegistrationGet.h"
+#include "mongoBackend/mongoRegistrationAux.h"                 // mongoSetXxx
+#include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLdXxx
+#include "mongoBackend/mongoRegistrationGet.h"                 // Own interface
 
 
 
 /* ****************************************************************************
 *
-* setRegistrationId -
-*/
-static void setRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->id = getFieldF(r, "_id").OID().toString();
-}
-
-
-
-/* ****************************************************************************
-*
-* setDescription -
-*/
-static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  if (r.hasField(REG_DESCRIPTION))
-  {
-    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
-    regP->descriptionProvided = true;
-  }
-  else
-  {
-    regP->description         = "";
-    regP->descriptionProvided = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setProvider -
-*/
-static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
-
-  //
-  // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
-  // into account for them).
-  //
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
-
-  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
-  if (format == "JSON")
-  {
-    regP->provider.legacyForwardingMode = true;
-  }
-  else
-  {
-    // FIXME #3068: to be implemented once we define NGSIv2 based forwarding
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setEntities -
-*/
-static void setEntities(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
-  {
-    ngsiv2::EntID    entity;
-    mongo::BSONObj   ce = dbEntityV[ix].embeddedObject();
-
-    if (ce.hasField(REG_ENTITY_ISPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-      else
-      {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-    }
-    else
-    {
-      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-    }
-
-    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-      else
-      {
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-    }
-    else
-    {
-      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-    }
-
-    regP->dataProvided.entities.push_back(entity);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setAttributes -
-*/
-static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
-{
-  std::vector<mongo::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
-  {
-    mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
-
-    if (attrName != "")
-    {
-      regP->dataProvided.attributes.push_back(attrName);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDataProvided -
-*
-* Make sure there is only ONE "contextRegistration" in the vector
-* If we have more than one, then the Registration is made in API V1 as this is not
-* possible in V2 and we cannot respond to the request using the current implementation of V2.
-* This function will be changed to work in a different way once issue #3044 is dealt with.
-*/
-static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r, bool arrayAllowed)
-{
-  std::vector<mongo::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-
-  if (crV.size() > 1)
-  {
-    return false;
-  }
-
-  //
-  // Extract the first (and only) CR from the contextRegistration vector
-  //
-  mongo::BSONObj cr0 = crV[0].embeddedObject();
-
-  setEntities(regP, cr0);
-  setAttributes(regP, cr0);
-  setProvider(regP, cr0);
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setExpires -
-*/
-static void setExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntFieldF(r, REG_EXPIRATION) : -1;
-}
-
-
-
-/* ****************************************************************************
-*
-* setStatus -
-*/
-static void setStatus(ngsiv2::Registration* regP, const mongo::BSONObj& r)
-{
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoRegistrationGet - 
+* mongoRegistrationGet -
 */
 void mongoRegistrationGet
 (
@@ -281,8 +97,9 @@ void mongoRegistrationGet
   /* Process query result */
   if (moreSafe(cursor))
   {
-    mongo::BSONObj r;
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    mongo::BSONObj bob;
+
+    if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
@@ -290,15 +107,15 @@ void mongoRegistrationGet
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
 
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(regP, r);
-    setDescription(regP, r);
+    mongoSetRegistrationId(regP, bob);
+    mongoSetDescription(regP, bob);
 
-    if (setDataProvided(regP, r, false) == false)
+    if (mongoSetDataProvided(regP, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -307,8 +124,13 @@ void mongoRegistrationGet
       return;
     }
 
-    setExpires(regP, r);
-    setStatus(regP, r);
+#ifdef ORIONLD
+    // FIXME: Can this be removed?
+    mongoSetLdObservationInterval(regP, bob);
+    mongoSetLdManagementInterval(regP, bob);
+#endif
+    mongoSetExpires(regP, bob);
+    mongoSetStatus(regP, bob);
 
     if (moreSafe(cursor))  // Can only be one ...
     {
@@ -339,7 +161,7 @@ void mongoRegistrationGet
 
 /* ****************************************************************************
 *
-* mongoRegistrationsGet - 
+* mongoRegistrationsGet -
 */
 void mongoRegistrationsGet
 (
@@ -389,25 +211,25 @@ void mongoRegistrationsGet
   int docs = 0;
   while (moreSafe(cursor))
   {
-    mongo::BSONObj        r;
+    mongo::BSONObj        bob;
     ngsiv2::Registration  reg;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &bob, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
 
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, bob.toString().c_str()));
     ++docs;
 
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(&reg, r);
-    setDescription(&reg, r);
+    mongoSetRegistrationId(&reg, bob);
+    mongoSetDescription(&reg, bob);
 
-    if (setDataProvided(&reg, r, false) == false)
+    if (mongoSetDataProvided(&reg, bob, false) == false)
     {
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
@@ -416,8 +238,8 @@ void mongoRegistrationsGet
       return;
     }
 
-    setExpires(&reg, r);
-    setStatus(&reg, r);
+    mongoSetExpires(&reg, bob);
+    mongoSetStatus(&reg, bob);
 
     regV->push_back(reg);
   }

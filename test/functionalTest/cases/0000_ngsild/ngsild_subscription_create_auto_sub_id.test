@@ -1,22 +1,22 @@
-# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -120,7 +120,7 @@ Date: REGEX(.*)
 02. Check subscription in mongo
 ===============================
 MongoDB shell version REGEX(.*)
-connecting to: mongodb://localhost:27017/ftest
+connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:REGEX([0-9a-f\-]{24})",
@@ -136,7 +136,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"id" : "urn:ngsi-ld:E01",
 			"isPattern" : "false",
-			"type" : "http://example.org/ngsi-ld/default/T1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
 			"isTypePattern" : false
 		},
 		{
@@ -155,12 +155,14 @@ MongoDB server version: REGEX(.*)
 	"attrs" : [
 		"http://example.org/P1",
 		"http://example.org/P2",
-		"http://example.org/ngsi-ld/default/A3"
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+	"csf" : "not implemented",
+	"timeInterval" : -1,
 	"conditions" : [
 		"http://example.org/P2"
 	],
@@ -169,7 +171,8 @@ MongoDB server version: REGEX(.*)
 		"mq" : "",
 		"geometry" : "circle",
 		"coords" : "1,2",
-		"georel" : "near"
+		"georel" : "near",
+		"geoproperty" : "not supported"
 	},
 	"format" : "keyValues"
 }
@@ -179,7 +182,7 @@ bye
 03. Grep mongo content for subscription id and do a GET /ngsi-ld/v1/subscription/$SUB_ID
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 846
+Content-Length: 910
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -210,9 +213,12 @@ Date: REGEX(.*)
   "geoQ": {
     "geometry": "circle",
     "coordinates": "1,2",
-    "georel": "near"
+    "georel": "near",
+    "geoproperty": "not supported"
   },
+  "csf": "not implemented",
   "isActive": false,
+  "status": "paused",
   "notification": {
     "attributes": [
       "P1",
@@ -226,8 +232,7 @@ Date: REGEX(.*)
     }
   },
   "expires": "2028-12-31T10:00:00Z",
-  "throttling": 5,
-  "status": "paused"
+  "throttling": 5
 }
 
 

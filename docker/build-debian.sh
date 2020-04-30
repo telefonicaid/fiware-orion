@@ -94,7 +94,7 @@ mkdir -p /var/{log,run}/${BROKER}
 echo "Builder: update apt"
 apt-get -y update
 
-echo "Builder: installing  tools and dependencies"
+echo "Builder: installing tools and dependencies"
 apt-get -y install --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
@@ -106,12 +106,12 @@ scons --disable-warnings-as-errors --use-sasl-client --ssl
 scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
 cd ${ROOT} && rm -Rf mongo-cxx-driver
 
-echo "Builder: installing rapid json"
+echo "Builder: installing rapidjson"
 curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC ${ROOT}
 mv ${ROOT}/rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 cd ${ROOT} && rm -Rf rapidjson-1.0.2
 
-echo "Builder: installing libmicronhttpd"
+echo "Builder: installing libmicrohttpd"
 curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC ${ROOT}
 cd ${ROOT}/libmicrohttpd-0.9.48
 ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -121,22 +121,45 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 
 ldconfig
 
-echo "Builder: installing k tools"
-for kproj in kbase klog kalloc kjson
+echo "Debian Builder: installing k libs"
+for kproj in kbase klog kalloc kjson khash
 do
-    git clone https://gitlab-ci-token:${TOKEN}@gitlab.com/kzangeli/${kproj}.git ${ROOT}/$kproj
+    git clone https://gitlab.com/kzangeli/${kproj}.git ${ROOT}/$kproj
 done
 
-for kproj in kbase klog kalloc kjson
+for kproj in kbase klog kalloc kjson khash
 do
     cd ${ROOT}/$kproj
-    git checkout release/0.2
+    git checkout release/0.4
     make
     make install
 done
 
-if [[ "${STAGE}" == 'deps' ]]; then
-    echo "Builder: installing mongo"
+    echo "Debian Builder: installing Paho MQTT C library"
+    apt-get -y install doxygen                                                    # OK - with -y. NOT OK without -y !!!
+    apt-get -y install graphviz 
+    rm -f /usr/local/lib/libpaho*                                                 # OK
+    git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c      # OK
+    cd ${ROOT}/paho.mqtt.c                                                        # OK
+    git fetch -a
+    git checkout tags/v1.3.1                                                      # OK - git checkout develop ...
+    make html                                                                     # OK
+
+    echo Building Paho MQTT C Library
+    make > /tmp/paho-build 2&>1 || /bin/true
+    echo Paho Built ...
+    echo "============== PAHO BUILD TRACES START ============================="
+    cat /tmp/paho-build
+    echo "============== PAHO BUILD TRACES END ==============================="
+
+    echo Installing Paho MQTT C Library
+    make install > /tmp/paho-install 2&>1 || /bin/true                            # ... ?
+    echo Paho Installed ...
+    echo "============== PAHO INSTALLATION TRACES START ============================="
+    cat /tmp/paho-install
+    echo "============== PAHO INSTALLATION TRACES END ==============================="
+
+    echo "Builder: installing mongo and MQTT"
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
 
     echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
@@ -145,6 +168,18 @@ if [[ "${STAGE}" == 'deps' ]]; then
         mongodb-org \
         mongodb-org-shell
 
+    #
+    # FIXME
+    #   For unknown reasons, 'mosquitto' can't be installed in this repo
+    #   As workaround, all MQTT functests are disabled for travis. 
+    #
+    # echo "Builder: installing and starting mosquitto"
+    # apt-get -y install mosquitto
+    # sudo service mosquitto start
+    #
+
+
+if [[ "${STAGE}" == 'deps' ]]; then
     echo "Builder: installing gmock"
     curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
     cd ${ROOT}/gmock-1.5.0
@@ -159,13 +194,13 @@ if [[ "${STAGE}" == 'deps' ]]; then
 
     echo "Builder: installing python dependencies"
     pip install --upgrade setuptools wheel
-    pip install Flask==1.0.2 pyOpenSSL==19.0.0
+    pip install Flask==1.0.2 pyOpenSSL==19.0.0 # paho-mqtt
     yes | pip uninstall setuptools wheel
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
 
-    echo "Builder: installing orion"
+    echo "Debian Builder: installing orion"
     git clone ${REPOSITORY} ${PATH_TO_SRC}
     cd ${PATH_TO_SRC}
     git checkout ${REV}

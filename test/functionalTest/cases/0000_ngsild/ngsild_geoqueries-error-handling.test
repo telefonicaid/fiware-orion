@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -208,37 +208,37 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Mandatory 'coordinates' field missing for a GeoJSON Property",
+    "detail": "Mandatory 'coordinates' field missing for a GeoJSON Property",
     "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 02. Non array 'coordinate' in payload for creation - see error
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 215
+Content-Length: 164
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 03. Only one 'coordinate' in payload for creation - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 195
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "array with only ONE member for 'coordinates'",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -250,51 +250,51 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "empty array for 'coordinates'",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 05. 'type' member missing in value of a GeoProperty - see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 204
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "Mandatory 'type' field missing for a GeoJSON Property",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "value",
+    "title": "Mandatory 'type' field missing for GeoJSON Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 06. Non string 'type' in payload for creation - see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 209
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "the 'type' field of a GeoJSON object must be a JSON String",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "the 'type' field of a GeoJSON object must be a JSON String",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. Invalid value for 'type' in payload for creation - see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 171
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "invalid GeoJSON type",
-    "title": "The value of an attribute of type GeoProperty must be valid GeoJson",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "invalid string for geo type",
+    "title": "invalid geometry",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -306,9 +306,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "geometry without coordinates",
+    "detail": "geometry without coordinates",
     "title": "no coordinates",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -320,9 +320,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "invalid point in URI param /coords/",
+    "detail": "invalid point in URI param /coords/",
     "title": "error filling a scope",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
 
@@ -334,9 +334,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "invalid point in URI param /coords/",
+    "detail": "invalid point in URI param /coords/",
     "title": "error filling a scope",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
 
@@ -348,9 +348,9 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "no coordinates for geometry",
+    "detail": "no coordinates for geometry",
     "title": "error filling a scope",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
 

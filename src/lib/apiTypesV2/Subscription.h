@@ -112,6 +112,8 @@ struct Subscription
 #ifdef ORIONLD
   std::string   name;
   std::string   ldContext;
+  int           timeInterval;
+  std::string   csf;
 #endif
 
   std::string   toJson();

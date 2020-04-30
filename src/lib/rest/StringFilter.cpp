@@ -27,7 +27,8 @@
 
 extern "C"
 {
-#include "kbase/kFloatTrim.h"                 // kFloatTrim
+#include "kbase/kFloatTrim.h"                       // kFloatTrim
+#include "kalloc/kaStrdup.h"                        // kaStrdup
 }
 
 #include "mongo/client/dbclient.h"
@@ -45,9 +46,9 @@ extern "C"
 #include "mongoBackend/dbConstants.h"
 
 #ifdef ORIONLD
-#include "orionld/context/OrionldContext.h"
-#include "orionld/common/OrionldConnection.h"    // orionldState
-#include "orionld/context/orionldUriExpand.h"
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #endif
 #include "rest/StringFilter.h"
 
@@ -462,9 +463,9 @@ bool StringFilterItem::valueGet
 
   if ((*valueTypeP == SfvtString) && (op != SfopMatchPattern))
   {
-    if (forbiddenChars(s, ""))
+    if (forbiddenChars(s, "="))  // For NGSI-LD, attr long names have had the dots replaced by '='
     {
-      LM_E(("forbidden characters in String Filter"));
+      LM_E(("forbidden characters in String Filter '%s'", s));
       *errorStringP = std::string("forbidden characters in String Filter");
       return false;
     }
@@ -522,7 +523,14 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
       }
       else   if (*eP == '<') { *rhsP = &eP[1]; op = SfopLessThan;           }
       else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
-      else   if (*eP == ':') { *rhsP = &eP[1]; op = SfopEquals;             }
+      else   if (*eP == ':')
+      {
+        if ((orionldState.apiVersion != NGSI_LD_V1) && (eP[1] != '/') && (eP[2] != '/'))  // Don't if xxx://
+        {
+          *rhsP = &eP[1];
+          op = SfopEquals;
+        }
+      }
 
       if (op != SfopExists)  // operator found, RHS already set
       {
@@ -617,6 +625,9 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
+  // Replace '=' back to '.'
+  eqForDot(lhs);
+
   if (forbiddenChars(lhs, "'"))
   {
     if (type == SftQ)
@@ -648,28 +659,24 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    char*  details;
-    char   expanded[256];
-
-    if (orionldUriExpand(orionldState.contextP, (char*) attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
-    {
-      *errorStringP = details;
-      return false;
-    }
+    char* expanded = orionldContextItemExpand(orionldState.contextP, attributeName.c_str(), NULL, true, NULL);
 
     //
     // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo
+    // But, we need to do this in a copy, to not destroy its real name, as 'expanded' points to the value inside the Context-Cache
     //
-    for (unsigned int ix = 0; ix < sizeof(expanded); ix++)
+    expanded = kaStrdup(&orionldState.kalloc, expanded);
+
+    char* cP = expanded;
+
+    while (*cP != 0)
     {
-      if (expanded[ix] == '.')
-        expanded[ix] = '=';
-      else if (expanded[ix] == 0)
-        break;
+      if (*cP == '.')
+        *cP = '=';
+      ++cP;
     }
 
     attributeName = expanded;
-    LM_TMP(("SUB: expanded attribute name: '%s'", attributeName.c_str()));
   }
 
 #endif
@@ -907,8 +914,6 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
   char* dotP          = scopyP;
   bool  insideQuotes  = false;
 
-  LM_TMP(("SUB: IN: '%s'", s));
-
   //
   // Replace '.' for '=' if inside quotes
   //
@@ -947,7 +952,6 @@ static char* lhsDotToEqualIfInsideQuote(char* s)
 
   free(scopyP);
 
-  LM_TMP(("SUB: OUT: '%s'", s));
   return s;
 }
 
@@ -962,24 +966,19 @@ void StringFilterItem::lhsParse(void)
   char* start = (char*) left.c_str();
   char* dotP  = start;
 
-  LM_TMP(("SUB: start: %s", start));
   start = lhsDotToEqualIfInsideQuote(start);
-  LM_TMP(("SUB: start: '%s'", start));
 
   attributeName = "";
   metadataName  = "";
   compoundPath  = "";
 
-  LM_TMP(("SUB: start: '%s'", start));
   dotP = strchr(start, '.');
-  LM_TMP(("SUB: start: '%s'", start));
   if (dotP == NULL)
   {
     attributeName = start;
     metadataName  = "";
     compoundPath  = "";
 
-    LM_TMP(("SUB: attributeName: '%s'", attributeName.c_str()));
     return;
   }
 
@@ -987,7 +986,6 @@ void StringFilterItem::lhsParse(void)
   ++dotP;  // Step over the dot
 
   attributeName = start;
-  LM_TMP(("SUB: attributeName: '%s'", attributeName.c_str()));
 
   // If MQ, a second dot must be found in order for LHS to be about compounds
   if (type == SftMq)
@@ -1946,6 +1944,8 @@ bool StringFilter::render(char* buf, int bufLen, std::string* errorStringP)
     if (ix != 0)
     {
       *bufP = ';';
+      ++bufP;
+      *bufP = 0;
       ++charsUsed;
     }
 
@@ -1963,7 +1963,6 @@ bool StringFilter::render(char* buf, int bufLen, std::string* errorStringP)
     buf[charsUsed] = 0;
   }
 
-  LM_TMP(("SUB: renderer StringFilter: %s", buf));
   return true;
 }
 
@@ -1985,37 +1984,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     BSONObjBuilder     bb2;
     BSONObj            f;
     std::string        left = std::string(itemP->left.c_str());
-
-#if 0
-    //
-    // This is now taken care of in StringFilter::parse instead.
-    // Leaving it here commented out for some time ...
-    //
-    if (orionldState.apiVersion == NGSI_LD_V1)
-    {
-      char  expanded[256];
-      char* details;
-
-      if (orionldUriExpand(orionldState.contextP, (char*) itemP->attributeName.c_str(), expanded, sizeof(expanded), &details) == false)
-      {
-        *errorStringP = details;
-        return false;
-      }
-
-      //
-      // After expanding we need to replace all dots ('.') with equal signs ('='), because, that is how the attribute name is stored in mongo
-      //
-      for (unsigned int ix = 0; ix < sizeof(expanded); ix++)
-      {
-        if (expanded[ix] == '.')
-          expanded[ix] = '=';
-        else if (expanded[ix] == 0)
-          break;
-      }
-
-      itemP->attributeName = expanded;
-    }
-#endif
 
     //
     // Left hand side might have to change, in case of Metadata filters (mq)

@@ -1,195 +1,95 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2019 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                  // LM_*
-#include "logMsg/traceLevels.h"                             // Lmt*
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                   // KjNode
-#include "kjson/kjRender.h"                                 // kjRender
-#include "kjson/kjBufferCreate.h"                           // kjBufferCreate
+#include "khash/khash.h"                                         // KHashTable
 }
 
-#include "orionld/context/OrionldContext.h"                 // OrionldContext
-#include "orionld/context/orionldContextList.h"             // orionldContextHead
-#include "orionld/context/orionldContextPresent.h"          // Own interface
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+#include "orionld/context/orionldContextCache.h"                 // ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE
+#include "orionld/context/orionldContextPresent.h"               // Own interface
 
 
 
-// ----------------------------------------------------------------------------
-//
-// allCachedContextsPresent -
-//
-static void allCachedContextsPresent(void)
-{
-  OrionldContext* contextP = orionldContextHead;
-
-  while (contextP != NULL)
-  {
-    orionldContextPresent(contextP);
-    contextP = contextP->next;
-  }
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// stringContextPresent -
-//
-static void stringContextPresent(OrionldContext* contextP)
-{
-  LM_T(LmtContextPresent, ("Context STRING: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
-  LM_T(LmtContextPresent, ("  %s", contextP->tree->value.s));
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// arrayContextPresent -
-//
-static void arrayContextPresent(OrionldContext* contextP)
-{
-  KjNode* itemP;
-
-  LM_T(LmtContextPresent, ("Context ARRAY: %s (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
-
-  for (itemP = contextP->tree->value.firstChildP; itemP != NULL; itemP = itemP->next)
-  {
-    LM_T(LmtContextPresent, ("  %s", itemP->value.s));
-  }
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// objectContextPresent -
-//
-static Kjson* kjsonBuffer = NULL;
-static void objectContextPresent(OrionldContext* contextP)
-{
-  if (contextP == NULL)
-  {
-    LM_T(LmtContextPresent, ("contextP == NULL"));
-    return;
-  }
-
-  if (kjsonBuffer == NULL)
-  {
-    kjsonBuffer = kjBufferCreate(NULL, NULL);
-    if (kjsonBuffer == NULL)
-      LM_X(1, ("Out of memory"));
-
-    kjsonBuffer->spacesPerIndent   = 0;
-    kjsonBuffer->nlString          = (char*) "";
-    kjsonBuffer->stringBeforeColon = (char*) "";
-    kjsonBuffer->stringAfterColon  = (char*) "";
-  }
-
-  LM_T(LmtContextPresent, ("Context '%s' (ignored: %s):", contextP->url, (contextP->ignore == true)? "YES" : "NO"));
-
-  char buf[1024];
-
-  kjRender(kjsonBuffer, contextP->tree, buf, sizeof(buf));
-  buf[120] = 0;
-  LM_T(LmtContextPresent, ("Context Tree: %s", buf));
-
-#if 1
-  if (contextP->tree == NULL)
-  {
-    LM_T(LmtContextPresent, ("contextP->tree is NULL"));
-  }
-  else if (contextP->tree->value.firstChildP == NULL)
-  {
-    LM_T(LmtContextPresent, ("contextP->tree is of type '%s'", kjValueType(contextP->tree->type)));
-    LM_T(LmtContextPresent, ("contextP->tree->value.firstChildP is NULL"));
-  }
-  else if (contextP->tree->value.firstChildP->value.firstChildP == NULL)
-  {
-    LM_T(LmtContextPresent, ("contextP->tree->value.firstChildP->value.firstChildP is NULL"));
-  }
-  else
-  {
-    if (contextP->tree->value.firstChildP->type == KjString)
-    {
-      LM_T(LmtContextPresent, ("    %s: %s", contextP->tree->value.firstChildP->name, contextP->tree->value.firstChildP->value.s));
-    }
-    else if (contextP->tree->value.firstChildP->type == KjObject)
-    {
-      for (KjNode* nodeP = contextP->tree->value.firstChildP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
-      {
-        if (nodeP->type == KjString)
-        {
-          LM_T(LmtContextPresent, ("  %s: %s", nodeP->name, nodeP->value.s));
-        }
-        else if (nodeP->type == KjObject)
-        {
-          LM_T(LmtContextPresent, ("  %s: {", nodeP->name));
-
-          for (KjNode* childP = nodeP->value.firstChildP; childP != NULL; childP = childP->next)
-            LM_T(LmtContextPresent, ("    %s: %s", childP->name, childP->value.s));
-          LM_T(LmtContextPresent, ("  }"));
-        }
-      }
-    }
-  }
-#endif
-}
-
-
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 // orionldContextPresent -
 //
-void orionldContextPresent(OrionldContext* contextP)
+void orionldContextPresent(const char* prefix, OrionldContext* contextP)
 {
-  //
-  // Three types of contexts;
-  //
-  // - A String naming another context
-  // - A Vector naming a set of other contextx
-  // - An Object with context items (key values)
-  //
-  // Also, if called with NULL, then all cached contexts are presented
-  //
-
   if (contextP == NULL)
-    allCachedContextsPresent();
-  else if (contextP->tree == NULL)
-    LM_TMP(("contextP->tree == NULL!!!"));
-  else if (contextP->tree->type == KjObject)
-    objectContextPresent(contextP);
-  else if (contextP->tree->type == KjString)
-    stringContextPresent(contextP);
-  else if (contextP->tree->type == KjArray)
-    arrayContextPresent(contextP);
+    return;
+
+  LM_TMP(("    %s: Context '%s' (%s)", prefix, contextP->url, contextP->keyValues? "Key-Values" : "Array"));
+  LM_TMP(("    %s: ----------------------------------------------------------------------------", prefix));
+
+  if (contextP->keyValues == true)
+  {
+    int          noOfItems = 0;
+    KHashTable*  htP       = contextP->context.hash.nameHashTable;
+
+    for (int slot = 0; slot < ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE; slot++)
+    {
+      KHashListItem* itemP = htP->array[slot];
+
+      while (itemP != 0)
+      {
+        OrionldContextItem* hiP = (OrionldContextItem*) itemP->data;
+
+        LM_TMP(("    %s: key-value[slot %d]: %s -> %s (type: %s)", prefix, slot, hiP->name, hiP->id, hiP->type));
+        itemP = itemP->next;
+        ++noOfItems;
+
+        if (noOfItems >= 100)
+          break;
+      }
+
+      if (noOfItems >= 100)
+        break;
+    }
+  }
   else
   {
-    LM_T(LmtContextPresent, ("%s:", contextP->url));
-    LM_T(LmtContextPresent, ("  Invalid Type of tree for a context: %s", kjValueType(contextP->tree->type)));
+    for (int iIx = 0; iIx < contextP->context.array.items; iIx++)
+    {
+      if (contextP->context.array.vector[iIx] == NULL)
+      {
+        LM_TMP(("    %s:   Array Item %d is not ready", prefix, iIx));
+      }
+      else
+      {
+        LM_TMP(("    %s:   Array Item %d: %s (%s)",
+                prefix,
+                iIx,
+                contextP->context.array.vector[iIx]->url,
+                contextP->context.array.vector[iIx]->keyValues? "Key-Values" : "Array"));
+      }
+    }
   }
 }

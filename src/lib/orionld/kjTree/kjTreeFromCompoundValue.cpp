@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -30,7 +30,8 @@ extern "C"
 }
 
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
-#include "orionld/common/OrionldConnection.h"                  // orionldState
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // Own interface
 
 
@@ -39,16 +40,20 @@ extern "C"
 //
 // kjTreeFromCompoundValue2
 //
-static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNode* compoundP, char** detailsP)
+static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNode* compoundP, bool valueMayBeCompacted, char** detailsP)
 {
   KjNode*       nodeP = NULL;
   char*         name  = (char*) compoundP->name.c_str();
   unsigned int  size;
+  char*         compactedValue;
 
   switch (compoundP->valueType)
   {
   case orion::ValueTypeString:
-    nodeP = kjString(orionldState.kjsonP, name, compoundP->stringValue.c_str());
+    if ((valueMayBeCompacted == true) && ((compactedValue = orionldContextItemAliasLookup(orionldState.contextP, compoundP->stringValue.c_str(), NULL, NULL)) != NULL))
+      nodeP = kjString(orionldState.kjsonP, name, compactedValue);
+    else
+      nodeP = kjString(orionldState.kjsonP, name, compoundP->stringValue.c_str());
     kjChildAdd(parentP, nodeP);
     break;
 
@@ -77,7 +82,7 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
     size = compoundP->childV.size();
     for (unsigned int ix = 0; ix < size; ++ix)
     {
-      KjNode* itemP = kjTreeFromCompoundValue2(nodeP, compoundP->childV[ix], detailsP);
+      KjNode* itemP = kjTreeFromCompoundValue2(nodeP, compoundP->childV[ix], valueMayBeCompacted, detailsP);
 
       if (itemP == NULL)
         return NULL;
@@ -104,7 +109,7 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
 //
 // kjTreeFromCompoundValue -
 //
-KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, char** detailsP)
+KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* containerP, bool valueMayBeCompacted, char** detailsP)
 {
   KjNode* topNodeP = containerP;
 
@@ -130,7 +135,7 @@ KjNode* kjTreeFromCompoundValue(orion::CompoundValueNode* compoundP, KjNode* con
   unsigned int size = compoundP->childV.size();
   for (unsigned int ix = 0; ix < size; ++ix)
   {
-    KjNode* nodeP = kjTreeFromCompoundValue2(topNodeP, compoundP->childV[ix], detailsP);
+    KjNode* nodeP = kjTreeFromCompoundValue2(topNodeP, compoundP->childV[ix], valueMayBeCompacted, detailsP);
     if (nodeP == NULL)
     {
       kjFree(topNodeP);

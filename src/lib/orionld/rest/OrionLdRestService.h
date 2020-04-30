@@ -3,25 +3,25 @@
 
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -29,31 +29,39 @@
 
 
 
-/* ****************************************************************************
-*
-* OrionldServiceRoutine -
-*/
+// -----------------------------------------------------------------------------
+//
+// OrionldServiceRoutine -
+//
 typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
 
 
 
-/* ****************************************************************************
-*
-* OrionLdRestServiceSimplified -
-*
-* This struct is a simplified OrionLdRestService.
-* To create an OrionLd service, all that is needed is the URL and the service routine.
-* In the initialization stage, the URL is parsed and data is taken out of it to make
-* the URL parse (service routine lookup) faster.
-* A lot faster actually, as string comparisons are avoided and instead integers are compared.
-*
-* The info extracted from this initialization stage, plus the url and service routine, is
-* stored in the "real" OrionLdRestService struct, which is used during lookup of URL->service-routine.
-* The struct OrionLdRestServiceSimplified is no longer used after the creation of the OrionLdRestService items.
-* However, the URL is not copied to the OrionLdRestService items, but just pointed to from OrionLdRestService to
-* OrionLdRestServiceSimplified, so, the OrionLdRestServiceSimplified vectors must stay intact during
-* the entire lifetime of the broker.
-*/
+// -----------------------------------------------------------------------------
+//
+// OrionldTemporalRoutine -
+//
+typedef bool (*OrionldTemporalRoutine)(ConnectionInfo* ciP);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionLdRestServiceSimplified -
+//
+// This struct is a simplified OrionLdRestService.
+// To create an OrionLd service, all that is needed is the URL and the service routine.
+// In the initialization stage, the URL is parsed and data is taken out of it to make
+// the URL parse (service routine lookup) faster.
+// A lot faster actually, as string comparisons are avoided and instead integers are compared.
+//
+// The info extracted from this initialization stage, plus the url and service routine, is
+// stored in the "real" OrionLdRestService struct, which is used during lookup of URL->service-routine.
+// The struct OrionLdRestServiceSimplified is no longer used after the creation of the OrionLdRestService items.
+// However, the URL is not copied to the OrionLdRestService items, but just pointed to from OrionLdRestService to
+// OrionLdRestServiceSimplified, so, the OrionLdRestServiceSimplified vectors must stay intact during
+// the entire lifetime of the broker.
+//
 typedef struct OrionLdRestServiceSimplified
 {
   const char*            url;
@@ -89,8 +97,10 @@ typedef struct OrionLdRestServiceSimplifiedVector
 //
 // Options
 //
-#define ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE  (1 << 0)
-#define ORIONLD_SERVICE_OPTION_CREATE_CONTEXT        (1 << 1)
+#define ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE                  (1 << 0)
+#define ORIONLD_SERVICE_OPTION_CREATE_CONTEXT                        (1 << 1)
+#define ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD  (1 << 2)
+#define ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS               (1 << 3)
 
 
 
@@ -107,6 +117,7 @@ typedef struct OrionLdRestService
 {
   char*                  url;                           // URL Path
   OrionldServiceRoutine  serviceRoutine;                // Function pointer to service routine
+  OrionldTemporalRoutine temporalRoutine;               // Function pointer to routines that saves temporal values
   int                    wildcards;                     // Number of wildcards in URL: 0, 1, or 2
   int                    charsBeforeFirstWildcard;      // E.g. 9 for [/ngsi-ld/v1/]entities/*
   int                    charsBeforeFirstWildcardSum;   // -"-  'e' + 'n' + 't' + 'i' + 't' + 'i' + 'e' + 's'

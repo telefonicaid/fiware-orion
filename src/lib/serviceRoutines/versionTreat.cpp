@@ -33,6 +33,7 @@
 #include "common/tag.h"
 #include "common/compileInfo.h"
 #include "common/defaultValues.h"
+#include "orionld/common/orionldState.h"
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 
@@ -58,6 +59,8 @@ void versionSet(const char* version)
 {
   strncpy(versionString, version, sizeof(versionString));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -108,16 +111,15 @@ std::string versionTreat
 #endif
 
   out += "{\n";
-  out += "\"orion\" : {\n";
-  out += "  \"version\" : \"" + std::string(versionString) + "\",\n";
-  out += "  \"uptime\" : \"" + std::string(uptime) + "\",\n";
-  out += "  \"git_hash\" : \"" + std::string(GIT_HASH) + "\",\n";
-  out += "  \"compile_time\" : \"" + std::string(COMPILE_TIME) + "\",\n";
-  out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
-  out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
-  out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
-  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
-  out += "}\n";
+  out += "  \"orionld version\": \"" + std::string(orionldVersion) + "\",\n";
+  out += "  \"orion version\":   \"" + std::string(versionString)  + "\",\n";
+  out += "  \"uptime\":          \"" + std::string(uptime)         + "\",\n";
+  out += "  \"git_hash\":        \"" + std::string(GIT_HASH)       + "\",\n";
+  out += "  \"compile_time\":    \"" + std::string(COMPILE_TIME)   + "\",\n";
+  out += "  \"compiled_by\":     \"" + std::string(COMPILED_BY)    + "\",\n";
+  out += "  \"compiled_in\":     \"" + std::string(COMPILED_IN)    + "\",\n";
+  out += "  \"release_date\":    \"" + std::string(RELEASE_DATE)   + "\",\n";
+  out += "  \"doc\":             \"" + std::string(API_DOC)        + "\"\n";
   out += "}\n";
 
   ciP->httpStatusCode = SccOk;

@@ -215,7 +215,7 @@ if [[ "${STAGE}" == 'release' || "${STAGE}" == 'deps' ]]; then
         exit 1
     fi
 
-    echo "Builder: building started"
+    echo "Builder: building starts for OS $OS"
     build-${OS}.sh
     echo "Builder: building ended"
     exit 0

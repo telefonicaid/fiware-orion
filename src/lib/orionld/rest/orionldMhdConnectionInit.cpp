@@ -1,40 +1,45 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
-#include <microhttpd.h>                                        // MHD
+#include <string.h>                                              // strlen
+#include <microhttpd.h>                                          // MHD
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+extern "C"
+{
+#include "kbase/kMacros.h"                                       // K_FT
+}
 
-#include "rest/Verb.h"                                         // Verb
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldErrorResponse.h"               // OrionldBadRequestData, OrionldDetailsString, ...
-#include "orionld/common/orionldState.h"                       // orionldState, orionldStateInit
-#include "orionld/context/orionldContextListPresent.h"         // orionldContextListPresent
-#include "orionld/rest/temporaryErrorPayloads.h"               // Temporary Error Payloads
-#include "orionld/rest/orionldMhdConnectionInit.h"             // Own interface
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "rest/Verb.h"                                           // Verb
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
+#include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
+#include "orionld/common/SCOMPARE.h"                             // SCOMPARE
+#include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
+#include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
 
 
 
@@ -161,7 +166,126 @@ static void ipAddressAndPort(ConnectionInfo* ciP)
     port = 0;
     snprintf(ip, sizeof(ip), "IP unknown");
   }
+
   ciP->port = port;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// optionsParse -
+//
+static void optionsParse(const char* options)
+{
+  char* optionStart = (char*) options;
+  char* cP          = (char*) options;
+
+  while (1)
+  {
+    if ((*cP == ',') || (*cP == 0))  // Found the end of an option
+    {
+      bool done  = (*cP == 0);
+      char saved = *cP;
+
+      *cP = 0;  // Zero-terminate
+
+      if      (strcmp(optionStart, "update")      == 0)  orionldState.uriParamOptions.update      = true;
+      else if (strcmp(optionStart, "replace")     == 0)  orionldState.uriParamOptions.replace     = true;
+      else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
+      else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
+      else if (strcmp(optionStart, "sysAttrs")    == 0)  orionldState.uriParamOptions.sysAttrs    = true;
+      else
+      {
+        LM_W(("Unknown 'options' value: %s", optionStart));
+        // orionldState.httpStatusCode = SccBadRequest;
+        // orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
+        // return;
+      }
+
+      if (done == true)
+        break;
+
+      *cP = saved;
+      optionStart = &cP[1];
+    }
+
+    ++cP;
+  }
+}
+
+
+#if 0
+// -----------------------------------------------------------------------------
+//
+// orionldHttpHeaderGet -
+//
+static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+{
+  if (strcmp(key, "NGSILD-Tenant") == 0)
+    orionldState.httpHeaders.tenant = value;
+}
+#endif
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldUriArgumentGet -
+//
+static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+{
+  if (SCOMPARE3(key, 'i', 'd', 0))
+    orionldState.uriParams.id = (char*) value;
+  else if (SCOMPARE5(key, 't', 'y', 'p', 'e', 0))
+    orionldState.uriParams.type = (char*) value;
+  else if (SCOMPARE10(key, 'i', 'd', 'P', 'a', 't', 't', 'e', 'r', 'n', 0))
+    orionldState.uriParams.idPattern = (char*) value;
+  else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
+    orionldState.uriParams.attrs = (char*) value;
+  else if (SCOMPARE7(key, 'o', 'f', 'f', 's', 'e', 't', 0))
+    orionldState.uriParams.offset = atoi(value);
+  else if (SCOMPARE6(key, 'l', 'i', 'm', 'i', 't', 0))
+    orionldState.uriParams.limit = atoi(value);
+  else if (SCOMPARE8(key, 'o', 'p', 't', 'i', 'o', 'n', 's', 0))
+  {
+    orionldState.uriParams.options = (char*) value;
+    optionsParse(value);
+  }
+  else if (SCOMPARE12(key, 'g', 'e', 'o', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+    orionldState.uriParams.geoproperty = (char*) value;
+  else if (SCOMPARE6(key, 'c', 'o', 'u', 'n', 't', 0))
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.count = true;
+    else if (strcmp(value, "false") != 0)
+    {
+      LM_W(("Bad Input (invalid value for URI parameter 'count': %s)", value));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /count/", value);
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
+  }
+  else if (SCOMPARE10(key, 'd', 'a', 't', 'a', 's', 'e', 't', 'I', 'd', 0))
+  {
+    orionldState.uriParams.datasetId = (char*) value;
+    // Check that it's a URI
+  }
+
+  return MHD_YES;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriArgumentsPresent - necessary for functest "ngsild_uri_params_in_orionldState.test"
+//
+static void uriArgumentsPresent(void)
+{
+  LM_T(LmtUriParams, ("orionldUriArguments: id:        '%s'", orionldState.uriParams.id));
+  LM_T(LmtUriParams, ("orionldUriArguments: type:      '%s'", orionldState.uriParams.type));
+  LM_T(LmtUriParams, ("orionldUriArguments: idPattern: '%s'", orionldState.uriParams.idPattern));
+  LM_T(LmtUriParams, ("orionldUriArguments: attrs:     '%s'", orionldState.uriParams.attrs));
+  LM_T(LmtUriParams, ("orionldUriArguments: options:   '%s'", orionldState.uriParams.options));
 }
 
 
@@ -182,11 +306,10 @@ int orionldMhdConnectionInit
   ++requestNo;
 
   //
-  // This call to LM_TMP should not be removed. Only commented out
+  // This call to LM_TMP should not be removed.
+  // At most, commented out
   //
   LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
-  orionldContextListPresent();
-
 
   //
   // 1. Prepare connectionInfo
@@ -203,13 +326,14 @@ int orionldMhdConnectionInit
   // 1. Prepare orionldState
   //
   orionldStateInit();
+  orionldState.ciP = ciP;
 
 
   // The 'connection', as given by MHD is very important. No responses can be sent without it
   ciP->connection = connection;
 
   // Flagging all as OK - errors will be flagged when occurring
-  ciP->httpStatusCode = SccOk;
+  orionldState.httpStatusCode = SccOk;
 
 
   // IP Address and port of caller
@@ -239,34 +363,42 @@ int orionldMhdConnectionInit
     {
       LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
       orionldState.responsePayload = (char*) doubleSlashPayload;
-      ciP->httpStatusCode          = SccBadRequest;
+      orionldState.httpStatusCode  = SccBadRequest;
       return MHD_YES;
     }
   }
 
-  // 3.  Check invalid verb
-  ciP->verb = verbGet(method);
-  if (ciP->verb == NOVERB)
+  // 3. Check invalid verb
+  orionldState.verb = verbGet(method);
+  ciP->verb = orionldState.verb;  // FIXME: to be removed
+  if (orionldState.verb == NOVERB)
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "not a valid verb", method, OrionldDetailsString);
-    ciP->httpStatusCode   = SccBadRequest;
+    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);
+    orionldState.httpStatusCode   = SccBadRequest;
     return MHD_YES;
   }
 
-  // 4.  Check payload too big
+  // 4. Get HTTP Headers
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: implement orionldHttpHeaderGet in C !!!
+
+  if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
+    orionldState.httpStatusCode  = SccBadRequest;
+    return MHD_YES;
+  }
+
+  // 5. Check payload too big
   if (ciP->httpHeaders.contentLength > 2000000)
   {
     orionldState.responsePayload = (char*) payloadTooLargePayload;
-    ciP->httpStatusCode          = SccBadRequest;
+    orionldState.httpStatusCode  = SccBadRequest;
     return MHD_YES;
   }
 
-  // 5.  Get HTTP Headers
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
-
   // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
-  ciP->servicePathV.push_back((ciP->verb == GET)? "/#" : "/");
+  ciP->servicePathV.push_back((orionldState.verb == GET)? "/#" : "/");
 
 
   // 7.  Check that GET/DELETE has no payload
@@ -276,35 +408,28 @@ int orionldMhdConnectionInit
   // 11. Check URL path is OK
 
   // 12. Check Content-Type is accepted
-  if ((ciP->verb == POST) || (ciP->verb == PATCH))
+  if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
   {
     //
     // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
     //
     if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
     {
-      orionldErrorResponseCreate(ciP,
-                                 OrionldBadRequestData,
+      LM_W(("Bad Input (invalid Content-Type: '%s'", ciP->httpHeaders.contentType.c_str()));
+      orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
-                                 "only application/json and application/ld+json are supported",
-                                 OrionldDetailsString);
-      ciP->httpStatusCode = SccUnsupportedMediaType;
+                                 "only application/json and application/ld+json are supported");
+      orionldState.httpStatusCode = SccUnsupportedMediaType;
       return MHD_YES;
     }
   }
 
   // 13. Get URI parameters
-  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-
-  // 14. Check ...
-
-  // 20. Lookup the Service Routine
-  // 21. Not found?  Look it up in the badVerb vector
-  // 22. Not found still? Return error
-
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);           // FIXME: To Be Removed!
+  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
   //
-  // 23. Format of response payload
+  // Format of response payload
   //
   if (orionldState.prettyPrint == true)
   {
@@ -323,15 +448,47 @@ int orionldMhdConnectionInit
     orionldState.kjsonP->stringAfterColon  = (char*) "";
   }
 
+  if (orionldState.httpStatusCode != SccOk)
+  {
+    LM_W(("Bad Input (invalid URI parameter)"));
+    orionldState.httpStatusCode = SccBadRequest;
+  }
+
+  //
+  // Check validity of URI parameters
+  //
+  if ((orionldState.uriParams.limit == 0) && (orionldState.uriParams.count == false))
+  {
+    LM_E(("Invalid value for URI parameter 'limit': 0"));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1, if /count/ is not set");
+    orionldState.httpStatusCode = SccBadRequest;
+  }
+
+  if (orionldState.uriParams.limit > 1000)
+  {
+    LM_E(("Invalid value for URI parameter 'limit': %d", orionldState.uriParams.limit));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
+    orionldState.httpStatusCode = SccBadRequest;
+  }
+
+  if (lmTraceIsSet(LmtUriParams))
+    uriArgumentsPresent();
+
+  // 14. Check ...
+
+  // 20. Lookup the Service Routine
+  // 21. Not found?  Look it up in the badVerb vector
+  // 22. Not found still? Return error
+
   //
   // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH
   // If any other verb is used, even if a valid REST Verb, a generic error will be returned
   //
-  if ((ciP->verb != POST) && (ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->verb != PATCH))
+  if ((orionldState.verb != POST) && (orionldState.verb != GET) && (orionldState.verb != DELETE) && (orionldState.verb != PATCH))
   {
     LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
-    orionldErrorResponseCreate(ciP, OrionldBadRequestData, "Verb not supported by NGSI-LD", method, OrionldDetailsString);
-    ciP->httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
+    orionldState.httpStatusCode = SccBadRequest;
   }
 
   LM_T(LmtMhd, ("Connection Init DONE"));

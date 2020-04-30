@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -32,12 +32,12 @@ brokerStart CB 0-255 --prettyPrint
 
 #
 # 01. Create an entity with three attrs P1-P3, Using an inline context, where P1, P2, and P3 is defined
-# 02. Delete P1 using the alias and the context created for the entity
 # 03. Attempt to delete P2, without context, using alias P2 => see error Not Found
 # 04. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK
 # 05. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context
-# 06. Get the entity, with its creation context, see only P3 and with shortname, as P3 is found in creation context
 #
+
+HOST=$(hostname)
 
 echo "01. Create an entity with three attrs P1-P3, Using an inline context, where P1, P2, and P3 is defined"
 echo "====================================================================================================="
@@ -67,23 +67,16 @@ echo
 echo
 
 
-echo "02. Delete P1 using the alias and the context created for the entity"
-echo "===================================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P1 -X DELETE -H 'Link: <http://localhost:9999/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
-echo
-echo
-
-
 echo "03. Attempt to delete P2, without context, using alias P2 => see error Not Found"
 echo "================================================================================"
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P2 -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/P2 -X DELETE --linkHeaderFix
 echo
 echo
 
 
 echo "04. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK"
 echo "======================================================================================================================"
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/http://a.b.c./urn:ngsi-ld:T:12:13:14/attrs/P2.jsonld -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14/attrs/http://a.b.c./urn:ngsi-ld:T:12:13:14/attrs/P2.jsonld -X DELETE --linkHeaderFix
 echo
 echo
 
@@ -95,29 +88,12 @@ echo
 echo
 
 
-echo "06. Get the entity, with its creation context, see only P3 and with shortname, as P3 is found in creation context"
-echo "================================================================================================================="
-HOST=$(hostname)
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14 -H 'Link: <http://'$HOST':'$CB_PORT'/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --linkHeaderFix
-echo
-echo
-
-
 --REGEXPECT--
 01. Create an entity with three attrs P1-P3, Using an inline context, where P1, P2, and P3 is defined
 =====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:12:13:14
-Date: REGEX(.*)
-
-
-
-02. Delete P1 using the alias and the context created for the entity
-====================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -125,14 +101,14 @@ Date: REGEX(.*)
 03. Attempt to delete P2, without context, using alias P2 => see error Not Found
 ================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 140
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "http://example.org/ngsi-ld/default/P2",
+    "detail": "P2",
     "title": "Attribute Not Found",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -147,31 +123,17 @@ Date: REGEX(.*)
 05. Get the entity, without context, see only P3 and with long name, as P3 is not found in default context
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 218
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
-    "http://a.b.c./urn:ngsi-ld:T:12:13:14/attrs/P3.jsonld": {
+    "http://a.b.c./urn:ngsi-ld:T:12:13:14/attrs/P1.jsonld": {
         "type": "Property",
-        "value": "P3"
+        "value": "P1"
     },
-    "id": "urn:ngsi-ld:T:12:13:14",
-    "type": "T"
-}
-
-
-06. Get the entity, with its creation context, see only P3 and with shortname, as P3 is found in creation context
-=================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:T:12:13:14>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "P3": {
+    "http://a.b.c./urn:ngsi-ld:T:12:13:14/attrs/P3.jsonld": {
         "type": "Property",
         "value": "P3"
     },

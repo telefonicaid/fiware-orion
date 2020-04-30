@@ -1,22 +1,22 @@
-# Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2019 FIWARE Foundation e.V.
 #
-# This file is part of Orion Context Broker.
+# This file is part of Orion-LD Context Broker.
 #
-# Orion Context Broker is free software: you can redistribute it and/or
+# Orion-LD Context Broker is free software: you can redistribute it and/or
 # modify it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Orion Context Broker is distributed in the hope that it will be useful,
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es
+# orionld at fiware dot org
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
@@ -33,7 +33,8 @@ brokerStart CB 0-255 --prettyPrint
 #
 # 01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error
 # 02. Create the entity of issue #131, with @context in payload and application/ld+json
-# 03. GET the entity
+# 03. GET the entity, without context, see long names
+# 04. GET the entity, with context, see short names
 #
 
 echo "01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error"
@@ -66,7 +67,7 @@ payload='{
     "value": "Bösebrücke Einkauf"
   },
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "https://fiware.github.io/data-models/full-context.jsonld",
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -105,7 +106,7 @@ payload='{
     "value": "Bösebrücke Einkauf"
   },
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "https://fiware.github.io/data-models/full-context.jsonld",
     "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -114,9 +115,16 @@ echo
 echo
 
 
-echo "03. GET the entity"
-echo "=================="
+echo "03. GET the entity, without context, see long names"
+echo "==================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET the entity, with context, see short names"
+echo "================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221?prettyPrint=yes&spaces=2' --noPayloadCheck -H 'Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -125,14 +133,14 @@ echo
 01. Create the entity of issue #131, with @context in payload and application/json which crashes the broker according to the issue, see error
 =============================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 191
+Content-Length: 243
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "details": "For @context in payload, the MIME type must be application/ld+json",
-    "title": "Invalid MIME-type for @context in payload",
-    "type": "http://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "Content-Type is application/json, yet a '@context' item was present in the payload body",
+    "title": "Mismatch between /Content-Type/ and contents of the request payload body",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -140,24 +148,27 @@ Date: REGEX(.*)
 =====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Link: <http://IP:PORT/ngsi-ld/ex/v1/contexts/urn:ngsi-ld:Building:store00221>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221
 Date: REGEX(.*)
 
 
 
-03. GET the entity
-==================
+03. GET the entity, without context, see long names
+===================================================
 HTTP/1.1 200 OK
-Content-Length: 632
+Content-Length: 723
 Content-Type: application/json
-Link: <https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/defaultContext/defaultContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
   "id": "urn:ngsi-ld:Building:store00221",
-  "type": "Building",
-  "address": {
+  "type": "https://uri.fiware.org/ns/data-models#Building",
+  "https://uri.fiware.org/ns/data-models#category": {
+    "type": "Property",
+    "value": "https://uri.fiware.org/ns/data-models#commercial"
+  },
+  "https://schema.org/address": {
     "type": "Property",
     "value": {
       "streetAddress": "Bornholmer Straße 65",
@@ -165,16 +176,6 @@ Date: REGEX(.*)
       "addressLocality": "Prenzlauer Berg",
       "postalCode": "10439"
     }
-  },
-  "category": {
-    "type": "Property",
-    "value": [
-      "commercial"
-    ]
-  },
-  "http://uri.etsi.org/ngsi-ld/name": {
-    "type": "Property",
-    "value": "Bösebrücke Einkauf"
   },
   "location": {
     "type": "GeoProperty",
@@ -185,6 +186,52 @@ Date: REGEX(.*)
         52.5547
       ]
     }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
+  }
+}
+
+
+
+04. GET the entity, with context, see short names
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 590
+Content-Type: application/json
+Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:Building:store00221",
+  "type": "Building",
+  "category": {
+    "type": "Property",
+    "value": "commercial"
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Bornholmer Straße 65",
+      "addressRegion": "Berlin",
+      "addressLocality": "Prenzlauer Berg",
+      "postalCode": "10439"
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.3986,
+        52.5547
+      ]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Bösebrücke Einkauf"
   }
 }
 

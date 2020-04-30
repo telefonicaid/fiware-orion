@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -43,7 +43,7 @@
 // 6. Optionally, a :<port number> - if so, make sure it is a number
 // 7. Make sure the rest is a valid path
 //
-bool urlCheck(char* url, char** detailsPP)
+bool urlCheck(char* url, char** detailP)
 {
   //
   // 1. A URL for ngsi-ld MUST start with http:// or https://
@@ -55,8 +55,8 @@ bool urlCheck(char* url, char** detailsPP)
   //
   if (!SCOMPARE4(url, 'h', 't', 't', 'p'))
   {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "protocol doesn't start with 'http' nor 'https'";
+    if (detailP != NULL)
+      *detailP = (char*) "protocol doesn't start with 'http' nor 'https'";
     return false;
   }
 
@@ -67,8 +67,8 @@ bool urlCheck(char* url, char** detailsPP)
 
   if (!SCOMPARE3(urlP, ':', '/', '/'))
   {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "protocol doesn't start with 'http://' nor 'https://'";
+    if (detailP != NULL)
+      *detailP = (char*) "protocol doesn't start with 'http://' nor 'https://'";
     return false;
   }
 
@@ -86,8 +86,8 @@ bool urlCheck(char* url, char** detailsPP)
       ip[toIx] = *urlP;
     else
     {
-      if (detailsPP != NULL)
-        *detailsPP = (char*) "assumed IP address too long";
+      if (detailP != NULL)
+        *detailP = (char*) "assumed IP address too long";
       ip[toIx] = 0;
       return false;
     }
@@ -97,11 +97,8 @@ bool urlCheck(char* url, char** detailsPP)
   }
 
   if (*urlP == 0)
-  {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "URL parse error - no slash found after IP address";
-    return false;
-  }
+    return true;
+
   ip[toIx] = 0;
 
   // FIXME: Check that 'ip' is a valid IP address
@@ -123,28 +120,26 @@ bool urlCheck(char* url, char** detailsPP)
     {
       if (toIx >= portNumberStringSize - 1)  // One char left for nuling the string
       {
-        if (detailsPP != NULL)
-          *detailsPP = (char*) "port number too big";
+        if (detailP != NULL)
+          *detailP = (char*) "port number too big";
         return false;
       }
 
       portNumberString[toIx++] = *urlP;
       ++urlP;
     }
+
     if (*urlP == 0)
-    {
-      if (detailsPP != NULL)
-        *detailsPP = (char*) "URL parse error - no slash found after port number";
-      return false;
-    }
+      return true;
+
     portNumberString[toIx] = 0;
 
     for (char* portCharP = portNumberString; *portCharP != 0; ++portCharP)
     {
       if ((*portCharP < '0') || (*portCharP > '9'))
       {
-        if (detailsPP != NULL)
-          *detailsPP = (char*) "URL parse error - invalid port number";
+        if (detailP != NULL)
+          *detailP = (char*) "URL parse error - invalid port number";
         return false;
       }
     }
@@ -155,8 +150,11 @@ bool urlCheck(char* url, char** detailsPP)
   //
   if (*urlP != '/')
   {
-    if (detailsPP != NULL)
-      *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
+    if (*urlP == 0)
+      return true;
+
+    if (detailP != NULL)
+      *detailP = (char*) "URL parse error - no slash found to start the URL PATH";
     return false;
   }
 

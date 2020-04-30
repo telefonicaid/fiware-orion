@@ -1,0 +1,270 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Expansion of sub-attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity with all four combinations of sub-attrs: { Prop/Prop, Prop/Rel, Rel/Prop, Rel/Rel }
+# 02. See mongo content, make sure all sub-attrs are expanded
+# 03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs
+# 04. See mongo content, make sure Prop2/Prop2 is expanded
+#
+
+echo "01. Create an entity with all four combinations of sub-attrs: { Prop/Prop, Prop/Rel, Rel/Prop, Rel/Rel }"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:T:001",
+  "type": "T",
+  "Prop": {
+    "type": "Property",
+    "value": "Property with Property as sub-attr",
+    "Prop": {
+      "type": "Property",
+      "value": "sub-attr for Prop/Prop"
+    },
+    "Rel": {
+      "type": "Relationship",
+      "object": "http://a.b.c/x.jsonld"
+    }
+  },
+  "Rel": {
+    "type": "Relationship",
+    "object": "http://a.b.c/x.jsonld",
+    "Prop": {
+      "type": "Property",
+      "value": "sub-attr for Rel/Prop"
+    },
+    "Rel": {
+      "type": "Relationship",
+      "object": "http://a.b.c/x.jsonld"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. See mongo content, make sure all sub-attrs are expanded"
+echo "==========================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs"
+echo "========================================================="
+payload='{
+  "Prop2": {
+    "type": "Property",
+    "value": "Property with Property as sub-attr",
+    "Prop2": {
+      "type": "Property",
+      "value": "sub-attr Prop2/Prop2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. See mongo content, make sure Prop2/Prop2 is expanded"
+echo "========================================================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with all four combinations of sub-attrs: { Prop/Prop, Prop/Rel, Rel/Prop, Rel/Rel }
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:001
+Date: REGEX(.*)
+
+
+
+02. See mongo content, make sure all sub-attrs are expanded
+===========================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:001",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+		"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Property with Property as sub-attr",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"type" : "Property",
+					"value" : "sub-attr for Prop/Prop"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"type" : "Relationship",
+					"value" : "http://a.b.c/x.jsonld"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "http://a.b.c/x.jsonld",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"type" : "Property",
+					"value" : "sub-attr for Rel/Prop"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"type" : "Relationship",
+					"value" : "http://a.b.c/x.jsonld"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs
+=========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. See mongo content, make sure Prop2/Prop2 is expanded
+========================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:001",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+		"https://uri.etsi.org/ngsi-ld/default-context/Rel",
+		"https://uri.etsi.org/ngsi-ld/default-context/Prop2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Property with Property as sub-attr",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"type" : "Property",
+					"value" : "sub-attr for Prop/Prop"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"type" : "Relationship",
+					"value" : "http://a.b.c/x.jsonld"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "http://a.b.c/x.jsonld",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop" : {
+					"type" : "Property",
+					"value" : "sub-attr for Rel/Prop"
+				},
+				"https://uri=etsi=org/ngsi-ld/default-context/Rel" : {
+					"type" : "Relationship",
+					"value" : "http://a.b.c/x.jsonld"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop",
+				"https://uri.etsi.org/ngsi-ld/default-context/Rel"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
+			"value" : "Property with Property as sub-attr",
+			"type" : "Property",
+			"md" : {
+				"https://uri=etsi=org/ngsi-ld/default-context/Prop2" : {
+					"type" : "Property",
+					"value" : "sub-attr Prop2/Prop2"
+				}
+			},
+			"mdNames" : [
+				"https://uri.etsi.org/ngsi-ld/default-context/Prop2"
+			],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

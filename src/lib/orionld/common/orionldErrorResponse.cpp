@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -31,9 +31,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
-#include "orionld/context/orionldContextItemLookup.h"          // orionldContextItemLookup
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // Own interface
 
@@ -45,13 +42,30 @@ extern "C"
 //
 static const char* errorTypeStringV[] =
 {
-  "http://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
-  "http://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-  "http://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
-  "http://uri.etsi.org/ngsi-ld/errors/OperationNotSupported",
-  "http://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
-  "http://uri.etsi.org/ngsi-ld/errors/InternalError"
+  "https://uri.etsi.org/ngsi-ld/errors/OK",
+  "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
+  "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists",
+  "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported",
+  "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound",
+  "https://uri.etsi.org/ngsi-ld/errors/InternalError",
+  "https://uri.etsi.org/ngsi-ld/errors/TooComplexQuery",
+  "https://uri.etsi.org/ngsi-ld/errors/TooManyResults",
+  "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable",
+  "https://uri.etsi.org/ngsi-ld/errors/NoMultiTenantSupport",
+  "https://uri.etsi.org/ngsi-ld/errors/NonExistingTenant"
 };
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorTypeToString -
+//
+const char* orionldErrorTypeToString(OrionldResponseErrorType type)
+{
+  return errorTypeStringV[type];
+}
 
 
 
@@ -61,64 +75,29 @@ static const char* errorTypeStringV[] =
 //
 // NOTE
 //   Only service routines should use this function.
-//   Lower level functions should just return the 'details' string.
+//   Lower level functions should just return the 'detail' string.
 //
 void orionldErrorResponseCreate
 (
-  ConnectionInfo*           ciP,
   OrionldResponseErrorType  errorType,
   const char*               title,
-  const char*               details,
-  OrionldDetailsType        detailsType
-  )
+  const char*               detail
+)
 {
-  LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, details));
+  LM_T(LmtErrorResponse, ("Creating error response: %s (%s)", title, detail));
 
-  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    errorTypeStringV[errorType]);
+  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    orionldErrorTypeToString(errorType));
   KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
-  KjNode* detailsP;
+  KjNode* detailP;
 
-  if ((details != NULL) && (details[0] != 0))
-  {
-    char*   contextDetails = NULL;
-
-    if (detailsType == OrionldDetailsString)  // no replacement as it's just a descriptive string
-    {
-      contextDetails = (char*) details;
-    }
-    else  // lookup 'details' in context
-    {
-      KjNode*  nodeP = orionldContextItemLookup(orionldState.contextP, details);
-      char     contextDetailsV[512];  // FIXME: Define a max length for a context item?
-
-      if (nodeP == NULL)
-      {
-        snprintf(contextDetailsV, sizeof(contextDetailsV), "%s%s", orionldDefaultUrl, details);
-        contextDetails = contextDetailsV;
-      }
-      else
-      {
-        contextDetails = nodeP->value.s;
-      }
-    }
-
-    detailsP = kjString(orionldState.kjsonP, "details", contextDetails);
-  }
+  if ((detail != NULL) && (detail[0] != 0))
+    detailP = kjString(orionldState.kjsonP, "detail", detail);
   else
-  {
-    detailsP = kjString(orionldState.kjsonP, "details", "no details");
-  }
+    detailP = kjString(orionldState.kjsonP, "detail", "no detail");
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
   kjChildAdd(orionldState.responseTree, typeP);
   kjChildAdd(orionldState.responseTree, titleP);
-  kjChildAdd(orionldState.responseTree, detailsP);
-
-  if ((orionldState.acceptJsonld) && (orionldState.contextP != NULL))
-  {
-    KjNode* contextP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
-
-    kjChildAdd(orionldState.responseTree, contextP);
-  }
+  kjChildAdd(orionldState.responseTree, detailP);
 }

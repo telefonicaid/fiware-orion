@@ -36,6 +36,7 @@
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
+#include "orionld/common/orionldState.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -46,8 +47,14 @@
 
 /* ****************************************************************************
 *
-* setRegistrationId - 
+* setRegistrationId -
 */
+#ifdef ORIONLD
+static void setNgsildRegistrationId(mongo::BSONObjBuilder* bobP, const char* regId)
+{
+  bobP->append("_id", regId);
+}
+#endif
 static void setRegistrationId(mongo::BSONObjBuilder* bobP, std::string* regIdP)
 {
   mongo::OID oId;
@@ -69,6 +76,19 @@ static void setDescription(const std::string& description, mongo::BSONObjBuilder
   if (description != "")
   {
     bobP->append(REG_DESCRIPTION, description);
+  }
+}
+
+
+/* ****************************************************************************
+*
+* setName -
+*/
+static void setName(const std::string& name, mongo::BSONObjBuilder* bobP)
+{
+  if (name != "")
+  {
+    bobP->append(REG_NAME, name);
   }
 }
 
@@ -104,7 +124,7 @@ static void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder
 
 /* ****************************************************************************
 *
-* setContextRegistrationVector - 
+* setContextRegistrationVector -
 */
 static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSONObjBuilder* bobP)
 {
@@ -116,19 +136,53 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (eP->type == "")  // No type provided => all types
+    if (orionldState.apiVersion == NGSI_LD_V1)
     {
-      entities.append(BSON(REG_ENTITY_ID << eP->id));
+      if (eP->id != "")
+      {
+        if (eP->type == "")
+          entities.append(BSON(REG_ENTITY_ID << eP->id));
+        else
+          entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      }
+      else if (eP->idPattern != "")
+      {
+        if (eP->type == "")
+          entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
+        else
+          entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true" << REG_ENTITY_TYPE << eP->type));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_TYPE << eP->type));
+      }
     }
     else
     {
-      entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      if (eP->type == "")  // No type provided => all types
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id));
+      }
+      else
+      {
+        entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+      }
     }
   }
 
-  for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)
+  if (orionldState.apiVersion == NGSI_LD_V1)
   {
-    attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << "" << REG_ATTRS_ISDOMAIN << "false"));
+    for (unsigned int pIx = 0; pIx < regP->dataProvided.propertyV.size(); ++pIx)
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.propertyV[pIx] << REG_ATTRS_TYPE << "Property" << REG_ATTRS_ISDOMAIN << "false"));
+    for (unsigned int rIx = 0; rIx < regP->dataProvided.relationshipV.size(); ++rIx)
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.relationshipV[rIx] << REG_ATTRS_TYPE << "Relationship" << REG_ATTRS_ISDOMAIN << "false"));
+  }
+  else
+  {
+    for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)
+    {
+      attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << "" << REG_ATTRS_ISDOMAIN << "false"));
+    }
   }
 
   contextRegistration.append(
@@ -138,6 +192,73 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 
   bobP->append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 }
+
+
+
+#ifdef ORIONLD
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setTimestamp -
+//
+static void setTimestamp(const char* name, int ts, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(name, ts);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setTimeInterval
+//
+static void setTimeInterval(const char* name, const OrionldTimeInterval* intervalP, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder intervalObj;
+
+  intervalObj.append("start", (long long) intervalP->start);
+  intervalObj.append("end",   (long long) intervalP->end);
+
+  bobP->append(name, intervalObj.obj());
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setGeoLocation -
+//
+static void setGeoLocation(const char* name, const OrionldGeoLocation* locationP, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObjBuilder  locationObj;
+  mongo::BSONArray       coordsArray;
+
+  locationObj.append("type", locationP->geoType);
+
+  mongoCppLegacyKjTreeToBsonObj(locationP->coordsNodeP, &coordsArray);
+  locationObj.append("coordinates", coordsArray);
+
+  bobP->append(name, locationObj.obj());
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// setProperties -
+//
+static void setProperties(const char* name, KjNode* properties, mongo::BSONObjBuilder* bobP)
+{
+  mongo::BSONObj propertiesObj;
+
+  mongoCppLegacyKjTreeToBsonObj(properties, &propertiesObj);
+  bobP->append(name, propertiesObj);
+}
+
+#endif
 
 
 
@@ -171,7 +292,7 @@ static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
 
 /* ****************************************************************************
 *
-* mongoRegistrationCreate - 
+* mongoRegistrationCreate -
 */
 void mongoRegistrationCreate
 (
@@ -191,13 +312,39 @@ void mongoRegistrationCreate
   //
   mongo::BSONObjBuilder  bob;
 
-  setRegistrationId(&bob, regIdP);
+  if (orionldState.apiVersion == NGSI_LD_V1)
+    setNgsildRegistrationId(&bob, regP->id.c_str());
+  else
+    setRegistrationId(&bob, regIdP);
+
   setDescription(regP->description, &bob);
+  setName(regP->name, &bob);
   setExpiration(regP->expires, &bob);
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
-  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardired when we implement NGSIv2-based forwarding
+  setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
+
+#ifdef ORIONLD
+  int now = getCurrentTime();
+
+  setTimestamp("createdAt",  now, &bob);
+  setTimestamp("modifiedAt", now, &bob);
+
+  if (regP->observationInterval.start != 0)
+    setTimeInterval("observationInterval", &regP->observationInterval, &bob);
+  if (regP->managementInterval.start != 0)
+    setTimeInterval("managementInterval", &regP->managementInterval, &bob);
+
+  if (regP->location.coordsNodeP != NULL)
+    setGeoLocation("location", &regP->location, &bob);
+  if (regP->observationSpace.coordsNodeP != NULL)
+    setGeoLocation("observationSpace", &regP->observationSpace, &bob);
+  if (regP->operationSpace.coordsNodeP != NULL)
+    setGeoLocation("operationSpace", &regP->operationSpace, &bob);
+  if (regP->properties != NULL)
+    setProperties("properties", regP->properties, &bob);
+#endif
 
   //
   // Insert in DB
@@ -209,6 +356,7 @@ void mongoRegistrationCreate
   {
     reqSemGive(__FUNCTION__, "Mongo Create Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);
+
     return;
   }
 

@@ -1,0 +1,1012 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert with an array of three entities, with context arrays in payload
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB smartmaas001
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Upsert 5 entities with context arrays in payload
+# 02. Make sure the upsert took less than 5 seconds (to see that the contexts were downloaded only once)
+# 03. Get the entities
+# 04. Get all contexts from the context cache
+# 05. Upsert the same 5 entities, but with different values in some attributes
+# 06. Get the entities
+# 07. Get all contexts from the context cache
+#
+
+echo "01. Upsert 5 entities with context arrays in payload"
+echo "===================================================="
+payload='[
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:22828"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.418,
+          52.562
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:38Z",
+      "type": "Property",
+      "value": 21.9
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:38Z",
+      "type": "Property",
+      "value": 1014.96
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:15333"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          6.722,
+          51.534
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:36Z",
+      "type": "Property",
+      "value": 29.55
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:36Z",
+      "type": "Property",
+      "value": 1018.0255999999999
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:25514"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          10.28,
+          54.242
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:34Z",
+      "type": "Property",
+      "value": 14.3
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:34Z",
+      "type": "Property",
+      "value": 1020.87
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:18219"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11.12,
+          49.344
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:30Z",
+      "type": "Property",
+      "value": 33.9
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:30Z",
+      "type": "Property",
+      "value": 980.56
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:16956"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          8.354,
+          52.052
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:29Z",
+      "type": "Property",
+      "value": 22.8
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:29Z",
+      "type": "Property",
+      "value": 1015.64
+    }
+  }
+]'
+startTime=$(date +%s)
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?prettyPrint=yes' --payload "$payload" -H 'Fiware-Service: smartmaas001' -H 'Content-Type: application/ld+json' --noPayloadCheck
+endTime=$(date +%s)
+echo
+echo
+
+
+echo "02. Make sure the upsert took less than 5 seconds (to see that the contexts were downloaded only once)"
+echo "======================================================================================================"
+typeset -i diffTime
+diffTime=$endTime-$startTime
+if [ $diffTime -gt 5 ]
+then
+  echo "The creation of the 5 entities took TOO LONG ($diffTime seconds)"
+else
+  echo "Good - the creation of the 5 entities took less than 5 seconds"
+fi
+echo
+echo
+
+
+echo "03. Get the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=WeatherObserved&prettyPrint=yes' -H 'Link: <https://schema.lab.fiware.org/ld/context>; ""' -H 'Fiware-Service: smartmaas001' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Get all contexts from the context cache"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/ex/v1/contexts?prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "05. Upsert the same 5 entities, but with different values in some attributes"
+echo "============================================================================"
+payload='[
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:22828"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.418,
+          52.562
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:38Z",
+      "type": "Property",
+      "value": 21.9
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:38Z",
+      "type": "Property",
+      "value": 1014.96
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:15333"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          6.722,
+          51.534
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:36Z",
+      "type": "Property",
+      "value": 29.55
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:36Z",
+      "type": "Property",
+      "value": 1018.0255999999999
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:25514"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          10.28,
+          54.242
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:34Z",
+      "type": "Property",
+      "value": 14.3
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:34Z",
+      "type": "Property",
+      "value": 1020.87
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:18219"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11.12,
+          49.344
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:30Z",
+      "type": "Property",
+      "value": 33.9
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:30Z",
+      "type": "Property",
+      "value": 980.56
+    }
+  },
+  {
+    "type": "WeatherObserved",
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:16956"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          8.354,
+          52.052
+        ]
+      }
+    },
+    "@context": [
+      "https://schema.lab.fiware.org/ld/context",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    ],
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
+    "temperature": {
+      "observedAt": "2020-04-09T14:33:29Z",
+      "type": "Property",
+      "value": 22.8
+    },
+    "atmosphericPressure": {
+      "observedAt": "2020-04-09T14:33:29Z",
+      "type": "Property",
+      "value": 1015.64
+    }
+  }
+]'
+startTime=$(date +%s)
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?prettyPrint=yes' --payload "$payload" -H 'Fiware-Service: smartmaas001' -H 'Content-Type: application/ld+json' --noPayloadCheck
+endTime=$(date +%s)
+echo
+echo
+
+
+
+echo "06. Get the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=WeatherObserved&prettyPrint=yes' -H 'Link: <https://schema.lab.fiware.org/ld/context>; ""' -H 'Fiware-Service: smartmaas001' --noPayloadCheck
+echo
+echo
+
+
+echo "07. Get all contexts from the context cache"
+echo "==========================================="
+orionCurl --url '/ngsi-ld/ex/v1/contexts?prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Upsert 5 entities with context arrays in payload
+====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+
+02. Make sure the upsert took less than 5 seconds (to see that the contexts were downloaded only once)
+======================================================================================================
+Good - the creation of the 5 entities took less than 5 seconds
+
+
+03. Get the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 4121
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:22828"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1014.96,
+      "observedAt": "2020-04-09T14:33:38Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 21.9,
+      "observedAt": "2020-04-09T14:33:38Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.418,
+          52.562
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:15333"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1018.0256,
+      "observedAt": "2020-04-09T14:33:36Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 29.55,
+      "observedAt": "2020-04-09T14:33:36Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          6.722,
+          51.534
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:25514"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1020.87,
+      "observedAt": "2020-04-09T14:33:34Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 14.3,
+      "observedAt": "2020-04-09T14:33:34Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          10.28,
+          54.242
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:18219"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 980.56,
+      "observedAt": "2020-04-09T14:33:30Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 33.9,
+      "observedAt": "2020-04-09T14:33:30Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11.12,
+          49.344
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:16956"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1015.64,
+      "observedAt": "2020-04-09T14:33:29Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 22.8,
+      "observedAt": "2020-04-09T14:33:29Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          8.354,
+          52.052
+        ]
+      }
+    }
+  }
+]
+
+
+
+04. Get all contexts from the context cache
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 1158
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "None",
+    "type": "hash-table",
+    "hash-table": {
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+      "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+      "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+      "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+      "properties": "https://uri.etsi.org/ngsi-ld/properties"
+    }
+  },
+  {
+    "url": "https://fiware.github.io/data-models/context.jsonld",
+    "id": "None",
+    "type": "hash-table",
+    "hash-table": {
+      "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+      "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+      "areaServed": "https://schema.org/areaServed",
+      "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
+    }
+  },
+  {
+    "url": "https://schema.lab.fiware.org/ld/context",
+    "id": "None",
+    "type": "array",
+    "URLs": [
+      "https://fiware.github.io/data-models/context.jsonld"
+    ]
+  }
+]
+
+
+
+05. Upsert the same 5 entities, but with different values in some attributes
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+
+06. Get the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 4121
+Content-Type: application/json
+Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:22828"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1014.96,
+      "observedAt": "2020-04-09T14:33:38Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 21.9,
+      "observedAt": "2020-04-09T14:33:38Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          13.418,
+          52.562
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:15333"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1018.0256,
+      "observedAt": "2020-04-09T14:33:36Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 29.55,
+      "observedAt": "2020-04-09T14:33:36Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          6.722,
+          51.534
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:25514"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1020.87,
+      "observedAt": "2020-04-09T14:33:34Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 14.3,
+      "observedAt": "2020-04-09T14:33:34Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          10.28,
+          54.242
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:18219"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 980.56,
+      "observedAt": "2020-04-09T14:33:30Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 33.9,
+      "observedAt": "2020-04-09T14:33:30Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          11.12,
+          49.344
+        ]
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
+    "type": "WeatherObserved",
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:16956"
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1015.64,
+      "observedAt": "2020-04-09T14:33:29Z"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "sensor.community"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP181"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 22.8,
+      "observedAt": "2020-04-09T14:33:29Z"
+    },
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          8.354,
+          52.052
+        ]
+      }
+    }
+  }
+]
+
+
+
+07. Get all contexts from the context cache
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 1158
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "id": "None",
+    "type": "hash-table",
+    "hash-table": {
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+      "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+      "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+      "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+      "properties": "https://uri.etsi.org/ngsi-ld/properties"
+    }
+  },
+  {
+    "url": "https://fiware.github.io/data-models/context.jsonld",
+    "id": "None",
+    "type": "hash-table",
+    "hash-table": {
+      "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+      "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+      "areaServed": "https://schema.org/areaServed",
+      "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
+    }
+  },
+  {
+    "url": "https://schema.lab.fiware.org/ld/context",
+    "id": "None",
+    "type": "array",
+    "URLs": [
+      "https://fiware.github.io/data-models/context.jsonld"
+    ]
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB smartmaas001

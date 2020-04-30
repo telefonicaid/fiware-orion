@@ -1,0 +1,181 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Subscription Created with complex Q-filter - Issue #329
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create subscription urn:ngsi-ld:subscription:S1 with a complex Q-filter
+# 02. See the subscription in mongo
+# 03. GET /ngsi-ld/v1/subscription/urn:ngsi-ld:subscription:S1, make sure the Q-filter is OK
+#
+
+
+echo "01. Create subscription urn:ngsi-ld:subscription:S1 with a complex Q-filter"
+echo "==========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscription:S1",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "type": "Shelf"
+    }
+  ],
+  "watchedAttributes": [ "numberOfItems" ],
+  "q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Store:001",
+  "notification": {
+    "attributes": [ "numberOfItems", "stocks", "locatedIn" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    }
+  },
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/subscription/urn:ngsi-ld:subscription:S1, make sure the Q-filter is OK"
+echo "=========================================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:S1?prettyPrint=yes&spaces=2' -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription urn:ngsi-ld:subscription:S1 with a complex Q-filter
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:S1
+Date: REGEX(.*)
+
+
+
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscription:S1",
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "http://valid.url/url",
+	"custom" : false,
+	"mimeType" : "application/ld+json",
+	"throttling" : NumberLong(0),
+	"servicePath" : "/",
+	"description" : "Description of Test subscription 01",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://fiware.github.io/tutorials.Step-by-Step/schema/Shelf",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/numberOfItems",
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/stocks",
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Test subscription 01",
+	"ldContext" : "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+	"timeInterval" : -1,
+	"conditions" : [
+		"https://fiware.github.io/tutorials.Step-by-Step/schema/numberOfItems"
+	],
+	"expression" : {
+		"q" : "https://fiware=github=io/tutorials=Step-by-Step/schema/numberOfItems<10;https://fiware=github=io/tutorials=Step-by-Step/schema/locatedIn==urn:ngsi-ld:Store:001",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "keyValues"
+}
+bye
+
+
+03. GET /ngsi-ld/v1/subscription/urn:ngsi-ld:subscription:S1, make sure the Q-filter is OK
+==========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 558
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "Shelf"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscription:S1",
+    "name": "Test subscription 01",
+    "notification": {
+        "attributes": [
+            "numberOfItems",
+            "stocks",
+            "locatedIn"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "uri": "http://valid.url/url"
+        },
+        "format": "keyValues"
+    },
+    "q": "numberOfItems<10;locatedIn==urn:ngsi-ld:Store:001",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "numberOfItems"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

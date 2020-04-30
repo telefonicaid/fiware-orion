@@ -43,6 +43,7 @@
 #include "ngsiNotify/Notifier.h"
 #include "alarmMgr/alarmMgr.h"
 #include "logSummary/logSummary.h"
+#include "orionld/common/orionldState.h"
 
 #include "unittests/unittest.h"
 
@@ -84,6 +85,10 @@ int           dbPoolSize;
 int           writeConcern;
 char          gtest_filter[1024];
 char          gtest_output[1024];
+int           contextDownloadAttempts = 5;
+int           contextDownloadTimeout  = 10000;
+bool          temporal                = false;
+bool          multitenancy            = false;
 
 
 
@@ -145,6 +150,7 @@ int main(int argC, char** argV)
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   setupDatabase();
+  orionldStateInit();
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

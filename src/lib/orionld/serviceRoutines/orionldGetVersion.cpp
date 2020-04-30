@@ -1,24 +1,24 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2018 FIWARE Foundation e.V.
 *
-* This file is part of Orion Context Broker.
+* This file is part of Orion-LD Context Broker.
 *
-* Orion Context Broker is free software: you can redistribute it and/or
+* Orion-LD Context Broker is free software: you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
 *
-* Orion Context Broker is distributed in the hope that it will be useful,
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 * General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
 *
 * For those usages not covered by this license please contact with
-* iot_support at tid dot es
+* orionld at fiware dot org
 *
 * Author: Ken Zangelin
 */
@@ -36,6 +36,7 @@ extern "C"
 {
 #include "kbase/version.h"                                     // kbaseVersion
 #include "kalloc/version.h"                                    // kallocVersion
+#include "khash/version.h"                                     // khashVersion
 #include "kjson/version.h"                                     // kjsonVersion
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
@@ -45,7 +46,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/common/orionldState.h"                       // orionldState
+#include "serviceRoutines/versionTreat.h"                      // versionGet
+#include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
 
@@ -79,22 +81,28 @@ void mhdVersionGet(char* buff, int buflen, int iVersion)
 //
 bool orionldGetVersion(ConnectionInfo* ciP)
 {
-  KjNode* nodeP;
-  char    mhdVersion[32];
+  KjNode*                  nodeP;
+  char                     mhdVersion[32];
   curl_version_info_data*  curlVersionP;
 
   mhdVersionGet(mhdVersion, sizeof(mhdVersion), MHD_VERSION);
 
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
-  // Branch
-  nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
+  // Orion-LD version
+  nodeP = kjString(orionldState.kjsonP, "Orion-LD version", orionldVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Orion version
+  nodeP = kjString(orionldState.kjsonP, "based on orion", versionGet());
   kjChildAdd(orionldState.responseTree, nodeP);
 
   // K-Lib versions
   nodeP = kjString(orionldState.kjsonP, "kbase version", kbaseVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kalloc version", kallocVersion);
+  kjChildAdd(orionldState.responseTree, nodeP);
+  nodeP = kjString(orionldState.kjsonP, "khash version", khashVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
   nodeP = kjString(orionldState.kjsonP, "kjson version", kjsonVersion);
   kjChildAdd(orionldState.responseTree, nodeP);
@@ -124,6 +132,10 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   nodeP = kjString(orionldState.kjsonP, "libuuid version", "UNKNOWN");
   kjChildAdd(orionldState.responseTree, nodeP);
 
+  // Branch
+  nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
   //
   // Opening and closing an arbitrary file (/etc/passwd) only to see the next non-open
   // file descriptor.
@@ -141,7 +153,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   orionldState.kjsonP->stringBeforeColon = (char*) "";
   orionldState.kjsonP->stringAfterColon  = (char*) " ";
 
-  orionldState.useLinkHeader = false;  // We don't want the Link header for version requests
+  orionldState.noLinkHeader              = true;  // We don't want the Link header for version requests
 
   return true;
 }

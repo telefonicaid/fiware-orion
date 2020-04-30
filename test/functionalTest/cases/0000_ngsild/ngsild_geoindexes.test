@@ -1,0 +1,368 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo-Index List test
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB tn1
+dbInit CB tn2
+dbInit CB tn3
+brokerStart CB 0-255 IPv4 -multiservice
+
+--SHELL--
+
+#
+# 01. Get the list of geo-indexes
+# 02. Create an entity E1 with three GeoProperties in the default tenant
+# 03. Get the list of geo-indexes
+# 04. Create an entity E1 with two GeoProperties in the tenant tn1
+# 05. Get the list of geo-indexes
+# 06. Kill the broker and restart it
+# 07. Get the list of geo-indexes
+# 08. Create an entity E2 without GeoProperties in the tenant tn2
+# 09. Create an entity E2 with one GeoProperty in the tenant tn3
+# 10. Get the list of geo-indexes
+#
+
+echo "01. Get the list of geo-indexes"
+echo "==============================="
+orionCurl --url "/ngsi-ld/ex/v1/dbIndexes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "02. Create an entity E1 with three GeoProperties in the default tenant"
+echo "======================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T1",
+  "g1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 2 ]
+    }
+  },
+  "g2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 3 ]
+    }
+  },
+  "g3": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 4 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Get the list of geo-indexes"
+echo "==============================="
+orionCurl --url "/ngsi-ld/ex/v1/dbIndexes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "04. Create an entity E1 with two GeoProperties in the tenant tn1"
+echo "================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T1",
+  "g1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 2 ]
+    }
+  },
+  "g2": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 3 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant tn1
+echo
+echo
+
+
+echo "05. Get the list of geo-indexes"
+echo "==============================="
+orionCurl --url "/ngsi-ld/ex/v1/dbIndexes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "06. Kill the broker and restart it"
+echo "=================================="
+brokerStop CB
+brokerStart CB 0-255 IPv4 -multiservice
+echo
+echo
+
+
+echo "07. Get the list of geo-indexes"
+echo "==============================="
+orionCurl --url "/ngsi-ld/ex/v1/dbIndexes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+echo "08. Create an entity E2 without GeoProperties in the tenant tn2"
+echo "==============================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "T1",
+  "g1": {
+    "type": "Property",
+    "value": 12
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant tn2
+echo
+echo
+
+
+echo "09. Create an entity E2 with one GeoProperty in the tenant tn3"
+echo "=============================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "T1",
+  "g1": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 2 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant tn3
+echo
+echo
+
+
+echo "10. Get the list of geo-indexes"
+echo "==============================="
+orionCurl --url "/ngsi-ld/ex/v1/dbIndexes?prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Get the list of geo-indexes
+===============================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+02. Create an entity E1 with three GeoProperties in the default tenant
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+03. Get the list of geo-indexes
+===============================
+HTTP/1.1 200 OK
+Content-Length: 165
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "tenant": "ftest",
+    "attribute": "g3"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g1"
+  }
+]
+
+
+
+04. Create an entity E1 with two GeoProperties in the tenant tn1
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+05. Get the list of geo-indexes
+===============================
+HTTP/1.1 200 OK
+Content-Length: 281
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "tenant": "ftest-tn1",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest-tn1",
+    "attribute": "g1"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g3"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g1"
+  }
+]
+
+
+
+06. Kill the broker and restart it
+==================================
+
+
+07. Get the list of geo-indexes
+===============================
+HTTP/1.1 200 OK
+Content-Length: 281
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "tenant": "ftest-tn1",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest-tn1",
+    "attribute": "g1"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g3"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g1"
+  }
+]
+
+
+
+08. Create an entity E2 without GeoProperties in the tenant tn2
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+Date: REGEX(.*)
+
+
+
+09. Create an entity E2 with one GeoProperty in the tenant tn3
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+Date: REGEX(.*)
+
+
+
+10. Get the list of geo-indexes
+===============================
+HTTP/1.1 200 OK
+Content-Length: 339
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "tenant": "ftest-tn3",
+    "attribute": "g1"
+  },
+  {
+    "tenant": "ftest-tn1",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest-tn1",
+    "attribute": "g1"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g3"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "ftest",
+    "attribute": "g1"
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
+dbDrop CB tn1
+dbDrop CB tn2
+dbDrop CB tn3

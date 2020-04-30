@@ -59,7 +59,16 @@
 #include "apiTypesV2/ngsiWrappers.h"
 
 #ifdef ORIONLD
-#include "orionld/common/orionldState.h"
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+}
+
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/common/dotForEq.h"                           // dotForEq
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
 
 #include "mongoBackend/mongoConnectionPool.h"
@@ -249,6 +258,7 @@ void mongoInit
   //
   ensureLocationIndex("");
   ensureDateExpirationIndex("");
+
   if (mtenant)
   {
     /* We get tenant database names and apply ensure the location and date expiration indexes in each one */
@@ -260,6 +270,7 @@ void mongoInit
     {
       std::string orionDb = orionDbs[ix];
       std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+
       ensureLocationIndex(tenant);
       ensureDateExpirationIndex(tenant);
     }
@@ -1322,15 +1333,6 @@ bool entitiesQuery
    *
    */
 
-  LM_TMP(("SUB: %d Entities:", enV.size()));
-  LM_TMP(("SUB: ---------------------"));
-  for (unsigned int ix = 0; ix < enV.size(); ix++)
-    LM_TMP(("SUB:   - Entity %d: id='%s' / type='%s'", ix, enV[ix]->id.c_str(), enV[ix]->type.c_str()));
-  LM_TMP(("SUB: %d Attributes", attrL.size()));
-  LM_TMP(("SUB: ---------------------"));
-  for (unsigned int ix = 0; ix < attrL.size(); ix++)
-    LM_TMP(("SUB:   - Attribute %d: name='%s'", ix, attrL[ix].c_str()));
-
   BSONObjBuilder    finalQuery;
   BSONArrayBuilder  orEnt;
 
@@ -1370,16 +1372,18 @@ bool entitiesQuery
 
   if (attrs.arrSize() > 0)
   {
-    /* If we don't do this checking, the {$in: [] } in the attribute name part will
-     * make the query fail*/
+    // If we don't do this check, the {$in: [] } in the attribute name part will make the query fail
     finalQuery.append(ENT_ATTRNAMES, BSON("$in" << attrs.arr()));
   }
 
+#ifdef ORIONLD
+  if (orionldState.qMongoFilterP != NULL)
+    finalQuery.appendElements(*orionldState.qMongoFilterP);
+#endif
   /* Part 5: scopes */
   std::vector<BSONObj>  filters;
   unsigned int          geoScopes = 0;
 
-  LM_TMP(("SUB: Scopes ... %d items in scope vector", res.scopeVector.size()));
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
     const Scope* scopeP = res.scopeVector[ix];
@@ -1414,8 +1418,34 @@ bool entitiesQuery
 
         if (result)
         {
-          std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-          finalQuery.append(locCoords, areaQuery);
+          if (orionldState.apiVersion == NGSI_LD_V1)
+          {
+            char  locationCoordinates[512];
+            char* attrNameP = (char*) "location";  // Default geoproperty name
+
+            //
+            // If uriParams.geoproperty not present, then "location" is the default name of the geoproperty to use
+            // If uriParams.geoproperty  IS present, then we need to replace all '.' for '='
+            //
+            // After that, "attrs.$ATTRNAME.coordinates" must be used
+            //
+            if (orionldState.uriParams.geoproperty != NULL)
+            {
+              attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, NULL, true, NULL);
+              dotForEq(attrNameP);
+            }
+
+            snprintf(locationCoordinates, sizeof(locationCoordinates), "attrs.%s.value", attrNameP);
+
+            finalQuery.append(locationCoordinates, areaQuery);
+          }
+          else
+          {
+            std::string locationCoordinates;
+
+            locationCoordinates = ENT_LOCATION "." ENT_LOCATION_COORDS;
+            finalQuery.append(locationCoordinates, areaQuery);
+          }
         }
       }
     }
@@ -1455,6 +1485,7 @@ bool entitiesQuery
 
   /* Do the query on MongoDB */
   std::auto_ptr<DBClientCursor>  cursor;
+  // LM_TMP(("Q: finalQuery: %s (DESTRUCTIVE)", finalQuery.obj().toString().c_str()));  // Calling obj() destroys finalQuery
   Query                          query(finalQuery.obj());
 
   if (sortOrderList == "")
@@ -1510,11 +1541,12 @@ bool entitiesQuery
   /* Process query result */
   unsigned int docs = 0;
 
+  if (orionldState.onlyCount == true)  // If only 'count', we can avoid to perform the "real" query
+    goto release;
+
   while (moreSafe(cursor))
   {
     BSONObj  r;
-
-    LM_TMP(("SUB: In moreSafe: loop no %d", docs));
 
     try
     {
@@ -1570,7 +1602,12 @@ bool entitiesQuery
       cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
       releaseMongoConnection(connection);
-      return true;
+
+      //
+      // This is a bit weird ...
+      // We got an exception but 'true' is returned???
+      //
+      return false;
     }
     catch (const std::exception &e)
     {
@@ -1591,14 +1628,13 @@ bool entitiesQuery
 
     // Build CER from BSON retrieved from DB
     docs++;
+
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    LM_TMP(("SUB: retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
 
     addDatesForAttrs(cer, metadataList.lookup(NGSI_MD_DATECREATED), metadataList.lookup(NGSI_MD_DATEMODIFIED));
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
-    LM_TMP(("SUB: attrL.size: %d", attrL.size()));
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
     {
       bool         found     = false;
@@ -1629,6 +1665,8 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
+
+ release:
   releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
@@ -1646,15 +1684,12 @@ bool entitiesQuery
 
   /* All the not-patterned entities in the request not in the response are added (without attributes), as they are
    * used before pruning in the CPr calculation logic */
-  LM_TMP(("SUB: enV.size: %d", enV.size()));
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    LM_TMP(("SUB: enV[%d]->isPattern == %s", ix, enV[ix]->isPattern.c_str()));
     if (enV[ix]->isPattern != "true")
     {
       bool needToAdd = true;
 
-      LM_TMP(("SUB: cerV->size: %d", cerV->size()));
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
         EntityId eP = (*cerV)[jx]->contextElement.entityId;
@@ -1662,7 +1697,6 @@ bool entitiesQuery
         if ((eP.id == enV[ix]->id) && (eP.type == enV[ix]->type))
         {
           needToAdd = false;
-          LM_TMP(("SUB: needToAdd = false"));
           break;  /* jx */
         }
       }
@@ -1670,7 +1704,6 @@ bool entitiesQuery
       if (needToAdd)
       {
         ContextElementResponse* cerP = new ContextElementResponse();
-        LM_TMP(("SUB: Adding to cerV"));
 
         cerP->contextElement.entityId.id = enV[ix]->id;
         cerP->contextElement.entityId.type = enV[ix]->type;
@@ -1694,12 +1727,9 @@ bool entitiesQuery
 
         cerV->push_back(cerP);
       }
-      else
-        LM_TMP(("SUB: NOT Adding to cerV"));
     }
   }
 
-  LM_TMP(("SUB: cerV->size: %d", cerV->size()));
   return true;
 }
 
@@ -2175,7 +2205,6 @@ static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
 #endif
 
 
-
 /* ****************************************************************************
 *
 * processOnChangeConditionForSubscription -
@@ -2213,20 +2242,25 @@ static bool processOnChangeConditionForSubscription
   bool                             blacklist
 )
 {
+  //
+  // By default - no initial notifications in Orion-LD
+  // => if the service routine is "orionldPostSubscriptions", then nothing to be done in this function
+  //
+  if ((orionldState.serviceP != NULL) && (orionldState.serviceP->serviceRoutine == orionldPostSubscriptions))
+    return false;
+
   std::string                   err;
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
   StringList                    emptyList;
   StringList                    metadataList;
 
-  LM_TMP(("SUB: In processOnChangeConditionForSubscription: calling entitiesQuery. %d items in enV, %d items in attrL", enV.size(), attrL.size()));
   metadataList.fill(metadataV);
 
   if (!blacklist && !entitiesQuery(enV, attrL, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
-    LM_TMP(("SUB: processOnChangeConditionForSubscription returns false"));
     return false;
   }
   else if (blacklist && !entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
@@ -2234,7 +2268,6 @@ static bool processOnChangeConditionForSubscription
     ncr.contextElementResponseVector.release();
     rawCerV.release();
 
-    LM_TMP(("SUB: processOnChangeConditionForSubscription returns false"));
     return false;
   }
 
@@ -2247,12 +2280,10 @@ static bool processOnChangeConditionForSubscription
   {
     if (rawCerV.size() == 0)
     {
-      LM_TMP(("SUB: Nothing found - querying again"));
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, true, tenant, servicePathV))
       {
         ncr.contextElementResponseVector.release();
         rawCerV.release();
-        LM_TMP(("SUB: processOnChangeConditionForSubscription returns false"));
         return false;
       }
 
@@ -2272,9 +2303,7 @@ static bool processOnChangeConditionForSubscription
 #endif
 
   /* Prune "not found" CERs */
-  LM_TMP(("SUB: Calling pruneContextElements to put stuff in ncr.contextElementResponseVector (%d items in rawCerV)", rawCerV.size()));
   pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
-  LM_TMP(("SUB: After pruneContextElements: %d items in ncr.contextElementResponseVector", ncr.contextElementResponseVector.size()));
 
 #ifdef WORKAROUND_2994
   delayedReleaseAdd(rawCerV);
@@ -2292,8 +2321,6 @@ static bool processOnChangeConditionForSubscription
   }
 #endif
 
-  LM_TMP(("SUB: In processOnChangeConditionForSubscription. ncr.contextElementResponseVector.size() == %d", ncr.contextElementResponseVector.size()));
-
   if (ncr.contextElementResponseVector.size() > 0)
   {
     /* Complete the fields in NotifyContextRequest */
@@ -2307,7 +2334,6 @@ static bool processOnChangeConditionForSubscription
        * Note that in this case we do a query for all the attributes, not restricted to attrV */
       ContextElementResponseVector  allCerV;
 
-
       if (!entitiesQuery(enV, emptyList, metadataList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
 #ifdef WORKAROUND_2994
@@ -2318,7 +2344,6 @@ static bool processOnChangeConditionForSubscription
 #endif
         ncr.contextElementResponseVector.release();
 
-        LM_TMP(("SUB: processOnChangeConditionForSubscription returns false"));
         return false;
       }
 
@@ -2332,10 +2357,8 @@ static bool processOnChangeConditionForSubscription
       rawCerV.release();
 #endif
 
-      LM_TMP(("SUB: deciding to send notifs or not, by calling isCondValueInContextElementResponse "));
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
-        LM_TMP(("SUB: calling sendNotifyContextRequest"));
         /* Send notification */
         getNotifier()->sendNotifyContextRequest(&ncr,
                                                 notifyHttpInfo,
@@ -2349,7 +2372,6 @@ static bool processOnChangeConditionForSubscription
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
-        LM_TMP(("SUB: processOnChangeConditionForSubscription returns true"));
         return true;
       }
 
@@ -2357,7 +2379,6 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
-      LM_TMP(("SUB: calling sendNotifyContextRequest"));
       getNotifier()->sendNotifyContextRequest(&ncr,
                                               notifyHttpInfo,
                                               tenant,
@@ -2369,14 +2390,12 @@ static bool processOnChangeConditionForSubscription
                                               blacklist);
       ncr.contextElementResponseVector.release();
 
-      LM_TMP(("SUB: processOnChangeConditionForSubscription returns true"));
       return true;
     }
   }
 
   ncr.contextElementResponseVector.release();
 
-  LM_TMP(("SUB: processOnChangeConditionForSubscription returns false"));
   return false;
 }
 
@@ -2410,40 +2429,36 @@ static BSONArray processConditionVector
 
   *notificationDone = false;
 
-  LM_TMP(("SUB: In static processConditionVector: loop over %d items", ncvP->size()));
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
     NotifyCondition* nc = (*ncvP)[ix];
 
-    LM_TMP(("SUB: nc at %p", nc));
     if (nc->type == ON_CHANGE_CONDITION)
     {
-      LM_TMP(("SUB: nc->type == ON_CHANGE_CONDITION"));
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
-        LM_TMP(("SUB: Adding condition"));
         conds.append(nc->condValueList[jx]);
       }
 
-      LM_TMP(("SUB: status == %s", status.c_str()));
-      LM_TMP(("SUB: In processConditionVector: calling processOnChangeConditionForSubscription. %d items in enV, %d items in attrL", enV.size(), attrL.size()));
-      if ((status == STATUS_ACTIVE) &&
-          (processOnChangeConditionForSubscription(enV,
-                                                   attrL,
-                                                   metadataV,
-                                                   &(nc->condValueList),
-                                                   subId,
-                                                   httpInfo,
-                                                   renderFormat,
-                                                   tenant,
-                                                   xauthToken,
-                                                   servicePathV,
-                                                   resP,
-                                                   fiwareCorrelator,
-                                                   attrsOrder,
-                                                   blacklist)))
+      if (status == STATUS_ACTIVE)
       {
-        *notificationDone = true;
+        if (processOnChangeConditionForSubscription(enV,
+                                                    attrL,
+                                                    metadataV,
+                                                    &(nc->condValueList),
+                                                    subId,
+                                                    httpInfo,
+                                                    renderFormat,
+                                                    tenant,
+                                                    xauthToken,
+                                                    servicePathV,
+                                                    resP,
+                                                    fiwareCorrelator,
+                                                    attrsOrder,
+                                                    blacklist))
+        {
+          *notificationDone = true;
+        }
       }
     }
     else
@@ -2488,15 +2503,11 @@ BSONArray processConditionVector
   EntityIdVector        enV;
   StringList            attrL;
 
-  LM_TMP(("SUB: In processConditionVector: condAttributesV  has %d members",  condAttributesV.size()));
-  LM_TMP(("SUB: In processConditionVector: notifAttributesV has %d members", notifAttributesV.size()));
-
   attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
   entIdStdVector2EntityIdVector(entitiesV, &enV);
 
   attrL.fill(notifAttributesV);
 
-  LM_TMP(("SUB: In processConditionVector: calling static processConditionVector. %d items in enV, %d items in attrL", enV.size(), attrL.size()));
   BSONArray arr = processConditionVector(&ncV,
                                          enV,
                                          attrL,
