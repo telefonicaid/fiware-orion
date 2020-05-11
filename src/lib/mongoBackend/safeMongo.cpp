@@ -248,6 +248,11 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, co
     {
       return b.getField(field).Int();
     }
+    else if (b.getField(field).type() == mongo::NumberDouble)
+    {
+      LM_W(("The field '%s' was a DOUBLE - converting to long long", field.c_str()));
+      return (long long) b.getField(field).Double();
+    }
   }
 
   // Detect error

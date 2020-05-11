@@ -240,7 +240,7 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
 void orionldStateDelayedKjFreeEnqueue(KjNode* tree)
 {
   if (orionldState.delayedKjFreeVecIndex >= orionldState.delayedKjFreeVecSize - 1)
-    LM_X(1, ("Internal Error (the size of orionldState.delayedKjFreeVec needs to be augmented)"));
+    LM_X(1, ("Internal Error (the size of orionldState.delayedKjFreeVec needs to be augmented (current value: %d))", orionldState.delayedKjFreeVecSize));
 
   orionldState.delayedKjFreeVec[orionldState.delayedKjFreeVecIndex] = tree;
   ++orionldState.delayedKjFreeVecIndex;
