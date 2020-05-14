@@ -49,6 +49,7 @@ SET (SOURCES
     orionldPostBatchCreate.cpp
     orionldPostBatchUpsert.cpp
     orionldPostBatchUpdate.cpp
+    orionldPostQuery.cpp
     orionldGetEntityTypes.cpp
     orionldGetTenants.cpp
     orionldGetDbIndexes.cpp

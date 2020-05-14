@@ -48,6 +48,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // mongoCppLegacyEntityTypesFromRegistrationsGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"           // mongoCppLegacyGeoIndexCreate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"           // mongoCppLegacyEntityRetrieve
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"            // mongoCppLegacyEntitiesQuery
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -91,6 +92,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntitiesGet                            = mongoCppLegacyEntitiesGet;
   dbEntityTypesFromRegistrationsGet        = mongoCppLegacyEntityTypesFromRegistrationsGet;
   dbGeoIndexCreate                         = mongoCppLegacyGeoIndexCreate;
+  dbEntitiesQuery                          = mongoCppLegacyEntitiesQuery;
 
   mongoCppLegacyInit(dbHost, dbName);
 
@@ -114,6 +116,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntitiesGet                            = NULL;  // FIXME: Implement
   dbEntityTypesFromRegistrationsGet        = NULL;  // FIXME: Implement
   dbGeoIndexCreate                         = NULL;  // FIXME: Implement
+  dbEntitiesQuery                          = NULL;  // FIXME: Implement
 
   mongocInit(dbHost, dbName);
 

@@ -32,6 +32,6 @@
 //
 // httpStatusCodeToOrionldErrorType
 //
-extern OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode sc);
+extern OrionldResponseErrorType httpStatusCodeToOrionldErrorType(int httpStatusCode);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_HTTPSTATUSCODETOORIONLDERRORTYPE_H_

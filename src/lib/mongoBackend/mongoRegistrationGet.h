@@ -64,35 +64,4 @@ extern void mongoRegistrationsGet
   OrionError*                         oeP
 );
 
-
-
-#ifdef ORIONLD
-/* ****************************************************************************
-*
-* mongoLdRegistrationGet - 
-*/
-extern bool mongoLdRegistrationGet
-(
-  ngsiv2::Registration*  regP,
-  const char*            regId,
-  const char*            tenant,
-  HttpStatusCode*        statusCodeP,
-  char**                 detailsP
-);
-
-/* ****************************************************************************
-*
-* mongoLdRegistrationsGet - 
-*/
-extern bool mongoLdRegistrationsGet
-(
-  ConnectionInfo*                     ciP,
-  std::vector<ngsiv2::Registration>*  regVecP,
-  const char*                         tenant,
-  long long*                          countP,
-  OrionError*                         oeP
-);
-
-#endif  // ORIONLD
-
 #endif  // SRC_LIB_MONGOBACKEND_MONGOREGISTRATIONGET_H_

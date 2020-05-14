@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <time.h>                                                // struct timespec
+
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 
@@ -148,7 +150,8 @@ typedef struct OrionldNotificationInfo
 typedef struct OrionldConnectionState
 {
   ConnectionInfo*         ciP;
-  HttpStatusCode          httpStatusCode;
+  struct timespec         timestamp;  // the time when the request entered
+  int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
   KAlloc                  kalloc;

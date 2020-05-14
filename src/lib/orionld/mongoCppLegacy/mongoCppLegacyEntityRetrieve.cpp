@@ -380,7 +380,7 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
 
   if (dbTree == NULL)
   {
-    // Entity nt found
+    // Entity not found
     return NULL;
   }
 

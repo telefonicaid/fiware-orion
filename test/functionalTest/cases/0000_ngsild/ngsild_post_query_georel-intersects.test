@@ -1,0 +1,345 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with geospatial query using georel=overlaps
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# For this test, a Polygon (R), a LineString (L), and a Point (P) is used
+#
+#   Latitude
+#     ^
+#   9-|
+#     |  |  |  |  |  |  |  |  |  |  |
+#   8-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |
+#   7-|--+--+--+--+--+--+--+--P--+--+
+#     |  |  |  |  |  |  |  |  |  |  |
+#   6-|--x--+--x--+--+--+--+--+--+--+
+#     |  |RR|RR|  |  |  |  |  |  |  |
+#   5-|--+--+--+--+--+--+--+--+--+--+
+#     |  |RR|RR|  |  |  |  |  |  |  |
+#   4-|--x--+--x--+--LLLLLLL--+--+--+
+#     |  |  |  |  | L|  |  |  |  |  |
+#   3-|--+--+--+--+-L+--+--+--+--+--+
+#     |  |  |  |  |L |  |  |  |  |  |
+#   2-|--+--LLLLLLL--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |
+#   1-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |
+#   0-|------------------------------------> Longitude
+#     |  1  2  3  4  5  6  7  8  9  10
+#
+# The Geometries are:
+# - R  [[ [1,4], [1,6], [3,6], [3,4], [1,4] ]]
+# - L  [ [2,2], [4,2], [5,4], [7,4] ]
+# - P  [ 8,7 ]
+#
+# There will be three different type of Query over each Geometry:
+# - Match
+# - No Match due to position
+# - No Match due to Geometry Type (For Overlap to match, the Geometry Type must coincide as well)
+#
+#
+# 01. Create entity ER, with a geo-property geo that is the Polygon R
+# 02. Create entity EL, with a geo-property geo that is the LineString L
+# 03. Create entity EP, with a geo-property geo that is the Point P
+#
+# 04. Post Query for overlap with Query-Polygon [[ [3,4], [3,8], [4,8], [4,4], [3,4] ]] - see entity ER
+# 05. Post Query for overlap with Query-LineString [ [2,2], [7,2] ] - see entity EL
+# 06. Post Query for overlap with Query-Point [8,7] - see entity EP
+#
+# 07. Post Query for overlap with Query-Polygon [[ [2,2], [2,3], [3,3], [3,2], [2,2] ]] - no match
+# 08. Post Query for overlap with Query-LineString [ [5,2], [6,2] ] - no match
+# 09. Post Query for overlap with Query-Point [3,3] - no match
+#
+# 10. Post Query for overlap with Query-LineString [ [0.4], [4,4] ] - no match
+# 11. Post Query for overlap with Query-Polygon [[ [2,0], [2,2], [4,2], [4,0], [2,0] ]] - no match
+# 12. Post Query for overlap with Query-LineString [ [7,7], [9,7] ] - no match
+#
+
+echo "01. Create entity ER, with a geo-property geo that is the Polygon R"
+echo "==================================================================="
+payload='{
+  "id": "http://a.b.c/entity/ER",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [1,4], [1,6], [3,6], [3,4], [1,4] ]]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity EL, with a geo-property geo that is the LineString L"
+echo "======================================================================"
+payload='{
+  "id": "http://a.b.c/entity/EL",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [2,2], [4,2], [5,4], [7,4] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity EP, with a geo-property geo that is the Point P"
+echo "================================================================="
+payload='{
+  "id": "http://a.b.c/entity/EP",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [8,7]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Post Query for overlap with Query-Polygon [[ [2,4], [2,8], [4,8], [4,4], [2,4] ]] - see entity ER"
+echo "====================================================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "overlaps",
+    "coordinates": [[ [2,4], [2,8], [4,8], [4,4], [2,4] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "05. Post Query for overlap with Query-LineString [ [2,2], [7,2] ] - see entity EL"
+echo "================================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "LineString",
+    "georel": "overlaps",
+    "coordinates": [ [2,2], [7,2] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "06. Post Query for overlap with Query-Point [8,7] - see entity EP"
+echo "================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Point",
+    "georel": "overlaps",
+    "coordinates": [8,7],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "07. Post Query for overlap with Query-Polygon [[ [2,2], [2,3], [3,3], [3,2], [2,2] ]] - no match"
+echo "================================================================================================"
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "overlaps",
+    "coordinates": [[ [2,2], [2,3], [3,3], [3,2], [2,2] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "08. Post Query for overlap with Query-LineString [ [5,2], [6,2] ] - no match"
+echo "============================================================================"
+payload='{
+  "geoQ": {
+    "geometry": "LineString",
+    "georel": "overlaps",
+    "coordinates": [ [5,2], [6,2] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "09. Post Query for overlap with Query-Point [3,3] - no match"
+echo "============================================================"
+payload='{
+  "geoQ": {
+    "geometry": "Point",
+    "georel": "overlaps",
+    "coordinates": [3,3],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "10. Post Query for overlap with Query-LineString [ [0.4], [4,4] ] - no match"
+echo "============================================================================"
+payload='{
+  "geoQ": {
+    "geometry": "LineString",
+    "georel": "overlaps",
+    "coordinates": [ [0.4], [4,4] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "11. Post Query for overlap with Query-Polygon [[ [2,0], [2,2], [4,2], [4,0], [2,0] ]] - no match"
+echo "================================================================================================"
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "overlaps",
+    "coordinates": [[ [2,0], [2,2], [4,2], [4,0], [2,0] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "12. Post Query for overlap with Query-LineString [ [7,7], [9,7] ] - no match"
+echo "============================================================================"
+payload='{
+  "geoQ": {
+    "geometry": "LineString",
+    "georel": "overlaps",
+    "coordinates": [ [7,7], [9,7] ]
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity ER, with a geo-property geo that is the Polygon R
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/ER
+Date: REGEX(.*)
+
+
+
+02. Create entity EL, with a geo-property geo that is the LineString L
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/EL
+Date: REGEX(.*)
+
+
+
+03. Create entity EP, with a geo-property geo that is the Point P
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/EP
+Date: REGEX(.*)
+
+
+
+04. Post Query for overlap with Query-Polygon [[ [2,4], [2,8], [4,8], [4,4], [2,4] ]] - see entity ER
+=====================================================================================================
+        "id": "http://a.b.c/entity/ER",
+
+
+05. Post Query for overlap with Query-LineString [ [2,2], [7,2] ] - see entity EL
+=================================================================================
+        "id": "http://a.b.c/entity/EL",
+
+
+06. Post Query for overlap with Query-Point [8,7] - see entity EP
+=================================================================
+        "id": "http://a.b.c/entity/EP",
+
+
+07. Post Query for overlap with Query-Polygon [[ [2,2], [2,3], [3,3], [3,2], [2,2] ]] - no match
+================================================================================================
+
+
+08. Post Query for overlap with Query-LineString [ [5,2], [6,2] ] - no match
+============================================================================
+
+
+09. Post Query for overlap with Query-Point [3,3] - no match
+============================================================
+
+
+10. Post Query for overlap with Query-LineString [ [0.4], [4,4] ] - no match
+============================================================================
+
+
+11. Post Query for overlap with Query-Polygon [[ [2,0], [2,2], [4,2], [4,0], [2,0] ]] - no match
+================================================================================================
+
+
+12. Post Query for overlap with Query-LineString [ [7,7], [9,7] ] - no match
+============================================================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1242,6 +1242,9 @@ function orionCurl()
   then
     echo "Broker seems to have died ..."
   else
+    cat /tmp/httpHeaders.out  | sed 's///g' > /tmp/httpHeaders.noCtrlM
+    mv /tmp/httpHeaders.noCtrlM /tmp/httpHeaders.out
+
     _responseHeaders=$(cat /tmp/httpHeaders.out)
 
     #
@@ -1268,7 +1271,6 @@ function orionCurl()
     sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
     sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
     sed '/Connection: Close/d'      /tmp/httpHeaders.out
-
   fi
 
   #

@@ -64,6 +64,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
+#include "orionld/serviceRoutines/orionldPostQuery.h"                // orionldPostQuery
 #include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
 #include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
@@ -247,6 +248,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+  {
+    serviceP->options  = 0;
+  }
+  else if (serviceP->serviceRoutine == orionldPostQuery)
   {
     serviceP->options  = 0;
   }

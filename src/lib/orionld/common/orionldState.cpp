@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kalloc/kaBufferInit.h"                                 // kaBufferInit
@@ -111,6 +112,8 @@ void orionldStateInit(void)
   // Creating kjson environment for KJson parse and render
   //
   kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 16 * 1024, NULL, "Thread KAlloc buffer");
+
+  kTimeGet(&orionldState.timestamp);
 
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;

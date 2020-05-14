@@ -1,4 +1,4 @@
-# Issue #280  MQTT Notifications
+# Issue #280  MQTT Notifications - not 100% - ETSI NGSI-LD spec is still neing updated on MQTT notifications
 # Issue #409  Removed an incorrect warning about options=keyValues not supported
 # Issue #XXX  'location' not to be expanded - fixed for PATCH ops
 # Issue #280  Implemented POST /ngsi-ld/v1/entityOperations/create
@@ -17,3 +17,4 @@
 # Issue #280  Two new NGSI-LD error codes: NoMultiTenantSupport and NonExistingTenant
 # Issue #280  Giving error when non-existinf tenant is used (except for creation)
 # Issue #457  creDate can now be either a float, an int or a long in some functions (e.g. batch upsert)
+# Issue #280  Implemented the POST Query request - POST /ngsi-ld/v1/entityOperations/query

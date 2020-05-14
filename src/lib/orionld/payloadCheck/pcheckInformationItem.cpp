@@ -32,7 +32,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/payloadCheck/pcheckEntities.h"                // pcheckEntities
+#include "orionld/payloadCheck/pcheckEntityInfoArray.h"         // pcheckEntityInfoArray
 #include "orionld/payloadCheck/pcheckInformationItem.h"         // Own interface
 
 
@@ -60,7 +60,9 @@ bool pcheckInformationItem(KjNode* informationP)
     if (strcmp(infoItemP->name, "entities") == 0)
     {
       DUPLICATE_CHECK(entitiesP, "entities", infoItemP);
-      if (pcheckEntities(entitiesP) == false)
+      ARRAY_CHECK(entitiesP, "entities");
+      EMPTY_ARRAY_CHECK(entitiesP, "entities");
+      if (pcheckEntityInfoArray(entitiesP, true) == false)  // FIXME: Why is the entity type mandatory?
         return false;
     }
     else if (strcmp(infoItemP->name, "properties") == 0)

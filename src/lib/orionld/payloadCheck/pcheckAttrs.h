@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONGET_H_
-#define SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONGET_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRS_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRS_H_
 
 /*
 *
@@ -23,23 +23,19 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
+* Author: Ken Zangelin
 */
-#include "apiTypesV2/Registration.h"
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
-/* ****************************************************************************
-*
-* mongoLdRegistrationGet - 
-*/
-extern bool mongoLdRegistrationGet
-(
-  ngsiv2::Registration*  regP,
-  const char*            regId,
-  const char*            tenant,
-  int*                   statusCodeP,
-  char**                 detailsP
-);
+// -----------------------------------------------------------------------------
+//
+// pcheckAttrs -
+//
+extern bool pcheckAttrs(KjNode* tree);
 
-#endif  // SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONGET_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRS_H_

@@ -144,7 +144,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
     LM_E(("Bad Input (%s: %s)", errorTitle, errorDetails));
 
     orionldErrorResponseCreate(OrionldBadRequestData, errorTitle, errorDetails);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
 
     return false;
   }
@@ -277,7 +277,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   if (ciP->payload == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -285,7 +285,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   if (ciP->payload[0] == 0)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -329,7 +329,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if (orionldState.requestTree == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -338,8 +338,8 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Object", "{}");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload Body", "Empty Object");
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -349,7 +349,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Array", "[]");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -473,7 +473,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     if ((orionldState.payloadContextNode->type != KjString) && (orionldState.payloadContextNode->type != KjArray) && (orionldState.payloadContextNode->type != KjObject))
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       return false;
     }
   }
@@ -505,7 +505,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   if (orionldState.link[0] != '<')
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid Link HTTP header", "link doesn't start with '<'");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -515,7 +515,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   {
     LM_E(("linkCheck: %s", details));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Link HTTP Header", details);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -838,7 +838,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (serviceRoutineResult == false)
   {
     if (orionldState.httpStatusCode < 400)
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
   }
   else  // Service Routine worked
   {
@@ -942,7 +942,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // restReply assumes that the HTTP Status Code for the response is in 'ciP->httpStatusCode'
   // FIXME: make the HTTP Status Code a parameter for restReply
   //
-  ciP->httpStatusCode = orionldState.httpStatusCode;
+  ciP->httpStatusCode = (HttpStatusCode) orionldState.httpStatusCode;
+
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else

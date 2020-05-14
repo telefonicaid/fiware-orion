@@ -1,0 +1,334 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert with an array of three entities, with context arrays in payload, provoking error described in issue #457
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB smartmaas001
+brokerStart CB 0-255 IPv4 -multiservice
+
+--SHELL--
+
+#
+# The Issue #457 is about creDate in mongo being a float and not a 32 bit integer.
+# Unfortunately, I have been unable to reproduce the issue ...
+# This test will be modified once I find a way to reproduce the issue
+#
+# 01. Create 2 entities
+# 02. See the entities in the database
+# 03. Update the 2 entities, with the exact same payload
+#
+
+echo "01. Create 2 entities"
+echo "====================="
+payload='[
+  {
+    "type" : "WeatherObserved",
+    "dataProvider" : {
+      "type" : "Property",
+      "value" : "sensor.community"
+    },
+    "source" : {
+      "type" : "Property",
+      "value" : "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName" : {
+      "type" : "Property",
+      "value" : "BMP180:21336"
+    },
+    "location" : {
+      "type" : "GeoProperty",
+      "value" : {
+        "type" : "Point",
+        "coordinates" : [ 13.432, 52.536 ]
+      }
+    },
+    "id" : "urn:ngsi-ld:WeatherObserved:BMP180:21336",
+    "temperature" : {
+      "observedAt" : "2020-05-06T13:01:56Z",
+      "type" : "Property",
+      "value" : 21.1
+    },
+    "atmosphericPressure" : {
+      "observedAt" : "2020-05-06T13:01:56Z",
+      "type" : "Property",
+      "value" : 1016.46
+    }
+  },
+  {
+    "type" : "WeatherObserved",
+    "dataProvider" : {
+      "type" : "Property",
+      "value" : "sensor.community"
+    },
+    "source" : {
+      "type" : "Property",
+      "value" : "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180"
+    },
+    "stationName" : {
+      "type" : "Property",
+      "value" : "BMP180:30765"
+    },
+    "location" : {
+      "type" : "GeoProperty",
+      "value" : {
+        "type" : "Point",
+        "coordinates" : [ 10.106, 48.744 ]
+      }
+    },
+    "id" : "urn:ngsi-ld:WeatherObserved:BMP180:30765",
+    "temperature" : {
+      "observedAt" : "2020-05-06T13:01:53Z",
+      "type" : "Property",
+      "value" : 27.0
+    },
+    "atmosphericPressure" : {
+      "observedAt" : "2020-05-06T13:01:53Z",
+      "type" : "Property",
+      "value" : 962.36
+    }
+  }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?prettyPrint=yes' --payload "$payload" -H 'Fiware-Service: smartmaas001' -H 'Content-Type: application/json' -H 'fiware-service: smartmaas001' -H 'fiware-servicepath: /' \
+-H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' -H 'Content-Type: application/json' --noPayloadCheck
+echo
+echo
+
+
+echo "02. See the entities in the database"
+echo "===================================="
+mongoCmd2 "ftest-smartmaas001" 'db.entities.findOne({"_id.id": "urn:ngsi-ld:WeatherObserved:BMP180:21336"})'
+mongoCmd2 "ftest-smartmaas001" 'db.entities.findOne({"_id.id": "urn:ngsi-ld:WeatherObserved:BMP180:30765"})'
+echo
+echo
+
+
+echo "03. Update the 2 entities, with the exact same payload"
+echo "======================================================"
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?prettyPrint=yes' --payload "$payload" -H 'Fiware-Service: smartmaas001' -H 'Content-Type: application/json' -H 'fiware-service: smartmaas001' -H 'fiware-servicepath: /' \
+-H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' -H 'Content-Type: application/json' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 2 entities
+=====================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+
+02. See the entities in the database
+====================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:WeatherObserved:BMP180:21336",
+		"type" : "https://uri.fiware.org/ns/data-models#WeatherObserved",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.fiware.org/ns/data-models#dataProvider",
+		"https://uri.fiware.org/ns/data-models#source",
+		"https://uri.etsi.org/ngsi-ld/default-context/stationName",
+		"location",
+		"https://uri.fiware.org/ns/data-models#temperature",
+		"https://uri.fiware.org/ns/data-models#atmosphericPressure"
+	],
+	"attrs" : {
+		"https://uri=fiware=org/ns/data-models#dataProvider" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "sensor.community",
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#source" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/stationName" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "BMP180:21336",
+			"mdNames" : [ ]
+		},
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					13.432,
+					52.536
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#temperature" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 21.1,
+			"md" : {
+				"observedAt" : {
+					"value" : 1588770116
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		},
+		"https://uri=fiware=org/ns/data-models#atmosphericPressure" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1016.46,
+			"md" : {
+				"observedAt" : {
+					"value" : 1588770116
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:WeatherObserved:BMP180:30765",
+		"type" : "https://uri.fiware.org/ns/data-models#WeatherObserved",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.fiware.org/ns/data-models#dataProvider",
+		"https://uri.fiware.org/ns/data-models#source",
+		"https://uri.etsi.org/ngsi-ld/default-context/stationName",
+		"location",
+		"https://uri.fiware.org/ns/data-models#temperature",
+		"https://uri.fiware.org/ns/data-models#atmosphericPressure"
+	],
+	"attrs" : {
+		"https://uri=fiware=org/ns/data-models#dataProvider" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "sensor.community",
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#source" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://data.sensor.community/airrohr/v1/filter/country=DE&type=BMP180",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/stationName" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "BMP180:30765",
+			"mdNames" : [ ]
+		},
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					10.106,
+					48.744
+				]
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=fiware=org/ns/data-models#temperature" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 27,
+			"md" : {
+				"observedAt" : {
+					"value" : 1588770113
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		},
+		"https://uri=fiware=org/ns/data-models#atmosphericPressure" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 962.36,
+			"md" : {
+				"observedAt" : {
+					"value" : 1588770113
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. Update the 2 entities, with the exact same payload
+======================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB smartmaas001

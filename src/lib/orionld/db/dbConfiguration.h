@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/common/QNode.h"                                // QNode
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
@@ -84,6 +85,7 @@ typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbR
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
 typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
 typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
+typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP);
 
 
 
@@ -102,7 +104,7 @@ extern DbEntityBatchDeleteFunction               dbEntityBatchDelete;
 extern DbDataToKjTreeFunction                    dbDataToKjTree;
 extern DbDataFromKjTreeFunction                  dbDataFromKjTree;
 extern DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
-extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;  // FIXME: Name must change - what does it to really?
+extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;
 extern DbRegistrationLookup                      dbRegistrationLookup;
 extern DbRegistrationExists                      dbRegistrationExists;
 extern DbRegistrationDelete                      dbRegistrationDelete;
@@ -113,5 +115,6 @@ extern DbRegistrationReplace                     dbRegistrationReplace;
 extern DbEntityTypesFromRegistrationsGet         dbEntityTypesFromRegistrationsGet;
 extern DbEntitiesGet                             dbEntitiesGet;
 extern DbGeoIndexCreate                          dbGeoIndexCreate;
+extern DbEntitiesQuery                           dbEntitiesQuery;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

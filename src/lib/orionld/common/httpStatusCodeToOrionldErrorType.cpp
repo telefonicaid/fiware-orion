@@ -22,7 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/HttpStatusCode.h"                               // HttpStatusCode
 #include "orionld/common/orionldErrorResponse.h"               // OrionldResponseErrorType
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"   // Own interface
 
@@ -32,35 +31,35 @@
 //
 // httpStatusCodeToOrionldErrorType
 //
-OrionldResponseErrorType httpStatusCodeToOrionldErrorType(HttpStatusCode sc)
+OrionldResponseErrorType httpStatusCodeToOrionldErrorType(int httpStatusCode)
 {
-  switch (sc)
+  switch (httpStatusCode)
   {
-  case SccNone:                           return OrionldInternalError;
-  case SccOk:                             return OrionldInternalError;  // Should not be here if 200 ...
-  case SccCreated:                        return OrionldInternalError;
-  case SccNoContent:                      return OrionldInternalError;
-  case SccMultiStatus:                    return OrionldInternalError;
-  case SccBadRequest:                     return OrionldBadRequestData;
-  case SccForbidden:                      return OrionldOperationNotSupported;
-  case SccContextElementNotFound:         return OrionldResourceNotFound;
-  case SccBadVerb:                        return OrionldInvalidRequest;
-  case SccNotAcceptable:                  return OrionldInvalidRequest;
-  case SccConflict:                       return OrionldAlreadyExists;
-  case SccContentLengthRequired:          return OrionldInvalidRequest;
-  case SccRequestEntityTooLarge:          return OrionldInvalidRequest;
-  case SccUnsupportedMediaType:           return OrionldInvalidRequest;
-  case SccInvalidModification:            return OrionldOperationNotSupported;
-  case SccSubscriptionIdNotFound:         return OrionldResourceNotFound;
-  case SccMissingParameter:               return OrionldBadRequestData;
-  case SccInvalidParameter:               return OrionldBadRequestData;
-  case SccErrorInMetadata:                return OrionldBadRequestData;
-  case SccEntityIdReNotAllowed:           return OrionldBadRequestData;
-  case SccEntityTypeRequired:             return OrionldBadRequestData;
-  case SccAttributeListRequired:          return OrionldInvalidRequest;
-  case SccReceiverInternalError:          return OrionldInternalError;
-  case SccNotImplemented:                 return OrionldOperationNotSupported;
-  case SccServiceUnavailable:             return OrionldInternalError;
+  case 0:   return OrionldInternalError;
+  case 200: return OrionldInternalError;  // Should not be here if 200 ...
+  case 201: return OrionldInternalError;
+  case 204: return OrionldInternalError;
+  case 207: return OrionldInternalError;
+  case 400: return OrionldBadRequestData;
+  case 403: return OrionldOperationNotSupported;
+  case 404: return OrionldResourceNotFound;
+  case 405: return OrionldInvalidRequest;
+  case 406: return OrionldInvalidRequest;
+  case 409: return OrionldAlreadyExists;
+  case 411: return OrionldInvalidRequest;
+  case 413: return OrionldInvalidRequest;
+  case 415: return OrionldInvalidRequest;
+  case 422: return OrionldOperationNotSupported;
+  case 470: return OrionldResourceNotFound;
+  case 471: return OrionldBadRequestData;
+  case 472: return OrionldBadRequestData;
+  case 473: return OrionldBadRequestData;
+  case 480: return OrionldBadRequestData;
+  case 481: return OrionldBadRequestData;
+  case 482: return OrionldInvalidRequest;
+  case 500: return OrionldInternalError;
+  case 501: return OrionldOperationNotSupported;
+  case 503: return OrionldInternalError;
   }
 
   return OrionldInternalError;

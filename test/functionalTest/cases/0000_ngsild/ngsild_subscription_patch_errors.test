@@ -967,8 +967,14 @@ echo
 echo "65. Attempt to PATCH the subscription with a duplicated 'notification'"
 echo "======================================================================"
 payload='{
-  "notification": {},
-  "notification": {}
+  "notification": {
+    "attributes": [ "A1" ],
+    "endpoint": "localhost:9999/here"    
+  },
+  "notification": {
+    "attributes": [ "A1" ],
+    "endpoint": "localhost:9999/here"    
+  }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
 echo

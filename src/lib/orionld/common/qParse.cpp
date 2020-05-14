@@ -311,7 +311,7 @@ static QNode* qNodeAppend(QNode* container, QNode* childP)
 //
 QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
 {
-  QNode*     qNodeV[10];
+  QNode*     qNodeV[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
   int        qNodeIx    = 0;
   QNode*     qLexP      = qLexList;
   QNode*     opNodeP    = NULL;
@@ -514,6 +514,13 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
     for (int ix = 0; ix < qNodeIx; ix++)
       qNodeAppend(opNodeP, qNodeV[ix]);
     return opNodeP;
+  }
+
+  if (qNodeV[0] == NULL)
+  {
+    *titleP   = (char*) "Parse Error in Q-Expression";
+    *detailsP = (char*) "Unfinished statement?";
+    return NULL;
   }
 
   return qNodeV[0];

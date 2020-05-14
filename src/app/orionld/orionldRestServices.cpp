@@ -52,6 +52,7 @@
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"
 #include "orionld/serviceRoutines/orionldGetTenants.h"
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"
+#include "orionld/serviceRoutines/orionldPostQuery.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -95,6 +96,7 @@ static OrionLdRestServiceSimplified postServiceV[] =
   { "/ngsi-ld/v1/entityOperations/upsert", orionldPostBatchUpsert                },
   { "/ngsi-ld/v1/entityOperations/update", orionldPostBatchUpdate                },
   { "/ngsi-ld/v1/entityOperations/delete", orionldPostBatchDeleteEntities        },
+  { "/ngsi-ld/v1/entityOperations/query",  orionldPostQuery                      },
   { "/ngsi-ld/v1/subscriptions",           orionldPostSubscriptions              },
   { "/ngsi-ld/v1/csourceRegistrations",    orionldPostRegistrations              },
   { "/ngsi-ld/v1/temporal/entities",       orionldNotImplemented                 },

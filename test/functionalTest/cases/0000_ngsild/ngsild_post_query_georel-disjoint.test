@@ -1,0 +1,321 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with geospatial query using georel=disjoint
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# For this test, 4 Polygons (Rectangles) and 4 LineStrings are used:
+#
+#   Latitude
+#     ^
+#   9-|
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   8-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   7-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   6-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   5-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   4-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   3-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   2-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   1-|--+--+--+--+--+--+--+--+--+--+
+#     |  |  |  |  |  |  |  |  |  |  |  
+#   0-|------------------------------------> Longitude
+#     |  1  2  3  4  5  6  7  8  9  10
+#
+# The 4 Polygons are:
+# - R1  [[ [1,5], [5,5], [5,8], [1,8], [1,5] ]]
+# - R2  [[ [4,3], [8,3], [8,7], [4,7], [4,3] ]]  - Intersects with R1
+# - R3  [[ [2,6], [3,6], [3,7], [2,7], [2,6] ]]  - Completely inside R1
+# - R4  [[ [6,8], [7,8], [7,9], [6,9], [6,8] ]]  - Completely outside R1-R3
+#
+# R2 will not be an Entity, but the geometry to use for the query
+#
+# The four LineStrings are:
+# - L1  [ [7,6], [6,5], [6,4], [7,4] ]  - Completely inside R2
+# - L2  [ [5,4], [5,2], [6,1]        ]  - Intersects with R2
+# - L3  [ [2,2], [4,2], [5,9]        ]  - Intersects with both R1 and R2
+# - L4  [ [9,8], [9,6], [10,6]       ]  - Completely outside R1-R4
+#
+#
+# 01. Create entity ER1, with a geo-property geo that is R1
+# 02. Create entity ER3, with a geo-property geo that is R3
+# 03. Create entity ER4, with a geo-property geo that is R4
+# 04. Create entity EL1, with a geo-property geo that is L1
+# 05. Create entity EL2, with a geo-property geo that is L2
+# 06. Create entity EL3, with a geo-property geo that is L3
+# 07. Create entity EL4, with a geo-property geo that is L4
+# 08. Post Query for disjoint using R2 - see ER3, ER4, and EL4
+# 09. Post Query for disjoint using	R1 - see ER4, EL1, EL2, and EL4
+#
+
+echo "01. Create entity ER1, with a geo-property geo that is R1"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/ER1",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [1,5], [5,5], [5,8], [1,8], [1,5] ]]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity ER3, with a geo-property geo that is R3"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/ER3",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [2,6], [3,6], [3,7], [2,7], [2,6] ]]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+echo "03. Create entity ER4, with a geo-property geo that is R4"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/ER4",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [6,8], [7,8], [7,9], [6,9], [6,8] ]]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity EL1, with a geo-property geo that is L1"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/EL1",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [7,6], [6,5], [6,4], [7,4] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity EL2, with a geo-property geo that is L2"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/EL2",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [5,4], [5,2], [6,1] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity EL3, with a geo-property geo that is L3"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/EL3",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [2,2], [4,2], [5,9] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Create entity EL4, with a geo-property geo that is L4"
+echo "========================================================="
+payload='{
+  "id": "http://a.b.c/entity/EL4",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [9,8], [9,6], [10,6] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Post Query for disjoint using R2 - see ER3, ER4, and EL4"
+echo "============================================================"
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "disjoint",
+    "coordinates": [[ [4,3], [8,3], [8,7], [4,7], [4,3] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "09. Post Query for disjoint using	R1 - see ER4, EL1, EL2, and EL4"
+echo "================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "disjoint",
+    "coordinates": [[ [1,5], [5,5], [5,8], [1,8], [1,5] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity ER1, with a geo-property geo that is R1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/ER1
+Date: REGEX(.*)
+
+
+
+02. Create entity ER3, with a geo-property geo that is R3
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/ER3
+Date: REGEX(.*)
+
+
+
+03. Create entity ER4, with a geo-property geo that is R4
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/ER4
+Date: REGEX(.*)
+
+
+
+04. Create entity EL1, with a geo-property geo that is L1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/EL1
+Date: REGEX(.*)
+
+
+
+05. Create entity EL2, with a geo-property geo that is L2
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/EL2
+Date: REGEX(.*)
+
+
+
+06. Create entity EL3, with a geo-property geo that is L3
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/EL3
+Date: REGEX(.*)
+
+
+
+07. Create entity EL4, with a geo-property geo that is L4
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/EL4
+Date: REGEX(.*)
+
+
+
+08. Post Query for disjoint using R2 - see ER3, ER4, and EL4
+============================================================
+        "id": "http://a.b.c/entity/EL4",
+        "id": "http://a.b.c/entity/ER3",
+        "id": "http://a.b.c/entity/ER4",
+
+
+09. Post Query for disjoint using	R1 - see ER4, EL1, EL2, and EL4
+=================================================================
+        "id": "http://a.b.c/entity/EL1",
+        "id": "http://a.b.c/entity/EL2",
+        "id": "http://a.b.c/entity/EL4",
+        "id": "http://a.b.c/entity/ER4",
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

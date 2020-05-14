@@ -116,12 +116,14 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
 
       DUPLICATE_CHECK(idP, "id", nodeP);
       STRING_CHECK(nodeP, "id");
+      EMPTY_STRING_CHECK(nodeP, "id");
       URI_CHECK(nodeP, "id");
     }
     else if (strcmp(nodeP->name, "type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
       STRING_CHECK(nodeP, "type");
+      EMPTY_STRING_CHECK(nodeP, "type");
 
       if (strcmp(nodeP->value.s, "ContextSourceRegistration") != 0)
       {
@@ -134,16 +136,19 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(nameP, "name", nodeP);
       STRING_CHECK(nodeP, "name");
+      EMPTY_STRING_CHECK(nodeP, "name");
     }
     else if (strcmp(nodeP->name, "description") == 0)
     {
       DUPLICATE_CHECK(descriptionP, "description", nodeP);
       STRING_CHECK(nodeP, "description");
+      EMPTY_STRING_CHECK(nodeP, "description");
     }
     else if (strcmp(nodeP->name, "information") == 0)
     {
       DUPLICATE_CHECK(informationP, "information", nodeP);
       ARRAY_CHECK(nodeP, "information");
+      EMPTY_ARRAY_CHECK(nodeP, "information");
       if (pcheckInformation(nodeP) == false)
         return false;
     }
@@ -159,6 +164,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(managementIntervalP, "managementInterval", nodeP);
       OBJECT_CHECK(nodeP, "managementInterval");
+      EMPTY_OBJECT_CHECK(nodeP, "managementInterval");
       if (pcheckTimeInterval(nodeP, "managementInterval") == false)
         return false;
     }
@@ -166,6 +172,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(locationP, "location", nodeP);
       OBJECT_CHECK(nodeP, "location");
+      EMPTY_OBJECT_CHECK(nodeP, "location");
 
       if (pcheckGeoProperty(locationP, NULL, NULL) == false)
       {
@@ -177,6 +184,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(observationSpaceP, "observationSpace", nodeP);
       OBJECT_CHECK(nodeP, "observationSpace");
+      EMPTY_OBJECT_CHECK(nodeP, "observationSpace");
       if (pcheckGeoProperty(observationSpaceP, NULL, NULL) == false)
       {
         orionldState.httpStatusCode = SccBadRequest;
@@ -187,6 +195,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(operationSpaceP, "operationSpace", nodeP);
       OBJECT_CHECK(nodeP, "operationSpace");
+      EMPTY_OBJECT_CHECK(nodeP, "operationSpace");
       if (pcheckGeoProperty(operationSpaceP, NULL, NULL) == false)
       {
         orionldState.httpStatusCode = SccBadRequest;
@@ -197,12 +206,14 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
     {
       DUPLICATE_CHECK(expiresP, "expires", nodeP);
       STRING_CHECK(nodeP, "expires");
+      EMPTY_STRING_CHECK(nodeP, "expires");
       DATETIME_CHECK(expiresP->value.s, dateTime, "expires");
     }
     else if (strcmp(nodeP->name, "endpoint") == 0)
     {
       DUPLICATE_CHECK(endpointP, "endpoint", nodeP);
       STRING_CHECK(nodeP, "endpoint");
+      EMPTY_STRING_CHECK(nodeP, "endpoint");
       URI_CHECK(nodeP, nodeP->name);
     }
     else

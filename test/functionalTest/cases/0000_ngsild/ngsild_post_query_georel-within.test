@@ -1,0 +1,477 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with geospatial query using georel=within
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# For this test we will create 11 entities, 8 with a Geo Point and 3 with a Geo Polygon:
+# * E01 (P1):  Point [ 1, 1 ]
+# * E02 (P2):  Point [ 7, 7 ]
+# * E03 (P3):  Point [ 1, 7 ]
+# * E04 (P4):  Point [ 7, 1 ]
+# * E05 (P5):  Point [ 3, 5 ]
+# * E06 (P6):  Point [ 5, 3 ]
+# * E07 (P7):  Point [ 3, 2 ]
+# * E08 (P8):  LineString [[ 3, 4 ], [ 3, 5 ]]
+#
+# * E09 (PG1): Polygon [ [ 7,2.5 ], [ 7,6 ], [ 2,6 ], [ 2,2.5 ], [ 7,2.5 ] ]
+# * E10 (PG2): Polygon [ [ 1,8 ],   [ 1,3 ], [ 4,3 ], [ 4,8 ],   [ 1,8 ]   ]
+# * E11 (PG3): Polygon [ [ 7,1 ],   [ 7,7 ], [ 1,7 ], [ 1,1 ],   [ 7,1 ]   ]
+#
+# As query polygons:
+# * PG1 - Captures P5, P6, and P8
+# * PG2 - Captures P3, P5, and P8
+# * PG3 - captures points P1-P8, PG1 and PG2
+# * PG4 - covering all the 11 points and polygons - [ [0,0], [0,9], [9,9], [9,0], [0,0] ]
+#
+# 01. Create entity E01 with Point P1
+# 02. Create entity E02 with Point P2
+# 03. Create entity E03 with Point P3
+# 04. Create entity E04 with Point P4
+# 05. Create entity E05 with Point P5
+# 06. Create entity E06 with Point P6
+# 07. Create entity E07 with Point P7
+# 08. Create entity E08 with LineString from 3,4 to 3,5
+#
+# 09. Create entity E09 with Polygon PG1
+# 10. Create entity E10 with Polygon PG2
+# 11. Create entity E11 with Polygon PG3
+#
+# 12. Post Query - GET entities within PG1 - see E05, E06, E08, and E09
+# 13. Post Query - GET entities within PG2 - see E03, E05, E08, and E10
+# 14. Post Query - GET entities within PG3 - see E01-E08, and E11
+# 15. Post Query - GET entities within PG4 - see all eleven entities
+#
+
+echo "01. Create entity E01 with Point P1"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E01",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 1 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E02 with Point P2"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E02",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 7, 7 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E03 with Point P3"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E03",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 7 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E04 with Point P4"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E04",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 7, 1 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E05 with Point P5"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E05",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 3, 5 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity E06 with Point P6"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E06",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 5, 3 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Create entity E07 with Point P7"
+echo "==================================="
+payload='{
+  "id": "http://a.b.c/entity/E07",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 3, 2 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. Create entity E08 with LineString from 3,4 to 3,5"
+echo "====================================================="
+payload='{
+  "id": "http://a.b.c/entity/E08",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [ 3, 4 ], [ 3, 5 ] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "09. Create entity E09 with Polygon PG1"
+echo "======================================"
+payload='{
+  "id": "http://a.b.c/entity/E09",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [ 7,2.5 ], [ 7,6 ], [ 2,6 ], [ 2,2.5 ], [ 7,2.5 ] ] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "10. Create entity E10 with Polygon PG2"
+echo "======================================"
+payload='{
+  "id": "http://a.b.c/entity/E10",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [ 1,8 ], [ 1,3 ], [ 4,3 ], [ 4,8 ], [ 1,8 ] ] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. Create entity E11 with Polygon PG3"
+echo "======================================"
+payload='{
+  "id": "http://a.b.c/entity/E11",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [ 7,1 ], [ 7,7 ], [ 1,7 ], [ 1,1 ], [ 7,1 ] ] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. Post Query - GET entities within PG1 - see E05, E06, E08, and E09"
+echo "====================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "within",
+    "coordinates": [ [ [ 7,2.5 ], [ 7,6 ], [ 2,6 ], [ 2,2.5 ], [ 7,2.5 ] ] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "13. Post Query - GET entities within PG2 - see E03, E05, E08, and E10"
+echo "====================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "within",
+    "coordinates": [ [ [ 1,8 ], [ 1,3 ], [ 4,3 ], [ 4,8 ], [ 1,8 ] ] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "14. Post Query - GET entities within PG3 - see E01-E08, and E11"
+echo "==============================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "within",
+    "coordinates": [[  [ 7,1 ], [ 7,7 ], [ 1,7 ], [ 1,1 ], [ 7,1 ]  ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "15. Post Query - GET entities within PG4 - see all eleven entities"
+echo "=================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "within",
+    "coordinates": [ [ [0,0], [0,9], [9,9], [9,0], [0,0] ] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E01 with Point P1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E01
+Date: REGEX(.*)
+
+
+
+02. Create entity E02 with Point P2
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E02
+Date: REGEX(.*)
+
+
+
+03. Create entity E03 with Point P3
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E03
+Date: REGEX(.*)
+
+
+
+04. Create entity E04 with Point P4
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E04
+Date: REGEX(.*)
+
+
+
+05. Create entity E05 with Point P5
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E05
+Date: REGEX(.*)
+
+
+
+06. Create entity E06 with Point P6
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E06
+Date: REGEX(.*)
+
+
+
+07. Create entity E07 with Point P7
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E07
+Date: REGEX(.*)
+
+
+
+08. Create entity E08 with LineString from 3,4 to 3,5
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E08
+Date: REGEX(.*)
+
+
+
+09. Create entity E09 with Polygon PG1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E09
+Date: REGEX(.*)
+
+
+
+10. Create entity E10 with Polygon PG2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E10
+Date: REGEX(.*)
+
+
+
+11. Create entity E11 with Polygon PG3
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E11
+Date: REGEX(.*)
+
+
+
+12. Post Query - GET entities within PG1 - see E05, E06, E08, and E09
+=====================================================================
+        "id": "http://a.b.c/entity/E05",
+        "id": "http://a.b.c/entity/E06",
+        "id": "http://a.b.c/entity/E08",
+        "id": "http://a.b.c/entity/E09",
+
+
+13. Post Query - GET entities within PG2 - see E03, E05, E08, and E10
+=====================================================================
+        "id": "http://a.b.c/entity/E03",
+        "id": "http://a.b.c/entity/E05",
+        "id": "http://a.b.c/entity/E08",
+        "id": "http://a.b.c/entity/E10",
+
+
+14. Post Query - GET entities within PG3 - see E01-E08, and E11
+===============================================================
+        "id": "http://a.b.c/entity/E01",
+        "id": "http://a.b.c/entity/E02",
+        "id": "http://a.b.c/entity/E03",
+        "id": "http://a.b.c/entity/E04",
+        "id": "http://a.b.c/entity/E05",
+        "id": "http://a.b.c/entity/E06",
+        "id": "http://a.b.c/entity/E07",
+        "id": "http://a.b.c/entity/E08",
+        "id": "http://a.b.c/entity/E11",
+
+
+15. Post Query - GET entities within PG4 - see all eleven entities
+==================================================================
+        "id": "http://a.b.c/entity/E01",
+        "id": "http://a.b.c/entity/E02",
+        "id": "http://a.b.c/entity/E03",
+        "id": "http://a.b.c/entity/E04",
+        "id": "http://a.b.c/entity/E05",
+        "id": "http://a.b.c/entity/E06",
+        "id": "http://a.b.c/entity/E07",
+        "id": "http://a.b.c/entity/E08",
+        "id": "http://a.b.c/entity/E09",
+        "id": "http://a.b.c/entity/E10",
+        "id": "http://a.b.c/entity/E11",
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

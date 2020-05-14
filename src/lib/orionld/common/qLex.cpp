@@ -464,6 +464,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       {}
       else
       {
+        LM_W(("Bad Input (invalid character '%s')", *sP));
         *titleP = (char*) "ngsi-ld query language: invalid character";
         *detailsP = sP;
         sP[1] = 0;

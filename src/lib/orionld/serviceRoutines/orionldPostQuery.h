@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONGET_H_
-#define SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONGET_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTQUERY_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTQUERY_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,23 +23,16 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
+* Author: Ken Zangelin
 */
-#include "apiTypesV2/Registration.h"
+#include "rest/ConnectionInfo.h"
 
 
 
-/* ****************************************************************************
-*
-* mongoLdRegistrationGet - 
-*/
-extern bool mongoLdRegistrationGet
-(
-  ngsiv2::Registration*  regP,
-  const char*            regId,
-  const char*            tenant,
-  int*                   statusCodeP,
-  char**                 detailsP
-);
+// ----------------------------------------------------------------------------
+//
+// orionldPostQuery -
+//
+extern bool orionldPostQuery(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_MONGOBACKEND_MONGOLDREGISTRATIONGET_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTQUERY_H_

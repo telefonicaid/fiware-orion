@@ -60,7 +60,7 @@ extern "C"
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/removeArrayEntityLookup.h"            // removeArrayEntityLookup
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
-#include "orionld/payloadCheck/pcheckEntities.h"               // pcheckEntities
+#include "orionld/payloadCheck/pcheckEntityInfoArray.h"        // pcheckEntityInfoArray
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -116,7 +116,7 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 // POST /ngsi-ld/v1/entityOperations/create
 //
 // From the spec:
-//   This operation allows creating a batch of NGSI-LD Entities, creating each of them if they does not exist.
+//   This operation allows creating a batch of NGSI-LD Entities, creating each of them if they don't exist.
 //
 bool orionldPostBatchCreate(ConnectionInfo* ciP)
 {
@@ -124,10 +124,10 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array
   // * cannot be empty
-  // * all entities must contain a entity::id (one level down)
+  // * all entities must contain an entity::id (one level down)
   // * no entity can contain an entity::type (one level down)
   //
-  pcheckEntities(orionldState.requestTree);
+  pcheckEntityInfoArray(orionldState.requestTree, true);  // FIXME: This is not the correct check!
 
   KjNode*               incomingTree   = orionldState.requestTree;
   KjNode*               idArray        = kjArray(orionldState.kjsonP, NULL);

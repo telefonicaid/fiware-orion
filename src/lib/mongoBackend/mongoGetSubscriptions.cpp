@@ -515,7 +515,7 @@ bool mongoGetLdSubscription
   ngsiv2::Subscription*  subP,
   const char*            subId,
   const char*            tenant,
-  HttpStatusCode*        statusCodeP,
+  int*                   statusCodeP,
   char**                 detailsP
 )
 {
@@ -536,7 +536,7 @@ bool mongoGetLdSubscription
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *detailsP    = (char*) "Internal Error during DB-query";
-    *statusCodeP = SccReceiverInternalError;
+    *statusCodeP = 500;
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -552,7 +552,7 @@ bool mongoGetLdSubscription
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *detailsP    = (char*) "Runtime Error (exception in nextSafe)";
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -576,7 +576,7 @@ bool mongoGetLdSubscription
       LM_T(LmtMongo, ("more than one subscription: '%s'", subId));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *detailsP    = (char*) "more than one subscription matched";
-      *statusCodeP = SccConflict;
+      *statusCodeP = 409;
       return false;
     }
   }
@@ -586,14 +586,14 @@ bool mongoGetLdSubscription
     LM_T(LmtMongo, ("subscription not found: '%s'", subId));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *detailsP    = (char*) "subscription not found";
-    *statusCodeP = SccContextElementNotFound;
+    *statusCodeP = 404;
     return false;
   }
 
   releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
 
-  *statusCodeP = SccOk;
+  *statusCodeP = 200;
   return true;
 }
 
