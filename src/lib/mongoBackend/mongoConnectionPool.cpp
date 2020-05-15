@@ -414,7 +414,7 @@ int mongoConnectionPoolInit
 * Very important to call the function 'mongoPoolConnectionRelease' after finishing using the connection !
 *
 */
-DBClientBase* mongoPoolConnectionGet(void)
+static DBClientBase* mongoPoolConnectionGet(void)
 {
   DBClientBase*    connection = NULL;
   struct timespec  startTime;
@@ -453,12 +453,12 @@ DBClientBase* mongoPoolConnectionGet(void)
 }
 
 
-
+#ifndef UNIT_TEST
 /* ****************************************************************************
 *
 * mongoPoolConnectionRelease -
 */
-void mongoPoolConnectionRelease(DBClientBase* connection)
+static void mongoPoolConnectionRelease(DBClientBase* connection)
 {
   sem_wait(&connectionPoolSem);
 
@@ -474,7 +474,7 @@ void mongoPoolConnectionRelease(DBClientBase* connection)
 
   sem_post(&connectionPoolSem);
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -542,4 +542,79 @@ const char* mongoConnectionSemGet(void)
   }
 
   return "free";
+}
+
+
+
+#ifdef UNIT_TEST
+
+static DBClientBase* connection = NULL;
+
+
+
+/* ****************************************************************************
+*
+* setMongoConnectionForUnitTest -
+*
+* For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
+* given out using the function getMongoConnection().
+*/
+void setMongoConnectionForUnitTest(DBClientBase* _connection)
+{
+  connection = _connection;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoInitialConnectionGetForUnitTest -
+*
+* This function is meant to be used by unit tests, to get a connection from the pool
+* and then use that connection, setting it with the function 'setMongoConnectionForUnitTest'.
+* This will set the static variable 'connection' in MongoGlobal.cpp and later 'getMongoConnection'
+* returns that variable (getMongoConnection is used by the entire mongo backend).
+*/
+DBClientBase* mongoInitialConnectionGetForUnitTest(void)
+{
+  return mongoPoolConnectionGet();
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* getMongoConnection -
+*
+* I would prefer to have per-collection methods, to have a better encapsulation, but
+* the Mongo C++ API doesn't seem to work that way
+*/
+DBClientBase* getMongoConnection(void)
+{
+#ifdef UNIT_TEST
+  return connection;
+#else
+  return mongoPoolConnectionGet();
+#endif
+}
+
+
+
+/* ****************************************************************************
+*
+* releaseMongoConnection - give back mongo connection to connection pool
+*
+* Older versions of this function planned to use a std::auto_ptr<DBClientCursor>* parameter
+* in order to invoke kill() on it for a "safer" connection releasing. However, at the end
+* it seems that kill() will not help at all (see deetails in https://github.com/telefonicaid/fiware-orion/issues/1568)
+* and after some testing we have checked that the current solution is stable.
+*/
+void releaseMongoConnection(DBClientBase* connection)
+{
+#ifdef UNIT_TEST
+  return;
+#else
+  return mongoPoolConnectionRelease(connection);
+#endif  // UNIT_TEST
 }

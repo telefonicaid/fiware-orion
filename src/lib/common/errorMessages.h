@@ -48,6 +48,7 @@
 
 #define ERROR_PARSE                                   "ParseError"
 #define ERROR_DESC_PARSE                              "Errors found in incoming JSON buffer"
+#define ERROR_DESC_PARSE_MAX_JSON_NESTING             "attribute or metadata value has overpassed maximum nesting limit: " STR(MAX_JSON_NESTING)
 
 #define ERROR_BAD_REQUEST                             "BadRequest"
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI       "invalid character in URI"

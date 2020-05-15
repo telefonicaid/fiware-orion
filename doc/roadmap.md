@@ -17,14 +17,14 @@ any time.
 
 Disclaimer:
 
-* This section has been last updated in January 2019. Please take into account its 
+* This section has been last updated in March 2020. Please take into account its 
   content could be obsolete.
 * Note we develop this software in Agile way, so development plan is continuously 
   under review. Thus, this roadmap has to be understood as rough plan of features 
   to be done along time which is fully valid only at the time of writing it. This
   roadmap has not be understood as a commitment on features and/or dates.
 * Some of the roadmap items may be implemented by external community developers, 
-  out of the scope of GEi owners. Thus, the moment in which these features will be
+  out of the scope of GE owners. Thus, the moment in which these features will be
   finalized cannot be assured.
 
 ## Short term
@@ -32,8 +32,9 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
-- NGSI-LD Basic Functionality. Entity creation, Entity update, Entity delete, Basic Query Support. 
-- Notification improvements (initial notification skip, always-notify updates, etc.) (community)
+- Unrestricted text attributes ([#3550](https://github.com/telefonicaid/fiware-orion/issues/3550))
+- Notification flow control ([#3568](https://github.com/telefonicaid/fiware-orion/issues/3568))
+- Improvements and fixed based on pentesting reports
 
 ## Medium term
 
@@ -41,8 +42,11 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
-- NGSI-LD Advanced Functionality. Full Query support. Batch operations. Context Source Registrations. 
+- Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
+- Attribute update operators (inc, push, etc.)
 - MQTT notifications (community)
+- Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
+- Advanced query language
 
 ## Long term
 
@@ -51,7 +55,6 @@ of the product even though development of these features has not yet been
 scheduled for a release in the near future. Please feel free to contact us if
 you wish to get involved in the implementation or influence the roadmap
 
-- Lightweight ingestion for connection oriented updates. The following technologies are under study for its integration:
-  - Apache Avro
-  - [FastRTPS](https://github.com/eProsima/Fast-RTPS) (the default robotics middleware of ROS2)
-  - Apache Kafka
+- Migration from legacy to new MongoDB driver
+- Performance improvements in the notifications system ([#3461](https://github.com/telefonicaid/fiware-orion/issues/3461))
+- Improve performance in update/notifications (connection-oriented, lightweight ingestion, etc.)

@@ -1,10 +1,16 @@
-FROM centos:centos7.6.1810
+ARG  IMAGE_TAG=centos7.7.1908
+FROM centos:${IMAGE_TAG}
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
+ARG GIT_NAME
+ARG GIT_REV_ORION
+ARG CLEAN_DEV_TOOLS
+
 ENV ORION_USER orion
-ENV GIT_REV_ORION master
-ENV CLEAN_DEV_TOOLS 1
+ENV GIT_NAME ${GIT_NAME:-telefonicaid}
+ENV GIT_REV_ORION ${GIT_REV_ORION:-master}
+ENV CLEAN_DEV_TOOLS ${CLEAN_DEV_TOOLS:-1}
 
 WORKDIR /opt
 
@@ -30,6 +36,7 @@ RUN \
       which \
       cyrus-sasl-devel && \
     # Install libmicrohttpd from source
+    cd /opt && \
     curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz && \
     tar xvf libmicrohttpd-0.9.48.tar.gz && \
     cd libmicrohttpd-0.9.48 && \
@@ -38,17 +45,20 @@ RUN \
     make install && \
     ldconfig && \
     # Install mongodb driver from source
+    cd /opt && \
     curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz && \
     tar xfz legacy-1.1.2.tar.gz && \
     cd mongo-cxx-driver-legacy-1.1.2 && \
     scons --use-sasl-client --ssl && \
     scons install --prefix=/usr/local --use-sasl-client --ssl && \
     # Install rapidjson from source
+    cd /opt && \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
     tar xfz v1.0.2.tar.gz && \
     mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include && \
     # Install orion from source
-    git clone https://github.com/telefonicaid/fiware-orion && \
+    cd /opt && \
+    git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
     make && \

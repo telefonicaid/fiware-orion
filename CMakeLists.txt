@@ -78,15 +78,14 @@ add_definitions(-fPIC)
 # This workaround consists of putting back the -Werror flag and instead solving the problem by
 # adding another flag: -Wno-deprecated-declarations
 #
-IF (${DISTRO} MATCHES "Ubuntu_17.*")
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
-ELSEIF (${DISTRO} MATCHES "Ubuntu_18.*")
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
-ELSEIF (${DISTRO} MATCHES "Debian_9.*")
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
-ELSE()
+if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.3)
+  message ("gcc version less than 6.3, compiling without -Wno-deprecated-declarations")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
-ENDIF ()
+else()
+  # Formerly this was a condition based in distribution, set for Ubuntu_17.*, Ubuntu_18.* and Debian_9.*
+  message("gcc version 6.3 or higher, compiling with -Wno-deprecated-declarations")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+endif()
 
 #
 # Platform checks
@@ -249,6 +248,8 @@ include_directories("/usr/include")
 #
 MESSAGE("Building for ${BUILD_ARCH}")
 if ("${BUILD_ARCH}" STREQUAL "x86_64")
+    link_directories("/usr/lib64")
+elseif ("${BUILD_ARCH}" STREQUAL "aarch64")
     link_directories("/usr/lib64")
 else (NOT "${BUILD_ARCH}" STREQUAL "x86_64")
     link_directories("/usr/lib")
