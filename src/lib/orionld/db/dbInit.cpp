@@ -34,7 +34,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"        // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"          // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityDelete.h"             // mongoCppLegacyEntityDelete
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"        // mongoCppLegacyEntityBatchDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"           // mongoCppLegacyEntitiesDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"        // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"       // mongoCppLegacyRegistrationLookup
@@ -79,7 +79,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityDelete                           = mongoCppLegacyEntityDelete;
-  dbEntityBatchDelete                      = mongoCppLegacyEntityBatchDelete;
+  dbEntitiesDelete                      = mongoCppLegacyEntitiesDelete;
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
   dbEntityListLookupWithIdTypeCreDate      = mongoCppLegacyEntityListLookupWithIdTypeCreDate;
   dbRegistrationLookup                     = mongoCppLegacyRegistrationLookup;
@@ -103,7 +103,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbDataToKjTree                           = mongocKjTreeFromBsonObj;
   dbDataFromKjTree                         = NULL;  // FIXME: Implement mongocKjTreeToBson
   dbEntityDelete                           = NULL;  // FIXME: Implement mongocEntityDelete
-  dbEntityBatchDelete                      = NULL;  // FIXME: Implement mongocEntityBatchDelete
+  dbEntitiesDelete                         = NULL;  // FIXME: Implement mongocEntitiesDelete
   dbSubscriptionMatchEntityIdAndAttributes = NULL;  // FIXME: Implement mongocSubscriptionMatchEntityIdAndAttributes
   dbEntityListLookupWithIdTypeCreDate      = NULL;  // FIXME: Implement mongocEntityListLookupWithIdTypeCreDate
   dbRegistrationLookup                     = NULL;  // FIXME: Implement mongocRegistrationLookup

@@ -43,7 +43,7 @@ DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
 DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
 DbEntityUpdateFunction                    dbEntityUpdate;
 DbEntityDeleteFunction                    dbEntityDelete;
-DbEntityBatchDeleteFunction               dbEntityBatchDelete;
+DbEntitiesDeleteFunction                  dbEntitiesDelete;
 DbDataToKjTreeFunction                    dbDataToKjTree;
 DbDataFromKjTreeFunction                  dbDataFromKjTree;
 DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;

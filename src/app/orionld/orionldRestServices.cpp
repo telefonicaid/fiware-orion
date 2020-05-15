@@ -29,7 +29,7 @@
 #include "orionld/serviceRoutines/orionldGetEntity.h"
 #include "orionld/serviceRoutines/orionldGetEntities.h"
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"
-#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"
+#include "orionld/serviceRoutines/orionldPostBatchDelete.h"
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"
 #include "orionld/serviceRoutines/orionldGetSubscription.h"
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"
@@ -95,7 +95,7 @@ static OrionLdRestServiceSimplified postServiceV[] =
   { "/ngsi-ld/v1/entityOperations/create", orionldPostBatchCreate                },
   { "/ngsi-ld/v1/entityOperations/upsert", orionldPostBatchUpsert                },
   { "/ngsi-ld/v1/entityOperations/update", orionldPostBatchUpdate                },
-  { "/ngsi-ld/v1/entityOperations/delete", orionldPostBatchDeleteEntities        },
+  { "/ngsi-ld/v1/entityOperations/delete", orionldPostBatchDelete                },
   { "/ngsi-ld/v1/entityOperations/query",  orionldPostQuery                      },
   { "/ngsi-ld/v1/subscriptions",           orionldPostSubscriptions              },
   { "/ngsi-ld/v1/csourceRegistrations",    orionldPostRegistrations              },

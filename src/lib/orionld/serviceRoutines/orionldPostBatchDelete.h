@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETEENTITIES_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETEENTITIES_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_
 
 /*
 *
@@ -33,8 +33,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostBatchDeleteEntities -
+// orionldPostBatchDelete -
 //
-extern bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP);
+extern bool orionldPostBatchDelete(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETEENTITIES_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPOSTBATCHDELETE_H_

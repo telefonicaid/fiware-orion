@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYBATCHDELETE_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYBATCHDELETE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESDELETE_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESDELETE_H_
 
 /*
 *
@@ -34,8 +34,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityBatchDelete -
+// mongoCppLegacyEntitiesDelete -
 //
-extern bool mongoCppLegacyEntityBatchDelete(KjNode* entityIdsArray);
+extern bool mongoCppLegacyEntitiesDelete(KjNode* entityIdsArray);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYBATCHDELETE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESDELETE_H_

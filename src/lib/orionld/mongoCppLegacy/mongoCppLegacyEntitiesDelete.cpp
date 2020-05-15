@@ -38,15 +38,15 @@ extern "C"
 #include "orionld/common/orionldState.h"                              // orionldState, dbName, mongoEntitiesCollectionP
 #include "orionld/db/dbCollectionPathGet.h"                           // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                               // dbDataToKjTree, dbDataFromKjTree
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"   // Own interface
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityBatchDelete -
+// mongoCppLegacyEntitiesDelete -
 //
-bool mongoCppLegacyEntityBatchDelete(KjNode* entityIdsArray)
+bool mongoCppLegacyEntitiesDelete(KjNode* entityIdsArray)
 {
   char collectionPath[256];
 

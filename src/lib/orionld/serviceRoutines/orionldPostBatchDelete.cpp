@@ -42,19 +42,19 @@ extern "C"
 #include "orionld/common/urnCheck.h"                                     // urnCheck
 #include "orionld/common/orionldState.h"                                 // orionldState
 #include "orionld/common/orionldErrorResponse.h"                         // orionldErrorResponseCreate
-#include "orionld/db/dbConfiguration.h"                                  // dbEntityBatchDelete, dbEntityListLookupWithIdTypeCreDate
-#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"      // Own interface
+#include "orionld/db/dbConfiguration.h"                                  // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
+#include "orionld/serviceRoutines/orionldPostBatchDelete.h"              // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostBatchDeleteEntities -
+// orionldPostBatchDelete -
 //
 // This function receives an array of entity ids as parameter and performs the batch delete operation.
 // It will remove a set of entities from the database.
 //
-bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
+bool orionldPostBatchDelete(ConnectionInfo* ciP)
 {
   KjNode* success  = kjArray(orionldState.kjsonP, "success");
   KjNode* errors   = kjArray(orionldState.kjsonP, "errors");
@@ -163,12 +163,12 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
   //
   // Call batch delete function
   //
-  if (dbEntityBatchDelete(orionldState.requestTree) == false)
+  if (dbEntitiesDelete(orionldState.requestTree) == false)
   {
-    LM_E(("dbEntityBatchDelete returned false"));
+    LM_E(("dbEntitiesDelete returned false"));
     orionldState.httpStatusCode = SccBadRequest;
     if (orionldState.responseTree == NULL)
-      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntityBatchDelete");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntitiesDelete");
     return false;
   }
   else

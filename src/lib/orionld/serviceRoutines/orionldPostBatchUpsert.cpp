@@ -387,7 +387,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 05. Remove the entities in "removeArray" from DB
   //
   if ((removeArray != NULL) && (removeArray->value.firstChildP != NULL))
-    dbEntityBatchDelete(removeArray);
+    dbEntitiesDelete(removeArray);
 
 
   //

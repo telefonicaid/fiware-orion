@@ -61,7 +61,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetSubscription.h"          // orionldGetSubscription
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"        // orionldPostRegistrations
 #include "orionld/serviceRoutines/orionldGetVersion.h"               // orionldGetVersion
-#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
+#include "orionld/serviceRoutines/orionldPostBatchDelete.h"          // orionldPostBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
 #include "orionld/serviceRoutines/orionldPostQuery.h"                // orionldPostQuery
@@ -239,7 +239,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
-  else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+  else if (serviceP->serviceRoutine == orionldPostBatchDelete)
   {
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
@@ -283,7 +283,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     if (serviceP->serviceRoutine == orionldPostEntities)
       serviceP->temporalRoutine  = temporalPostEntities;
-    else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+    else if (serviceP->serviceRoutine == orionldPostBatchDelete)
       serviceP->temporalRoutine   = temporalPostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
       serviceP->temporalRoutine = temporalPostEntity;
