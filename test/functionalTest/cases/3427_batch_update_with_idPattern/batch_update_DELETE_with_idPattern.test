@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-V2 batch update REPLACE with idPattern
+V2 batch update DELETE with idPattern
 
 --SHELL-INIT--
 dbInit CB
@@ -142,13 +142,13 @@ Date: REGEX(.*)
 03. Delete E1, with idPattern(.*) using POST /v2/op/update with DELETE, see error
 =================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -175,13 +175,13 @@ Date: REGEX(.*)
 05. Delete E1, with idPattern(E.*) using POST /v2/op/update with DELETE, see error
 ==================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 

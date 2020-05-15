@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-V2 batch update with idPattern
+V2 batch update with idPattern (APPEND and APPEND_STRICT)
 
 --SHELL-INIT--
 dbInit CB
@@ -312,13 +312,13 @@ Date: REGEX(.*)
 03. Change an attribute value A1=3, with idPattern(.*) using POST /v2/op/update with APPEND, see error
 ======================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -345,13 +345,13 @@ Date: REGEX(.*)
 05. Change an attribute value A1=3, with idPattern(E.*) using POST /v2/op/update with APPEND, see error
 =======================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -378,13 +378,13 @@ Date: REGEX(.*)
 07. Add an attribute A2=9 with idPattern(.*) using POST /v2/op/update with APPEND, see error
 ============================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -411,13 +411,13 @@ Date: REGEX(.*)
 09. Add an attribute A2=9 with idPattern(E.*) using POST /v2/op/update with APPEND, see error
 =============================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -444,13 +444,13 @@ Date: REGEX(.*)
 11. Change an attribute value A1=3 with idPattern(.*) using POST /v2/op/update with APPEND_STRICT, see error
 ============================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -477,13 +477,13 @@ Date: REGEX(.*)
 13. Change an attribute value A1=3 with idPattern(E.*) using POST /v2/op/update with APPEND_STRICT, see error
 =============================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -510,13 +510,13 @@ Date: REGEX(.*)
 15. Add an attribute A2=9 with idPattern(.*) using POST /v2/op/update with APPEND_STRICT, see error
 ===================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -543,13 +543,13 @@ Date: REGEX(.*)
 17. Add an attribute A2=9 with idPattern(E.*) using POST /v2/op/update with APPEND_STRICT, see error
 ====================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 

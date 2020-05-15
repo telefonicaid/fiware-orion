@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-V2 batch update UPDATE with idPattern
+V2 batch update UPDATE with idPattern (UPDATE)
 
 --SHELL-INIT--
 dbInit CB
@@ -213,13 +213,13 @@ Date: REGEX(.*)
 03. Modify A1=3, with idPattern(.*) using POST /v2/op/update with UPDATE, see error
 ===================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -251,13 +251,13 @@ Date: REGEX(.*)
 05. Modify A1=4, with idPattern(E.*) using POST /v2/op/update with UPDATE, see error
 ====================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -289,13 +289,13 @@ Date: REGEX(.*)
 07. Try to UPDATE non-existing attribute A3, with idPattern(.*), see error
 ==========================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -327,13 +327,13 @@ Date: REGEX(.*)
 09. Try to UPDATE non-existing attribute A3, with idPattern(E.*), see error
 ===========================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 

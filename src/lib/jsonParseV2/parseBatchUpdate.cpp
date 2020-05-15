@@ -46,6 +46,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 {
   rapidjson::Document  document;
   OrionError           oe;
+  bool                 idPatternAllowed;
 
   document.Parse(ciP->payload);
 
@@ -84,15 +85,22 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
     return oe.toJson();
   }
-  else if (!document.HasMember("actionType"))
-  {
-    std::string  details = "Invalid JSON payload, mandatory field /actionType/ not found";
+  else 
+  {    
+    if (!document.HasMember("actionType"))
+    {
+      std::string  details = "Invalid JSON payload, mandatory field /actionType/ not found";
 
-    alarmMgr.badInput(clientIp, details);
-    oe.fill(SccBadRequest, details, "BadRequest");
-    ciP->httpStatusCode = SccBadRequest;
-
-    return oe.toJson();
+      alarmMgr.badInput(clientIp, details);
+      oe.fill(SccBadRequest, details, "BadRequest");
+      ciP->httpStatusCode = SccBadRequest;
+      idPatternAllowed = false;
+      return oe.toJson();
+    }
+    else
+    {
+      idPatternAllowed = true;
+    }
   }
 
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
@@ -102,9 +110,9 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     if (name == "entities")
     {
       // param 4 for parseEntityVector(): attributes are allowed in payload
-      std::string r = parseEntityVector(ciP, iter, &burP->entities, true);
+      std::string r = parseEntityVector(ciP, iter, &burP->entities, idPatternAllowed, true);
 
-      if (r == "Unsupported idPattern")
+      if (r == "NotImplemented")
       {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccNotImplemented, r, "NotImplemented");

@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -148,13 +148,13 @@ Date: REGEX(.*)
 03. Modify E1 to have an attribute A2=2 with idPattern(.*) using POST /v2/op/update with REPLACE, see error
 ===========================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 
@@ -181,13 +181,13 @@ Date: REGEX(.*)
 05. Modify E1 to have an attribute A2=3 with idPattern(E.*) using POST /v2/op/update with REPLACE, see error
 ============================================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
+Content-Length: 57
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Unsupported idPattern",
+    "description": "NotImplemented",
     "error": "NotImplemented"
 }
 

@@ -72,7 +72,7 @@ static bool parseContextElementResponse
   std::string     r;
   Entity          entity;
 
-  if ((r = parseEntityObject(ciP, iter, &entity, true)) != "OK")
+  if ((r = parseEntityObject(ciP, iter, &entity, false, true)) != "OK")
   {
     oeP->fill(SccBadRequest, r);
     return false;

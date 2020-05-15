@@ -47,13 +47,11 @@ std::string parseEntityObject
   ConnectionInfo*                        ciP,
   rapidjson::Value::ConstValueIterator&  valueP,
   Entity*                                eP,
+  bool                                   idPatternAllowed,
   bool                                   attrsAllowed
 )
 {
   std::string type  = jsonParseTypeNames[valueP->GetType()];
-
-  rapidjson::Document  document;
-  document.Parse(ciP->payload);
 
   if (type != "Object")
   {
@@ -91,9 +89,9 @@ std::string parseEntityObject
     }
     else if (name == "idPattern")
     {
-      if(document.HasMember("actionType"))
+      if (idPatternAllowed == true)
       {
-        return ERROR_DESC_IDPATTERN_NOTSUPPORTED;
+        return ERROR_NOTIMPLEMENTED;
       }
       if (type != "String")
       {
