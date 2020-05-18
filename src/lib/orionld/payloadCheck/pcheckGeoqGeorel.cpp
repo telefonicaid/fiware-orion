@@ -63,8 +63,6 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProble
 
   char* georel = georelP->value.s;
 
-  LM_TMP(("GEO: georel: %s", georel));
-
   //
   // Valid values for georel:
   // * near        - Point only             OK   Point queried to match Points in DB that are close enough

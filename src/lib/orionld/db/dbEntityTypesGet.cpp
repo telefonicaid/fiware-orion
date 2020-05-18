@@ -29,7 +29,6 @@ extern "C"
 #include "kjson/KjNode.h"                                         // KjNode
 #include "kjson/kjBuilder.h"                                      // kjArray
 #include "kjson/kjLookup.h"                                       // kjLookup
-#include "kjson/kjRender.h"                                       // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                        // LM_*

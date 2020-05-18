@@ -27,7 +27,6 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                             // KjNode
-#include "kjson/kjRender.h"                                           // kjRender - TMP
 #include "kjson/kjBuilder.h"                                          // kjArray, ...
 }
 

@@ -27,7 +27,6 @@ extern "C"
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjRender.h"                                      // kjRender
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
 }
 

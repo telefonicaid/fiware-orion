@@ -550,7 +550,7 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
     // Sort according to creDate
     query.sort("creDate", 1);
 
-    LM_TMP(("GEO: query: %s", query.toString().c_str()));  // Not Destructive
+    // LM_TMP(("GEO: query: %s", query.toString().c_str()));  // Not Destructive
     cursorP = connectionP->query(collectionPath, query, limit, offset);
 
     try

@@ -30,7 +30,6 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
-#include "kjson/kjRender.h"                                      // kjRender
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjClone.h"                                       // kjClone
 #include "kalloc/kaAlloc.h"                                      // kaAlloc

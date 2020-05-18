@@ -55,7 +55,6 @@ bool mongoCppLegacyGeoIndexCreate(const char* tenant, const char* attrLongName)
 
   dotForEq(attrNameCopy);
   snprintf(index, len, "attrs.%s.value", attrNameCopy);
-  LM_TMP(("GEO: Creating Geo-index on %s (tenant '%s')", index, tenant));
 
   char collectionPath[256];
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");

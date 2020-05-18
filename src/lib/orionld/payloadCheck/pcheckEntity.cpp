@@ -29,7 +29,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "common/globals.h"                                      // parse8601Time

@@ -30,7 +30,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjObject, kjArray, ...
-#include "kjson/kjRender.h"                                      // kjRender
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
@@ -270,12 +269,6 @@ bool orionldPostQuery(ConnectionInfo* ciP)
 
     return false;
   }
-
-  // <DEBUG>
-  char buf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
-  LM_TMP(("GEO: incoming payload data: %s", buf));
-  // </DEBUG>
 
   KjNode*  entitiesP = NULL;
   KjNode*  attrsP    = NULL;

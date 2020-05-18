@@ -31,7 +31,6 @@
 extern "C"
 {
 #include "kalloc/kaStrdup.h"                                   // kaStrdup
-#include "kjson/kjRender.h"                                    // kjRender
 #include "kjson/kjLookup.h"                                    // kjLookup
 }
 

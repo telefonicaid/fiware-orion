@@ -26,7 +26,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, kjString, kjBoolean, ...
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
