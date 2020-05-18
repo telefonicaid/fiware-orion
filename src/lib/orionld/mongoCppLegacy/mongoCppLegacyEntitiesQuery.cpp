@@ -494,7 +494,7 @@ static void geoqFilter(mongo::BSONObjBuilder* queryBuilderP, KjNode* geoqP)
 //
 // mongoCppLegacyEntitiesQuery -
 //
-KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP)
+KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP)
 {
   char                   collectionPath[256];
   mongo::BSONObjBuilder  queryBuilder;
@@ -523,33 +523,56 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(queryBuilder.obj());
 
-  // Sort according to creDate
-  query.sort("creDate", 1);
-
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "entities");
 
-  LM_TMP(("GEO: query: %s", query.toString().c_str()));  // Not Destructive
-  cursorP = connectionP->query(collectionPath, query);
-
-  try
+  //
+  // Count asked for ?
+  //
+  if (countP != NULL)
   {
-    while (cursorP->more())
+    try
     {
-      mongo::BSONObj  bsonObj = cursorP->nextSafe();
-      char*           title;
-      char*           details;
-      KjNode*         entityP;
-
-      entityP = dbDataToKjTree(&bsonObj, &title, &details);
-      if (entityP == NULL)
-        LM_E(("dbDataToKjTree: %s: %s", title, details));
-
-      kjChildAdd(kjTree, entityP);
+      *countP = connectionP->count(collectionPath, query);
+    }
+    catch (const std::exception &e)
+    {
+      LM_E(("Database Error (asking for the number of hits: %s)", e.what()));
+      kjTree = NULL;
+      limit = 0;  // Just to avoid performing the query
     }
   }
-  catch (const std::exception &e)
+
+  //
+  // Performing the Query to the database
+  //
+  if (limit != 0)
   {
-    LM_E(("Database Error (%s)", e.what()));
+    // Sort according to creDate
+    query.sort("creDate", 1);
+
+    LM_TMP(("GEO: query: %s", query.toString().c_str()));  // Not Destructive
+    cursorP = connectionP->query(collectionPath, query, limit, offset);
+
+    try
+    {
+      while (cursorP->more())
+      {
+        mongo::BSONObj  bsonObj = cursorP->nextSafe();
+        char*           title;
+        char*           details;
+        KjNode*         entityP;
+
+        entityP = dbDataToKjTree(&bsonObj, &title, &details);
+        if (entityP == NULL)
+          LM_E(("dbDataToKjTree: %s: %s", title, details));
+
+        kjChildAdd(kjTree, entityP);
+      }
+    }
+    catch (const std::exception &e)
+    {
+      LM_E(("Database Error (%s)", e.what()));
+    }
   }
 
   releaseMongoConnection(connectionP);

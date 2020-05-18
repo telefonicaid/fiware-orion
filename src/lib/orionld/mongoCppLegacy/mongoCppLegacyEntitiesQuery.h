@@ -39,6 +39,6 @@ extern "C"
 //
 // mongoCppLegacyEntitiesQuery -
 //
-extern KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP);
+extern KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITIESQUERY_H_

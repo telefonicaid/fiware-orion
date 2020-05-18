@@ -85,7 +85,7 @@ typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbR
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
 typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
 typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
-typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP);
+typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
 
 
 

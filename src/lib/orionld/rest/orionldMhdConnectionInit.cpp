@@ -242,9 +242,37 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
     orionldState.uriParams.attrs = (char*) value;
   else if (SCOMPARE7(key, 'o', 'f', 'f', 's', 'e', 't', 0))
+  {
+    if (value[0] == '-')
+    {
+      LM_W(("Bad Input (negative value for /offset/ URI param)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /offset/", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
     orionldState.uriParams.offset = atoi(value);
+  }
   else if (SCOMPARE6(key, 'l', 'i', 'm', 'i', 't', 0))
+  {
+    if (value[0] == '-')
+    {
+      LM_W(("Bad Input (negative value for /limit/ URI param)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
     orionldState.uriParams.limit = atoi(value);
+
+    if (orionldState.uriParams.limit > 1000)
+    {
+      LM_W(("Bad Input (too big value for /limit/ URI param: %d - max allowed is 1000)", orionldState.uriParams.limit));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/ (valid range: 0-1000)", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+  }
   else if (SCOMPARE8(key, 'o', 'p', 't', 'i', 'o', 'n', 's', 0))
   {
     orionldState.uriParams.options = (char*) value;

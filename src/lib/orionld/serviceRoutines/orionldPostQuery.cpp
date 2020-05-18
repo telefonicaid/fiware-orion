@@ -38,6 +38,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
@@ -285,16 +286,23 @@ bool orionldPostQuery(ConnectionInfo* ciP)
   if (pcheckQuery(orionldState.requestTree, &entitiesP, &attrsP, &qTree, &geoqP) == false)
     return false;
 
-  // <DEBUG>
-  kjRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
-  LM_TMP(("GEO: incoming payload data (after calling pcheckQuery): %s", buf));
-  // </DEBUG>
+  int      count;
+  int      limit  = orionldState.uriParams.limit;
+  int      offset = orionldState.uriParams.offset;
+  int*     countP = (orionldState.uriParams.count == true)? &count : NULL;
+  KjNode*  dbEntityArray;
 
-  KjNode* dbEntityArray;
-  if ((dbEntityArray = dbEntitiesQuery(entitiesP, attrsP, qTree, geoqP)) == NULL)
+  if ((dbEntityArray = dbEntitiesQuery(entitiesP, attrsP, qTree, geoqP, limit, offset, countP)) == NULL)
   {
     // Not an error - just "nothing found" - return an empty array
     orionldState.responsePayload = (char*) "[]";
+    if (countP != NULL)
+    {
+      char number[16];
+
+      snprintf(number, sizeof(number), "%d", count);
+      httpHeaderAdd(ciP, "NGSILD-Count", number);
+    }
     return true;
   }
 
@@ -324,6 +332,15 @@ bool orionldPostQuery(ConnectionInfo* ciP)
     orionldState.noLinkHeader = true;
 
   orionldState.httpStatusCode = 200;
+
+  if (countP != NULL)
+  {
+    char number[16];
+
+    snprintf(number, sizeof(number), "%d", count);
+    httpHeaderAdd(ciP, "NGSILD-Count", number);
+  }
+
   return true;
 }
 
