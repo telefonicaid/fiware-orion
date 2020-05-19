@@ -85,8 +85,8 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
     return oe.toJson();
   }
-  else 
-  {    
+  else
+  {
     if (!document.HasMember("actionType"))
     {
       std::string  details = "Invalid JSON payload, mandatory field /actionType/ not found";
