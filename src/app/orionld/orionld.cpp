@@ -109,6 +109,7 @@ extern "C"
 #include "logSummary/logSummary.h"
 
 #include "orionld/common/orionldState.h"                    // orionldStateRelease, kalloc, ...
+#include "orionld/common/branchName.h"                      // ORIONLD_BRANCH
 #include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
@@ -794,6 +795,10 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 
 
 
+// -----------------------------------------------------------------------------
+//
+// versionInfo -
+//
 static void versionInfo(void)
 {
   LM_K(("Version Info:"));
@@ -801,6 +806,7 @@ static void versionInfo(void)
   LM_K(("orionld version:    %s", orionldVersion));
   LM_K(("based on orion:     %s", ORION_VERSION));
   LM_K(("git hash:           %s", GIT_HASH));
+  LM_K(("build branch:       %s", ORIONLD_BRANCH));
   LM_K(("compiled by:        %s", COMPILED_BY));
   LM_K(("compiled in:        %s", COMPILED_IN));
   LM_K(("-----------------------------------------"));

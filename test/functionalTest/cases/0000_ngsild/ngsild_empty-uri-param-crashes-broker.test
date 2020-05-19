@@ -57,7 +57,7 @@ echo
 
 echo "02. Query the property P100 giving an empty coords URI param, make sure the broker doesn't crash - see error"
 echo "============================================================================================================"
-orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=\[52.5162,13.3777\]&geometry=point&coords=&type=Building&options=keyValues'
+orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=&geometry=Point&coords=&georel=near;maxDistance==10&type=Building&options=keyValues'
 echo
 echo
 
@@ -82,13 +82,13 @@ Date: REGEX(.*)
 02. Query the property P100 giving an empty coords URI param, make sure the broker doesn't crash - see error
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
+Content-Length: 156
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geometry with coordinates but without georel",
-    "title": "no georel",
+    "detail": "geometry, georel, and coordinates must all be present",
+    "title": "Incomplete geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -299,13 +299,13 @@ Date: REGEX(.*)
 07. 3 coords in a point - see error
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid query: invalid point in URI param /coords/",
+    "description": "Invalid query: invalid coordinates for point",
     "error": "BadRequest"
 }
 
@@ -313,13 +313,13 @@ Date: REGEX(.*)
 08. invalid point in coords - see error
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
+Content-Length: 83
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Invalid query: invalid point in URI param /coords/",
+    "description": "Invalid query: invalid coordinates for point",
     "error": "BadRequest"
 }
 

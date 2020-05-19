@@ -101,8 +101,8 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
-    "title": "too broad query",
+    "detail": "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter",
+    "title": "Too broad query",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

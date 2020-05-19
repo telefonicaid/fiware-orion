@@ -287,7 +287,7 @@ echo
 
 echo "20. GET all entities with a 'location' GeoProperty near a Point, using GET"
 echo "=========================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?geometry=point&coordinates=\[12,10\]&georel=near;maxDistance==100000'
+orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=\[12,10\]&georel=near;maxDistance==100000'
 echo
 echo
 
@@ -309,7 +309,7 @@ echo
 
 echo "22. GET all entities with a 'geoPoint2' GeoProperty near a Point, using GET"
 echo "==========================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?geometry=point&coordinates=\[12,10\]&georel=near;maxDistance==100000&geoproperty=geoPoint2'
+orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=\[12,10\]&georel=near;maxDistance==100000&geoproperty=geoPoint2'
 echo
 echo
 
