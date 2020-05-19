@@ -794,6 +794,20 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 
 
 
+static void versionInfo(void)
+{
+  LM_K(("Version Info:"));
+  LM_K(("-----------------------------------------"));
+  LM_K(("orionld version:    %s", orionldVersion));
+  LM_K(("based on orion:     %s", ORION_VERSION));
+  LM_K(("git hash:           %s", GIT_HASH));
+  LM_K(("compiled by:        %s", COMPILED_BY));
+  LM_K(("compiled in:        %s", COMPILED_IN));
+  LM_K(("-----------------------------------------"));
+}
+
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -946,7 +960,10 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+
   LM_I(("Orion Context Broker is running"));
+
+  versionInfo();
 
   if (fg == false)
   {
@@ -1107,7 +1124,7 @@ int main(int argC, char* argV[])
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_TMP(("Initialization ready - accepting requests on port %d", port));
+  LM_K(("Initialization ready - accepting requests on port %d", port));
 
   while (1)
   {

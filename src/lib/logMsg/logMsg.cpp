@@ -1078,7 +1078,7 @@ const char* longTypeName(char type)
   case '4':  return "DEBUG";
   case '5':  return "DEBUG";
   case 'M':  return "DEBUG";
-  case 'F':  return "DEBUG";
+  case 'F':  return "TMP";
   case 'I':  return "INFO";
   case 'S':  return "SUMMARY";
   case 'K':  return "TMP";
