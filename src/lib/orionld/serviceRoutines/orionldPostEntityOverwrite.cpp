@@ -630,14 +630,8 @@ static bool subscriptionMatchCallback
   else
     niP->mimeType = JSON;
 
-  if (allAttributesInNotification == true)
-  {
-    //
-    // ALL attributes ... simply clone the incoming request - LEAK
-    // FIXME: kjClone(&orionldState.kalloc, incomingRequestTree)
-    //
-    niP->attrsForNotification = kjClone(incomingRequestTree);
-  }
+  if (allAttributesInNotification == true)  // ALL attributes ... simply clone the incoming request
+    niP->attrsForNotification = kjClone(orionldState.kjsonP, incomingRequestTree);
   else
   {
     niP->attrsForNotification = kjObject(orionldState.kjsonP, NULL);  // Invent other Kjson-pointer - this one dies when request ends
@@ -685,7 +679,7 @@ static bool subscriptionMatchCallback
         }
       }
 
-      KjNode* aP = kjClone(reqAttrP);
+      KjNode* aP = kjClone(orionldState.kjsonP, reqAttrP);
 
       kjChildAdd(niP->attrsForNotification, aP);
     }
@@ -763,7 +757,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // After looking up longnames for entity-type and attribute names, and making the KjNode::name point to strings in the context cache,
   // we will need to clone the tree, so that we don't destroy the cache when changing '.' for '='
   //
-  KjNode* requestTree = orionldState.requestTree;  // kjClone(&orionldState.kalloc, orionldState.requestTree) ?
+  KjNode* requestTree = orionldState.requestTree;  // kjClone?
 
   // Expand attribute names
   if (expandAttrNames(requestTree, &details) == false)

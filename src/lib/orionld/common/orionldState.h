@@ -202,12 +202,14 @@ typedef struct OrionldConnectionState
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;    // Used by kjTreeFromBsonObj
 
+#if 0
   //
   // Array of KjNode trees that are to freed when the request thread ends
   //
-  KjNode*                 delayedKjFreeVec[1001];
+  KjNode*                 delayedKjFreeVec[50];
   int                     delayedKjFreeVecIndex;
   int                     delayedKjFreeVecSize;
+#endif
 
   //
   // Array of allocated buffers that are to freed when the request thread ends

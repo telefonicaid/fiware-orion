@@ -1,2 +1,3 @@
 * Issue #XXX  Better error handling for geo location
 * Issue #XXX  Version Info printed to stdout (and log-file) at startup
+* Issue #XXX  Fixed the "1001 bug" - a delayed free problem solved by making kjClone() not use always malloc, with an option to use KAlloc

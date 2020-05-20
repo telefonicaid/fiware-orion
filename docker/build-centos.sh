@@ -120,7 +120,7 @@ done
 for kproj in kbase klog kalloc kjson khash
 do
     cd ${ROOT}/$kproj
-    git checkout release/0.4
+    git checkout release/0.5
     make
     make install
 done

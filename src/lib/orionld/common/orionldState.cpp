@@ -124,9 +124,10 @@ void orionldStateInit(void)
   orionldState.contextP                = orionldCoreContextP;
   orionldState.prettyPrintSpaces       = 2;
   orionldState.forwardAttrsCompacted   = true;
-  orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
   orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
   orionldState.uriParams.limit         = 20;
+
+  // orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
 }
 
 
@@ -143,6 +144,7 @@ void orionldStateRelease(void)
     orionldState.errorAttributeArrayP = NULL;
   }
 
+#if 0
   //
   // This was added to fix a leak in contextToPayload(), orionldMhdConnectionTreat.cpp, calling kjClone(). a number of times
   // It happens for responses to GET that contain more than one item in the entity array.
@@ -156,7 +158,7 @@ void orionldStateRelease(void)
       orionldState.delayedKjFreeVec[ix] = NULL;
     }
   }
-
+#endif
 
   //
   // Not only KjNode trees may need delayed calls to free - normal allocated buffers may need it as well
@@ -235,12 +237,12 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
 }
 
 
-
+#if 0
 // -----------------------------------------------------------------------------
 //
 // orionldStateDelayedKjFreeEnqueue -
 //
-void orionldStateDelayedKjFreeEnqueue(KjNode* tree)
+void orionldStateDelayedKjFreeEnqueue(KjNode* tree)  // Outdeffed
 {
   if (orionldState.delayedKjFreeVecIndex >= orionldState.delayedKjFreeVecSize - 1)
     LM_X(1, ("Internal Error (the size of orionldState.delayedKjFreeVec needs to be augmented (current value: %d))", orionldState.delayedKjFreeVecSize));
@@ -248,6 +250,7 @@ void orionldStateDelayedKjFreeEnqueue(KjNode* tree)
   orionldState.delayedKjFreeVec[orionldState.delayedKjFreeVecIndex] = tree;
   ++orionldState.delayedKjFreeVecIndex;
 }
+#endif
 
 
 

@@ -573,7 +573,7 @@ static void contextToPayload(void)
   //
   if (orionldState.responseTree->type == KjObject)
   {
-    orionldState.payloadContextNode->next = orionldState.responseTree->value.firstChildP;
+    orionldState.payloadContextNode->next        = orionldState.responseTree->value.firstChildP;
     orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
   }
   else if (orionldState.responseTree->type == KjArray)
@@ -590,11 +590,7 @@ static void contextToPayload(void)
           contextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
       }
       else
-      {
-        contextNode = kjClone(orionldState.payloadContextNode);
-
-        orionldStateDelayedKjFreeEnqueue(contextNode);
-      }
+        contextNode = kjClone(orionldState.kjsonP, orionldState.payloadContextNode);
 
       if (contextNode == NULL)
       {
