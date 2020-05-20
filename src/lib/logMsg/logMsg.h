@@ -532,16 +532,16 @@ do                                                                        \
 *
 * LM_K - log message
 */
-#define LM_K(s)                                                        \
-do                                                                     \
-{                                                                      \
-  char* text;                                                          \
-                                                                       \
-  if ((text = lmTextGet s) != NULL)                                    \
-  {                                                                    \
-    lmOut(text, 'K', "Info", 0, "***", 0, NULL);                       \
-    ::free(text);                                                      \
-  }                                                                    \
+#define LM_K(s)                                                            \
+do                                                                         \
+{                                                                          \
+  char* text;                                                              \
+                                                                           \
+  if ((text = lmTextGet s) != NULL)                                        \
+  {                                                                        \
+    lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);   \
+    ::free(text);                                                          \
+  }                                                                        \
 } while (0)
 #endif
 

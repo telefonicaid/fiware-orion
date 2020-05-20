@@ -334,10 +334,10 @@ int orionldMhdConnectionInit
   ++requestNo;
 
   //
-  // This call to LM_TMP should not be removed.
+  // This call to LM_K should not be removed.
   // At most, commented out
   //
-  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
+  LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
 
   //
   // 1. Prepare connectionInfo

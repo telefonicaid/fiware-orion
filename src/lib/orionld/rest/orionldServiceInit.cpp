@@ -114,7 +114,7 @@ static void libLogFunction
   vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
   va_end(args);
 
-  // LM_TMP(("Got a message, severity: %d: %s", severity, libLogBuffer));
+  // LM_K(("Got a lib log message, severity: %d: %s", severity, libLogBuffer));
 
   if (severity == 1)
     lmOut(libLogBuffer, 'E', fileName, lineNo, functionName, 0, NULL);

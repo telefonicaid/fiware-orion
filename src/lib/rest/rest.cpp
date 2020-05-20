@@ -1373,7 +1373,7 @@ ConnectionInfo* connectionTreatInit
   ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
 
-  // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
+  // LM_K(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
 
   ciP->transactionStart.tv_sec  = transactionStart.tv_sec;
   ciP->transactionStart.tv_usec = transactionStart.tv_usec;
