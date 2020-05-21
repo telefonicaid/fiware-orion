@@ -28,6 +28,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -66,6 +67,7 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
+#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"      // kjEntityIdLookupInEntityArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
 
@@ -75,11 +77,17 @@ extern "C"
 //
 // entityIdPush - add ID to array
 //
-static void entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
+static KjNode* entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
 {
-  KjNode* idNodeP = kjString(orionldState.kjsonP, NULL, entityId);
+  KjNode* idNodeP = kjStringValueLookupInArray(entityIdsArrayP, entityId);
 
+  if (idNodeP != NULL)  // The Entity with ID "entityId" is already present ...
+    return NULL;
+
+  idNodeP = kjString(orionldState.kjsonP, NULL, entityId);
   kjChildAdd(entityIdsArrayP, idNodeP);
+
+  return idNodeP;
 }
 
 
@@ -138,7 +146,7 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostEntityOperationsUpsert -
+// orionldPostBatchUpsert -
 //
 // POST /ngsi-ld/v1/entityOperations/upsert
 //
@@ -255,7 +263,24 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       kjChildRemove(incomingTree, entityP);
     }
     else
-      entityIdPush(idArray, entityId);
+    {
+      if (entityIdPush(idArray, entityId) == NULL)  // NULL means the Entity ID was a duplicate
+      {
+        // Look up the previous entity and remove it from the tree
+        KjNode* eP = kjEntityIdLookupInEntityArray(incomingTree, entityId);
+
+        if (eP != NULL)
+        {
+          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instance removed", 400);
+
+          //
+          // Save the entity in a KjNode array in orionldState: orionldState.batchEntityArray
+          // Pass the array to temporal module before passing the batch request
+          //
+          kjChildRemove(incomingTree, eP);
+        }
+      }
+    }
 
     entityP = next;
   }
@@ -400,13 +425,11 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
 
   //
-  // 07. Set 'modDate' as "RIGHT NOW"
+  // 07. Set 'modDate' to "RIGHT NOW"
   //
-  time_t now = time(NULL);
-
   for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.size(); ++ix)
   {
-    mongoRequest.contextElementVector[ix]->entityId.modDate = now;
+    mongoRequest.contextElementVector[ix]->entityId.modDate = orionldState.timestamp.tv_sec;
   }
 
 
@@ -481,7 +504,10 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     return false;
   }
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
+  {
     orionldState.httpStatusCode = SccMultiStatus;
+    orionldState.noLinkHeader   = true;
+  }
   else
   {
     orionldState.httpStatusCode = SccNoContent;

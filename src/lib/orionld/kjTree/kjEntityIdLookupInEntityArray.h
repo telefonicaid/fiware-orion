@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJSTRINGVALUELOOKUPINARRAY_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJSTRINGVALUELOOKUPINARRAY_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYIDLOOKUPINENTITYARRAY_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJENTITYIDLOOKUPINENTITYARRAY_H_
 
 /*
 *
@@ -34,12 +34,12 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// kjStringValueLookupInArray -
+// kjEntityIdLookupInEntityArray -
 //
 // NOTE
-//   This lookup function works on string items in an array.
-//   The caller needs to be sure that the 'stringArrayNodeP' is really an array and that ALL its items are Strings
+//   This lookup function works for Entity Arrays (batch operations)
+//   For each item in the array, a field called "id" is looked up and compared to 'value'
 //
-extern KjNode* kjStringValueLookupInArray(KjNode* stringArrayNodeP, const char* value);
+extern KjNode* kjEntityIdLookupInEntityArray(KjNode* entityArrayP, const char* value);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJSTRINGVALUELOOKUPINARRAY_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYIDLOOKUPINENTITYARRAY_H_

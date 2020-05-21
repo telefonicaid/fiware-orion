@@ -37,6 +37,7 @@ SET (SOURCES
     kjTreeToTimeInterval.cpp
     kjTreeToGeoLocation.cpp
     kjStringValueLookupInArray.cpp
+    kjEntityIdLookupInEntityArray.cpp
     kjTreeToUpdateContextRequest.cpp
     kjTreeToEntity.cpp
     kjTreeToMetadata.cpp

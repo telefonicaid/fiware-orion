@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJSTRINGVALUELOOKUPINARRAY_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJSTRINGVALUELOOKUPINARRAY_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,21 +22,44 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                                        // strcmp
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                                  // KjNode
+#include "kjson/kjLookup.h"                                                // kjLookup
 }
+
+#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"                  // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// kjStringValueLookupInArray -
+// kjEntityIdLookupInEntityArray -
 //
 // NOTE
-//   This lookup function works on string items in an array.
-//   The caller needs to be sure that the 'stringArrayNodeP' is really an array and that ALL its items are Strings
+//   This lookup function works for Entity Arrays (batch operations)
+//   For each item in the array, a field called "id" is looked up and compared to 'value'
 //
-extern KjNode* kjStringValueLookupInArray(KjNode* stringArrayNodeP, const char* value);
+KjNode* kjEntityIdLookupInEntityArray(KjNode* entityArrayP, const char* value)
+{
+  if (entityArrayP == NULL)
+    return NULL;
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJSTRINGVALUELOOKUPINARRAY_H_
+  if (entityArrayP->type != KjArray)
+    return NULL;
+
+  for (KjNode* entityP = entityArrayP->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    if (entityP->type != KjObject)
+      continue;
+
+    KjNode* idP = kjLookup(entityP, "id");
+
+    if ((idP != NULL) && (strcmp(value, idP->value.s) == 0))
+      return entityP;
+  }
+
+  return NULL;
+}
