@@ -56,5 +56,6 @@ scheduled for a release in the near future. Please feel free to contact us if
 you wish to get involved in the implementation or influence the roadmap
 
 - Migration from legacy to new MongoDB driver
+- Dynamic / high order attribute values (e.g. an attribute being a sum of two other attributes)
 - Performance improvements in the notifications system ([#3461](https://github.com/telefonicaid/fiware-orion/issues/3461))
 - Improve performance in update/notifications (connection-oriented, lightweight ingestion, etc.)
