@@ -83,7 +83,7 @@ bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* e
   {
     Entity* eP = new Entity();
 
-    std::string s = parseEntityObject(ciP, iter, eP, false, true);
+    std::string s = parseEntityObject(ciP, iter, eP, true, true);
     if (s != "OK")
     {
       oeP->fill(SccBadRequest, s);

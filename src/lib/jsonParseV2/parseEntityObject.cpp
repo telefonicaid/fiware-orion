@@ -89,7 +89,7 @@ std::string parseEntityObject
     }
     else if (name == "idPattern")
     {
-      if (idPatternAllowed == true)
+      if (idPatternAllowed == false)
       {
         return ERROR_NOTIMPLEMENTED;
       }
