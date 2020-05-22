@@ -101,7 +101,8 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
     if (name == "entities")
     {
-      // param 4 for parseEntityVector(): attributes are allowed in payload
+      // param 4 to parseEntityVector(): idPattern is not allowed in batch updates
+      // param 5 for parseEntityVector(): attributes are allowed in payload
       std::string r = parseEntityVector(ciP, iter, &burP->entities, false, true);
 
       if (r == "NotImplemented")
