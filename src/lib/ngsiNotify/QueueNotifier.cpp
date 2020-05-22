@@ -58,6 +58,17 @@ int QueueNotifier::start()
 
 /* ****************************************************************************
 *
+* QueueNotifier::queueSize -
+*/
+size_t QueueNotifier::queueSize()
+{
+  return queue.size();
+}
+
+
+
+/* ****************************************************************************
+*
 * QueueNotifier::sendNotifyContextRequest -
 */
 void QueueNotifier::sendNotifyContextRequest

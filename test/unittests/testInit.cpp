@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongo/client/dbclient.h"
 
 
@@ -62,10 +63,10 @@ void setupDatabase(void)
   /* mongoStart is needed one time to create the connection pool */
   if (mongoStarted == false)
   {
-    /* In fact, the mongoStart() parameters related with the pool, e.g. pool size, are irrelevant,
+    /* In fact, the mongoConnectionPoolInit() parameters related with the pool, e.g. pool size, are irrelevant,
      * given that the connection creation is mocked under UNIT_TEST in the mongoBackend library
      */
-    mongoStart("localhost", "", "", "", "", "", "", false, false, 0, 10);
+    mongoConnectionPoolInit("localhost", "", "", "", "", "", "", false, false, 0, 10);
     mongoStarted = true;
   }
 

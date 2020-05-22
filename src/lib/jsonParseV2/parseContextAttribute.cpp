@@ -58,6 +58,11 @@ static std::string parseContextAttributeObject
   // valueTypeNotGiven will be overridden inside the 'for' block in case the attribute has an actual value
   caP->valueType = orion::ValueTypeNull;
 
+  // It may happen in the for iterator to see the same key twice. This is a problem for "value" in the
+  // case of compounds and may lead to a crash (see details in issue #3603). Thus, we need to control
+  // explicitely value has been set with this flag
+  bool valueSet = false;
+
   for (rapidjson::Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -67,7 +72,6 @@ static std::string parseContextAttributeObject
     {
       if (type != "String")
       {
-        alarmMgr.badInput(clientIp, "ContextAttributeObject::type must be a String");
         return "invalid JSON type for attribute type";
       }
 
@@ -76,6 +80,12 @@ static std::string parseContextAttributeObject
     }
     else if (name == "value")
     {
+      if (valueSet)
+      {
+        return "duplicated value key in attribute";
+      }
+      valueSet = true;
+
       if (type == "String")
       {
         caP->stringValue  = iter->value.GetString();
@@ -116,22 +126,19 @@ static std::string parseContextAttributeObject
         //
         caP->valueType  = orion::ValueTypeVector;
         *compoundVector = true;
-        std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL);
+        std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Vector");
-          return "json error in ContextAttributeObject::Vector";
+          return r;
         }
       }
       else if (type == "Object")
       {
-        caP->valueType    = orion::ValueTypeObject;
-
-        std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+        caP->valueType  = orion::ValueTypeObject;
+        std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Object");
-          return "json error in ContextAttributeObject::Object";
+          return r;
         }
       }
     }
@@ -141,8 +148,6 @@ static std::string parseContextAttributeObject
 
       if (r != "OK")
       {
-        std::string details = std::string("error parsing Metadata: ") + r;
-        alarmMgr.badInput(clientIp, details);
         return r;
       }
     }
@@ -226,9 +231,15 @@ std::string parseContextAttribute
     {
       compoundVector  = true;
       caP->valueType  = orion::ValueTypeObject;
-      std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL);
+      std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
 
-      if (r != "OK")
+      if (r == "max deep reached")
+      {
+        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Vector");
+        ciP->httpStatusCode = SccBadRequest;
+        return "max deep reached";
+      }
+      else if (r != "OK")  // other error cases get a general treatment
       {
         alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
         ciP->httpStatusCode = SccBadRequest;
@@ -237,8 +248,21 @@ std::string parseContextAttribute
     }
     else if (type == "Object")
     {
-      parseContextAttributeCompoundValue(iter, caP, NULL);
       caP->valueType = orion::ValueTypeObject;
+      std::string r = parseContextAttributeCompoundValue(iter, caP, NULL, 0);
+
+      if (r == "max deep reached")
+      {
+        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Object");
+        ciP->httpStatusCode = SccBadRequest;
+        return "max deep reached";
+      }
+      else if (r != "OK")  // other error cases get a general treatment
+      {
+        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Object");
+        ciP->httpStatusCode = SccBadRequest;
+        return "json error in ContextAttribute::Object";
+      }
     }
     else
     {
@@ -263,7 +287,13 @@ std::string parseContextAttribute
     if (iter->value.HasMember("value") || ciP->apiVersion == V2)
     {
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
-      if (r != "OK")
+      if (r == "max deep reached")
+      {
+        alarmMgr.badInput(clientIp, "max deep reached in ContextAttributeObject::Object");
+        ciP->httpStatusCode = SccBadRequest;
+        return "max deep reached";
+      }
+      else if (r != "OK")  // other error cases get a general treatment
       {
         alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
         ciP->httpStatusCode = SccBadRequest;
@@ -330,7 +360,16 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   bool         compoundVector = false;
   std::string  r = parseContextAttributeObject(document, caP, &compoundVector);
 
-  if (r != "OK")
+  if (r == "max deep reached")
+  {
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
+
+    alarmMgr.badInput(clientIp, r);
+    ciP->httpStatusCode = SccBadRequest;
+
+    return oe.toJson();
+  }
+  else if (r != "OK")  // other error cases get a general treatment
   {
     OrionError oe(SccBadRequest, r, "BadRequest");
 

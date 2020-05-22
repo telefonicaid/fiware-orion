@@ -51,6 +51,7 @@
 #include "rest/uriParamNames.h"
 
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
@@ -1665,8 +1666,11 @@ static bool processOnChangeConditionForUpdateContext
 /* ****************************************************************************
 *
 * processSubscriptions - send a notification for each subscription in the map
+*
+* Returns the number of notifications sent as consecuence of the update (used by the
+* flow control algorithm)
 */
-static bool processSubscriptions
+static unsigned int processSubscriptions
 (
   std::map<std::string, TriggeredSubscription*>& subs,
   ContextElementResponse*                        notifyCerP,
@@ -1676,9 +1680,9 @@ static bool processSubscriptions
   const std::string&                             fiwareCorrelator
 )
 {
-  bool ret = true;
-
   *err = "";
+
+  unsigned int notifSent = 0;
 
   for (std::map<std::string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
@@ -1789,6 +1793,8 @@ static bool processSubscriptions
 
     if (notificationSent)
     {
+      notifSent++;
+
       long long rightNow = getCurrentTime();
       BSONObj query  = BSON("_id" << OID(mapSubId));
       BSONObj update;
@@ -1820,7 +1826,7 @@ static bool processSubscriptions
           update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << rightNow) <<
                         "$inc" << BSON(CSUB_COUNT << (long long) 1));
         }
-        ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+        collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
 
 
@@ -1839,7 +1845,7 @@ static bool processSubscriptions
           {
             update = BSON("$set" << BSON(CSUB_STATUS << STATUS_INACTIVE));
             // update the status to inactive as status is oneshot (in both DB and csubs cache)
-            ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+            collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
             cSubP->status = STATUS_INACTIVE;
 
             LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
@@ -1863,7 +1869,7 @@ static bool processSubscriptions
 
   releaseTriggeredSubscriptions(&subs);
 
-  return ret;
+  return notifSent;
 }
 
 
@@ -2808,8 +2814,11 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 /* ****************************************************************************
 *
 * updateEntity -
+*
+* Returns the number of notifications sent as consecuence of the update (used by the
+* flow control algorithm)
 */
-static void updateEntity
+static unsigned int updateEntity
 (
   const BSONObj&                  r,
   ActionType                      action,
@@ -2852,7 +2861,7 @@ static void updateEntity
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
     responseP->contextElementResponseVector.push_back(cerP);
-    return;
+    return 0;
   }
 
   LM_T(LmtServicePath, ("eP->attributeVector.size: %d", eP->attributeVector.size()));
@@ -2994,7 +3003,7 @@ static void updateEntity
     notifyCerP->release();
     delete notifyCerP;
 
-    return;
+    return 0;
   }
 
   /* Compose the final update on database */
@@ -3153,7 +3162,7 @@ static void updateEntity
     notifyCerP->release();
     delete notifyCerP;
 
-    return;
+    return 0;
   }
 
   /* Send notifications for each one of the subscriptions accumulated by
@@ -3161,7 +3170,12 @@ static void updateEntity
    * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
    * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
   addBuiltins(notifyCerP);
-  processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken, fiwareCorrelator);
+  unsigned int notifSent = processSubscriptions(subsToNotify,
+                                                notifyCerP,
+                                                &err,
+                                                tenant,
+                                                xauthToken,
+                                                fiwareCorrelator);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -3190,6 +3204,8 @@ static void updateEntity
   }
 
   responseP->contextElementResponseVector.push_back(cerP);
+
+  return notifSent;
 }
 
 
@@ -3289,8 +3305,11 @@ static void setActionType(ContextElementResponse* notifyCerP, std::string action
 *
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
+*
+* Returns the number of notifications sent as consecuence of the update (used by the
+* flow control algorithm)
 */
-void processContextElement
+unsigned int processContextElement
 (
   Entity*                              eP,
   UpdateContextResponse*               responseP,
@@ -3309,7 +3328,7 @@ void processContextElement
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))
   {
-    return;  // Error already in responseP
+    return 0;  // Error already in responseP
   }
 
   /* Find entities (could be several, in the case of no type or isPattern=true) */
@@ -3358,7 +3377,7 @@ void processContextElement
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
       responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
-      return;
+      return 0;
     }
 
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
@@ -3366,7 +3385,7 @@ void processContextElement
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, "Already Exists");
       responseP->oe.fill(SccInvalidModification, "Already Exists", "Unprocessable");
-      return;
+      return 0;
     }
 
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
@@ -3374,7 +3393,7 @@ void processContextElement
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
       responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
-      return;
+      return 0;
     }
 
     // Next block is to avoid that several entities with the same ID get updated at the same time, which is
@@ -3384,7 +3403,7 @@ void processContextElement
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccConflict, ERROR_DESC_TOO_MANY_ENTITIES);
       responseP->oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
-      return;
+      return 0;
     }
   }
 
@@ -3400,7 +3419,7 @@ void processContextElement
     buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
 
-    return;
+    return 0;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
@@ -3454,6 +3473,8 @@ void processContextElement
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));
 
+  unsigned int notifSent = 0;
+
   // Used to accumulate error response information, checked at the end
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
@@ -3461,19 +3482,19 @@ void processContextElement
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
   {
-    updateEntity(results[ix],
-                 action,
-                 tenant,
-                 servicePathV,
-                 xauthToken,
-                 eP,
-                 responseP,
-                 &attributeAlreadyExistsError,
-                 &attributeAlreadyExistsList,
-                 forcedUpdate,
-                 apiVersion,
-                 fiwareCorrelator,
-                 ngsiV2AttrsFormat);
+    notifSent = updateEntity(results[ix],
+                             action,
+                             tenant,
+                             servicePathV,
+                             xauthToken,
+                             eP,
+                             responseP,
+                             &attributeAlreadyExistsError,
+                             &attributeAlreadyExistsList,
+                             forcedUpdate,
+                             apiVersion,
+                             fiwareCorrelator,
+                             ngsiV2AttrsFormat);
   }
 
   /*
@@ -3576,7 +3597,7 @@ void processContextElement
           responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
 
           responseP->contextElementResponseVector.push_back(cerP);
-          return;  // Error already in responseP
+          return 0;  // Error already in responseP
         }
 
         //
@@ -3605,7 +3626,12 @@ void processContextElement
          * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
          * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
         addBuiltins(notifyCerP);
-        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);
+        notifSent = processSubscriptions(subsToNotify,
+                                         notifyCerP,
+                                         &errReason,
+                                         tenant,
+                                         xauthToken,
+                                         fiwareCorrelator);
 
         notifyCerP->release();
         delete notifyCerP;
@@ -3624,4 +3650,5 @@ void processContextElement
   }
 
   // Response in responseP
+  return notifSent;
 }

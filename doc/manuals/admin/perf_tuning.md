@@ -4,6 +4,7 @@
 * [Database indexes](#database-indexes)
 * [Write concern](#write-concern)
 * [Notification modes and performance](#notification-modes-and-performance)
+* [Updates flow control mechanism](#updates-flow-control-mechanism)
 * [Payload and message size and performance](#payload-and-message-size-and-performance)
 * [HTTP server tuning](#http-server-tuning)
 * [Orion thread model and its implications](#orion-thread-model-and-its-implications)
@@ -119,6 +120,60 @@ to 10, although it could be more or less depending on the expected update burst 
 on [the `notifQueue` block](statistics.md#notifqueue-block) may help you to tune.
 
 ![](notif_queue.png "notif_queue.png")
+
+[Top](#top)
+
+## Updates flow control mechanism
+
+Orion implements a flow control mechanism that allow to slow-down the updates flow sent by a client.
+Using flow control, Orion does not respond immediately to update request, but when the notifications
+triggered by the update has been sent (totally or partially, depending on the flow control
+configuration). This way, we avoid Orion saturation due to too much accumulated notifications
+in the notification queue (which, at the end, causes notifications being discarded when the queue
+is full).
+
+Flow control mechanism is configured using `-notifFlowControl` which takes three parameters:
+`-notifFlowControl gauge:stepDelay:maxInterval` (which meaning and utilization is explained below).
+It requires threadpool notification mode (i.e. `-notificationMode` has to be `threadpool).
+
+Flow control is applied to updates that use the `flowControl` option (for instance,
+`POST /v2/op/update?options=flowControl`. In that case, Orion does not respond immediately
+to the update and applies a flow control mechanism, which works as follows:
+
+1. A target queue size is calculated. This calculation is based in the following formula:
+   `target = q0 + (1 - gauge) * notifSent`, where: `q0` is the size of the notification queue
+   before starting to process the update, `gauge` is a value from 0 to 1 defined globally for
+   Orion at startup time and `notifSent` are the notifications triggered by the update and
+   added to the notification queue. Note these special cases:
+     * If gauge is 1 (aggressive flow control), then `target = q0`. That is, the target
+       is that queue gets the same size it has before starting to process the update. This is the
+       recommended configuration for gauge.
+     * If gauge is 0 (permissive flow control), then `target = q0 + notifSent`. That is, the
+       target is that queue has the same size it has before starting to process the update. If
+       no concurrent updates occur, this means that flow control mechanism has reached the
+       target even before starting.
+2. Flow control is done in several passes. In each pass, the current notification queue (which
+   increases due to concurrent updates and decreases due to threadpool workers sending notifications)
+   is evaluated, so
+     * If current notification queue is equal or less than target, then flow control mechanism
+       returns control and the update response is finally sent
+     * If current notification queue is greater than target, then the flow control mechanism waits
+       for a while (`stepDelay` parameter) and does a new pass.
+3. In order not waiting too much (which eventually could cause a timeout connection close by the
+   client) we have the `maxInterval` parameter. This specifies and absolute waiting time for clients so,
+   if `maxInternval` time is reached in a given pass, flow control mechanism returns control, no
+   matter if the target was reached or not.
+
+Flow control is especially interesting in these two cases:
+
+* Batch updates (`POST /v2/update`), as they may include several individual entities updates, each one
+  involving potentially several notifications.
+* Updates (no matter if batch or regular) on entities with a 1:N subscriptions relationship
+  (N subscriptions on the same entity), as a single update causes several notifications.
+  Especially when N is large.
+
+A detailed example of flow control in operation can be found in
+[this document](https://github.com/telefonicaid/fiware-orion/blob/master/test/flowControlTest/README.md).
 
 [Top](#top)
 

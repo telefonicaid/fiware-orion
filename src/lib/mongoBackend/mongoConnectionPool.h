@@ -52,28 +52,13 @@ extern int mongoConnectionPoolInit
   const char* passwd,
   const char* mechanism,
   const char* authDb,
+  bool        dbSSL,
   bool        multitenant,
   double      timeout,
-  int         writeConcern,
-  int         poolSize,
-  bool        semTimeStat
+  int         writeConcern = 1,
+  int         poolSize = 10,
+  bool        semTimeStat = false
 );
-
-
-
-/* ****************************************************************************
-*
-* mongoPoolConnectionGet - 
-*/
-extern mongo::DBClientBase* mongoPoolConnectionGet(void);
-
-
-
-/* ****************************************************************************
-*
-* mongoPoolConnectionRelease - 
-*/
-extern void mongoPoolConnectionRelease(mongo::DBClientBase* connection);
 
 
 
@@ -106,5 +91,32 @@ extern const char* mongoConnectionPoolSemGet(void);
 * mongoConnectionSemGet - 
 */
 extern const char* mongoConnectionSemGet(void);
+
+
+
+// Higher level functions (previously in MongoGlobal)
+
+#ifdef UNIT_TEST
+extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
+#endif
+
+
+/* ****************************************************************************
+*
+* getMongoConnection -
+*
+* I would prefer to have per-collection methods, to have a better encapsulation, but
+* the Mongo C++ API seems not to work that way
+*/
+extern mongo::DBClientBase* getMongoConnection(void);
+
+
+
+/* ****************************************************************************
+*
+* releaseMongoConnection -
+*/
+extern void releaseMongoConnection(mongo::DBClientBase* connection);
+
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_

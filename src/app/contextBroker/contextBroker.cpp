@@ -156,6 +156,7 @@ int             writeConcern;
 unsigned int    cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
+char            notifFlowControl[64];
 int             notificationQueueSize;
 int             notificationThreadNum;
 bool            noCache;
@@ -176,6 +177,11 @@ bool            disableMetrics;
 int             reqTimeout;
 bool            insecureNotif;
 bool            ngsiv1Autocast;
+
+bool            fcEnabled;
+double          fcGauge;
+unsigned long   fcStepDelay;
+unsigned long   fcMaxInterval;
 
 
 
@@ -218,6 +224,7 @@ bool            ngsiv1Autocast;
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
+#define FLOW_CONTROL_DESC      "notification flow control parameters (gauge:stepDelay:maxInterval)"
 #define NO_CACHE               "disable subscription cache for lookups"
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
@@ -298,8 +305,9 @@ PaArgument paArgs[] =
   { "-inReqPayloadMaxSize",  &inReqPayloadMaxSize, "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE,   0, PaNL,  IN_REQ_PAYLOAD_MAX_SIZE_DESC   },
   { "-outReqMsgMaxSize",     &outReqMsgMaxSize,    "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,      0, PaNL,  OUT_REQ_MSG_MAX_SIZE_DESC      },
 
-  { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
-  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
+  { "-notificationMode",      &notificationMode,      "NOTIF_MODE",         PaString, PaOpt, _i     "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
+  { "-notifFlowControl",      &notifFlowControl,      "NOTIF_FLOW_CONTROL", PaString, PaOpt, _i     "",          PaNL,  PaNL, FLOW_CONTROL_DESC },
+  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF",         PaBool,   PaOpt, false, false,       true, SIMULATED_NOTIF_DESC   },
 
   { "-statCounters",   &statCounters,   "STAT_COUNTERS",    PaBool, PaOpt, false, false, true, STAT_COUNTERS     },
   { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
@@ -737,6 +745,69 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 
 
 
+/* ****************************************************************************
+*
+* notifFlowControlParse -
+*/
+static void notifFlowControlParse
+(
+  char*           notifFlowControl,
+  double*         fcGaugeP,
+  unsigned long*  fcStepDelayP,
+  unsigned long*  fcMaxIntervalP
+)
+{
+  std::stringstream ss(notifFlowControl);
+  std::vector<std::string> tokens;
+  while(ss.good())
+  {
+    std::string substr;
+    getline(ss, substr, ':');
+    tokens.push_back(substr);
+  }
+
+  if (tokens.size() != 3)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: more tokens than expected (%d)", tokens.size()));
+  }
+
+  std::string error = "";
+  *fcGaugeP = atoF(tokens[0].c_str(), &error);
+  if (error != "")
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: error parsing gauge '%s': %s",
+             tokens[0].c_str(), error.c_str()));
+  }
+  if (*fcGaugeP > 1 || *fcGaugeP < 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: gauge must be between 0 and 1 and is %f", *fcGaugeP));
+  }
+
+  *fcStepDelayP = atoUL(tokens[1].c_str(), &error);
+  if (error != "")
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: error parsing stepDelay '%s': %s",
+             tokens[1].c_str(), error.c_str()));
+  }
+  if (*fcStepDelayP == 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: stepDelay must be strictly greater than 0", *fcStepDelayP));
+  }
+
+  *fcMaxIntervalP = atoUL(tokens[2].c_str(), &error);
+  if (error != "")
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: error parsing maxInterval '%s': %s",
+             tokens[2].c_str(), error.c_str()));
+  }
+  if (*fcMaxIntervalP == 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification flow control: maxInterval must be strictly greater than 0", *fcMaxIntervalP));
+  }
+}
+
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -880,6 +951,24 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+
+  if ((strcmp(notifFlowControl, "") != 0) && (strcmp(notificationMode, "threadpool") != 0))
+  {
+      LM_X(1, ("Fatal Error ('-notifFlowControl' must be used in combination with threadpool notification mode)"));
+  }
+
+  if (strcmp(notifFlowControl, "") != 0)
+  {
+    fcEnabled = true;
+    notifFlowControlParse(notifFlowControl, &fcGauge, &fcStepDelay, &fcMaxInterval);
+    LM_T(LmtNotifier, ("notification flow control: enabled - gauge: %f, stepDelay: %d, maxInterval: %d", fcGauge, fcStepDelay, fcMaxInterval));
+  }
+  else
+  {
+    fcEnabled = false;
+    LM_T(LmtNotifier, ("notification flow control: disabled"));
+  }
+
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)

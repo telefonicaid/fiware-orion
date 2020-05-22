@@ -80,6 +80,7 @@
 #define DEFAULT_ATTR_ARRAY_TYPE   "StructuredValue"
 #define DEFAULT_ATTR_OBJECT_TYPE  "StructuredValue"
 #define DEFAULT_ATTR_NULL_TYPE    "None"
+#define TEXT_UNRESTRICTED_TYPE    "TextUnrestricted"
 #define DATE_TYPE                 "DateTime"
 #define DATE_TYPE_ALT             "ISO8601"
 #define NUMBER_TYPE_ALT           "Quantity"
@@ -113,6 +114,7 @@
 * Values for the URI param 'options'
 */
 #define OPT_COUNT                       "count"
+#define OPT_FLOW_CONTROL                "flowControl"
 #define OPT_APPEND                      "append"
 #define OPT_NORMALIZED                  "normalized"
 #define OPT_VALUES                      "values"
@@ -206,6 +208,7 @@ extern int                statisticsTime;
 extern OrionExitFunction  orionExitFunction;
 extern unsigned           cprForwardLimit;
 extern char               notificationMode[];
+extern char               notifFlowControl[];
 extern bool               noCache;
 extern bool               simulatedNotification;
 
@@ -222,6 +225,10 @@ extern bool               ngsiv1Autocast;
 extern unsigned long long inReqPayloadMaxSize;
 extern unsigned long long outReqMsgMaxSize;
 
+extern bool               fcEnabled;
+extern double             fcGauge;
+extern unsigned long      fcStepDelay;
+extern unsigned long      fcMaxInterval;
 
 
 /* ****************************************************************************

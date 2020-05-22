@@ -116,7 +116,8 @@ The list of available options is the following:
 -   **-pidpath <pid_file>**. Specifies the file to store the PID of the
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
-    for forwarding messages and for notifications.
+    for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
+    is 5 seconds.
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
@@ -143,6 +144,8 @@ The list of available options is the following:
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
       [thread model](perf_tuning.md#orion-thread-model-and-its-implications) section if you want to use this mode.
+-   **-notifFlowControl guage:stepDelay:maxInterval**. Enables flow control mechanism.
+    See [this section in the documentation](perf_tuning.md#updates-flow-control-mechanism).
 -   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the
     [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
     usage, but it is useful for debugging to calculate a maximum upper limit in notification rate from a CB

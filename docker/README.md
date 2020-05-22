@@ -9,7 +9,10 @@ You can run Orion Context Broker very easily using docker. There are several way
 
 These are alternative ways to do the same thing, you do not need to do all three of them.
 
+And you can also run Orion on Raspberry Pi. See the [documentation](./raspberry_pi.md) on how to do this.
+
 You do need to have docker in your machine. See the [documentation](https://docs.docker.com/installation/) on how to do this.
+
 
 ----
 ## 1. The Fastest Way
@@ -117,6 +120,15 @@ Check that everything works with
 
 The parameter `-t orion` in the `docker build` command gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
 
+The parameter `--build-arg` in the `docker build` can be set build-time variables. 
+
+| ARG             | Description                                                         | Example                         |
+| --------------- | ------------------------------------------------------------------- | ------------------------------- |
+| IMAGE_TAG       | Specify a tag of the base image.                                    | --build-arg IMAGE_TAG=centos7   |
+| GIT_NAME        | Specify a username of GitHub repository.                            | --build-arg GIT_NAME=fiware-ges |
+| GIT_REV_ORION   | Specify the Orion version you want to build.                        | --build-arg GIT_REV_ORION=2.3.0 |
+| CLEAN_DEV_TOOLS | Specify whether the development tools clear. It is remained when 0. | --build-arg CLEAN_DEV_TOOLS=0   |
+
 If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
 
 ## 4. Other info
@@ -127,6 +139,29 @@ Things to keep in mind while working with docker containers and Orion Context Br
 Everything you do with Orion Context Broker when dockerized is non-persistent. *You will lose all your data* if you turn off the MongoDB container. This will happen with either method presented in this README.
 
 If you want to prevent this from happening take a look at [this link](https://registry.hub.docker.com/_/mongo/) in section *Where to Store Data* of the MongoDB docker documentation. In it you will find instructions and ideas on how to make your MongoDB data persistent.
+
+#### Set-up appropriate Mongo-DB Database Indexes
+
+Subscription, registration and entity details are retrieved from a database.  Without supplying the `fiware-service` header, 
+the default name of the database is `orion`. Database access can be optimized by creating appropriate indices.
+
+For example: 
+
+```console
+docker exec  db-mongo mongo --eval '
+	conn = new Mongo();db.createCollection("orion");
+	db = conn.getDB("orion");
+	db.createCollection("entities");
+	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
+	db.entities.createIndex({"_id.type": 1}); 
+	db.entities.createIndex({"_id.id": 1});' > /dev/null
+```
+
+if the `fiware-service` header is being used, the name of the database will vary. Alter the `conn.getDB()` statement 
+above if an alternative database is being used. Additional database indexes may be required depending upon your use case.
+Further information on [performance tuning](https://fiware-orion.readthedocs.io/en/master/admin/perf_tuning/index.html#database-indexes)
+and [database administration](https://fiware-orion.readthedocs.io/en/master/admin/database_admin/index.html) can
+be found within the Orion documentation.
 
 ### 4.2 Using `sudo`
 

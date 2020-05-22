@@ -40,7 +40,7 @@
 *
 * processContextElement -
 */
-extern void processContextElement
+extern unsigned int processContextElement
 (
   Entity*                              ceP,
   UpdateContextResponse*               responseP,

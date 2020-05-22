@@ -34,20 +34,6 @@
 
 namespace orion
 {
-/* ****************************************************************************
-*
-* compoundValueMiddle - 
-*/
-extern void compoundValueMiddle
-(
-  ConnectionInfo*     ciP,
-  const std::string&  relPath,
-  const std::string&  name,
-  const std::string&  value,
-  orion::ValueType    type
-);
-
-
 
 /* ****************************************************************************
 *

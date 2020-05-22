@@ -5,6 +5,7 @@
 * [カスタム通知を無効にするオプション](#option-to-disable-custom-notifications)
 * [カスタム通知の変更不可能なヘッダ](#non-modifiable-headers-in-custom-notifications)
 * [エンティティ・ロケーションの属性に制限](#limit-to-attributes-for-entity-location)
+* [`geo:json` 属性でサポートされる GeoJSON タイプ](#supported-geojson-types-in-geojson-attributes)
 * [通知の従来の属性フォーマット](#legacy-attribute-format-in-notifications)
 * [日時サポート](#datetime-support)
 * [ユーザ属性または組み込み名前と一致するメタデータ](#user-attributes-or-metadata-matching-builtin-name)
@@ -17,6 +18,7 @@
 * [Oneshot サブスクリプション](#oneshot-subscriptions)
 * [変更された属性のみを通知](#notify-only-attributes-that-change)
 * [`lastFailureReason` および `lastSuccessCode` のサブスクリプション・フィールド](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
+* [`flowControl` オプション](#flowcontrol-option)
 * [`forcedUpdate` オプション](#forcedupdate-option)
 * [レジストレーション](#registrations)
 * [`POST /v2/op/notify` でサポートされない `keyValues`](#keyvalues-not-supported-in-post-v2opnotify)
@@ -32,6 +34,11 @@ NGSIv2 仕様の "フィールド構文の制限" セクションから :
 > 上記のルールに加えて、NGSIv2 サーバの実装では、クロス・スクリプト注入攻撃を避けるために、それらのフィールドまたは他のフィールドに構文上の制限を追加することができます。
 
 Orion に適用される追加の制限事項は、マニュアルの [禁止されている文字](forbidden_characters.md)のセクションに記載されているものです。
+
+属性値で禁止文字のチェックをスキップするために、"TextUnrestricted" 属性タイプ (および
+NGSIv2 仕様で定義されているもの以外の特別な属性タイプ) を使用できることに注意してください。
+ただし、セキュリティ上の問題 (スクリプト・インジェクション攻撃の可能性) がある可能性がある
+ため、自己責任で使用してください!
 
 [トップ](#top)
 
@@ -74,6 +81,33 @@ NGSIv2 仕様の "エンティティの地理空間プロパティ" のセクシ
 > クライアントアプリケーションは、(適切な NGSI アトリビュート型を提供することによって) ジオスペース・プロパティを伝えるエンティティ属性を定義する責任があります。通常これは `location` という名前のついたエンティティ属性ですが、エンティティに複数の地理空間属性が含まれているユース・ケースはありません。たとえば、異なる粒度レベルで指定された場所、または異なる精度で異なる場所の方法によって提供された場所です。それにもかかわらず、空間特性には、バックエンド・データベースによって課せられたリソースの制約下にある特別なインデックスが必要であることは注目に値します。したがって、実装では、空間インデックスの制限を超えるとエラーが発生する可能性があります。これらの状況で推奨される HTTP ステータス・コードは `413` です。リクエスト・エンティティが大きすぎます。また、レスポンス・ペイロードで報告されたエラーは、`NoResourcesAvailable` である必要があります。
 
 Orion の場合、その制限は1つの属性です。
+
+[トップ](#top)
+
+<a name="supported-geojson-types-in-geojson-attributes"></a>
+
+## `geo:json` 属性でサポートされる GeoJSON タイプ
+
+NGSIv2 仕様では、`geo:json` 属性に使用される可能性のある GeoJSON タイプに制限を設定していません。
+ただし、現在の Orion の実装 (MongoDB の機能に基づく) にはいくつかの制限があります。
+
+次のタイプのテストに成功しました :
+
+* Point
+* MultiPoint
+* LineString
+* MultiLineString
+* Polygon
+* MultiPolygon
+
+その一方で、次のタイプは機能しません (使用しようとすると "Database Error" が発生します) :
+
+* Feature
+* GeometryCollection
+* FeatureCollection
+
+実施されたテストの詳細については、
+[こちら](https://github.com/telefonicaid/fiware-orion/issues/3586)をご覧ください。
 
 [トップ](#top)
 
@@ -236,7 +270,8 @@ NGSIv2 仕様では、サブスクリプションの対象となるエンティ�
 
 初期通知は、新しい URI パラメータオプション `skipInitialNotification`
 を使用して設定できます。
-例えば、`POST /v2/subscriptions?options=skipInitialNotification` です。
+例えば、`POST /v2/subscriptions?options=skipInitialNotification` または、
+`PATCH /v2/subscriptions/{subId}?options=skipInitialNotification` です。
 
 [初期通知](initial_notification.md) について、ドキュメントで詳細を
 確認してください。
@@ -283,6 +318,27 @@ Orion は通知フィールド内でこの2つの追加フィールドをサポ�
 どちらも通知に関する問題の分析に使用できます。 詳しくは、
 [問題診断ドキュメント](../admin/diagnosis.md#diagnose-notification-reception-problems)
 のセクションを参照してください。
+
+[トップ](#top)
+
+<a name="flowcontrol-option"></a>
+## `flowControl` オプション
+
+これにより、更新操作でフロー制御を使用する必要があることを指定できます。これにより、パフォーマンスが
+向上し、高負荷シナリオでの飽和を回避できます。これは、[`-notifFlowControl` パラメータ](../admin/cli.md)
+を使用して ContextBroker が開始されている場合にのみ機能し、そうでない場合は無視されます。
+フロー制御メカニズムは、[ドキュメントのこのセクション](../admin/perf_tuning.md#updates-flow-control-mechanism)
+で説明しています。
+
+次のリクエストでは、flowControl URI param オプションを使用できます :
+
+* `POST /v2/entities/E/attrs?options=flowControl`
+* `POST /v2/entities/E/attrs?options=append,flowControl`
+* `POST /v2/op/update?options=flowControl`
+* `PUT /v2/entities/E/attrs?options=flowControl`
+* `PUT /v2/entities/E/attrs/A?options=flowControl`
+* `PUT /v2/entities/E/attrs/A/value?options=flowControl`
+* `PATCH /v2/entities/E/attrs?options=flowControl`
 
 [トップ](#top)
 

@@ -35,6 +35,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 
 
 
@@ -47,7 +48,6 @@ using mongo::DBClientCursor;
 using mongo::IndexSpec;
 using mongo::BSONObj;
 using mongo::DBException;
-using mongo::Query;
 using mongo::WriteConcern;
 
 
@@ -134,7 +134,8 @@ bool collectionRangedQuery
 (
   DBClientBase*                   connection,
   const std::string&              col,
-  const Query&                    q,
+  const mongo::BSONObj&           q,
+  const mongo::BSONObj&           sort,
   int                             limit,
   int                             offset,
   std::auto_ptr<DBClientCursor>*  cursor,
@@ -156,6 +157,10 @@ bool collectionRangedQuery
                   offset,
                   q.toString().c_str()));
 
+  // Compose the query
+  mongo::Query query(q);
+  query.sort(sort);
+
   try
   {
     if (count != NULL)
@@ -163,7 +168,7 @@ bool collectionRangedQuery
       *count = connection->count(col.c_str(), q);
     }
 
-    *cursor = connection->query(col.c_str(), q, limit, offset);
+    *cursor = connection->query(col.c_str(), query, limit, offset);
 
     //
     // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -174,12 +179,12 @@ bool collectionRangedQuery
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
+    LM_I(("Database Operation Successful (query: %s)", query.toString().c_str()));
   }
   catch (const std::exception &e)
   {
     std::string msg = std::string("collection: ") + col.c_str() +
-      " - query(): " + q.toString() +
+      " - query(): " + query.toString() +
       " - exception: " + e.what();
 
     *err = "Database Error (" + msg + ")";
@@ -190,7 +195,7 @@ bool collectionRangedQuery
   catch (...)
   {
     std::string msg = std::string("collection: ") + col.c_str() +
-      " - query(): " + q.toString() +
+      " - query(): " + query.toString() +
       " - exception: generic";
 
     *err = "Database Error (" + msg + ")";

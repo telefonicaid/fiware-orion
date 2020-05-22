@@ -1146,7 +1146,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
 
   if (valueType == orion::ValueTypeString)
   {
-    if (forbiddenChars(stringValue.c_str()))
+    if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
       return "Invalid characters in attribute value";
