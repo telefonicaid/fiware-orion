@@ -47,6 +47,7 @@ extern std::string parseEntityObject
   ConnectionInfo*                        ciP,
   rapidjson::Value::ConstValueIterator&  value,
   Entity*                                eP,
+  bool                                   idPatternAllowed,
   bool                                   attrsAllowed
 );
 

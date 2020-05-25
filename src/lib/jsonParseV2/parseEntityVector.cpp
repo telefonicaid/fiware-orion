@@ -47,6 +47,7 @@ std::string parseEntityVector
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
   Entities*                                     evP,
+  bool                                          idPatternAllowed,
   bool                                          attributesAllowed
 )
 {
@@ -72,7 +73,7 @@ std::string parseEntityVector
     // an OrionError and the evP is not actually used (and properly destroyed during
     // the release step)
     //
-    r = parseEntityObject(ciP, iter2, eP, attributesAllowed);
+    r = parseEntityObject(ciP, iter2, eP, idPatternAllowed, attributesAllowed);
     if (r != "OK")
     {
       return r;

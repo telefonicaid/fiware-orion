@@ -43,6 +43,7 @@ extern std::string parseEntityVector
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
   Entities*                                     evP,
+  bool                                          idPatternAllowed,
   bool                                          attributesAllowed
 );
 
