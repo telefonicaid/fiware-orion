@@ -39,6 +39,8 @@ This specification is the final and stable version of NGSIv2 API specification (
 
 # Changelog
 
+Add "Special Metadata Types" section
+
 Changes since v2.0:
 
 * Typo fixing
@@ -357,6 +359,25 @@ The list of builtin attributes is as follows:
 
 Like regular attributes, they can be used in `q` filters and in `orderBy`.
 However, they cannot be used in resource URLs.
+
+## Special Metadata Types
+
+Generally speaking, user-defined metadata types are informative; they are processed by the NGSIv2
+server in an opaque way. Nonetheless, the types described below are used to convey a special
+meaning:
+
+* `DateTime`:  identifies dates, in ISO8601 format. This metadata can be used with the query
+  operators greater-than, less-than, greater-or-equal, less-or-equal and range. For instance
+  (only the referred attribute metadata is shown):
+
+```
+"metadata": {
+      "dateCreated": {
+        "value": "2019-09-23T03:12:47.213Z",
+        "type": "DateTime"
+      }
+}
+```
 
 ## Builtin Metadata
 
