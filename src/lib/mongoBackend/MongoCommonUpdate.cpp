@@ -3068,8 +3068,8 @@ static bool createEntity
   if ((orionldState.creDatesP != NULL) && ((savedCreDateP = kjLookup(orionldState.creDatesP, eP->id.c_str())) != NULL))
   {
     eP->creDate = (double) savedCreDateP->value.i;
-    LM_W(("Inserting creDate as DOUBLE: %f (URL: %s)", eP->creDate, orionldState.urlPath));
-    insertedDoc.append(ENT_CREATION_DATE, eP->creDate);
+    // LM_W(("Inserting creDate as DOUBLE: %f (URL: %s)", eP->creDate, orionldState.urlPath));
+    insertedDoc.append(ENT_CREATION_DATE, (int) savedCreDateP->value.i);
   }
   else
     insertedDoc.append(ENT_CREATION_DATE, now);

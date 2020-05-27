@@ -59,7 +59,7 @@ KjNode* mongocEntityLookup(const char* entityId)
   //
   // Create the filter for the query
   //
-  bson_append_utf8(&mongoFilter, "_id.id", 3, entityId, -1);
+  bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
 
   //
   // Run the query
