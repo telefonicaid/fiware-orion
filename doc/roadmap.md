@@ -47,6 +47,7 @@ after next planned release:
 - MQTT notifications (community)
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
 - Advanced query language
+- Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
 
 ## Long term
 
