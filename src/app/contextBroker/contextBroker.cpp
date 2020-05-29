@@ -265,18 +265,18 @@ PaArgument paArgs[] =
   { "-port",          &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
   { "-pidpath",       pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
 
-  { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
-  { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
-  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
-  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
+  { "-dbhost",        dbHost,        "MONGO_HOST",     PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
+  { "-rplSet",        rplSet,        "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
+  { "-dbuser",        user,          "MONGO_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
+  { "-dbpwd",         pwd,           "MONGO_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
 
-  { "-dbAuthMech",    authMech,      "DB_AUTH_MECH",   PaString, PaOpt, _i "SCRAM-SHA-1", PaNL,   PaNL,  DBAUTHMECH_DESC    },
-  { "-dbAuthDb",      authDb,        "DB_AUTH_DB",     PaString, PaOpt, _i "",            PaNL,   PaNL,  DBAUTHDB_DESC    },
-  { "-dbSSL",         &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,            false,  true,  DBSSL_DESC    },
+  { "-dbAuthMech",    authMech,      "MONGO_AUTH_MECH",   PaString, PaOpt, _i "SCRAM-SHA-1", PaNL,   PaNL,  DBAUTHMECH_DESC    },
+  { "-dbAuthDb",      authDb,        "MONGO_AUTH_SOURCE",     PaString, PaOpt, _i "",            PaNL,   PaNL,  DBAUTHDB_DESC    },
+  { "-dbSSL",         &dbSSL,        "MONGO_SSL",    PaBool,   PaOpt, false,            false,  true,  DBSSL_DESC    },
 
-  { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
-  { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
-  { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
+  { "-db",            dbName,        "MONGO_DB",          PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
+  { "-dbTimeout",     &dbTimeout,    "MONGO_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
+  { "-dbPoolSize",    &dbPoolSize,   "MONGO_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
 
   { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
   { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
@@ -291,9 +291,9 @@ PaArgument paArgs[] =
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
   { "-reqTimeout",    &reqTimeout,   "REQ_TIMEOUT",    PaLong,   PaOpt,  0,          0,     PaNL,  REQ_TMO_DESC       },
   { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
+  { "-writeConcern",  &writeConcern, "MONGO_WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
+  { "-corsOrigin",       allowedOrigin,     "CORS_ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-corsMaxAge",       &maxAge,           "CORS_MAX_AGE",      PaInt,    PaOpt, 86400,          -1,    86400,    CORS_MAX_AGE_DESC      },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
@@ -862,6 +862,7 @@ int main(int argC, char* argV[])
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("builtin prefix",                (void*) "ORION_");
+  paConfig("prefix",                        (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
   paConfig("valid log level strings",       validLogLevels);
