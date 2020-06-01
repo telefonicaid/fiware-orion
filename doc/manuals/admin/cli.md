@@ -178,7 +178,7 @@ Orion supports argument passing using environment variables. Each CLI parameter
 has an equivalent environment variable, as shown in the table below
 (`contextBroker -U` can be also used to get the same information).
 
-Two comments have to be taken into account:
+Two facts have to be taken into account:
 
 * Environment variables for CLI parameters that work in a "flag" way 
   (i.e. they are enabled or not, but doesn't have an actual value, such as `-fg`)
@@ -242,4 +242,3 @@ Two comments have to be taken into account:
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
 |	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
-
