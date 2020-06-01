@@ -187,7 +187,6 @@ Two comments have to be taken into account:
 * In the case of conflict (i.e. using at the same time the environment variable
   and the CLI parameter) the later takes preference over the former.
 
-| ----------------- | --------- |
 |	Environment variable	|	Equivalent CLI parameter	|
 | ----------------- | --------- |
 |	ORION_LOG_DIR	|	logDir	|
