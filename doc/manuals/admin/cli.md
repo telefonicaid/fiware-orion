@@ -181,7 +181,7 @@ has an equivalent environment variable, as shown in the table below
 Two facts have to be taken into account:
 
 * Environment variables for CLI parameters that work in a "flag" way 
-  (i.e. they are enabled or not, but doesn't have an actual value, such as `-fg`)
+  (i.e. they are either enabled or not, but don't have an actual value - `-fg` is one of them)
   can take the case-sensitive values `TRUE` (to enable the parameter) or
   `FALSE` (to disable it).
 * In case of conflict (i.e. using at the same time the environment variable
