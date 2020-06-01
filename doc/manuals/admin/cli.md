@@ -184,7 +184,7 @@ Two facts have to be taken into account:
   (i.e. they are enabled or not, but doesn't have an actual value, such as `-fg`)
   can take the case-sensitive values `TRUE` (to enable the parameter) or
   `FALSE` (to disable it).
-* In the case of conflict (i.e. using at the same time the environment variable
+* In case of conflict (i.e. using at the same time the environment variable
   and the CLI parameter) the CLI parameter is used.
 
 |	Environment variable	|	Equivalent CLI parameter	|
