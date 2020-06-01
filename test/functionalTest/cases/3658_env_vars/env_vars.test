@@ -27,7 +27,12 @@ broker env vars set on command line
 
 #
 # 01. Get the extended usage from the broker withut any alterations - see default state
-# 02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb.pid, start the broker in BG, make sure that /tmp/cb.pid has been created
+# 02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb3658.pid, start the broker in BG, make sure that /tmp/cb3658.pid has been created
+#
+# NOTE about '| cut -c 1-200'
+#   In step 01 we ran into inexplicable differences between Ubuntu 18.04 and the CentOS of travis, about the number of spaces
+#   between the teo last output items of "contextBroker -U". Seems like e.g. snprintf("%-20s", "abc") behaves differently ... A Poltergeist.
+#   As a workaround, only the first 200 characters of each line of the output of "contextBroker -U" are compared.
 #
 
 echo "01. Get the extended usage from the broker withut any alterations - see default state"
@@ -37,9 +42,9 @@ echo
 echo
 
 
-echo "02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb.pid, start the broker in BG, make sure that /tmp/cb.pid has been created"
-echo "========================================================================================================================================"
-export ORION_PID_PATH=/tmp/cb.pid
+echo "02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb3658.pid, start the broker in BG, make sure that /tmp/cb3658.pid has been created"
+echo "================================================================================================================================================"
+export ORION_PID_PATH=/tmp/cb3658.pid
 rm -f $ORION_PID_PATH
 contextBroker
 sleep .1
@@ -125,10 +130,11 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
 
 
 
-02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb.pid, start the broker in BG, make sure that /tmp/cb.pid has been created
-========================================================================================================================================
-OK - the pidfile /tmp/cb.pid has been created
-OK - the pidfile /tmp/cb.pid disappeared once the broker died
+02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb3658.pid, start the broker in BG, make sure that /tmp/cb3658.pid has been created
+================================================================================================================================================
+OK - the pidfile /tmp/cb3658.pid has been created
+OK - the pidfile /tmp/cb3658.pid disappeared once the broker died
 
 
 --TEARDOWN--
+rm -f /tmp/cb3658.pid
