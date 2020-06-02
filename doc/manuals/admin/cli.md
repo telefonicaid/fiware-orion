@@ -172,3 +172,73 @@ The list of available options is the following:
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
 
+## Configuration using environment variables
+
+Orion supports argument passing using environment variables. Each CLI parameter
+has an equivalent environment variable, as shown in the table below
+(`contextBroker -U` can be also used to get the same information).
+
+Two facts have to be taken into account:
+
+* Environment variables for CLI parameters that work in a "flag" way 
+  (i.e. they are either enabled or not, but don't have an actual value - `-fg` is one of them)
+  can take the case-sensitive values `TRUE` (to enable the parameter) or
+  `FALSE` (to disable it).
+* In case of conflict (i.e. using at the same time the environment variable
+  and the CLI parameter) the CLI parameter is used.
+
+|	Environment variable	|	Equivalent CLI parameter	|
+| ----------------- | --------- |
+|	ORION_LOG_DIR	|	logDir	|
+|	ORION_TRACE	|	t	|
+|	ORION_LOG_LEVEL	|	logLevel	|
+|	ORION_LOG_APPEND	|	logAppend	|
+|	ORION_FOREGROUND	|	fg	|
+|	ORION_LOCALIP	|	localIp	|
+|	ORION_PORT	|	port	|
+|	ORION_PID_PATH	|	pidpath	|
+|	ORION_MONGO_HOST	|	dbhost	|
+|	ORION_MONGO_REPLICA_SET	|	rplSet	|
+|	ORION_MONGO_USER	|	dbuser	|
+|	ORION_MONGO_PASSWORD	|	dbpwd	|
+|	ORION_MONGO_AUTH_MECH	|	dbAuthMech	|
+|	ORION_MONGO_AUTH_SOURCE	|	dbAuthDb	|
+|	ORION_MONGO_SSL	|	dbSSL	|
+|	ORION_MONGO_DB	|	db	|
+|	ORION_MONGO_TIMEOUT	|	dbTimeout	|
+|	ORION_MONGO_POOL_SIZE	|	dbPoolSize	|
+|	ORION_USEIPV4	|	ipv4	|
+|	ORION_USEIPV6	|	ipv6	|
+|	ORION_HTTPS	|	https	|
+|	ORION_HTTPS_KEYFILE	|	key	|
+|	ORION_HTTPS_CERTFILE	|	cert	|
+|	ORION_MULTI_SERVICE	|	multiservice	|
+|	ORION_HTTP_TIMEOUT	|	httpTimeout	|
+|	ORION_REQ_TIMEOUT	|	reqTimeout	|
+|	ORION_MUTEX_POLICY	|	reqMutexPolicy	|
+|	ORION_MONGO_WRITE_CONCERN	|	writeConcern	|
+|	ORION_CORS_ALLOWED_ORIGIN	|	corsOrigin	|
+|	ORION_CORS_MAX_AGE	|	corsMaxAge	|
+|	ORION_CPR_FORWARD_LIMIT	|	cprForwardLimit	|
+|	ORION_SUBCACHE_IVAL	|	subCacheIval	|
+|	ORION_NOCACHE	|	noCache	|
+|	ORION_CONN_MEMORY	|	connectionMemory	|
+|	ORION_MAX_CONN	|	maxConnections	|
+|	ORION_TRQ_POOL_SIZE	|	reqPoolSize	|
+|	ORION_IN_REQ_PAYLOAD_MAX_SIZE	|	inReqPayloadMaxSize	|
+|	ORION_OUT_REQ_MSG_MAX_SIZE	|	outReqMsgMaxSize	|
+|	ORION_NOTIF_MODE	|	notificationMode	|
+|	ORION_NOTIF_FLOW_CONTROL	|	notifFlowControl	|
+|	ORION_DROP_NOTIF	|	simulatedNotification	|
+|	ORION_STAT_COUNTERS	|	statCounters	|
+|	ORION_STAT_SEM_WAIT	|	statSemWait	|
+|	ORION_STAT_TIMING	|	statTiming	|
+|	ORION_STAT_NOTIF_QUEUE	|	statNotifQueue	|
+|	ORION_LOG_SUMMARY_PERIOD	|	logSummary	|
+|	ORION_RELOG_ALARMS	|	relogAlarms	|
+|	ORION_CHECK_ID_V1	|	strictNgsiv1Ids	|
+|	ORION_DISABLE_CUSTOM_NOTIF	|	disableCustomNotifications	|
+|	ORION_LOG_FOR_HUMANS	|	logForHumans	|
+|	ORION_DISABLE_METRICS	|	disableMetrics	|
+|	ORION_INSECURE_NOTIF	|	insecureNotif	|
+|	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
