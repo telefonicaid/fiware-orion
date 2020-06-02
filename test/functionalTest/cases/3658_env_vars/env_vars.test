@@ -31,7 +31,7 @@ broker env vars set on command line
 #
 # NOTE about '| cut -c 1-200'
 #   In step 01 we ran into inexplicable differences between Ubuntu 18.04 and the CentOS of travis, about the number of spaces
-#   between the teo last output items of "contextBroker -U". Seems like e.g. snprintf("%-20s", "abc") behaves differently ... A Poltergeist.
+#   between the two last output items of "contextBroker -U". Seems like e.g. snprintf("%-20s", "abc") behaves differently ... A Poltergeist.
 #   As a workaround, only the first 200 characters of each line of the output of "contextBroker -U" are compared.
 #
 
