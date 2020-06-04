@@ -550,9 +550,9 @@ REGEX(.*) msg=Notification loop detected for entity id <E> type <Thing>, skippin
 
 
 --TEARDOWN--
+brokerStop
 brokerStop CP1
 brokerStop CP2
-brokerStop CP3
+dbDrop
 dbDrop CP1
 dbDrop CP2
-dbDrop CP3
