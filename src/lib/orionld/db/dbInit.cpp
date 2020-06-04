@@ -42,6 +42,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationDelete.h"       // mongoCppLegacyRegistrationDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h"          // mongoCppLegacySubscriptionGet
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionReplace.h"      // mongoCppLegacySubscriptionReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionDelete.h"       // mongoCppLegacySubscriptionDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationGet.h"          // mongoCppLegacyRegistrationGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"      // mongoCppLegacyRegistrationReplace
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesGet.h"              // mongoCppLegacyEntitiesGet
@@ -79,7 +80,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityDelete                           = mongoCppLegacyEntityDelete;
-  dbEntitiesDelete                      = mongoCppLegacyEntitiesDelete;
+  dbEntitiesDelete                         = mongoCppLegacyEntitiesDelete;
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
   dbEntityListLookupWithIdTypeCreDate      = mongoCppLegacyEntityListLookupWithIdTypeCreDate;
   dbRegistrationLookup                     = mongoCppLegacyRegistrationLookup;
@@ -87,6 +88,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbRegistrationDelete                     = mongoCppLegacyRegistrationDelete;
   dbSubscriptionGet                        = mongoCppLegacySubscriptionGet;
   dbSubscriptionReplace                    = mongoCppLegacySubscriptionReplace;
+  dbSubscriptionDelete                     = mongoCppLegacySubscriptionDelete;
   dbRegistrationGet                        = mongoCppLegacyRegistrationGet;
   dbRegistrationReplace                    = mongoCppLegacyRegistrationReplace;
   dbEntitiesGet                            = mongoCppLegacyEntitiesGet;

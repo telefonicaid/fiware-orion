@@ -53,6 +53,7 @@ DbRegistrationExists                      dbRegistrationExists;
 DbRegistrationDelete                      dbRegistrationDelete;
 DbSubscriptionGet                         dbSubscriptionGet;
 DbSubscriptionReplace                     dbSubscriptionReplace;
+DbSubscriptionDelete                      dbSubscriptionDelete;
 DbRegistrationGet                         dbRegistrationGet;
 DbRegistrationReplace                     dbRegistrationReplace;
 DbEntityTypesFromRegistrationsGet         dbEntityTypesFromRegistrationsGet;

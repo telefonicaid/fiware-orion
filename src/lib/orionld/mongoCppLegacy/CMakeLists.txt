@@ -37,6 +37,7 @@ SET (SOURCES
     mongoCppLegacyEntityAttributesDelete.cpp
     mongoCppLegacySubscriptionGet.cpp
     mongoCppLegacySubscriptionReplace.cpp
+    mongoCppLegacySubscriptionDelete.cpp
     mongoCppLegacyRegistrationGet.cpp
     mongoCppLegacyRegistrationReplace.cpp
     mongoCppLegacyEntityTypesFromRegistrationsGet.cpp
