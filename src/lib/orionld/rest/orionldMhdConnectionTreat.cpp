@@ -258,7 +258,7 @@ static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
     else
     {
       orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
-      orionldState.httpStatusCode = SccContextElementNotFound;
+      orionldState.httpStatusCode = 404;
     }
   }
 
@@ -383,6 +383,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
+          orionldState.httpStatusCode = 400;
           return false;
         }
         orionldState.payloadContextNode = attrNodeP;
@@ -397,6 +398,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:id'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Entity:id");
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -413,6 +415,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:type'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Entity:type");
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -423,7 +426,8 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         char* detail;
         if (pcheckName(orionldState.payloadTypeNode->value.s, &detail) == false)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", detail);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", orionldState.payloadTypeNode->value.s);
+          orionldState.httpStatusCode = 400;
           return false;
         }
         LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.payloadTypeNode));
@@ -453,6 +457,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -490,6 +495,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
 void orionldErrorResponseFromProblemDetails(OrionldProblemDetails* pdP)
 {
   orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+  orionldState.httpStatusCode = pdP->status;
 }
 
 
@@ -563,6 +569,7 @@ static void contextToPayload(void)
   {
     LM_E(("Out of memory"));
     orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
+    orionldState.httpStatusCode = 500;  // If ever able to send the response ...
     return;
   }
 
@@ -595,6 +602,7 @@ static void contextToPayload(void)
       if (contextNode == NULL)
       {
         orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
+        orionldState.httpStatusCode = 500;  // If ever able to send the response ...
         return;
       }
 
@@ -722,7 +730,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenant));
         orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenant);
-        orionldState.httpStatusCode = SccContextElementNotFound;  // 404
+        orionldState.httpStatusCode = 404;
         goto respond;
       }
     }
@@ -863,7 +871,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // The only exception is 405 that has no payload - the info comes in the "Accepted" HTTP header.
   //
   if ((orionldState.httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (orionldState.httpStatusCode != 405))
+  {
     orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
+    orionldState.httpStatusCode = 500;
+  }
 
   //
   // On error, the Content-Type is always "application/json" and there is NO Link header
@@ -931,6 +942,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       LM_E(("Error allocating buffer for response payload"));
       orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
+      orionldState.httpStatusCode = 500;  // If ever able to send the response ...
     }
   }
 

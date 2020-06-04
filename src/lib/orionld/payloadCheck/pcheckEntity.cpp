@@ -172,7 +172,7 @@ bool pcheckEntity
       {
         if (pcheckName(kNodeP->name, &detailsP) == false)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", detailsP);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", kNodeP->name);
           return false;
         }
       }

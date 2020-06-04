@@ -184,6 +184,12 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
     return false;
   }
 
+  if (typeP->type != KjString)
+  {
+    LM_E(("Database Error (field 'type' not a String for attribute '%s' of entity '%s')", attrP->name, entityId));
+    return false;
+  }
+
   if (strcmp(typeP->value.s, "Relationship") == 0)
   {
     KjNode* objectP = kjLookup(attrP, "value");
@@ -236,6 +242,17 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
   {
     for (KjNode* metadataP = mdP->value.firstChildP; metadataP != NULL; metadataP = metadataP->next)
     {
+      char* mdName = kaStrdup(&orionldState.kalloc, metadataP->name);
+
+      // FIXME: due to a bug, I expand observedAt in either PATCH Entity or PATCH Attribute :(
+      //        Because of this, I must do the compaction BEFORE I check for observedAt/unitCode
+      //        That's unnecessary time-consuming and this bug must be fixed +
+      //        the call to eqForDot+orionldContextItemAliasLookup moved to after checking for
+      //        special attributes (observedAt/unitCode).
+      //
+      eqForDot(mdName);
+      metadataP->name = orionldContextItemAliasLookup(orionldState.contextP, mdName, NULL, NULL);
+
       //
       // Special fields:
       // - observedAt
@@ -265,19 +282,17 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
         continue;
       }
 
-      char* mdName = kaStrdup(&orionldState.kalloc, metadataP->name);
-      eqForDot(mdName);
-      metadataP->name = orionldContextItemAliasLookup(orionldState.contextP, mdName, NULL, NULL);
-
       // If Relationship - change 'value' for 'object'
       KjNode* typeP = kjLookup(metadataP, "type");
       if (typeP == NULL)
       {
-        // Error
+        LM_E(("Database Error (field 'type' not found for metadata '%s' of attribute '%s' of entity '%s')", metadataP->name, attrP->name, entityId));
+        return false;
       }
       else if (typeP->type != KjString)
       {
-        // Error
+        LM_E(("Database Error (field 'type' not a String for metadata '%s' of attribute '%s' of entity '%s')", metadataP->name, attrP->name, entityId));
+        return false;
       }
 
       if (strcmp(typeP->value.s, "Relationship") == 0)
