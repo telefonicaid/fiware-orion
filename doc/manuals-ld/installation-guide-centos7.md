@@ -221,7 +221,8 @@ sudo yum -y install epel-release
 sudo yum -y install mosquitto
 sudo systemctl start mosquitto
 
-# If you want to enable the service to make sure it starts up when reboot the system
+# If you wish to enable `mosquitto` to have it start automatically on system reboot:
+# [ If you prefer yo use another MQTT broker, that's fine too. But, bear in mind that only mosquitto has been tested ]
 sudo systemctl enable mosquitto
 ```
 
