@@ -221,7 +221,14 @@ make html
 make
 sudo make install
 
+
 # Python library
+
+# [ If you don't have pip installed: ]
+sudo aptitude update
+sudo aptitude install python-pip
+pip --version
+
 pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
