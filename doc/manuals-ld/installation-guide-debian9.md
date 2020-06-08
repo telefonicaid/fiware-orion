@@ -209,8 +209,8 @@ To download, build and install:
 The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
 
 ```bash
-apt-get -y install doxygen
-apt-get -y install graphviz
+aptitude -y install doxygen
+aptitude -y install graphviz
 rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
@@ -229,7 +229,7 @@ pip install paho-mqtt
 *Eclipse Mosquitto* is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers. Source: https://mosquitto.org
 
 ```bash
-sudo apt-get install mosquitto
+sudo aptitude install mosquitto
 sudo systemctl start mosquitto
 
 # If you want to enable the service to make sure it starts up when reboot the system
