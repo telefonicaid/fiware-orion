@@ -2,6 +2,20 @@
 
 In order to write this guide, CentOS 7 (Desktop image) was downloaded from [here](http://isoredirect.centos.org/centos/8/isos/x86_64/CentOS-8-x86_64-1905-dvd1.iso), and installed as a virtual machine under VMWare.
 
+## Grant sudo permissions to your user (if you don't have)
+
+```bash
+visudo
+
+# On this line that contains: root ALL=(ALL) ALL, add your user
+<USER> ALL=(ALL) ALL
+```
+
+*Obs.: If you don't have internet access execute this command:*
+```bash
+dhclient
+```
+
 ## Installation of dependency packages
 
 To be installed via package manager:
@@ -17,7 +31,9 @@ To be installed via package manager:
 Tools needed for compilation and testing:
 
 ```bash
-sudo yum install make cmake gcc-c++ scons
+sudo yum install http://repo.okay.com.mx/centos/7/x86_64/release/okay-release-1-1.noarch.rpm
+
+sudo yum install make cmake gcc-c++ scons curl wget libicu-devel
 ```
 
 Libraries that aren't built from source code:
@@ -197,9 +213,9 @@ To download, build and install:
 The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
 
 ```bash
-yum -y install doxygen
-yum -y install graphviz
-rm -f /usr/local/lib/libpaho*
+sudo yum -y install doxygen
+sudo yum -y install graphviz
+sudo rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
 cd paho.mqtt.c
@@ -210,7 +226,12 @@ make
 sudo make install
 
 # Python library
-pip install paho-mqtt
+
+# If you don't have pip installed:
+sudo yum update
+sudo yum install python-pip
+
+sudo pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
 
