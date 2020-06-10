@@ -2,15 +2,6 @@
 
 In order to write this guide, CentOS 7 (Desktop image) was downloaded from [here](http://isoredirect.centos.org/centos/8/isos/x86_64/CentOS-8-x86_64-1905-dvd1.iso), and installed as a virtual machine under VMWare.
 
-## Grant sudo permissions to your user (if you don't have)
-
-```bash
-visudo
-
-# On this line that contains: root ALL=(ALL) ALL, add your user
-<USER> ALL=(ALL) ALL
-```
-
 *Obs.: If you don't have internet access execute this command:*
 ```bash
 dhclient
@@ -30,10 +21,14 @@ To be installed via package manager:
 
 Tools needed for compilation and testing:
 
+Install OKay repository that offers an alternate to complement missing packages from CENTOS and EPEL. Source (https://okay.network/blog-news/rpm-repositories-for-centos-6-and-7.html)
+
 ```bash
 sudo yum install http://repo.okay.com.mx/centos/7/x86_64/release/okay-release-1-1.noarch.rpm
+```
 
-sudo yum install make cmake gcc-c++ scons curl wget libicu-devel
+```bash
+sudo yum install make cmake gcc-c++ scons curl wget
 ```
 
 Libraries that aren't built from source code:
