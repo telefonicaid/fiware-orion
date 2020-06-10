@@ -51,16 +51,16 @@ curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz 
 && scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl \
 && rm -Rf /opt/mongo-cxx-driver-legacy-1.1.2
 
-curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC /opt/ \
-&& mv /opt/rapidjson-1.0.2/include/rapidjson/ /usr/local/include \
-&& rm -Rf /opt/rapidjson-1.0.2
+curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
+&& mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \
+&& rm -Rf /opt/rapidjson-1.1.0
 
-curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC /opt/ \
-&& cd /opt/libmicrohttpd-0.9.48  \
+curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz | tar xzC /opt/ \
+&& cd /opt/libmicrohttpd-0.9.69  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install \
-&& rm -Rf /opt/libmicrohttpd-0.9.48
+&& rm -Rf /opt/libmicrohttpd-0.9.69
 
 curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \

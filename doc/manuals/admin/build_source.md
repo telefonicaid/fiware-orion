@@ -7,12 +7,12 @@ Orion Context Broker reference distribution is CentOS 7.x. This doesn't mean tha
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.53
-* libmicrohttpd: 0.9.48 (from source)
+* libmicrohttpd: 0.9.69 (from source)
 * libcurl: 7.29.0
 * openssl: 1.0.2k
 * libuuid: 2.23.2
 * Mongo Driver: legacy-1.1.2 (from source)
-* rapidjson: 1.0.2 (from source)
+* rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 
@@ -37,15 +37,15 @@ commands that require root privilege):
 
 * Install rapidjson from sources:
 
-        wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
-        tar xfvz v1.0.2.tar.gz
-        sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
+        wget https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz
+        tar xfvz v1.1.0.tar.gz
+        sudo mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
-        tar xvf libmicrohttpd-0.9.48.tar.gz
-        cd libmicrohttpd-0.9.48
+        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz
+        tar xvf libmicrohttpd-0.9.69.tar.gz
+        cd libmicrohttpd-0.9.69
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -153,12 +153,12 @@ And it includes the instruction to build MongoDB 3.6 that the Orion depends on.
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.65.1
-* libmicrohttpd: 0.9.48 (from source)
+* libmicrohttpd: 0.9.69 (from source)
 * libcurl: 7.58.0
 * openssl: 1.0.2n
 * libuuid: 2.31.1
 * Mongo Driver: legacy-1.1.2 (from source)
-* rapidjson: 1.0.2 (from source)
+* rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 * MongoDB: 3.6.17 (from source)
@@ -189,15 +189,15 @@ add a `-Wno-{option name}` option to CCFLAGS.
 
 * Install rapidjson from sources:
 
-        wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
-        tar xfvz v1.0.2.tar.gz
-        sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
+        wget https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz
+        tar xfvz v1.1.0.tar.gz
+        sudo mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
-        tar xvf libmicrohttpd-0.9.48.tar.gz
-        cd libmicrohttpd-0.9.48
+        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz
+        tar xvf libmicrohttpd-0.9.69.tar.gz
+        cd libmicrohttpd-0.9.69
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
