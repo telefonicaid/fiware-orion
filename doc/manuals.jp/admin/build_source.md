@@ -7,7 +7,7 @@ Orion Context Broker のリファレンス配布は CentOS 7.x です。これ�
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
 * boost: 1.53
-* libmicrohttpd: 0.9.69 (ソースから)
+* libmicrohttpd: 0.9.70 (ソースから)
 * libcurl: 7.29.0
 * openssl: 1.0.2k
 * libuuid: 2.23.2
@@ -42,9 +42,9 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz
-        tar xvf libmicrohttpd-0.9.69.tar.gz
-        cd libmicrohttpd-0.9.69
+        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
+        tar xvf libmicrohttpd-0.9.70.tar.gz
+        cd libmicrohttpd-0.9.70
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -153,7 +153,7 @@ aarch64 アーキテクチャの場合、さらに yum で、python-devel と li
 して次のライブラリを使用します :
 
 * boost: 1.65.1
-* libmicrohttpd: 0.9.69 (from source)
+* libmicrohttpd: 0.9.70 (from source)
 * libcurl: 7.58.0
 * openssl: 1.0.2n
 * libuuid: 2.31.1
@@ -195,9 +195,9 @@ aarch64 アーキテクチャの場合、さらに yum で、python-devel と li
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを
 得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz
-        tar xvf libmicrohttpd-0.9.69.tar.gz
-        cd libmicrohttpd-0.9.69
+        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
+        tar xvf libmicrohttpd-0.9.70.tar.gz
+        cd libmicrohttpd-0.9.70
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib

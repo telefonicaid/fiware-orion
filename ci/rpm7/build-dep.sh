@@ -55,12 +55,12 @@ curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /op
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \
 && rm -Rf /opt/rapidjson-1.1.0
 
-curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz | tar xzC /opt/ \
-&& cd /opt/libmicrohttpd-0.9.69  \
+curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
+&& cd /opt/libmicrohttpd-0.9.70  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install \
-&& rm -Rf /opt/libmicrohttpd-0.9.69
+&& rm -Rf /opt/libmicrohttpd-0.9.70
 
 curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \

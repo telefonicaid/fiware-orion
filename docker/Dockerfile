@@ -37,9 +37,9 @@ RUN \
       cyrus-sasl-devel && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.69.tar.gz && \
-    tar xvf libmicrohttpd-0.9.69.tar.gz && \
-    cd libmicrohttpd-0.9.69 && \
+    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
+    tar xvf libmicrohttpd-0.9.70.tar.gz && \
+    cd libmicrohttpd-0.9.70 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
     make && \
     make install && \
@@ -73,10 +73,10 @@ RUN \
     cd /opt && \
     if [ ${CLEAN_DEV_TOOLS} -eq 0 ] ; then yum clean all && exit 0 ; fi && \
     # cleanup sources, dev tools, locales and yum cache to reduce the final image size
-    rm -rf /opt/libmicrohttpd-0.9.69.tar.gz \
+    rm -rf /opt/libmicrohttpd-0.9.70.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
-           /opt/libmicrohttpd-0.9.69 \
+           /opt/libmicrohttpd-0.9.70 \
            /opt/legacy-1.1.2.tar.gz \
            /opt/mongo-cxx-driver-legacy-1.1.2 \
            /usr/local/include/mongo \
