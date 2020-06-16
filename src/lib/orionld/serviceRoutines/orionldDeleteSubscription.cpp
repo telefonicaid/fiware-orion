@@ -26,6 +26,8 @@
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "common/globals.h"                                      // noCache
+#include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup, ...
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/urlCheck.h"                             // urlCheck
 #include "orionld/common/urnCheck.h"                             // urnCheck
@@ -65,6 +67,15 @@ bool orionldDeleteSubscription(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "The requested subscription has not been found - check its id", orionldState.wildcard[0]);
     return false;
+  }
+
+  if (noCache == false)
+  {
+    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenant, orionldState.wildcard[0]);
+    if (cSubP != NULL)
+      subCacheItemRemove(cSubP);
+    else
+      LM_W(("The subscription '%s' was successfully removed from DB but does not exist in sub-cache ... (sub-cache is enabled)"));
   }
 
   orionldState.httpStatusCode = SccNoContent;

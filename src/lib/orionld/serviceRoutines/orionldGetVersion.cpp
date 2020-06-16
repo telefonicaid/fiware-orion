@@ -47,6 +47,7 @@ extern "C"
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "serviceRoutines/versionTreat.h"                      // versionGet
+#include "cache/subCache.h"                                    // subCacheItems
 #include "orionld/common/orionldState.h"                       // orionldState, orionldVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
@@ -134,6 +135,10 @@ bool orionldGetVersion(ConnectionInfo* ciP)
 
   // Branch
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Number of item in the subscription cache
+  nodeP = kjInteger(orionldState.kjsonP, "cached subscriptions", subCacheItems());
   kjChildAdd(orionldState.responseTree, nodeP);
 
   //

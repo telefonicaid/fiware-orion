@@ -199,11 +199,11 @@ fi
 
 if [[ ${STAGE} == 'release' ]]; then
 
-    echo "Debian Builder: installing orion"
+    echo "Debian Builder: compiling and installing orion as a DEBUGGABLE executable"
     git clone ${REPOSITORY} ${PATH_TO_SRC}
     cd ${PATH_TO_SRC}
     git checkout ${REV}
-    make install
+    make debug install
     strip /usr/bin/${BROKER}
 
     BOOST_VER=$(apt-cache policy libboost-all-dev | grep Installed | awk '{ print $2 }' | cut -c -6)

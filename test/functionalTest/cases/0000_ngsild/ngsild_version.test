@@ -81,6 +81,7 @@ Date: REGEX(.*)
   "libcurl version": "REGEX(.*)",
   "libuuid version": "UNKNOWN",
   "branch": "REGEX(.*)",
+  "cached subscriptions": 0,
   "Next File Descriptor": REGEX(\d+)
 }
 

@@ -81,6 +81,7 @@ Date: REGEX(.*)
     "based on orion": "REGEX(.*)",
     "boost version": "REGEX(.*)",
     "branch": "REGEX(.*)",
+    "cached subscriptions": 0,
     "kalloc version": "REGEX(.*)",
     "kbase version": "REGEX(.*)",
     "khash version": "REGEX(.*)",
