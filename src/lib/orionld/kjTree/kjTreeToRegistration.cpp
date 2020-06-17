@@ -259,7 +259,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   while (kNodeP != NULL)
   {
     next = kNodeP->next;
-    
+
     if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
     {
       // Ignored - read-only

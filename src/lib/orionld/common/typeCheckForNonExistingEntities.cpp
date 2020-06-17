@@ -58,7 +58,7 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
     if (inEntityIdNodeP == NULL)  // Entity ID is mandatory
     {
       inEntityIdNodeP = kjLookup(inNodeP, "@id");
-      if(inEntityIdNodeP == NULL)
+      if (inEntityIdNodeP == NULL)
       {
         LM_E(("KZ: Invalid Entity: Mandatory field entity::id is missing"));
         entityErrorPush(errorsArrayP, "No ID", OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::id is missing", 400);
