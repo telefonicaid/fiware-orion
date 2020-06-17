@@ -183,18 +183,31 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   KjNode*  operationSpaceP           = NULL;
   KjNode*  expiresP                  = NULL;
 
-  if (orionldState.payloadIdNode == NULL)
+  bool hasAtId = false;
+  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  {
+    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode != NULL))
+    {
+      LM_W(("Bad Input (Registration::id must be '@id' or 'id')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id must be '@id' or 'id'", regP->id.c_str());
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
+    else if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode == NULL))
+    {
+      regP->id = kNodeP->value.s;
+      hasAtId = true;
+    }
+  }
+
+  if (orionldState.payloadIdNode == NULL && hasAtId == false)
   {
     char randomId[32];
-
-    LM_T(LmtServiceRoutine, ("jorge-log: orionldState.payloadIdNode == NULL"));
-
     mongoIdentifier(randomId);
-
     regP->id  = "urn:ngsi-ld:ContextSourceRegistration:";
     regP->id += randomId;
   }
-  else
+  else if (orionldState.payloadIdNode != NULL && hasAtId == false)
     regP->id = orionldState.payloadIdNode->value.s;
 
   if ((urlCheck((char*) regP->id.c_str(), NULL) == false) && (urnCheck((char*) regP->id.c_str(), NULL) == false))
@@ -246,8 +259,12 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   while (kNodeP != NULL)
   {
     next = kNodeP->next;
-
-    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    
+    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
+    {
+      // Ignored - read-only
+    }
+    else if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Registration::name", kNodeP);
       STRING_CHECK(kNodeP, "Registration::name");

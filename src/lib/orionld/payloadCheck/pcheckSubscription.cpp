@@ -82,7 +82,7 @@ bool pcheckSubscription
 
   for (KjNode* nodeP = subNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (strcmp(nodeP->name, "id") == 0)
+    if (strcmp(nodeP->name, "id") == 0 || strcmp(nodeP->name, "@id") == 0)
     {
       if (idCanBePresent == false)
       {
@@ -92,13 +92,21 @@ bool pcheckSubscription
       }
 
       DUPLICATE_CHECK(idP, "id", nodeP);
+
+      if (strcmp(nodeP->name, "@id") == 0)
+        DUPLICATE_CHECK(idP, "@id", nodeP);
+
       STRING_CHECK(nodeP, nodeP->name);
       EMPTY_STRING_CHECK(nodeP, nodeP->name);
       URI_CHECK(nodeP, nodeP->name);
     }
-    else if (strcmp(nodeP->name, "type") == 0)
+    else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
+
+      if (strcmp(nodeP->name, "@type") == 0)
+        DUPLICATE_CHECK(typeP, "@type", nodeP);
+
       STRING_CHECK(nodeP, nodeP->name);
 
       if (strcmp(nodeP->value.s, "Subscription") != 0)

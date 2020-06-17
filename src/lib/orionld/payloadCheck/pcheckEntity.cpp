@@ -126,17 +126,22 @@ bool pcheckEntity
   {
     if (isBatchOperation == true)
     {
-      if (strcmp(kNodeP->name, "id") == 0)
+      if (strcmp(kNodeP->name, "id") == 0 || strcmp(kNodeP->name, "@id") == 0)
       {
         DUPLICATE_CHECK(batchIdP, "id", kNodeP);
+        DUPLICATE_CHECK(batchIdP, "@id", kNodeP);
         STRING_CHECK(batchIdP, "id");
+        STRING_CHECK(batchIdP, "@id");
         URI_CHECK(batchIdP, "id");
+        URI_CHECK(batchIdP, "@id");
         orionldState.payloadIdNode = kNodeP;  // FIXME: Is this necessary?
       }
-      else if (strcmp(kNodeP->name, "type") == 0)
+      else if (strcmp(kNodeP->name, "type") == 0 || strcmp(kNodeP->name, "@type") == 0)
       {
         DUPLICATE_CHECK(batchTypeP, "type", kNodeP);
+        DUPLICATE_CHECK(batchTypeP, "@type", kNodeP);
         STRING_CHECK(batchTypeP, "type");
+        STRING_CHECK(batchTypeP, "@type");
         orionldState.payloadTypeNode = kNodeP;  // FIXME: Is this necessary?
       }
     }

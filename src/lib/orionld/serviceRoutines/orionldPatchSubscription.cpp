@@ -71,7 +71,7 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 //
 static bool okToRemove(const char* fieldName)
 {
-  if (strcmp(fieldName, "id") == 0)
+  if (strcmp(fieldName, "id") == 0 || strcmp(fieldName, "@id") == 0)
     return false;
   else if (strcmp(fieldName, "notification") == 0)
     return false;
@@ -288,7 +288,7 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
   //
   for (KjNode* fragmentP = patchTree->value.firstChildP; fragmentP != NULL; fragmentP = fragmentP->next)
   {
-    if (strcmp(fragmentP->name, "type") == 0)
+    if (strcmp(fragmentP->name, "type") == 0 || strcmp(fragmentP->name, "@type") == 0)
     {
       // Just skip it - don't want "type: Subscription" in the DB. Not needed
     }
@@ -299,9 +299,13 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
       {
         KjNode* isTypePatternP = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
         KjNode* idP            = kjLookup(entityNodeP, "id");
+        KjNode* atIdP          = kjLookup(entityNodeP, "@id");
         KjNode* idPatternP     = kjLookup(entityNodeP, "idPattern");
 
-        if ((idP == NULL) && (idPatternP == NULL))
+        if ((idP != NULL) && (atIdP != NULL))
+          return false;
+
+        if ((idP == NULL) && (atIdP == NULL) && (idPatternP == NULL))
         {
           KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", ".*");
           KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "true");
@@ -309,7 +313,7 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
           kjChildAdd(entityNodeP, idNodeP);
           kjChildAdd(entityNodeP, isPatternNodeP);
         }
-        else if (idP == NULL)
+        else if (idP == NULL && atIdP == NULL)
         {
           KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "true");
           kjChildAdd(entityNodeP, isPatternNodeP);
@@ -557,7 +561,14 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   fixDbSubscription(dbSubscriptionP);
 
 
-  ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
+  if (ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree) == false)
+  {
+    LM_W(("Bad Input (Attempt to use 'id' and '@id' to a Subscription)"));
+    orionldState.httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to use 'id' and '@id' to a Subscription");
+    return false;
+  }
+
 
   //
   // After calling ngsildSubscriptionToAPIv1Datamodel, the incoming payload data has beed structured just as the

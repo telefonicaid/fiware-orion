@@ -61,12 +61,12 @@ static bool entityFieldsExtractSimple(KjNode* entityNodeP, char** entityIdP, cha
   {
     KjNode* next = itemP->next;
 
-    if (SCOMPARE3(itemP->name, 'i', 'd', 0))
+    if (SCOMPARE3(itemP->name, 'i', 'd', 0) || SCOMPARE4(itemP->name, '@', 'i', 'd', 0))
     {
       *entityIdP = itemP->value.s;
       kjChildRemove(entityNodeP, itemP);
     }
-    else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
+    else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(itemP->name, '@', 't', 'y', 'p', 'e', 0))
     {
       *entityTypeP = itemP->value.s;
       kjChildRemove(entityNodeP, itemP);

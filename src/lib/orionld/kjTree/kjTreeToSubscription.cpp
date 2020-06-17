@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "apiTypesV2/Subscription.h"                           // Subscription
@@ -97,17 +98,32 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   // o id
   // o type
   //
+  
+  bool hasAtId = false;
+  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  {
+    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode != NULL))
+    {
+      LM_W(("Bad Input (Subscription::id must be '@id' or 'id')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id must be '@id' or 'id'", subP->id.c_str());
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
+    else if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode == NULL))
+    {
+      subP->id = kNodeP->value.s;
+      hasAtId = true;
+    }
+  }
 
-  if (orionldState.payloadIdNode == NULL)
+  if (orionldState.payloadIdNode == NULL && hasAtId == false)
   {
     char randomId[32];
-
     mongoIdentifier(randomId);
-
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
   }
-  else
+  else if (orionldState.payloadIdNode != NULL && hasAtId == false)
     subP->id = orionldState.payloadIdNode->value.s;
 
   if ((urlCheck((char*) subP->id.c_str(), NULL) == false) && (urnCheck((char*) subP->id.c_str(), NULL) == false))
@@ -154,7 +170,11 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
+    {
+      // Ignored - read-only
+    }
+    else if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Subscription::name", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::name");
