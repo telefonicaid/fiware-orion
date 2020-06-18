@@ -83,6 +83,12 @@ void* startSenderThread(void* p)
                           &out,
                           params->extraHeaders);
 
+      if (params->toFree != NULL)
+      {
+        free(params->toFree);
+        params->toFree = NULL;
+      }
+
       if (r == 0)
       {
         statisticsUpdate(NotifyContextSent, params->mimeType);
