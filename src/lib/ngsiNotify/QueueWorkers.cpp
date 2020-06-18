@@ -166,6 +166,12 @@ static void* workerFunc(void* pSyncQ)
                                     params->extraHeaders);
       }
 
+      if (params->toFree != NULL)
+      {
+        free(params->toFree);
+        params->toFree = NULL;
+      }
+
       if (!simulatedNotification)
       {
         //
