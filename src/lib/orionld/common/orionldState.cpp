@@ -125,6 +125,9 @@ void orionldStateInit(void)
   orionldState.prettyPrintSpaces       = 2;
   orionldState.forwardAttrsCompacted   = true;
   orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
+
+  // Paginataion
+  orionldState.uriParams.offset        = 0;
   orionldState.uriParams.limit         = 20;
 
   // orionldState.delayedKjFreeVecSize    = sizeof(orionldState.delayedKjFreeVec) / sizeof(orionldState.delayedKjFreeVec[0]);
