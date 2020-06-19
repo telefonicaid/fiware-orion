@@ -99,18 +99,20 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   // o type
   //
 
-  bool hasAtId = false;
+  bool     hasAtId      = false;
+  KjNode*  atIdNodeP  = NULL;
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode != NULL))
     {
-      LM_W(("Bad Input (Subscription::id must be '@id' or 'id')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id must be '@id' or 'id'", subP->id.c_str());
+      LM_W(("Bad Input (Subscription::id must be only '@id' or 'id')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id must be only '@id' or 'id'", subP->id.c_str());
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
     else if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode == NULL))
     {
+      DUPLICATE_CHECK(atIdNodeP, "@id", kNodeP);
       subP->id = kNodeP->value.s;
       hasAtId = true;
     }
@@ -148,7 +150,26 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //     "type": "Subscription"
   //   is added to the response payload.
   //
-  if (orionldState.payloadTypeNode == NULL)
+  bool     hasAtType    = false;
+  KjNode*  atTypeNodeP  = NULL;
+  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
+  {
+    if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode != NULL))
+    {
+      LM_W(("Bad Input (Subscription::type must be only '@type' or 'type')"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::type must be only '@type' or 'type'", subP->id.c_str());
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
+    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode == NULL))
+    {
+      DUPLICATE_CHECK(atTypeNodeP, "@type", kNodeP);
+      orionldState.payloadTypeNode = kNodeP;
+      hasAtType = true;
+    }
+  }
+
+  if (orionldState.payloadTypeNode == NULL && hasAtType == false)
   {
     LM_W(("Bad Input (Mandatory field missing: Subscription::type)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::type");
@@ -171,6 +192,10 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
     if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
+    {
+      // Ignored - read-only
+    }
+    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0))
     {
       // Ignored - read-only
     }
