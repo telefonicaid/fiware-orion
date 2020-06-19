@@ -183,21 +183,23 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
 //
 bool pcheckAttributeType(KjNode* attrTypeP, const char* attrName)
 {
-  if (attrTypeP == NULL)
+  if((strcmp(attrName, "@id") != 0) && (strcmp(attrName, "@type") != 0))
   {
-    LM_W(("Bad Input (attribute without type)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute without type", attrName);
-    orionldState.httpStatusCode = SccBadRequest;
-    return false;
+    if (attrTypeP == NULL)
+    {
+      LM_W(("Bad Input (attribute without type)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute without type", attrName);
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
+    if (attrTypeP->type != KjString)
+    {
+      LM_W(("Bad Input (attribute type must be a JSON string)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type must be a JSON string", attrName);
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
   }
-  if (attrTypeP->type != KjString)
-  {
-    LM_W(("Bad Input (attribute type must be a JSON string)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute type must be a JSON string", attrName);
-    orionldState.httpStatusCode = SccBadRequest;
-    return false;
-  }
-
   return true;
 }
 

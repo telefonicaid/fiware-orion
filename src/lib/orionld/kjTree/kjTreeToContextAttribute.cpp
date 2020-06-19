@@ -496,21 +496,29 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
   LM_T(LmtPayloadCheck, ("Treating attribute '%s' (KjNode at %p)", caName, kNodeP));
 
-  if (kNodeP->type != KjObject)
+  if((strcmp(kNodeP->name, "@id") != 0) && (strcmp(kNodeP->name, "@type") != 0))
   {
-    *detailP = (char*) "Attribute must be a JSON object";
-    orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", caName);
-    orionldState.httpStatusCode = SccBadRequest;
-    return false;
+    if (kNodeP->type != KjObject)
+    {
+      *detailP = (char*) "Attribute must be a JSON object";
+      orionldErrorResponseCreate(OrionldBadRequestData, "Attribute must be a JSON object", caName);
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
   }
-
 
   //
   // Expand name of attribute
   //
   OrionldContextItem*  contextItemP = NULL;
 
-  if ((strcmp(kNodeP->name, "location") != 0) && (strcmp(kNodeP->name, "observationSpace") != 0) && (strcmp(kNodeP->name, "operationSpace") != 0))
+  if 
+  (
+    (strcmp(kNodeP->name, "location") != 0) &&
+    (strcmp(kNodeP->name, "observationSpace") != 0) &&
+    (strcmp(kNodeP->name, "operationSpace") != 0) &&
+    (strcmp(kNodeP->name, "@id") != 0) && (strcmp(kNodeP->name, "@type") != 0)
+  )
   {
     char*                longName;
     bool                 valueMayBeExpanded  = false;
