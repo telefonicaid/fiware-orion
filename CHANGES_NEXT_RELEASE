@@ -7,3 +7,4 @@
 * Issue #XXX  Subscriptions when deleted were not removed from the subscription cache - now they are
 * Issue #482  Fixed "Part C" - Notifications of big size attributes are cut off at 2049 Byte total message length
 * Issue #482  Fixed "Part B" - Size constraints on entity size for GET /entities/{entity-id}
+* Issue #480  Erroneous contexts are saved in the context cache
