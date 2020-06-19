@@ -36,7 +36,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                           // LM_*
 #include "logMsg/traceLevels.h"                                      // Lmt*
 
-#include "orionld/common/orionldState.h"                             // orionldState
+#include "orionld/common/orionldState.h"                             // orionldState, orionldStateDelayedFreeEnqueue
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // Own interface
 
 
@@ -59,7 +59,9 @@ KjNode* mongoCppLegacyKjTreeFromBsonObj(const void* dataP, char** titleP, char**
   }
   else
   {
-    orionldState.jsonBuf = kaStrdup(&orionldState.kalloc, (char*) jsonString.c_str());
+    // FIXME: Use kjStrdup, and only if it fals, use strdup and orionldStateDelayedFreeEnqueue
+    orionldState.jsonBuf = strdup(jsonString.c_str());
+    orionldStateDelayedFreeEnqueue(orionldState.jsonBuf);
     treeP = kjParse(orionldState.kjsonP, orionldState.jsonBuf);
     if (treeP == NULL)
     {
