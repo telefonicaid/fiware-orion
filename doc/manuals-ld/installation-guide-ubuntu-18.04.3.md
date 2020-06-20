@@ -117,7 +117,7 @@ tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
 
-*~/git* folder should be same as the folder where Context Broker cloned folder locally.
+**_~/git_ folder should be same as the folder where Context Broker cloned folder locally**
 ### kbase
 
 *kbase* is a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
