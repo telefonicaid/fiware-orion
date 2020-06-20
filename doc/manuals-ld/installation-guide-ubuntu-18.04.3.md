@@ -283,6 +283,10 @@ sudo apt-get update
 
 # Install the MongoDB packages
 sudo apt-get install -y mongodb-org
+
+# Once the installation is done, start MongoDB before starting Orionld
+sudo systemctl start mongod
+
 ```
 
 For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
