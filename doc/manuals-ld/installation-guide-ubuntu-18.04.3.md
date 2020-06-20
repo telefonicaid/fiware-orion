@@ -117,6 +117,7 @@ tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
 
+*~/git* folder should be same as the folder where Context Broker cloned folder locally.
 ### kbase
 
 *kbase* is a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
@@ -149,7 +150,7 @@ make install
 *kalloc* is a library that provides faster allocation by avoiding calls to `malloc`.
 The library allocates *big* buffers by calling `malloc` and then gives out portions of this big allocated buffer.
 The portions cannot be freed, only the *big* buffers allocated via `malloc` and that is done when the kalloc instance dies.
-For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view. *~/git* folder should be same as the folder where Context Broker cloned folder locally.
+For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view. 
 
 To download, build and install:
 ```bash
