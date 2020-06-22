@@ -47,7 +47,8 @@ Some libraries are built from source code and those sources must be downloaded a
 * gmock:          1.5 (needed for unit testing only)
 
 For those libraries that are cloned repositories, I myself keep all repositories in a directory I call *git* directly under my home directory: `~/git`.
-This guide follows that example, so, let's start by creating the directory for repositories:
+For this guide to work, you will need to do the same.
+So, let's start by creating the directory for repositories:
 
 ```bash
 mkdir ~/git
@@ -117,7 +118,6 @@ tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
 
-**_~/git_ folder should be same as the folder where Context Broker cloned folder locally**
 ### kbase
 
 *kbase* is a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
