@@ -51,10 +51,10 @@ OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblem
 
   if (tree == NULL)
   {
-    LM_E(("parse error"));
+    LM_E(("JSON Parse Error in @context '%s'", url));
     pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Parse Error";
-    pdP->detail = kjsonP->errorString;
+    pdP->title  = (char*) "JSON Parse Error in @context";
+    pdP->detail = url;
     pdP->status = 400;
 
     return NULL;
@@ -65,8 +65,8 @@ OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblem
   {
     LM_E(("No @context field in the context"));
     pdP->type   = OrionldBadRequestData;
-    pdP->title  = (char*) "Invalid context";
-    pdP->detail = (char*) "No @context field";
+    pdP->title  = (char*) "Invalid context - @context field missing";
+    pdP->detail = url;
     pdP->status = 400;
 
     return NULL;

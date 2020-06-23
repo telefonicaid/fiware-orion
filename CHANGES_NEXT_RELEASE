@@ -7,4 +7,6 @@
 * Issue #XXX  Subscriptions when deleted were not removed from the subscription cache - now they are
 * Issue #482  Fixed "Part C" - Notifications of big size attributes are cut off at 2049 Byte total message length
 * Issue #482  Fixed "Part B" - Size constraints on entity size for GET /entities/{entity-id}
+* Issue #480  Erroneous contexts are saved in the context cache
+* Issue #482-bis: error following the 482 fix, too small buffer of delayed free references - upped to 1001 slots
 * Issue #280  @id and @type can now be used instead of id and type
