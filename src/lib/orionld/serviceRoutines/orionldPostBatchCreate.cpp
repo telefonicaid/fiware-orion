@@ -82,6 +82,7 @@ static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 }
 
 
+
 // ----------------------------------------------------------------------------
 //
 // entityIdPush - add ID to array
@@ -94,6 +95,7 @@ static void entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
 // entityIdGet -
@@ -102,10 +104,11 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 {
   for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (SCOMPARE3(nodeP->name, 'i', 'd', 0))
+    if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
       *idP = nodeP->value.s;
   }
 }
+
 
 
 // ----------------------------------------------------------------------------

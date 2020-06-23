@@ -71,7 +71,7 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 //
 static bool okToRemove(const char* fieldName)
 {
-  if (strcmp(fieldName, "id") == 0 || strcmp(fieldName, "@id") == 0)
+  if ((strcmp(fieldName, "id") == 0) || (strcmp(fieldName, "@id") == 0))
     return false;
   else if (strcmp(fieldName, "notification") == 0)
     return false;

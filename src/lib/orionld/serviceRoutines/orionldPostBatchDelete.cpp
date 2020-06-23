@@ -92,16 +92,6 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
     }
   }
 
-  #if 0
-    if (mongoCppLegacyEntityListLookupWithIdTypeCreDate(orionldState.requestTree) == NULL)
-    {
-      LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
-      orionldState.httpStatusCode = SccBadRequest;
-      if (orionldState.responseTree == NULL)
-        orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL");
-      return false;
-    }
-  #endif
 
   //
   // First get the entities from database to check if they exist
@@ -126,9 +116,13 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
 
     for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
     {
-      KjNode* dbEntityId  = kjLookup(dbEntity, "id");
+      KjNode* dbEntityId  = kjLookup(dbEntity, "id");  // Coming from DB - '@id' not necessary
 
-      if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
+      if (dbEntityId == NULL)
+      {
+        // This can't happen ... however, let's make sure the broker never crashes ...
+      }
+      else if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
       {
         idExists = true;
         break;  // Found - no need to keep searching.

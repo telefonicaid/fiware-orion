@@ -55,18 +55,17 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
     //
     KjNode* inEntityIdNodeP = kjLookup(inNodeP, "id");
 
+    if (inEntityIdNodeP == NULL)
+      inEntityIdNodeP = kjLookup(inNodeP, "@id");
+
     if (inEntityIdNodeP == NULL)  // Entity ID is mandatory
     {
-      inEntityIdNodeP = kjLookup(inNodeP, "@id");
-      if (inEntityIdNodeP == NULL)
-      {
-        LM_E(("KZ: Invalid Entity: Mandatory field entity::id is missing"));
-        entityErrorPush(errorsArrayP, "No ID", OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::id is missing", 400);
-        next = inNodeP->next;
-        kjChildRemove(incomingTree, inNodeP);
-        inNodeP = next;
-        continue;
-      }
+      LM_E(("KZ: Invalid Entity: Mandatory field entity::id is missing"));
+      entityErrorPush(errorsArrayP, "No ID", OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::id is missing", 400);
+      next = inNodeP->next;
+      kjChildRemove(incomingTree, inNodeP);
+      inNodeP = next;
+      continue;
     }
 
     KjNode* dbEntityId = NULL;
@@ -80,26 +79,25 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
       KjNode* inEntityTypeNodeP = kjLookup(inNodeP, "type");
 
       if (inEntityTypeNodeP == NULL)
-      {
         inEntityTypeNodeP = kjLookup(inNodeP, "@type");
-        if (inEntityTypeNodeP == NULL)
+
+      if (inEntityTypeNodeP == NULL)
+      {
+        LM_E(("KZ: Invalid Entity: Mandatory field entity::type is missing"));
+        entityErrorPush(errorsArrayP, inEntityIdNodeP->value.s, OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::type is missing", 400);
+
+        if (removeArray != NULL)
         {
-          LM_E(("KZ: Invalid Entity: Mandatory field entity::type is missing"));
-          entityErrorPush(errorsArrayP, inEntityIdNodeP->value.s, OrionldBadRequestData, "Invalid Entity", "Mandatory field entity::type is missing", 400);
+          KjNode* entityInRemoveArray = removeArrayEntityLookup(removeArray, inEntityIdNodeP->value.s);
 
-          if (removeArray != NULL)
-          {
-            KjNode* entityInRemoveArray = removeArrayEntityLookup(removeArray, inEntityIdNodeP->value.s);
-
-            if (entityInRemoveArray != NULL)
-              kjChildRemove(removeArray, entityInRemoveArray);
-          }
-
-          next = inNodeP->next;
-          kjChildRemove(incomingTree, inNodeP);
-          inNodeP = next;
-          continue;
+          if (entityInRemoveArray != NULL)
+            kjChildRemove(removeArray, entityInRemoveArray);
         }
+
+        next = inNodeP->next;
+        kjChildRemove(incomingTree, inNodeP);
+        inNodeP = next;
+        continue;
       }
     }
 

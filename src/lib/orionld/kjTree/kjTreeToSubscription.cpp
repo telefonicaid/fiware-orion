@@ -152,15 +152,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //
   for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
   {
-    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
-    {
-      // Ignored - read-only
-    }
-    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0))
-    {
-      // Ignored - read-only
-    }
-    else if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Subscription::name", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::name");

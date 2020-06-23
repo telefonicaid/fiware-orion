@@ -323,10 +323,11 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
       {
         next = nodeP->next;
 
-        if (SCOMPARE3(nodeP->name, 'i', 'd', 0))
+        if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
         {
+          // Do Nothing
         }
-        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
+        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
         {
           if (needEntityType)
           {

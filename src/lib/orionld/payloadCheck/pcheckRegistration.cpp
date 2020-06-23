@@ -105,7 +105,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
   {
     next = nodeP->next;
 
-    if (strcmp(nodeP->name, "id") == 0 || strcmp(nodeP->name, "@id") == 0)
+    if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
     {
       if (idCanBePresent == false)
       {
