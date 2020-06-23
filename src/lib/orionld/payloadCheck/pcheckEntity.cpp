@@ -59,52 +59,13 @@ extern "C"
 //
 static bool checkEntityIdFieldExists(void)
 {
-  KjNode*  kNodeP;
-  bool     hasAtId    = false;
-  KjNode*  atIdNodeP  = NULL;
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode != NULL))
-    {
-      LM_W(("Bad Input (Entity::id must be only '@id' or 'id')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Entity::id must be only '@id' or 'id'", orionldState.payloadIdNode->value.s);
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode == NULL))
-    {
-      DUPLICATE_CHECK(atIdNodeP, "@id", kNodeP);
-      orionldState.payloadIdNode = kNodeP;
-      hasAtId = true;
-    }
-  }
-
-  if (orionldState.payloadIdNode == NULL && hasAtId == false)
+  if (orionldState.payloadIdNode == NULL)
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity id is missing", "The 'id' field is mandatory");
     return false;
   }
 
-  bool     hasAtType    = false;
-  KjNode*  atTypeNodeP  = NULL;
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode != NULL))
-    {
-      LM_W(("Bad Input (Entity::type must be only '@type' or 'type')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Entity::type must be only '@type' or 'type'", orionldState.payloadTypeNode->value.s);
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode == NULL))
-    {
-      DUPLICATE_CHECK(atTypeNodeP, "@type", kNodeP);
-      orionldState.payloadTypeNode = kNodeP;
-      hasAtType = true;
-    }
-  }
-
-  if (orionldState.payloadTypeNode == NULL && hasAtType == false)
+  if (orionldState.payloadTypeNode == NULL)
   {
     const char* entityStartTitle       = "Entity - ";
     const char* idEntityFromPayload    = orionldState.payloadIdNode->value.s;
@@ -168,19 +129,14 @@ bool pcheckEntity
       if (strcmp(kNodeP->name, "id") == 0 || strcmp(kNodeP->name, "@id") == 0)
       {
         DUPLICATE_CHECK(batchIdP, "id", kNodeP);
-        DUPLICATE_CHECK(batchIdP, "@id", kNodeP);
         STRING_CHECK(batchIdP, "id");
-        STRING_CHECK(batchIdP, "@id");
         URI_CHECK(batchIdP, "id");
-        URI_CHECK(batchIdP, "@id");
         orionldState.payloadIdNode = kNodeP;  // FIXME: Is this necessary?
       }
       else if (strcmp(kNodeP->name, "type") == 0 || strcmp(kNodeP->name, "@type") == 0)
       {
         DUPLICATE_CHECK(batchTypeP, "type", kNodeP);
-        DUPLICATE_CHECK(batchTypeP, "@type", kNodeP);
         STRING_CHECK(batchTypeP, "type");
-        STRING_CHECK(batchTypeP, "@type");
         orionldState.payloadTypeNode = kNodeP;  // FIXME: Is this necessary?
       }
     }

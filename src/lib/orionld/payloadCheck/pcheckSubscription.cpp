@@ -92,10 +92,6 @@ bool pcheckSubscription
       }
 
       DUPLICATE_CHECK(idP, "id", nodeP);
-
-      if (strcmp(nodeP->name, "@id") == 0)
-        DUPLICATE_CHECK(idP, "@id", nodeP);
-
       STRING_CHECK(nodeP, nodeP->name);
       EMPTY_STRING_CHECK(nodeP, nodeP->name);
       URI_CHECK(nodeP, nodeP->name);
@@ -103,10 +99,6 @@ bool pcheckSubscription
     else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
-
-      if (strcmp(nodeP->name, "@type") == 0)
-        DUPLICATE_CHECK(typeP, "@type", nodeP);
-
       STRING_CHECK(nodeP, nodeP->name);
 
       if (strcmp(nodeP->value.s, "Subscription") != 0)

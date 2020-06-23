@@ -98,34 +98,14 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   // o id
   // o type
   //
-
-  bool     hasAtId      = false;
-  KjNode*  atIdNodeP  = NULL;
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode != NULL))
-    {
-      LM_W(("Bad Input (Subscription::id must be only '@id' or 'id')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id must be only '@id' or 'id'", subP->id.c_str());
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode == NULL))
-    {
-      DUPLICATE_CHECK(atIdNodeP, "@id", kNodeP);
-      subP->id = kNodeP->value.s;
-      hasAtId = true;
-    }
-  }
-
-  if (orionldState.payloadIdNode == NULL && hasAtId == false)
+  if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
     mongoIdentifier(randomId);
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
   }
-  else if (orionldState.payloadIdNode != NULL && hasAtId == false)
+  else
     subP->id = orionldState.payloadIdNode->value.s;
 
   if ((urlCheck((char*) subP->id.c_str(), NULL) == false) && (urnCheck((char*) subP->id.c_str(), NULL) == false))
@@ -150,26 +130,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   //     "type": "Subscription"
   //   is added to the response payload.
   //
-  bool     hasAtType    = false;
-  KjNode*  atTypeNodeP  = NULL;
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode != NULL))
-    {
-      LM_W(("Bad Input (Subscription::type must be only '@type' or 'type')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::type must be only '@type' or 'type'", subP->id.c_str());
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode == NULL))
-    {
-      DUPLICATE_CHECK(atTypeNodeP, "@type", kNodeP);
-      orionldState.payloadTypeNode = kNodeP;
-      hasAtType = true;
-    }
-  }
-
-  if (orionldState.payloadTypeNode == NULL && hasAtType == false)
+  if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Subscription::type)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::type");

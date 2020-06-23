@@ -445,13 +445,13 @@ Date: REGEX(.*)
 14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 168
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "name",
-    "title": "Attribute with type GeoProperty found, but the associated value field is missing",
+    "detail": "Entity:id",
+    "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -459,13 +459,13 @@ Date: REGEX(.*)
 15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 168
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "name",
-    "title": "Attribute with type GeoProperty found, but the associated value field is missing",
+    "detail": "Entity:type",
+    "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

@@ -112,10 +112,6 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-//
-//
-//
-//
 static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
@@ -291,21 +287,21 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
     if (strcmp(fragmentP->name, "type") == 0 || strcmp(fragmentP->name, "@type") == 0)
     {
       // Just skip it - don't want "type: Subscription" in the DB. Not needed
+      continue;
     }
     else if (strcmp(fragmentP->name, "entities") == 0)
     {
-      // Make sure there is an "id" and an "isPattern"
+      // Make sure there is an "id" and an "isPattern" in the output
       for (KjNode* entityNodeP = fragmentP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
       {
-        KjNode* isTypePatternP = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
-        KjNode* idP            = kjLookup(entityNodeP, "id");
-        KjNode* atIdP          = kjLookup(entityNodeP, "@id");
-        KjNode* idPatternP     = kjLookup(entityNodeP, "idPattern");
+        KjNode* isTypePatternP  = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
+        KjNode* idP             = kjLookup(entityNodeP, "id");
+        KjNode* idPatternP      = kjLookup(entityNodeP, "idPattern");
 
-        if ((idP != NULL) && (atIdP != NULL))
-          return false;
+        if (idP == NULL)
+          idP = kjLookup(entityNodeP, "@id");
 
-        if ((idP == NULL) && (atIdP == NULL) && (idPatternP == NULL))
+        if ((idP == NULL) && (idPatternP == NULL))
         {
           KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", ".*");
           KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "true");
@@ -313,7 +309,7 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
           kjChildAdd(entityNodeP, idNodeP);
           kjChildAdd(entityNodeP, isPatternNodeP);
         }
-        else if (idP == NULL && atIdP == NULL)
+        else if (idP == NULL)
         {
           KjNode* isPatternNodeP = kjString(orionldState.kjsonP, "isPattern", "true");
           kjChildAdd(entityNodeP, isPatternNodeP);
@@ -559,16 +555,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // FIXME: This is BAD ... shouldn't change the type of these fields
   //
   fixDbSubscription(dbSubscriptionP);
-
-
-  if (ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree) == false)
-  {
-    LM_W(("Bad Input (Attempt to use 'id' and '@id' to a Subscription)"));
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to use 'id' and '@id' to a Subscription");
-    return false;
-  }
-
+  ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
 
   //
   // After calling ngsildSubscriptionToAPIv1Datamodel, the incoming payload data has beed structured just as the

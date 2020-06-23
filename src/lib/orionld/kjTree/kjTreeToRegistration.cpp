@@ -183,31 +183,14 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   KjNode*  operationSpaceP           = NULL;
   KjNode*  expiresP                  = NULL;
 
-  bool hasAtId = false;
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode != NULL))
-    {
-      LM_W(("Bad Input (Registration::id must be only '@id' or 'id')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id must be only '@id' or 'id'", regP->id.c_str());
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0) && (orionldState.payloadIdNode == NULL))
-    {
-      regP->id = kNodeP->value.s;
-      hasAtId = true;
-    }
-  }
-
-  if (orionldState.payloadIdNode == NULL && hasAtId == false)
+  if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
     mongoIdentifier(randomId);
     regP->id  = "urn:ngsi-ld:ContextSourceRegistration:";
     regP->id += randomId;
   }
-  else if (orionldState.payloadIdNode != NULL && hasAtId == false)
+  else
     regP->id = orionldState.payloadIdNode->value.s;
 
   if ((urlCheck((char*) regP->id.c_str(), NULL) == false) && (urnCheck((char*) regP->id.c_str(), NULL) == false))
@@ -231,26 +214,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   //     "type": "ContextSourceRegistration"
   //   is added to the response payload.
   //
-  bool     hasAtType    = false;
-  KjNode*  atTypeNodeP  = NULL;
-  for (kNodeP = orionldState.requestTree->value.firstChildP; kNodeP != NULL; kNodeP = kNodeP->next)
-  {
-    if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode != NULL))
-    {
-      LM_W(("Bad Input (Registration::type must be only '@type' or 'type')"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Registration::type must be only '@type' or 'type'", regP->id.c_str());
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0) && (orionldState.payloadTypeNode == NULL))
-    {
-      DUPLICATE_CHECK(atTypeNodeP, "@type", kNodeP);
-      orionldState.payloadTypeNode = kNodeP;
-      hasAtType = true;
-    }
-  }
-
-  if (orionldState.payloadTypeNode == NULL && hasAtType == false)
+  if (orionldState.payloadTypeNode == NULL)
   {
     LM_W(("Bad Input (Mandatory field missing: Registration::type)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Registration::type");
@@ -279,15 +243,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   {
     next = kNodeP->next;
 
-    if (SCOMPARE4(kNodeP->name, '@', 'i', 'd', 0))
-    {
-      // Ignored - read-only
-    }
-    else if (SCOMPARE6(kNodeP->name, '@', 't', 'y', 'p', 'e', 0))
-    {
-      // Ignored - read-only
-    }
-    else if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
+    if (SCOMPARE5(kNodeP->name, 'n', 'a', 'm', 'e', 0))
     {
       DUPLICATE_CHECK(nameP, "Registration::name", kNodeP);
       STRING_CHECK(kNodeP, "Registration::name");
