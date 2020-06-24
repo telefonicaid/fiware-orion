@@ -1126,6 +1126,8 @@ int main(int argC, char* argV[])
   }
 
   LM_I(("Startup completed"));
+  orionldPhase = OrionldPhaseServing;
+
   if (simulatedNotification)
   {
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));

@@ -84,6 +84,8 @@ int               orionldHostNameLen       = -1;
 char*             tenantV[100];
 unsigned int      tenants                  = 0;
 OrionldGeoIndex*  geoIndexList             = NULL;
+OrionldPhase      orionldPhase             = OrionldPhaseStartup;
+
 
 //
 // Variables for Mongo C Driver
@@ -174,6 +176,7 @@ void orionldStateRelease(void)
       orionldState.delayedFreeVec[ix] = NULL;
     }
   }
+  orionldState.delayedFreeVecIndex = 0;
 
   if (orionldState.delayedFreePointer != NULL)
   {

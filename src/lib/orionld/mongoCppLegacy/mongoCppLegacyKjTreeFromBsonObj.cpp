@@ -59,9 +59,10 @@ KjNode* mongoCppLegacyKjTreeFromBsonObj(const void* dataP, char** titleP, char**
   }
   else
   {
-    // FIXME: Use kjStrdup, and only if it fals, use strdup and orionldStateDelayedFreeEnqueue
     orionldState.jsonBuf = strdup(jsonString.c_str());
-    orionldStateDelayedFreeEnqueue(orionldState.jsonBuf);
+    if (orionldPhase != OrionldPhaseStartup)
+      orionldStateDelayedFreeEnqueue(orionldState.jsonBuf);  // automatic free if not in startup phase
+
     treeP = kjParse(orionldState.kjsonP, orionldState.jsonBuf);
     if (treeP == NULL)
     {

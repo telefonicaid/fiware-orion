@@ -135,6 +135,13 @@ typedef struct OrionldNotificationInfo
 } OrionldNotificationInfo;
 
 
+typedef enum OrionldPhase
+{
+  OrionldPhaseStartup = 1,
+  OrionldPhaseServing
+} OrionldPhase;
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -149,6 +156,7 @@ typedef struct OrionldNotificationInfo
 //
 typedef struct OrionldConnectionState
 {
+  OrionldPhase            phase;
   ConnectionInfo*         ciP;
   struct timespec         timestamp;  // the time when the request entered
   int                     httpStatusCode;
@@ -286,6 +294,7 @@ extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
+extern OrionldPhase      orionldPhase;
 
 
 
