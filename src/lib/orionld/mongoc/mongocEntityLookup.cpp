@@ -73,7 +73,7 @@ KjNode* mongocEntityLookup(const char* entityId)
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);
+    entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);  // FIXME: Don't use the DB layer Function Pointers here - use mongocXXXX directly
     break;  // Just using the first one - should be no more than one!
   }
 
