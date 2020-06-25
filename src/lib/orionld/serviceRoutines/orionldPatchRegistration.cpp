@@ -428,9 +428,9 @@ static bool ngsildRegistrationToAPIv1Datamodel(ConnectionInfo* ciP, KjNode* patc
   //
   for (KjNode* fragmentP = patchTree->value.firstChildP; fragmentP != NULL; fragmentP = fragmentP->next)
   {
-    if (strcmp(fragmentP->name, "id") == 0)
+    if (strcmp(fragmentP->name, "id") == 0 || strcmp(fragmentP->name, "@id") == 0)
       fragmentP->name = (char*) "_id";
-    else if (strcmp(fragmentP->name, "type") == 0)
+    else if (strcmp(fragmentP->name, "type") == 0 || strcmp(fragmentP->name, "@type") == 0)
     {
       // Just skip it - don't want "type: ContextSourceRegistration" in the DB. Not needed
     }

@@ -186,11 +186,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
-
-    LM_T(LmtServiceRoutine, ("jorge-log: orionldState.payloadIdNode == NULL"));
-
     mongoIdentifier(randomId);
-
     regP->id  = "urn:ngsi-ld:ContextSourceRegistration:";
     regP->id += randomId;
   }

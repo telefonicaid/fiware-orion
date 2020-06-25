@@ -392,7 +392,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = orionldState.payloadContextNode->next;
         kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
       }
-      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0))
+      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0) || SCOMPARE4(attrNodeP->name, '@', 'i', 'd', 0))
       {
         if (orionldState.payloadIdNode != NULL)
         {
@@ -409,7 +409,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = orionldState.payloadIdNode->next;
         kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
       }
-      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0))
+      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(attrNodeP->name, '@', 't', 'y', 'p', 'e', 0))
       {
         if (orionldState.payloadTypeNode != NULL)
         {

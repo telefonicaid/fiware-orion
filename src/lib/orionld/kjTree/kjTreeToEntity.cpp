@@ -56,7 +56,7 @@ bool kjTreeToEntity(UpdateContextRequest* ucrP, KjNode* treeP)
     {
       for (KjNode* idPartP = attrP->value.firstChildP; idPartP != NULL; idPartP = idPartP->next)
       {
-        if (strcmp(idPartP->name, "id") == 0)
+        if (strcmp(idPartP->name, "id") == 0)  // Comes from DB - no need to check for '@id' / '@type'
           ucrP->contextElementVector[0]->entityId.id = idPartP->value.s;
         else if (strcmp(idPartP->name, "type") == 0)
           ucrP->contextElementVector[0]->entityId.type = idPartP->value.s;

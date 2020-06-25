@@ -64,11 +64,11 @@ static void entityInfoArrayFilter(mongo::BSONObjBuilder* queryBuilderP, KjNode* 
 
     for (KjNode* nodeP = entityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
-      if (strcmp(nodeP->name, "id") == 0)
+      if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
         idP = nodeP;
       else if (strcmp(nodeP->name, "idPattern") == 0)
         idPatternP = nodeP;
-      else if (strcmp(nodeP->name, "type") == 0)
+      else if ((strcmp(nodeP->name, "type") == 0) || (strcmp(nodeP->name, "@type") == 0))
         typeP = nodeP;
     }
 

@@ -189,7 +189,7 @@ void dbRegistrationsOnlyOneAllowed(KjNode* regArray, int matchingRegs, const cha
 
   for (KjNode* regP = regArray->value.firstChildP; regP != NULL; regP = regP->next)
   {
-    KjNode* idNodeP = kjLookup(regP, "id");
+    KjNode* idNodeP = kjLookup(regP, "id");  // Coming from DB - no '@id' needed
 
     if (idNodeP != NULL)
       LM_E(("Matching Registration: %s", idNodeP->value.s));

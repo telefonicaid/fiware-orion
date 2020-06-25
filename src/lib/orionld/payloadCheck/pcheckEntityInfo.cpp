@@ -54,7 +54,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
 
   for (KjNode* entityItemP = entityInfoP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
   {
-    if (strcmp(entityItemP->name, "id") == 0)
+    if ((strcmp(entityItemP->name, "id") == 0) || (strcmp(entityItemP->name, "@id") == 0))
     {
       DUPLICATE_CHECK(idP, "entities[X]::id", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::id");
@@ -68,7 +68,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::idPattern");
       // FIXME: How check for valid REGEX???
     }
-    else if (strcmp(entityItemP->name, "type") == 0)
+    else if ((strcmp(entityItemP->name, "type") == 0) || (strcmp(entityItemP->name, "@type") == 0))
     {
       DUPLICATE_CHECK(typeP, "entities[X]::type", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::type");

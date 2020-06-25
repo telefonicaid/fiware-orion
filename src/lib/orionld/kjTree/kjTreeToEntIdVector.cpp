@@ -72,7 +72,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
 
     for (itemP = entityP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
-      if (SCOMPARE3(itemP->name, 'i', 'd', 0))
+      if (SCOMPARE3(itemP->name, 'i', 'd', 0) || SCOMPARE4(itemP->name, '@', 'i', 'd', 0))
       {
         DUPLICATE_CHECK(idP, "EntityInfo::id", itemP->value.s);
         STRING_CHECK(itemP, "EntityInfo::id");
@@ -82,7 +82,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
         DUPLICATE_CHECK(idPatternP, "EntityInfo::idPattern", itemP->value.s);
         STRING_CHECK(itemP, "EntityInfo::idPattern");
       }
-      else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
+      else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(itemP->name, '@', 't', 'y', 'p', 'e', 0))
       {
         DUPLICATE_CHECK(typeP, "EntityInfo::type", itemP->value.s);
         STRING_CHECK(itemP, "EntityInfo::type");

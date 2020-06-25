@@ -71,7 +71,7 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 //
 static bool okToRemove(const char* fieldName)
 {
-  if (strcmp(fieldName, "id") == 0)
+  if ((strcmp(fieldName, "id") == 0) || (strcmp(fieldName, "@id") == 0))
     return false;
   else if (strcmp(fieldName, "notification") == 0)
     return false;
@@ -111,10 +111,6 @@ static bool okToRemove(const char* fieldName)
 // DON'T forget the "q", that is also part of "expression" but not a part of "geoQ".
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
-//
-//
-//
-//
 //
 static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
@@ -288,18 +284,22 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
   //
   for (KjNode* fragmentP = patchTree->value.firstChildP; fragmentP != NULL; fragmentP = fragmentP->next)
   {
-    if (strcmp(fragmentP->name, "type") == 0)
+    if (strcmp(fragmentP->name, "type") == 0 || strcmp(fragmentP->name, "@type") == 0)
     {
       // Just skip it - don't want "type: Subscription" in the DB. Not needed
+      continue;
     }
     else if (strcmp(fragmentP->name, "entities") == 0)
     {
-      // Make sure there is an "id" and an "isPattern"
+      // Make sure there is an "id" and an "isPattern" in the output
       for (KjNode* entityNodeP = fragmentP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
       {
-        KjNode* isTypePatternP = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
-        KjNode* idP            = kjLookup(entityNodeP, "id");
-        KjNode* idPatternP     = kjLookup(entityNodeP, "idPattern");
+        KjNode* isTypePatternP  = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
+        KjNode* idP             = kjLookup(entityNodeP, "id");
+        KjNode* idPatternP      = kjLookup(entityNodeP, "idPattern");
+
+        if (idP == NULL)
+          idP = kjLookup(entityNodeP, "@id");
 
         if ((idP == NULL) && (idPatternP == NULL))
         {
@@ -555,8 +555,6 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // FIXME: This is BAD ... shouldn't change the type of these fields
   //
   fixDbSubscription(dbSubscriptionP);
-
-
   ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
 
   //

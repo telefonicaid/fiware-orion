@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "apiTypesV2/Subscription.h"                           // Subscription
@@ -97,13 +98,10 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   // o id
   // o type
   //
-
   if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
-
     mongoIdentifier(randomId);
-
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
   }

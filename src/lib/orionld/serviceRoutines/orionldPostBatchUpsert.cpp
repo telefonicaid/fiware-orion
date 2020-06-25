@@ -102,7 +102,7 @@ static char* entityTypeGet(KjNode* entityNodeP, KjNode** contextNodePP)
 
   for (KjNode* itemP = entityNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
-    if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
+    if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(itemP->name, '@', 't', 'y', 'p', 'e', 0))
       type = itemP->value.s;
     if (SCOMPARE9(itemP->name, '@', 'c', 'o', 'n', 't', 'e', 'x', 't', 0))
       *contextNodePP = itemP;
@@ -133,9 +133,9 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 {
   for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (SCOMPARE3(nodeP->name, 'i', 'd', 0))
+    if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
       *idP = nodeP->value.s;
-    else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
+    else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
       *typeP = nodeP->value.s;
     else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
       *creDateP = nodeP->value.i;

@@ -44,6 +44,9 @@ KjNode* entityLookupById(KjNode* entityArray, char* entityId)
   {
     KjNode* idNodeP = kjLookup(entityP, "id");
 
+    if (idNodeP == NULL)
+      idNodeP = kjLookup(entityP, "@id");
+
     if ((idNodeP != NULL) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
       return entityP;
   }

@@ -171,9 +171,9 @@ KjNode* dmodelEntity(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pd
 
   for (KjNode* nodeP = _idP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (strcmp(nodeP->name, "id") == 0)
+    if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
       idP = nodeP;
-    else if (strcmp(nodeP->name, "type") == 0)
+    else if ((strcmp(nodeP->name, "type") == 0) || (strcmp(nodeP->name, "@type") == 0))
       typeP = nodeP;
   }
 
