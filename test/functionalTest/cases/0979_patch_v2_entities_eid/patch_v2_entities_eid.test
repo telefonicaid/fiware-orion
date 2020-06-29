@@ -136,7 +136,6 @@ Date: REGEX(.*)
 04. PATCH /v2/entities/E1 attr1=4
 =================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

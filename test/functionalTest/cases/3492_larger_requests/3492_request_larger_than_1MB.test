@@ -74,7 +74,7 @@ Date: REGEX(.*)
 
 02. Sending a request of ~60 MB, to a broker that excepts request upto ~50MB - see 413 error
 ============================================================================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 102
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

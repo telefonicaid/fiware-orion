@@ -268,7 +268,6 @@ Date: REGEX(.*)
 05. Update entity temp==15
 ==========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -277,7 +276,6 @@ Date: REGEX(.*)
 06. Update entity temp==5
 =========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -286,7 +284,6 @@ Date: REGEX(.*)
 07. Update entity temp==10
 ==========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

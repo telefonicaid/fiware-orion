@@ -313,7 +313,6 @@ Date: REGEX(.*)
 08. Update entities E4 of type T1, setting A1 to 'updated-4'
 ============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -322,7 +321,6 @@ Date: REGEX(.*)
 09. Update entities E5 of type T1, setting A2 to 'updated-5'
 ============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -331,7 +329,6 @@ Date: REGEX(.*)
 10. Update entities E6 of type T1, setting A3 to 'updated-6'
 ============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

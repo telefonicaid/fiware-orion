@@ -273,7 +273,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 ================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -311,7 +310,6 @@ Fiware-Correlator: REGEX(.*)
 06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity with same value.
 =============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -324,7 +322,6 @@ Date: REGEX(.*)
 08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 ===============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -362,7 +359,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.
 ==================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -400,7 +396,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.
 ========================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -438,7 +433,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity with same value.
 =======================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

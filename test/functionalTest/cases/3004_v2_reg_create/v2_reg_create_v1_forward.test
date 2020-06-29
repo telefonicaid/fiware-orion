@@ -150,7 +150,6 @@ Date: REGEX(.*)
 04. UPDATE E1/A1 in main broker (forward made to CP1)
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
