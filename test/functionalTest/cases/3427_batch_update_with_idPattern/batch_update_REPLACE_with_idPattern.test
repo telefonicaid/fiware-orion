@@ -120,7 +120,6 @@ echo
 01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND
 ===========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

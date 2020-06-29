@@ -40,7 +40,7 @@ orionCurl --url "/v1/registry/registerContext" --payload "$BIGFILE"
 
 rm $BIGFILE
 --REGEXPECT--
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 177
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

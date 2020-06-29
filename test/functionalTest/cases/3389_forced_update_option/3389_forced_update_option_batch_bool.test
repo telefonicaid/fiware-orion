@@ -262,7 +262,6 @@ echo
 01. POST /v2/op/update, create Slot1 and Slot2 entity with availability attribute set to true.
 ==============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -349,7 +348,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. POST /v2/op/update without forcedUpdate, to update Slot1 and Slot2 with the same values.
 ============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -362,7 +360,6 @@ Date: REGEX(.*)
 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Slot1 and Slot2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -425,7 +422,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Slot1 and Slot2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

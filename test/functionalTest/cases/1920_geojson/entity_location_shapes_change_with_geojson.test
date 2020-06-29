@@ -228,7 +228,6 @@ Date: REGEX(.*)
 03. Entity changes to point
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -279,7 +278,6 @@ Date: REGEX(.*)
 05. Entity changes to line (using GeoJSON)
 ==========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -364,7 +362,6 @@ Date: REGEX(.*)
 07. Entity changes to box
 ==========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -457,7 +454,6 @@ Date: REGEX(.*)
 09. Entity changes to triangle
 ==============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -543,7 +539,6 @@ Date: REGEX(.*)
 11. Entity changes to none
 ==========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
