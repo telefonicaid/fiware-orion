@@ -218,7 +218,6 @@ Date: REGEX(.*)
 06. Modify E3 at t_6
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -227,7 +226,6 @@ Date: REGEX(.*)
 07. Modify E1 at t_7
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

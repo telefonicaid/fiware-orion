@@ -536,7 +536,6 @@ Date: REGEX(.*)
 01c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -629,7 +628,6 @@ Date: REGEX(.*)
 02c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -722,7 +720,6 @@ Date: REGEX(.*)
 03c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -823,7 +820,6 @@ Date: REGEX(.*)
 04c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -940,7 +936,6 @@ Date: REGEX(.*)
 05c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -1049,7 +1044,6 @@ Date: REGEX(.*)
 06c. Update entity to trigger a second notification
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

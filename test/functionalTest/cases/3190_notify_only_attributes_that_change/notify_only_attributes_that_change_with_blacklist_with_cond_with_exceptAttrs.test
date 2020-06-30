@@ -282,7 +282,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -320,7 +319,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -358,7 +356,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -401,7 +398,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
 ================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

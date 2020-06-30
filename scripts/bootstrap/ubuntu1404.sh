@@ -50,9 +50,9 @@ sudo ldconfig      # just in case... it doesn't hurt :)
 cd ..
 
 # Install Rapidjson
-wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
-tar xfvz v1.0.2.tar.gz
-sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
+wget https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz
+tar xfvz v1.1.0.tar.gz
+sudo mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 # Start MongoDB
 sudo apt-get install libpcre3            # otherwise, mongod crashes in CentOS 6.3

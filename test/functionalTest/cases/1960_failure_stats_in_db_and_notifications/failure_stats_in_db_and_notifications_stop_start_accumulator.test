@@ -214,7 +214,6 @@ Date: REGEX(.*)
 05. Update E1, to provoke notification that now fails
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -268,7 +267,6 @@ accumulator running as PID REGEX(\d+)
 08. Update E1, to provoke notification that now works
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
