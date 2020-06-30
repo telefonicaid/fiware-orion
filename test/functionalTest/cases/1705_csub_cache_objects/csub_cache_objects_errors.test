@@ -336,26 +336,29 @@ Date: REGEX(.*)
 09. GET /v2/entities with only whitespace in q-item (q=   )
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 78
+Content-Length: 77
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "Empty right-hand-side for URI param /q/",
+    "description": "empty q-item &#40;only whitespace&#41;",
     "error": "BadRequest"
 }
 
 
 10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
 ================================================================
-HTTP/1.1 200 OK
-Content-Length: 2
+HTTP/1.1 400 Bad Request
+Content-Length: 51
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[]
+{
+    "description": "empty q-item",
+    "error": "BadRequest"
+}
 
 
 11. GET /v2/entities with > RANGE

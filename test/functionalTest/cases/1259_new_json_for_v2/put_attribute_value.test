@@ -316,7 +316,6 @@ Date: REGEX(.*)
 03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
 ==================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -343,7 +342,6 @@ Date: REGEX(.*)
 05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -371,7 +369,6 @@ Date: REGEX(.*)
 07. PUT /v2/entities/E1/attrs/A1/value with TEXT payload "STRING"
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -395,7 +392,6 @@ Date: REGEX(.*)
 09. PUT /v2/entities/E1/attrs/A1/value with TEXT payload true
 =============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -419,7 +415,6 @@ Date: REGEX(.*)
 11. PUT /v2/entities/E1/attrs/A1/value with TEXT payload TRUE
 =============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -443,7 +438,6 @@ Date: REGEX(.*)
 13. PUT /v2/entities/E1/attrs/A1/value with TEXT payload True
 =============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -467,7 +461,6 @@ Date: REGEX(.*)
 15. PUT /v2/entities/E1/attrs/A1/value with TEXT payload false
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -491,7 +484,6 @@ Date: REGEX(.*)
 17. PUT /v2/entities/E1/attrs/A1/value with TEXT payload FALSE
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -515,7 +507,6 @@ Date: REGEX(.*)
 19. PUT /v2/entities/E1/attrs/A1/value with TEXT payload False
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -539,7 +530,6 @@ Date: REGEX(.*)
 21. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 123
 ============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -563,7 +553,6 @@ Date: REGEX(.*)
 23. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.14
 =============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -616,7 +605,6 @@ Date: REGEX(.*)
 27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -640,7 +628,6 @@ Date: REGEX(.*)
 29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
