@@ -81,8 +81,12 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 # in Werkzeug which makes an empty content-length header appear in the accumulator-server.py
 # dumps. The bug is fixed in Werkzeug==0.11.16. Thus, we override the system setting,
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
+#
+# In addition, note we upgrade pip before installing virtualenv. The virtualenv installation
+# may fail otherwise
 cd /opt \
-&& pip install virtualenv\
+&& pip install --upgrade pip \
+&& pip install virtualenv \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==1.0.2 \
