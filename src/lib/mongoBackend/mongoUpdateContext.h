@@ -51,7 +51,8 @@ extern HttpStatusCode mongoUpdateContext
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate     = false,
   ApiVersion                            apiVersion       = V1,
-  Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR
+  Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR,
+  bool                                  flowControl      = false
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOUPDATECONTEXT_H_

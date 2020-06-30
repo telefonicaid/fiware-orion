@@ -19,6 +19,7 @@
 * [Notify only attributes that change](#notify-only-attributes-that-change)
 * [`lastFailureReason` and `lastSuccessCode` subscriptions fields](#lastfailurereason-and-lastsuccesscode-subscriptions-fields)
 * [`forcedUpdate` option](#forcedupdate-option)
+* [`flowControl` option](#flowcontrol-option)
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
@@ -36,6 +37,11 @@ From "Field syntax restrictions" section at NGSIv2 specification:
 
 The additional restrictions that apply to Orion are the ones describe in the
 [forbidden characters](forbidden_characters.md) section of the manual.
+
+Note that you can use "TextUnrestricted" attribut type (and special attribute type beyond
+the ones defined in the NGSIv2 Specification) in order to skip forbidden characters checkings
+in the attribute value. However, it could have security implications (possible script
+injections attacks) so use it at your own risk!
 
 [Top](#top)
 
@@ -268,7 +274,7 @@ if they arrive too close in time. If your use case doesn't support losing notifi
 
 In addition, Orion implements throttling in a local way. In multi-CB configurations, take into account that the last-notification
 measure is local to each Orion node. Although each node periodically synchronizes with the DB in order to get potentially newer
-values (more on this [here](perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
+values (more on this [here](../admin/perf_tuning.md#subscription-cache)) it may happen that a particular node has an old value, so throttling
 is not 100% accurate.
 
 [Top](#top)
@@ -303,7 +309,7 @@ corresponding to a given subscription, based on updates to the entities covered 
 Apart from that kind of regular notifications, Orion may send also an initial notification at
 subscription creation/update time.
 
-Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification`. 
+Initial notification can be configurable using a new URI parameter option  `skipInitialNotification`. For instance `POST /v2/subscriptions?options=skipInitialNotification` or `PATCH /v2/subscriptions/{subId}?options=skipInitialNotification`
 
 Check details in the document about [initial notifications](initial_notification.md)
 
@@ -340,6 +346,25 @@ field:
 Both can be used to analyze possible problems with notifications. See section in the
 [problem diagnosis procedures document](../admin/diagnosis.md#diagnose-notification-reception-problems)
 for more details.
+
+[Top](#top)
+
+## `flowControl` option
+As extra URI param option to the ones included in the NGSIv2 specification, Orion implements flowControl,
+than can be used to specify that an update operation have to use flow control, which can improve performance
+and avoid saturacion in high-load scenarios. This only works if the ContextBroker has been started using
+the [`-notifFlowControl` parameter](../admin/cli.md), otherwise is ignored. The flow control mechanism
+is explained in [this section in the documentation](../admin/perf_tuning.md#updates-flow-control-mechanism).
+
+The following requests can use the flowControl URI param option:
+
+* `POST /v2/entities/E/attrs?options=flowControl`
+* `POST /v2/entities/E/attrs?options=append,flowControl`
+* `POST /v2/op/update?options=flowControl`
+* `PUT /v2/entities/E/attrs?options=flowControl`
+* `PUT /v2/entities/E/attrs/A?options=flowControl`
+* `PUT /v2/entities/E/attrs/A/value?options=flowControl`
+* `PATCH /v2/entities/E/attrs?options=flowControl`
 
 [Top](#top)
 

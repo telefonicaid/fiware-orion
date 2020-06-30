@@ -47,7 +47,7 @@ echo
 --REGEXPECT--
 01. Send a POST /v2/entites of a few bytes but set Content-Length to 2 Mb in HTTP header - see response
 =======================================================================================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

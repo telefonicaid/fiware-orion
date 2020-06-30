@@ -335,7 +335,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. Update sub with metadata: M1, M2
 ====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -344,7 +343,6 @@ Date: REGEX(.*)
 05. Update entity to trigger notification
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -411,7 +409,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Update sub with metadata: actionType, M3
 ============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -420,7 +417,6 @@ Date: REGEX(.*)
 08. Update entity to trigger notification
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -487,7 +483,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. Update sub with metadata: actionType, *
 ===========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -496,7 +491,6 @@ Date: REGEX(.*)
 11. Update entity to trigger notification
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

@@ -179,7 +179,6 @@ Date: REGEX(.*)
 04. Modify entity E3
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -188,7 +187,6 @@ Date: REGEX(.*)
 04. Modify entity E2
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

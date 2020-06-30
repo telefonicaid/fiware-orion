@@ -500,15 +500,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), HTTP_HOST) == 0)              headerP->host           = value;
-  else if (strcasecmp(key.c_str(), HTTP_ACCEPT) == 0)
+  if (strcasecmp(key.c_str(), HTTP_ACCEPT) == 0)
   {
     headerP->accept = value;
     acceptParse(ciP, value);  // Any errors are flagged in ciP->acceptHeaderError and taken care of later
   }
-  else if (strcasecmp(key.c_str(), HTTP_EXPECT) == 0)            headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), HTTP_CONNECTION) == 0)        headerP->connection     = value;
   else if (strcasecmp(key.c_str(), HTTP_CONTENT_TYPE) == 0)      headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), HTTP_CONTENT_LENGTH) == 0)    headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), HTTP_ORIGIN) == 0)            headerP->origin         = value;
@@ -530,11 +526,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else
   {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
-  }
-
-  if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
-  {
-    LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
   }
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0

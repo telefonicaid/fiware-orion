@@ -1,6 +1,6 @@
 # <a name="top"></a>Development Manual
 
-*Note: This document describes Orion Context Broker as of release 2.3.x.*
+*Note: This document describes Orion Context Broker as of release 2.4.x.*
 
 ## Intended audience
 The intended audience of this manual is developers that need to understand the internals of the Orion Context Broker
@@ -28,5 +28,6 @@ Also, as NGSI is used for the payload of the requests, some previous knowledge o
 * [Source code: main program and libraries](sourceCode.md). A description of the different libraries (and main program) in which the source code is structured.
 * [Flow index](flowsIndex.md). An index for all the flow diagrams described in the development documentation. A very useful "map" to have at hand.
 * [Semaphores](semaphores.md). This document provides detailed information about the different semaphores that Orion uses for internal synchronization.
+* [HTTP Headers](httpHeaders.md). This document provides a list of all HTTP headers used by Orion along with their description.
 * [Cookbook](cookbook.md). This document describes some useful development related recipes.
 

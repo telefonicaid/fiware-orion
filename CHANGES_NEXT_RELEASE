@@ -1,4 +1,5 @@
-- Fix: crash when using null character in some NGSIv1 operations
-- Hardening: NULL control in some strdup and calloc cases (very unlikely, but theoretically possible) (#3578)
-- Hardening: avoid crash in the unlikely case MongoDB get databases operations fails in csubs cache refresh logic (#3456, partly)
+- Fix: upgrade rapidjson dependecy from 1.0.2 to 1.1.0
+- Fix: upgrade microhttpd dependency from 0.9.48 to 0.9.70
+- Fix: wrong 204 code was responded (instead of 501) when using idPattern in POST /v2/op/update operation (#3427)
+- Fix: changed the name of pretty much all the environment variables for Orion. E.g. adding prefix 'ORION_'
 - Remove: NGSIv1 context availability subscriptions

@@ -79,7 +79,6 @@ Date: REGEX(.*)
 02. PUT /v2/entities/E2/attrs/A1/value with TEXT payload 'abc'
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

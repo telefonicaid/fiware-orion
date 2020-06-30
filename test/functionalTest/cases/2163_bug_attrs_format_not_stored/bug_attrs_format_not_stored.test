@@ -196,7 +196,6 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/ID (without attrsFormat)
 ====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -242,7 +241,6 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions/ID (attrsFormat = values)
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

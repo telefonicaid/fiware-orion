@@ -327,7 +327,7 @@ Date: REGEX(.*)
 
 03. Create entity with two geo:line -> fail
 ============================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -388,7 +388,6 @@ Date: REGEX(.*)
 05. Update attr1 geo:line attribute -> OK
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -418,7 +417,7 @@ Date: REGEX(.*)
 
 06. Append a new geo:line attribute (attr2) -> fail
 ===================================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -455,7 +454,6 @@ Date: REGEX(.*)
 07. Remove the geo:line attribute (attr1) -> OK
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -478,7 +476,6 @@ Date: REGEX(.*)
 08. Append a new geo:line attribute (attr2) -> OK
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -509,7 +506,6 @@ Date: REGEX(.*)
 09. Change attribute type to no-geo:line (attr2) -> OK
 ======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -537,7 +533,6 @@ Date: REGEX(.*)
 10. Append new geo:line attribute (attr3) -> OK
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -572,7 +567,7 @@ Date: REGEX(.*)
 
 11. Change attr2 type to geo:line again -> fail
 ===============================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

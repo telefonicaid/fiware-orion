@@ -8,6 +8,8 @@ Docker を使用して Orion Context Broker を非常に簡単に実行できま
 
 これらは同じことをする別の方法ですが、3つすべてを行う必要はありません。
 
+また、Raspberry Pi で Orion を実行することもできます。これを行う方法については、この[ドキュメント](./raspberry_pi.jp.md)を参照してください。
+
 Docker が動作するマシンが必要です。これを行う方法の [ドキュメント](https://docs.docker.com/installation/)を参照してください。
 
 ----
@@ -116,6 +118,15 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 `docker build` コマンドのパラメータ `-t orion` は、イメージに名前を付けます。この名前は何でもかまいませんし、`-t org/fiware-orion` のような組織も含めています。この名前は後でイメージに基づいてコンテナを実行するために使用されます。
 
+`docker build` のパラメータ `--build-arg`i はビルド時の変数を設定できます。
+
+| ARG             | 説明                                                           | 例                              |
+| --------------- | -------------------------------------------------------------- | ------------------------------- |
+| IMAGE_TAG       | ベース・イメージのタグを指定します                             | --build-arg IMAGE_TAG=centos7   |
+| GIT_NAME        | GitHub リポジトリのユーザ名を指定します                        | --build-arg GIT_NAME=fiware-ges |
+| GIT_REV_ORION   | ビルドする Orion バージョンを指定します                        | --build-arg GIT_REV_ORION=2.3.0 |
+| CLEAN_DEV_TOOLS | 開発ツールをクリアするかどうかを指定します。0 の場合は残ります | --build-arg CLEAN_DEV_TOOLS=0   |
+
 イメージとビルド・プロセスの詳細については、[Docker のドキュメント](https://docs.docker.com/userguide/dockerimages/)を参照してください。
 
 ## 4. その他の情報
@@ -126,6 +137,29 @@ Docker コンテナと Orion Context Broker を操作する際に留意すべき
 Docker コンテナ化された Orion Context Broker で行うすべての作業は、非永続的なものです。 MongoDB コンテナを無効にすると、*すべてのデータが失われます*。これは、この README に記載されているいずれの方法でも発生します。
 
 これを防ぐには、MongoDB Docker のドキュメントの "どこにデータを格納するか (*Where to Store Data*)" のセクションの [このリンク](https://registry.hub.docker.com/_/mongo/)を参照してください。その中に MongoDB のデータを永続化する方法とアイデアがあります。
+
+#### 適切な Mongo-DB データベース・インデックスのセットアップ
+
+サブスクリプション、レジストレーション および エンティティの詳細は、データベースから取得されます。`fiware-service`
+ヘッダを指定しない場合、データベースのデフォルト名は `orion` です。適切なインデックスを作成することにより、データベース・
+アクセスを最適化できます。
+
+例 :
+
+```console
+docker exec  db-mongo mongo --eval '
+    conn = new Mongo();db.createCollection("orion");
+    db = conn.getDB("orion");
+    db.createCollection("entities");
+    db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
+    db.entities.createIndex({"_id.type": 1});
+    db.entities.createIndex({"_id.id": 1});' > /dev/null
+```
+
+`fiware-service` ヘッダを使用している場合、データベースの名前は異なります。代替データベースが使用されている場合、上記の `conn.getDB()`
+ステートメントを変更します。ユースケースによっては、追加のデータベース・インデックスが必要になる場合があります。
+[パフォーマンス・チューニング](https://fiware-orion.readthedocs.io/en/master/admin/perf_tuning/index.html#database-indexes) および
+[データベース管理](https://fiware-orion.readthedocs.io/en/master/admin/database_admin/index.html)は、Orion ドキュメントにあります。
 
 ### 4.2 `sudo` を使用
 

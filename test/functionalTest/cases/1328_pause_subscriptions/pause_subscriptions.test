@@ -285,7 +285,6 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/ID1 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -393,7 +392,6 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions/ID2 to change status to "active"
 ============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -448,7 +446,6 @@ Date: REGEX(.*)
 09. PATCH /v2/subscriptions/ID2 to change expiration time to make it to expire
 ==============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -503,7 +500,6 @@ Date: REGEX(.*)
 11. PATCH /v2/subscriptions/ID2 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -558,7 +554,6 @@ Date: REGEX(.*)
 13. PATCH /v2/subscriptions/ID2 to change expiration time to make it to un-expire
 =================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

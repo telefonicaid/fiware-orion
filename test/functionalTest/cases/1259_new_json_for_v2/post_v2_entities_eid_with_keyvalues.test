@@ -173,7 +173,6 @@ Date: REGEX(.*)
 02. POST /v2/entities/E1/attrs?options=keyValues, adding A1 to E1
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -201,7 +200,6 @@ Date: REGEX(.*)
 04. POST /v2/entities/E1/attrs?options=keyValues, adding A2 to E1
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -226,7 +224,6 @@ Date: REGEX(.*)
 06. PUT /v2/entities/E1/attrs?options=keyValues, replacing A1+A2 with A3
 ========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -250,7 +247,6 @@ Date: REGEX(.*)
 08. POST /v2/entities/E1/attrs?options=keyValues, adding A4 to E1
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -275,7 +271,6 @@ Date: REGEX(.*)
 10. PATCH /v2/entities/E1/attrs, setting A4 to 10
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

@@ -304,8 +304,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "b",
-                "a"
+#SORT_START
+                "b"REGEX(,?)
+                "a"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
@@ -359,8 +361,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "c",
-                "b"
+#SORT_START
+                "c"REGEX(,?)
+                "b"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
@@ -413,8 +417,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "d",
-                "c"
+#SORT_START
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
@@ -438,8 +444,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                "d",
-                "c"
+#SORT_START
+                "d"REGEX(,?)
+                "c"REGEX(,?)
+#SORT_END
             ],
             "name": "T"
         }
