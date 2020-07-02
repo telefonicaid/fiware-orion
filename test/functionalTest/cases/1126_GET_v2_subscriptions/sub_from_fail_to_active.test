@@ -109,6 +109,8 @@ payload='{
   "A": 2
 }'
 orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
+echo
+echo
 
 
 echo "07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)"
@@ -176,7 +178,7 @@ Date: REGEX(.*)
 04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,9 +192,9 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -223,10 +225,12 @@ Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
+
+
 07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 487
+Content-Length: 490
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -240,10 +244,10 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
         "timesSent": 2

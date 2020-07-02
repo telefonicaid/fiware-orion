@@ -113,14 +113,14 @@ Date: REGEX(.*)
 02. Get subscription and do not see typePattern
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 395
+Content-Length: 396
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "One subscription to rule them all",
-    "expires": "2027-04-05T14:00:00.00Z",
+    "expires": "2027-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -163,14 +163,14 @@ Date: REGEX(.*)
 04. Get subscription and see typePattern
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 380
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "One subscription to rule them all",
-    "expires": "2027-04-05T14:00:00.00Z",
+    "expires": "2027-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [

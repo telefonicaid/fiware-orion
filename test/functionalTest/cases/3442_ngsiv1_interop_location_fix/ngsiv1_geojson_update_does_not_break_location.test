@@ -177,9 +177,9 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "position": {
-            "creDate": REGEX(\d+),
+            "creDate": REGEX(\d+\.\d+),
             "mdNames": [],
-            "modDate": REGEX(\d+),
+            "modDate": REGEX(\d+\.\d+),
             "type": "geo:json",
             "value": {
                 "coordinates": [
@@ -190,7 +190,7 @@ Date: REGEX(.*)
             }
         }
     },
-    "creDate": REGEX(\d+),
+    "creDate": REGEX(\d+\.\d+),
     "lastCorrelator": "REGEX(.*)",
     "location": {
         "attrName": "position",
@@ -202,7 +202,7 @@ Date: REGEX(.*)
             "type": "Point"
         }
     },
-    "modDate": REGEX(\d+)
+    "modDate": REGEX(\d+\.\d+)
 }
 
 
@@ -251,9 +251,9 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "position": {
-            "creDate": REGEX(\d+),
+            "creDate": REGEX(\d+\.\d+),
             "mdNames": [],
-            "modDate": REGEX(\d+),
+            "modDate": REGEX(\d+\.\d+),
             "type": "geo:json",
             "value": {
                 "coordinates": [
@@ -264,7 +264,7 @@ Date: REGEX(.*)
             }
         }
     },
-    "creDate": REGEX(\d+),
+    "creDate": REGEX(\d+\.\d+),
     "lastCorrelator": "REGEX(.*)",
     "location": {
         "attrName": "position",
@@ -276,7 +276,7 @@ Date: REGEX(.*)
             "type": "Point"
         }
     },
-    "modDate": REGEX(\d+)
+    "modDate": REGEX(\d+\.\d+)
 }
 
 

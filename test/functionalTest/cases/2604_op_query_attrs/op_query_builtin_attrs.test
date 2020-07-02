@@ -114,7 +114,7 @@ Date: REGEX(.*)
 02. Query attrs: dateModified -> get E-dateModified
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 107
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -135,7 +135,7 @@ Date: REGEX(.*)
 03. Query attrs: dateModified,* -> get E-(A,dateModified)
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 155
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 03. Query attrs: dateModified,A -> get E-(A,dateModified)
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 155
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

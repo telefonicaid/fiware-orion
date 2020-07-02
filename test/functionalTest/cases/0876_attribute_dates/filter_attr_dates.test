@@ -44,7 +44,13 @@ brokerStart CB
 # 10. Get entities created in the range from t_3 to t_4 -> E3, E4
 # 11. Get entities modified in the range from t_3 to t_4 -> E4
 #
-
+# NOTE:
+#  The two timestamps t_3 and t_4 are used as start-end for a range with which to capture entities in this test.
+#  As the timestamps are created with current time and milliseconds set to ZERO, as end range, having the milliseconds set to zero doesn't work.
+#  As creation/modification is most likely made not on the exact 000 millisecond some some time after that
+#
+#  So, for t_4, the milliseconds are set to 999 instead of 0.
+#
 
 echo "01. Create entity E1 at t_1"
 echo "==========================="
@@ -95,7 +101,7 @@ payload='{
   "type": "T",
   "A": "entity 4"
 }'
-T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.999Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
