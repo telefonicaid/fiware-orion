@@ -108,8 +108,8 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field, const std::st
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an object but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be an object but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
   return BSONObj();
 }
@@ -139,8 +139,8 @@ BSONArray getArrayField(const BSONObj& b, const std::string& field, const std::s
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an array but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be an array but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
   return BSONArray();
 }
@@ -169,8 +169,8 @@ std::string getStringField(const BSONObj& b, const std::string& field, const std
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a string but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be a string but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
 
   return "";
@@ -200,8 +200,8 @@ double getNumberField(const BSONObj& b, const std::string& field, const std::str
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a double but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be a double but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
 
   return -1;
@@ -231,8 +231,8 @@ int getIntField(const BSONObj& b, const std::string& field, const std::string& c
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an int but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be an int but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
 
   return -1;
@@ -262,8 +262,8 @@ long long getLongField(const BSONObj& b, const std::string& field, const std::st
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a long but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be a long but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
 
   return -1;
@@ -300,8 +300,8 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, co
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be int or long but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be int or long but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
 
   return -1;
@@ -327,8 +327,8 @@ bool getBoolField(const BSONObj& b, const std::string& field, const std::string&
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a bool but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str()));
+    LM_E(("Runtime Error (field '%s' was supposed to be a bool but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str()));
   }
 
   return false;
@@ -364,8 +364,8 @@ double getNumberFieldAsDouble(const BSONObj& b, const std::string& field, const 
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+    LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
 
   return retVal;
@@ -423,8 +423,8 @@ void setStringVector
       }
       else
       {
-        LM_E(("Runtime Error (element %d in array was supposed to be a string but the type is '%s' from caller %s:%d)",
-              ix, mongoTypeName(ba[ix].type()), caller.c_str(), line));
+        LM_E(("Runtime Error (element %d in array was supposed to be a string but the type is '%s' (type as integer: %d) from caller %s:%d)",
+              ix, mongoTypeName(ba[ix].type()), ba[ix].type(), caller.c_str(), line));
         v->clear();
 
         return;
@@ -444,8 +444,8 @@ void setStringVector
     }
     else
     {
-      LM_E(("Runtime Error (field '%s' was supposed to be an array but the type is '%s' in BSONObj <%s> from caller %s:%d)",
-            field.c_str(), mongoTypeName(b.getField(field).type()), b.toString().c_str(), caller.c_str(), line));
+      LM_E(("Runtime Error (field '%s' was supposed to be an array but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+            field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
     }
   }
 }
