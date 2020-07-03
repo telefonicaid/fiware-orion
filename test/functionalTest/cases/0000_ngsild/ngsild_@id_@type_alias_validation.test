@@ -1,0 +1,456 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+@id and @type alias validation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Attempt to create a entity using @id and @type alias
+# 02. Attempt to create a subscription using @id and @type alias
+# 03. Attempt to update a subscription that used @id and @type alias
+# 04. Attempt to create a csourceRegistration using @id and @type alias
+# 05. Attempt to update a csourceRegistration that used @id and @type alias
+# 06. Attempt to create entities with entityOperations using @id and @type alias
+# 07. Attempt to update entities with entityOperations using @id and @type alias
+# 08. Attempt to upsert - options=update - entities with entityOperations using @id and @type alias
+# 09. Attempt to upsert - options=replace - entities with entityOperations using @id and @type alias
+#
+
+echo "01. Attempt to create a entity using @id and @type alias"
+echo "========================================================"
+payload='{
+  "@id": "urn:ngsi-ld:E01",
+  "@type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create a subscription using @id and @type alias"
+echo "=============================================================="
+payload='{
+  "@id": "http://a.b.c/subs/sub01",
+  "@type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Attempt to update a subscription that used @id and @type alias"
+echo "=================================================================="
+payload='{
+  "name": "Changed Name for Test subscription S01",
+  "description": "New Description of Test subscription S01"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create a csourceRegistration using @id and @type alias"
+echo "====================================================================="
+payload='{
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "@type": "ContextSourceRegistration",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to update a csourceRegistration that used @id and @type alias"
+echo "========================================================================="
+payload='{
+  "name": "New Name",
+  "description": "Modified description of reg R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. Attempt to create entities with entityOperations using @id and @type alias"
+echo "=============================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E1",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E2",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "07. Attempt to update entities with entityOperations using @id and @type alias"
+echo "=============================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E1",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E2",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "08. Attempt to upsert - options=update - entities with entityOperations using @id and @type alias"
+echo "================================================================================================="
+payload='[
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00001",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00002",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "09. Attempt to upsert - options=replace - entities with entityOperations using @id and @type alias"
+echo "=================================================================================================="
+payload='[
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00004",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00005",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create a entity using @id and @type alias
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
+Date: REGEX(.*)
+
+
+
+02. Attempt to create a subscription using @id and @type alias
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Date: REGEX(.*)
+
+
+
+03. Attempt to update a subscription that used @id and @type alias
+==================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Attempt to create a csourceRegistration using @id and @type alias
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Date: REGEX(.*)
+
+
+
+05. Attempt to update a csourceRegistration that used @id and @type alias
+=========================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Attempt to create entities with entityOperations using @id and @type alias
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 96
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "success": [
+    "urn:ngsi-ld:entity:E1",
+    "urn:ngsi-ld:entity:E2"
+  ],
+  "errors": []
+}
+
+
+
+07. Attempt to update entities with entityOperations using @id and @type alias
+==============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+
+08. Attempt to upsert - options=update - entities with entityOperations using @id and @type alias
+=================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. Attempt to upsert - options=replace - entities with entityOperations using @id and @type alias
+==================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

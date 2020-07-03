@@ -1,0 +1,2495 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+@id and @type alias validation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255 --prettyPrint
+
+--SHELL--
+
+#
+# 01. Attempt to create a entity using @id invalid - see error
+# 02. Attempt to create a entity using @type invalid - see error
+# 03. Attempt to create a entity using @id and @type invalid - see error
+# 04. Attempt to create a entity w/o @id - see error
+# 05. Attempt to create a entity w/o @type - see error
+# 06. Attempt to create a entity w/o @id and @type - see error
+# 07. Attempt to create a subscription using @id invalid - see error
+# 08. Attempt to create a subscription using @type invalid - see error
+# 09. Attempt to create a subscription using @id and @type invalid - see error
+# 10. Attempt to create a subscription w/o @type - see error
+# 11. Attempt to create a csourceRegistration using @id invalid - see error
+# 12. Attempt to create a csourceRegistration using @type invalid - see error
+# 13. Attempt to create a csourceRegistration using @id and @type invalid - see error
+# 14. Attempt to create a csourceRegistration w/o @type - see error
+# 15. Attempt to create entities with entityOperations using @id invalid - see error
+# 16. Attempt to create entities with entityOperations using @type invalid - see error
+# 17. Attempt to create entities with entityOperations using @id and @type invalid - see error
+# 18. Attempt to create entities with entityOperations w/o @id - see error
+# 19. Attempt to create entities with entityOperations w/o @type - see error
+# 20. Attempt to create entities with entityOperations w/o @id and @type - see error
+# 21. Attempt to update entities with entityOperations using @id invalid - see error
+# 22. Attempt to update entities with entityOperations using @type invalid - see error
+# 23. Attempt to update entities with entityOperations using @id and @type invalid - see error
+# 24. Attempt to update entities with entityOperations w/o @id - see error
+# 25. Attempt to update entities with entityOperations w/o @id and @type - see error
+# 26. Attempt to upsert - options=update - entities with entityOperations using @id invalid - see error
+# 27. Attempt to upsert - options=update - entities with entityOperations using @type invalid - see error
+# 28. Attempt to upsert - options=update - entities with entityOperations using @id and @type invalid - see error
+# 29. Attempt to upsert - options=update - entities with entityOperations w/o @id - see error
+# 30. Attempt to upsert - options=update - entities with entityOperations w/o @type - see error
+# 31. Attempt to upsert - options=update - entities with entityOperations w/o @id and @type - see error
+# 32. Attempt to upsert - options=replace - entities with entityOperations using @id invalid - see error
+# 33. Attempt to upsert - options=replace - entities with entityOperations using @type invalid - see error
+# 34. Attempt to upsert - options=replace - entities with entityOperations using @id and @type invalid - see error
+# 35. Attempt to upsert - options=replace - entities with entityOperations w/o @id - see error
+# 36. Attempt to upsert - options=replace - entities with entityOperations w/o @type - see error
+# 37. Attempt to upsert - options=replace - entities with entityOperations w/o @id and @type - see error
+#
+
+echo "01. Attempt to create a entity using @id invalid - see error"
+echo "============================================================"
+payload='{
+  "@id": "123",
+  "@type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create a entity using @type invalid - see error"
+echo "=============================================================="
+payload='{
+  "@id": "urn:ngsi-ld:E01",
+  "@type": 123,
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create a entity using @id and @type invalid - see error"
+echo "======================================================================"
+payload='{
+  "@id": "123",
+  "@type": 123,
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create a entity w/o @id - see error"
+echo "=================================================="
+payload='{
+  "@type": "T",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to create a entity w/o @type - see error"
+echo "===================================================="
+payload='{
+  "@id": "urn:ngsi-ld:E01",
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create a entity w/o @id and @type - see error"
+echo "============================================================"
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": {
+      "@type": "Property",
+      "@value": "2018-12-04T12:00:00"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to create a subscription using @id invalid - see error"
+echo "=================================================================="
+payload='{
+  "@id": "123",
+  "@type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "08. Attempt to create a subscription using @type invalid - see error"
+echo "===================================================================="
+payload='{
+  "@id": "http://a.b.c/subs/sub01",
+  "@type": 123,
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "09. Attempt to create a subscription using @id and @type invalid - see error"
+echo "============================================================================"
+payload='{
+  "@id": "123",
+  "@type": 123,
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "10. Attempt to create a subscription w/o @type - see error"
+echo "=========================================================="
+payload='{
+  "@id": "http://a.b.c/subs/sub01",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T1"
+    },
+    {
+      "id": "http://a.b.c/E02",
+      "type": "T2"
+    },
+    {
+      "idPattern": ".*E03.*",
+      "type": "T3"
+    }
+  ],
+  "watchedAttributes": [ "P2" ],
+  "q": "P2>10",
+  "geoQ": {
+    "geometry": "circle",
+    "coordinates": "1,2",
+    "georel": "near",
+    "geoproperty": "not supported"
+  },
+  "csf": "not implemented",
+  "isActive": false,
+  "notification": {
+    "attributes": [ "P1", "P2", "A3" ],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "http://valid.url/url",
+      "accept": "application/ld+json"
+    },
+    "status": "ignored",
+    "timesSent": "ignored",
+    "lastNotification": "ignored",
+    "lastFailure": "ignored",
+    "lastSuccess": "ignored"
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 5,
+  "status": "to be ignored - read-only",
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "createdAt": "ignored",
+  "modifiedAt": "ignored"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "11. Attempt to create a csourceRegistration using @id invalid - see error"
+echo "========================================================================="
+payload='{
+  "@id": "123",
+  "@type": "ContextSourceRegistration",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "12. Attempt to create a csourceRegistration using @type invalid - see error"
+echo "==========================================================================="
+payload='{
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "@type": 123,
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "13. Attempt to create a csourceRegistration using @id and @type invalid - see error"
+echo "==================================================================================="
+payload='{
+  "@id": "123",
+  "@type": 123,
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "14. Attempt to create a csourceRegistration w/o @type - see error"
+echo "================================================================="
+payload='{
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "15. Attempt to create entities with entityOperations using @id invalid - see error"
+echo "=================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "16. Attempt to create entities with entityOperations using @type invalid - see error"
+echo "===================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E1",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E2",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "17. Attempt to create entities with entityOperations using @id and @type invalid - see error"
+echo "============================================================================================"
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "18. Attempt to create entities with entityOperations w/o @id - see error"
+echo "========================================================================"
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "19. Attempt to create entities with entityOperations w/o @type - see error"
+echo "=========================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E1",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E2",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "20. Attempt to create entities with entityOperations w/o @id and @type - see error"
+echo "=================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/create?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "21. Attempt to update entities with entityOperations using @id invalid - see error"
+echo "=================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "22. Attempt to update entities with entityOperations using @type invalid - see error"
+echo "===================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E1",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "urn:ngsi-ld:entity:E2",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "23. Attempt to update entities with entityOperations using @id and @type invalid - see error"
+echo "============================================================================================"
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@id": "123",
+    "@type": 123,
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "24. Attempt to update entities with entityOperations w/o @id - see error"
+echo "========================================================================"
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "@type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "25. Attempt to update entities with entityOperations w/o @id and @type - see error"
+echo "=================================================================================="
+payload='[
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "P1": {
+      "type": "Property",
+      "value": "STEP 02"
+    }
+  },
+  {
+    "@context": {
+      "Vehicle": "http://example.org/Vehicle"
+    },
+    "P1": {
+      "type": "Property",
+      "value": "STEP 04"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/update?prettyPrint=yes&spaces=2" -X POST --payload "$payload" -H "Content-Type: application/ld+json" --noPayloadCheck
+echo
+echo
+
+
+echo "26. Attempt to upsert - options=update - entities with entityOperations using @id invalid - see error"
+echo "====================================================================================================="
+payload='[
+    {
+        "@id": "123",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "123",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "27. Attempt to upsert - options=update - entities with entityOperations using @type invalid - see error"
+echo "======================================================================================================="
+payload='[
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00001",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00002",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "28. Attempt to upsert - options=update - entities with entityOperations using @id and @type invalid - see error"
+echo "==============================================================================================================="
+payload='[
+    {
+        "@id": "123",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "123",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "29. Attempt to upsert - options=update - entities with entityOperations w/o @id - see error"
+echo "==========================================================================================="
+payload='[
+    {
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "30. Attempt to upsert - options=update - entities with entityOperations w/o @type - see error"
+echo "============================================================================================="
+payload='[
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00001",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00002",
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "31. Attempt to upsert - options=update - entities with entityOperations w/o @id and @type - see error"
+echo "====================================================================================================="
+payload='[
+    {
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "32. Attempt to upsert - options=replace - entities with entityOperations using @id invalid - see error"
+echo "======================================================================================================"
+payload='[
+    {
+        "@id": "123",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "123",
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+echo "33. Attempt to upsert - options=replace - entities with entityOperations using @type invalid - see error"
+echo "========================================================================================================"
+payload='[
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00004",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00005",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+echo "34. Attempt to upsert - options=replace - entities with entityOperations using @id and @type invalid - see error"
+echo "================================================================================================================"
+payload='[
+    {
+        "@id": "123",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "123",
+        "@type": 123,
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+echo "35. Attempt to upsert - options=replace - entities with entityOperations w/o @id - see error"
+echo "============================================================================================"
+payload='[
+    {
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@type": "Vehicle",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+echo "36. Attempt to upsert - options=replace - entities with entityOperations w/o @type - see error"
+echo "=============================================================================================="
+payload='[
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00004",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "@id": "urn:ngsi-ld:Vehicle:00005",
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+echo "37. Attempt to upsert - options=replace - entities with entityOperations w/o @id and @type - see error"
+echo "======================================================================================================"
+payload='[
+    {
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    },
+    {
+        "brandName": {
+            "type": "Property",
+            "value": "Volvo"
+        },
+        "isParked": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+            "observedAt": "2017-07-29T12:00:04Z",
+            "providedBy": {
+                "type": "Relationship",
+                "object": "urn:ngsi-ld:Person:Bob"
+            }
+        }
+    }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=replace' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create a entity using @id invalid - see error
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 152
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "The id specified cannot be resolved to a URL or URN",
+    "title": "Invalid Entity id",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create a entity using @type invalid - see error
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create a entity using @id and @type invalid - see error
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create a entity w/o @id - see error
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "The 'id' field is mandatory",
+    "title": "Entity id is missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create a entity w/o @type - see error
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "The 'type' field is mandatory",
+    "title": "Entity - urn:ngsi-ld:E01",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create a entity w/o @id and @type - see error
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "The 'id' field is mandatory",
+    "title": "Entity id is missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create a subscription using @id invalid - see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "123",
+    "title": "Subscription::id is not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create a subscription using @type invalid - see error
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to create a subscription using @id and @type invalid - see error
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Attempt to create a subscription w/o @type - see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "Subscription::type",
+    "title": "Mandatory field missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Attempt to create a csourceRegistration using @id invalid - see error
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "123",
+    "title": "Registration::id is not a URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. Attempt to create a csourceRegistration using @type invalid - see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. Attempt to create a csourceRegistration using @id and @type invalid - see error
+===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "entity type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. Attempt to create a csourceRegistration w/o @type - see error
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "detail": "Registration::type",
+    "title": "Mandatory field missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. Attempt to create entities with entityOperations using @id invalid - see error
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 458
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+16. Attempt to create entities with entityOperations using @type invalid - see error
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 540
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "field with invalid type",
+        "detail": "entity::type",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "field with invalid type",
+        "detail": "entity::type",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+17. Attempt to create entities with entityOperations using @id and @type invalid - see error
+============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 458
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+18. Attempt to create entities with entityOperations w/o @id - see error
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 520
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+19. Attempt to create entities with entityOperations w/o @type - see error
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Invalid Entity",
+        "detail": "Mandatory field entity::type is missing",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Invalid Entity",
+        "detail": "Mandatory field entity::type is missing",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+20. Attempt to create entities with entityOperations w/o @id and @type - see error
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 520
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+21. Attempt to update entities with entityOperations using @id invalid - see error
+==================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 458
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+22. Attempt to update entities with entityOperations using @type invalid - see error
+====================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 540
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "urn:ngsi-ld:entity:E1",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "field with invalid type",
+        "detail": "entity::type",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "urn:ngsi-ld:entity:E2",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "field with invalid type",
+        "detail": "entity::type",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+23. Attempt to update entities with entityOperations using @id and @type invalid - see error
+============================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 458
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "123",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "Not a URI",
+        "detail": "123",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+24. Attempt to update entities with entityOperations w/o @id - see error
+========================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 520
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+25. Attempt to update entities with entityOperations w/o @id and @type - see error
+==================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 520
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(*.)
+
+{
+  "success": [],
+  "errors": [
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    },
+    {
+      "entityId": "no entity::id",
+      "error": {
+        "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+        "title": "mandatory field missing",
+        "detail": "entity::id",
+        "status": 400
+      }
+    }
+  ]
+}
+
+
+
+26. Attempt to upsert - options=update - entities with entityOperations using @id invalid - see error
+=====================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+27. Attempt to upsert - options=update - entities with entityOperations using @type invalid - see error
+=======================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 389
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00001",
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00002",
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+28. Attempt to upsert - options=update - entities with entityOperations using @id and @type invalid - see error
+===============================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+29. Attempt to upsert - options=update - entities with entityOperations w/o @id - see error
+===========================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 361
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+30. Attempt to upsert - options=update - entities with entityOperations w/o @type - see error
+=============================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 425
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00001",
+            "error": {
+                "detail": "Mandatory field entity::type is missing",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00002",
+            "error": {
+                "detail": "Mandatory field entity::type is missing",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+31. Attempt to upsert - options=update - entities with entityOperations w/o @id and @type - see error
+=====================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 361
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+32. Attempt to upsert - options=replace - entities with entityOperations using @id invalid - see error
+======================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+33. Attempt to upsert - options=replace - entities with entityOperations using @type invalid - see error
+========================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 389
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00004",
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00005",
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "field with invalid type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+34. Attempt to upsert - options=replace - entities with entityOperations using @id and @type invalid - see error
+================================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "123",
+            "error": {
+                "detail": "123",
+                "status": 400,
+                "title": "Not a URI",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+35. Attempt to upsert - options=replace - entities with entityOperations w/o @id - see error
+============================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 361
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+36. Attempt to upsert - options=replace - entities with entityOperations w/o @type - see error
+==============================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 425
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00004",
+            "error": {
+                "detail": "Mandatory field entity::type is missing",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:Vehicle:00005",
+            "error": {
+                "detail": "Mandatory field entity::type is missing",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+37. Attempt to upsert - options=replace - entities with entityOperations w/o @id and @type - see error
+======================================================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 361
+Content-Type: application/json
+Date: REGEX(*.)
+
+{
+    "errors": [
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
