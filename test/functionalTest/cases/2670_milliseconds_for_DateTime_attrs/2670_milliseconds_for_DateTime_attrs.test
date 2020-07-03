@@ -26,12 +26,15 @@ Milliseconds for a DateTime attribute
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0
+accumulatorStart --pretty-print
 
 --SHELL--
 
 #
 # 01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds
 # 02. GET E1 and see its 'ts' attribute with its milliseconds
+# 03. Create a subscription to provoke an initial notification of E1
+# 04. Dump accumulator to see the notification and especially the milliseconds of 'ts'
 #
 
 echo "01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds"
@@ -51,6 +54,38 @@ echo
 echo "02. GET E1 and see its 'ts' attribute with its milliseconds"
 echo "==========================================================="
 orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+echo "03. Create a subscription to provoke an initial notification of E1"
+echo "=================================================================="
+payload='
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": [ "ts" ]
+    }
+  },
+  "notification": {
+    "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+    "attrs": [ ]
+  },
+  "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Dump accumulator to see the notification and especially the milliseconds of 'ts'"
+echo "===================================================================================="
+accumulatorDump
 echo
 echo
 
@@ -83,6 +118,45 @@ Date: REGEX(.*)
     },
     "type": "Thing"
 }
+
+
+03. Create a subscription to provoke an initial notification of E1
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Dump accumulator to see the notification and especially the milliseconds of 'ts'
+====================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 155
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "id": "E1",
+            "ts": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "2020-07-03T09:24:04.455Z"
+            },
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
 
 
 --TEARDOWN--
