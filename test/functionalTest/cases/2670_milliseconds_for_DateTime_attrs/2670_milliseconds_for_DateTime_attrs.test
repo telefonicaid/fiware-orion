@@ -118,12 +118,12 @@ Date: REGEX(.*)
     "ts": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2020-07-03T09:24:04.455Z"
+        "value": "2020-07-03T09:24:04.456Z"
     },
     "ts2": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2020-07-03T08:24:04.455Z"
+        "value": "2020-07-03T08:24:04.456Z"
     },
     "type": "Thing"
 }
@@ -158,12 +158,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "ts": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "2020-07-03T09:24:04.455Z"
+                "value": "2020-07-03T09:24:04.456Z"
             },
             "ts2": {
                 "metadata": {}, 
                 "type": "DateTime", 
-                "value": "2020-07-03T08:24:04.455Z"
+                "value": "2020-07-03T08:24:04.456Z"
             }, 
             "type": "Thing"
         }
@@ -175,4 +175,4 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB

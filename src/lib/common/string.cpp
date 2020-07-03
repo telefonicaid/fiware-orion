@@ -1011,10 +1011,13 @@ std::string isodate2str(double timestamp)
 {
   // 80 bytes is enough to store any ISO8601 string safely
   // We use gmtime() to get UTC strings, otherwise we would use localtime()
-  // Date pattern: 1970-04-26T17:46:40.00Z
+  // Date pattern: 1970-04-26T17:46:40.000Z
+
   char    buffer[80];
   time_t  seconds   = (time_t) timestamp;
-  int     millis    = (timestamp * 1000) - (seconds * 1000);   // (timestamp - seconds) * 1000 gives rounding errors ...
+  double  ms        = timestamp - (double) seconds;
+  int     micros    = ms * 1000000;
+  int     millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
 
   strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime(&seconds));
 
