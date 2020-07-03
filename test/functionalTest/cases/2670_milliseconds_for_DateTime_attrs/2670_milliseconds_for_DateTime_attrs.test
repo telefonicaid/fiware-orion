@@ -31,19 +31,23 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds
-# 02. GET E1 and see its 'ts' attribute with its milliseconds
+# 01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone
+# 02. GET E1 and see its two 'ts' attribute with their milliseconds
 # 03. Create a subscription to provoke an initial notification of E1
-# 04. Dump accumulator to see the notification and especially the milliseconds of 'ts'
+# 04. Dump accumulator to see the notification and especially the milliseconds of the 'ts' attrs
 #
 
-echo "01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds"
-echo "==========================================================================================================="
+echo "01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone"
+echo "================================================================================================================================================================="
 payload='{
   "id": "E1",
   "ts": {
     "type": "DateTime",
     "value": "2020-07-03T09:24:04.456"
+  },
+  "ts2": {
+    "type": "DateTime",
+    "value": "2020-07-03T09:24:04.456+0100"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -51,8 +55,8 @@ echo
 echo
 
 
-echo "02. GET E1 and see its 'ts' attribute with its milliseconds"
-echo "==========================================================="
+echo "02. GET E1 and see its two 'ts' attribute with their milliseconds"
+echo "================================================================="
 orionCurl --url /v2/entities/E1
 echo
 echo
@@ -83,16 +87,16 @@ echo
 echo
 
 
-echo "04. Dump accumulator to see the notification and especially the milliseconds of 'ts'"
-echo "===================================================================================="
+echo "04. Dump accumulator to see the notification and especially the milliseconds of the 'ts' attrs"
+echo "=============================================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds
-===========================================================================================================
+01. Create an Entity E1, with an attribute 'ts' that is of DateTime type and with a value with milliseconds, and one attribute ts2 that uses a different timezone
+=================================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=Thing
@@ -101,10 +105,10 @@ Date: REGEX(.*)
 
 
 
-02. GET E1 and see its 'ts' attribute with its milliseconds
-===========================================================
+02. GET E1 and see its two 'ts' attribute with their milliseconds
+=================================================================
 HTTP/1.1 200 OK
-Content-Length: 100
+Content-Length: 175
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -115,6 +119,11 @@ Date: REGEX(.*)
         "metadata": {},
         "type": "DateTime",
         "value": "2020-07-03T09:24:04.455Z"
+    },
+    "ts2": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2020-07-03T08:24:04.455Z"
     },
     "type": "Thing"
 }
@@ -130,11 +139,11 @@ Date: REGEX(.*)
 
 
 
-04. Dump accumulator to see the notification and especially the milliseconds of 'ts'
-====================================================================================
+04. Dump accumulator to see the notification and especially the milliseconds of the 'ts' attrs
+==============================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 155
+Content-Length: 230
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -151,6 +160,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
                 "type": "DateTime",
                 "value": "2020-07-03T09:24:04.455Z"
             },
+            "ts2": {
+                "metadata": {}, 
+                "type": "DateTime", 
+                "value": "2020-07-03T08:24:04.455Z"
+            }, 
             "type": "Thing"
         }
     ],
