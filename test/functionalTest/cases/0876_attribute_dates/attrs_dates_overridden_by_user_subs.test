@@ -345,7 +345,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 05. Modify just attr value in E1 (should not trigger notif)
 ===========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -354,7 +353,6 @@ Date: REGEX(.*)
 06. Modify just attr value in E2 (should trigger notif)
 =======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -485,7 +483,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. Remove user dateModified from E1 (should not trigger notif) & reset accumulator
 ===================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -494,7 +491,6 @@ Date: REGEX(.*)
 11. Modify just attr value in E1 (should trigger 2 notifs)
 ==========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -503,7 +499,6 @@ Date: REGEX(.*)
 12. Modify just attr value in E2 (should trigger 2 notifs)
 ==========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

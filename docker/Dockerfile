@@ -37,9 +37,9 @@ RUN \
       cyrus-sasl-devel && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz && \
-    tar xvf libmicrohttpd-0.9.48.tar.gz && \
-    cd libmicrohttpd-0.9.48 && \
+    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
+    tar xvf libmicrohttpd-0.9.70.tar.gz && \
+    cd libmicrohttpd-0.9.70 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
     make && \
     make install && \
@@ -53,9 +53,9 @@ RUN \
     scons install --prefix=/usr/local --use-sasl-client --ssl && \
     # Install rapidjson from source
     cd /opt && \
-    curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
-    tar xfz v1.0.2.tar.gz && \
-    mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include && \
+    curl -kOL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz && \
+    tar xfz v1.1.0.tar.gz && \
+    mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include && \
     # Install orion from source
     cd /opt && \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
@@ -73,16 +73,16 @@ RUN \
     cd /opt && \
     if [ ${CLEAN_DEV_TOOLS} -eq 0 ] ; then yum clean all && exit 0 ; fi && \
     # cleanup sources, dev tools, locales and yum cache to reduce the final image size
-    rm -rf /opt/libmicrohttpd-0.9.48.tar.gz \
+    rm -rf /opt/libmicrohttpd-0.9.70.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
-           /opt/libmicrohttpd-0.9.48 \
+           /opt/libmicrohttpd-0.9.70 \
            /opt/legacy-1.1.2.tar.gz \
            /opt/mongo-cxx-driver-legacy-1.1.2 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
-           /opt/rapidjson-1.0.2 \
-           /opt/v1.0.2.tar.gz \
+           /opt/rapidjson-1.1.0 \
+           /opt/v1.1.0.tar.gz \
            /usr/local/include/rapidjson \
            /opt/fiware-orion \
            # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.

@@ -206,7 +206,6 @@ Date: REGEX(.*)
 04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work
 ===========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -234,7 +233,6 @@ Date: REGEX(.*)
 06. PUT /v2/entities/E1/attrs/A1/value (=true)
 ==============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -262,7 +260,6 @@ Date: REGEX(.*)
 08. PUT /v2/entities/E1/attrs/A1/value (=false)
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -290,7 +287,6 @@ Date: REGEX(.*)
 10. PUT /v2/entities/E1/attrs/A1/value (="STRING")
 ==================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -318,7 +314,6 @@ Date: REGEX(.*)
 12. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -350,7 +345,6 @@ Date: REGEX(.*)
 14. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
