@@ -41,7 +41,7 @@ public:
   void        addRaw(const std::string& key, const std::string& value);
   void        addNumber(const std::string& key, long long value);
   void        addNumber(const std::string& key, double value);
-  void        addDate(const std::string& key, long long timestamp);
+  void        addDate(const std::string& key, double timestamp);
   void        addBool(const std::string& key, bool b);
 
   std::string str();
@@ -61,7 +61,7 @@ public:
   void        addRaw(const std::string& value);
   void        addNumber(long long value);
   void        addNumber(double value);
-  void        addDate(long long timestamp);
+  void        addDate(double timestamp);
   void        addBool(bool b);
 
   std::string str();

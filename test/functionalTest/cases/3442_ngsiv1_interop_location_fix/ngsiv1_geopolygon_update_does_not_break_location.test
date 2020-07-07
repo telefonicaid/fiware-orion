@@ -171,9 +171,9 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "position": {
-            "creDate": REGEX(\d+),
+            "creDate": REGEX(\d+\.\d+),
             "mdNames": [],
-            "modDate": REGEX(\d+),
+            "modDate": REGEX(\d+\.\d+),
             "type": "geo:polygon",
             "value": [
                 "-3.3, 4.4",
@@ -183,7 +183,7 @@ Date: REGEX(.*)
             ]
         }
     },
-    "creDate": REGEX(\d+),
+    "creDate": REGEX(\d+\.\d+),
     "lastCorrelator": "REGEX(.*)",
     "location": {
         "attrName": "position",
@@ -211,7 +211,7 @@ Date: REGEX(.*)
             "type": "Polygon"
         }
     },
-    "modDate": REGEX(\d+)
+    "modDate": REGEX(\d+\.\d+)
 }
 
 
@@ -260,9 +260,9 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "position": {
-            "creDate": REGEX(\d+),
+            "creDate": REGEX(\d+\.\d+),
             "mdNames": [],
-            "modDate": REGEX(\d+),
+            "modDate": REGEX(\d+\.\d+),
             "type": "geo:polygon",
             "value": [
                 "7.7, 8.8",
@@ -272,7 +272,7 @@ Date: REGEX(.*)
             ]
         }
     },
-    "creDate": REGEX(\d+),
+    "creDate": REGEX(\d+\.\d+),
     "lastCorrelator": "REGEX(.*)",
     "location": {
         "attrName": "position",
@@ -300,7 +300,7 @@ Date: REGEX(.*)
             "type": "Polygon"
         }
     },
-    "modDate": REGEX(\d+)
+    "modDate": REGEX(\d+\.\d+)
 }
 
 

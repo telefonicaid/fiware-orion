@@ -216,7 +216,7 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 386
+Content-Length: 388
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 05. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -312,7 +312,7 @@ Date: REGEX(.*)
 07. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -415,7 +415,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

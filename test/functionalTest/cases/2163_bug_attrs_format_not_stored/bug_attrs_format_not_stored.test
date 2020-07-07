@@ -159,13 +159,13 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (and get keyValues)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 307
+Content-Length: 308
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2057-04-05T14:00:00.00Z",
+    "expires": "2057-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -205,13 +205,13 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (and get normalized)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 308
+Content-Length: 309
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2057-04-05T14:00:00.00Z",
+    "expires": "2057-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -251,13 +251,13 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID (and get values)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 304
+Content-Length: 305
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2057-04-05T14:00:00.00Z",
+    "expires": "2057-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -288,3 +288,4 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+

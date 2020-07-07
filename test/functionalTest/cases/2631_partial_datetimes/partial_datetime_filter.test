@@ -124,7 +124,7 @@ Date: REGEX(.*)
 03. Get entities after 2016-10-01, get E2
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -134,7 +134,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-10-01T01:23:45.00Z"
+            "value": "2016-10-01T01:23:45.000Z"
         },
         "id": "E2",
         "type": "T"
@@ -145,7 +145,7 @@ Date: REGEX(.*)
 04. Get entities before 2016-10-01, get E1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -155,7 +155,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-09-30T22:48:51.00Z"
+            "value": "2016-09-30T22:48:51.000Z"
         },
         "id": "E1",
         "type": "T"
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 05. Get entities after 2016-10-01T0000Z, get E2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -176,7 +176,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-10-01T01:23:45.00Z"
+            "value": "2016-10-01T01:23:45.000Z"
         },
         "id": "E2",
         "type": "T"
@@ -187,7 +187,7 @@ Date: REGEX(.*)
 06. Get entities before 2016-10-01T0000Z, get E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +197,7 @@ Date: REGEX(.*)
         "D": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2016-09-30T22:48:51.00Z"
+            "value": "2016-09-30T22:48:51.000Z"
         },
         "id": "E1",
         "type": "T"
