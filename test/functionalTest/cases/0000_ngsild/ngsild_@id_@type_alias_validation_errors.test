@@ -31,12 +31,12 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. Attempt to create a entity using @id invalid - see error
-# 02. Attempt to create a entity using @type invalid - see error
-# 03. Attempt to create a entity using @id and @type invalid - see error
-# 04. Attempt to create a entity w/o @id - see error
-# 05. Attempt to create a entity w/o @type - see error
-# 06. Attempt to create a entity w/o @id and @type - see error
+# 01. Attempt to create an entity using @id invalid - see error
+# 02. Attempt to create an entity using @type invalid - see error
+# 03. Attempt to create an entity using @id and @type invalid - see error
+# 04. Attempt to create an entity w/o @id - see error
+# 05. Attempt to create an entity w/o @type - see error
+# 06. Attempt to create an entity w/o @id and @type - see error
 # 07. Attempt to create a subscription using @id invalid - see error
 # 08. Attempt to create a subscription using @type invalid - see error
 # 09. Attempt to create a subscription using @id and @type invalid - see error
@@ -70,8 +70,8 @@ brokerStart CB 0-255 --prettyPrint
 # 37. Attempt to upsert - options=replace - entities with entityOperations w/o @id and @type - see error
 #
 
-echo "01. Attempt to create a entity using @id invalid - see error"
-echo "============================================================"
+echo "01. Attempt to create an entity using @id invalid - see error"
+echo "============================================================="
 payload='{
   "@id": "123",
   "@type": "T",
@@ -88,8 +88,8 @@ echo
 echo
 
 
-echo "02. Attempt to create a entity using @type invalid - see error"
-echo "=============================================================="
+echo "02. Attempt to create an entity using @type invalid - see error"
+echo "==============================================================="
 payload='{
   "@id": "urn:ngsi-ld:E01",
   "@type": 123,
@@ -106,8 +106,8 @@ echo
 echo
 
 
-echo "03. Attempt to create a entity using @id and @type invalid - see error"
-echo "======================================================================"
+echo "03. Attempt to create an entity using @id and @type invalid - see error"
+echo "======================================================================="
 payload='{
   "@id": "123",
   "@type": 123,
@@ -124,8 +124,8 @@ echo
 echo
 
 
-echo "04. Attempt to create a entity w/o @id - see error"
-echo "=================================================="
+echo "04. Attempt to create an entity w/o @id - see error"
+echo "==================================================="
 payload='{
   "@type": "T",
   "P1": {
@@ -141,8 +141,8 @@ echo
 echo
 
 
-echo "05. Attempt to create a entity w/o @type - see error"
-echo "===================================================="
+echo "05. Attempt to create an entity w/o @type - see error"
+echo "====================================================="
 payload='{
   "@id": "urn:ngsi-ld:E01",
   "P1": {
@@ -158,8 +158,8 @@ echo
 echo
 
 
-echo "06. Attempt to create a entity w/o @id and @type - see error"
-echo "============================================================"
+echo "06. Attempt to create an entity w/o @id and @type - see error"
+echo "============================================================="
 payload='{
   "P1": {
     "type": "Property",
@@ -1536,8 +1536,8 @@ echo
 
 
 --REGEXPECT--
-01. Attempt to create a entity using @id invalid - see error
-============================================================
+01. Attempt to create an entity using @id invalid - see error
+=============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 152
 Content-Type: application/json
@@ -1550,8 +1550,8 @@ Date: REGEX(*.)
 }
 
 
-02. Attempt to create a entity using @type invalid - see error
-==============================================================
+02. Attempt to create an entity using @type invalid - see error
+===============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 112
 Content-Type: application/json
@@ -1564,8 +1564,8 @@ Date: REGEX(*.)
 }
 
 
-03. Attempt to create a entity using @id and @type invalid - see error
-======================================================================
+03. Attempt to create an entity using @id and @type invalid - see error
+=======================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 112
 Content-Type: application/json
@@ -1578,8 +1578,8 @@ Date: REGEX(*.)
 }
 
 
-04. Attempt to create a entity w/o @id - see error
-==================================================
+04. Attempt to create an entity w/o @id - see error
+===================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 131
 Content-Type: application/json
@@ -1592,8 +1592,8 @@ Date: REGEX(*.)
 }
 
 
-05. Attempt to create a entity w/o @type - see error
-====================================================
+05. Attempt to create an entity w/o @type - see error
+=====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 137
 Content-Type: application/json
@@ -1606,8 +1606,8 @@ Date: REGEX(*.)
 }
 
 
-06. Attempt to create a entity w/o @id and @type - see error
-============================================================
+06. Attempt to create an entity w/o @id and @type - see error
+=============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 131
 Content-Type: application/json

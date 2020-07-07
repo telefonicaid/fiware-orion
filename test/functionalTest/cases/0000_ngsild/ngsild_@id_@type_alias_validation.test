@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-@id and @type alias validation
+@id and @type validation
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,19 +31,19 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. Attempt to create a entity using @id and @type alias
-# 02. Attempt to create a subscription using @id and @type alias
-# 03. Attempt to update a subscription that used @id and @type alias
-# 04. Attempt to create a csourceRegistration using @id and @type alias
-# 05. Attempt to update a csourceRegistration that used @id and @type alias
-# 06. Attempt to create entities with entityOperations using @id and @type alias
-# 07. Attempt to update entities with entityOperations using @id and @type alias
-# 08. Attempt to upsert - options=update - entities with entityOperations using @id and @type alias
-# 09. Attempt to upsert - options=replace - entities with entityOperations using @id and @type alias
+# 01. Creation of entity using @id and @type
+# 02. Creation of subscription using @id and @type
+# 03. Update of subscription using @id and @type
+# 04. Creation of registration using @id and @type
+# 05. Update of registration using @id and @type
+# 06. Creation of entities with entityOperations using @id and @type
+# 07. Update of entities with entityOperations using @id and @type
+# 08. Upsert of entities - options=update - with entityOperations using @id and @type
+# 09. Upsert of entities - options=replace - with entityOperations using @id and @type
 #
 
-echo "01. Attempt to create a entity using @id and @type alias"
-echo "========================================================"
+echo "01. Creation of entity using @id and @type"
+echo "=========================================="
 payload='{
   "@id": "urn:ngsi-ld:E01",
   "@type": "T",
@@ -60,8 +60,8 @@ echo
 echo
 
 
-echo "02. Attempt to create a subscription using @id and @type alias"
-echo "=============================================================="
+echo "02. Creation of subscription using @id and @type"
+echo "================================================"
 payload='{
   "@id": "http://a.b.c/subs/sub01",
   "@type": "Subscription",
@@ -116,8 +116,8 @@ echo
 echo
 
 
-echo "03. Attempt to update a subscription that used @id and @type alias"
-echo "=================================================================="
+echo "03. Update of subscription using @id and @type"
+echo "=============================================="
 payload='{
   "name": "Changed Name for Test subscription S01",
   "description": "New Description of Test subscription S01"
@@ -127,8 +127,8 @@ echo
 echo
 
 
-echo "04. Attempt to create a csourceRegistration using @id and @type alias"
-echo "====================================================================="
+echo "04. Creation of registration using @id and @type"
+echo "================================================"
 payload='{
   "@id": "urn:ngsi-ld:ContextSourceRegistration:R1",
   "@type": "ContextSourceRegistration",
@@ -205,8 +205,8 @@ echo
 echo
 
 
-echo "05. Attempt to update a csourceRegistration that used @id and @type alias"
-echo "========================================================================="
+echo "05. Update of registration using @id and @type"
+echo "=============================================="
 payload='{
   "name": "New Name",
   "description": "Modified description of reg R1"
@@ -216,8 +216,8 @@ echo
 echo
 
 
-echo "06. Attempt to create entities with entityOperations using @id and @type alias"
-echo "=============================================================================="
+echo "06. Creation of entities with entityOperations using @id and @type"
+echo "=================================================================="
 payload='[
   {
     "@context": {
@@ -247,8 +247,8 @@ echo
 echo
 
 
-echo "07. Attempt to update entities with entityOperations using @id and @type alias"
-echo "=============================================================================="
+echo "07. Update of entities with entityOperations using @id and @type"
+echo "================================================================"
 payload='[
   {
     "@context": {
@@ -278,8 +278,8 @@ echo
 echo
 
 
-echo "08. Attempt to upsert - options=update - entities with entityOperations using @id and @type alias"
-echo "================================================================================================="
+echo "08. Upsert of entities - options=update - with entityOperations using @id and @type"
+echo "==================================================================================="
 payload='[
     {
         "@id": "urn:ngsi-ld:Vehicle:00001",
@@ -321,8 +321,8 @@ echo
 echo
 
 
-echo "09. Attempt to upsert - options=replace - entities with entityOperations using @id and @type alias"
-echo "=================================================================================================="
+echo "09. Upsert of entities - options=replace - with entityOperations using @id and @type"
+echo "===================================================================================="
 payload='[
     {
         "@id": "urn:ngsi-ld:Vehicle:00004",
@@ -365,8 +365,8 @@ echo
 
 
 --REGEXPECT--
-01. Attempt to create a entity using @id and @type alias
-========================================================
+01. Creation of entity using @id and @type
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
@@ -374,8 +374,8 @@ Date: REGEX(.*)
 
 
 
-02. Attempt to create a subscription using @id and @type alias
-==============================================================
+02. Creation of subscription using @id and @type
+================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
@@ -383,16 +383,16 @@ Date: REGEX(.*)
 
 
 
-03. Attempt to update a subscription that used @id and @type alias
-==================================================================
+03. Update of subscription using @id and @type
+==============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-04. Attempt to create a csourceRegistration using @id and @type alias
-=====================================================================
+04. Creation of registration using @id and @type
+================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
@@ -400,16 +400,16 @@ Date: REGEX(.*)
 
 
 
-05. Attempt to update a csourceRegistration that used @id and @type alias
-=========================================================================
+05. Update of registration using @id and @type
+==============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-06. Attempt to create entities with entityOperations using @id and @type alias
-==============================================================================
+06. Creation of entities with entityOperations using @id and @type
+==================================================================
 HTTP/1.1 200 OK
 Content-Length: 96
 Content-Type: application/json
@@ -426,8 +426,8 @@ Date: REGEX(.*)
 
 
 
-07. Attempt to update entities with entityOperations using @id and @type alias
-==============================================================================
+07. Update of entities with entityOperations using @id and @type
+================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -435,16 +435,16 @@ Date: REGEX(.*)
 
 
 
-08. Attempt to upsert - options=update - entities with entityOperations using @id and @type alias
-=================================================================================================
+08. Upsert of entities - options=update - with entityOperations using @id and @type
+===================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-09. Attempt to upsert - options=replace - entities with entityOperations using @id and @type alias
-==================================================================================================
+09. Upsert of entities - options=replace - with entityOperations using @id and @type
+====================================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
