@@ -1022,8 +1022,8 @@ std::string isodate2str(double timestamp)
   // We've seen that e.g. the number 12.60 is stored as 12.599999999 and as here we cut
   // the number it ends up as 12.59, which is no good ...
   //
-  // Two choices here, enther call some rounding function, or use a trick.
-  // The trick is to add a microsecond (we're only interested in milliseconds) and then cut
+  // Two choices here, either call some rounding function, or use a trick.
+  // The trick is to add a microsecond (we're only interested in milliseconds) and then cut.
   //
   // Assuming we have nine decimals: 12.599999999, adding a microsecond to this gives 12.600000999:
   //
@@ -1034,12 +1034,12 @@ std::string isodate2str(double timestamp)
   // If instead the rounding error would go on the upper side, i.e. 12.60 would be 12.6000000001, adding that microsecond
   // doesn't change anything. All still work just fine.
   //
-  // Better example: what if we wish to store 12.5999?
-  // A typical rounding error on the "upper side" would then be 12.599900001, and again, adding that microsecond after
+  // Better example: what if we wish to store 12.599?
+  // A typical rounding error on the "upper side" would then be 12.599000001, and again, adding that microsecond after
   // cutting doesn't change a thing.
   //
   //
-  // So, the algorithm is as follows:
+  // So, the "trick algorithm" is as follows:
   //
   // 1. Get the integer part of "double timestamp" - this cuts all decimals, no rounding is done,
   //    and store it in the variable 'seconds'
