@@ -44,9 +44,9 @@ accumulatorStart --pretty-print
 # Note that we avoid using T_2 and T_6 for entity creation, as they are "edge" cases in the range limits.
 #
 
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z"  --date="3seconds")
-T_10=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="10seconds")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
+T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z"  --date="3seconds")
+T_10=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z" --date="10seconds")
 
 echo "01. At T_0: Create subscription with mq: A.dateCreated==T_3..T_10"
 echo "================================================================="

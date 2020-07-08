@@ -55,17 +55,18 @@ echo
 
 echo "02. GET E1/A1, see dateCreated == dateModified"
 echo "=============================================="
+# Note we remove milliseconds part, as it makes comparison with date output harder
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
-dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo "=============================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
-dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 
 if [ "$dateCreated" != "$dateModified" ]
 then
   echo dateCreated $dateCreated differs from dateModified
 fi
-if [[ "$dateCreated" != "$T_0"* ]]
+if [ "$dateCreated" != "$T_0" ]
 then
   echo "invalid dateCreated"
   echo "dateCreated: $dateCreated"
@@ -97,20 +98,21 @@ echo
 
 echo "04. GET E1/A1, check dateModified and dateCreated"
 echo "================================================="
+# Note we remove milliseconds part, as it makes comparison with date output harder
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
-dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo "================================================="
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateModified'
-dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}')
+dateModified=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 
-if [[ "$dateCreated" != "$T_0"* ]]
+if [ "$dateCreated" != "$T_0" ]
 then
   echo "invalid dateCreated"
   echo "dateCreated: $dateCreated"
   echo "should be:   $T_0"
 fi
 
-if [[ "$dateModified" != "$T_1"* ]]
+if [ "$dateModified" != "$T_1" ]
 then
   echo "invalid dateModified"
   echo "dateModified: $dateModified"

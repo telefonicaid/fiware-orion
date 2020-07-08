@@ -65,8 +65,9 @@ echo
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
-CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
-MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
+# Note we remove milliseconds part, as it makes comparison with date output harder
+CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
+MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo
 echo
 
@@ -80,13 +81,13 @@ echo
 
 echo "03. Check dateCreate == t_0 and dateModified == t_0"
 echo "==================================================="
-if [[ "$CRE_DATE" == "$T_0"* ]]
+if [ "$CRE_DATE" == "$T_0" ]
 then
   echo "dateCreated: t_0"
 else
   echo "dateCreated: not t_0 ($CRE_DATE != $T_0)"
 fi
-if [[ "$MOD_DATE" == "$T_0"* ]]
+if [ "$MOD_DATE" == "$T_0" ]
 then
   echo "dateModified: t_0"
 else
@@ -120,8 +121,9 @@ echo
 echo "05b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
-CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
-MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
+# Note we remove milliseconds part, as it makes comparison with date output harder
+CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
+MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo
 echo
 
@@ -135,13 +137,13 @@ echo
 
 echo "06. Check dateCreate == t_0 and dateModified == t_1"
 echo "==================================================="
-if [[ "$CRE_DATE" == "$T_0"* ]]
+if [ "$CRE_DATE" == "$T_0" ]
 then
   echo "dateCreated: t_0"
 else
   echo "dateCreated: not t_0 ($CRE_DATE != $T_0)"
 fi
-if [[ "$MOD_DATE" == "$T_1"* ]]
+if [ "$MOD_DATE" == "$T_1" ]
 then
   echo "dateModified: t_1"
 else
