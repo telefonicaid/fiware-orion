@@ -27,7 +27,6 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjRender.h"                                      // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -60,7 +59,7 @@ KjNode* mongocEntityLookup(const char* entityId)
   //
   // Create the filter for the query
   //
-  bson_append_utf8(&mongoFilter, "_id.id", 3, entityId, -1);
+  bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
 
   //
   // Run the query
@@ -74,7 +73,7 @@ KjNode* mongocEntityLookup(const char* entityId)
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);
+    entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);  // FIXME: Don't use the DB layer Function Pointers here - use mongocXXXX directly
     break;  // Just using the first one - should be no more than one!
   }
 

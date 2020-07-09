@@ -53,10 +53,10 @@ extern HttpStatusCode mongoUnsubscribeContext
 */
 extern bool mongoDeleteLdSubscription
 (
-  const char*     subId,
-  const char*     tenant,
-  HttpStatusCode* statusCodeP,
-  char**          details
+  const char*  subId,
+  const char*  tenant,
+  int*         statusCodeP,
+  char**       details
 );
 #endif  // ORIONLD
 

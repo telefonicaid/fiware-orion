@@ -42,7 +42,6 @@ bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* field
 
   mongo::BSONType valueType = boP->getField(fieldName).type();
 
-  LM_TMP(("CRED: The value type of '%s' is %d", fieldName, valueType));
   switch (valueType)
   {
   case mongo::NumberDouble:

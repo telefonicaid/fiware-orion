@@ -69,10 +69,10 @@ Date: REGEX(.*)
 {
   "Orion-LD version": "REGEX(.*)",
   "based on orion": "REGEX(.*)",
-  "kbase version": "0.4",
-  "kalloc version": "0.4",
-  "khash version": "0.4",
-  "kjson version": "0.4",
+  "kbase version": "0.5",
+  "kalloc version": "0.5",
+  "khash version": "0.5",
+  "kjson version": "0.5",
   "boost version": "REGEX(.*)",
   "microhttpd version": "0.9.48-0",
   "openssl version": "REGEX(.*)",
@@ -81,6 +81,7 @@ Date: REGEX(.*)
   "libcurl version": "REGEX(.*)",
   "libuuid version": "UNKNOWN",
   "branch": "REGEX(.*)",
+  "cached subscriptions": 0,
   "Next File Descriptor": REGEX(\d+)
 }
 

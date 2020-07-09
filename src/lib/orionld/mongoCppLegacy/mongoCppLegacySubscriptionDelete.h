@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYBATCHDELETE_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYBATCHDELETE_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONDELETE_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONDELETE_H_
 
 /*
 *
@@ -23,19 +23,15 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Larysse Savanna
+* Author: Gabriel Quaresma
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityBatchDelete -
+// mongoCppLegacySubscriptionDelete -
 //
-extern bool mongoCppLegacyEntityBatchDelete(KjNode* entityIdsArray);
+extern bool mongoCppLegacySubscriptionDelete(const char* subscriptionId);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYBATCHDELETE_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYSUBSCRIPTIONDELETE_H_

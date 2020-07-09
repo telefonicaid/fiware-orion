@@ -29,9 +29,9 @@
 #include "rest/httpHeaderAdd.h"                                // httpHeaderAdd
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
 #include "orionld/kjTree/kjTreeFromRegistration.h"             // kjTreeFromRegistration
+#include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
 
 
 

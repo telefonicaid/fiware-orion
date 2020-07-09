@@ -197,7 +197,7 @@ static void optionsParse(const char* options)
       else
       {
         LM_W(("Unknown 'options' value: %s", optionStart));
-        // orionldState.httpStatusCode = SccBadRequest;
+        // orionldState.httpStatusCode = 400;
         // orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
         // return;
       }
@@ -242,9 +242,37 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
     orionldState.uriParams.attrs = (char*) value;
   else if (SCOMPARE7(key, 'o', 'f', 'f', 's', 'e', 't', 0))
+  {
+    if (value[0] == '-')
+    {
+      LM_W(("Bad Input (negative value for /offset/ URI param)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /offset/", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
     orionldState.uriParams.offset = atoi(value);
+  }
   else if (SCOMPARE6(key, 'l', 'i', 'm', 'i', 't', 0))
+  {
+    if (value[0] == '-')
+    {
+      LM_W(("Bad Input (negative value for /limit/ URI param)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
     orionldState.uriParams.limit = atoi(value);
+
+    if (orionldState.uriParams.limit > 1000)
+    {
+      LM_W(("Bad Input (too big value for /limit/ URI param: %d - max allowed is 1000)", orionldState.uriParams.limit));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/ (valid range: 0-1000)", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+  }
   else if (SCOMPARE8(key, 'o', 'p', 't', 'i', 'o', 'n', 's', 0))
   {
     orionldState.uriParams.options = (char*) value;
@@ -260,7 +288,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       LM_W(("Bad Input (invalid value for URI parameter 'count': %s)", value));
       orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /count/", value);
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       return false;
     }
   }
@@ -306,10 +334,10 @@ int orionldMhdConnectionInit
   ++requestNo;
 
   //
-  // This call to LM_TMP should not be removed.
+  // This call to LM_K should not be removed.
   // At most, commented out
   //
-  LM_TMP(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
+  LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
 
   //
   // 1. Prepare connectionInfo
@@ -333,7 +361,7 @@ int orionldMhdConnectionInit
   ciP->connection = connection;
 
   // Flagging all as OK - errors will be flagged when occurring
-  orionldState.httpStatusCode = SccOk;
+  orionldState.httpStatusCode = 200;
 
 
   // IP Address and port of caller
@@ -363,7 +391,7 @@ int orionldMhdConnectionInit
     {
       LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
       orionldState.responsePayload = (char*) doubleSlashPayload;
-      orionldState.httpStatusCode  = SccBadRequest;
+      orionldState.httpStatusCode  = 400;
       return MHD_YES;
     }
   }
@@ -375,7 +403,7 @@ int orionldMhdConnectionInit
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);
-    orionldState.httpStatusCode   = SccBadRequest;
+    orionldState.httpStatusCode   = 400;
     return MHD_YES;
   }
 
@@ -385,7 +413,7 @@ int orionldMhdConnectionInit
   if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
-    orionldState.httpStatusCode  = SccBadRequest;
+    orionldState.httpStatusCode  = 400;
     return MHD_YES;
   }
 
@@ -393,7 +421,7 @@ int orionldMhdConnectionInit
   if (ciP->httpHeaders.contentLength > 2000000)
   {
     orionldState.responsePayload = (char*) payloadTooLargePayload;
-    orionldState.httpStatusCode  = SccBadRequest;
+    orionldState.httpStatusCode  = 400;
     return MHD_YES;
   }
 
@@ -419,7 +447,7 @@ int orionldMhdConnectionInit
       orionldErrorResponseCreate(OrionldBadRequestData,
                                  "unsupported format of payload",
                                  "only application/json and application/ld+json are supported");
-      orionldState.httpStatusCode = SccUnsupportedMediaType;
+      orionldState.httpStatusCode = 415;  // Unsupported Media Type
       return MHD_YES;
     }
   }
@@ -448,10 +476,10 @@ int orionldMhdConnectionInit
     orionldState.kjsonP->stringAfterColon  = (char*) "";
   }
 
-  if (orionldState.httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != 200)
   {
     LM_W(("Bad Input (invalid URI parameter)"));
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
   }
 
   //
@@ -461,14 +489,14 @@ int orionldMhdConnectionInit
   {
     LM_E(("Invalid value for URI parameter 'limit': 0"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value >= 1, if /count/ is not set");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
   }
 
   if (orionldState.uriParams.limit > 1000)
   {
     LM_E(("Invalid value for URI parameter 'limit': %d", orionldState.uriParams.limit));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /limit/", "must be an integer value <= 1000");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
   }
 
   if (lmTraceIsSet(LmtUriParams))
@@ -488,7 +516,7 @@ int orionldMhdConnectionInit
   {
     LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
   }
 
   LM_T(LmtMhd, ("Connection Init DONE"));

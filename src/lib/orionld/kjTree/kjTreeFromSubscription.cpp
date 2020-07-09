@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate, OrionldInternalError
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/qAliasCompact.h"                        // qAliasCompact
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextCacheLookup.h"           // orionldContextCacheLookup
@@ -240,9 +241,13 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
     nodeP = kjString(orionldState.kjsonP, "georel", subscriptionP->subject.condition.expression.georel.c_str());
     kjChildAdd(objectP, nodeP);
 
-    if ( subscriptionP->subject.condition.expression.geoproperty != "")
+    if (subscriptionP->subject.condition.expression.geoproperty != "")
     {
-      nodeP = kjString(orionldState.kjsonP, "geoproperty", subscriptionP->subject.condition.expression.geoproperty.c_str());
+      char* geoproperty = (char*) subscriptionP->subject.condition.expression.geoproperty.c_str();
+
+      eqForDot(geoproperty);
+      geoproperty = orionldContextItemAliasLookup(orionldState.contextP, geoproperty, NULL, NULL);
+      nodeP       = kjString(orionldState.kjsonP, "geoproperty", geoproperty);
       kjChildAdd(objectP, nodeP);
     }
 

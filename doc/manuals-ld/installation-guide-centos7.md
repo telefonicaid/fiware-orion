@@ -186,6 +186,47 @@ CFLAGS= -g -std=c99
 make install
 ```
 
+### MQTT (Paho & Mosquitto)
+
+*MQTT* is a machine-to-machine (M2M)/"Internet of Things" connectivity protocol. It was designed as an extremely lightweight publish/subscribe messaging transport. It is useful for connections with remote locations where a small code footprint is required and/or network bandwidth is at a premium. Source: https://mqtt.org
+
+To download, build and install:
+
+#### Eclipse Paho
+
+The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
+
+```bash
+yum -y install doxygen
+yum -y install graphviz
+rm -f /usr/local/lib/libpaho*
+cd ~/git
+git clone https://github.com/eclipse/paho.mqtt.c.git
+cd paho.mqtt.c
+git fetch -a
+git checkout tags/v1.3.1
+make html
+make
+sudo make install
+
+# Python library
+pip install paho-mqtt
+```
+#### Eclipse Mosquitto
+
+*Eclipse Mosquitto* is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers. Source: https://mosquitto.org
+
+```bash
+sudo yum -y install epel-release
+sudo yum -y install mosquitto
+sudo systemctl start mosquitto
+
+# If you wish to enable `mosquitto` to have it start automatically on system reboot:
+# [ If you prefer to use another MQTT broker, that's fine too. But, bear in mind that only mosquitto has been tested ]
+sudo systemctl enable mosquitto
+```
+
+
 ## Source code of Orion-LD
 
 Now that we have all the dependencies installed, it's time to clone the Orion-LD repository:

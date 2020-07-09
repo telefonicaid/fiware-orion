@@ -61,9 +61,10 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetSubscription.h"          // orionldGetSubscription
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"        // orionldPostRegistrations
 #include "orionld/serviceRoutines/orionldGetVersion.h"               // orionldGetVersion
-#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"  // orionldPostBatchDeleteEntities
+#include "orionld/serviceRoutines/orionldPostBatchDelete.h"          // orionldPostBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
+#include "orionld/serviceRoutines/orionldPostQuery.h"                // orionldPostQuery
 #include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
 #include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
@@ -113,7 +114,7 @@ static void libLogFunction
   vsnprintf(libLogBuffer, sizeof(libLogBuffer), format, args);
   va_end(args);
 
-  // LM_TMP(("Got a message, severity: %d: %s", severity, libLogBuffer));
+  // LM_K(("Got a lib log message, severity: %d: %s", severity, libLogBuffer));
 
   if (severity == 1)
     lmOut(libLogBuffer, 'E', fileName, lineNo, functionName, 0, NULL);
@@ -238,7 +239,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
-  else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+  else if (serviceP->serviceRoutine == orionldPostBatchDelete)
   {
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
@@ -247,6 +248,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+  {
+    serviceP->options  = 0;
+  }
+  else if (serviceP->serviceRoutine == orionldPostQuery)
   {
     serviceP->options  = 0;
   }
@@ -278,7 +283,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     if (serviceP->serviceRoutine == orionldPostEntities)
       serviceP->temporalRoutine  = temporalPostEntities;
-    else if (serviceP->serviceRoutine == orionldPostBatchDeleteEntities)
+    else if (serviceP->serviceRoutine == orionldPostBatchDelete)
       serviceP->temporalRoutine   = temporalPostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
       serviceP->temporalRoutine = temporalPostEntity;

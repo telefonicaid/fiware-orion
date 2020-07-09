@@ -119,7 +119,12 @@ make
 make install
 cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 
-ldconfig
+echo "Builder: installing mongo"
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+
+echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
+apt-get -y update
+apt-get -y install mongodb-org mongodb-org-shell
 
 echo "Debian Builder: installing k libs"
 for kproj in kbase klog kalloc kjson khash
@@ -130,54 +135,48 @@ done
 for kproj in kbase klog kalloc kjson khash
 do
     cd ${ROOT}/$kproj
-    git checkout release/0.4
+    git checkout release/0.5
     make
     make install
 done
 
-    echo "Debian Builder: installing Paho MQTT C library"
-    apt-get -y install doxygen                                                    # OK - with -y. NOT OK without -y !!!
-    apt-get -y install graphviz 
-    rm -f /usr/local/lib/libpaho*                                                 # OK
-    git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c      # OK
-    cd ${ROOT}/paho.mqtt.c                                                        # OK
-    git fetch -a
-    git checkout tags/v1.3.1                                                      # OK - git checkout develop ...
-    make html                                                                     # OK
+echo "Debian Builder: installing Paho MQTT C library"
+apt-get -y install doxygen                                                    # OK - with -y. NOT OK without -y !!!
+apt-get -y install graphviz 
+rm -f /usr/local/lib/libpaho*                                                 # OK
+git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT}/paho.mqtt.c      # OK
+cd ${ROOT}/paho.mqtt.c                                                        # OK
+git fetch -a
+git checkout tags/v1.3.1                                                      # OK - git checkout develop ...
+make html                                                                     # OK
 
-    echo Building Paho MQTT C Library
-    make > /tmp/paho-build 2&>1 || /bin/true
-    echo Paho Built ...
-    echo "============== PAHO BUILD TRACES START ============================="
-    cat /tmp/paho-build
-    echo "============== PAHO BUILD TRACES END ==============================="
+echo Building Paho MQTT C Library
+make > /tmp/paho-build 2&>1 || /bin/true
+echo Paho Built ...
+echo "============== PAHO BUILD TRACES START ============================="
+cat /tmp/paho-build
+echo "============== PAHO BUILD TRACES END ==============================="
 
-    echo Installing Paho MQTT C Library
-    make install > /tmp/paho-install 2&>1 || /bin/true                            # ... ?
-    echo Paho Installed ...
-    echo "============== PAHO INSTALLATION TRACES START ============================="
-    cat /tmp/paho-install
-    echo "============== PAHO INSTALLATION TRACES END ==============================="
+echo Installing Paho MQTT C Library
+make install > /tmp/paho-install 2&>1 || /bin/true                            # ... ?
+echo Paho Installed ...
+echo "============== PAHO INSTALLATION TRACES START ============================="
+cat /tmp/paho-install
+echo "============== PAHO INSTALLATION TRACES END ==============================="
 
-    echo "Builder: installing mongo and MQTT"
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+echo "Builder: installing MQTT - not!"
+#
+# FIXME
+#   For unknown reasons, 'mosquitto' can't be installed in this repo
+#   As workaround, all MQTT functests are disabled for travis. 
+#
+# echo "Builder: installing and starting mosquitto"
+# apt-get -y install mosquitto
+# sudo service mosquitto start
+#
 
-    echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
-    apt-get -y update
-    apt-get -y install \
-        mongodb-org \
-        mongodb-org-shell
 
-    #
-    # FIXME
-    #   For unknown reasons, 'mosquitto' can't be installed in this repo
-    #   As workaround, all MQTT functests are disabled for travis. 
-    #
-    # echo "Builder: installing and starting mosquitto"
-    # apt-get -y install mosquitto
-    # sudo service mosquitto start
-    #
-
+ldconfig
 
 if [[ "${STAGE}" == 'deps' ]]; then
     echo "Builder: installing gmock"
@@ -200,11 +199,11 @@ fi
 
 if [[ ${STAGE} == 'release' ]]; then
 
-    echo "Debian Builder: installing orion"
+    echo "Debian Builder: compiling and installing orion as a DEBUGGABLE executable"
     git clone ${REPOSITORY} ${PATH_TO_SRC}
     cd ${PATH_TO_SRC}
     git checkout ${REV}
-    make install
+    make debug install
     strip /usr/bin/${BROKER}
 
     BOOST_VER=$(apt-cache policy libboost-all-dev | grep Installed | awk '{ print $2 }' | cut -c -6)

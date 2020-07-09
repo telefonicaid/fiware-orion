@@ -1,0 +1,6478 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Context in Link header if no Accept header present
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an Entity urn:ngsi-ld:ApiService:RequestUUID01a-100 with ... a HUGE attr response-Flixbus
+# 02. Create an	Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute
+# 03. Retrieve the entity urn:ngsi-ld:ApiService:RequestUUID01a-100 - make sure it's OK
+# 04. QUERY Entities - see both of them
+#
+
+echo "01. Create an entity, no @context"
+echo "================================="
+payload='{
+  "id": "urn:ngsi-ld:ApiService:RequestUUID01a-100",
+  "type": "ApiService",
+  "requestParameters": {
+    "type": "Property",
+    "value": {
+      "tompHeader": {},
+      "otherQueryParameter": {
+        "X-API-Authentication": "DEV_TEST_TOKEN_STAGING",
+        "User-Agent": "FIWARE Foundation Projekt SmartMaaS"
+      },
+      "tompQueryParameter": {},
+      "tompPath": {},
+      "tompBody": {}
+    }
+  },
+  "requesterID": {
+    "type": "Property",
+    "value": "bettermobility"
+  },
+  "expiresAt": {
+    "type": "Property",
+    "value": "2020-09-01T12:00:00.000Z"
+  },
+  "serviceName": {
+    "type": "Property",
+    "value": "operatorRegions:FB:0.0.1"
+  },
+  "dataConsumer": {
+    "type": "Property",
+    "value": "https://www.bettermobility.de/"
+  },
+  "response-Flixbus": {
+    "value": {
+      "responseBodyTomp": {},
+      "responseBodyOriginal": [
+        {
+          "classes": "A",
+          "id": 243,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14698,
+            28508
+          ],
+          "name": "Aachen",
+          "coordinates": {
+            "longitude": 6.102988,
+            "latitude": 50.780919
+          }
+        },
+        {
+          "classes": "B",
+          "id": 244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            181
+          ],
+          "name": "Aalen",
+          "coordinates": {
+            "longitude": 10.092956,
+            "latitude": 48.835296
+          }
+        },
+        {
+          "classes": "C",
+          "id": 10878,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12298
+          ],
+          "name": "Achim",
+          "coordinates": {
+            "longitude": 9.05104,
+            "latitude": 53.0092
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2248,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2938
+          ],
+          "name": "Ahlbeck",
+          "coordinates": {
+            "longitude": 14.187473,
+            "latitude": 53.940628
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2498,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3328
+          ],
+          "name": "Ahrenshoop",
+          "coordinates": {
+            "longitude": 12.421252,
+            "latitude": 54.380715
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3778,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4068
+          ],
+          "name": "Aichach",
+          "coordinates": {
+            "longitude": 11.135986,
+            "latitude": 48.457704
+          }
+        },
+        {
+          "classes": "C",
+          "id": 116,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            34
+          ],
+          "name": "Alsfeld",
+          "coordinates": {
+            "longitude": 9.261227,
+            "latitude": 50.744911
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2238,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2948
+          ],
+          "name": "Anklam",
+          "coordinates": {
+            "longitude": 13.695973,
+            "latitude": 53.850291
+          }
+        },
+        {
+          "classes": "C",
+          "id": 255,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1905
+          ],
+          "name": "Ansbach",
+          "coordinates": {
+            "longitude": 10.571936,
+            "latitude": 49.300425
+          }
+        },
+        {
+          "classes": "B",
+          "id": 256,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            391
+          ],
+          "name": "Arnsberg",
+          "coordinates": {
+            "longitude": 8.066429,
+            "latitude": 51.405015
+          }
+        },
+        {
+          "classes": "B",
+          "id": 258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            754,
+            23248
+          ],
+          "name": "Aschaffenburg",
+          "coordinates": {
+            "longitude": 9.14962,
+            "latitude": 49.977752
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1164,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1164
+          ],
+          "name": "Aschersleben",
+          "coordinates": {
+            "longitude": 11.462988,
+            "latitude": 51.758059
+          }
+        },
+        {
+          "classes": "C",
+          "id": 259,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            33941
+          ],
+          "name": "Aue",
+          "coordinates": {
+            "longitude": 12.699016,
+            "latitude": 50.58733
+          }
+        },
+        {
+          "classes": "A",
+          "id": 137,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            55
+          ],
+          "name": "Augsburg",
+          "coordinates": {
+            "longitude": 10.882896,
+            "latitude": 48.383046
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            974
+          ],
+          "name": "Baabe",
+          "coordinates": {
+            "longitude": 13.704913,
+            "latitude": 54.361697
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3188,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4078
+          ],
+          "name": "Bad Arolsen",
+          "coordinates": {
+            "longitude": 9.012551,
+            "latitude": 51.379864
+          }
+        },
+        {
+          "classes": "C",
+          "id": 800,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3118
+          ],
+          "name": "Bad Doberan",
+          "coordinates": {
+            "longitude": 11.9086,
+            "latitude": 54.102832
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1184,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1264
+          ],
+          "name": "Bad Harzburg",
+          "coordinates": {
+            "longitude": 10.556421,
+            "latitude": 51.887109
+          }
+        },
+        {
+          "classes": "C",
+          "id": 117,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            35
+          ],
+          "name": "Bad Hersfeld",
+          "coordinates": {
+            "longitude": 9.722872,
+            "latitude": 50.863034
+          }
+        },
+        {
+          "classes": "B",
+          "id": 23661,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            32001
+          ],
+          "name": "Bad Homburg",
+          "coordinates": {
+            "longitude": 8.621083,
+            "latitude": 50.219678
+          }
+        },
+        {
+          "classes": "C",
+          "id": 279,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            201
+          ],
+          "name": "Bad Oeynhausen",
+          "coordinates": {
+            "longitude": 8.79963,
+            "latitude": 52.205381
+          }
+        },
+        {
+          "classes": "C",
+          "id": 23541,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            31851
+          ],
+          "name": "Bad Schandau",
+          "coordinates": {
+            "longitude": 14.153571,
+            "latitude": 50.920741
+          }
+        },
+        {
+          "classes": "C",
+          "id": 286,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            784
+          ],
+          "name": "Bad Segeberg",
+          "coordinates": {
+            "longitude": 10.309166,
+            "latitude": 53.934446
+          }
+        },
+        {
+          "classes": "C",
+          "id": 289,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14048
+          ],
+          "name": "Bad Wörishofen",
+          "coordinates": {
+            "longitude": 10.594936,
+            "latitude": 48.005129
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1464,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1574
+          ],
+          "name": "Bad Zwesten",
+          "coordinates": {
+            "longitude": 9.175395,
+            "latitude": 51.051932
+          }
+        },
+        {
+          "classes": "C",
+          "id": 291,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12288
+          ],
+          "name": "Baden-Baden",
+          "coordinates": {
+            "longitude": 8.165347,
+            "latitude": 48.764275
+          }
+        },
+        {
+          "classes": "B",
+          "id": 149,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            67
+          ],
+          "name": "Bamberg",
+          "coordinates": {
+            "longitude": 10.898663,
+            "latitude": 49.900581
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2958
+          ],
+          "name": "Bansin",
+          "coordinates": {
+            "longitude": 14.137602,
+            "latitude": 53.968123
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1044,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4088
+          ],
+          "name": "Bautzen",
+          "coordinates": {
+            "longitude": 14.423775,
+            "latitude": 51.182293
+          }
+        },
+        {
+          "classes": "B",
+          "id": 124,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            42,
+            1715
+          ],
+          "name": "Bayreuth",
+          "coordinates": {
+            "longitude": 11.584071,
+            "latitude": 49.94085
+          }
+        },
+        {
+          "classes": "C",
+          "id": 122,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            40
+          ],
+          "name": "Bergen (Celle)",
+          "coordinates": {
+            "longitude": 9.95944,
+            "latitude": 52.812018
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1224,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            944
+          ],
+          "name": "Bergen auf Rügen",
+          "coordinates": {
+            "longitude": 13.43144,
+            "latitude": 54.41165
+          }
+        },
+        {
+          "classes": "A",
+          "id": 88,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1,
+            20688,
+            1224,
+            481,
+            471,
+            12468,
+            611,
+            3288,
+            2825,
+            19368,
+            19378,
+            18088,
+            20788,
+            13328,
+            20798
+          ],
+          "name": "Berlin",
+          "coordinates": {
+            "longitude": 13.404616,
+            "latitude": 52.486081
+          }
+        },
+        {
+          "classes": "C",
+          "id": 25391,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            32671
+          ],
+          "name": "Bernau bei Berlin",
+          "coordinates": {
+            "longitude": 13.567277,
+            "latitude": 52.687484
+          }
+        },
+        {
+          "classes": "C",
+          "id": 299,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            8978
+          ],
+          "name": "Bernburg (Saale)",
+          "coordinates": {
+            "longitude": 11.73421,
+            "latitude": 51.797014
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2808,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3748
+          ],
+          "name": "Beverstedt",
+          "coordinates": {
+            "longitude": 8.821112,
+            "latitude": 53.431787
+          }
+        },
+        {
+          "classes": "A",
+          "id": 302,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1434,
+            30058
+          ],
+          "name": "Bielefeld",
+          "coordinates": {
+            "longitude": 8.528143,
+            "latitude": 52.01847
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1204,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            954,
+            21558
+          ],
+          "name": "Binz",
+          "coordinates": {
+            "longitude": 13.600996,
+            "latitude": 54.405138
+          }
+        },
+        {
+          "classes": "C",
+          "id": 5398,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            6948
+          ],
+          "name": "Bischofsgrün",
+          "coordinates": {
+            "longitude": 11.806513,
+            "latitude": 50.056723
+          }
+        },
+        {
+          "classes": "C",
+          "id": 15908,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            19078
+          ],
+          "name": "Bispingen",
+          "coordinates": {
+            "longitude": 10.00019,
+            "latitude": 53.077839
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://developer.flix.tech/"
+    },
+    "type": "Property",
+    "dataProvider": {
+      "value": "https://www.flixbus.de/",
+      "type": "Property"
+    },
+    "responderID": {
+      "value": "Flixbus",
+      "type": "Property"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an	Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ApiService:RequestUUID01a-101",
+  "type": "ApiService",
+  "requestParameters": {
+    "type": "Property",
+    "value": {
+      "tompHeader": {},
+      "otherQueryParameter": {
+        "X-API-Authentication": "DEV_TEST_TOKEN_STAGING",
+        "User-Agent": "FIWARE Foundation Projekt SmartMaaS"
+      },
+      "tompQueryParameter": {},
+      "tompPath": {},
+      "tompBody": {}
+    }
+  },
+  "requesterID": {
+    "type": "Property",
+    "value": "bettermobility"
+  },
+  "expiresAt": {
+    "type": "Property",
+    "value": "2020-09-01T12:00:00.000Z"
+  },
+  "serviceName": {
+    "type": "Property",
+    "value": "operatorRegions:FB:0.0.1"
+  },
+  "dataConsumer": {
+    "type": "Property",
+    "value": "https://www.bettermobility.de/"
+  },
+  "response-Flixbus": {
+    "value": {
+      "responseBodyTomp": {},
+      "responseBodyOriginal": [
+        {
+          "classes": "A",
+          "id": 243,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14698,
+            28508
+          ],
+          "name": "Aachen",
+          "coordinates": {
+            "longitude": 6.102988,
+            "latitude": 50.780919
+          }
+        },
+        {
+          "classes": "B",
+          "id": 244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            181
+          ],
+          "name": "Aalen",
+          "coordinates": {
+            "longitude": 10.092956,
+            "latitude": 48.835296
+          }
+        },
+        {
+          "classes": "C",
+          "id": 10878,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12298
+          ],
+          "name": "Achim",
+          "coordinates": {
+            "longitude": 9.05104,
+            "latitude": 53.0092
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2248,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2938
+          ],
+          "name": "Ahlbeck",
+          "coordinates": {
+            "longitude": 14.187473,
+            "latitude": 53.940628
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2498,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3328
+          ],
+          "name": "Ahrenshoop",
+          "coordinates": {
+            "longitude": 12.421252,
+            "latitude": 54.380715
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3778,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4068
+          ],
+          "name": "Aichach",
+          "coordinates": {
+            "longitude": 11.135986,
+            "latitude": 48.457704
+          }
+        },
+        {
+          "classes": "C",
+          "id": 116,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            34
+          ],
+          "name": "Alsfeld",
+          "coordinates": {
+            "longitude": 9.261227,
+            "latitude": 50.744911
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2238,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2948
+          ],
+          "name": "Anklam",
+          "coordinates": {
+            "longitude": 13.695973,
+            "latitude": 53.850291
+          }
+        },
+        {
+          "classes": "C",
+          "id": 255,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1905
+          ],
+          "name": "Ansbach",
+          "coordinates": {
+            "longitude": 10.571936,
+            "latitude": 49.300425
+          }
+        },
+        {
+          "classes": "B",
+          "id": 256,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            391
+          ],
+          "name": "Arnsberg",
+          "coordinates": {
+            "longitude": 8.066429,
+            "latitude": 51.405015
+          }
+        },
+        {
+          "classes": "B",
+          "id": 258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            754,
+            23248
+          ],
+          "name": "Aschaffenburg",
+          "coordinates": {
+            "longitude": 9.14962,
+            "latitude": 49.977752
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1164,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1164
+          ],
+          "name": "Aschersleben",
+          "coordinates": {
+            "longitude": 11.462988,
+            "latitude": 51.758059
+          }
+        },
+        {
+          "classes": "C",
+          "id": 259,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            33941
+          ],
+          "name": "Aue",
+          "coordinates": {
+            "longitude": 12.699016,
+            "latitude": 50.58733
+          }
+        },
+        {
+          "classes": "A",
+          "id": 137,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            55
+          ],
+          "name": "Augsburg",
+          "coordinates": {
+            "longitude": 10.882896,
+            "latitude": 48.383046
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            974
+          ],
+          "name": "Baabe",
+          "coordinates": {
+            "longitude": 13.704913,
+            "latitude": 54.361697
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3188,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4078
+          ],
+          "name": "Bad Arolsen",
+          "coordinates": {
+            "longitude": 9.012551,
+            "latitude": 51.379864
+          }
+        },
+        {
+          "classes": "C",
+          "id": 800,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3118
+          ],
+          "name": "Bad Doberan",
+          "coordinates": {
+            "longitude": 11.9086,
+            "latitude": 54.102832
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1184,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1264
+          ],
+          "name": "Bad Harzburg",
+          "coordinates": {
+            "longitude": 10.556421,
+            "latitude": 51.887109
+          }
+        },
+        {
+          "classes": "C",
+          "id": 117,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            35
+          ],
+          "name": "Bad Hersfeld",
+          "coordinates": {
+            "longitude": 9.722872,
+            "latitude": 50.863034
+          }
+        },
+        {
+          "classes": "B",
+          "id": 23661,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            32001
+          ],
+          "name": "Bad Homburg",
+          "coordinates": {
+            "longitude": 8.621083,
+            "latitude": 50.219678
+          }
+        },
+        {
+          "classes": "C",
+          "id": 279,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            201
+          ],
+          "name": "Bad Oeynhausen",
+          "coordinates": {
+            "longitude": 8.79963,
+            "latitude": 52.205381
+          }
+        },
+        {
+          "classes": "C",
+          "id": 23541,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            31851
+          ],
+          "name": "Bad Schandau",
+          "coordinates": {
+            "longitude": 14.153571,
+            "latitude": 50.920741
+          }
+        },
+        {
+          "classes": "C",
+          "id": 286,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            784
+          ],
+          "name": "Bad Segeberg",
+          "coordinates": {
+            "longitude": 10.309166,
+            "latitude": 53.934446
+          }
+        },
+        {
+          "classes": "C",
+          "id": 289,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14048
+          ],
+          "name": "Bad Wörishofen",
+          "coordinates": {
+            "longitude": 10.594936,
+            "latitude": 48.005129
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1464,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1574
+          ],
+          "name": "Bad Zwesten",
+          "coordinates": {
+            "longitude": 9.175395,
+            "latitude": 51.051932
+          }
+        },
+        {
+          "classes": "C",
+          "id": 291,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12288
+          ],
+          "name": "Baden-Baden",
+          "coordinates": {
+            "longitude": 8.165347,
+            "latitude": 48.764275
+          }
+        },
+        {
+          "classes": "B",
+          "id": 149,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            67
+          ],
+          "name": "Bamberg",
+          "coordinates": {
+            "longitude": 10.898663,
+            "latitude": 49.900581
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2958
+          ],
+          "name": "Bansin",
+          "coordinates": {
+            "longitude": 14.137602,
+            "latitude": 53.968123
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1044,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4088
+          ],
+          "name": "Bautzen",
+          "coordinates": {
+            "longitude": 14.423775,
+            "latitude": 51.182293
+          }
+        },
+        {
+          "classes": "B",
+          "id": 124,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            42,
+            1715
+          ],
+          "name": "Bayreuth",
+          "coordinates": {
+            "longitude": 11.584071,
+            "latitude": 49.94085
+          }
+        },
+        {
+          "classes": "C",
+          "id": 122,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            40
+          ],
+          "name": "Bergen (Celle)",
+          "coordinates": {
+            "longitude": 9.95944,
+            "latitude": 52.812018
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1224,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            944
+          ],
+          "name": "Bergen auf Rügen",
+          "coordinates": {
+            "longitude": 13.43144,
+            "latitude": 54.41165
+          }
+        },
+        {
+          "classes": "A",
+          "id": 88,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1,
+            20688,
+            1224,
+            481,
+            471,
+            12468,
+            611,
+            3288,
+            2825,
+            19368,
+            19378,
+            18088,
+            20788,
+            13328,
+            20798
+          ],
+          "name": "Berlin",
+          "coordinates": {
+            "longitude": 13.404616,
+            "latitude": 52.486081
+          }
+        },
+        {
+          "classes": "C",
+          "id": 25391,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            32671
+          ],
+          "name": "Bernau bei Berlin",
+          "coordinates": {
+            "longitude": 13.567277,
+            "latitude": 52.687484
+          }
+        },
+        {
+          "classes": "C",
+          "id": 299,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            8978
+          ],
+          "name": "Bernburg (Saale)",
+          "coordinates": {
+            "longitude": 11.73421,
+            "latitude": 51.797014
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2808,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3748
+          ],
+          "name": "Beverstedt",
+          "coordinates": {
+            "longitude": 8.821112,
+            "latitude": 53.431787
+          }
+        },
+        {
+          "classes": "A",
+          "id": 302,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1434,
+            30058
+          ],
+          "name": "Bielefeld",
+          "coordinates": {
+            "longitude": 8.528143,
+            "latitude": 52.01847
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1204,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            954,
+            21558
+          ],
+          "name": "Binz",
+          "coordinates": {
+            "longitude": 13.600996,
+            "latitude": 54.405138
+          }
+        },
+        {
+          "classes": "C",
+          "id": 5398,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            6948
+          ],
+          "name": "Bischofsgrün",
+          "coordinates": {
+            "longitude": 11.806513,
+            "latitude": 50.056723
+          }
+        },
+        {
+          "classes": "C",
+          "id": 15908,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            19078
+          ],
+          "name": "Bispingen",
+          "coordinates": {
+            "longitude": 10.00019,
+            "latitude": 53.077839
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "A",
+          "id": 243,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14698,
+            28508
+          ],
+          "name": "Aachen",
+          "coordinates": {
+            "longitude": 6.102988,
+            "latitude": 50.780919
+          }
+        },
+        {
+          "classes": "A",
+          "id": 243,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14698,
+            28508
+          ],
+          "name": "Aachen",
+          "coordinates": {
+            "longitude": 6.102988,
+            "latitude": 50.780919
+          }
+        },
+        {
+          "classes": "B",
+          "id": 244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            181
+          ],
+          "name": "Aalen",
+          "coordinates": {
+            "longitude": 10.092956,
+            "latitude": 48.835296
+          }
+        },
+        {
+          "classes": "C",
+          "id": 10878,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12298
+          ],
+          "name": "Achim",
+          "coordinates": {
+            "longitude": 9.05104,
+            "latitude": 53.0092
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2248,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2938
+          ],
+          "name": "Ahlbeck",
+          "coordinates": {
+            "longitude": 14.187473,
+            "latitude": 53.940628
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2498,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3328
+          ],
+          "name": "Ahrenshoop",
+          "coordinates": {
+            "longitude": 12.421252,
+            "latitude": 54.380715
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3778,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4068
+          ],
+          "name": "Aichach",
+          "coordinates": {
+            "longitude": 11.135986,
+            "latitude": 48.457704
+          }
+        },
+        {
+          "classes": "C",
+          "id": 116,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            34
+          ],
+          "name": "Alsfeld",
+          "coordinates": {
+            "longitude": 9.261227,
+            "latitude": 50.744911
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2238,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2948
+          ],
+          "name": "Anklam",
+          "coordinates": {
+            "longitude": 13.695973,
+            "latitude": 53.850291
+          }
+        },
+        {
+          "classes": "C",
+          "id": 255,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1905
+          ],
+          "name": "Ansbach",
+          "coordinates": {
+            "longitude": 10.571936,
+            "latitude": 49.300425
+          }
+        },
+        {
+          "classes": "B",
+          "id": 256,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            391
+          ],
+          "name": "Arnsberg",
+          "coordinates": {
+            "longitude": 8.066429,
+            "latitude": 51.405015
+          }
+        },
+        {
+          "classes": "B",
+          "id": 258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            754,
+            23248
+          ],
+          "name": "Aschaffenburg",
+          "coordinates": {
+            "longitude": 9.14962,
+            "latitude": 49.977752
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://developer.flix.tech/"
+    },
+    "type": "Property",
+    "dataProvider": {
+      "value": "https://www.flixbus.de/",
+      "type": "Property"
+    },
+    "responderID": {
+      "value": "Flixbus",
+      "type": "Property"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Retrieve the entity urn:ngsi-ld:ApiService:RequestUUID01a-100 - make sure it's OK"
+echo "====================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:ApiService:RequestUUID01a-100?prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "04. QUERY Entities - see both of them"
+echo "====================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=ApiService&prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity, no @context
+=================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ApiService:RequestUUID01a-100
+Date: REGEX(.*)
+
+
+
+02. Create an	Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ApiService:RequestUUID01a-101
+Date: REGEX(.*)
+
+
+
+03. Retrieve the entity urn:ngsi-ld:ApiService:RequestUUID01a-100 - make sure it's OK
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 26789
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:ApiService:RequestUUID01a-100",
+  "type": "ApiService",
+  "requestParameters": {
+    "type": "Property",
+    "value": {
+      "tompHeader": {},
+      "otherQueryParameter": {
+        "X-API-Authentication": "DEV_TEST_TOKEN_STAGING",
+        "User-Agent": "FIWARE Foundation Projekt SmartMaaS"
+      },
+      "tompQueryParameter": {},
+      "tompPath": {},
+      "tompBody": {}
+    }
+  },
+  "requesterID": {
+    "type": "Property",
+    "value": "bettermobility"
+  },
+  "expiresAt": {
+    "type": "Property",
+    "value": "2020-09-01T12:00:00.000Z"
+  },
+  "serviceName": {
+    "type": "Property",
+    "value": "operatorRegions:FB:0.0.1"
+  },
+  "dataConsumer": {
+    "type": "Property",
+    "value": "https://www.bettermobility.de/"
+  },
+  "response-Flixbus": {
+    "type": "Property",
+    "value": {
+      "responseBodyTomp": {},
+      "responseBodyOriginal": [
+        {
+          "classes": "A",
+          "id": 243,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14698,
+            28508
+          ],
+          "name": "Aachen",
+          "coordinates": {
+            "longitude": 6.102988,
+            "latitude": 50.780919
+          }
+        },
+        {
+          "classes": "B",
+          "id": 244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            181
+          ],
+          "name": "Aalen",
+          "coordinates": {
+            "longitude": 10.092956,
+            "latitude": 48.835296
+          }
+        },
+        {
+          "classes": "C",
+          "id": 10878,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12298
+          ],
+          "name": "Achim",
+          "coordinates": {
+            "longitude": 9.05104,
+            "latitude": 53.0092
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2248,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2938
+          ],
+          "name": "Ahlbeck",
+          "coordinates": {
+            "longitude": 14.187473,
+            "latitude": 53.940628
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2498,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3328
+          ],
+          "name": "Ahrenshoop",
+          "coordinates": {
+            "longitude": 12.421252,
+            "latitude": 54.380715
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3778,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4068
+          ],
+          "name": "Aichach",
+          "coordinates": {
+            "longitude": 11.135986,
+            "latitude": 48.457704
+          }
+        },
+        {
+          "classes": "C",
+          "id": 116,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            34
+          ],
+          "name": "Alsfeld",
+          "coordinates": {
+            "longitude": 9.261227,
+            "latitude": 50.744911
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2238,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2948
+          ],
+          "name": "Anklam",
+          "coordinates": {
+            "longitude": 13.695973,
+            "latitude": 53.850291
+          }
+        },
+        {
+          "classes": "C",
+          "id": 255,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1905
+          ],
+          "name": "Ansbach",
+          "coordinates": {
+            "longitude": 10.571936,
+            "latitude": 49.300425
+          }
+        },
+        {
+          "classes": "B",
+          "id": 256,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            391
+          ],
+          "name": "Arnsberg",
+          "coordinates": {
+            "longitude": 8.066429,
+            "latitude": 51.405015
+          }
+        },
+        {
+          "classes": "B",
+          "id": 258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            754,
+            23248
+          ],
+          "name": "Aschaffenburg",
+          "coordinates": {
+            "longitude": 9.14962,
+            "latitude": 49.977752
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1164,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1164
+          ],
+          "name": "Aschersleben",
+          "coordinates": {
+            "longitude": 11.462988,
+            "latitude": 51.758059
+          }
+        },
+        {
+          "classes": "C",
+          "id": 259,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            33941
+          ],
+          "name": "Aue",
+          "coordinates": {
+            "longitude": 12.699016,
+            "latitude": 50.58733
+          }
+        },
+        {
+          "classes": "A",
+          "id": 137,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            55
+          ],
+          "name": "Augsburg",
+          "coordinates": {
+            "longitude": 10.882896,
+            "latitude": 48.383046
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1244,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            974
+          ],
+          "name": "Baabe",
+          "coordinates": {
+            "longitude": 13.704913,
+            "latitude": 54.361697
+          }
+        },
+        {
+          "classes": "C",
+          "id": 3188,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4078
+          ],
+          "name": "Bad Arolsen",
+          "coordinates": {
+            "longitude": 9.012551,
+            "latitude": 51.379864
+          }
+        },
+        {
+          "classes": "C",
+          "id": 800,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3118
+          ],
+          "name": "Bad Doberan",
+          "coordinates": {
+            "longitude": 11.9086,
+            "latitude": 54.102832
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1184,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1264
+          ],
+          "name": "Bad Harzburg",
+          "coordinates": {
+            "longitude": 10.556421,
+            "latitude": 51.887109
+          }
+        },
+        {
+          "classes": "C",
+          "id": 117,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            35
+          ],
+          "name": "Bad Hersfeld",
+          "coordinates": {
+            "longitude": 9.722872,
+            "latitude": 50.863034
+          }
+        },
+        {
+          "classes": "B",
+          "id": 23661,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            32001
+          ],
+          "name": "Bad Homburg",
+          "coordinates": {
+            "longitude": 8.621083,
+            "latitude": 50.219678
+          }
+        },
+        {
+          "classes": "C",
+          "id": 279,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            201
+          ],
+          "name": "Bad Oeynhausen",
+          "coordinates": {
+            "longitude": 8.79963,
+            "latitude": 52.205381
+          }
+        },
+        {
+          "classes": "C",
+          "id": 23541,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            31851
+          ],
+          "name": "Bad Schandau",
+          "coordinates": {
+            "longitude": 14.153571,
+            "latitude": 50.920741
+          }
+        },
+        {
+          "classes": "C",
+          "id": 286,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            784
+          ],
+          "name": "Bad Segeberg",
+          "coordinates": {
+            "longitude": 10.309166,
+            "latitude": 53.934446
+          }
+        },
+        {
+          "classes": "C",
+          "id": 289,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            14048
+          ],
+          "name": "Bad Wörishofen",
+          "coordinates": {
+            "longitude": 10.594936,
+            "latitude": 48.005129
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1464,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1574
+          ],
+          "name": "Bad Zwesten",
+          "coordinates": {
+            "longitude": 9.175395,
+            "latitude": 51.051932
+          }
+        },
+        {
+          "classes": "C",
+          "id": 291,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            12288
+          ],
+          "name": "Baden-Baden",
+          "coordinates": {
+            "longitude": 8.165347,
+            "latitude": 48.764275
+          }
+        },
+        {
+          "classes": "B",
+          "id": 149,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            67
+          ],
+          "name": "Bamberg",
+          "coordinates": {
+            "longitude": 10.898663,
+            "latitude": 49.900581
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2258,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            2958
+          ],
+          "name": "Bansin",
+          "coordinates": {
+            "longitude": 14.137602,
+            "latitude": 53.968123
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1044,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            4088
+          ],
+          "name": "Bautzen",
+          "coordinates": {
+            "longitude": 14.423775,
+            "latitude": 51.182293
+          }
+        },
+        {
+          "classes": "B",
+          "id": 124,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            42,
+            1715
+          ],
+          "name": "Bayreuth",
+          "coordinates": {
+            "longitude": 11.584071,
+            "latitude": 49.94085
+          }
+        },
+        {
+          "classes": "C",
+          "id": 122,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            40
+          ],
+          "name": "Bergen (Celle)",
+          "coordinates": {
+            "longitude": 9.95944,
+            "latitude": 52.812018
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1224,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            944
+          ],
+          "name": "Bergen auf Rügen",
+          "coordinates": {
+            "longitude": 13.43144,
+            "latitude": 54.41165
+          }
+        },
+        {
+          "classes": "A",
+          "id": 88,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1,
+            20688,
+            1224,
+            481,
+            471,
+            12468,
+            611,
+            3288,
+            2825,
+            19368,
+            19378,
+            18088,
+            20788,
+            13328,
+            20798
+          ],
+          "name": "Berlin",
+          "coordinates": {
+            "longitude": 13.404616,
+            "latitude": 52.486081
+          }
+        },
+        {
+          "classes": "C",
+          "id": 25391,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            32671
+          ],
+          "name": "Bernau bei Berlin",
+          "coordinates": {
+            "longitude": 13.567277,
+            "latitude": 52.687484
+          }
+        },
+        {
+          "classes": "C",
+          "id": 299,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            8978
+          ],
+          "name": "Bernburg (Saale)",
+          "coordinates": {
+            "longitude": 11.73421,
+            "latitude": 51.797014
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2808,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3748
+          ],
+          "name": "Beverstedt",
+          "coordinates": {
+            "longitude": 8.821112,
+            "latitude": 53.431787
+          }
+        },
+        {
+          "classes": "A",
+          "id": 302,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1434,
+            30058
+          ],
+          "name": "Bielefeld",
+          "coordinates": {
+            "longitude": 8.528143,
+            "latitude": 52.01847
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1204,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            954,
+            21558
+          ],
+          "name": "Binz",
+          "coordinates": {
+            "longitude": 13.600996,
+            "latitude": 54.405138
+          }
+        },
+        {
+          "classes": "C",
+          "id": 5398,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            6948
+          ],
+          "name": "Bischofsgrün",
+          "coordinates": {
+            "longitude": 11.806513,
+            "latitude": 50.056723
+          }
+        },
+        {
+          "classes": "C",
+          "id": 15908,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            19078
+          ],
+          "name": "Bispingen",
+          "coordinates": {
+            "longitude": 10.00019,
+            "latitude": 53.077839
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        },
+        {
+          "classes": "C",
+          "id": 1174,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1254
+          ],
+          "name": "Blankenburg",
+          "coordinates": {
+            "longitude": 10.960557,
+            "latitude": 51.79521
+          }
+        },
+        {
+          "classes": "C",
+          "id": 307,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3528
+          ],
+          "name": "Bocholt",
+          "coordinates": {
+            "longitude": 6.615092,
+            "latitude": 51.838428
+          }
+        },
+        {
+          "classes": "A",
+          "id": 132,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            50
+          ],
+          "name": "Bochum",
+          "coordinates": {
+            "longitude": 7.22485,
+            "latitude": 51.47931
+          }
+        },
+        {
+          "classes": "A",
+          "id": 309,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            501
+          ],
+          "name": "Bonn",
+          "coordinates": {
+            "longitude": 7.108202,
+            "latitude": 50.724542
+          }
+        },
+        {
+          "classes": "C",
+          "id": 312,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3518
+          ],
+          "name": "Borken",
+          "coordinates": {
+            "longitude": 6.859448,
+            "latitude": 51.848271
+          }
+        },
+        {
+          "classes": "C",
+          "id": 2508,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3368,
+            17938
+          ],
+          "name": "Born (Darß)",
+          "coordinates": {
+            "longitude": 12.526667,
+            "latitude": 54.385833
+          }
+        },
+        {
+          "classes": "B",
+          "id": 314,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1074
+          ],
+          "name": "Bottrop",
+          "coordinates": {
+            "longitude": 6.936545,
+            "latitude": 51.510187
+          }
+        },
+        {
+          "classes": "A",
+          "id": 169,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            89
+          ],
+          "name": "Bremen",
+          "coordinates": {
+            "longitude": 8.810576,
+            "latitude": 53.082179
+          }
+        },
+        {
+          "classes": "C",
+          "id": 319,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            1945
+          ],
+          "name": "Bremerhaven",
+          "coordinates": {
+            "longitude": 8.599862,
+            "latitude": 53.536707
+          }
+        },
+        {
+          "classes": "C",
+          "id": 320,
+          "country": {
+            "name": "Germany",
+            "alpha2_code": "DE"
+          },
+          "stations": [
+            3738
+          ],
+          "name": "Bremervörde",
+          "coordinates": {
+            "longitude": 9.139978,
+            "latitude": 53.487132
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://developer.flix.tech/"
+    },
+    "dataProvider": {
+      "type": "Property",
+      "value": "https://www.flixbus.de/"
+    },
+    "responderID": {
+      "type": "Property",
+      "value": "Flixbus"
+    }
+  }
+}
+
+
+
+04. QUERY Entities - see both of them
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 63115
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "urn:ngsi-ld:ApiService:RequestUUID01a-100",
+    "type": "ApiService",
+    "dataConsumer": {
+      "type": "Property",
+      "value": "https://www.bettermobility.de/"
+    },
+    "expiresAt": {
+      "type": "Property",
+      "value": "2020-09-01T12:00:00.000Z"
+    },
+    "requestParameters": {
+      "type": "Property",
+      "value": {
+        "tompHeader": {},
+        "otherQueryParameter": {
+          "X-API-Authentication": "DEV_TEST_TOKEN_STAGING",
+          "User-Agent": "FIWARE Foundation Projekt SmartMaaS"
+        },
+        "tompQueryParameter": {},
+        "tompPath": {},
+        "tompBody": {}
+      }
+    },
+    "requesterID": {
+      "type": "Property",
+      "value": "bettermobility"
+    },
+    "response-Flixbus": {
+      "type": "Property",
+      "value": {
+        "responseBodyTomp": {},
+        "responseBodyOriginal": [
+          {
+            "classes": "A",
+            "id": 243,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              14698,
+              28508
+            ],
+            "name": "Aachen",
+            "coordinates": {
+              "longitude": 6.102988,
+              "latitude": 50.780919
+            }
+          },
+          {
+            "classes": "B",
+            "id": 244,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              181
+            ],
+            "name": "Aalen",
+            "coordinates": {
+              "longitude": 10.092956,
+              "latitude": 48.835296
+            }
+          },
+          {
+            "classes": "C",
+            "id": 10878,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              12298
+            ],
+            "name": "Achim",
+            "coordinates": {
+              "longitude": 9.05104,
+              "latitude": 53.0092
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2248,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2938
+            ],
+            "name": "Ahlbeck",
+            "coordinates": {
+              "longitude": 14.187473,
+              "latitude": 53.940628
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2498,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3328
+            ],
+            "name": "Ahrenshoop",
+            "coordinates": {
+              "longitude": 12.421252,
+              "latitude": 54.380715
+            }
+          },
+          {
+            "classes": "C",
+            "id": 3778,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4068
+            ],
+            "name": "Aichach",
+            "coordinates": {
+              "longitude": 11.135986,
+              "latitude": 48.457704
+            }
+          },
+          {
+            "classes": "C",
+            "id": 116,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              34
+            ],
+            "name": "Alsfeld",
+            "coordinates": {
+              "longitude": 9.261227,
+              "latitude": 50.744911
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2238,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2948
+            ],
+            "name": "Anklam",
+            "coordinates": {
+              "longitude": 13.695973,
+              "latitude": 53.850291
+            }
+          },
+          {
+            "classes": "C",
+            "id": 255,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1905
+            ],
+            "name": "Ansbach",
+            "coordinates": {
+              "longitude": 10.571936,
+              "latitude": 49.300425
+            }
+          },
+          {
+            "classes": "B",
+            "id": 256,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              391
+            ],
+            "name": "Arnsberg",
+            "coordinates": {
+              "longitude": 8.066429,
+              "latitude": 51.405015
+            }
+          },
+          {
+            "classes": "B",
+            "id": 258,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              754,
+              23248
+            ],
+            "name": "Aschaffenburg",
+            "coordinates": {
+              "longitude": 9.14962,
+              "latitude": 49.977752
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1164,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1164
+            ],
+            "name": "Aschersleben",
+            "coordinates": {
+              "longitude": 11.462988,
+              "latitude": 51.758059
+            }
+          },
+          {
+            "classes": "C",
+            "id": 259,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              33941
+            ],
+            "name": "Aue",
+            "coordinates": {
+              "longitude": 12.699016,
+              "latitude": 50.58733
+            }
+          },
+          {
+            "classes": "A",
+            "id": 137,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              55
+            ],
+            "name": "Augsburg",
+            "coordinates": {
+              "longitude": 10.882896,
+              "latitude": 48.383046
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1244,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              974
+            ],
+            "name": "Baabe",
+            "coordinates": {
+              "longitude": 13.704913,
+              "latitude": 54.361697
+            }
+          },
+          {
+            "classes": "C",
+            "id": 3188,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4078
+            ],
+            "name": "Bad Arolsen",
+            "coordinates": {
+              "longitude": 9.012551,
+              "latitude": 51.379864
+            }
+          },
+          {
+            "classes": "C",
+            "id": 800,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3118
+            ],
+            "name": "Bad Doberan",
+            "coordinates": {
+              "longitude": 11.9086,
+              "latitude": 54.102832
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1184,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1264
+            ],
+            "name": "Bad Harzburg",
+            "coordinates": {
+              "longitude": 10.556421,
+              "latitude": 51.887109
+            }
+          },
+          {
+            "classes": "C",
+            "id": 117,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              35
+            ],
+            "name": "Bad Hersfeld",
+            "coordinates": {
+              "longitude": 9.722872,
+              "latitude": 50.863034
+            }
+          },
+          {
+            "classes": "B",
+            "id": 23661,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              32001
+            ],
+            "name": "Bad Homburg",
+            "coordinates": {
+              "longitude": 8.621083,
+              "latitude": 50.219678
+            }
+          },
+          {
+            "classes": "C",
+            "id": 279,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              201
+            ],
+            "name": "Bad Oeynhausen",
+            "coordinates": {
+              "longitude": 8.79963,
+              "latitude": 52.205381
+            }
+          },
+          {
+            "classes": "C",
+            "id": 23541,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              31851
+            ],
+            "name": "Bad Schandau",
+            "coordinates": {
+              "longitude": 14.153571,
+              "latitude": 50.920741
+            }
+          },
+          {
+            "classes": "C",
+            "id": 286,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              784
+            ],
+            "name": "Bad Segeberg",
+            "coordinates": {
+              "longitude": 10.309166,
+              "latitude": 53.934446
+            }
+          },
+          {
+            "classes": "C",
+            "id": 289,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              14048
+            ],
+            "name": "Bad Wörishofen",
+            "coordinates": {
+              "longitude": 10.594936,
+              "latitude": 48.005129
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1464,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1574
+            ],
+            "name": "Bad Zwesten",
+            "coordinates": {
+              "longitude": 9.175395,
+              "latitude": 51.051932
+            }
+          },
+          {
+            "classes": "C",
+            "id": 291,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              12288
+            ],
+            "name": "Baden-Baden",
+            "coordinates": {
+              "longitude": 8.165347,
+              "latitude": 48.764275
+            }
+          },
+          {
+            "classes": "B",
+            "id": 149,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              67
+            ],
+            "name": "Bamberg",
+            "coordinates": {
+              "longitude": 10.898663,
+              "latitude": 49.900581
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2258,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2958
+            ],
+            "name": "Bansin",
+            "coordinates": {
+              "longitude": 14.137602,
+              "latitude": 53.968123
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1044,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4088
+            ],
+            "name": "Bautzen",
+            "coordinates": {
+              "longitude": 14.423775,
+              "latitude": 51.182293
+            }
+          },
+          {
+            "classes": "B",
+            "id": 124,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              42,
+              1715
+            ],
+            "name": "Bayreuth",
+            "coordinates": {
+              "longitude": 11.584071,
+              "latitude": 49.94085
+            }
+          },
+          {
+            "classes": "C",
+            "id": 122,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              40
+            ],
+            "name": "Bergen (Celle)",
+            "coordinates": {
+              "longitude": 9.95944,
+              "latitude": 52.812018
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1224,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              944
+            ],
+            "name": "Bergen auf Rügen",
+            "coordinates": {
+              "longitude": 13.43144,
+              "latitude": 54.41165
+            }
+          },
+          {
+            "classes": "A",
+            "id": 88,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1,
+              20688,
+              1224,
+              481,
+              471,
+              12468,
+              611,
+              3288,
+              2825,
+              19368,
+              19378,
+              18088,
+              20788,
+              13328,
+              20798
+            ],
+            "name": "Berlin",
+            "coordinates": {
+              "longitude": 13.404616,
+              "latitude": 52.486081
+            }
+          },
+          {
+            "classes": "C",
+            "id": 25391,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              32671
+            ],
+            "name": "Bernau bei Berlin",
+            "coordinates": {
+              "longitude": 13.567277,
+              "latitude": 52.687484
+            }
+          },
+          {
+            "classes": "C",
+            "id": 299,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              8978
+            ],
+            "name": "Bernburg (Saale)",
+            "coordinates": {
+              "longitude": 11.73421,
+              "latitude": 51.797014
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2808,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3748
+            ],
+            "name": "Beverstedt",
+            "coordinates": {
+              "longitude": 8.821112,
+              "latitude": 53.431787
+            }
+          },
+          {
+            "classes": "A",
+            "id": 302,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1434,
+              30058
+            ],
+            "name": "Bielefeld",
+            "coordinates": {
+              "longitude": 8.528143,
+              "latitude": 52.01847
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1204,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              954,
+              21558
+            ],
+            "name": "Binz",
+            "coordinates": {
+              "longitude": 13.600996,
+              "latitude": 54.405138
+            }
+          },
+          {
+            "classes": "C",
+            "id": 5398,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              6948
+            ],
+            "name": "Bischofsgrün",
+            "coordinates": {
+              "longitude": 11.806513,
+              "latitude": 50.056723
+            }
+          },
+          {
+            "classes": "C",
+            "id": 15908,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              19078
+            ],
+            "name": "Bispingen",
+            "coordinates": {
+              "longitude": 10.00019,
+              "latitude": 53.077839
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1174,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1254
+            ],
+            "name": "Blankenburg",
+            "coordinates": {
+              "longitude": 10.960557,
+              "latitude": 51.79521
+            }
+          },
+          {
+            "classes": "C",
+            "id": 307,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3528
+            ],
+            "name": "Bocholt",
+            "coordinates": {
+              "longitude": 6.615092,
+              "latitude": 51.838428
+            }
+          },
+          {
+            "classes": "A",
+            "id": 132,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              50
+            ],
+            "name": "Bochum",
+            "coordinates": {
+              "longitude": 7.22485,
+              "latitude": 51.47931
+            }
+          },
+          {
+            "classes": "A",
+            "id": 309,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              501
+            ],
+            "name": "Bonn",
+            "coordinates": {
+              "longitude": 7.108202,
+              "latitude": 50.724542
+            }
+          },
+          {
+            "classes": "C",
+            "id": 312,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3518
+            ],
+            "name": "Borken",
+            "coordinates": {
+              "longitude": 6.859448,
+              "latitude": 51.848271
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2508,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3368,
+              17938
+            ],
+            "name": "Born (Darß)",
+            "coordinates": {
+              "longitude": 12.526667,
+              "latitude": 54.385833
+            }
+          },
+          {
+            "classes": "B",
+            "id": 314,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1074
+            ],
+            "name": "Bottrop",
+            "coordinates": {
+              "longitude": 6.936545,
+              "latitude": 51.510187
+            }
+          },
+          {
+            "classes": "A",
+            "id": 169,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              89
+            ],
+            "name": "Bremen",
+            "coordinates": {
+              "longitude": 8.810576,
+              "latitude": 53.082179
+            }
+          },
+          {
+            "classes": "C",
+            "id": 319,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1945
+            ],
+            "name": "Bremerhaven",
+            "coordinates": {
+              "longitude": 8.599862,
+              "latitude": 53.536707
+            }
+          },
+          {
+            "classes": "C",
+            "id": 320,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3738
+            ],
+            "name": "Bremervörde",
+            "coordinates": {
+              "longitude": 9.139978,
+              "latitude": 53.487132
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1174,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1254
+            ],
+            "name": "Blankenburg",
+            "coordinates": {
+              "longitude": 10.960557,
+              "latitude": 51.79521
+            }
+          },
+          {
+            "classes": "C",
+            "id": 307,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3528
+            ],
+            "name": "Bocholt",
+            "coordinates": {
+              "longitude": 6.615092,
+              "latitude": 51.838428
+            }
+          },
+          {
+            "classes": "A",
+            "id": 132,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              50
+            ],
+            "name": "Bochum",
+            "coordinates": {
+              "longitude": 7.22485,
+              "latitude": 51.47931
+            }
+          },
+          {
+            "classes": "A",
+            "id": 309,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              501
+            ],
+            "name": "Bonn",
+            "coordinates": {
+              "longitude": 7.108202,
+              "latitude": 50.724542
+            }
+          },
+          {
+            "classes": "C",
+            "id": 312,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3518
+            ],
+            "name": "Borken",
+            "coordinates": {
+              "longitude": 6.859448,
+              "latitude": 51.848271
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2508,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3368,
+              17938
+            ],
+            "name": "Born (Darß)",
+            "coordinates": {
+              "longitude": 12.526667,
+              "latitude": 54.385833
+            }
+          },
+          {
+            "classes": "B",
+            "id": 314,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1074
+            ],
+            "name": "Bottrop",
+            "coordinates": {
+              "longitude": 6.936545,
+              "latitude": 51.510187
+            }
+          },
+          {
+            "classes": "A",
+            "id": 169,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              89
+            ],
+            "name": "Bremen",
+            "coordinates": {
+              "longitude": 8.810576,
+              "latitude": 53.082179
+            }
+          },
+          {
+            "classes": "C",
+            "id": 319,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1945
+            ],
+            "name": "Bremerhaven",
+            "coordinates": {
+              "longitude": 8.599862,
+              "latitude": 53.536707
+            }
+          },
+          {
+            "classes": "C",
+            "id": 320,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3738
+            ],
+            "name": "Bremervörde",
+            "coordinates": {
+              "longitude": 9.139978,
+              "latitude": 53.487132
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1174,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1254
+            ],
+            "name": "Blankenburg",
+            "coordinates": {
+              "longitude": 10.960557,
+              "latitude": 51.79521
+            }
+          },
+          {
+            "classes": "C",
+            "id": 307,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3528
+            ],
+            "name": "Bocholt",
+            "coordinates": {
+              "longitude": 6.615092,
+              "latitude": 51.838428
+            }
+          },
+          {
+            "classes": "A",
+            "id": 132,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              50
+            ],
+            "name": "Bochum",
+            "coordinates": {
+              "longitude": 7.22485,
+              "latitude": 51.47931
+            }
+          },
+          {
+            "classes": "A",
+            "id": 309,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              501
+            ],
+            "name": "Bonn",
+            "coordinates": {
+              "longitude": 7.108202,
+              "latitude": 50.724542
+            }
+          },
+          {
+            "classes": "C",
+            "id": 312,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3518
+            ],
+            "name": "Borken",
+            "coordinates": {
+              "longitude": 6.859448,
+              "latitude": 51.848271
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2508,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3368,
+              17938
+            ],
+            "name": "Born (Darß)",
+            "coordinates": {
+              "longitude": 12.526667,
+              "latitude": 54.385833
+            }
+          },
+          {
+            "classes": "B",
+            "id": 314,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1074
+            ],
+            "name": "Bottrop",
+            "coordinates": {
+              "longitude": 6.936545,
+              "latitude": 51.510187
+            }
+          },
+          {
+            "classes": "A",
+            "id": 169,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              89
+            ],
+            "name": "Bremen",
+            "coordinates": {
+              "longitude": 8.810576,
+              "latitude": 53.082179
+            }
+          },
+          {
+            "classes": "C",
+            "id": 319,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1945
+            ],
+            "name": "Bremerhaven",
+            "coordinates": {
+              "longitude": 8.599862,
+              "latitude": 53.536707
+            }
+          },
+          {
+            "classes": "C",
+            "id": 320,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3738
+            ],
+            "name": "Bremervörde",
+            "coordinates": {
+              "longitude": 9.139978,
+              "latitude": 53.487132
+            }
+          }
+        ]
+      },
+      "dataProvider": {
+        "type": "Property",
+        "value": "https://www.flixbus.de/"
+      },
+      "responderID": {
+        "type": "Property",
+        "value": "Flixbus"
+      },
+      "source": {
+        "type": "Property",
+        "value": "https://developer.flix.tech/"
+      }
+    },
+    "serviceName": {
+      "type": "Property",
+      "value": "operatorRegions:FB:0.0.1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:ApiService:RequestUUID01a-101",
+    "type": "ApiService",
+    "dataConsumer": {
+      "type": "Property",
+      "value": "https://www.bettermobility.de/"
+    },
+    "expiresAt": {
+      "type": "Property",
+      "value": "2020-09-01T12:00:00.000Z"
+    },
+    "requestParameters": {
+      "type": "Property",
+      "value": {
+        "tompHeader": {},
+        "otherQueryParameter": {
+          "X-API-Authentication": "DEV_TEST_TOKEN_STAGING",
+          "User-Agent": "FIWARE Foundation Projekt SmartMaaS"
+        },
+        "tompQueryParameter": {},
+        "tompPath": {},
+        "tompBody": {}
+      }
+    },
+    "requesterID": {
+      "type": "Property",
+      "value": "bettermobility"
+    },
+    "response-Flixbus": {
+      "type": "Property",
+      "value": {
+        "responseBodyTomp": {},
+        "responseBodyOriginal": [
+          {
+            "classes": "A",
+            "id": 243,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              14698,
+              28508
+            ],
+            "name": "Aachen",
+            "coordinates": {
+              "longitude": 6.102988,
+              "latitude": 50.780919
+            }
+          },
+          {
+            "classes": "B",
+            "id": 244,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              181
+            ],
+            "name": "Aalen",
+            "coordinates": {
+              "longitude": 10.092956,
+              "latitude": 48.835296
+            }
+          },
+          {
+            "classes": "C",
+            "id": 10878,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              12298
+            ],
+            "name": "Achim",
+            "coordinates": {
+              "longitude": 9.05104,
+              "latitude": 53.0092
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2248,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2938
+            ],
+            "name": "Ahlbeck",
+            "coordinates": {
+              "longitude": 14.187473,
+              "latitude": 53.940628
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2498,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3328
+            ],
+            "name": "Ahrenshoop",
+            "coordinates": {
+              "longitude": 12.421252,
+              "latitude": 54.380715
+            }
+          },
+          {
+            "classes": "C",
+            "id": 3778,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4068
+            ],
+            "name": "Aichach",
+            "coordinates": {
+              "longitude": 11.135986,
+              "latitude": 48.457704
+            }
+          },
+          {
+            "classes": "C",
+            "id": 116,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              34
+            ],
+            "name": "Alsfeld",
+            "coordinates": {
+              "longitude": 9.261227,
+              "latitude": 50.744911
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2238,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2948
+            ],
+            "name": "Anklam",
+            "coordinates": {
+              "longitude": 13.695973,
+              "latitude": 53.850291
+            }
+          },
+          {
+            "classes": "C",
+            "id": 255,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1905
+            ],
+            "name": "Ansbach",
+            "coordinates": {
+              "longitude": 10.571936,
+              "latitude": 49.300425
+            }
+          },
+          {
+            "classes": "B",
+            "id": 256,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              391
+            ],
+            "name": "Arnsberg",
+            "coordinates": {
+              "longitude": 8.066429,
+              "latitude": 51.405015
+            }
+          },
+          {
+            "classes": "B",
+            "id": 258,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              754,
+              23248
+            ],
+            "name": "Aschaffenburg",
+            "coordinates": {
+              "longitude": 9.14962,
+              "latitude": 49.977752
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1164,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1164
+            ],
+            "name": "Aschersleben",
+            "coordinates": {
+              "longitude": 11.462988,
+              "latitude": 51.758059
+            }
+          },
+          {
+            "classes": "C",
+            "id": 259,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              33941
+            ],
+            "name": "Aue",
+            "coordinates": {
+              "longitude": 12.699016,
+              "latitude": 50.58733
+            }
+          },
+          {
+            "classes": "A",
+            "id": 137,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              55
+            ],
+            "name": "Augsburg",
+            "coordinates": {
+              "longitude": 10.882896,
+              "latitude": 48.383046
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1244,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              974
+            ],
+            "name": "Baabe",
+            "coordinates": {
+              "longitude": 13.704913,
+              "latitude": 54.361697
+            }
+          },
+          {
+            "classes": "C",
+            "id": 3188,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4078
+            ],
+            "name": "Bad Arolsen",
+            "coordinates": {
+              "longitude": 9.012551,
+              "latitude": 51.379864
+            }
+          },
+          {
+            "classes": "C",
+            "id": 800,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3118
+            ],
+            "name": "Bad Doberan",
+            "coordinates": {
+              "longitude": 11.9086,
+              "latitude": 54.102832
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1184,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1264
+            ],
+            "name": "Bad Harzburg",
+            "coordinates": {
+              "longitude": 10.556421,
+              "latitude": 51.887109
+            }
+          },
+          {
+            "classes": "C",
+            "id": 117,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              35
+            ],
+            "name": "Bad Hersfeld",
+            "coordinates": {
+              "longitude": 9.722872,
+              "latitude": 50.863034
+            }
+          },
+          {
+            "classes": "B",
+            "id": 23661,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              32001
+            ],
+            "name": "Bad Homburg",
+            "coordinates": {
+              "longitude": 8.621083,
+              "latitude": 50.219678
+            }
+          },
+          {
+            "classes": "C",
+            "id": 279,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              201
+            ],
+            "name": "Bad Oeynhausen",
+            "coordinates": {
+              "longitude": 8.79963,
+              "latitude": 52.205381
+            }
+          },
+          {
+            "classes": "C",
+            "id": 23541,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              31851
+            ],
+            "name": "Bad Schandau",
+            "coordinates": {
+              "longitude": 14.153571,
+              "latitude": 50.920741
+            }
+          },
+          {
+            "classes": "C",
+            "id": 286,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              784
+            ],
+            "name": "Bad Segeberg",
+            "coordinates": {
+              "longitude": 10.309166,
+              "latitude": 53.934446
+            }
+          },
+          {
+            "classes": "C",
+            "id": 289,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              14048
+            ],
+            "name": "Bad Wörishofen",
+            "coordinates": {
+              "longitude": 10.594936,
+              "latitude": 48.005129
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1464,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1574
+            ],
+            "name": "Bad Zwesten",
+            "coordinates": {
+              "longitude": 9.175395,
+              "latitude": 51.051932
+            }
+          },
+          {
+            "classes": "C",
+            "id": 291,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              12288
+            ],
+            "name": "Baden-Baden",
+            "coordinates": {
+              "longitude": 8.165347,
+              "latitude": 48.764275
+            }
+          },
+          {
+            "classes": "B",
+            "id": 149,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              67
+            ],
+            "name": "Bamberg",
+            "coordinates": {
+              "longitude": 10.898663,
+              "latitude": 49.900581
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2258,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2958
+            ],
+            "name": "Bansin",
+            "coordinates": {
+              "longitude": 14.137602,
+              "latitude": 53.968123
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1044,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4088
+            ],
+            "name": "Bautzen",
+            "coordinates": {
+              "longitude": 14.423775,
+              "latitude": 51.182293
+            }
+          },
+          {
+            "classes": "B",
+            "id": 124,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              42,
+              1715
+            ],
+            "name": "Bayreuth",
+            "coordinates": {
+              "longitude": 11.584071,
+              "latitude": 49.94085
+            }
+          },
+          {
+            "classes": "C",
+            "id": 122,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              40
+            ],
+            "name": "Bergen (Celle)",
+            "coordinates": {
+              "longitude": 9.95944,
+              "latitude": 52.812018
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1224,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              944
+            ],
+            "name": "Bergen auf Rügen",
+            "coordinates": {
+              "longitude": 13.43144,
+              "latitude": 54.41165
+            }
+          },
+          {
+            "classes": "A",
+            "id": 88,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1,
+              20688,
+              1224,
+              481,
+              471,
+              12468,
+              611,
+              3288,
+              2825,
+              19368,
+              19378,
+              18088,
+              20788,
+              13328,
+              20798
+            ],
+            "name": "Berlin",
+            "coordinates": {
+              "longitude": 13.404616,
+              "latitude": 52.486081
+            }
+          },
+          {
+            "classes": "C",
+            "id": 25391,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              32671
+            ],
+            "name": "Bernau bei Berlin",
+            "coordinates": {
+              "longitude": 13.567277,
+              "latitude": 52.687484
+            }
+          },
+          {
+            "classes": "C",
+            "id": 299,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              8978
+            ],
+            "name": "Bernburg (Saale)",
+            "coordinates": {
+              "longitude": 11.73421,
+              "latitude": 51.797014
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2808,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3748
+            ],
+            "name": "Beverstedt",
+            "coordinates": {
+              "longitude": 8.821112,
+              "latitude": 53.431787
+            }
+          },
+          {
+            "classes": "A",
+            "id": 302,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1434,
+              30058
+            ],
+            "name": "Bielefeld",
+            "coordinates": {
+              "longitude": 8.528143,
+              "latitude": 52.01847
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1204,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              954,
+              21558
+            ],
+            "name": "Binz",
+            "coordinates": {
+              "longitude": 13.600996,
+              "latitude": 54.405138
+            }
+          },
+          {
+            "classes": "C",
+            "id": 5398,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              6948
+            ],
+            "name": "Bischofsgrün",
+            "coordinates": {
+              "longitude": 11.806513,
+              "latitude": 50.056723
+            }
+          },
+          {
+            "classes": "C",
+            "id": 15908,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              19078
+            ],
+            "name": "Bispingen",
+            "coordinates": {
+              "longitude": 10.00019,
+              "latitude": 53.077839
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1174,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1254
+            ],
+            "name": "Blankenburg",
+            "coordinates": {
+              "longitude": 10.960557,
+              "latitude": 51.79521
+            }
+          },
+          {
+            "classes": "C",
+            "id": 307,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3528
+            ],
+            "name": "Bocholt",
+            "coordinates": {
+              "longitude": 6.615092,
+              "latitude": 51.838428
+            }
+          },
+          {
+            "classes": "A",
+            "id": 132,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              50
+            ],
+            "name": "Bochum",
+            "coordinates": {
+              "longitude": 7.22485,
+              "latitude": 51.47931
+            }
+          },
+          {
+            "classes": "A",
+            "id": 309,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              501
+            ],
+            "name": "Bonn",
+            "coordinates": {
+              "longitude": 7.108202,
+              "latitude": 50.724542
+            }
+          },
+          {
+            "classes": "C",
+            "id": 312,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3518
+            ],
+            "name": "Borken",
+            "coordinates": {
+              "longitude": 6.859448,
+              "latitude": 51.848271
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2508,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3368,
+              17938
+            ],
+            "name": "Born (Darß)",
+            "coordinates": {
+              "longitude": 12.526667,
+              "latitude": 54.385833
+            }
+          },
+          {
+            "classes": "B",
+            "id": 314,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1074
+            ],
+            "name": "Bottrop",
+            "coordinates": {
+              "longitude": 6.936545,
+              "latitude": 51.510187
+            }
+          },
+          {
+            "classes": "A",
+            "id": 169,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              89
+            ],
+            "name": "Bremen",
+            "coordinates": {
+              "longitude": 8.810576,
+              "latitude": 53.082179
+            }
+          },
+          {
+            "classes": "C",
+            "id": 319,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1945
+            ],
+            "name": "Bremerhaven",
+            "coordinates": {
+              "longitude": 8.599862,
+              "latitude": 53.536707
+            }
+          },
+          {
+            "classes": "C",
+            "id": 320,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3738
+            ],
+            "name": "Bremervörde",
+            "coordinates": {
+              "longitude": 9.139978,
+              "latitude": 53.487132
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1174,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1254
+            ],
+            "name": "Blankenburg",
+            "coordinates": {
+              "longitude": 10.960557,
+              "latitude": 51.79521
+            }
+          },
+          {
+            "classes": "C",
+            "id": 307,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3528
+            ],
+            "name": "Bocholt",
+            "coordinates": {
+              "longitude": 6.615092,
+              "latitude": 51.838428
+            }
+          },
+          {
+            "classes": "A",
+            "id": 132,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              50
+            ],
+            "name": "Bochum",
+            "coordinates": {
+              "longitude": 7.22485,
+              "latitude": 51.47931
+            }
+          },
+          {
+            "classes": "A",
+            "id": 309,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              501
+            ],
+            "name": "Bonn",
+            "coordinates": {
+              "longitude": 7.108202,
+              "latitude": 50.724542
+            }
+          },
+          {
+            "classes": "C",
+            "id": 312,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3518
+            ],
+            "name": "Borken",
+            "coordinates": {
+              "longitude": 6.859448,
+              "latitude": 51.848271
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2508,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3368,
+              17938
+            ],
+            "name": "Born (Darß)",
+            "coordinates": {
+              "longitude": 12.526667,
+              "latitude": 54.385833
+            }
+          },
+          {
+            "classes": "B",
+            "id": 314,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1074
+            ],
+            "name": "Bottrop",
+            "coordinates": {
+              "longitude": 6.936545,
+              "latitude": 51.510187
+            }
+          },
+          {
+            "classes": "A",
+            "id": 169,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              89
+            ],
+            "name": "Bremen",
+            "coordinates": {
+              "longitude": 8.810576,
+              "latitude": 53.082179
+            }
+          },
+          {
+            "classes": "C",
+            "id": 319,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1945
+            ],
+            "name": "Bremerhaven",
+            "coordinates": {
+              "longitude": 8.599862,
+              "latitude": 53.536707
+            }
+          },
+          {
+            "classes": "C",
+            "id": 320,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3738
+            ],
+            "name": "Bremervörde",
+            "coordinates": {
+              "longitude": 9.139978,
+              "latitude": 53.487132
+            }
+          },
+          {
+            "classes": "C",
+            "id": 1174,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1254
+            ],
+            "name": "Blankenburg",
+            "coordinates": {
+              "longitude": 10.960557,
+              "latitude": 51.79521
+            }
+          },
+          {
+            "classes": "C",
+            "id": 307,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3528
+            ],
+            "name": "Bocholt",
+            "coordinates": {
+              "longitude": 6.615092,
+              "latitude": 51.838428
+            }
+          },
+          {
+            "classes": "A",
+            "id": 132,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              50
+            ],
+            "name": "Bochum",
+            "coordinates": {
+              "longitude": 7.22485,
+              "latitude": 51.47931
+            }
+          },
+          {
+            "classes": "A",
+            "id": 309,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              501
+            ],
+            "name": "Bonn",
+            "coordinates": {
+              "longitude": 7.108202,
+              "latitude": 50.724542
+            }
+          },
+          {
+            "classes": "C",
+            "id": 312,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3518
+            ],
+            "name": "Borken",
+            "coordinates": {
+              "longitude": 6.859448,
+              "latitude": 51.848271
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2508,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3368,
+              17938
+            ],
+            "name": "Born (Darß)",
+            "coordinates": {
+              "longitude": 12.526667,
+              "latitude": 54.385833
+            }
+          },
+          {
+            "classes": "B",
+            "id": 314,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1074
+            ],
+            "name": "Bottrop",
+            "coordinates": {
+              "longitude": 6.936545,
+              "latitude": 51.510187
+            }
+          },
+          {
+            "classes": "A",
+            "id": 169,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              89
+            ],
+            "name": "Bremen",
+            "coordinates": {
+              "longitude": 8.810576,
+              "latitude": 53.082179
+            }
+          },
+          {
+            "classes": "C",
+            "id": 319,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1945
+            ],
+            "name": "Bremerhaven",
+            "coordinates": {
+              "longitude": 8.599862,
+              "latitude": 53.536707
+            }
+          },
+          {
+            "classes": "C",
+            "id": 320,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3738
+            ],
+            "name": "Bremervörde",
+            "coordinates": {
+              "longitude": 9.139978,
+              "latitude": 53.487132
+            }
+          },
+          {
+            "classes": "A",
+            "id": 243,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              14698,
+              28508
+            ],
+            "name": "Aachen",
+            "coordinates": {
+              "longitude": 6.102988,
+              "latitude": 50.780919
+            }
+          },
+          {
+            "classes": "A",
+            "id": 243,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              14698,
+              28508
+            ],
+            "name": "Aachen",
+            "coordinates": {
+              "longitude": 6.102988,
+              "latitude": 50.780919
+            }
+          },
+          {
+            "classes": "B",
+            "id": 244,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              181
+            ],
+            "name": "Aalen",
+            "coordinates": {
+              "longitude": 10.092956,
+              "latitude": 48.835296
+            }
+          },
+          {
+            "classes": "C",
+            "id": 10878,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              12298
+            ],
+            "name": "Achim",
+            "coordinates": {
+              "longitude": 9.05104,
+              "latitude": 53.0092
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2248,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2938
+            ],
+            "name": "Ahlbeck",
+            "coordinates": {
+              "longitude": 14.187473,
+              "latitude": 53.940628
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2498,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              3328
+            ],
+            "name": "Ahrenshoop",
+            "coordinates": {
+              "longitude": 12.421252,
+              "latitude": 54.380715
+            }
+          },
+          {
+            "classes": "C",
+            "id": 3778,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              4068
+            ],
+            "name": "Aichach",
+            "coordinates": {
+              "longitude": 11.135986,
+              "latitude": 48.457704
+            }
+          },
+          {
+            "classes": "C",
+            "id": 116,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              34
+            ],
+            "name": "Alsfeld",
+            "coordinates": {
+              "longitude": 9.261227,
+              "latitude": 50.744911
+            }
+          },
+          {
+            "classes": "C",
+            "id": 2238,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              2948
+            ],
+            "name": "Anklam",
+            "coordinates": {
+              "longitude": 13.695973,
+              "latitude": 53.850291
+            }
+          },
+          {
+            "classes": "C",
+            "id": 255,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              1905
+            ],
+            "name": "Ansbach",
+            "coordinates": {
+              "longitude": 10.571936,
+              "latitude": 49.300425
+            }
+          },
+          {
+            "classes": "B",
+            "id": 256,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              391
+            ],
+            "name": "Arnsberg",
+            "coordinates": {
+              "longitude": 8.066429,
+              "latitude": 51.405015
+            }
+          },
+          {
+            "classes": "B",
+            "id": 258,
+            "country": {
+              "name": "Germany",
+              "alpha2_code": "DE"
+            },
+            "stations": [
+              754,
+              23248
+            ],
+            "name": "Aschaffenburg",
+            "coordinates": {
+              "longitude": 9.14962,
+              "latitude": 49.977752
+            }
+          }
+        ]
+      },
+      "dataProvider": {
+        "type": "Property",
+        "value": "https://www.flixbus.de/"
+      },
+      "responderID": {
+        "type": "Property",
+        "value": "Flixbus"
+      },
+      "source": {
+        "type": "Property",
+        "value": "https://developer.flix.tech/"
+      }
+    },
+    "serviceName": {
+      "type": "Property",
+      "value": "operatorRegions:FB:0.0.1"
+    }
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <time.h>                                                // struct timespec
+
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 
@@ -59,7 +61,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v0.2.0"
+#define ORIONLD_VERSION "post-v0.4"
 
 
 
@@ -108,10 +110,10 @@ typedef struct OrionldUriParams
   char* options;
   int   offset;
   int   limit;
+  bool  count;
   char* geometry;
   char* geoloc;
   char* geoproperty;
-  bool  count;
   char* datasetId;
 } OrionldUriParams;
 
@@ -133,6 +135,13 @@ typedef struct OrionldNotificationInfo
 } OrionldNotificationInfo;
 
 
+typedef enum OrionldPhase
+{
+  OrionldPhaseStartup = 1,
+  OrionldPhaseServing
+} OrionldPhase;
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -147,8 +156,10 @@ typedef struct OrionldNotificationInfo
 //
 typedef struct OrionldConnectionState
 {
+  OrionldPhase            phase;
   ConnectionInfo*         ciP;
-  HttpStatusCode          httpStatusCode;
+  struct timespec         timestamp;  // the time when the request entered
+  int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
   KAlloc                  kalloc;
@@ -199,18 +210,19 @@ typedef struct OrionldConnectionState
   mongo::BSONObj*         qMongoFilterP;
   char*                   jsonBuf;    // Used by kjTreeFromBsonObj
 
+#if 0
   //
   // Array of KjNode trees that are to freed when the request thread ends
   //
-  KjNode*                 delayedKjFreeVec[500];
+  KjNode*                 delayedKjFreeVec[50];
   int                     delayedKjFreeVecIndex;
   int                     delayedKjFreeVecSize;
+#endif
 
   //
-  // Array of allocated buffers that are to freed when the request thread ends
+  // Array of allocated buffers that are to be freed when the request thread ends
   //
-  //
-  void*                   delayedFreeVec[50];
+  void*                   delayedFreeVec[1001];
   int                     delayedFreeVecIndex;
   int                     delayedFreeVecSize;
 
@@ -282,6 +294,7 @@ extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
+extern OrionldPhase      orionldPhase;
 
 
 

@@ -144,7 +144,7 @@ static bool contentTypeCheck(ConnectionInfo* ciP)
     LM_E(("Bad Input (%s: %s)", errorTitle, errorDetails));
 
     orionldErrorResponseCreate(OrionldBadRequestData, errorTitle, errorDetails);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
 
     return false;
   }
@@ -258,7 +258,7 @@ static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
     else
     {
       orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
-      orionldState.httpStatusCode = SccContextElementNotFound;
+      orionldState.httpStatusCode = 404;
     }
   }
 
@@ -277,7 +277,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   if (ciP->payload == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -285,7 +285,7 @@ static bool payloadEmptyCheck(ConnectionInfo* ciP)
   if (ciP->payload[0] == 0)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "payload missing", NULL);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -329,7 +329,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if (orionldState.requestTree == NULL)
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -338,8 +338,8 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Object", "{}");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload Body", "Empty Object");
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -349,7 +349,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
     orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Array", "[]");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -383,6 +383,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
+          orionldState.httpStatusCode = 400;
           return false;
         }
         orionldState.payloadContextNode = attrNodeP;
@@ -391,12 +392,13 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = orionldState.payloadContextNode->next;
         kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
       }
-      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0))
+      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0) || SCOMPARE4(attrNodeP->name, '@', 'i', 'd', 0))
       {
         if (orionldState.payloadIdNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:id'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Entity:id");
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -407,12 +409,13 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = orionldState.payloadIdNode->next;
         kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
       }
-      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0))
+      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(attrNodeP->name, '@', 't', 'y', 'p', 'e', 0))
       {
         if (orionldState.payloadTypeNode != NULL)
         {
           LM_W(("Bad Input (duplicated attribute: 'Entity:type'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "Entity:type");
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -423,7 +426,8 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         char* detail;
         if (pcheckName(orionldState.payloadTypeNode->value.s, &detail) == false)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", detail);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid entity type name", orionldState.payloadTypeNode->value.s);
+          orionldState.httpStatusCode = 400;
           return false;
         }
         LM_T(LmtContext, ("Found Entity::type in the payload (%p)", orionldState.payloadTypeNode));
@@ -453,6 +457,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         {
           LM_W(("Bad Input (duplicated attribute: '@context'"));
           orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", "@context");
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -473,7 +478,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
     if ((orionldState.payloadContextNode->type != KjString) && (orionldState.payloadContextNode->type != KjArray) && (orionldState.payloadContextNode->type != KjObject))
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor Object nor a String", "@context");
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       return false;
     }
   }
@@ -490,6 +495,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
 void orionldErrorResponseFromProblemDetails(OrionldProblemDetails* pdP)
 {
   orionldErrorResponseCreate(pdP->type, pdP->title, pdP->detail);
+  orionldState.httpStatusCode = pdP->status;
 }
 
 
@@ -505,7 +511,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   if (orionldState.link[0] != '<')
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "invalid Link HTTP header", "link doesn't start with '<'");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -515,7 +521,7 @@ static bool linkHeaderCheck(ConnectionInfo* ciP)
   {
     LM_E(("linkCheck: %s", details));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Link HTTP Header", details);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -563,6 +569,7 @@ static void contextToPayload(void)
   {
     LM_E(("Out of memory"));
     orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
+    orionldState.httpStatusCode = 500;  // If ever able to send the response ...
     return;
   }
 
@@ -573,7 +580,7 @@ static void contextToPayload(void)
   //
   if (orionldState.responseTree->type == KjObject)
   {
-    orionldState.payloadContextNode->next = orionldState.responseTree->value.firstChildP;
+    orionldState.payloadContextNode->next        = orionldState.responseTree->value.firstChildP;
     orionldState.responseTree->value.firstChildP = orionldState.payloadContextNode;
   }
   else if (orionldState.responseTree->type == KjArray)
@@ -590,15 +597,12 @@ static void contextToPayload(void)
           contextNode = kjString(orionldState.kjsonP, "@context", orionldState.link);
       }
       else
-      {
-        contextNode = kjClone(orionldState.payloadContextNode);
-
-        orionldStateDelayedKjFreeEnqueue(contextNode);
-      }
+        contextNode = kjClone(orionldState.kjsonP, orionldState.payloadContextNode);
 
       if (contextNode == NULL)
       {
         orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
+        orionldState.httpStatusCode = 500;  // If ever able to send the response ...
         return;
       }
 
@@ -726,7 +730,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
       {
         LM_W(("Bad Input (non-existing tenant: '%s')", orionldState.tenant));
         orionldErrorResponseCreate(OrionldNonExistingTenant, "No such tenant", orionldState.tenant);
-        orionldState.httpStatusCode = SccContextElementNotFound;  // 404
+        orionldState.httpStatusCode = 404;
         goto respond;
       }
     }
@@ -838,7 +842,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   if (serviceRoutineResult == false)
   {
     if (orionldState.httpStatusCode < 400)
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
   }
   else  // Service Routine worked
   {
@@ -867,7 +871,10 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // The only exception is 405 that has no payload - the info comes in the "Accepted" HTTP header.
   //
   if ((orionldState.httpStatusCode >= 400) && (orionldState.responseTree == NULL) && (orionldState.httpStatusCode != 405))
+  {
     orionldErrorResponseCreate(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
+    orionldState.httpStatusCode = 500;
+  }
 
   //
   // On error, the Content-Type is always "application/json" and there is NO Link header
@@ -935,6 +942,7 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     {
       LM_E(("Error allocating buffer for response payload"));
       orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
+      orionldState.httpStatusCode = 500;  // If ever able to send the response ...
     }
   }
 
@@ -942,7 +950,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // restReply assumes that the HTTP Status Code for the response is in 'ciP->httpStatusCode'
   // FIXME: make the HTTP Status Code a parameter for restReply
   //
-  ciP->httpStatusCode = orionldState.httpStatusCode;
+  ciP->httpStatusCode = (HttpStatusCode) orionldState.httpStatusCode;
+
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else

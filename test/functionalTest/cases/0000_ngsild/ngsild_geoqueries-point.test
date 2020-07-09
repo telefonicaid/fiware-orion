@@ -98,42 +98,42 @@ echo
 
 echo "04. Geoquery with Max Distance 15 - nothing found"
 echo "================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==15'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==15'
 echo
 echo
 
 
 echo "05. Geoquery with Max Distance 100000 - all three matching"
 echo "=========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==100000'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.7,40.4\]&georel=near;maxDistance==100000'
 echo
 echo
 
 
 echo "06. Geoquery with Max Distance 10 at GeoPoint Madrid - only Madrid matching"
 echo "==========================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.691944,40.418889\]&georel=near;maxDistance==10'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.691944,40.418889\]&georel=near;maxDistance==10'
 echo
 echo
 
 
 echo "07. Geoquery with Max Distance 10 at GeoPoint Leganes - only Leganes matching"
 echo "============================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.75,40.316667\]&georel=near;maxDistance==10'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.75,40.316667\]&georel=near;maxDistance==10'
 echo
 echo
 
 
 echo "08. Geoquery with Max Distance 10 at GeoPoint Alcobendas - only Alcobendas matching"
 echo "==================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.633333,40.533333\]&georel=near;maxDistance==10'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.633333,40.533333\]&georel=near;maxDistance==10'
 echo
 echo
 
 
 echo "09. Geoquery with Max Distance 10000 at GeoPoint between Madrid and Alcobendas - both found but not Leganes"
 echo "==========================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.6626385,40.476111\]&georel=near;maxDistance==10000'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.6626385,40.476111\]&georel=near;maxDistance==10000'
 echo
 echo
 

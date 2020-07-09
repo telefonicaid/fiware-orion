@@ -43,8 +43,10 @@ extern "C"
 //
 // mongoCppLegacyEntityAttributesDelete -
 //
-// db.entities.update({"_id.id": "urn:ngsi-ld:entities:E1"},
-//                    {"$unset": {"attrs.https://uri=etsi=org/ngsi-ld/default-context/P1": 1, "attrs.https://uri=etsi=org/ngsi-ld/default-context/P2": 1}})
+// Mongo Shell Example:
+//   db.entities.update({"_id.id": "urn:ngsi-ld:entities:E1"},
+//                      {"$unset": { "attrs.https://uri=etsi=org/ngsi-ld/default-context/P1": 1, "attrs.https://uri=etsi=org/ngsi-ld/default-context/P2": 1 }})
+//                      {"$pull":  { "attrNames": { "$in": [ "attrs.https://uri=etsi=org/ngsi-ld/default-context/P1", "attrs.https://uri=etsi=org/ngsi-ld/default-context/P2" ] }}}
 //
 bool mongoCppLegacyEntityAttributesDelete(const char* entityId, char** attrNameV, int vecSize)
 {

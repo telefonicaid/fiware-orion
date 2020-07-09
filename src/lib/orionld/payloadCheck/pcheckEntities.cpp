@@ -51,7 +51,7 @@ bool pcheckEntities(KjNode* entitiesP)
 
   for (KjNode* entityItemP = entitiesP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
   {
-    if (pcheckEntityInfo(entityItemP) == false)
+    if (pcheckEntityInfo(entityItemP, true) == false)
       return false;
   }
 

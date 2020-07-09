@@ -77,7 +77,7 @@ extern bool mongoGetLdSubscription
   ngsiv2::Subscription*  subP,
   const char*            subId,
   const char*            tenant,
-  HttpStatusCode*        statusCodeP,
+  int*                   statusCodeP,
   char**                 detailsP
 );
 

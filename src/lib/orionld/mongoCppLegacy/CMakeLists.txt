@@ -26,7 +26,7 @@ SET (SOURCES
     mongoCppLegacyEntityAttributeLookup.cpp
     mongoCppLegacyEntityUpdate.cpp
     mongoCppLegacyEntityDelete.cpp
-    mongoCppLegacyEntityBatchDelete.cpp
+    mongoCppLegacyEntitiesDelete.cpp
     mongoCppLegacyKjTreeFromBsonObj.cpp
     mongoCppLegacyKjTreeToBsonObj.cpp
     mongoCppLegacySubscriptionMatchEntityIdAndAttributes.cpp
@@ -37,6 +37,7 @@ SET (SOURCES
     mongoCppLegacyEntityAttributesDelete.cpp
     mongoCppLegacySubscriptionGet.cpp
     mongoCppLegacySubscriptionReplace.cpp
+    mongoCppLegacySubscriptionDelete.cpp
     mongoCppLegacyRegistrationGet.cpp
     mongoCppLegacyRegistrationReplace.cpp
     mongoCppLegacyEntityTypesFromRegistrationsGet.cpp
@@ -50,6 +51,7 @@ SET (SOURCES
     mongoCppLegacyDbNumberFieldGet.cpp
     mongoCppLegacyDbObjectFieldGet.cpp
     mongoCppLegacyEntityRetrieve.cpp
+    mongoCppLegacyEntitiesQuery.cpp
 )
 
 # Include directories

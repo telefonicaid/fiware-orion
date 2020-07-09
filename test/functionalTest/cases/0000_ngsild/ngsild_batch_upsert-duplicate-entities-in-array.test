@@ -1,0 +1,172 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Upsert with duplicated entities in the array of entities
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entities E1-E5 using Batch Upsert, but two copies of E4
+# 02. GET the entities
+#
+
+
+echo "01. Create entities E1-E5 using Batch Upsert, but two copies of E4"
+echo "=================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1 - first copy"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E5",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "Step 1 - second copy"
+    }
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Vehicle&options=keyValues'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1-E5 using Batch Upsert, but two copies of E4
+==================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 329
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entity:E4",
+            "error": {
+                "detail": "previous instance removed",
+                "status": 400,
+                "title": "Duplicated Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3",
+        "urn:ngsi-ld:entity:E5",
+        "urn:ngsi-ld:entity:E4"
+    ]
+}
+
+
+02. GET the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 325
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": "Step 1",
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "Vehicle"
+    },
+    {
+        "P1": "Step 1",
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "Vehicle"
+    },
+    {
+        "P1": "Step 1",
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "Vehicle"
+    },
+    {
+        "P1": "Step 1",
+        "id": "urn:ngsi-ld:entity:E5",
+        "type": "Vehicle"
+    },
+    {
+        "P1": "Step 1 - second copy",
+        "id": "urn:ngsi-ld:entity:E4",
+        "type": "Vehicle"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

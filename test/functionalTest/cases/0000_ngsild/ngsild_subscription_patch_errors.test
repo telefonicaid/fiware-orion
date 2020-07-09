@@ -173,6 +173,7 @@ brokerStart CB
 # 91. Attempt to PATCH the subscription with a 'throttling' that is not a number
 # 92. Attempt to PATCH the subscription with a duplicated 'throttling'
 # 93. Attempt to PATCH the subscription with a 'throttling' that is negative
+# 94. Attempt to use 'id' and '@id' to a Subscription
 #
 
 echo "01. Create a subscription with all fields"
@@ -967,8 +968,14 @@ echo
 echo "65. Attempt to PATCH the subscription with a duplicated 'notification'"
 echo "======================================================================"
 payload='{
-  "notification": {},
-  "notification": {}
+  "notification": {
+    "attributes": [ "A1" ],
+    "endpoint": "localhost:9999/here"    
+  },
+  "notification": {
+    "attributes": [ "A1" ],
+    "endpoint": "localhost:9999/here"    
+  }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
 echo
@@ -1314,6 +1321,16 @@ echo "93. Attempt to PATCH the subscription with a 'throttling' that is negative
 echo "=========================================================================="
 payload='{
   "throttling": -1
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "94. Attempt to use 'id' and '@id' to a Subscription"
+echo "==================================================="
+payload='{
+  "entities": [ { "id": "urn:ngsi-ld:subscriptions:S01", "@id": "urn:ngsi-ld:subscriptions:S01"} ]
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
 echo
@@ -2614,6 +2631,20 @@ Date: REGEX(.*)
 {
     "detail": "throttling",
     "title": "Negative Number not allowed in this position",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+94. Attempt to use 'id' and '@id' to a Subscription
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "entities[X]::id",
+    "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

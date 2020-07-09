@@ -22,16 +22,20 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strchr
+#include <string.h>                                             // strchr
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kalloc/kaStrdup.h"                                   // kaStrdup
+#include "kjson/KjNode.h"                                       // KjNode
+#include "kalloc/kaStrdup.h"                                    // kaStrdup
 }
 
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/types/OrionldGeoJsonType.h"                  // OrionldGeoJsonType
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
+#include "orionld/common/orionldState.h"                        // orionldState
+#include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/types/OrionldGeoJsonType.h"                   // OrionldGeoJsonType
 
 
 
@@ -39,32 +43,93 @@ extern "C"
 //
 // pcheckGeoqGeorel -
 //
-bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detailP)
+bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, OrionldProblemDetails* pdP)
 {
   if (georelP == NULL)
   {
-    *detailP = (char*) "georel missing";
+    orionldProblemDetailsFill(pdP, OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel missing", 400);
     return false;
   }
   else if (georelP->type != KjString)
   {
-    *detailP = (char*) "georel must be a string";
+    orionldProblemDetailsFill(pdP, OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel must be a string", 400);
     return false;
   }
   else if (georelP->value.s[0] == 0)
   {
-    *detailP = (char*) "no value for georel";
+    orionldProblemDetailsFill(pdP, OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel value is empty", 400);
+    return false;
+  }
+
+  char* georel = georelP->value.s;
+
+  //
+  // Valid values for georel:
+  // * near        - Point only             OK   Point queried to match Points in DB that are close enough
+  // * within      - Polygon|MultiPolygon   OK   Polygon used to find DB geometries inside it
+  // * contains    - Point only
+  // * overlaps    - Polygon Only
+  // * intersects  - Polygon Only           OK
+  // * equals      - Whatever               OK, I guess
+  // * disjoint    - Polygon Only           NOT intersects ?
+  //
+  // Any other value and it's an error
+  //
+  //
+  if (strncmp(georel, "near;", 5) == 0)
+  {
+    if (geoType != GeoJsonPoint)
+    {
+      orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be 'Point' for georel 'near'", 400);
+      return false;
+    }
+  }
+  else if (strcmp(georel, "within") == 0)
+  {
+    if ((geoType != GeoJsonPolygon) && (geoType != GeoJsonMultiPolygon))
+    {
+      orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be either 'Polygon' or 'MultiPolygon' for georel 'within'", 400);
+      return false;
+    }
+  }
+  else if (strcmp(georel, "overlaps") == 0)
+  {
+    // FIXME: Can be any Geometry ... Right?
+  }
+  else if (strcmp(georel, "intersects") == 0)
+  {
+    // FIXME: Should be possible to use any Geomtry ...
+    //        But, the mngodb docs talk about Polygon or MultiPolygon:
+    //          https://docs.mongodb.com/manual/reference/operator/query/geoIntersects/
+    //        For now, I'll allow any Geometry
+  }
+  else if (strcmp(georel, "disjoint") == 0)
+  {
+    // Uses $not { 'intersects-expression' }, so, if 'intersects' is only Polygons, then 'disjoint' also
+  }
+  else if (strcmp(georel, "contains") == 0)
+  {
+    orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Not Inplemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
+    return false;
+  }
+  else if (strcmp(georel, "equals") == 0)
+  {
+    // Valid for all geometry types
+  }
+  else
+  {
+    orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter - invalid 'georel'", georel, 400);
     return false;
   }
 
   if (geoType == GeoJsonPoint)
   {
     //
-    // For a Point, reorel can have the following values:
+    // For a Point, georel can have the following values:
     // - near
-    // -
+    //
     char* extra      = NULL;
-    char* grel       = kaStrdup(&orionldState.kalloc, georelP->value.s);
+    char* grel       = kaStrdup(&orionldState.kalloc, georel);
     char* semicolonP;
 
     if ((semicolonP = strchr(grel, ';')) != NULL)
@@ -74,7 +139,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detail
 
       if (strcmp(grel, "near") != 0)
       {
-        *detailP = (char*) "invalid geo-relation for Point";
+        orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid geo-relation for Point", 400);
         return false;
       }
 
@@ -85,7 +150,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detail
 
       if (distance == NULL)
       {
-        *detailP = (char*) "invalid distance for georel 'near' for Point";
+        orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
         return false;
       }
       *distance = 0;
@@ -93,7 +158,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detail
 
       if ((strcmp(extra, "maxDistance") != 0) && (strcmp(extra, "minDistance") != 0))
       {
-        *detailP = (char*) "invalid distance for georel 'near' for Point";
+        orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
         return false;
       }
 
@@ -104,7 +169,7 @@ bool pcheckGeoqGeorel(KjNode* georelP, OrionldGeoJsonType geoType, char** detail
       {
         if ((*distance < '0') || (*distance > '9'))
         {
-          *detailP = (char*) "invalid number for distance for georel 'near' for Point";
+          orionldProblemDetailsFill(pdP, OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid number for distance for georel 'near' for Point", 400);
           return false;
         }
         ++distance;

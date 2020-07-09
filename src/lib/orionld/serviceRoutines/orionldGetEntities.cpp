@@ -104,8 +104,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     LM_W(("Bad Input (too broad query - need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter"));
 
     orionldErrorResponseCreate(OrionldBadRequestData,
-                               "too broad query",
-                               "need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter");
+                               "Too broad query",
+                               "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter");
 
     orionldState.httpStatusCode = SccBadRequest;
     return false;
@@ -119,10 +119,25 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     return false;
   }
 
+
+  //
+  // If any of "geometry", "georel" and "coordinates" is present, they must all be present
+  // If "geoproperty" is present, "geometry", "georel" and "coordinates" must also be present
+  //
+  if ((geometry != NULL) || (georel != NULL) || (coordinates != NULL))
+  {
+    if ((geometry == NULL) || (georel == NULL) || (coordinates == NULL))
+    {
+      LM_W(("Bad Input (incomplete geometry - three URI parameters must be present)"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Incomplete geometry", "geometry, georel, and coordinates must all be present");
+      orionldState.httpStatusCode = SccBadRequest;
+      return false;
+    }
+  }
+
   //
   // If 'georel' is present, make sure it has a valid value
   //
-
   if (georel != NULL)
   {
     if ((strncmp(georel, "near", 4)        != 0) &&
@@ -134,7 +149,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
         (strncmp(georel, "disjoint", 8)    != 0))
     {
       LM_W(("Bad Input (invalid value for georel)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel", georel);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for georel", georel);
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
@@ -148,7 +163,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       if ((strncmp(georelExtra, "minDistance==", 11) != 0) && (strncmp(georelExtra, "maxDistance==", 11) != 0))
       {
         LM_W(("Bad Input (invalid value for georel parameter: %s)", georelExtra));
-        orionldErrorResponseCreate(OrionldBadRequestData, "invalid value for georel parameter", georel);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for georel parameter", georel);
         orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
@@ -157,26 +172,14 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   if (geometry != NULL)
   {
-    if (coordinates == NULL)
+    if ((strcmp(geometry, "Point")           != 0) &&
+        (strcmp(geometry, "Polygon")         != 0) &&
+        (strcmp(geometry, "MultiPolygon")    != 0) &&
+        (strcmp(geometry, "LineString")      != 0) &&
+        (strcmp(geometry, "MultiLineString") != 0))
     {
-      LM_W(("Bad Input (coordinates missing)"));
-
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "no coordinates",
-                                 "geometry without coordinates");
-
-      orionldState.httpStatusCode = SccBadRequest;
-      return false;
-    }
-
-    if (georel == NULL)
-    {
-      LM_W(("Bad Input (georel missing)"));
-
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "no georel",
-                                 "geometry with coordinates but without georel");
-
+      LM_W(("Bad Input (invalid value for URI parameter 'geometry'"));
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for URI parameter /geometry/", geometry);
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
@@ -202,7 +205,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
       delete scopeP;
 
       LM_E(("Geo: Scope::fill failed"));
-      orionldErrorResponseCreate(OrionldInternalError, "error filling a scope", errorString.c_str());
+      orionldErrorResponseCreate(OrionldInternalError, "Invalid Geometry", errorString.c_str());
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }

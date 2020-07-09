@@ -50,7 +50,7 @@ OrionldContext* orionldContextCreate(const char* url, const char* id, KjNode* tr
 
   contextP->url       = (url == NULL)? (char*) "no URL" : kaStrdup(&kalloc, url);
   contextP->id        = (id == NULL)? NULL : kaStrdup(&kalloc, id);
-  contextP->tree      = (toBeCloned == true)? kjClone(tree) : NULL;
+  contextP->tree      = (toBeCloned == true)? kjClone(NULL, tree) : NULL;
   contextP->keyValues = keyValues;
 
   return contextP;

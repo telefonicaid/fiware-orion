@@ -59,9 +59,9 @@ bool orionldPostRegistrations(ConnectionInfo* ciP)
   //
   if (orionldState.payloadIdNode != NULL)
   {
-    char*           regId = orionldState.payloadIdNode->value.s;
-    HttpStatusCode  statusCode;
-    char*           details;
+    char*   regId = orionldState.payloadIdNode->value.s;
+    int     statusCode;
+    char*   details;
 
     // mongoLdRegistrationGet takes the req semaphore
     if (mongoLdRegistrationGet(NULL, regId, orionldState.tenant, &statusCode, &details) == true)

@@ -34,7 +34,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"        // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"          // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityDelete.h"             // mongoCppLegacyEntityDelete
-#include "orionld/mongoCppLegacy/mongoCppLegacyEntityBatchDelete.h"        // mongoCppLegacyEntityBatchDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"           // mongoCppLegacyEntitiesDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"        // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"       // mongoCppLegacyRegistrationLookup
@@ -42,12 +42,14 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationDelete.h"       // mongoCppLegacyRegistrationDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h"          // mongoCppLegacySubscriptionGet
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionReplace.h"      // mongoCppLegacySubscriptionReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionDelete.h"       // mongoCppLegacySubscriptionDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationGet.h"          // mongoCppLegacyRegistrationGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"      // mongoCppLegacyRegistrationReplace
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesGet.h"              // mongoCppLegacyEntitiesGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // mongoCppLegacyEntityTypesFromRegistrationsGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"           // mongoCppLegacyGeoIndexCreate
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"           // mongoCppLegacyEntityRetrieve
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"            // mongoCppLegacyEntitiesQuery
 
 #elif DB_DRIVER_MONGOC
 #include "orionld/mongoc/mongocInit.h"                                     // mongocInit
@@ -78,7 +80,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityDelete                           = mongoCppLegacyEntityDelete;
-  dbEntityBatchDelete                      = mongoCppLegacyEntityBatchDelete;
+  dbEntitiesDelete                         = mongoCppLegacyEntitiesDelete;
   dbSubscriptionMatchEntityIdAndAttributes = mongoCppLegacySubscriptionMatchEntityIdAndAttributes;
   dbEntityListLookupWithIdTypeCreDate      = mongoCppLegacyEntityListLookupWithIdTypeCreDate;
   dbRegistrationLookup                     = mongoCppLegacyRegistrationLookup;
@@ -86,11 +88,13 @@ void dbInit(const char* dbHost, const char* dbName)
   dbRegistrationDelete                     = mongoCppLegacyRegistrationDelete;
   dbSubscriptionGet                        = mongoCppLegacySubscriptionGet;
   dbSubscriptionReplace                    = mongoCppLegacySubscriptionReplace;
+  dbSubscriptionDelete                     = mongoCppLegacySubscriptionDelete;
   dbRegistrationGet                        = mongoCppLegacyRegistrationGet;
   dbRegistrationReplace                    = mongoCppLegacyRegistrationReplace;
   dbEntitiesGet                            = mongoCppLegacyEntitiesGet;
   dbEntityTypesFromRegistrationsGet        = mongoCppLegacyEntityTypesFromRegistrationsGet;
   dbGeoIndexCreate                         = mongoCppLegacyGeoIndexCreate;
+  dbEntitiesQuery                          = mongoCppLegacyEntitiesQuery;
 
   mongoCppLegacyInit(dbHost, dbName);
 
@@ -101,7 +105,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbDataToKjTree                           = mongocKjTreeFromBsonObj;
   dbDataFromKjTree                         = NULL;  // FIXME: Implement mongocKjTreeToBson
   dbEntityDelete                           = NULL;  // FIXME: Implement mongocEntityDelete
-  dbEntityBatchDelete                      = NULL;  // FIXME: Implement mongocEntityBatchDelete
+  dbEntitiesDelete                         = NULL;  // FIXME: Implement mongocEntitiesDelete
   dbSubscriptionMatchEntityIdAndAttributes = NULL;  // FIXME: Implement mongocSubscriptionMatchEntityIdAndAttributes
   dbEntityListLookupWithIdTypeCreDate      = NULL;  // FIXME: Implement mongocEntityListLookupWithIdTypeCreDate
   dbRegistrationLookup                     = NULL;  // FIXME: Implement mongocRegistrationLookup
@@ -114,6 +118,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntitiesGet                            = NULL;  // FIXME: Implement
   dbEntityTypesFromRegistrationsGet        = NULL;  // FIXME: Implement
   dbGeoIndexCreate                         = NULL;  // FIXME: Implement
+  dbEntitiesQuery                          = NULL;  // FIXME: Implement
 
   mongocInit(dbHost, dbName);
 

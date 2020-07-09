@@ -26,7 +26,7 @@ Attribute Deletion - create an entity with three attrs and then delete one of th
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+brokerStart CB 0 --prettyPrint
 
 --SHELL--
 
@@ -160,12 +160,12 @@ Date: REGEX(.*)
 05. Attempt to delete non-existing attribute P4
 ===============================================
 HTTP/1.1 404 Not Found
-Content-Length: 105
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "P4",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P4",
     "title": "Attribute Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

@@ -37,8 +37,8 @@ brokerStart CB 0-255
 # 04. Delete subscription 'http://a.b.c/subs/sub01'
 # 05. GET subscription 'http://a.b.c/subs/sub01' and see that it is gone
 # 06. See no subscription in mongo
+# 07. GET version to see that there is ZERO subs in the subscription cache
 #
-
 
 echo "01. Create subscription 'http://a.b.c/subs/sub01'"
 echo "================================================="
@@ -127,6 +127,13 @@ echo
 echo "06. See no subscription in mongo"
 echo "================================"
 mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "07. GET version to see that there is ZERO subs in the subscription cache"
+echo "========================================================================"
+orionCurl --url '/ngsi-ld/ex/v1/version?prettyPrint=yes' --noPayloadCheck
 echo
 echo
 
@@ -291,6 +298,34 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 null
 bye
+
+
+07. GET version to see that there is ZERO subs in the subscription cache
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "Orion-LD version": REGEX(.*),
+  "based on orion": REGEX(.*),
+  "kbase version": REGEX(.*),
+  "kalloc version": REGEX(.*),
+  "khash version": REGEX(.*),
+  "kjson version": REGEX(.*),
+  "boost version": REGEX(.*),
+  "microhttpd version": REGEX(.*),
+  "openssl version": REGEX(.*),
+  "mongo version": REGEX(.*),
+  "rapidjson version": REGEX(.*),
+  "libcurl version": REGEX(.*),
+  "libuuid version": REGEX(.*),
+  "branch": REGEX(.*),
+  "cached subscriptions": 0,
+  "Next File Descriptor": REGEX(.*)
+}
+
 
 
 --TEARDOWN--

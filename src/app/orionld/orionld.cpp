@@ -109,6 +109,7 @@ extern "C"
 #include "logSummary/logSummary.h"
 
 #include "orionld/common/orionldState.h"                    // orionldStateRelease, kalloc, ...
+#include "orionld/common/branchName.h"                      // ORIONLD_BRANCH
 #include "orionld/context/orionldContextCacheRelease.h"     // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
@@ -272,13 +273,14 @@ PaArgument paArgs[] =
   { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC           },
   { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            PaNL,   PaNL,             PORT_DESC              },
   { "-pidpath",               pidPath,                  "PID_PATH",                  PaString,  PaOpt,  PIDPATH,         PaNL,   PaNL,             PIDPATH_DESC           },
-  { "-dbhost",                dbHost,                   "DB_HOST",                   PaString,  PaOpt,  LOCALHOST,       PaNL,   PaNL,             DBHOST_DESC            },
-  { "-rplSet",                rplSet,                   "RPL_SET",                   PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RPLSET_DESC            },
-  { "-dbuser",                dbUser,                   "DB_USER",                   PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBUSER_DESC            },
-  { "-dbpwd",                 dbPwd,                    "DB_PASSWORD",               PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBPASSWORD_DESC        },
-  { "-db",                    dbName,                   "DB",                        PaString,  PaOpt,  _i "orion",      PaNL,   PaNL,             DB_DESC                },
-  { "-dbTimeout",             &dbTimeout,               "DB_TIMEOUT",                PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC            },
-  { "-dbPoolSize",            &dbPoolSize,              "DB_POOL_SIZE",              PaInt,     PaOpt,  10,              1,      10000,            DBPS_DESC              },
+  { "-dbhost",                dbHost,                   "MONGO_HOST",                PaString,  PaOpt,  LOCALHOST,       PaNL,   PaNL,             DBHOST_DESC            },
+  { "-rplSet",                rplSet,                   "MONGO_REPLICA_SET",         PaString,  PaOpt,  _i "",           PaNL,   PaNL,             RPLSET_DESC            },
+  { "-dbuser",                dbUser,                   "MONGO_USER",                PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBUSER_DESC            },
+  { "-dbpwd",                 dbPwd,                    "MONGO_PASSWORD",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             DBPASSWORD_DESC        },
+  { "-db",                    dbName,                   "MONGO_DB",                  PaString,  PaOpt,  _i "orion",      PaNL,   PaNL,             DB_DESC                },
+  { "-dbTimeout",             &dbTimeout,               "MONGO_TIMEOUT",             PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC            },
+  { "-dbPoolSize",            &dbPoolSize,              "MONGO_POOL_SIZE",           PaInt,     PaOpt,  10,              1,      10000,            DBPS_DESC              },
+  { "-writeConcern",          &writeConcern,            "MONGO_WRITE_CONCERN",       PaInt,     PaOpt,  1,               0,      1,                WRITE_CONCERN_DESC     },
   { "-ipv4",                  &useOnlyIPv4,             "USEIPV4",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV4_DESC           },
   { "-ipv6",                  &useOnlyIPv6,             "USEIPV6",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV6_DESC           },
   { "-harakiri",              &harakiri,                "HARAKIRI",                  PaBool,    PaHid,  false,           false,  true,             HARAKIRI_DESC          },
@@ -290,8 +292,7 @@ PaArgument paArgs[] =
   { "-httpTimeout",           &httpTimeout,             "HTTP_TIMEOUT",              PaLong,    PaOpt,  -1,              -1,     MAX_L,            HTTP_TMO_DESC          },
   { "-reqTimeout",            &reqTimeout,              "REQ_TIMEOUT",               PaLong,    PaOpt,   0,              0,      PaNL,             REQ_TMO_DESC           },
   { "-reqMutexPolicy",        reqMutexPolicy,           "MUTEX_POLICY",              PaString,  PaOpt,  _i "all",        PaNL,   PaNL,             MUTEX_POLICY_DESC      },
-  { "-writeConcern",          &writeConcern,            "WRITE_CONCERN",             PaInt,     PaOpt,  1,               0,      1,                WRITE_CONCERN_DESC     },
-  { "-corsOrigin",            allowedOrigin,            "ALLOWED_ORIGIN",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             ALLOWED_ORIGIN_DESC    },
+  { "-corsOrigin",            allowedOrigin,            "CORS_ALLOWED_ORIGIN",       PaString,  PaOpt,  _i "",           PaNL,   PaNL,             ALLOWED_ORIGIN_DESC    },
   { "-corsMaxAge",            &maxAge,                  "CORS_MAX_AGE",              PaInt,     PaOpt,  86400,           -1,     86400,            CORS_MAX_AGE_DESC      },
   { "-cprForwardLimit",       &cprForwardLimit,         "CPR_FORWARD_LIMIT",         PaUInt,    PaOpt,  1000,            0,      UINT_MAX,         CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",          &subCacheInterval,        "SUBCACHE_IVAL",             PaInt,     PaOpt,  0,               0,      3600,             SUB_CACHE_IVAL_DESC    },
@@ -794,6 +795,25 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 
 
 
+// -----------------------------------------------------------------------------
+//
+// versionInfo -
+//
+static void versionInfo(void)
+{
+  LM_K(("Version Info:"));
+  LM_K(("-----------------------------------------"));
+  LM_K(("orionld version:    %s", orionldVersion));
+  LM_K(("based on orion:     %s", ORION_VERSION));
+  LM_K(("git hash:           %s", GIT_HASH));
+  LM_K(("build branch:       %s", ORIONLD_BRANCH));
+  LM_K(("compiled by:        %s", COMPILED_BY));
+  LM_K(("compiled in:        %s", COMPILED_IN));
+  LM_K(("-----------------------------------------"));
+}
+
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -850,7 +870,8 @@ int main(int argC, char* argV[])
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
-  paConfig("builtin prefix",                (void*) "ORION_");
+  paConfig("builtin prefix",                (void*) "ORIONLD_");
+  paConfig("prefix",                        (void*) "ORIONLD_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
   paConfig("valid log level strings",       validLogLevels);
@@ -946,7 +967,10 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+
   LM_I(("Orion Context Broker is running"));
+
+  versionInfo();
 
   if (fg == false)
   {
@@ -1102,12 +1126,14 @@ int main(int argC, char* argV[])
   }
 
   LM_I(("Startup completed"));
+  orionldPhase = OrionldPhaseServing;
+
   if (simulatedNotification)
   {
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
-  LM_TMP(("Initialization ready - accepting requests on port %d", port));
+  LM_K(("Initialization ready - accepting requests on port %d", port));
 
   while (1)
   {

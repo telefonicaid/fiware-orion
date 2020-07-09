@@ -421,7 +421,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
 #ifdef ORIONLD
-    CachedSubscription*  subP = NULL;
+    CachedSubscription*  subP    = NULL;
+    char*                toFree  = NULL;
 #endif
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
@@ -504,8 +505,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 #ifdef ORIONLD
     else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
     {
-      char buf[2048];
-
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
       if (subP == NULL)
       {
@@ -521,10 +520,13 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         LM_E(("kjTreeFromNotification error: %s", details));
         return paramsV;
       }
-      else
-        kjRender(orionldState.kjsonP, kjTree, buf, sizeof(buf));
 
+      int   bufSize = 512 * 1024;
+      char* buf     = (char*) malloc(bufSize);
+
+      kjRender(orionldState.kjsonP, kjTree, buf, bufSize);
       payloadString = buf;
+      toFree        = buf;
     }
 #endif
     else
@@ -561,6 +563,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->content_type     = content_type;
     params->content          = payloadString;
 #ifdef ORIONLD
+    params->toFree           = toFree;
     params->mimeType         = httpInfo.mimeType;
 #else
     params->mimeType         = JSON;
@@ -600,8 +603,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
           // Not that this would ever happen, but, what do we do here ?
           // Best choice seems to be to simply send the notification without the Link header.
           //
-
-          LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
         }
       }
     }

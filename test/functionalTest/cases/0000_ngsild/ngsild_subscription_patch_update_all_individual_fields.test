@@ -1098,7 +1098,7 @@ MongoDB server version: REGEX(.)
 		"geometry" : "Polygon",
 		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
 		"georel" : "within",
-		"geoproperty" : "geo1",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1",
 		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
 	}
 }
@@ -1319,7 +1319,7 @@ MongoDB server version: REGEX(.)
 		"geometry" : "Polygon",
 		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
 		"georel" : "within",
-		"geoproperty" : "geo1",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1",
 		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
 	}
 }
@@ -1459,7 +1459,7 @@ MongoDB server version: REGEX(.)
 		"geometry" : "Polygon",
 		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
 		"georel" : "within",
-		"geoproperty" : "geo1",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1",
 		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
 	}
 }
@@ -1761,7 +1761,7 @@ MongoDB server version: REGEX(.)
 		"geometry" : "Polygon",
 		"coords" : "[[[0,0],[0,1],[-1,1],[-1,0],[0,0]]]",
 		"georel" : "within",
-		"geoproperty" : "geo1",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1",
 		"q" : "https://uri.etsi.org/ngsi-ld/default-context/A11>12;https://uri.etsi.org/ngsi-ld/default-context/P1~=abc"
 	}
 }
@@ -1879,7 +1879,7 @@ MongoDB server version: REGEX(.)
 		"geometry" : "Point",
 		"coords" : "34.000000,34.000000",
 		"georel" : "near;maxDistance==34",
-		"geoproperty" : "geo34",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo34",
 		"q" : "https://uri.etsi.org/ngsi-ld/default-context/P34>34"
 	}
 }

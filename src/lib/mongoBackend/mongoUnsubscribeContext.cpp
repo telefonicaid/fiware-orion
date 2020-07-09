@@ -179,10 +179,10 @@ HttpStatusCode mongoUnsubscribeContext
 */
 bool mongoDeleteLdSubscription
 (
-  const char*     subId,
-  const char*     tenant,
-  HttpStatusCode* statusCodeP,
-  char**          details
+  const char*  subId,
+  const char*  tenant,
+  int*         httpStatusCodeP,
+  char**       details
 )
 {
   bool         reqSemTaken;
@@ -196,8 +196,8 @@ bool mongoDeleteLdSubscription
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
     LM_E(("collectionFindOne error: %s", err.c_str()));
-    *details     = (char*) "error finding the subscription";
-    *statusCodeP = SccReceiverInternalError;
+    *details         = (char*) "error finding the subscription";
+    *httpStatusCodeP = 500;
 
     return false;
   }
@@ -206,8 +206,8 @@ bool mongoDeleteLdSubscription
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
 
-    *details     = (char*) ERROR_DESC_NOT_FOUND_SUBSCRIPTION;
-    *statusCodeP = SccContextElementNotFound;
+    *details         = (char*) ERROR_DESC_NOT_FOUND_SUBSCRIPTION;
+    *httpStatusCodeP = 404;
 
     return false;
   }
@@ -224,8 +224,8 @@ bool mongoDeleteLdSubscription
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
-    *details     = (char*) "error removing subscription";
-    *statusCodeP = SccReceiverInternalError;
+    *details         = (char*) "error removing subscription";
+    *httpStatusCodeP = 500;
 
     return false;
   }
@@ -244,7 +244,7 @@ bool mongoDeleteLdSubscription
   cacheSemGive(__FUNCTION__, "Removing subscription from cache");
 
   reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
-  *statusCodeP = SccOk;
+  *httpStatusCodeP = 200;
   return true;
 }
 #endif

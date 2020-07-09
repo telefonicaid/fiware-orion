@@ -271,13 +271,13 @@ Date: REGEX(.*)
 03. Update subscription with errors in geo-fields, get error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 106
+Content-Length: 100
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "error parsing geo-query fields: invalid point in URI param /coords/",
+    "description": "error parsing geo-query fields: invalid coordinates for point",
     "error": "BadRequest"
 }
 

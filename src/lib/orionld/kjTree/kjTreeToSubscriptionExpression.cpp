@@ -121,9 +121,8 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
     //
     kjRender(orionldState.kjsonP, coordinatesNodeP, coords, sizeof(coords));
-    coords[strlen(coords) - 1] = 0;
-    LM_T(LmtGeoJson, ("Rendered coords array: '%s'", &coords[1]));
-    subExpressionP->coords = &coords[1];
+    coords[strlen(coords) - 1] = 0;       // Removing last ']'
+    subExpressionP->coords = &coords[1];  // Removing first '['
   }
   else
     subExpressionP->coords = coordinatesNodeP->value.s;

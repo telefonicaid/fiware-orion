@@ -525,23 +525,23 @@ do                                                                        \
 #endif
 
 
-#ifdef LM_NO_F
-#define LM_F(s)
+#ifdef LM_NO_K
+#define LM_K(s)
 #else
 /* ****************************************************************************
 *
-* LM_F - log message
+* LM_K - log message
 */
-#define LM_F(s)                                                        \
-do                                                                     \
-{                                                                      \
-  char* text;                                                          \
-                                                                       \
-  if (LM_MASK(LogLevelForce) && (text = lmTextGet s) != NULL)          \
-  {                                                                    \
-    lmOut(text, 'F', "ForcedLog", 0, "***", 0, NULL);                  \
-    ::free(text);                                                      \
-  }                                                                    \
+#define LM_K(s)                                                            \
+do                                                                         \
+{                                                                          \
+  char* text;                                                              \
+                                                                           \
+  if ((text = lmTextGet s) != NULL)                                        \
+  {                                                                        \
+    lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);   \
+    ::free(text);                                                          \
+  }                                                                        \
 } while (0)
 #endif
 
@@ -696,21 +696,21 @@ do                                                                             \
 #endif
 
 
-#ifdef LM_NO_F
-#define LMS_F(s)
+#ifdef LM_NO_K
+#define LMS_K(s)
 #else
 /* ****************************************************************************
 *
-* LMS_F - log message
+* LMS_K - log message
 */
-#define LMS_F(s)                                                      \
+#define LMS_K(s)                                                      \
 do                                                                    \
 {                                                                     \
   char* text;                                                         \
                                                                       \
   if ((text = lmTextGet s) != NULL)                                   \
   {                                                                   \
-    lmAddMsgBuf(text, 'F', __FILE__, __LINE__, "FFF", 0, NULL);       \
+    lmAddMsgBuf(text, 'K', __FILE__, __LINE__, "FFF", 0, NULL);       \
     ::free(text);                                                     \
   }                                                                   \
 } while (0)

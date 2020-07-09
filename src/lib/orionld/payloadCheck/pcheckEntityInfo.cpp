@@ -43,18 +43,18 @@ extern "C"
 //
 // pcheckEntityInfo -
 //
-bool pcheckEntityInfo(KjNode* entityP)
+bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
 {
   KjNode* idP         = NULL;
   KjNode* idPatternP  = NULL;
   KjNode* typeP       = NULL;
 
-  OBJECT_CHECK(entityP, "entities[X]");
-  EMPTY_OBJECT_CHECK(entityP, "entities[X]");
+  OBJECT_CHECK(entityInfoP, "entities[X]");
+  EMPTY_OBJECT_CHECK(entityInfoP, "entities[X]");
 
-  for (KjNode* entityItemP = entityP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
+  for (KjNode* entityItemP = entityInfoP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
   {
-    if (strcmp(entityItemP->name, "id") == 0)
+    if ((strcmp(entityItemP->name, "id") == 0) || (strcmp(entityItemP->name, "@id") == 0))
     {
       DUPLICATE_CHECK(idP, "entities[X]::id", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::id");
@@ -68,7 +68,7 @@ bool pcheckEntityInfo(KjNode* entityP)
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::idPattern");
       // FIXME: How check for valid REGEX???
     }
-    else if (strcmp(entityItemP->name, "type") == 0)
+    else if ((strcmp(entityItemP->name, "type") == 0) || (strcmp(entityItemP->name, "@type") == 0))
     {
       DUPLICATE_CHECK(typeP, "entities[X]::type", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::type");
@@ -90,7 +90,7 @@ bool pcheckEntityInfo(KjNode* entityP)
   }
 
   // Only if Fully NGSI-LD compliant
-  if (typeP == NULL)
+  if ((typeMandatory == true) && (typeP == NULL))
   {
     orionldErrorResponseCreate(OrionldBadRequestData, "Missing mandatory field", "entities[X]::type");
     orionldState.httpStatusCode = SccBadRequest;

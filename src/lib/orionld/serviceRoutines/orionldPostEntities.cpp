@@ -190,6 +190,7 @@ bool pcheckAttributeType(KjNode* attrTypeP, const char* attrName)
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
+
   if (attrTypeP->type != KjString)
   {
     LM_W(("Bad Input (attribute type must be a JSON string)"));

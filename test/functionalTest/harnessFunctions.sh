@@ -393,8 +393,18 @@ function localBrokerStart()
   # 
   # [ A *number* of old leaks were discovered when this modification was made. ]
   #
-  if [ "$VALGRIND" == "" ] || [ "$port" != "$CB_PORT" ]; then
+  if [ "$VALGRIND" == "" ] || [ "$port" != "$CB_PORT" ]
+  then
+    if [ "$verbose" == "on" ]
+    then
+      echo Starting broker: $CB_START_CMD
+    fi
     $CB_START_CMD
+    brokerPid=$!
+    if [ "$verbose" == "on" ]
+    then
+      echo Broker PID: $brokerPid
+    fi
   else
     #
     # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
@@ -408,6 +418,11 @@ function localBrokerStart()
   then
     echo "Unable to start $BROKER as $role"
     exit 1
+  else
+    if [ "$verbose" == "on" ]
+    then
+      echo "$BROKER is running as $role"
+    fi
   fi
 
   # Test to see whether we have a broker running on $port. If not raise an error
@@ -1242,6 +1257,9 @@ function orionCurl()
   then
     echo "Broker seems to have died ..."
   else
+    cat /tmp/httpHeaders.out  | sed 's///g' > /tmp/httpHeaders.noCtrlM
+    mv /tmp/httpHeaders.noCtrlM /tmp/httpHeaders.out
+
     _responseHeaders=$(cat /tmp/httpHeaders.out)
 
     #
@@ -1268,7 +1286,6 @@ function orionCurl()
     sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
     sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
     sed '/Connection: Close/d'      /tmp/httpHeaders.out
-
   fi
 
   #

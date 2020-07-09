@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "apiTypesV2/Registration.h"                           // ngsiv2::Registration
-#include "rest/HttpStatusCode.h"                               // HttpStatusCode
 #include "common/statistics.h"                                 // TIME_STAT_MONGO_READ_WAIT_START
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection
 #include "mongoBackend/connectionOperations.h"                 // collectionQuery
@@ -50,7 +49,7 @@ bool mongoLdRegistrationGet
   ngsiv2::Registration*  regP,
   const char*            regId,
   const char*            tenant,
-  HttpStatusCode*        statusCodeP,
+  int*                   statusCodeP,
   char**                 detailP
 )
 {

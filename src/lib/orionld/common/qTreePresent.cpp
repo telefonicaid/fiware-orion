@@ -52,17 +52,17 @@ void qTreePresent(QNode* qNodeP, int level)
 {
   const char* indent = indentV[level];
 
-  if      (qNodeP->type == QNodeVariable)       LM_TMP(("Q: %sVAR: '%s'",   indent, qNodeP->value.v));
-  else if (qNodeP->type == QNodeIntegerValue)   LM_TMP(("Q: %sINT: %lld",   indent, qNodeP->value.i));
-  else if (qNodeP->type == QNodeFloatValue)     LM_TMP(("Q: %sFLT: %f",     indent, qNodeP->value.f));
-  else if (qNodeP->type == QNodeStringValue)    LM_TMP(("Q: %sSTR: '%s'",   indent, qNodeP->value.s));
-  else if (qNodeP->type == QNodeTrueValue)      LM_TMP(("Q: %sTRUE",        indent));
-  else if (qNodeP->type == QNodeFalseValue)     LM_TMP(("Q: %sFALSE",       indent));
-  else if (qNodeP->type == QNodeRegexpValue)    LM_TMP(("Q: %sRE: '%s'",    indent, qNodeP->value.re));
+  if      (qNodeP->type == QNodeVariable)       LM_K(("Q: %sVAR: '%s'",   indent, qNodeP->value.v));
+  else if (qNodeP->type == QNodeIntegerValue)   LM_K(("Q: %sINT: %lld",   indent, qNodeP->value.i));
+  else if (qNodeP->type == QNodeFloatValue)     LM_K(("Q: %sFLT: %f",     indent, qNodeP->value.f));
+  else if (qNodeP->type == QNodeStringValue)    LM_K(("Q: %sSTR: '%s'",   indent, qNodeP->value.s));
+  else if (qNodeP->type == QNodeTrueValue)      LM_K(("Q: %sTRUE",        indent));
+  else if (qNodeP->type == QNodeFalseValue)     LM_K(("Q: %sFALSE",       indent));
+  else if (qNodeP->type == QNodeRegexpValue)    LM_K(("Q: %sRE: '%s'",    indent, qNodeP->value.re));
   else
   {
     ++level;
-    LM_TMP(("Q: %s%s", indent, qNodeType(qNodeP->type)));
+    LM_K(("Q: %s%s", indent, qNodeType(qNodeP->type)));
     for (QNode* childP = qNodeP->value.children; childP != NULL; childP = childP->next)
       qTreePresent(childP, level);
   }

@@ -26,7 +26,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                               // KjNode
 #include "kjson/kjBuilder.h"                                            // kjString, kjObject, ...
-#include "kjson/kjRender.h"                                             // kjRender
 #include "kjson/kjLookup.h"                                             // kjLookup
 }
 
@@ -42,19 +41,19 @@ extern "C"
 #include "orionld/common/urnCheck.h"                                     // urnCheck
 #include "orionld/common/orionldState.h"                                 // orionldState
 #include "orionld/common/orionldErrorResponse.h"                         // orionldErrorResponseCreate
-#include "orionld/db/dbConfiguration.h"                                  // dbEntityBatchDelete, dbEntityListLookupWithIdTypeCreDate
-#include "orionld/serviceRoutines/orionldPostBatchDeleteEntities.h"      // Own interface
+#include "orionld/db/dbConfiguration.h"                                  // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
+#include "orionld/serviceRoutines/orionldPostBatchDelete.h"              // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostBatchDeleteEntities -
+// orionldPostBatchDelete -
 //
 // This function receives an array of entity ids as parameter and performs the batch delete operation.
 // It will remove a set of entities from the database.
 //
-bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
+bool orionldPostBatchDelete(ConnectionInfo* ciP)
 {
   KjNode* success  = kjArray(orionldState.kjsonP, "success");
   KjNode* errors   = kjArray(orionldState.kjsonP, "errors");
@@ -93,16 +92,6 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
     }
   }
 
-  #if 0
-    if (mongoCppLegacyEntityListLookupWithIdTypeCreDate(orionldState.requestTree) == NULL)
-    {
-      LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
-      orionldState.httpStatusCode = SccBadRequest;
-      if (orionldState.responseTree == NULL)
-        orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL");
-      return false;
-    }
-  #endif
 
   //
   // First get the entities from database to check if they exist
@@ -127,9 +116,13 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
 
     for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
     {
-      KjNode* dbEntityId  = kjLookup(dbEntity, "id");
+      KjNode* dbEntityId  = kjLookup(dbEntity, "id");  // Coming from DB - '@id' not necessary
 
-      if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
+      if (dbEntityId == NULL)
+      {
+        // This can't happen ... however, let's make sure the broker never crashes ...
+      }
+      else if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
       {
         idExists = true;
         break;  // Found - no need to keep searching.
@@ -163,12 +156,12 @@ bool orionldPostBatchDeleteEntities(ConnectionInfo* ciP)
   //
   // Call batch delete function
   //
-  if (dbEntityBatchDelete(orionldState.requestTree) == false)
+  if (dbEntitiesDelete(orionldState.requestTree) == false)
   {
-    LM_E(("dbEntityBatchDelete returned false"));
+    LM_E(("dbEntitiesDelete returned false"));
     orionldState.httpStatusCode = SccBadRequest;
     if (orionldState.responseTree == NULL)
-      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntityBatchDelete");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "dbEntitiesDelete");
     return false;
   }
   else

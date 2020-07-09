@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin, Larysse Savanna and Gabriel Quaresma
 */
-#include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
 
 
@@ -39,7 +38,7 @@ extern bool mongoLdRegistrationGet
   ngsiv2::Registration*  regP,
   const char*            regId,
   const char*            tenant,
-  HttpStatusCode*        statusCodeP,
+  int*                   statusCodeP,
   char**                 detailsP
 );
 

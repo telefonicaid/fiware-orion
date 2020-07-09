@@ -68,14 +68,14 @@ echo
 01. Attempt to add an attribute using POST and payload, but the payload is an empty object - see 400 Bad Request
 ================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
-  "title": "Empty Object",
-  "detail": "{}"
+  "title": "Invalid Payload Body",
+  "detail": "Empty Object"
 }
 
 

@@ -24,21 +24,21 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
-#include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/common/qAliasCompact.h"                       // qAliasCompact
-#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/payloadCheck/pcheckGeoQ.h"                    // pcheckGeoQ
-#include "orionld/payloadCheck/pcheckEntities.h"                // pcheckEntities
-#include "orionld/payloadCheck/pcheckNotification.h"            // pcheckNotification
-#include "orionld/payloadCheck/pcheckSubscription.h"            // Own interface
+#include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/qAliasCompact.h"                        // qAliasCompact
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
+#include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray
+#include "orionld/payloadCheck/pcheckNotification.h"             // pcheckNotification
+#include "orionld/payloadCheck/pcheckSubscription.h"             // Own interface
 
 
 
@@ -82,7 +82,7 @@ bool pcheckSubscription
 
   for (KjNode* nodeP = subNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (strcmp(nodeP->name, "id") == 0)
+    if (strcmp(nodeP->name, "id") == 0 || strcmp(nodeP->name, "@id") == 0)
     {
       if (idCanBePresent == false)
       {
@@ -93,9 +93,10 @@ bool pcheckSubscription
 
       DUPLICATE_CHECK(idP, "id", nodeP);
       STRING_CHECK(nodeP, nodeP->name);
+      EMPTY_STRING_CHECK(nodeP, nodeP->name);
       URI_CHECK(nodeP, nodeP->name);
     }
-    else if (strcmp(nodeP->name, "type") == 0)
+    else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
       STRING_CHECK(nodeP, nodeP->name);
@@ -111,6 +112,7 @@ bool pcheckSubscription
     {
       DUPLICATE_CHECK(nameP, "name", nodeP);
       STRING_CHECK(nodeP, nodeP->name);
+      EMPTY_STRING_CHECK(nodeP, nodeP->name);
     }
     else if (strcmp(nodeP->name, "description") == 0)
     {
@@ -120,13 +122,16 @@ bool pcheckSubscription
     else if (strcmp(nodeP->name, "entities") == 0)
     {
       DUPLICATE_CHECK(entitiesP, "entities", nodeP);
-      if (pcheckEntities(entitiesP) == false)
+      ARRAY_CHECK(entitiesP, "entities");
+      EMPTY_ARRAY_CHECK(entitiesP, "entities");
+      if (pcheckEntityInfoArray(entitiesP, true) == false)  // FIXME: Why is the entity type mandatory?
         return false;
     }
     else if (strcmp(nodeP->name, "watchedAttributes") == 0)
     {
       DUPLICATE_CHECK(watchedAttributesP, "watchedAttributes", nodeP);
       ARRAY_CHECK(nodeP, nodeP->name);
+      EMPTY_ARRAY_CHECK(nodeP, nodeP->name);
       for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
       {
         STRING_CHECK(itemP, "watchedAttributes item");
@@ -144,6 +149,7 @@ bool pcheckSubscription
     {
       DUPLICATE_CHECK(qP, "q", nodeP);
       STRING_CHECK(nodeP, "q");
+      EMPTY_STRING_CHECK(nodeP, "q");
       *qPP = qP;
       qAliasCompact(qP, false);
     }
@@ -151,7 +157,8 @@ bool pcheckSubscription
     {
       DUPLICATE_CHECK(geoqP, "geoQ", nodeP);
       OBJECT_CHECK(nodeP, "geoQ");
-      if (pcheckGeoQ(nodeP) == false)
+      EMPTY_OBJECT_CHECK(nodeP, "geoQ");
+      if (pcheckGeoQ(nodeP, true) == false)  // true: convert coordinates from array to string
         return false;
       *geoqPP = geoqP;
     }
@@ -159,6 +166,7 @@ bool pcheckSubscription
     {
       DUPLICATE_CHECK(csfP, "csf", nodeP);
       STRING_CHECK(nodeP, "csf");
+      EMPTY_STRING_CHECK(nodeP, "csf");
     }
     else if (strcmp(nodeP->name, "isActive") == 0)
     {
@@ -169,6 +177,7 @@ bool pcheckSubscription
     {
       DUPLICATE_CHECK(notificationP, "notification", nodeP);
       OBJECT_CHECK(nodeP, "notification");
+      EMPTY_OBJECT_CHECK(nodeP, "notification");
     }
     else if (strcmp(nodeP->name, "expires") == 0)
     {
@@ -187,6 +196,7 @@ bool pcheckSubscription
     {
       DUPLICATE_CHECK(temporalqP, "temporalQ", nodeP);
       OBJECT_CHECK(nodeP, "temporalQ");
+      EMPTY_OBJECT_CHECK(nodeP, "temporalQ");
     }
     else if (strcmp(nodeP->name, "status") == 0)
     {

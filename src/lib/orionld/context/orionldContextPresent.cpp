@@ -46,8 +46,8 @@ void orionldContextPresent(const char* prefix, OrionldContext* contextP)
   if (contextP == NULL)
     return;
 
-  LM_TMP(("    %s: Context '%s' (%s)", prefix, contextP->url, contextP->keyValues? "Key-Values" : "Array"));
-  LM_TMP(("    %s: ----------------------------------------------------------------------------", prefix));
+  LM_K(("    %s: Context '%s' (%s)", prefix, contextP->url, contextP->keyValues? "Key-Values" : "Array"));
+  LM_K(("    %s: ----------------------------------------------------------------------------", prefix));
 
   if (contextP->keyValues == true)
   {
@@ -62,7 +62,7 @@ void orionldContextPresent(const char* prefix, OrionldContext* contextP)
       {
         OrionldContextItem* hiP = (OrionldContextItem*) itemP->data;
 
-        LM_TMP(("    %s: key-value[slot %d]: %s -> %s (type: %s)", prefix, slot, hiP->name, hiP->id, hiP->type));
+        LM_K(("    %s: key-value[slot %d]: %s -> %s (type: %s)", prefix, slot, hiP->name, hiP->id, hiP->type));
         itemP = itemP->next;
         ++noOfItems;
 
@@ -80,15 +80,15 @@ void orionldContextPresent(const char* prefix, OrionldContext* contextP)
     {
       if (contextP->context.array.vector[iIx] == NULL)
       {
-        LM_TMP(("    %s:   Array Item %d is not ready", prefix, iIx));
+        LM_K(("    %s:   Array Item %d is not ready", prefix, iIx));
       }
       else
       {
-        LM_TMP(("    %s:   Array Item %d: %s (%s)",
-                prefix,
-                iIx,
-                contextP->context.array.vector[iIx]->url,
-                contextP->context.array.vector[iIx]->keyValues? "Key-Values" : "Array"));
+        LM_K(("    %s:   Array Item %d: %s (%s)",
+              prefix,
+              iIx,
+              contextP->context.array.vector[iIx]->url,
+              contextP->context.array.vector[iIx]->keyValues? "Key-Values" : "Array"));
       }
     }
   }

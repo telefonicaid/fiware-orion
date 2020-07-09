@@ -1,0 +1,345 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST Query of entities with pagination and count
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# Mongo seems to give the entities back in th order they were created, so, no sleep needed when creating entities.
+# As the entities are ordered by Creation Date, I assumed we'd need different creation dates for all entities (only seconds - no fractions).
+# But, this doesn't seem to be necessary - which saves us 20 seconds for this functest :)
+#
+# 01. Create 21 entities, E00 - E20, sleeping 1.1 seconds between each 
+# 02. Query entities without and URI parameters - see E00 - E19
+# 03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Count: 21 as HTTP header in response
+# 04. Query entities with limit=4 - see E00-E03
+# 05. Query entities with limit=4, offset=12 - see E12-E15
+# 06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Count: 21 as HTTP header
+# 07. Query entities with limit=-1, see error
+# 08. Query entities with limit=1001 - see error
+# 09. Query entities with offset=-1 - see error
+# 10. Query entities with offset=22 - see empty array
+#
+
+echo "01. Create 21 entities, E00 - E20, sleeping 1.1 seconds between each"
+echo "===================================================================="
+typeset -i eNo
+eNo=0
+
+while [ $eNo -le 20 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:'
+done
+echo
+echo
+
+
+echo "02. Query entities without and URI parameters - see E00 - E19"
+echo "============================================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes' --payload "$payload" --noPayloadCheck | grep '"id"'
+echo
+echo
+
+
+echo "03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Count: 21 as HTTP header in response"
+echo "======================================================================================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&count=true&limit=0' --payload "$payload" --noPayloadCheck
+echo
+echo
+
+
+echo "04. Query entities with limit=4 - see E00-E03"
+echo "============================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&limit=4' --payload "$payload" --noPayloadCheck | egrep '"id"|NGSILD-'
+echo
+echo
+
+
+echo "05. Query entities with limit=4, offset=12 - see E12-E15"
+echo "========================================================"
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&limit=4&offset=12' --payload "$payload" --noPayloadCheck | egrep '"id"|NGSILD-'
+echo
+echo
+
+
+echo "06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Count: 21 as HTTP header"
+echo "========================================================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&limit=4&offset=12&count=true' --payload "$payload" --noPayloadCheck | egrep '"id"|NGSILD-'
+echo
+echo
+
+
+echo "07. Query entities with limit=-1, see error"
+echo "==========================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&limit=-1' --payload "$payload" --noPayloadCheck
+echo
+echo
+
+
+echo "08. Query entities with limit=1001 - see error"
+echo "=============================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&limit=1001' --payload "$payload" --noPayloadCheck
+echo
+echo
+
+
+echo "09. Query entities with offset=-1 - see error"
+echo "============================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&offset=-1' --payload "$payload" --noPayloadCheck
+echo
+echo
+
+
+echo "10. Query entities with offset=22 - see empty array"
+echo "==================================================="
+payload='{
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url '/ngsi-ld/v1/entityOperations/query?prettyPrint=yes&offset=22' --payload "$payload" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 21 entities, E00 - E20, sleeping 1.1 seconds between each
+====================================================================
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E00
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E01
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E02
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E03
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E04
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E05
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E06
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E07
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E08
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E09
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E10
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E11
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E12
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E13
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E14
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E15
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E16
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E17
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E18
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E19
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E20
+
+
+02. Query entities without and URI parameters - see E00 - E19
+=============================================================
+    "id": "urn:ngsi-ld:entities:E00",
+    "id": "urn:ngsi-ld:entities:E01",
+    "id": "urn:ngsi-ld:entities:E02",
+    "id": "urn:ngsi-ld:entities:E03",
+    "id": "urn:ngsi-ld:entities:E04",
+    "id": "urn:ngsi-ld:entities:E05",
+    "id": "urn:ngsi-ld:entities:E06",
+    "id": "urn:ngsi-ld:entities:E07",
+    "id": "urn:ngsi-ld:entities:E08",
+    "id": "urn:ngsi-ld:entities:E09",
+    "id": "urn:ngsi-ld:entities:E10",
+    "id": "urn:ngsi-ld:entities:E11",
+    "id": "urn:ngsi-ld:entities:E12",
+    "id": "urn:ngsi-ld:entities:E13",
+    "id": "urn:ngsi-ld:entities:E14",
+    "id": "urn:ngsi-ld:entities:E15",
+    "id": "urn:ngsi-ld:entities:E16",
+    "id": "urn:ngsi-ld:entities:E17",
+    "id": "urn:ngsi-ld:entities:E18",
+    "id": "urn:ngsi-ld:entities:E19",
+
+
+03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Count: 21 as HTTP header in response
+=======================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+NGSILD-Count: 21
+Date: REGEX(.*)
+
+[]
+
+
+
+04. Query entities with limit=4 - see E00-E03
+=============================================
+    "id": "urn:ngsi-ld:entities:E00",
+    "id": "urn:ngsi-ld:entities:E01",
+    "id": "urn:ngsi-ld:entities:E02",
+    "id": "urn:ngsi-ld:entities:E03",
+
+
+05. Query entities with limit=4, offset=12 - see E12-E15
+========================================================
+    "id": "urn:ngsi-ld:entities:E12",
+    "id": "urn:ngsi-ld:entities:E13",
+    "id": "urn:ngsi-ld:entities:E14",
+    "id": "urn:ngsi-ld:entities:E15",
+
+
+06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Count: 21 as HTTP header
+=========================================================================================================
+NGSILD-Count: 21
+    "id": "urn:ngsi-ld:entities:E12",
+    "id": "urn:ngsi-ld:entities:E13",
+    "id": "urn:ngsi-ld:entities:E14",
+    "id": "urn:ngsi-ld:entities:E15",
+
+
+07. Query entities with limit=-1, see error
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad value for URI parameter /limit/",
+  "detail": "-1"
+}
+
+
+
+08. Query entities with limit=1001 - see error
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 169
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Invalid value for URI parameter /limit/",
+  "detail": "must be an integer value <= 1000"
+}
+
+
+
+09. Query entities with offset=-1 - see error
+=============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
+  "title": "Bad value for URI parameter /offset/",
+  "detail": "-1"
+}
+
+
+
+10. Query entities with offset=22 - see empty array
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 3
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

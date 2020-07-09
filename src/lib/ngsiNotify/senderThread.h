@@ -57,6 +57,7 @@ typedef struct SenderThreadParams
   std::string                        content;
   char                               transactionId[64];
   MimeType                           mimeType;
+  char*                              toFree;             // Payload Data buffer has been allocated
   std::string                        renderFormat;
   std::string                        fiwareCorrelator;
   struct timespec                    timeStamp;

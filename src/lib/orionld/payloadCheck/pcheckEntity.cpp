@@ -29,7 +29,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "common/globals.h"                                      // parse8601Time
@@ -127,14 +126,14 @@ bool pcheckEntity
   {
     if (isBatchOperation == true)
     {
-      if (strcmp(kNodeP->name, "id") == 0)
+      if (strcmp(kNodeP->name, "id") == 0 || strcmp(kNodeP->name, "@id") == 0)
       {
         DUPLICATE_CHECK(batchIdP, "id", kNodeP);
         STRING_CHECK(batchIdP, "id");
         URI_CHECK(batchIdP, "id");
         orionldState.payloadIdNode = kNodeP;  // FIXME: Is this necessary?
       }
-      else if (strcmp(kNodeP->name, "type") == 0)
+      else if (strcmp(kNodeP->name, "type") == 0 || strcmp(kNodeP->name, "@type") == 0)
       {
         DUPLICATE_CHECK(batchTypeP, "type", kNodeP);
         STRING_CHECK(batchTypeP, "type");
@@ -173,7 +172,7 @@ bool pcheckEntity
       {
         if (pcheckName(kNodeP->name, &detailsP) == false)
         {
-          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", detailsP);
+          orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Property/Relationship name", kNodeP->name);
           return false;
         }
       }

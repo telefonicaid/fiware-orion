@@ -303,7 +303,6 @@ echo
 HTTP/1.1 207 Multi Status
 Content-Length: 223
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -329,7 +328,6 @@ Date: REGEX(.*)
 HTTP/1.1 207 Multi Status
 Content-Length: 218
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -355,7 +353,6 @@ Date: REGEX(.*)
 HTTP/1.1 207 Multi Status
 Content-Length: 201
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -381,7 +378,6 @@ Date: REGEX(.*)
 HTTP/1.1 207 Multi Status
 Content-Length: 230
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -407,7 +403,6 @@ Date: REGEX(.*)
 HTTP/1.1 207 Multi Status
 Content-Length: 230
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -433,7 +428,6 @@ Date: REGEX(.*)
 HTTP/1.1 207 Multi Status
 Content-Length: 223
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -459,7 +453,6 @@ Date: REGEX(.*)
 HTTP/1.1 207 Multi Status
 Content-Length: 223
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {

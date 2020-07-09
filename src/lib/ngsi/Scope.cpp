@@ -356,7 +356,7 @@ int Scope::fill
 
     if ((coords != 2) && (geometry.areaType == "point"))
     {
-      *errorStringP = "invalid point in URI param /coords/";
+      *errorStringP = "invalid coordinates for point";
       LM_E(("geometry.parse: %s (%d coords)", errorStringP->c_str(), coords));
       pointVectorRelease(pointV);
       pointV.clear();

@@ -173,28 +173,28 @@ echo
 
 echo "11. 'coordinates' missing in URI param for query - see error"
 echo "============================================================"
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&georel=near;maxDistance==15'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&georel=near;maxDistance==15'
 echo
 echo
 
 
 echo "12. Non array 'coordinate' in URI param for query - see error"
 echo "============================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=12&georel=near;maxDistance==15'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=12&georel=near;maxDistance==15'
 echo
 echo
 
 
 echo "13. Only one coordinate in URI param for query - see error"
 echo "=========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[-3.7\]&georel=near;maxDistance==15'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[-3.7\]&georel=near;maxDistance==15'
 echo
 echo
 
 
 echo "14. Zero 'coordinates' in URI param for query - see error"
 echo "========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=point&coordinates=\[\]&georel=near;maxDistance==15'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_City&geometry=Point&coordinates=\[\]&georel=near;maxDistance==15'
 echo
 echo
 
@@ -301,13 +301,13 @@ Date: REGEX(.*)
 11. 'coordinates' missing in URI param for query - see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 156
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geometry without coordinates",
-    "title": "no coordinates",
+    "detail": "geometry, georel, and coordinates must all be present",
+    "title": "Incomplete geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -315,13 +315,13 @@ Date: REGEX(.*)
 12. Non array 'coordinate' in URI param for query - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid point in URI param /coords/",
-    "title": "error filling a scope",
+    "detail": "invalid coordinates for point",
+    "title": "Invalid Geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
@@ -329,13 +329,13 @@ Date: REGEX(.*)
 13. Only one coordinate in URI param for query - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 139
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid point in URI param /coords/",
-    "title": "error filling a scope",
+    "detail": "invalid coordinates for point",
+    "title": "Invalid Geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 
@@ -343,13 +343,13 @@ Date: REGEX(.*)
 14. Zero 'coordinates' in URI param for query - see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "no coordinates for geometry",
-    "title": "error filling a scope",
+    "title": "Invalid Geometry",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InternalError"
 }
 

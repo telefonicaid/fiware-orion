@@ -504,13 +504,14 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     return false;
   }
 
-
   //
   // Expand name of attribute
   //
   OrionldContextItem*  contextItemP = NULL;
 
-  if ((strcmp(kNodeP->name, "location") != 0) && (strcmp(kNodeP->name, "observationSpace") != 0) && (strcmp(kNodeP->name, "operationSpace") != 0))
+  if ((strcmp(kNodeP->name, "location")         != 0) &&
+      (strcmp(kNodeP->name, "observationSpace") != 0) &&
+      (strcmp(kNodeP->name, "operationSpace")   != 0))
   {
     char*                longName;
     bool                 valueMayBeExpanded  = false;

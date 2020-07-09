@@ -20,13 +20,22 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information 
 | :books: [Documentation](https://github.com/FIWARE/context.Orion-LD/tree/develop/doc/manuals-ld) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion-ld) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion-ld/) |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 
-If you want to start testing NGSI-LD, one option is to use Docker:
+If you want to start testing NGSI-LD, one option is to use Docker.
 
-```docker run fiware/orion-ld```  or even better: use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
+There are a number of docker images to choose from.
+
+If you (at your own risk) always want the latest image:
+```docker run fiware/orion-ld:latest```  or even better: use [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it
+
+If you instead want to use a more stable image, the latest alpha release (as of May 2020) is Alpha-4:
+
+```docker run fiware/orion-ld:alpha-0.4.0```
+
+Please check [dockerhub](https://hub.docker.com/r/fiware/orion-ld/tags) for newer releases.
 
 If you only intend to use NGSIv2, please use instead [Orion](https://github.com/telefonicaid/fiware-orion). 
 
-This component is still in Alpha state but already passing a bunch of [tests](https://github.com/FIWARE/NGSI-LD_TestSuite)
+This component is still in Alpha state but already passing all the [tests](https://github.com/FIWARE/NGSI-LD_TestSuite)
 
 For a description of what NGSI-LD is please check [this](https://github.com/Fiware/NGSI-LD_Wrapper/blob/master/README.md).
 This presentation from FIWARE Summit Malaga 2018 is also of interest: https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-data

@@ -1,0 +1,249 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of Entities with geospatial query using georel=equals
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# For this test, a Polygon, a LineString, and a Point is used
+# The three entities are created and then six queries are performed, two queries for each entity, one with match, the other without
+#
+# 01. Create Entity E1, with a property 'geo' that is a Polygon [[ [0,0], [0,1], [1,1], [0,0] ]]
+# 02. Create Entity E2, with a property 'geo' that is a LineString [ [3,5], [1,1] ]
+# 03. Create Entity E3, with a property 'geo' that is a Point [5,6]
+# 04. POST Query using geoQ over geoproperty 'geo' for a Polygon [[ [0,0], [0,1], [1,1], [0,0] ]] - see E1
+# 05. POST Query using geoQ over geoproperty 'geo' for a Polygon [[ [0,0], [0,2], [1,1], [0,0] ]] - no result
+# 06. POST Query using geoQ over geoproperty 'geo' for a LineString [ [3,5], [1,1] ] - see E2
+# 07. POST Query using geoQ over geoproperty 'geo' for a LineString [ [3,5], [1,2] ] - no result
+# 08. POST Query using geoQ over geoproperty 'geo' for a Point [5,6] - see E3
+# 09. POST Query using geoQ over geoproperty 'geo' for a Point [5,5] - no result
+#
+
+echo "01. Create Entity E1, with a property 'geo' that is a Polygon [[ [0,0], [0,1], [1,1], [0,0] ]]"
+echo "=============================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Polygon",
+      "coordinates": [[ [0,0], [0,1], [1,1], [0,0] ]]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create Entity E2, with a property 'geo' that is a LineString [ [3,5], [1,1] ]"
+echo "================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [3,5], [1,1] ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create Entity E3, with a property 'geo' that is a Point [5,6]"
+echo "================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E3",
+  "type": "T",
+  "geo": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [5,6]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. POST Query using geoQ over geoproperty 'geo' for a Polygon [[ [0,0], [0,1], [1,1], [0,0] ]] - see E1"
+echo "========================================================================================================"
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "equals",
+    "coordinates": [[ [0,0], [0,1], [1,1], [0,0] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "05. POST Query using geoQ over geoproperty 'geo' for a Polygon [[ [0,0], [0,2], [1,1], [0,0] ]] - no result"
+echo "==========================================================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Polygon",
+    "georel": "equals",
+    "coordinates": [[ [0,0], [0,2], [1,1], [0,0] ]],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "06. POST Query using geoQ over geoproperty 'geo' for a LineString [ [3,5], [1,1] ] - see E2"
+echo "==========================================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "LineString",
+    "georel": "equals",
+    "coordinates": [ [3,5], [1,1] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "07. POST Query using geoQ over geoproperty 'geo' for a LineString [ [3,5], [1,2] ] - no result"
+echo "=============================================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "LineString",
+    "georel": "equals",
+    "coordinates": [ [3,5], [1,2] ],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "08. POST Query using geoQ over geoproperty 'geo' for a Point [5,6] - see E3"
+echo "==========================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Point",
+    "georel": "equals",
+    "coordinates": [5,6],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+echo "09. POST Query using geoQ over geoproperty 'geo' for a Point [5,5] - no result"
+echo "=============================================================================="
+payload='{
+  "geoQ": {
+    "geometry": "Point",
+    "georel": "equals",
+    "coordinates": [5,5],
+    "geoproperty": "geo"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" | grep '"id"' | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity E1, with a property 'geo' that is a Polygon [[ [0,0], [0,1], [1,1], [0,0] ]]
+==============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+Date: REGEX(.*)
+
+
+
+02. Create Entity E2, with a property 'geo' that is a LineString [ [3,5], [1,1] ]
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+Date: REGEX(.*)
+
+
+
+03. Create Entity E3, with a property 'geo' that is a Point [5,6]
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E3
+Date: REGEX(.*)
+
+
+
+04. POST Query using geoQ over geoproperty 'geo' for a Polygon [[ [0,0], [0,1], [1,1], [0,0] ]] - see E1
+========================================================================================================
+        "id": "http://a.b.c/entity/E1",
+
+
+05. POST Query using geoQ over geoproperty 'geo' for a Polygon [[ [0,0], [0,2], [1,1], [0,0] ]] - no result
+===========================================================================================================
+
+
+06. POST Query using geoQ over geoproperty 'geo' for a LineString [ [3,5], [1,1] ] - see E2
+===========================================================================================
+        "id": "http://a.b.c/entity/E2",
+
+
+07. POST Query using geoQ over geoproperty 'geo' for a LineString [ [3,5], [1,2] ] - no result
+==============================================================================================
+
+
+08. POST Query using geoQ over geoproperty 'geo' for a Point [5,6] - see E3
+===========================================================================
+        "id": "http://a.b.c/entity/E3",
+
+
+09. POST Query using geoQ over geoproperty 'geo' for a Point [5,5] - no result
+==============================================================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

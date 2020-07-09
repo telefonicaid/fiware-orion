@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/common/QNode.h"                                // QNode
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 
 
@@ -69,7 +70,7 @@ typedef KjNode* (*DbEntityAttributeLookupFunction)(const char* entityId, const c
 typedef bool    (*DbEntityAttributesDeleteFunction)(const char* entityId, char** attrNameV, int vecSize);
 typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestTree);
 typedef bool    (*DbEntityDeleteFunction)(const char* entityId);
-typedef bool    (*DbEntityBatchDeleteFunction)(KjNode* entityIdsArray);
+typedef bool    (*DbEntitiesDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, char** detailsP);
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
@@ -79,11 +80,13 @@ typedef bool    (*DbRegistrationExists)(const char* registrationId);
 typedef bool    (*DbRegistrationDelete)(const char* registrationId);
 typedef KjNode* (*DbSubscriptionGet)(const char* subscriptionId);
 typedef bool    (*DbSubscriptionReplace)(const char* subscriptionId, KjNode* dbSubscriptionP);
+typedef bool    (*DbSubscriptionDelete)(const char* subscriptionId);
 typedef KjNode* (*DbRegistrationGet)(const char* registrationId);
 typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbRegistrationP);
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
 typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
 typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
+typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
 
 
 
@@ -98,20 +101,22 @@ extern DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
 extern DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
 extern DbEntityUpdateFunction                    dbEntityUpdate;
 extern DbEntityDeleteFunction                    dbEntityDelete;
-extern DbEntityBatchDeleteFunction               dbEntityBatchDelete;
+extern DbEntitiesDeleteFunction                  dbEntitiesDelete;
 extern DbDataToKjTreeFunction                    dbDataToKjTree;
 extern DbDataFromKjTreeFunction                  dbDataFromKjTree;
 extern DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
-extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;  // FIXME: Name must change - what does it to really?
+extern DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;
 extern DbRegistrationLookup                      dbRegistrationLookup;
 extern DbRegistrationExists                      dbRegistrationExists;
 extern DbRegistrationDelete                      dbRegistrationDelete;
 extern DbSubscriptionGet                         dbSubscriptionGet;
 extern DbSubscriptionReplace                     dbSubscriptionReplace;
+extern DbSubscriptionDelete                      dbSubscriptionDelete;
 extern DbRegistrationGet                         dbRegistrationGet;
 extern DbRegistrationReplace                     dbRegistrationReplace;
 extern DbEntityTypesFromRegistrationsGet         dbEntityTypesFromRegistrationsGet;
 extern DbEntitiesGet                             dbEntitiesGet;
 extern DbGeoIndexCreate                          dbGeoIndexCreate;
+extern DbEntitiesQuery                           dbEntitiesQuery;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

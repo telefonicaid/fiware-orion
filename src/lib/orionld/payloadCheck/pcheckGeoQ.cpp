@@ -35,6 +35,9 @@ extern "C"
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
+#include "orionld/common/dotForEq.h"                            // dotForEq
+#include "orionld/types/OrionldProblemDetails.h"                // OrionldProblemDetails
+#include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
 #include "orionld/payloadCheck/pcheckGeoType.h"                 // pcheckGeoType
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"         // pcheckGeoqCoordinates
 #include "orionld/payloadCheck/pcheckGeoqGeorel.h"              // pcheckGeoqGeorel
@@ -46,7 +49,7 @@ extern "C"
 //
 // ngsildCoordinatesToAPIv1Datamodel -
 //
-static bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldName, KjNode* geometryP)
+bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldName, KjNode* geometryP)
 {
   bool   isPoint = false;
   char*  buf;
@@ -102,14 +105,14 @@ static bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* 
 //
 // pcheckGeoQ -
 //
-bool pcheckGeoQ(KjNode* geoqNodeP)
+bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
 {
-  KjNode*             geometryP    = NULL;
-  KjNode*             coordinatesP = NULL;
-  KjNode*             georelP      = NULL;
-  KjNode*             geopropertyP = NULL;
-  OrionldGeoJsonType  geoJsonType;
-  char*               detail;
+  KjNode*                geometryP    = NULL;
+  KjNode*                coordinatesP = NULL;
+  KjNode*                georelP      = NULL;
+  KjNode*                geopropertyP = NULL;
+  OrionldGeoJsonType     geoJsonType;
+  OrionldProblemDetails  pd;
 
   for (KjNode* itemP = geoqNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -136,7 +139,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP)
     else
     {
       LM_W(("Bad Input (invalid field in geoQ: '%s')", itemP->name));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Payload Data", "invalid field in geoQ");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Payload Data - invalid field in geoQ", itemP->name);
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
@@ -166,6 +169,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP)
     return false;
   }
 
+  char* detail;
   if (pcheckGeoType(geometryP->value.s, &geoJsonType, &detail) == false)  // Rename to pcheckGeoqGeometry
   {
     LM_W(("Bad Input (invalid geometry: '%s')", geometryP->value.s));
@@ -182,19 +186,36 @@ bool pcheckGeoQ(KjNode* geoqNodeP)
     return false;
   }
 
-  if (pcheckGeoqGeorel(georelP, geoJsonType, &detail) == false)
+  if (pcheckGeoqGeorel(georelP, geoJsonType, &pd) == false)
   {
     LM_W(("Bad Input (invalid georel (%s): for geo '%s')", georelP->value.s, geometryP->value.s));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Payload Data", detail);
+    orionldErrorResponseCreate(OrionldBadRequestData, pd.title, pd.detail);
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
 
   //
+  // If geoproperty has been given, the name must be expanded, and any dots replaced by '='
+  //
+  if (geopropertyP != NULL)
+  {
+    char* pName = geopropertyP->value.s;
+
+    if (strcmp(pName, "location") != 0)
+    {
+      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, NULL, true, NULL);
+      dotForEq(geopropertyP->value.s);
+    }
+  }
+
+  //
   // Render the coordinates and convert to a string - for the NGSIv1 database model ... ?
   //
-  if (ngsildCoordinatesToAPIv1Datamodel(coordinatesP, "geoQ::coordinates", geometryP) == false)
-    return false;
+  if (coordsToString == true)
+  {
+    if (ngsildCoordinatesToAPIv1Datamodel(coordinatesP, "geoQ::coordinates", geometryP) == false)
+      return false;
+  }
 
   return true;
 }

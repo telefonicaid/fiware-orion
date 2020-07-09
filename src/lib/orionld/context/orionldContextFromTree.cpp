@@ -26,7 +26,6 @@ extern "C"
 {
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjRender.h"                                      // kjRender
 #include "kjson/kjFree.h"                                        // kjFree
 }
 

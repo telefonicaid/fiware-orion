@@ -217,7 +217,7 @@ echo
 
 echo "17. DELETE /ngsi-ld/v1/subscriptions/S1"
 echo "======================================="
-orionCurl --url /ngsi-ld/v1/subscriptions/S1 -X DELETE
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 -X DELETE
 echo
 echo
 
@@ -425,27 +425,27 @@ Date: REGEX(.*)
 16. DELETE /ngsi-ld/v1/entities/E1/attrs/A1
 ===========================================
 HTTP/1.1 404 Not Found
-Content-Length: 141
+Content-Length: 175
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "http://a.b.c/list/of/attributes/A1.xxx",
-    "title": "Attribute Not Found",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "http://a.b.c/list/of/entities/E1.xxx",
+    "title": "The requested entity has not been found. Check its id",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
 17. DELETE /ngsi-ld/v1/subscriptions/S1
 =======================================
 HTTP/1.1 404 Not Found
-Content-Length: 141
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "S1",
-    "title": "The requested subscription has not been found. Check id",
+    "detail": "urn:S1",
+    "title": "The requested subscription has not been found - check its id",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
