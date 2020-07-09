@@ -65,7 +65,7 @@ Fields:
 -   **attrNames**: an array of strings. Its elements are the names of the
     attributes of the entity (without IDs). In this case, the "." to "="
     replacement is not done.
--   **creDate**: the timestamp (as float number, meaning seconds with milliseconds)
+-   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
     corresponding to entity creation date (as a consequence of append).
 -   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
     corresponding to last entity update. Note that it uses to be the same that a
