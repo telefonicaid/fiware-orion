@@ -603,8 +603,6 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
           // Not that this would ever happen, but, what do we do here ?
           // Best choice seems to be to simply send the notification without the Link header.
           //
-
-          LM_E(("Unable to find subscription: %s", ncrP->subscriptionId.c_str()));
         }
       }
     }
