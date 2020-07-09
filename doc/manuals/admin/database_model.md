@@ -67,7 +67,7 @@ Fields:
     replacement is not done.
 -   **creDate**: the timestamp (as float number, meaning seconds with milliseconds)
     corresponding to entity creation date (as a consequence of append).
--   **modDate**: the timestamp (as float number, meaning seconds with milliseconds)
+-   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
     corresponding to last entity update. Note that it uses to be the same that a
     modDate corresponding to at least one of the attributes (not always: it will
     not be the same if the last update was a DELETE operation). It matches creDate
