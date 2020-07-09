@@ -65,7 +65,7 @@ echo
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url /v2/entities/E?options=dateCreated,dateModified,keyValues
-# Note we remove milliseconds part, as it makes comparison with date output harder
+# Note that we remove the milliseconds part, as this makes comparison with date output easier
 CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo
