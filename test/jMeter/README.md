@@ -1,33 +1,33 @@
 # Performance tests with Apache JMeter
 
-This python script help to measure performance of any REST application using Apache JMeter tool
+This python script helps to measure performance of any REST application using the Apache JMeter tool
 
 ## How to make the test
 
-### Requeriments
+### Requirements
 
-- Install [Apache JMeter](https://jmeter.apache.org/download_jmeter.cgi) on Linux OS (recommend) or Windows OS, in a machine
+- Install [Apache JMeter](https://jmeter.apache.org/download_jmeter.cgi) on Linux (recommended) or Windows.
 - Define the Apache JMeter as Path Variable
 
 ```bash
-nano .bashrc
+nano ~/.bashrc
 
-# Add this line:
-export PATH="$PATH":"$HOME/apache-jmeter-5.3/bin"
+# Add the following line (assuming you have installed jmeter right under your home directory):
+export PATH=$PATH:$HOME/apache-jmeter-5.3/bin
 
-# Save and run this command:
-source .bashrc
+# Save the file, exit the editor, and run this command:
+source ~/.bashrc
 ```
 
-- In another machine, with Linux OS, install the Orion LD broker
+- In another machine, this one with Linux, install the Orion LD broker - instructions available on the Orion-LD github repo.
 - Install the [Plugins Manager](https://jmeter-plugins.org/install/Install/) on Apache JMeter and put it into lib/ext directory, then restart JMeter;
 - Install the plugin: *jpgc - Standard Set*, which will allow to use graph generators listeners, about:
   * Transactions per seconds,
   * Performance metrics,
-  * and many others.
+  * etc
   However, to use the performance metrics listener, it is necessary to use the
-  [Server Agent tool](https://github.com/undera/perfmon-agent/blob/master/README.md) on both machines used,
-  to get help monitoring the CPU, RAM and others parameters of the machine which has the broker installed.
+  [Server Agent tool](https://github.com/undera/perfmon-agent/blob/master/README.md) on both machines,
+  to get help monitoring the CPU, RAM and others parameter of the machine on which the broker runs.
   The usage of the Server Agent tool is easy:
   In the machine with Apache JMeter, execute `startAgent.[bat|sh]` (`.bat` for Windows, `.sh` for Linux)
   and in the broker's machine, execute `startAgent.sh`.
@@ -36,7 +36,7 @@ source .bashrc
   In the Broker machine - generate a real time graph, ready to save as an image or a csv file.
 
 ### Performance test script structure
-This script has been developed in the Python programming language. The parameters used are: 
+The test script has been developed in the Python programming language. The parameters used are: 
 * Number of users/threads
 * Loop count (represents the repetition quantity of users doing requests)
 * Ramp time (represents the time which all threads/users must be ready to make requests)
@@ -77,9 +77,9 @@ This script has been developed in the Python programming language. The parameter
 * Run command:
 
   ``` bash
-  # For specific test case
+  # For a particular test case:
   python generateTestJMeter.py test_name.json
   
-  # For all test cases created
+  # For all test cases:
   python generateTestJMeter.py
   ```
