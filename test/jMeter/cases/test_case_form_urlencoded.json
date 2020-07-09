@@ -1,0 +1,15 @@
+{
+    "NUM_OF_THREADS": 1,
+    "LOOPS": 1,
+    "RAMP_TIME": 1,
+    "DOMAIN_IP": "localhost",
+    "PORT": 1026,
+    "PATH_SERVICE": "path/name",
+    "HTTP_VERB": "GET",
+    "HEADERS": {
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "BODY_DATA": {
+        "raw": "name=tester&age=34"
+    }
+}
