@@ -59,7 +59,7 @@ Fields:
         replacement is not done.
     -   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
         corresponding to attribute creation (as a consequence of append).
-    -   **modDate**: the timestamp (as float number, meaning seconds with milliseconds)
+    -   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
         corresponding to last attribute update. It matches creDate if the attribute has
         not been modified after creation.
 -   **attrNames**: an array of strings. Its elements are the names of the
