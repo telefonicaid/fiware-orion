@@ -177,7 +177,7 @@ std::string getStringField(const BSONObj& b, const std::string& field, const std
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * getNumberField -
@@ -206,7 +206,7 @@ double getNumberField(const BSONObj& b, const std::string& field, const std::str
 
   return -1;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -338,9 +338,9 @@ bool getBoolField(const BSONObj& b, const std::string& field, const std::string&
 
 /* ****************************************************************************
 *
-* getNumberFieldAsDouble -
+* getNumberField -
 */
-double getNumberFieldAsDouble(const BSONObj& b, const std::string& field, const std::string& caller, int line)
+double getNumberField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   double retVal = -1;
 
