@@ -57,7 +57,7 @@ Fields:
     -   **mdNames**: an array of strings. Its elements are the names of the
         metadata of the attribute. Here the "." to "="
         replacement is not done.
-    -   **creDate**: the timestamp (as float number, meaning seconds with milliseconds)
+    -   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
         corresponding to attribute creation (as a consequence of append).
     -   **modDate**: the timestamp (as float number, meaning seconds with milliseconds)
         corresponding to last attribute update. It matches creDate if the attribute has
