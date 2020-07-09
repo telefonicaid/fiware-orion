@@ -50,7 +50,7 @@ payload='{
         "temperature"
       ],
       "expression": {
-        "mq": "timestamp.meta_timestamp==2016-06-16T07:21:24.00Z..2026-06-16T07:21:24.00Z"
+        "mq": "timestamp.meta_timestamp==2016-06-16T07:21:24.000Z..2026-06-16T07:21:24.000Z"
       }
     }
   },
@@ -109,7 +109,7 @@ payload='{
     "type": "nothing",
     "metadata": {
       "meta_timestamp": {
-        "value": "2017-06-15T07:21:24.00Z",
+        "value": "2017-06-15T07:21:24.000Z",
         "type": "DateTime"
       }
     },

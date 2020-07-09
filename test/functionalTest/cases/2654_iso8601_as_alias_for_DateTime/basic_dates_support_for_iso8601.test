@@ -68,7 +68,7 @@ payload='{
   "id": "E1",
   "type": "T1",
   "birthdate": {
-    "value": "2050-04-05T14:00:00.00Z",
+    "value": "2050-04-05T14:00:00.000Z",
     "type": "ISO8601"
   }
 }'
@@ -108,7 +108,7 @@ echo "07. Update entity with right date"
 echo "================================="
 payload='{
   "birthdate": {
-    "value": "2018-12-03T13:21:42.00Z",
+    "value": "2018-12-03T13:21:42.000Z",
     "type": "ISO8601"
   }
 }'

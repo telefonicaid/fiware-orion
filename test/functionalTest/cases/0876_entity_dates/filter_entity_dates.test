@@ -58,7 +58,7 @@ payload='{
   "type": "T",
   "A": "entity 1"
 }'
-T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -72,7 +72,7 @@ payload='{
   "type": "T",
   "A": "entity 2"
 }'
-T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -86,7 +86,7 @@ payload='{
   "type": "T",
   "A": "entity 3"
 }'
-T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -114,7 +114,7 @@ payload='{
   "type": "T",
   "A": "entity 5"
 }'
-T_5=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_5=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -126,7 +126,7 @@ echo "===================="
 payload='{
   "A": "entity 3 mod"
 }'
-T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities/E3/attrs?options=keyValues' --payload "$payload"
 sleep 1s
 echo

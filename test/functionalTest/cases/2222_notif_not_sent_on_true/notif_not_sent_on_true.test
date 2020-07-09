@@ -96,7 +96,7 @@ payload2='{
   },
   "timestamp": {
     "type": "DateTime",
-    "value": "2017-06-15T07:21:24.00Z"
+    "value": "2017-06-15T07:21:24.000Z"
   },
   "value_str": {
     "value": "true"
