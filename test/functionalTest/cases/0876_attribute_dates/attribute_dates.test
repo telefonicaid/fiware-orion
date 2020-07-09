@@ -55,7 +55,7 @@ echo
 
 echo "02. GET E1/A1, see dateCreated == dateModified"
 echo "=============================================="
-# Note we remove milliseconds part, as it makes comparison with date output harder
+# Note that we remove the milliseconds part, as this makes comparison with date output easier
 orionCurl --url '/v2/entities/E1/attrs/A1?metadata=dateCreated'
 dateCreated=$(echo "$_response" | python -mjson.tool | grep value | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo "=============================================="
