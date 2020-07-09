@@ -47,7 +47,6 @@
 #define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
 #define getLongFieldF(b, field)             getLongField(b, field, __FUNCTION__, __LINE__)
 #define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
-//#define getNumberFieldAsDoubleF(b, field)   getNumberFieldAsDouble(b, field, __FUNCTION__, __LINE__)
 #define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__, __LINE__)
 #define getFieldF(b, field)                 getField(b, field, __FUNCTION__,  __LINE__)
 #define setStringVectorF(b, field, v)       setStringVector(b, field, v, __FUNCTION__,  __LINE__)
@@ -150,21 +149,6 @@ extern long long getIntOrLongFieldAsLong
   const std::string&     caller = "<none>",
   int                    line   = 0
 );
-
-
-#if 0
-/* ****************************************************************************
-*
-* getNumberFieldAsDouble -
-*/
-extern double getNumberFieldAsDouble
-(
-  const mongo::BSONObj&  b,
-  const std::string&     field,
-  const std::string&     caller = "<none>",
-  int                    line   = 0
-);
-#endif
 
 
 

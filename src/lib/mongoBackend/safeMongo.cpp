@@ -177,37 +177,6 @@ std::string getStringField(const BSONObj& b, const std::string& field, const std
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* getNumberField -
-*/
-double getNumberField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
-{
-  if (b.hasField(field) && b.getField(field).type() == mongo::NumberDouble)
-  {
-    return b.getField(field).Number();
-  }
-
-  // Detect error
-  if (!b.hasField(field))
-  {
-    LM_E(("Runtime Error (double field '%s' is missing in BSONObj <%s> from caller %s:%d)",
-          field.c_str(),
-          b.toString().c_str(),
-          caller.c_str(),
-          line));
-  }
-  else
-  {
-    LM_E(("Runtime Error (field '%s' was supposed to be a double but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
-  }
-
-  return -1;
-}
-#endif
-
 
 /* ****************************************************************************
 *
