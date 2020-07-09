@@ -2,12 +2,12 @@
 # 2019
 
 import os
+import sys
 import pprint
 import xml.etree.ElementTree as ET
 import string
 import datetime
-
-now = datetime.datetime.now()
+import json
 
 # Allow/Not Allow to save jmx test file for option 3.
 NOT_SAVE_FILE_JMX_FOR_OPTION_3 = True
@@ -15,38 +15,105 @@ NOT_SAVE_FILE_JMX_FOR_OPTION_3 = True
 # Allow/Not Allow to generate data of CPU and RAM of machine which running the broker.
 GENERATE_DATA_OF_CPU_RAM = False
 
-# Const options parameters
+# Const options parameters - DON'T CHANGE
 GENERATE_COMPLETE_REPORT = 1
 GENERATE_ONLY_CSV_FILE = 2
 ONLY_RESULTS = 3
 
-# Change the parameters
+HTTP_VERBS = ['GET', 'POST', 'PATCH', 'DELETE', 'PUT']
+# Parameters ==================================================
 NUM_OF_THREADS = 1
-LOOPS = 1
+LOOPS = 2
 RAMP_TIME = 1
 DOMAIN_IP = 'localhost'
-PORT = 1026
-PATH_SERVICE = '/ngsi-ld/v1/entities/'
+PORT = 8080
+PATH_SERVICE = ''
+HEADERS = {}
+HTTP_VERB = ""
+BODY_DATA = ""
 
-HTTP_VERBS = ['GET', 'POST', 'PATCH', 'DELETE']
+OUTPUT_FILE_NAME = ''
+# =============================================================
 
-HTTP_VERB = 'GET'
 
-OUTPUT_FILE_NAME = \
-    "{HTTP_VERB}_num_threads_{NUM_OF_THREADS}_loops_{LOOPS}_ramp_time_{RAMP_TIME}_{timeNow}"\
-    .format(HTTP_VERB=HTTP_VERB, NUM_OF_THREADS=NUM_OF_THREADS, LOOPS=LOOPS, RAMP_TIME=RAMP_TIME, timeNow=str(now.isoformat()))
+def loadParamsFromFileSelected(file):
+    now = datetime.datetime.now()
+    with open('cases/' + file) as f:
+        title = file.split(".")[0]
+        data = json.load(f)
+        readData = json.loads(json.dumps(data))
+        try:
+            if readData["NUM_OF_THREADS"]:
+                global NUM_OF_THREADS
+                NUM_OF_THREADS = readData["NUM_OF_THREADS"]
+            if readData["LOOPS"]:
+                global LOOPS
+                LOOPS = readData["LOOPS"]
+            if readData["RAMP_TIME"]:
+                global RAMP_TIME
+                RAMP_TIME = readData["RAMP_TIME"]
+            if readData["DOMAIN_IP"]:
+                global DOMAIN_IP
+                DOMAIN_IP = readData["DOMAIN_IP"]
+            if readData["PORT"]:
+                global PORT
+                PORT = readData["PORT"]
+            if readData["PATH_SERVICE"]:
+                global PATH_SERVICE
+                PATH_SERVICE = readData["PATH_SERVICE"]
+            if readData["HTTP_VERB"]:
+                global HTTP_VERB
+                HTTP_VERB = readData["HTTP_VERB"]
+            if readData["HEADERS"]:
+                global HEADERS
+                HEADERS = readData["HEADERS"]
+            if readData["BODY_DATA"]:
+                global BODY_DATA
+                if "raw" in readData["BODY_DATA"] and "json" not in readData["BODY_DATA"]:
+                    BODY_DATA = str(readData["BODY_DATA"]["raw"])
+                if "raw" not in readData["BODY_DATA"] and "json" in readData["BODY_DATA"]:
+                    BODY_DATA = str(readData["BODY_DATA"]["json"])
 
-BODY_DATA = """
-{
-    "brandName": {
-        "type": "Property",
-        "value": "Chevrolet Spin"
-    }
-}
-"""
+            global OUTPUT_FILE_NAME
+            OUTPUT_FILE_NAME = "{title}_{timeNow}".format(
+                title=title, timeNow=str(now.isoformat())
+            )
+        except Exception as e:
+            print("ERROR: " + str(e) + " is required")
+
+
+def loadParamsFromFiles(tree, op):
+    your_path = 'cases'
+    files = os.listdir(your_path)
+    for file in files:
+        tree = ET.parse('testTemplate.jmx')
+        if os.path.isfile('cases/' + file):
+            print('cases/' + file)
+            loadParamsFromFileSelected(file)
+            defineParams(tree, op)
+            execute(op, tree)
+
+
+def setHeaders(key, value):
+    header = ET.Element("elementProp")
+    header.set("name", "")
+    header.set("elementType", "Header")
+
+    keyProp = ET.Element("stringProp")
+    keyProp.set("name", 'Header.name')
+    keyProp.text = key
+
+    valueProp = ET.Element("stringProp")
+    valueProp.set("name", 'Header.value')
+    valueProp.text = value
+
+    header.append(keyProp)
+    header.append(valueProp)
+    return header
+
+
 # defineParams: Create a structure of folders for HTML Report or just .csv file
 # @params : isCreateHTMLReport - Works like a switch for choose the structure
-
 
 def defineParams(tree, op):
     root = tree.getroot()
@@ -56,6 +123,12 @@ def defineParams(tree, op):
     if verbSelected == []:
         print('ERROR:', 'Use a Orion-LD Broker supported HTTP verb.')
         os.abort()
+
+    for item in root.iter('collectionProp'):
+        if item.attrib['name'] == 'HeaderManager.headers':
+            for key, value in HEADERS.items():
+                header = setHeaders(key, value)
+                item.append(header)
 
     for item in root.iter('stringProp'):
         if item.attrib['name'] == "ThreadGroup.num_threads":
@@ -80,7 +153,7 @@ def defineParams(tree, op):
                 else:
                     item.text = dirpath + '/output/' + OUTPUT_FILE_NAME + '/' + item.text
             else:
-                item.text = ''            
+                item.text = ''
 
         if HTTP_VERB == "GET":
             if item.attrib['name'] == "Argument.value":
@@ -88,9 +161,7 @@ def defineParams(tree, op):
         elif HTTP_VERB == "POST":
             if item.attrib['name'] == "Argument.value":
                 item.text = BODY_DATA
-        elif HTTP_VERB == "PATCH" or HTTP_VERB == "DELETE":
-            if item.attrib['name'] == "Header.value":
-                item.text = 'application/json'
+        elif HTTP_VERB == "PATCH" or HTTP_VERB == "DELETE" or HTTP_VERB == "PUT":
             if item.attrib['name'] == "Argument.value":
                 item.text = BODY_DATA
 
@@ -110,30 +181,41 @@ def createFolders(isCreateHTMLReport):
 
 # executeTest: execute one of the options of menu for JMeter Test
 
+
 def executeTest(operation, tree):
-    pathReportJmx    = os.path.join('output', OUTPUT_FILE_NAME+'_Report', OUTPUT_FILE_NAME+'.jmx')
-    pathReportCsv    = os.path.join('output', OUTPUT_FILE_NAME+'_Report', OUTPUT_FILE_NAME+'.csv')
-    pathReportFolder = os.path.join('output', OUTPUT_FILE_NAME+'_Report', 'Report')
-    pathCsvFileJmx   = os.path.join('output', OUTPUT_FILE_NAME, OUTPUT_FILE_NAME+'.jmx')
-    pathCsvFileCsv   = os.path.join('output', OUTPUT_FILE_NAME, OUTPUT_FILE_NAME+'.csv')
-    
+    pathReportJmx = os.path.join(
+        'output', OUTPUT_FILE_NAME+'_Report', OUTPUT_FILE_NAME+'.jmx')
+    pathReportCsv = os.path.join(
+        'output', OUTPUT_FILE_NAME+'_Report', OUTPUT_FILE_NAME+'.csv')
+    pathReportFolder = os.path.join(
+        'output', OUTPUT_FILE_NAME+'_Report', 'Report')
+    pathCsvFileJmx = os.path.join(
+        'output', OUTPUT_FILE_NAME, OUTPUT_FILE_NAME+'.jmx')
+    pathCsvFileCsv = os.path.join(
+        'output', OUTPUT_FILE_NAME, OUTPUT_FILE_NAME+'.csv')
+
     if operation == GENERATE_COMPLETE_REPORT:
         createFolders(True)
         tree.write(pathReportJmx)
-        os.system('jmeter -n -t {pathJmx} -l {pathCsv} -e -o {reportFolder}'\
-            .format(pathJmx=pathReportJmx, pathCsv=pathReportCsv, reportFolder=pathReportFolder))
+        os.system('jmeter -n -t {pathJmx} -l {pathCsv} -e -o {reportFolder}'
+                  .format(pathJmx=pathReportJmx, pathCsv=pathReportCsv, reportFolder=pathReportFolder))
     elif operation == GENERATE_ONLY_CSV_FILE:
         createFolders(False)
         tree.write(pathCsvFileJmx)
-        os.system('jmeter -n -t {pathJmx} -l {pathCsv}'\
-            .format(pathJmx=pathCsvFileJmx, pathCsv=pathCsvFileCsv))
+        os.system('jmeter -n -t {pathJmx} -l {pathCsv}'
+                  .format(pathJmx=pathCsvFileJmx, pathCsv=pathCsvFileCsv))
     elif operation == ONLY_RESULTS:
-        tree.write('{OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
-        os.system('jmeter -n -t {OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
+        tree.write('{OUTPUT_FILE_NAME}.jmx'.format(
+            OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
+        os.system(
+            'jmeter -n -t {OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
         if NOT_SAVE_FILE_JMX_FOR_OPTION_3:
-            os.remove('{OUTPUT_FILE_NAME}.jmx'.format(OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
+            os.remove('{OUTPUT_FILE_NAME}.jmx'.format(
+                OUTPUT_FILE_NAME=OUTPUT_FILE_NAME))
 
 # execute: It is a selector to execute one of the options of menu for JMeter Test
+
+
 def execute(op, tree):
     if op.isdigit():
         op = int(op)
@@ -151,6 +233,14 @@ def execute(op, tree):
         print("ERROR:", "Type any of the available options")
 
 
+def getFileSpecific():
+    try:
+        fileSpecific = sys.argv[1]
+        return fileSpecific
+    except Exception:
+        return ''
+
+
 def main():
     tree = ET.parse('testTemplate.jmx')
 
@@ -159,9 +249,16 @@ def main():
     print('3 - Only results on terminal')
     print('0 - Exit')
     op = input('Chose the option: ')
-    
-    defineParams(tree, op)
-    execute(op, tree)
+
+    fileName = getFileSpecific()
+    if len(fileName) > 0:
+        print('cases/' + fileName)
+        loadParamsFromFileSelected(fileName)
+        print(OUTPUT_FILE_NAME)
+        defineParams(tree, op)
+        execute(op, tree)
+    else:
+        loadParamsFromFiles(tree, op)
 
 
 if __name__ == "__main__":
