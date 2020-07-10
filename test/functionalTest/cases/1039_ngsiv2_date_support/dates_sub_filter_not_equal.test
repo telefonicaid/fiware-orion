@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z
-# 02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)
-# 03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)
-# 04. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (notif)
+# 01. Create subscription with q: birthday!=2016-02-24T10:00:00.000Z
+# 02. Create entity with birthdaty: 2016-02-23T10:00:00.000Z (notif)
+# 03. Update entity to birthdaty: 2016-02-24T10:00:00.000Z (not notif)
+# 04. Update entity to birthdaty: 2016-02-25T10:00:00.000Z (notif)
 # 05. Dump accumulator (2 notifications)
 #
 
-echo "01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z"
-echo "================================================================="
+echo "01. Create subscription with q: birthday!=2016-02-24T10:00:00.000Z"
+echo "=================================================================="
 payload='
 {
     "subject": {
@@ -52,7 +52,7 @@ payload='
         "condition": {
             "attrs": [ ],
             "expression": {
-               "q": "birthday!=2016-02-24T10:00:00.00Z"
+               "q": "birthday!=2016-02-24T10:00:00.000Z"
             }
          }
     },
@@ -68,13 +68,13 @@ echo
 echo
 
 
-echo "02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)"
-echo "================================================================="
+echo "02. Create entity with birthdaty: 2016-02-23T10:00:00.000Z (notif)"
+echo "=================================================================="
 payload='{
   "id": "E1",
   "type": "T",
   "birthday": {
-    "value": "2016-02-23T10:00:00.00Z",
+    "value": "2016-02-23T10:00:00.000Z",
     "type": "DateTime"
   }
 }'
@@ -83,11 +83,11 @@ echo
 echo
 
 
-echo "03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)"
-echo "==================================================================="
+echo "03. Update entity to birthdaty: 2016-02-24T10:00:00.000Z (not notif)"
+echo "===================================================================="
 payload='{
  "birthday": {
-   "value": "2016-02-24T10:00:00.00Z",
+   "value": "2016-02-24T10:00:00.000Z",
    "type": "DateTime"
   }
 }'
@@ -96,11 +96,11 @@ echo
 echo
 
 
-echo "05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (notif)"
-echo "==============================================================="
+echo "05. Update entity to birthdaty: 2016-02-25T10:00:00.000Z (notif)"
+echo "================================================================"
 payload='{
  "birthday": {
-   "value": "2016-02-25T10:00:00.00Z",
+   "value": "2016-02-25T10:00:00.000Z",
    "type": "DateTime"
   }
 }'
@@ -117,8 +117,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z
-=================================================================
+01. Create subscription with q: birthday!=2016-02-24T10:00:00.000Z
+==================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -127,8 +127,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)
-=================================================================
+02. Create entity with birthdaty: 2016-02-23T10:00:00.000Z (notif)
+==================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -137,16 +137,16 @@ Date: REGEX(.*)
 
 
 
-03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)
-===================================================================
+03. Update entity to birthdaty: 2016-02-24T10:00:00.000Z (not notif)
+====================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (notif)
-===============================================================
+05. Update entity to birthdaty: 2016-02-25T10:00:00.000Z (notif)
+================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

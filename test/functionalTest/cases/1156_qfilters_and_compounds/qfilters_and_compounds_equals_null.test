@@ -48,7 +48,7 @@ payload='{
       "T": true,
       "F": false,
       "N": null,
-      "D": "2016-07-22T10:42:42.00Z"
+      "D": "2016-07-22T10:42:42.000Z"
     }
   },
   "A2": { "value": 22 }
@@ -93,7 +93,7 @@ Date: REGEX(.*)
 02. GET /v2/entities?q=A1.N:null, see E1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -104,7 +104,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -127,7 +127,7 @@ Date: REGEX(.*)
 03. GET /v2/entities?q=A1.N==null, see E1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -138,7 +138,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
