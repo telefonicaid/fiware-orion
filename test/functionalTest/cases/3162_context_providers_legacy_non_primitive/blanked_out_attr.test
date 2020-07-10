@@ -198,9 +198,9 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "address": {
-            "creDate": REGEX([0-9]+),
+            "creDate": REGEX([0-9]+\.[0-9]+),
             "mdNames": [],
-            "modDate": REGEX([0-9]+),
+            "modDate": REGEX([0-9]+\.[0-9]+),
             "type": "PostalAddress",
             "value": {
                 "addressLocality": "Mitte",
@@ -210,9 +210,9 @@ Date: REGEX(.*)
             }
         },
         "location": {
-            "creDate": REGEX([0-9]+),
+            "creDate": REGEX([0-9]+\.[0-9]+),
             "mdNames": [],
-            "modDate": REGEX([0-9]+),
+            "modDate": REGEX([0-9]+\.[0-9]+),
             "type": "geo:json",
             "value": {
                 "coordinates": [
@@ -223,14 +223,14 @@ Date: REGEX(.*)
             }
         },
         "name": {
-            "creDate": REGEX([0-9]+),
+            "creDate": REGEX([0-9]+\.[0-9]+),
             "mdNames": [],
-            "modDate": REGEX([0-9]+),
+            "modDate": REGEX([0-9]+\.[0-9]+),
             "type": "Text",
             "value": "Tower Troddelmarkt"
         }
     },
-    "creDate": REGEX([0-9]+),
+    "creDate": REGEX([0-9]+\.[0-9]+),
     "lastCorrelator": "REGEX([0-9a-f\-]{36})",
     "location": {
         "attrName": "location",
@@ -242,7 +242,7 @@ Date: REGEX(.*)
             "type": "Point"
         }
     },
-    "modDate": REGEX([0-9]+)
+    "modDate": REGEX([0-9]+\.[0-9]+)
 }
 
 
@@ -311,9 +311,9 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "address": {
-            "creDate": REGEX([0-9]+),
+            "creDate": REGEX([0-9]+\.[0-9]+),
             "mdNames": [],
-            "modDate": REGEX([0-9]+),
+            "modDate": REGEX([0-9]+\.[0-9]+),
             "type": "PostalAddress",
             "value": {
                 "addressLocality": "Mitte",
@@ -323,9 +323,9 @@ Date: REGEX(.*)
             }
         },
         "location": {
-            "creDate": REGEX([0-9]+),
+            "creDate": REGEX([0-9]+\.[0-9]+),
             "mdNames": [],
-            "modDate": REGEX([0-9]+),
+            "modDate": REGEX([0-9]+\.[0-9]+),
             "type": "geo:json",
             "value": {
                 "coordinates": [
@@ -336,14 +336,14 @@ Date: REGEX(.*)
             }
         },
         "name": {
-            "creDate": REGEX([0-9]+),
+            "creDate": REGEX([0-9]+\.[0-9]+),
             "mdNames": [],
-            "modDate": REGEX([0-9]+),
+            "modDate": REGEX([0-9]+\.[0-9]+),
             "type": "Text",
             "value": "Tower Troddelmarkt"
         }
     },
-    "creDate": REGEX([0-9]+),
+    "creDate": REGEX([0-9]+\.[0-9]+),
     "lastCorrelator": "REGEX([0-9a-f\-]{36})",
     "location": {
         "attrName": "location",
@@ -355,7 +355,7 @@ Date: REGEX(.*)
             "type": "Point"
         }
     },
-    "modDate": REGEX([0-9]+)
+    "modDate": REGEX([0-9]+\.[0-9]+)
 }
 
 

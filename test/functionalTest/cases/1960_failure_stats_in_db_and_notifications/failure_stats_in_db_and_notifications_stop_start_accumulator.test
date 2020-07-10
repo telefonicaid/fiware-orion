@@ -148,6 +148,7 @@ orionCurl --url /v2/subscriptions
 echo
 echo
 
+
 --REGEXPECT--
 01. Create entity E1
 ====================
@@ -172,7 +173,7 @@ Date: REGEX(.*)
 03. GET subscription, see lastSuccess but not lastFailure and status==active
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 362
+Content-Length: 364
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -222,7 +223,7 @@ Date: REGEX(.*)
 06. GET subscription, see lastFailure GT lastSuccess and status==failed
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -275,7 +276,7 @@ Date: REGEX(.*)
 09. GET subscription, see lastSuccess GT lastFailure and status==active
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

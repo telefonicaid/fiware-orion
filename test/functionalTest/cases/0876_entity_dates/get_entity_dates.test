@@ -49,7 +49,7 @@ payload='{
   "type": "T",
   "A": "foo"
 }'
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 echo
 echo
@@ -65,8 +65,9 @@ echo
 echo "02b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
-CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
-MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
+# Note that we remove the milliseconds part, as this makes comparison with date output easier
+CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
+MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo
 echo
 
@@ -104,7 +105,7 @@ echo "========================"
 payload='{
   "value": "bar"
 }'
-T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S")
 orionCurl --url '/v2/entities/E/attrs/A' -X PUT --payload "$payload"
 echo
 echo
@@ -120,8 +121,9 @@ echo
 echo "05b. Get entity with dates keyValues"
 echo "===================================="
 orionCurl --url '/v2/entities/E?options=keyValues&attrs=dateCreated,dateModified,*'
-CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}')
-MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}')
+# Note that we remove the milliseconds part, as this makes comparison with date output easier
+CRE_DATE=$(echo "$_response" | python -mjson.tool | grep dateCreated | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
+MOD_DATE=$(echo "$_response" | python -mjson.tool | grep dateModified | awk -F '"' '{print $4}' | awk -F '.' '{print $1}')
 echo
 echo
 
@@ -165,7 +167,7 @@ Date: REGEX(.*)
 02a. Get entity with dates
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 236
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -194,7 +196,7 @@ Date: REGEX(.*)
 02b. Get entity with dates keyValues
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 114
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -211,7 +213,7 @@ Date: REGEX(.*)
 02c. Get entity with dates values
 =================================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 61
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -240,7 +242,7 @@ Date: REGEX(.*)
 05a. Get entity with dates
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 234
+Content-Length: 236
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -269,7 +271,7 @@ Date: REGEX(.*)
 05b. Get entity with dates keyValues
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 114
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,7 +288,7 @@ Date: REGEX(.*)
 05c. Get entity with dates values
 =================================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 61
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

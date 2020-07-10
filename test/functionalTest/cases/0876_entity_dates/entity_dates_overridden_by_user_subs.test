@@ -92,7 +92,7 @@ payload='{
     "type": "Text"
   },
   "dateModified": {
-    "value": "2051-01-01T00:00:00",
+    "value": "2051-01-01T00:00:00.666",
     "type": "DateTime"
   }
 }'
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 ============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -295,7 +295,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "2051-01-01T00:00:00.00Z"
+                "value": "2051-01-01T00:00:00.666Z"
             },
             "id": "E1",
             "type": "T"
@@ -306,7 +306,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -325,7 +325,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -356,7 +356,7 @@ Date: REGEX(.*)
 ============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -375,7 +375,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "2051-01-01T00:00:00.00Z"
+                "value": "2051-01-01T00:00:00.666Z"
             },
             "id": "E1",
             "type": "T"
@@ -386,7 +386,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -405,7 +405,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -430,7 +430,7 @@ Date: REGEX(.*)
 ==========================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 362
+Content-Length: 364
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -449,7 +449,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "2051-01-01T00:00:00.00Z"
+                "value": "2051-01-01T00:00:00.666Z"
             },
             "id": "E1",
             "type": "T"
@@ -463,7 +463,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -477,7 +477,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. Sanity check: E1 has dateModified in a far away future
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 132
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -491,7 +491,7 @@ Date: REGEX(.*)
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2051-01-01T00:00:00.00Z"
+        "value": "2051-01-01T00:00:00.666Z"
     }
 }
 
@@ -524,7 +524,7 @@ Date: REGEX(.*)
 ===============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -543,7 +543,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E1",
             "type": "T"
@@ -554,7 +554,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -573,7 +573,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E1",
             "type": "T"
@@ -584,7 +584,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -603,7 +603,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E2",
             "type": "T"
@@ -614,7 +614,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 208
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -633,7 +633,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "dateModified": {
                 "metadata": {},
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "id": "E2",
             "type": "T"

@@ -146,10 +146,8 @@ The following considerations have to be taken into account at attribute creation
     * `MM`: month (two digits)
     * `DD`: day (two digits)
 * Regarding `<time>` it must follow any of the patterns described in [the ISO8601 specification](https://en.wikipedia.org/wiki/ISO_8601#Times):
-    * `hh:mm:ss.sss` or `hhmmss.sss`. At the present moment, Orion is able to process times including microseconds (or even
-      smaller resolutions) although internally they are stored as `.00`. However, this may change in the future
-      (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2670)).
-    * `hh:mm:ss` or `hhmmss`.
+    * `hh:mm:ss.sss` or `hhmmss.sss`.
+    * `hh:mm:ss` or `hhmmss`. Milliseconds are set to `000` in this case.
     * `hh:mm` or `hhmm`. Seconds are set to `00` in this case.
     * `hh`. Minutes and seconds are set to `00` in this case.
     * If `<time>` is omitted, then hours, minutes and seconds are set to `00`.
@@ -162,9 +160,13 @@ The following considerations have to be taken into account at attribute creation
   However, this is ambiguous when client and server are in different zones. Thus, in order to solve this ambiguity, Orion will always
   assume timezone `Z` when timezone designator is omitted.
 
-Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.ssZ`. Note it uses UTC/Zulu
-timezone (which is the best default option, as clients/receivers may be running in any timezone). This may change in the
-future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
+Orion always provides datetime attributes/metadata using the format `YYYY-MM-DDThh:mm:ss.sssZ`. However, note that
+Orion provides other timestamps (registration/subscription expiration date, last notification/failure/sucess in notifications,
+etc.) using `YYYY-MM-DDThh:mm:ss.ssZ` format (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/3671)
+about this)).
+
+In addition, note Orion uses always UTC/Zulu timezone when provides datetime (which is the best default option, as
+clients/receivers may be running in any timezone). This may change in the future (see [related issue](https://github.com/telefonicaid/fiware-orion/issues/2663)).
 
 The string "ISO8601" as type for attributes and metadata is also supported. The effect is the same as when using "DateTime".
 

@@ -2,3 +2,4 @@
 - Fix: upgrade microhttpd dependency from 0.9.48 to 0.9.70
 - Fix: wrong 204 code was responded (instead of 501) when using idPattern in POST /v2/op/update operation (#3427)
 - Fix: changed the name of pretty much all the environment variables for Orion. E.g. adding prefix 'ORION_'
+- Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)

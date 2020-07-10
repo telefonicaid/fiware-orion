@@ -54,7 +54,7 @@ payload='{
       "T": true,
       "F": false,
       "N": null,
-      "D": "2016-07-22T10:42:42.00Z"
+      "D": "2016-07-22T10:42:42.000Z"
     }
   },
   "A2": { "value": 22 }
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 02. True Equal to True: GET /v2/entities?q=A1.T:true, see E1
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -145,7 +145,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -168,7 +168,7 @@ Date: REGEX(.*)
 03. True Equal to True: GET /v2/entities?q=A1.T==true, see E1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -179,7 +179,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 08. False Equal to False: GET /v2/entities?q=A1.F:false, see E1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -257,7 +257,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -280,7 +280,7 @@ Date: REGEX(.*)
 09. False Equal to False: GET /v2/entities?q=A1.F==false, see E1
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -291,7 +291,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
