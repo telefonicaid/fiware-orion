@@ -254,7 +254,7 @@ void JsonHelper::addNumber(const std::string& key, float  value)
 *
 * JsonHelper::addDate -
 */
-void JsonHelper::addDate(const std::string& key, long long timestamp)
+void JsonHelper::addDate(const std::string& key, double timestamp)
 {
   if (!empty)
   {

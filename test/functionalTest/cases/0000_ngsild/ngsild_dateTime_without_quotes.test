@@ -44,7 +44,7 @@ payload='{
   "P100": {
 	  "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00Z",
+    "observedAt": "2018-12-04T12:05:06.789Z",
     "P1_R1": {
 		  "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
@@ -85,14 +85,14 @@ echo
 
 echo "02. NGSI-LD Test Suite Case 042: Query by condition over observedAt"
 echo "==================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>\"2018-12-03T12:00:00Z\"'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>\"2018-12-03T12:05:06.000Z\"'
 echo
 echo
 
 
 echo "03. NGSI-LD Test Suite Case 042: Query by condition over observedAt - without quotes"
 echo "===================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>2018-12-03T12:00:00Z'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>2018-12-03T12:05:06.000Z'
 echo
 echo
 
@@ -110,7 +110,7 @@ Date: REGEX(.*)
 02. NGSI-LD Test Suite Case 042: Query by condition over observedAt
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 536
+Content-Length: 540
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -130,7 +130,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:00:00Z",
+            "observedAt": "2018-12-04T12:05:06.789Z",
             "type": "Property",
             "value": 12
         },
@@ -165,7 +165,7 @@ Date: REGEX(.*)
 03. NGSI-LD Test Suite Case 042: Query by condition over observedAt - without quotes
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 536
+Content-Length: 540
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -185,7 +185,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:00:00Z",
+            "observedAt": "2018-12-04T12:05:06.789Z",
             "type": "Property",
             "value": 12
         },

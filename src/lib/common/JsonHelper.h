@@ -40,7 +40,7 @@ public:
   void        addRaw(const std::string& key, const std::string& value);
   void        addNumber(const std::string& key, long long value);
   void        addNumber(const std::string& key, float value);
-  void        addDate(const std::string& key, long long timestamp);
+  void        addDate(const std::string& key, double timestamp);
   void        addBool(const std::string& key, bool b);
 
   std::string str();

@@ -238,7 +238,7 @@ Date: REGEX(.*)
 03. GET  /ngsi-ld/v1/csourceRegistrations all data
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 18358
+Content-Length: 18558
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -251,7 +251,7 @@ Date: REGEX(.*)
     "description": "description of 1",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -271,12 +271,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -350,7 +350,7 @@ Date: REGEX(.*)
     "description": "description of 10",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -370,12 +370,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -449,7 +449,7 @@ Date: REGEX(.*)
     "description": "description of 2",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -469,12 +469,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -548,7 +548,7 @@ Date: REGEX(.*)
     "description": "description of 3",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -568,12 +568,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -647,7 +647,7 @@ Date: REGEX(.*)
     "description": "description of 4",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -667,12 +667,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -746,7 +746,7 @@ Date: REGEX(.*)
     "description": "description of 5",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -766,12 +766,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -845,7 +845,7 @@ Date: REGEX(.*)
     "description": "description of 6",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -865,12 +865,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -944,7 +944,7 @@ Date: REGEX(.*)
     "description": "description of 7",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -964,12 +964,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -1043,7 +1043,7 @@ Date: REGEX(.*)
     "description": "description of 8",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -1063,12 +1063,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -1142,7 +1142,7 @@ Date: REGEX(.*)
     "description": "description of 9",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -1162,12 +1162,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
@@ -1240,7 +1240,7 @@ Date: REGEX(.*)
 04. GET  /ngsi-ld/v1/csourceRegistrations limit:5 csourceRegistration
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 3946
+Content-Length: 4046
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1251,7 +1251,7 @@ Date: REGEX(.*)
         "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
         "information": [
             {
@@ -1298,13 +1298,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1347,7 +1347,7 @@ Date: REGEX(.*)
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -1394,13 +1394,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1443,7 +1443,7 @@ Date: REGEX(.*)
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -1490,13 +1490,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1539,7 +1539,7 @@ Date: REGEX(.*)
         "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
         "information": [
             {
@@ -1586,13 +1586,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1635,7 +1635,7 @@ Date: REGEX(.*)
         "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
         "information": [
             {
@@ -1682,13 +1682,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1732,7 +1732,7 @@ Date: REGEX(.*)
 05. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:0 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 3946
+Content-Length: 4046
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1743,7 +1743,7 @@ Date: REGEX(.*)
         "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
         "information": [
             {
@@ -1790,13 +1790,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1839,7 +1839,7 @@ Date: REGEX(.*)
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -1886,13 +1886,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -1935,7 +1935,7 @@ Date: REGEX(.*)
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -1982,13 +1982,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2031,7 +2031,7 @@ Date: REGEX(.*)
         "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
         "information": [
             {
@@ -2078,13 +2078,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2127,7 +2127,7 @@ Date: REGEX(.*)
         "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
         "information": [
             {
@@ -2174,13 +2174,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2224,7 +2224,7 @@ Date: REGEX(.*)
 06. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:1 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 3946
+Content-Length: 4046
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -2235,7 +2235,7 @@ Date: REGEX(.*)
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -2282,13 +2282,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2331,7 +2331,7 @@ Date: REGEX(.*)
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -2378,13 +2378,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2427,7 +2427,7 @@ Date: REGEX(.*)
         "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
         "information": [
             {
@@ -2474,13 +2474,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2523,7 +2523,7 @@ Date: REGEX(.*)
         "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
         "information": [
             {
@@ -2570,13 +2570,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2619,7 +2619,7 @@ Date: REGEX(.*)
         "P2": "String-5",
         "description": "description of 5",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
         "information": [
             {
@@ -2666,13 +2666,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2716,7 +2716,7 @@ Date: REGEX(.*)
 07. GET  /ngsi-ld/v1/csourceRegistrations with count
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 2370
+Content-Length: 2430
 Content-Type: application/json
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 NGSILD-Results-Count: 10
@@ -2728,7 +2728,7 @@ Date: REGEX(.*)
         "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
         "information": [
             {
@@ -2775,13 +2775,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2824,7 +2824,7 @@ Date: REGEX(.*)
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -2871,13 +2871,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -2920,7 +2920,7 @@ Date: REGEX(.*)
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -2967,13 +2967,13 @@ Date: REGEX(.*)
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00Z",
-            "start": "2017-12-31T10:00:00Z"
+            "end": "2027-12-31T10:00:00.000Z",
+            "start": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00Z",
-            "start": "2018-12-31T10:00:00Z"
+            "end": "2028-12-31T10:00:00.000Z",
+            "start": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
@@ -3028,7 +3028,7 @@ Date: REGEX(.*)
 09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1759
+Content-Length: 1779
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -3041,7 +3041,7 @@ Date: REGEX(.*)
     "description": "description of 5",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -3061,12 +3061,12 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00Z",
-      "end": "2028-12-31T10:00:00Z"
+      "start": "2018-12-31T10:00:00.000Z",
+      "end": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00Z",
-      "end": "2027-12-31T10:00:00Z"
+      "start": "2017-12-31T10:00:00.000Z",
+      "end": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",

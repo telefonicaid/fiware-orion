@@ -44,7 +44,7 @@ payload='{
   "P1": {
     "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00"
+    "observedAt": "2018-12-04T12:01:02.34Z"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
@@ -98,7 +98,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 12,
 			"md" : {
 				"observedAt" : {
-					"value" : 1543924800
+					"value" : 1543924862.34
 				}
 			},
 			"mdNames" : [
@@ -116,7 +116,7 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 153
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -127,7 +127,7 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00Z"
+    "observedAt": "2018-12-04T12:01:02.340Z"
   }
 }
 

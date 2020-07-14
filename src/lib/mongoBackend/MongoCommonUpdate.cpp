@@ -578,7 +578,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getIntFieldF(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldAsDoubleF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -619,7 +619,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldAsDoubleF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -718,7 +718,7 @@ static bool updateAttribute
   if (isReplace)
   {
     BSONObjBuilder newAttr;
-    int            now = getCurrentTime();
+    double         now = getCurrentTime();
 
     *actualUpdate = true;
 
@@ -868,7 +868,7 @@ static bool appendAttribute
   ab.append(ENT_ATTRS_MDNAMES, mdNames);
 
   /* 4. Dates */
-  int now = getCurrentTime();
+  double now = getCurrentTime();
 
   ab.append(ENT_ATTRS_CREATION_DATE, now);
   ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
@@ -1113,7 +1113,7 @@ static bool addTriggeredSubscriptions_withCache
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     CachedSubscription* cSubP = subVec[ix];
@@ -1121,7 +1121,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)",
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%f, DIFF: %f)",
                          cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
@@ -1159,7 +1159,7 @@ static bool addTriggeredSubscriptions_withCache
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
@@ -1171,7 +1171,7 @@ static bool addTriggeredSubscriptions_withCache
       else
       {
         LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
@@ -1183,7 +1183,7 @@ static bool addTriggeredSubscriptions_withCache
     else
     {
       LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
-                         "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                         "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
                          cSubP->subscriptionId,
                          cSubP->throttling,
                          cSubP->lastNotificationTime,
@@ -1472,7 +1472,7 @@ static bool addTriggeredSubscriptions_noCache
   //
   // Allocating buffer to hold all these BIG variables, necessary for the population of
   // the four parts of the final query.
-  // The necessary variables are too big for the stack and thus moved to the head, inside BsonGroup.
+  // The necessary variables are too big for the stack and thus moved to the heap, inside CSubQueryGroup.
   //
   CSubQueryGroup* bgP = new CSubQueryGroup();
 
@@ -2397,7 +2397,7 @@ static void updateAttrInNotifyCer
       caP->actionType = actionType;
 
       /* Set modification date */
-      int now = getCurrentTime();
+      double now = getCurrentTime();
       caP->modDate = now;
 
       /* Metadata */
@@ -2454,7 +2454,7 @@ static void updateAttrInNotifyCer
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
-  int now = getCurrentTime();
+  double now = getCurrentTime();
 
   caP->creDate = now;
   caP->modDate = now;
@@ -2929,7 +2929,7 @@ static bool createEntity
 (
   EntityId*                        eP,
   const ContextAttributeVector&    attrsV,
-  int                              now,
+  double                           now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -3067,12 +3067,15 @@ static bool createEntity
 
   if ((orionldState.creDatesP != NULL) && ((savedCreDateP = kjLookup(orionldState.creDatesP, eP->id.c_str())) != NULL))
   {
-    eP->creDate = (double) savedCreDateP->value.i;
-    // LM_W(("Inserting creDate as DOUBLE: %f (URL: %s)", eP->creDate, orionldState.urlPath));
-    insertedDoc.append(ENT_CREATION_DATE, (int) savedCreDateP->value.i);
+    eP->creDate = (double) savedCreDateP->value.f;
+    LM_TMP(("MILLIS: Inserting creDate as DOUBLE: %f (URL: %s)", eP->creDate, orionldState.urlPath));
+    insertedDoc.append(ENT_CREATION_DATE, savedCreDateP->value.f);
   }
   else
+  {
+    LM_TMP(("MILLIS: Inserting creDate as DOUBLE: %f (URL: %s)", now, orionldState.urlPath));
     insertedDoc.append(ENT_CREATION_DATE, now);
+  }
 #else
   insertedDoc.append(ENT_CREATION_DATE, now);
 #endif
@@ -3458,7 +3461,7 @@ static void updateEntity
 
   if (action != ActionTypeReplace)
   {
-    int now = getCurrentTime();
+    double now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
     notifyCerP->contextElement.entityId.modDate = now;
   }
@@ -3511,7 +3514,7 @@ static void updateEntity
   {
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
-    int            now = getCurrentTime();
+    double         now = getCurrentTime();
 
     // This avoids strange behavior like as for the location, as reported in the #1142 issue
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
@@ -3979,7 +3982,7 @@ void processContextElement
     {
       std::string  errReason;
       std::string  errDetail;
-      int          now = getCurrentTime();
+      double       now = getCurrentTime();
 
       if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {

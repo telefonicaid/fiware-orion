@@ -196,7 +196,7 @@ bye
 03. GET the subscription - see its initial state
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 547
+Content-Length: 551
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -228,7 +228,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -245,7 +245,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 625
+Content-Length: 629
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -278,7 +278,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -347,7 +347,7 @@ Date: REGEX(.*)
 ================================================
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
-Content-Length: 291
+Content-Length: 295
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:9997

@@ -23,6 +23,8 @@
 * Author: Fermin Galan
 */
 #include <stdint.h>
+#include <errno.h>                   // errno
+#include <string.h>                  // strerror
 
 #include "common/Timer.h"
 #include "logMsg/logMsg.h"
@@ -50,7 +52,18 @@ Timer::~Timer(void)
 *
 * Timer::getCurrentTime -
 */
-int Timer::getCurrentTime(void)
+double Timer::getCurrentTime(void)
 {
-  return (int) time(NULL);
+  struct timespec  ts;
+  double           timestamp;
+
+  if (clock_gettime(CLOCK_REALTIME, &ts) != 0)
+  {
+    LM_E(("Internal Error (clock_gettime: %s)", strerror(errno)));
+    return 0;
+  }
+
+  timestamp = ts.tv_sec + ((double) ts.tv_nsec) / 1000000000;
+
+  return timestamp;
 }

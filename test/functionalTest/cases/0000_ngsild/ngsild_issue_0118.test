@@ -150,7 +150,7 @@ Date: REGEX(.*)
 02. GET subscriptions, no Accept MIME type, make sure application/json is returned
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 583
+Content-Length: 587
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -172,7 +172,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 03. GET subscriptions, Accept MIME type explicitly set to application/json, make sure application/json is returned
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 583
+Content-Length: 587
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -229,7 +229,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -264,7 +264,7 @@ Date: REGEX(.*)
 04. GET subscriptions, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 ========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 668
+Content-Length: 672
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -286,7 +286,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -321,7 +321,7 @@ Date: REGEX(.*)
 05. GET particular subscription, no Accept MIME type, make sure application/json is returned
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 581
+Content-Length: 585
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -342,7 +342,7 @@ Date: REGEX(.*)
             "type": "T3"
         }
     ],
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "geoQ": {
         "coordinates": "1,2",
         "geometry": "circle",
@@ -376,7 +376,7 @@ Date: REGEX(.*)
 06. GET particular subscription, Accept MIME type explicitly set to application/json, make sure application/json is returned
 ============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 581
+Content-Length: 585
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -397,7 +397,7 @@ Date: REGEX(.*)
             "type": "T3"
         }
     ],
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "geoQ": {
         "coordinates": "1,2",
         "geometry": "circle",
@@ -431,7 +431,7 @@ Date: REGEX(.*)
 07. GET particular subscription, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 ==================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 666
+Content-Length: 670
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -452,7 +452,7 @@ Date: REGEX(.*)
             "type": "T3"
         }
     ],
-    "expires": "2028-12-31T10:00:00Z",
+    "expires": "2028-12-31T10:00:00.000Z",
     "geoQ": {
         "coordinates": "1,2",
         "geometry": "circle",

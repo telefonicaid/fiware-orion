@@ -49,6 +49,42 @@ using mongo::AssertionException;
 
 /* ****************************************************************************
 *
+* mongoTypeName -
+*/
+const char* mongoTypeName(mongo::BSONType type)
+{
+  switch (type)
+  {
+  case mongo::MinKey:        return "MinKey";
+  case mongo::EOO:           return "EOO";
+  case mongo::NumberDouble:  return "NumberDouble";
+  case mongo::String:        return "String";
+  case mongo::Object:        return "Object";
+  case mongo::Array:         return "Array";
+  case mongo::BinData:       return "BinData";
+  case mongo::Undefined:     return "Undefined";
+  case mongo::jstOID:        return "jstOID";
+  case mongo::Bool:          return "Bool";
+  case mongo::Date:          return "Date";
+  case mongo::jstNULL:       return "jstNULL";
+  case mongo::RegEx:         return "RegEx";
+  case mongo::DBRef:         return "DBRef";
+  case mongo::Code:          return "Code";
+  case mongo::Symbol:        return "Symbol";
+  case mongo::CodeWScope:    return "CodeWScope";
+  case mongo::NumberInt:     return "NumberInt";
+  case mongo::Timestamp:     return "Timestamp";
+  case mongo::NumberLong:    return "NumberLong";  // Same value as mongo::JSTypeMax
+  case mongo::MaxKey:        return "MaxKey";
+  }
+
+  return "Unknown Mongo Type";
+}
+
+
+
+/* ****************************************************************************
+*
 * getObjectField -
 */
 BSONObj getObjectField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
@@ -298,6 +334,37 @@ bool getBoolField(const BSONObj& b, const std::string& field, const std::string&
   }
 
   return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* getNumberFieldAsDouble -
+*/
+double getNumberFieldAsDouble(const BSONObj& b, const std::string& field, const std::string& caller, int line)
+{
+  double retVal = -1;
+
+  if (b.hasField(field))
+  {
+    if      (b.getField(field).type() == mongo::NumberDouble)      retVal = b.getField(field).Double();
+    else if (b.getField(field).type() == mongo::NumberLong)        retVal = b.getField(field).Long();
+    else if (b.getField(field).type() == mongo::NumberInt)         retVal = b.getField(field).Int();
+    else
+      LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+            field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+
+    return retVal;
+  }
+
+  LM_E(("Runtime Error (double/int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+        field.c_str(),
+        b.toString().c_str(),
+        caller.c_str(),
+        line));
+
+  return -1;
 }
 
 

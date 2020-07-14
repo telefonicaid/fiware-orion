@@ -204,7 +204,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 //
 // setTimestamp -
 //
-static void setTimestamp(const char* name, int ts, mongo::BSONObjBuilder* bobP)
+static void setTimestamp(const char* name, double ts, mongo::BSONObjBuilder* bobP)
 {
   bobP->append(name, ts);
 }
@@ -326,7 +326,7 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
-  int now = getCurrentTime();
+  double now = getCurrentTime();
 
   setTimestamp("createdAt",  now, &bob);
   setTimestamp("modifiedAt", now, &bob);

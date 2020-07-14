@@ -164,9 +164,10 @@ void orionldNotify(void)
   int           contentLength;
   struct iovec  ioVec[6]        = { { requestHeader, 0 }, { contentLenHeader, 0 }, { contentTypeHeaderJson, 32 }, { userAgentHeader, 23 }, { payload, 0 } };
   int           ioVecLen        = 5;
-  int           now             = time(NULL);
+  double        now             = getTimer()->getCurrentTime();
   char          nowString[64];
   char*         detail;
+
 
   if (numberToDate(now, nowString, sizeof(nowString), &detail) == false)
   {

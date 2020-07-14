@@ -180,10 +180,10 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
 //
 // mongoSetLdTimestamp -
 //
-void mongoSetLdTimestamp(long long* timestampP, const char* name, const mongo::BSONObj& bobj)
+void mongoSetLdTimestamp(double* timestampP, const char* name, const mongo::BSONObj& bobj)
 {
   if (bobj.hasField(name))
-    *timestampP = getIntFieldF(bobj, name);
+    *timestampP = getNumberFieldAsDoubleF(bobj, name);
   else
     *timestampP = -1;
 }

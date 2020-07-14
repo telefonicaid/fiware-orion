@@ -149,8 +149,8 @@ struct Registration
 #ifdef ORIONLD
   std::string           name;
   std::string           ldContext;
-  long long             createdAt;
-  long long             modifiedAt;
+  double                createdAt;
+  double                modifiedAt;
   OrionldTimeInterval   observationInterval;
   OrionldTimeInterval   managementInterval;
   OrionldGeoLocation    location;

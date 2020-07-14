@@ -419,12 +419,22 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
       // Lookup member "value"
       KjNode* valueP = kjLookup(observedAtP, "value");
       if (valueP != NULL)
-        mdP->numberValue = valueP->value.i;
+      {
+        if (valueP->type == KjFloat)
+          mdP->numberValue = valueP->value.f;
+        else
+          mdP->numberValue = valueP->value.i;
+      }
       else
         mdP->numberValue = 0;
     }
     else
-      mdP->numberValue = observedAtP->value.i;
+    {
+      if (observedAtP->type == KjFloat)
+        mdP->numberValue = observedAtP->value.f;
+      else
+        mdP->numberValue = observedAtP->value.i;
+    }
   }
   else if (isProperty == true)
   {
@@ -662,7 +672,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       // It's value must be a JSON String and the string must be a valid ISO8601 dateTime
       // The string is changed for a Number before stored in the database
       //
-      int64_t dateTime;
+      double dateTime;
 
       // Check for valid ISO8601
       if ((dateTime = parse8601Time(nodeP->value.s)) == -1)
@@ -672,8 +682,8 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       }
 
       // Change to Number
-      nodeP->type    = KjInt;
-      nodeP->value.i = dateTime;
+      nodeP->type    = KjFloat;
+      nodeP->value.f = dateTime;
 
       if (metadataAdd(caP, nodeP, caName) == false)
       {
@@ -818,7 +828,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       //
       if (valueP->type == KjString)
       {
-        int64_t dateTime;
+        double dateTime;
 
         if ((dateTime = parse8601Time(valueP->value.s)) == -1)
         {

@@ -126,7 +126,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"md" : {
 				"observedAt" : {
-					"value" : 1583166673
+					"value" : 1583166673.124
 				}
 			},
 			"mdNames" : [
@@ -144,7 +144,7 @@ bye
 03. GET the entity, see the LineString GeoProperty
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 272
+Content-Length: 276
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 {
     "id": "urn:ngsi-ld:GtfsShape:900000470000-900000445316:MS",
     "location": {
-        "observedAt": "2020-03-02T16:31:13Z",
+        "observedAt": "2020-03-02T16:31:13.124Z",
         "type": "GeoProperty",
         "value": {
             "coordinates": [

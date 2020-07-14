@@ -287,7 +287,7 @@ Date: REGEX(.*)
 04. Get entity using NGSIv2 and check values (right types)
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 317
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,12 +301,12 @@ Date: REGEX(.*)
     "D": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2018-01-12T15:25:00.00Z"
+        "value": "2018-01-12T15:25:00.000Z"
     },
     "I": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2019-02-24T10:00:00.00Z"
+        "value": "2019-02-24T10:00:00.000Z"
     },
     "N": {
         "metadata": {},

@@ -33,6 +33,6 @@
 //
 // mongoCppLegacyDbNumberFieldGet -
 //
-extern bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* fieldName, int* iP);
+extern bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* fieldName, double* dP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYDBNUMBERFIELDGET_H_

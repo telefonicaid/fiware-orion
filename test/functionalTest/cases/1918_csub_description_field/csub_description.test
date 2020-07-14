@@ -227,13 +227,13 @@ Date: REGEX(.*)
 02. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -281,14 +281,14 @@ Date: REGEX(.*)
 04. Get subscription (see desc = one)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 447
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "one",
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -336,14 +336,14 @@ Date: REGEX(.*)
 06. Get subscription (see desc = two)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 447
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "two",
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -391,13 +391,13 @@ Date: REGEX(.*)
 08. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -446,14 +446,14 @@ Date: REGEX(.*)
 10. Get subscription (see desc = three)
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 449
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "three",
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -492,14 +492,14 @@ Date: REGEX(.*)
 11. Get subscriptions list (first csub without desc, second with desc = three)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 877
+Content-Length: 879
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "expires": "2050-04-05T14:00:00.00Z",
+        "expires": "2050-04-05T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -535,7 +535,7 @@ Date: REGEX(.*)
     },
     {
         "description": "three",
-        "expires": "2050-04-05T14:00:00.00Z",
+        "expires": "2050-04-05T14:00:00.000Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [

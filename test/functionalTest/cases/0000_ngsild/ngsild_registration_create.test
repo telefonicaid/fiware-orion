@@ -637,7 +637,7 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1964
+Content-Length: 1984
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -649,7 +649,7 @@ Date: REGEX(.*)
   "description": "description of reg 1",
   "createdAt": REGEX(.*),
   "modifiedAt": REGEX(.*),
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:00.000Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -669,12 +669,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00Z",
-    "end": "2028-12-31T10:00:00Z"
+    "start": "2018-12-31T10:00:00.000Z",
+    "end": "2028-12-31T10:00:00.000Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00Z",
-    "end": "2027-12-31T10:00:00Z"
+    "start": "2017-12-31T10:00:00.000Z",
+    "end": "2027-12-31T10:00:00.000Z"
   },
   "location": {
     "type": "Polygon",
