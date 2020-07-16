@@ -374,11 +374,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "http://a.b.c/subs/sub01",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(5),
+	"throttling" : 5,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "paused",

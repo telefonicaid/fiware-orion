@@ -246,11 +246,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:S1",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://mycallback:8080/callback",
 	"custom" : false,
 	"mimeType" : "application/json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"status" : "active",
 	"entities" : [
@@ -295,11 +295,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:S2",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://mycallback:8080/callback",
 	"custom" : false,
 	"mimeType" : "application/json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"status" : "active",
 	"entities" : [

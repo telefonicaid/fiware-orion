@@ -73,12 +73,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "start": "2018-12-31T10:00:00.123Z",
+    "end": "2028-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "start": "2017-12-31T10:00:00.798",
+    "end": "2027-12-31T10:00:00.120"
   },
   "location": {
     "type": "Polygon",
@@ -116,7 +116,7 @@ payload='{
       ]
     ]
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
   "P2": "2",
@@ -495,7 +495,7 @@ MongoDB server version: REGEX(.*)
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
 	"description" : "description of reg 1",
 	"name" : "reg_csr1a341",
-	"expiration" : NumberLong(1861869600),
+	"expiration" : 1861869601.234,
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
@@ -529,12 +529,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : NumberLong(1546250400),
-		"end" : NumberLong(1861869600)
+		"start" : 1546250400.123,
+		"end" : 1861869600.456
 	},
 	"managementInterval" : {
-		"start" : NumberLong(1514714400),
-		"end" : NumberLong(1830247200)
+		"start" : 1514714400.79REGEX(.*),
+		"end" : 1830247200.12
 	},
 	"location" : {
 		"type" : "Polygon",
@@ -649,7 +649,7 @@ Date: REGEX(.*)
   "description": "description of reg 1",
   "createdAt": REGEX(.*),
   "modifiedAt": REGEX(.*),
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -669,12 +669,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2018-12-31T10:00:00.123Z",
+    "end": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.000Z",
-    "end": "2027-12-31T10:00:00.000Z"
+    "start": "2017-12-31T10:00:00.798Z",
+    "end": "2027-12-31T10:00:00.120Z"
   },
   "location": {
     "type": "Polygon",

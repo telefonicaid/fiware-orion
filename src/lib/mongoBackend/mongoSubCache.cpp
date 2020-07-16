@@ -137,13 +137,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
-  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(sub, CSUB_EXPIRATION)       : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
-  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(sub, CSUB_LASTFAILURE)      : -1;
+  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -287,10 +287,10 @@ int mongoSubCacheItemInsert
   const BSONObj&      sub,
   const char*         subscriptionId,
   const char*         servicePath,
-  int                 lastNotificationTime,
-  int                 lastFailure,
-  int                 lastSuccess,
-  long long           expirationTime,
+  double              lastNotificationTime,
+  double              lastFailure,
+  double              lastSuccess,
+  double              expirationTime,
   const std::string&  status,
   const std::string&  q,
   const std::string&  mq,
@@ -375,14 +375,14 @@ int mongoSubCacheItemInsert
     // if the database objuect contains lastNotificationTime,
     // then use the value from the database
     //
-    lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
+    lastNotificationTime = getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION);
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
@@ -427,7 +427,7 @@ int mongoSubCacheItemInsert
     cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
+  LM_T(LmtSubCache, ("set lastNotificationTime to %f for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
 
   //
@@ -549,7 +549,7 @@ static void mongoSubCountersUpdateLastNotificationTime
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastNotificationTime
+  double              lastNotificationTime
 )
 {
   BSONObj      condition;
@@ -577,7 +577,7 @@ static void mongoSubCountersUpdateLastFailure
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastFailure
+  double              lastFailure
 )
 {
   BSONObj      condition;
@@ -605,7 +605,7 @@ static void mongoSubCountersUpdateLastSuccess
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastSuccess
+  double              lastSuccess
 )
 {
   BSONObj      condition;
@@ -635,9 +635,9 @@ void mongoSubCountersUpdate
   const std::string& tenant,
   const std::string& subId,
   long long          count,
-  long long          lastNotificationTime,
-  long long          lastFailure,
-  long long          lastSuccess
+  double             lastNotificationTime,
+  double             lastFailure,
+  double             lastSuccess
 )
 {
   std::string  collection = getSubscribeContextCollectionName(tenant);

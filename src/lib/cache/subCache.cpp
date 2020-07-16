@@ -735,13 +735,13 @@ void subCacheItemInsert
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
-  int64_t                            expirationTime,
-  int64_t                            throttling,
+  double                             expirationTime,
+  double                             throttling,
   RenderFormat                       renderFormat,
   bool                               notificationDone,
-  int64_t                            lastNotificationTime,
-  int64_t                            lastNotificationSuccessTime,
-  int64_t                            lastNotificationFailureTime,
+  double                             lastNotificationTime,
+  double                             lastNotificationSuccessTime,
+  double                             lastNotificationFailureTime,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -1046,10 +1046,10 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
+  double   lastNotificationTime;
   int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  double   lastFailure;
+  double   lastSuccess;
 } CachedSubSaved;
 
 

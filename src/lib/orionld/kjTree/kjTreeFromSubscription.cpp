@@ -270,8 +270,8 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // status
-  time_t now    = time(NULL);
-  char*  status = NULL;
+  double  now    = getCurrentTime();
+  char*   status = NULL;
 
   if (subscriptionP->expires < now)
     status = (char*) "expired";
@@ -363,7 +363,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
     char*            details;
     char             date[64];
 
-    if (numberToDate((time_t) subscriptionP->expires, date, sizeof(date), &details) == false)
+    if (numberToDate(subscriptionP->expires, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'expires'"));
       orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", details);
@@ -374,9 +374,10 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // throttling
+  LM_TMP(("THROT: throttling: %f", subscriptionP->throttling));
   if (subscriptionP->throttling != 0)
   {
-    nodeP = kjInteger(orionldState.kjsonP, "throttling", subscriptionP->throttling);
+    nodeP = kjFloat(orionldState.kjsonP, "throttling", subscriptionP->throttling);
     kjChildAdd(topP, nodeP);
   }
 

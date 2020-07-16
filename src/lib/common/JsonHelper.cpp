@@ -230,7 +230,7 @@ void JsonHelper::addNumber(const std::string& key, long long value)
 *           should be used instead.
 *           See issue #3058
 */
-void JsonHelper::addNumber(const std::string& key, float  value)
+void JsonHelper::addNumber(const std::string& key, double value)
 {
   unsigned int oldPrecision = ss.precision();
   ss << std::fixed << std::setprecision(decimalDigits(value));

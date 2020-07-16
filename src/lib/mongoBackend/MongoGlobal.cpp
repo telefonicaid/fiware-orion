@@ -1988,7 +1988,7 @@ bool registrationsQuery
    * it has no impact on MongoDB query optimizer
    */
   queryBuilder.append("$or", entityOr.arr());
-  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << getCurrentTime()));
 
   if (attrs.arrSize() > 0)
   {

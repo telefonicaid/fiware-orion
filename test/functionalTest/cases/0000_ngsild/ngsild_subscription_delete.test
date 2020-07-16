@@ -84,7 +84,7 @@ payload='{
     "lastFailure": "ignored",
     "lastSuccess": "ignored"
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T10:00:00.123",
   "throttling": 5,
   "status": "to be ignored - read-only",
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
@@ -200,7 +200,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T10:00:00.123Z",
   "throttling": 5
 }
 
@@ -213,11 +213,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "http://a.b.c/subs/sub01",
-	"expiration" : NumberLong(1861869600),
+	"expiration" : 1861869600.123,
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(5),
+	"throttling" : 5,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "paused",

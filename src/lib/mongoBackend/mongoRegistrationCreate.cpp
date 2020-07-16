@@ -98,7 +98,7 @@ static void setName(const std::string& name, mongo::BSONObjBuilder* bobP)
 *
 * setExpiration -
 */
-static void setExpiration(long long expires, mongo::BSONObjBuilder* bobP)
+static void setExpiration(double expires, mongo::BSONObjBuilder* bobP)
 {
   if (expires != -1)
   {
@@ -219,9 +219,11 @@ static void setTimeInterval(const char* name, const OrionldTimeInterval* interva
 {
   mongo::BSONObjBuilder intervalObj;
 
-  intervalObj.append("start", (long long) intervalP->start);
-  intervalObj.append("end",   (long long) intervalP->end);
-
+  LM_TMP(("MILI: Appending start: %f", intervalP->start));
+  LM_TMP(("MILI: Appending end: %f", intervalP->end));
+  intervalObj.append("start", intervalP->start);
+  intervalObj.append("end",   intervalP->end);
+  // LM_TMP(("MILI: intervalObj: %s", intervalObj.obj().toString().c_str()));     // DESTRUCTIVE !!!
   bobP->append(name, intervalObj.obj());
 }
 

@@ -85,12 +85,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00",
-    "end": "2019-12-31T10:00:00"
+    "start": "2018-12-30T10:00:00.123",
+    "end": "2019-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2018-12-31T10:00:00"
+    "start": "2017-12-31T10:00:00.789",
+    "end": "2018-12-31T10:00:00.012"
   },
   "location": {
     "type": "Point",
@@ -104,7 +104,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 300.0, 0.0 ]
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1
 }'
@@ -199,8 +199,8 @@ echo "11. PATCH the registration with a new observationInterval"
 echo "========================================================="
 payload='{
   "observationInterval": {
-    "start": "2028-12-30T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   }
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
@@ -219,8 +219,8 @@ echo "13. PATCH the registration with a new managementInterval"
 echo "========================================================"
 payload='{
   "managementInterval": {
-    "start": "2025-12-30T10:00:00",
-    "end": "2026-12-31T10:00:00"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   }
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
@@ -298,7 +298,7 @@ echo
 echo "21. PATCH the registration with a new expires"
 echo "============================================="
 payload='{
-  "expires": "2021-12-31T10:00:00"
+  "expires": "2021-12-31T18:19:20.210Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
 echo
@@ -391,12 +391,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2023-12-30T10:00:00",
-    "end": "2024-12-31T10:00:00"
+    "start": "2023-12-30T21:22:23.123Z",
+    "end": "2024-12-30T21:22:23.456Z"
   },
   "managementInterval": {
-    "start": "2025-12-31T10:00:00",
-    "end": "2026-12-31T10:00:00"
+    "start": "2025-12-09T01:02:03.456Z",
+    "end": "2025-12-09T01:02:03.457Z"
   },
   "location": {
     "type": "Point",
@@ -410,7 +410,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 31.0, 32.77 ]
   },
-  "expires": "2024-12-31T10:00:00",
+  "expires": "2024-12-31T10:00:00.123Z",
   "endpoint": "http://my.other.csource.org:1099",
   "P1": [ 1, 2, 3, 4 ]
 }'
@@ -452,7 +452,7 @@ MongoDB server version: REGEX(.*)
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
 	"description" : "description of reg R1",
 	"name" : "R1",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
@@ -486,12 +486,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : NumberLong(REGEX(.*)),
-		"end" : NumberLong(REGEX(.*))
+		"start" : REGEX(.*),
+		"end" : REGEX(.*)
 	},
 	"managementInterval" : {
-		"start" : NumberLong(REGEX(.*)),
-		"end" : NumberLong(REGEX(.*))
+		"start" : REGEX(.*),
+		"end" : REGEX(.*)
 	},
 	"location" : {
 		"type" : "Point",
@@ -534,7 +534,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "R1",
   "description": "description of reg R1",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -554,12 +554,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.000Z",
-    "end": "2019-12-31T10:00:00.000Z"
+    "start": "2018-12-30T10:00:00.123Z",
+    "end": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.000Z",
-    "end": "2018-12-31T10:00:00.000Z"
+    "start": "2017-12-31T10:00:00.789Z",
+    "end": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
@@ -608,7 +608,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "description of reg R1",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -628,12 +628,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.000Z",
-    "end": "2019-12-31T10:00:00.000Z"
+    "start": "2018-12-30T10:00:00.123Z",
+    "end": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.000Z",
-    "end": "2018-12-31T10:00:00.000Z"
+    "start": "2017-12-31T10:00:00.789Z",
+    "end": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
@@ -682,7 +682,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -702,12 +702,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.000Z",
-    "end": "2019-12-31T10:00:00.000Z"
+    "start": "2018-12-30T10:00:00.123Z",
+    "end": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.000Z",
-    "end": "2018-12-31T10:00:00.000Z"
+    "start": "2017-12-31T10:00:00.789Z",
+    "end": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
@@ -756,7 +756,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -775,12 +775,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.000Z",
-    "end": "2019-12-31T10:00:00.000Z"
+    "start": "2018-12-30T10:00:00.123Z",
+    "end": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.000Z",
-    "end": "2018-12-31T10:00:00.000Z"
+    "start": "2017-12-31T10:00:00.789Z",
+    "end": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
@@ -900,7 +900,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -919,12 +919,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.000Z",
-    "end": "2018-12-31T10:00:00.000Z"
+    "start": "2017-12-31T10:00:00.789Z",
+    "end": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
@@ -973,7 +973,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -992,12 +992,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1046,7 +1046,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1065,12 +1065,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1119,7 +1119,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1138,12 +1138,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1192,7 +1192,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1211,12 +1211,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1265,7 +1265,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T10:00:00.000Z",
+  "expires": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1284,12 +1284,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1338,7 +1338,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T10:00:00.000Z",
+  "expires": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1357,12 +1357,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1411,7 +1411,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T10:00:00.000Z",
+  "expires": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1430,12 +1430,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1490,7 +1490,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T10:00:00.000Z",
+  "expires": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1509,12 +1509,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T10:00:00.000Z",
-    "end": "2028-12-31T10:00:00.000Z"
+    "start": "2028-12-30T11:12:13.567Z",
+    "end": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-30T10:00:00.111Z",
+    "end": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1635,7 +1635,7 @@ Date: REGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "R1-bis",
   "description": "description of reg R1-bis",
-  "expires": "2024-12-31T10:00:00.000Z",
+  "expires": "2024-12-31T10:00:00.123Z",
   "endpoint": "http://my.other.csource.org:1099",
   "information": [
     {
@@ -1657,12 +1657,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2023-12-30T10:00:00.000Z",
-    "end": "2024-12-31T10:00:00.000Z"
+    "start": "2023-12-30T21:22:23.123Z",
+    "end": "2024-12-30T21:22:23.456Z"
   },
   "managementInterval": {
-    "start": "2025-12-31T10:00:00.000Z",
-    "end": "2026-12-31T10:00:00.000Z"
+    "start": "2025-12-09T01:02:03.456Z",
+    "end": "2025-12-09T01:02:03.457Z"
   },
   "location": {
     "type": "Point",
@@ -1704,7 +1704,7 @@ MongoDB server version: REGEX(.*)
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
 	"description" : "description of reg R1-bis",
 	"name" : "R1-bis",
-	"expiration" : 1735639200,
+	"expiration" : 1735639200.123,
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
@@ -1739,12 +1739,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : 1703930400,
-		"end" : 1735639200
+		"start" : 1703971343.123,
+		"end" : 1735593743.456
 	},
 	"managementInterval" : {
-		"start" : 1767175200,
-		"end" : 1798711200
+		"start" : 1765242123.456,
+		"end" : 1765242123.457
 	},
 	"location" : {
 		"type" : "Point",

@@ -174,7 +174,7 @@ Date: REGEX(.*)
 
 [
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -209,7 +209,7 @@ Date: REGEX(.*)
         "throttling": 5
     },
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 
 [
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -298,7 +298,7 @@ Date: REGEX(.*)
         "throttling": 5
     },
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -309,8 +309,8 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://127.0.0.1:REGEX(\d+)/notify"
             },
-            "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-            "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+            "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
+            "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
             "timesSent": 1
         },
         "status": "failed",

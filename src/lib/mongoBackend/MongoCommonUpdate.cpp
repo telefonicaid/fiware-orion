@@ -1121,7 +1121,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%f, DIFF: %f)",
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%f, NOW:%f, DIFF: %f)",
                          cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
@@ -1150,16 +1150,16 @@ static bool addTriggeredSubscriptions_withCache
 
     // Throttling
     LM_T(LmtSubCache, ("---------------- Throttling check ------------------"));
-    LM_T(LmtSubCache, ("cSubP->throttling:           %d", cSubP->throttling));
-    LM_T(LmtSubCache, ("cSubP->lastNotificationTime: %d", cSubP->lastNotificationTime));
-    LM_T(LmtSubCache, ("Now:                         %d", now));
+    LM_T(LmtSubCache, ("cSubP->throttling:           %f", cSubP->throttling));
+    LM_T(LmtSubCache, ("cSubP->lastNotificationTime: %f", cSubP->lastNotificationTime));
+    LM_T(LmtSubCache, ("Now:                         %f", now));
 
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
+                           "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
@@ -1171,7 +1171,7 @@ static bool addTriggeredSubscriptions_withCache
       else
       {
         LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
+                           "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
@@ -1183,7 +1183,7 @@ static bool addTriggeredSubscriptions_withCache
     else
     {
       LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
-                         "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
+                         "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
                          cSubP->subscriptionId,
                          cSubP->throttling,
                          cSubP->lastNotificationTime,
@@ -1192,8 +1192,8 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
-    TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
-                                                           (long long) cSubP->lastNotificationTime,
+    TriggeredSubscription* subP = new TriggeredSubscription(cSubP->throttling,
+                                                           cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
                                                            aList,
@@ -1277,7 +1277,7 @@ static void fill_idNPtypeNP
                                              BSON(entTypeQ << BSON("$exists" << false))) <<
                          entPatternQ << "false" <<
                          typePatternQ << BSON("$ne" << true) <<
-                         CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                         CSUB_EXPIRATION   << BSON("$gt" << getCurrentTime()) <<
                          CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
                          CSUB_SERVICE_PATH << spBson);
 }
@@ -1316,7 +1316,7 @@ static void fill_idPtypeNP
 
   bgP->boPNP.append(entPatternQ, "true");
   bgP->boPNP.append(typePatternQ, BSON("$ne" << true));
-  bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
   bgP->boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   bgP->boPNP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
@@ -1356,7 +1356,7 @@ static void fill_idNPtypeP
 
   bgP->boNPP.append(entPatternQ, "false");
   bgP->boNPP.append(typePatternQ, true);
-  bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
   bgP->boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   bgP->boNPP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
@@ -1398,7 +1398,7 @@ static void fill_idPtypeP
 
   bgP->boPP.append(entPatternQ, "true");
   bgP->boPP.append(typePatternQ, true);
-  bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
   bgP->boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   bgP->boPP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
@@ -1556,8 +1556,8 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-      long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+      double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
+      double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
@@ -2047,13 +2047,13 @@ static bool processSubscriptions
     /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
-      long long  current               = getCurrentTime();
-      long long  sinceLastNotification = current - tSubP->lastNotification;
+      double  current                = getCurrentTime();
+      double  sinceLastNotification  = current - tSubP->lastNotification;
 
       if (tSubP->throttling > sinceLastNotification)
       {
-        LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", tSubP->cacheSubId.c_str(), current));
+        LM_T(LmtMongo, ("blocked due to throttling, current time is: %f", current));
+        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %f", tSubP->cacheSubId.c_str(), current));
         continue;
       }
     }
@@ -2173,7 +2173,7 @@ static bool processSubscriptions
 
     if (notificationSent)
     {
-      long long rightNow = getCurrentTime();
+      double rightNow = getCurrentTime();
 
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
@@ -2203,7 +2203,7 @@ static bool processSubscriptions
           cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
-          LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'",
+          LM_T(LmtSubCache, ("set lastNotificationTime to %f and count to %lld for '%s'",
                              cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
         }
         else
@@ -3397,8 +3397,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldAsDoubleF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldAsDoubleF(r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification

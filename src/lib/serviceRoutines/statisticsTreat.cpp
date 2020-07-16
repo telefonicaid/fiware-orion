@@ -328,8 +328,8 @@ std::string statisticsTreat
 
   // Unconditional stats
   int now = getCurrentTime();
-  js.addNumber("uptime_in_secs",(long long)(now - startTime));
-  js.addNumber("measuring_interval_in_secs", (long long)(now - statisticsTime));
+  js.addNumber("uptime_in_secs",(long long) (now - startTime));
+  js.addNumber("measuring_interval_in_secs", (long long) (now - statisticsTime));
 
   // Special case: simulated notifications
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);

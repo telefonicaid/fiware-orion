@@ -97,11 +97,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subscription:S1",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "active",

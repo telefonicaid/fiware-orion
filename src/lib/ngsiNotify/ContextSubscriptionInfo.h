@@ -42,8 +42,8 @@ typedef struct ContextSubscriptionInfo
   std::string     url;
   MimeType        mimeType;
   int             lastNotification;
-  long long       expiration;
-  long long       throttling;
+  double          expiration;
+  double          throttling;
 
   void            release(void);
 } ContextSubscriptionInfo;

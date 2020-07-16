@@ -56,7 +56,7 @@ bool numberToDate(double timestamp, char* date, int dateLen, char** detailsP)
   int dMicros  = (int) (millis * 1000000) + 1;
   int dMillis  = dMicros / 1000;
   LM_TMP(("MILLIS: dMicros: %d", dMicros));
-  snprintf(&date[sLen], 5, ".%03dZ", dMillis);
+  snprintf(&date[sLen], dateLen - sLen, ".%03dZ", dMillis);
   LM_TMP(("MILLIS: %f => '%s'", timestamp, date));
   LM_TMP(("MILLIS: --------------------------"));
   return true;

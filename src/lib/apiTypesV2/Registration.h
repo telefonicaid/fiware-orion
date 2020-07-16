@@ -141,7 +141,7 @@ struct Registration
   std::string            description;
   bool                   descriptionProvided;
   DataProvided           dataProvided;
-  long long              expires;
+  double                 expires;
   std::string            status;
   Provider               provider;
   ForwardingInformation  forwardingInformation;

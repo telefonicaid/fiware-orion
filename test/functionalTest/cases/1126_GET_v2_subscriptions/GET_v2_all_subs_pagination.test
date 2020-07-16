@@ -161,7 +161,7 @@ Date: REGEX(.*)
 
 [
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -209,7 +209,7 @@ Date: REGEX(.*)
 
 [
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
