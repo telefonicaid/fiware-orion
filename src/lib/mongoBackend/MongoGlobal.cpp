@@ -261,8 +261,8 @@ void mongoInit
   //
   if (!mtenant)
   {
-  ensureLocationIndex("");
-  ensureDateExpirationIndex("");
+    ensureLocationIndex("");
+    ensureDateExpirationIndex("");
   }
   else
   {
