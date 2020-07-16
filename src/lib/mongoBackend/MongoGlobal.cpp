@@ -259,9 +259,12 @@ void mongoInit
   // "If you call multiple ensureIndex() methods with the same index specification at the same time,
   // only the first operation will succeed, all other operations will have no effect."
   //
+  if (!mtenant)
+  {
   ensureLocationIndex("");
   ensureDateExpirationIndex("");
-  if (mtenant)
+  }
+  else
   {
     /* We get tenant database names and apply ensure the location and date expiration indexes in each one */
     std::vector<std::string> orionDbs;
