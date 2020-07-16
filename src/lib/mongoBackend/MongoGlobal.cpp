@@ -261,6 +261,7 @@ void mongoInit
   //
   if (!mtenant)
   {
+    // To avoid creating and empty 'orion' database when -multiservice is in use
     ensureLocationIndex("");
     ensureDateExpirationIndex("");
   }
