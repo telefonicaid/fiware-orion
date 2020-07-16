@@ -59,15 +59,27 @@ This script has been developed in the Python programming language. The parameter
     "HTTP_VERB": "GET",
     "HEADERS": {
         "Content-Type": "application/json",
-        "client-id": "app_devboard"
+        "client-id": "app"
     },
     "BODY_DATA": {
-        "raw": "username=gerente_app_devboard&password=1234"
+        "raw": "username=manager&password=1234"
     }
   }
   ```
 
   * **"BODY_DATA"** can be **"raw"** for **"application/x-www-form-urlencoded"** or **"json"** for **"application/json"**
+
+  * You can use a counter variable:
+
+    ``` bash
+      "raw": "username=manager${counter_value}&password=1234"
+    ```
+
+  * You can use, too, a random variable:
+
+    ``` bash
+      "raw": "username=manager${__UUID()}&password=1234"
+    ```
 
 * Choose one of the following options:
 	* Generate complete report (.csv + HTML)

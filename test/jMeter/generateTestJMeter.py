@@ -72,7 +72,7 @@ def loadParamsFromFileSelected(file):
                 if "raw" in readData["BODY_DATA"] and "json" not in readData["BODY_DATA"]:
                     BODY_DATA = str(readData["BODY_DATA"]["raw"])
                 if "raw" not in readData["BODY_DATA"] and "json" in readData["BODY_DATA"]:
-                    BODY_DATA = str(readData["BODY_DATA"]["json"])
+                    BODY_DATA = str(readData["BODY_DATA"]["json"]).replace("'", "\"")
 
             global OUTPUT_FILE_NAME
             OUTPUT_FILE_NAME = "{title}_{timeNow}".format(
