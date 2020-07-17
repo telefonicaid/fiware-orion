@@ -2333,7 +2333,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
               "- query(): { query: { $or: [ { contextRegistration.entities: "
               "{ $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
               "{ contextRegistration.entities.id: { $in: [] } } ], "
-              "expiration: { $gt: 1360232700 }"
+              "expiration: { $gt: 1360232700.0 }"
               ", servicePath: { $in: [ /^/.*/, null ] } }"
               ", orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
     EXPECT_EQ(0, res.responseVector.size());
