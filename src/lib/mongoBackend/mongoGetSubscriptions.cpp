@@ -46,6 +46,14 @@
 
 
 
+// -----------------------------------------------------------------------------
+//
+// FIXME: move mongoSetLdTimestamp from mongoLdRegistrationAux to a more neutral aux file
+//
+extern void mongoSetLdTimestamp(double* timestampP, const char* name, const mongo::BSONObj& bobj);
+
+
+
 /* ****************************************************************************
 *
 * USING -
@@ -567,6 +575,8 @@ bool mongoGetLdSubscription
     setContext(subP, r);
     setCsf(subP, r);
     setTimeInterval(subP, r);
+    mongoSetLdTimestamp(&subP->createdAt, "createdAt", r);
+    mongoSetLdTimestamp(&subP->modifiedAt, "modifiedAt", r);
 
     if (moreSafe(cursor))
     {

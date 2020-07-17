@@ -492,6 +492,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -725,6 +727,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -842,6 +846,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
@@ -973,6 +979,8 @@ MongoDB server version: REGEX(.)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
@@ -1090,6 +1098,8 @@ MongoDB server version: REGEX(.)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
@@ -1311,6 +1321,8 @@ MongoDB server version: REGEX(.)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "CSF is not implemented yet ...",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
@@ -1451,6 +1463,8 @@ MongoDB server version: REGEX(.)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "CSF is not implemented yet ...",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
@@ -1753,6 +1767,8 @@ MongoDB server version: REGEX(.)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "CSF is not implemented yet ...",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
@@ -1871,6 +1887,8 @@ MongoDB server version: REGEX(.)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "34",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P34"
 	],

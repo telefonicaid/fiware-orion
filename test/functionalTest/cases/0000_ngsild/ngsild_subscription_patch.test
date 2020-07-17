@@ -66,7 +66,7 @@ payload='{
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T11:12:13.14",
   "throttling": 5
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
@@ -100,7 +100,7 @@ echo
 
 echo "05. GET the subscription - see the modification"
 echo "==============================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01?prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01?prettyPrint=yes&spaces=2&options=sysAttrs' --noPayloadCheck
 echo
 echo
 
@@ -177,6 +177,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -228,7 +230,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.140Z",
   "throttling": 5
 }
 
@@ -245,7 +247,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 629
+Content-Length: 716
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -255,6 +257,8 @@ Date: REGEX(.*)
   "type": "Subscription",
   "name": "Changed Name for Test subscription S01",
   "description": "New Description of Test subscription S01",
+  "createdAt": "REGEX(.*)",
+  "modifiedAt": "REGEX(.*)",
   "entities": [
     {
       "id": "urn:ngsi-ld:E01",
@@ -278,7 +282,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00.000Z",
+  "expires": "2028-12-31T11:12:13.140Z",
   "throttling": 5
 }
 
@@ -317,6 +321,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],

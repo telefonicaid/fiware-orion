@@ -238,7 +238,7 @@ Date: REGEX(.*)
 03. GET  /ngsi-ld/v1/csourceRegistrations all data
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 18558
+Content-Length: 18878
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -3028,7 +3028,7 @@ Date: REGEX(.*)
 09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1779
+Content-Length: 1811
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -3138,4 +3138,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB

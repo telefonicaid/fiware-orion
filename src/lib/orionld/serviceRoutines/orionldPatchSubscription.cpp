@@ -566,6 +566,18 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
     return false;
 
+  // Update modifiedAt
+  double  now         = getCurrentTime();
+  KjNode* modifiedAtP = kjLookup(dbSubscriptionP, "modifiedAt");
+
+  if (modifiedAtP != NULL)
+    modifiedAtP->value.f = now;
+  else
+  {
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", now);
+    kjChildAdd(dbSubscriptionP, modifiedAtP);
+  }
+
   //
   // Overwrite the current Subscription in the database
   //

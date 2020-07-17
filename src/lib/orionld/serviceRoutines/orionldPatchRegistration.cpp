@@ -24,8 +24,10 @@
 */
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                    // kaStrdup
 #include "kjson/kjLookup.h"                                     // kjLookup
 #include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
+#include "kjson/kjRender.h"                                     // kjRender (DEBUG)
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
@@ -38,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                            // urlCheck
 #include "orionld/common/urnCheck.h"                            // urnCheck
+#include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
 #include "orionld/context/orionldContextValueExpand.h"          // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
@@ -646,6 +649,19 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   // Now we're ready to merge to patch into what's already there ...
   ngsildRegistrationPatch(dbRegistrationP, orionldState.requestTree);
+
+  // Update modifiedAt
+  double  now         = getCurrentTime();
+  KjNode* modifiedAtP = kjLookup(dbRegistrationP, "modifiedAt");
+
+  if (modifiedAtP != NULL)
+    modifiedAtP->value.f = now;
+  else
+  {
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", now);
+    kjChildAdd(dbRegistrationP, modifiedAtP);
+  }
+
 
   //
   // Overwrite the current Registration in the database

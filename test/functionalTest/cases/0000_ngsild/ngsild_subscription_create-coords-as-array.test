@@ -122,6 +122,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"csf" : "not implemented",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"http://example.org/P2"
 	],

@@ -123,6 +123,8 @@ MongoDB server version: REGEX(.*)
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/numberOfItems"
 	],

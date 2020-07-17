@@ -94,16 +94,22 @@ KjNode* kjTreeFromRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regist
   //
   if (orionldState.uriParamOptions.sysAttrs == true)
   {
+    char    dateTime[64];
+    char*   detail;
+    KjNode* nodeP;
+
     if (registrationP->createdAt != -1)
     {
-      KjNode* createdAtNodeP = kjInteger(orionldState.kjsonP, "createdAt", registrationP->createdAt);
-      kjChildAdd(topP, createdAtNodeP);
+      numberToDate(registrationP->createdAt, dateTime, sizeof(dateTime), &detail);
+      nodeP = kjString(orionldState.kjsonP, "createdAt", dateTime);
+      kjChildAdd(topP, nodeP);
     }
 
     if (registrationP->modifiedAt != -1)
     {
-      KjNode* modifiedAtNodeP = kjInteger(orionldState.kjsonP, "modifiedAt", registrationP->modifiedAt);
-      kjChildAdd(topP, modifiedAtNodeP);
+      numberToDate(registrationP->modifiedAt, dateTime, sizeof(dateTime), &detail);
+      nodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
+      kjChildAdd(topP, nodeP);
     }
   }
 

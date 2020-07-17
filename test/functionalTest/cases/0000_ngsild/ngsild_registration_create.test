@@ -637,7 +637,7 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1984
+Content-Length: 2016
 Content-Type: application/ld+json
 Date: REGEX(.*)
 

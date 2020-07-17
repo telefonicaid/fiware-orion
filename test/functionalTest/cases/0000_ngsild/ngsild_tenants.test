@@ -266,6 +266,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",
@@ -315,6 +317,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",
