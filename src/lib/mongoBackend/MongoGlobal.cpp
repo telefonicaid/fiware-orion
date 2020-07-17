@@ -892,7 +892,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
   // case in which first element is "" is special, it means that the SP were not provided and
   // we have to apply the default
   //
-  if (servicePath[0] == "")
+  if ((servicePath.size() == 0) || (servicePath[0] == ""))
   {
     LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
     return fromjson("{$in: [ /^\\/.*/, null] }");
