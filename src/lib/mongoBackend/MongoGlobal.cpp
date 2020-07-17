@@ -258,9 +258,13 @@ void mongoInit
   // "If you call multiple ensureIndex() methods with the same index specification at the same time,
   // only the first operation will succeed, all other operations will have no effect."
   //
-  ensureLocationIndex("");
-  ensureDateExpirationIndex("");
-  if (mtenant)
+  if (!mtenant)
+  {
+    // To avoid creating and empty 'orion' database when -multiservice is in use
+    ensureLocationIndex("");
+    ensureDateExpirationIndex("");
+  }
+  else
   {
     /* We get tenant database names and apply ensure the location and date expiration indexes in each one */
     std::vector<std::string> orionDbs;
@@ -1101,7 +1105,7 @@ static void addIfNotPresentAttr
 
 /* ****************************************************************************
 *
-* addIfNotPresentAttrMetadata (double version) -
+* addIfNotPresentMetadata (double version) -
 *
 * If the metadata doesn't exist in the attribute, then add it (shadowed, render will depend on filter)
 */
@@ -1120,6 +1124,7 @@ static void addIfNotPresentMetadata
     caP->metadataVector.push_back(mdP);
   }
 }
+
 
 
 /* ****************************************************************************
@@ -1248,7 +1253,7 @@ void addBuiltins(ContextElementResponse* cerP)
   {
     ContextAttribute* caP = cerP->entity.attributeVector[ix];
 
-    // dateCreated medatada
+    // dateCreated metadata
     if (caP->creDate != 0)
     {
       addIfNotPresentMetadata(caP, NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
@@ -1266,7 +1271,7 @@ void addBuiltins(ContextElementResponse* cerP)
       addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
     }
 
-    // previosValue
+    // previousValue
     if (caP->previousValue != NULL)
     {
       addIfNotPresentPreviousValueMetadata(caP);

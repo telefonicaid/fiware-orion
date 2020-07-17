@@ -56,18 +56,18 @@ echo "02. Update entity with geo:point with NGSIv1 (APPEND)"
 echo "====================================================="
 payload='{
   "contextElements": [
-  {
-    "type": "E",
-    "isPattern": "false",
-    "id": "E1",
-    "attributes": [
     {
-      "name": "position",
-      "type": "geo:point",
-      "value": "-3.3, 4.4"
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "position",
+          "type": "geo:point",
+          "value": "-3.3, 4.4"
+        }
+      ]
     }
-    ]
-  }
   ],
   "updateAction": "APPEND"
 }'
@@ -87,18 +87,18 @@ echo "04. Update entity with geo:point with NGSIv1 (UPDATE)"
 echo "====================================================="
 payload='{
   "contextElements": [
-  {
-    "type": "E",
-    "isPattern": "false",
-    "id": "E1",
-    "attributes": [
     {
-      "name": "position",
-      "type": "geo:point",
-      "value": "5.5, -6.6"
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "position",
+          "type": "geo:point",
+          "value": "5.5, -6.6"
+        }
+      ]
     }
-    ]
-  }
   ],
   "updateAction": "UPDATE"
 }'
@@ -171,14 +171,14 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "position": {
-            "creDate": REGEX(\d+),
+            "creDate": REGEX(\d+\.\d+),
             "mdNames": [],
-            "modDate": REGEX(\d+),
+            "modDate": REGEX(\d+\.\d+),
             "type": "geo:point",
             "value": "-3.3, 4.4"
         }
     },
-    "creDate": REGEX(\d+),
+    "creDate": REGEX(\d+\.\d+),
     "lastCorrelator": "REGEX(.*)",
     "location": {
         "attrName": "position",
@@ -190,7 +190,7 @@ Date: REGEX(.*)
             "type": "Point"
         }
     },
-    "modDate": REGEX(\d+)
+    "modDate": REGEX(\d+\.\d+)
 }
 
 
@@ -239,14 +239,14 @@ Date: REGEX(.*)
     ],
     "attrs": {
         "position": {
-            "creDate": REGEX(\d+),
+            "creDate": REGEX(\d+\.\d+),
             "mdNames": [],
-            "modDate": REGEX(\d+),
+            "modDate": REGEX(\d+\.\d+),
             "type": "geo:point",
             "value": "5.5, -6.6"
         }
     },
-    "creDate": REGEX(\d+),
+    "creDate": REGEX(\d+\.\d+),
     "lastCorrelator": "REGEX(.*)",
     "location": {
         "attrName": "position",
@@ -258,7 +258,7 @@ Date: REGEX(.*)
             "type": "Point"
         }
     },
-    "modDate": REGEX(\d+)
+    "modDate": REGEX(\d+\.\d+)
 }
 
 

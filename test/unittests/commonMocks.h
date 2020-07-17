@@ -277,10 +277,10 @@ class TimerMock : public Timer
       .WillByDefault(::testing::Invoke(this, &TimerMock::parent_getCurrentTime));
   }
 
-  MOCK_METHOD0(getCurrentTime, int(void));
+  MOCK_METHOD0(getCurrentTime, double(void));
 
   /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-  int parent_getCurrentTime(void)
+  double parent_getCurrentTime(void)
   {
     return Timer::getCurrentTime();
   }

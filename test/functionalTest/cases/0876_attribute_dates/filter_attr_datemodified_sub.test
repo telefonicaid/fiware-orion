@@ -54,8 +54,8 @@ echo
 echo
 
 
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="4seconds")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
+T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z" --date="4seconds")
 
 
 echo "02. At T_0: Create subscription with mq: dateModified>T_4"

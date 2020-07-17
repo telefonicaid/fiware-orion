@@ -119,14 +119,14 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: true is rendered
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1", 
-    "expires": "2040-01-01T14:00:00.00Z", 
+    "expires": "2040-01-01T14:00:00.000Z", 
     "id": "REGEX([0-9a-f]{24})", 
     "notification": {
         "attrs": [
@@ -171,14 +171,14 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/{subscription_id}, Get subscription to check onlyChanged: false is rendered
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 385
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1", 
-    "expires": "2040-01-01T14:00:00.00Z", 
+    "expires": "2040-01-01T14:00:00.000Z", 
     "id": "REGEX([0-9a-f]{24})", 
     "notification": {
         "attrs": [
@@ -215,4 +215,3 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-

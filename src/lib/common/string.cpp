@@ -999,6 +999,7 @@ std::string double2string(double f)
 }
 
 
+
 /*****************************************************************************
 *
 * isodate2str -
@@ -1006,14 +1007,55 @@ std::string double2string(double f)
 * FIXME P6: change implementation to use gmtime_r
 *
 */
-std::string isodate2str(long long timestamp)
+std::string isodate2str(double timestamp)
 {
   // 80 bytes is enough to store any ISO8601 string safely
   // We use gmtime() to get UTC strings, otherwise we would use localtime()
-  // Date pattern: 1970-04-26T17:46:40.00Z
-  char   buffer[80];
-  time_t rawtime = (time_t) timestamp;
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
+  // Date pattern: 1970-04-26T17:46:40.000Z
+
+  char    buffer[80];
+
+  //
+  // About the added microsecond in  **int millis = (micros + 1) / 1000;**
+  //
+  // Floating point numbers are often a problem for a CPU, giving funny rounding errors.
+  // We've seen that e.g. the number 12.60 is stored as 12.599999999 and as here we cut
+  // the number it ends up as 12.59, which is no good ...
+  //
+  // Two choices here, either call some rounding function, or use a trick.
+  // The trick is to add a microsecond (we're only interested in milliseconds) and then cut.
+  //
+  // Assuming we have nine decimals: 12.599999999, adding a microsecond to this gives 12.600000999:
+  //
+  //  12.599999999 + 0.000001 == 12.600000999
+  //
+  // After that we cut it at three decimals and end up with 12.600.
+  //
+  // If instead the rounding error would go on the upper side, i.e. 12.60 would be 12.6000000001, adding that microsecond
+  // doesn't change anything. All still work just fine.
+  //
+  // Better example: what if we wish to store 12.599?
+  // A typical rounding error on the "upper side" would then be 12.599000001, and again, adding that microsecond after
+  // cutting doesn't change a thing.
+  //
+  //
+  // So, the "trick algorithm" is as follows:
+  //
+  // 1. Get the integer part of "double timestamp" - this cuts all decimals, no rounding is done,
+  //    and store it in the variable 'seconds'
+  // 2. Store the decimals in 'ms', by extracting the integer part ('seconds') from 'timestamp'
+  // 3. Convert the decimals into microseconds, by multiplicating with one million (1000000) - in the variable 'micros'.
+  // 4. Add a microsecond and then divide by one thousand - cutting all decimals
+  //
+  time_t  seconds   = (time_t) timestamp;
+  double  ms        = timestamp - (double) seconds;
+  int     micros    = ms * 1000000;
+  int     millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
+
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime(&seconds));
+
+  char* eob = &buffer[strlen(buffer)];
+  sprintf(eob, ".%03dZ", millis);
   return std::string(buffer);
 }
 

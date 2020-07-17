@@ -114,7 +114,7 @@ Date: REGEX(.*)
 02. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 909
+Content-Length: 921
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -123,62 +123,62 @@ Date: REGEX(.*)
     "D00": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D01": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D02": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D03": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D04": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D05": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D06": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D07": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D08": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D09": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D10": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "D11": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-10-01T01:23:45.00Z"
+        "value": "2016-10-01T01:23:45.000Z"
     },
     "id": "E",
     "type": "T"

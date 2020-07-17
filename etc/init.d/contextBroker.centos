@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # contextBroker         Start/Stop the Context Broker
@@ -22,6 +22,8 @@
 # * Query context information. The Orion Context Broker stores context information
 #   updated from applications, so queries are resolved based on that information.
 ### END INIT INFO
+
+export SYSTEMCTL_SKIP_REDIRECT=true
 
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -50,6 +52,10 @@
 PARAM=$1
 NAME=contextBroker
 EXECUTABLE=/usr/bin/${NAME}
+
+# Assure that exist PID_DIR and LOG_DIR
+mkdir -p /var/run/${NAME} /var/log/${NAME}
+chown orion.orion /var/run/${NAME} /var/log/${NAME}
 
 # Load the environment
 if [[ -f /etc/sysconfig/${NAME} ]]; then

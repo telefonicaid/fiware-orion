@@ -59,11 +59,11 @@ payload='{
     "type": "Number",
     "metadata": {
       "dateCreated": {
-        "value": "2050-01-01T00:00:00",
+        "value": "2050-01-01T00:00:00.123",
         "type": "DateTime"
       },
       "dateModified": {
-        "value": "2051-01-01T00:00:00",
+        "value": "2051-01-01T00:00:00.456",
         "type": "DateTime"
       }
     }
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 and and get user defined dates
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -195,11 +195,11 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "2050-01-01T00:00:00.00Z"
+                "value": "2050-01-01T00:00:00.123Z"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "2051-01-01T00:00:00.00Z"
+                "value": "2051-01-01T00:00:00.456Z"
             }
         },
         "type": "Number",
@@ -213,7 +213,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get user defined dates
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -223,11 +223,11 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "2050-01-01T00:00:00.00Z"
+                "value": "2050-01-01T00:00:00.123Z"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "2051-01-01T00:00:00.00Z"
+                "value": "2051-01-01T00:00:00.456Z"
             }
         },
         "type": "Number",
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1-user [should get no entity]
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,11 +274,11 @@ Date: REGEX(.*)
             "metadata": {
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "2050-01-01T00:00:00.00Z"
+                    "value": "2050-01-01T00:00:00.123Z"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "2051-01-01T00:00:00.00Z"
+                    "value": "2051-01-01T00:00:00.456Z"
                 }
             },
             "type": "Number",
@@ -293,7 +293,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1-user [should get no entity]
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 209
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -304,11 +304,11 @@ Date: REGEX(.*)
             "metadata": {
                 "dateCreated": {
                     "type": "DateTime",
-                    "value": "2050-01-01T00:00:00.00Z"
+                    "value": "2050-01-01T00:00:00.123Z"
                 },
                 "dateModified": {
                     "type": "DateTime",
-                    "value": "2051-01-01T00:00:00.00Z"
+                    "value": "2051-01-01T00:00:00.456Z"
                 }
             },
             "type": "Number",
@@ -350,7 +350,7 @@ Date: REGEX(.*)
 10. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic metadata
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 207
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -360,11 +360,11 @@ Date: REGEX(.*)
         "metadata": {
             "dateCreated": {
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             },
             "dateModified": {
                 "type": "DateTime",
-                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+                "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
             }
         },
         "type": "Number",

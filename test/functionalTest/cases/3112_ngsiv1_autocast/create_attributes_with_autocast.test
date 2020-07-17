@@ -66,12 +66,12 @@ payload='{
         {
           "name": "D",
           "type": "DateTime",
-          "value": "2016-01-12T15:25:00.00Z"
+          "value": "2016-01-12T15:25:00.000Z"
         },
         {
           "name": "I",
           "type": "ISO8601",
-          "value": "2016-02-24T10:00:00.00Z"
+          "value": "2016-02-24T10:00:00.000Z"
         }
       ]
     }
@@ -116,12 +116,12 @@ payload='{
         {
           "name": "D1",
           "type": "DateTime",
-          "value": "2018-01-12T15:25:00.00Z"
+          "value": "2018-01-12T15:25:00.000Z"
         },
         {
           "name": "I1",
           "type": "ISO8601",
-          "value": "2019-02-24T10:00:00.00Z"
+          "value": "2019-02-24T10:00:00.000Z"
         }
       ]
     }
@@ -196,7 +196,7 @@ Date: REGEX(.*)
 02. Get entity using NGSIv2 and check values are right
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 316
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -210,12 +210,12 @@ Date: REGEX(.*)
     "D": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-01-12T15:25:00.00Z"
+        "value": "2016-01-12T15:25:00.000Z"
     },
     "I": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2016-02-24T10:00:00.00Z"
+        "value": "2016-02-24T10:00:00.000Z"
     },
     "N": {
         "metadata": {},
@@ -287,7 +287,7 @@ Date: REGEX(.*)
 04. Get entity using NGSIv2 and check values are right
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 613
+Content-Length: 617
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -306,22 +306,22 @@ Date: REGEX(.*)
     "D": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2016-01-12T15:25:00.00Z"
+        "value": "2016-01-12T15:25:00.000Z"
     },
     "D1": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2018-01-12T15:25:00.00Z"
+        "value": "2018-01-12T15:25:00.000Z"
     },
     "I": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2016-02-24T10:00:00.00Z"
+        "value": "2016-02-24T10:00:00.000Z"
     },
     "I1": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2019-02-24T10:00:00.00Z"
+        "value": "2019-02-24T10:00:00.000Z"
     },
     "N": {
         "metadata": {},
