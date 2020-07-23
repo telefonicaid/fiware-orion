@@ -1290,7 +1290,7 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
   if (errors == 0)
     subP->lastSuccess  = now;
   else
-   subP->lastFailure  = now;
+    subP->lastFailure  = now;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }
