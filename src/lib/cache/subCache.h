@@ -29,8 +29,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "common/RenderFormat.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"

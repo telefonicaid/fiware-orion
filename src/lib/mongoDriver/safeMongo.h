@@ -38,27 +38,29 @@
 #include "mongoDriver/BSONElement.h"
 #include "mongoDriver/OID.h"
 
-namespace orion
-{
+
+
 /* ****************************************************************************
 *
 * Some macros to make the usage of these functions prettier
+*
+* FIXME OLD-DR: FF -> F in sufisex
 */
-#define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__, __LINE__)
-#define getArrayFieldF(b, field)            getArrayField(b, field, __FUNCTION__, __LINE__)
-#define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
-#define getNumberFieldF(b, field)           getNumberField(b, field, __FUNCTION__, __LINE__)
-#define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
-#define getLongFieldF(b, field)             getLongField(b, field, __FUNCTION__, __LINE__)
-#define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
-#define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__, __LINE__)
-#define getFieldF(b, field)                 getField(b, field, __FUNCTION__,  __LINE__)
-#define setStringVectorF(b, field, v)       setStringVector(b, field, v, __FUNCTION__,  __LINE__)
+#define getObjectFieldFF(b, field)           orion::getObjectField(b, field, __FUNCTION__, __LINE__)
+#define getArrayFieldFF(b, field)            orion::getArrayField(b, field, __FUNCTION__, __LINE__)
+#define getStringFieldFF(b, field)           orion::getStringField(b, field, __FUNCTION__, __LINE__)
+#define getNumberFieldFF(b, field)           orion::getNumberField(b, field, __FUNCTION__, __LINE__)
+#define getIntFieldFF(b, field)              orion::getIntField(b, field, __FUNCTION__, __LINE__)
+#define getLongFieldFF(b, field)             orion::getLongField(b, field, __FUNCTION__, __LINE__)
+#define getIntOrLongFieldAsLongFF(b, field)  orion::getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
+#define getBoolFieldFF(b, field)             orion::getBoolField(b, field, __FUNCTION__, __LINE__)
+#define getFieldFF(b, field)                 orion::getField(b, field, __FUNCTION__,  __LINE__)
+#define setStringVectorFF(b, field, v)       orion::setStringVector(b, field, v, __FUNCTION__,  __LINE__)
 
-#define nextSafeOrErrorF(c, r, err)         nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
+#define nextSafeOrErrorFF(c, r, err)         orion::nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
 
-
-
+namespace orion
+{
 /* ****************************************************************************
 *
 * getObjectField -

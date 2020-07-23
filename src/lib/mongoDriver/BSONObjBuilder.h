@@ -31,6 +31,7 @@
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/OID.h"
 #include "mongoDriver/BSONArray.h"
+#include "mongoDriver/BSONDate.h"
 
 #include "mongo/bson/bsonobjbuilder.h"  // FIXME OLD-DR: change in next PoC stage
 
@@ -49,12 +50,19 @@ class BSONObjBuilder
   // methods to be used by client code (without references to low-level driver code)
   BSONObjBuilder();
   void append(const std::string& key, const std::string& value);
+  void append(const std::string& key, const char* value);
   void append(const std::string& key, int value);
   void append(const std::string& key, long long value);
+  void append(const std::string& key, double value);
   void append(const std::string& key, bool value);
   void append(const std::string& key, const orion::OID& value);
   void append(const std::string& key, const BSONObj& value);
   void append(const std::string& key, const BSONArray& value);
+  void appendCode(const std::string& key, const std::string& value);
+  void appendRegex(const std::string& key, const std::string& value);
+  void appendDate(const std::string& key, const BSONDate& value);
+  void appendNull(const std::string& key);
+  void appendElements(orion::BSONObj b);
   BSONObj obj(void);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

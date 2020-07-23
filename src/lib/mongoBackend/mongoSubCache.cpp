@@ -70,7 +70,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // 01. Check validity of subP parameter
   //
-  orion::BSONElement  idField = getFieldF(sub, "_id");
+  orion::BSONElement  idField = getFieldFF(sub, "_id");
 
   if (idField.eoo() == true)
   {
@@ -99,22 +99,22 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldFF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().c_str());
-  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldFF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
-  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
-  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
-  cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(sub, CSUB_LASTFAILUREASON)           : "";
-  cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESSCODE)  : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongFF(sub, CSUB_THROTTLING)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongFF(sub, CSUB_EXPIRATION)       : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongFF(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldFF(sub, CSUB_STATUS)                    : "active";
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldFF(sub, CSUB_BLACKLIST)                   : false;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongFF(sub, CSUB_LASTFAILURE)      : -1;
+  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongFF(sub, CSUB_LASTSUCCESS)      : -1;
+  cSubP->lastFailureReason     = sub.hasField(CSUB_LASTFAILUREASON)?  getStringFieldFF(sub, CSUB_LASTFAILUREASON)           : "";
+  cSubP->lastSuccessCode       = sub.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongFF(sub, CSUB_LASTSUCCESSCODE)  : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -132,13 +132,13 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   if (sub.hasField(CSUB_EXPR))
   {
-    orion::BSONObj expression = getObjectFieldF(sub, CSUB_EXPR);
+    orion::BSONObj expression = getObjectFieldFF(sub, CSUB_EXPR);
 
     if (expression.hasField(CSUB_EXPR_Q))
     {
       std::string errorString;
 
-      cSubP->expression.q = getStringFieldF(expression, CSUB_EXPR_Q);
+      cSubP->expression.q = getStringFieldFF(expression, CSUB_EXPR_Q);
       if (cSubP->expression.q != "")
       {
         if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
@@ -155,7 +155,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
     {
       std::string errorString;
 
-      cSubP->expression.mq = getStringFieldF(expression, CSUB_EXPR_MQ);
+      cSubP->expression.mq = getStringFieldFF(expression, CSUB_EXPR_MQ);
       if (cSubP->expression.mq != "")
       {
         if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
@@ -170,17 +170,17 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 
     if (expression.hasField(CSUB_EXPR_GEOM))
     {
-      cSubP->expression.geometry = getStringFieldF(expression, CSUB_EXPR_GEOM);
+      cSubP->expression.geometry = getStringFieldFF(expression, CSUB_EXPR_GEOM);
     }
 
     if (expression.hasField(CSUB_EXPR_COORDS))
     {
-      cSubP->expression.coords = getStringFieldF(expression, CSUB_EXPR_COORDS);
+      cSubP->expression.coords = getStringFieldFF(expression, CSUB_EXPR_COORDS);
     }
 
     if (expression.hasField(CSUB_EXPR_GEOREL))
     {
-      cSubP->expression.georel = getStringFieldF(expression, CSUB_EXPR_GEOREL);
+      cSubP->expression.georel = getStringFieldFF(expression, CSUB_EXPR_GEOREL);
     }
   }
 
@@ -188,7 +188,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
-  std::vector<orion::BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement>  eVec = getFieldFF(sub, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
     orion::BSONObj entity = eVec[ix].embeddedObject();
@@ -199,10 +199,10 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
       continue;
     }
 
-    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
-    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string id            = getStringFieldFF(entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldFF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldFF(entity, CSUB_ENTITY_TYPE)      : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldFF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
@@ -220,20 +220,20 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
+  setStringVectorFF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
   //
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   //
   if (sub.hasField(CSUB_METADATA))
   {
-    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+    setStringVectorFF(sub, CSUB_METADATA, &(cSubP->metadata));
   }
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
   //
-  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+  setStringVectorFF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
 
   subCacheItemInsert(cSubP);
@@ -312,7 +312,7 @@ int mongoSubCacheItemInsert
   //     NOTE that if there is no patterned entity in the entity-vector,
   //     then the subscription is not valid for the sub-cache and is rejected.
   //
-  std::vector<orion::BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement>  eVec = getFieldFF(sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
@@ -324,10 +324,10 @@ int mongoSubCacheItemInsert
       continue;
     }
 
-    std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
-    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
-    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
+    std::string id            = getStringFieldFF(entity, ENT_ENTITY_ID);
+    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldFF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldFF(entity, CSUB_ENTITY_TYPE)      : "";
+    bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldFF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
 
     cSubP->entityIdInfos.push_back(eiP);
@@ -351,14 +351,14 @@ int mongoSubCacheItemInsert
     // if the database objuect contains lastNotificationTime,
     // then use the value from the database
     //
-    lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
+    lastNotificationTime = getIntOrLongFieldAsLongFF(sub, CSUB_LASTNOTIFICATION);
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongFF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
@@ -369,7 +369,7 @@ int mongoSubCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldFF(sub, CSUB_BLACKLIST) : false;
 
   //
   // httpInfo
@@ -409,20 +409,20 @@ int mongoSubCacheItemInsert
   //
   // 06. Push attribute names to Attribute Vector (cSubP->attributes)
   //
-  setStringVectorF(sub, CSUB_ATTRS, &(cSubP->attributes));
+  setStringVectorFF(sub, CSUB_ATTRS, &(cSubP->attributes));
 
   //
   // 07. Push metadata names to Metadata Vector (cSubP->metadatas)
   //
   if (sub.hasField(CSUB_METADATA))
   {
-    setStringVectorF(sub, CSUB_METADATA, &(cSubP->metadata));
+    setStringVectorFF(sub, CSUB_METADATA, &(cSubP->metadata));
   }
 
   //
   // 08. Fill in cSubP->notifyConditionV from condVec
   //
-  setStringVectorF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
+  setStringVectorFF(sub, CSUB_CONDITIONS, &(cSubP->notifyConditionV));
 
   subCacheItemInsert(cSubP);
 
@@ -469,10 +469,10 @@ void mongoSubCacheRefresh(const std::string& database)
   int subNo = 0;
   while (orion::moreSafe(&cursor))
   {
-    orion::BSONObj      sub;
-    std::string  err;
+    orion::BSONObj  sub;
+    std::string     err;
 
-    if (!nextSafeOrErrorF(cursor, &sub, &err))
+    if (!nextSafeOrErrorFF(cursor, &sub, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;

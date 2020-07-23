@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -37,10 +35,13 @@
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationCreate.h"
+
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 
@@ -48,9 +49,9 @@
 *
 * setRegistrationId - 
 */
-static void setRegistrationId(mongo::BSONObjBuilder* bobP, std::string* regIdP)
+static void setRegistrationId(orion::BSONObjBuilder* bobP, std::string* regIdP)
 {
-  mongo::OID oId;
+  orion::OID oId;
 
   oId.init();
 
@@ -64,7 +65,7 @@ static void setRegistrationId(mongo::BSONObjBuilder* bobP, std::string* regIdP)
 *
 * setDescription -
 */
-static void setDescription(const std::string& description, mongo::BSONObjBuilder* bobP)
+static void setDescription(const std::string& description, orion::BSONObjBuilder* bobP)
 {
   if (description != "")
   {
@@ -78,7 +79,7 @@ static void setDescription(const std::string& description, mongo::BSONObjBuilder
 *
 * setExpiration -
 */
-static void setExpiration(long long expires, mongo::BSONObjBuilder* bobP)
+static void setExpiration(long long expires, orion::BSONObjBuilder* bobP)
 {
   if (expires != -1)
   {
@@ -92,7 +93,7 @@ static void setExpiration(long long expires, mongo::BSONObjBuilder* bobP)
 *
 * setServicePath -
 */
-static void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder* bobP)
+static void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* bobP)
 {
   if (servicePath != "")
   {
@@ -106,49 +107,53 @@ static void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder
 *
 * setContextRegistrationVector - 
 */
-static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSONObjBuilder* bobP)
+static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSONObjBuilder* bobP)
 {
-  mongo::BSONArrayBuilder  contextRegistration;
-  mongo::BSONArrayBuilder  entities;
-  mongo::BSONArrayBuilder  attrs;
+  orion::BSONArrayBuilder  contextRegistration;
+  orion::BSONArrayBuilder  entities;
+  orion::BSONArrayBuilder  attrs;
 
   for (unsigned int eIx = 0; eIx < regP->dataProvided.entities.size(); ++eIx)
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
+    orion::BSONObjBuilder bob;
     if (eP->idPattern == "")
     {
-      if (eP->type == "")
+      bob.append(REG_ENTITY_ID, eP->id);
+      if (eP->type != "")
       {
-        entities.append(BSON(REG_ENTITY_ID << eP->id));
-      }
-      else
-      {
-        entities.append(BSON(REG_ENTITY_ID << eP->id << REG_ENTITY_TYPE << eP->type));
+        bob.append(REG_ENTITY_TYPE, eP->type);
       }
     }
     else
     {
-      if (eP->type == "")
+      bob.append(REG_ENTITY_ID, eP->idPattern);
+      bob.append(REG_ENTITY_ISPATTERN, "true");
+      if (eP->type != "")
       {
-        entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
-      }
-      else
-      {
-        entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true" << REG_ENTITY_TYPE << eP->type));
+        bob.append(REG_ENTITY_TYPE, eP->type);
       }
     }
+    entities.append(bob.obj());
   }
 
   for (unsigned int aIx = 0; aIx < regP->dataProvided.attributes.size(); ++aIx)
   {
-    attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.attributes[aIx] << REG_ATTRS_TYPE << ""));
+    orion::BSONObjBuilder bob;
+    bob.append(REG_ATTRS_NAME, regP->dataProvided.attributes[aIx]);
+    bob.append(REG_ATTRS_TYPE, "");
+    attrs.append(bob.obj());
   }
 
-  contextRegistration.append(
-    BSON(REG_ENTITIES              << entities.arr() <<
-         REG_ATTRS                 << attrs.arr()    <<
-         REG_PROVIDING_APPLICATION << regP->provider.http.url));
+  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
+  // should be changed?
+  orion::BSONObjBuilder bob;
+  bob.append(REG_ENTITIES, entities.arr());
+  bob.append(REG_ATTRS, attrs.arr());
+  bob.append(REG_PROVIDING_APPLICATION, regP->provider.http.url);
+
+  contextRegistration.append(bob.obj());
 
   bobP->append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 }
@@ -159,7 +164,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 *
 * setStatus -
 */
-static void setStatus(const std::string& status, mongo::BSONObjBuilder* bobP)
+static void setStatus(const std::string& status, orion::BSONObjBuilder* bobP)
 {
   if (status != "")
   {
@@ -173,7 +178,7 @@ static void setStatus(const std::string& status, mongo::BSONObjBuilder* bobP)
 *
 * setFormat -
 */
-static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
+static void setFormat(const std::string& format, orion::BSONObjBuilder* bobP)
 {
   if (format != "")
   {
@@ -203,7 +208,7 @@ void mongoRegistrationCreate
   //
   // Build the BSON object to insert
   //
-  mongo::BSONObjBuilder  bob;
+  orion::BSONObjBuilder  bob;
 
   setRegistrationId(&bob, regIdP);
   setDescription(regP->description, &bob);
@@ -218,10 +223,10 @@ void mongoRegistrationCreate
   //
   // Insert in DB
   //
-  mongo::BSONObj  doc = bob.obj();
+  orion::BSONObj  doc = bob.obj();
   std::string     err;
 
-  if (!collectionInsert(getRegistrationsCollectionName(tenant), doc, &err))
+  if (!orion::collectionInsert(getRegistrationsCollectionName(tenant), doc, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo Create Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);

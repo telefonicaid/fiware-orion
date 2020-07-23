@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
-#define SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+#ifndef SRC_LIB_MONGODRIVER_BSONTYPES_H_
+#define SRC_LIB_MONGODRIVER_BSONTYPES_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,28 +25,36 @@
 *
 * Author: Fermín Galán
 */
-#include <string>
-
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
-#include "apiTypesV2/Registration.h"
-
-#include "mongoDriver/OID.h"
 
 
-/* ****************************************************************************
-*
-* processRegisterContext -
-*/
-extern HttpStatusCode processRegisterContext
-(
-  RegisterContextRequest*   requestP,
-  RegisterContextResponse*  responseP,
-  orion::OID*               id,
-  const std::string&        tenant,
-  const std::string&        servicePath,
-  const std::string&        format,
-  const std::string&        fiwareCorrelator
-);
+namespace orion
+{
 
-#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+enum BSONType {
+    MinKey = -1,
+    EOO = 0,
+    NumberDouble = 1,
+    String = 2,
+    Object = 3,
+    Array = 4,
+    BinData = 5,
+    Undefined = 6,
+    jstOID = 7,
+    Bool = 8,
+    Date = 9,
+    jstNULL = 10,
+    RegEx = 11,
+    DBRef = 12,
+    Code = 13,
+    Symbol = 14,
+    CodeWScope = 15,
+    NumberInt = 16,
+    Timestamp = 17,
+    NumberLong = 18,
+    JSTypeMax = 18,
+    MaxKey = 127
+};
+}
+
+
+#endif // SRC_LIB_MONGODRIVER_BSONTYPES_H_

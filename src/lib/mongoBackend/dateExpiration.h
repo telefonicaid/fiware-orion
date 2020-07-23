@@ -28,8 +28,6 @@
 */
 #include <string>
 
-#include "mongo/client/dbclient.h"
-
 #include "common/globals.h"
 #include "rest/OrionError.h"
 #include "ngsi/ContextAttributeVector.h"
@@ -52,7 +50,7 @@
 extern bool processDateExpirationAtEntityCreation
 (
   const ContextAttributeVector&  caV,
-  mongo::Date_t*                 dateExpiration,
+  orion::BSONDate*               dateExpiration,
   std::string*                   errDetail,
   OrionError*                    oe
 );
@@ -66,7 +64,7 @@ extern bool processDateExpirationAtEntityCreation
 extern bool processDateExpirationAtUpdateAttribute
 (
   const ContextAttribute*  targetAttr,
-  mongo::Date_t*           dateExpiration,
+  orion::BSONDate*         dateExpiration,
   bool*                    replaceDate,
   std::string*             errDetail,
   OrionError*              oe
@@ -80,7 +78,7 @@ extern bool processDateExpirationAtUpdateAttribute
 */
 extern bool processDateExpirationAtAppendAttribute
 (
-  mongo::Date_t*           dateExpiration,
+  orion::BSONDate*         dateExpiration,
   const ContextAttribute*  targetAttr,
   bool                     actualAppend,
   std::string*             errDetail,

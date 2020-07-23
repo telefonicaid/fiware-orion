@@ -44,6 +44,7 @@ class BSONArray
  public:
   // methods to be used by client code (without references to low-level driver code)
   BSONArray();
+  int nFields(void) const;
   std::string toString(void);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

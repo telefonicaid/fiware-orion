@@ -61,7 +61,7 @@ using ngsiv2::EntID;
 */
 static void setNewSubscriptionId(Subscription* s, const orion::BSONObj& r)
 {
-  s->id = getFieldF(r, "_id").OID();
+  s->id = getFieldFF(r, "_id").OID();
 }
 
 
@@ -72,7 +72,7 @@ static void setNewSubscriptionId(Subscription* s, const orion::BSONObj& r)
 */
 static void setDescription(Subscription* s, const orion::BSONObj& r)
 {
-  s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
+  s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldFF(r, CSUB_DESCRIPTION) : "";
 }
 
 
@@ -84,15 +84,15 @@ static void setDescription(Subscription* s, const orion::BSONObj& r)
 static void setSubject(Subscription* s, const orion::BSONObj& r)
 {
   // Entities
-  std::vector<orion::BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement> ents = getFieldFF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     orion::BSONObj ent           = ents[ix].embeddedObject();
-    std::string    id            = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string    type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string    isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    std::string    id            = getStringFieldFF(ent, CSUB_ENTITY_ID);
+    std::string    type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldFF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string    isPattern     = getStringFieldFF(ent, CSUB_ENTITY_ISPATTERN);
     bool           isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
-                                     getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
+                                     getBoolFieldFF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
     EntID en;
     if (isFalse(isPattern))
@@ -118,17 +118,17 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
   }
 
   // Condition
-  setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
+  setStringVectorFF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
   if (r.hasField(CSUB_EXPR))
   {
-    orion::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
+    orion::BSONObj expression = getObjectFieldFF(r, CSUB_EXPR);
 
-    std::string  q      = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expression, CSUB_EXPR_Q)      : "";
-    std::string  mq     = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expression, CSUB_EXPR_MQ)     : "";
-    std::string  geo    = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expression, CSUB_EXPR_GEOM)   : "";
-    std::string  coords = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expression, CSUB_EXPR_COORDS) : "";
-    std::string  georel = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expression, CSUB_EXPR_GEOREL) : "";
+    std::string  q      = expression.hasField(CSUB_EXPR_Q)      ? getStringFieldFF(expression, CSUB_EXPR_Q)      : "";
+    std::string  mq     = expression.hasField(CSUB_EXPR_MQ)     ? getStringFieldFF(expression, CSUB_EXPR_MQ)     : "";
+    std::string  geo    = expression.hasField(CSUB_EXPR_GEOM)   ? getStringFieldFF(expression, CSUB_EXPR_GEOM)   : "";
+    std::string  coords = expression.hasField(CSUB_EXPR_COORDS) ? getStringFieldFF(expression, CSUB_EXPR_COORDS) : "";
+    std::string  georel = expression.hasField(CSUB_EXPR_GEOREL) ? getStringFieldFF(expression, CSUB_EXPR_GEOREL) : "";
 
     s->subject.condition.expression.q        = q;
     s->subject.condition.expression.mq       = mq;
@@ -146,30 +146,30 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
 static void setNotification(Subscription* subP, const orion::BSONObj& r, const std::string& tenant)
 {
   // Attributes
-  setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
+  setStringVectorFF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
   // Metadata
   if (r.hasField(CSUB_METADATA))
   {
-    setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
+    setStringVectorFF(r, CSUB_METADATA, &(subP->notification.metadata));
   }
 
   subP->notification.httpInfo.fill(r);
 
   ngsiv2::Notification* nP = &subP->notification;
 
-  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
-  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
-  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
-  nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(r, CSUB_ONLYCHANGED)                 : false;
-  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
-  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
-  nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(r, CSUB_LASTFAILUREASON)           : "";
-  nP->lastSuccessCode   = r.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESSCODE)  : -1;
+  subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongFF(r, CSUB_THROTTLING)       : -1;
+  nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongFF(r, CSUB_LASTNOTIFICATION) : -1;
+  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongFF(r, CSUB_COUNT)            : -1;
+  nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldFF(r, CSUB_BLACKLIST)                   : false;
+  nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldFF(r, CSUB_ONLYCHANGED)                 : false;
+  nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongFF(r, CSUB_LASTFAILURE)      : -1;
+  nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongFF(r, CSUB_LASTSUCCESS)      : -1;
+  nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldFF(r, CSUB_LASTFAILUREASON)           : "";
+  nP->lastSuccessCode   = r.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongFF(r, CSUB_LASTSUCCESSCODE)  : -1;
 
   // Attributes format
-  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
+  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldFF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
 
 
   //
@@ -222,7 +222,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 */
 static void setStatus(Subscription* s, const orion::BSONObj& r)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongFF(r, CSUB_EXPIRATION) : -1;
 
   //
   // Status
@@ -234,7 +234,7 @@ static void setStatus(Subscription* s, const orion::BSONObj& r)
   //
   if ((s->expires > getCurrentTime()) || (s->expires == -1))
   {
-    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+    s->status = r.hasField(CSUB_STATUS) ? getStringFieldFF(r, CSUB_STATUS) : STATUS_ACTIVE;
   }
   else
   {
@@ -311,7 +311,7 @@ void mongoListSubscriptions
   {
     orion::BSONObj  r;
 
-    if (!orion::nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
@@ -390,7 +390,7 @@ void mongoGetSubscription
   {
     orion::BSONObj r;
 
-    if (!orion::nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       orion::releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));

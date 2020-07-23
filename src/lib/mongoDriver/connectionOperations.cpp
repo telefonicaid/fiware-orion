@@ -649,22 +649,27 @@ bool collectionCreateIndex
 
   return true;
 }
-
+#endif
 
 
 /* ****************************************************************************
 *
-* runCollectionCommand -
+* orion::runCollectionCommand -
 */
-bool runCollectionCommand
+bool orion::runCollectionCommand
 (
-  const std::string&  col,
-  const BSONObj&      command,
-  BSONObj*            result,
-  std::string*        err
+  const std::string&     col,
+  const orion::BSONObj&  command,
+  orion::BSONObj*        result,
+  std::string*           err
 )
 {
-  return runCollectionCommand(NULL, col, command, result, err);
+  orion::DBConnection connection;
+
+  // Note that connection has a NULL mongo::DBConnection inside, so having the same
+  // effect that the version of this method for the old driver.
+
+  return orion::runCollectionCommand(connection, col, command, result, err);
 }
 
 
@@ -678,13 +683,13 @@ bool runCollectionCommand
 *   in the params, instead of using getMongoConnection().
 *   This is only done from DB connection bootstrapping code .
 */
-bool runCollectionCommand
+bool orion::runCollectionCommand
 (
-  DBClientBase*       connection,
-  const std::string&  col,
-  const BSONObj&      command,
-  BSONObj*            result,
-  std::string*        err
+  orion::DBConnection    connection,
+  const std::string&     col,
+  const orion::BSONObj&  command,
+  orion::BSONObj*        result,
+  std::string*           err
 )
 {
   bool releaseConnection = false;
@@ -695,12 +700,17 @@ bool runCollectionCommand
   //
   TIME_STAT_MONGO_COMMAND_WAIT_START();
 
-  if (connection == NULL)
+  // FIXME DR-OLD: re-assign a veriable that comes from the function parameters is weird...
+  // probably this should be improved. Maybe a solution is to unify both runCollectionCommand functions
+  // into just one (the one that needs connection as parameters, assuming not NULL as other functions
+  // in this file)
+
+  if (connection.isNull())
   {
-    connection        = getMongoConnection();
+    connection        = orion::getMongoConnection();
     releaseConnection = true;
 
-    if (connection == NULL)
+    if (connection.isNull())
     {
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
       LM_E(("Fatal Error (null DB connection)"));
@@ -711,12 +721,13 @@ bool runCollectionCommand
 
   LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col.c_str(), command.toString().c_str()));
 
+  mongo::BSONObj mResult;
   try
   {
-    connection->runCommand(col.c_str(), command, *result);
+    connection.get()->runCommand(col.c_str(), command.get(), mResult);
     if (releaseConnection)
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
     LM_I(("Database Operation Successful (command: %s)", command.toString().c_str()));
@@ -725,7 +736,7 @@ bool runCollectionCommand
   {
     if (releaseConnection)
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
 
@@ -742,7 +753,7 @@ bool runCollectionCommand
   {
     if (releaseConnection)
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
 
@@ -756,12 +767,13 @@ bool runCollectionCommand
     return false;
   }
 
+  *result = orion::BSONObj(mResult);
   alarmMgr.dbErrorReset();
   return true;
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * setWriteConcern -

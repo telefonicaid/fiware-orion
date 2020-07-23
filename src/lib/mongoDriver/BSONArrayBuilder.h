@@ -48,8 +48,15 @@ class BSONArrayBuilder
   // methods to be used by client code (without references to low-level driver code)
   BSONArrayBuilder();
   BSONArray arr(void);
+  int arrSize(void);
   void append(const BSONObj& value);
+  void append(const BSONArray& value);
   void append(const std::string& value);
+  void append(const char* value);
+  void append(double value);
+  void append(bool value);
+  void appendNull(void);
+  void appendRegex(const std::string& value);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   // (none so far)

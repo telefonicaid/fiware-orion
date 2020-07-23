@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "common/string.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -54,7 +52,7 @@ using mongo::BSONObjBuilder;
 * strings are converted to numbers (strings are not allowed in GeoJSON)
 *
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, BSONArrayBuilder& b, bool strings2numbers)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONArrayBuilder& b, bool strings2numbers)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
@@ -86,14 +84,14 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     }
     else if (child->valueType == orion::ValueTypeVector)
     {
-      BSONArrayBuilder ba;
+      orion::BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba, strings2numbers);
       b.append(ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
-      BSONObjBuilder bo;
+      orion::BSONObjBuilder bo;
 
       compoundValueBson(child->childV, bo, strings2numbers);
       b.append(bo.obj());
@@ -118,7 +116,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
 * strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
 * strings are converted to numbers (strings are not allowed in GeoJSON)
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, BSONObjBuilder& b, bool strings2numbers)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONObjBuilder& b, bool strings2numbers)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
@@ -151,14 +149,14 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, B
     }
     else if (child->valueType == orion::ValueTypeVector)
     {
-      BSONArrayBuilder ba;
+      orion::BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba, strings2numbers);
       b.append(effectiveName, ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
-      BSONObjBuilder bo;
+      orion::BSONObjBuilder bo;
 
       compoundValueBson(child->childV, bo, strings2numbers);
       b.append(effectiveName, bo.obj());

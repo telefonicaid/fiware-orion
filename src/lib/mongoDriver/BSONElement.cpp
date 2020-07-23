@@ -42,6 +42,55 @@ BSONElement::BSONElement(void)
 
 /* ****************************************************************************
 *
+* BSONElement::type -
+*
+*/
+BSONType BSONElement::type(void) const
+{
+  switch (be.type())
+  {
+  case mongo::MinKey:        return MinKey;
+  case mongo::EOO:           return EOO;
+  case mongo::NumberDouble:  return NumberDouble;
+  case mongo::String:        return orion::String;
+  case mongo::Object:        return Object;
+  case mongo::Array:         return orion::Array;
+  case mongo::BinData:       return BinData;
+  case mongo::Undefined:     return Undefined;
+  case mongo::jstOID:        return jstOID;
+  case mongo::Bool:          return orion::Bool;
+  case mongo::Date:          return Date;
+  case mongo::jstNULL:       return jstNULL;
+  case mongo::RegEx:         return RegEx;
+  case mongo::DBRef:         return DBRef;
+  case mongo::Code:          return Code;
+  case mongo::Symbol:        return Symbol;
+  case mongo::CodeWScope:    return CodeWScope;
+  case mongo::NumberInt:     return NumberInt;
+  case mongo::Timestamp:     return Timestamp;
+  case mongo::NumberLong:    return NumberLong;
+  case mongo::MaxKey:        return MaxKey;
+  }
+
+  // FIXME: maybe we should return some other thing...
+  return EOO;
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONElement::isNull -
+*/
+bool BSONElement::isNull(void)
+{
+  return be.isNull();
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONElement::OID -
 */
 std::string BSONElement::OID(void)
@@ -55,9 +104,30 @@ std::string BSONElement::OID(void)
 *
 * BSONElement::String -
 */
-std::string BSONElement::String(void)
+std::string BSONElement::String(void) const
 {
-  return String();
+  return be.String();
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONElement::Bool -
+*/
+bool BSONElement::Bool(void) const
+{
+  return be.Bool();
+}
+
+
+/* ****************************************************************************
+*
+* BSONElement::Number -
+*/
+double BSONElement::Number(void) const
+{
+  return be.Number();
 }
 
 
@@ -66,7 +136,7 @@ std::string BSONElement::String(void)
 *
 * BSONElement::Array -
 */
-std::vector<BSONElement> BSONElement::Array(void)
+std::vector<BSONElement> BSONElement::Array(void) const
 {
   std::vector<BSONElement> v;
 
@@ -84,7 +154,7 @@ std::vector<BSONElement> BSONElement::Array(void)
 *
 * BSONElement::embeddedObject -
 */
-BSONObj BSONElement::embeddedObject(void)
+BSONObj BSONElement::embeddedObject(void) const
 {
   return BSONObj(be.embeddedObject());
 }
@@ -93,11 +163,33 @@ BSONObj BSONElement::embeddedObject(void)
 
 /* ****************************************************************************
 *
+* BSONElement::date -
+*/
+BSONDate BSONElement::date(void)
+{
+  return BSONDate(be.date());
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONElement::fieldName -
 */
-std::string BSONElement::fieldName(void)
+std::string BSONElement::fieldName(void) const
 {
   return be.fieldName();
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONElement::str -
+*/
+std::string BSONElement::str() const
+{
+  return be.str();
 }
 
 

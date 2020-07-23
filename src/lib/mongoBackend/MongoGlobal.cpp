@@ -58,32 +58,27 @@
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/ngsiWrappers.h"
 
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/mongoConnectionPool.h"  // FIXME OLD-DR: to be removed
+#include "mongoBackend/connectionOperations.h" // FIXME OLD-DR: to be removed
+#include "mongoBackend/safeMongo.h"            // FIXME OLD-DR: to be removed
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"
 
 #include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
 #include "mongoDriver/BSONArray.h"
 #include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/BSONElement.h"
 
 
 /* ****************************************************************************
 *
 * USING
 */
-using mongo::DBClientBase;
-using mongo::DBClientCursor;
-using mongo::BSONObj;
-using mongo::BSONElement;
-using mongo::BSONArrayBuilder;
-using mongo::BSONObjBuilder;
-using mongo::AssertionException;
-using mongo::BSONArray;
-using mongo::OID;
+using mongo::AssertionException;  // FIXME OLD-DR: to be removed
 using ngsiv2::HttpInfo;
 using ngsiv2::EntID;
 
@@ -356,10 +351,13 @@ const std::string& getDbPrefix(void)
 */
 bool getOrionDatabases(std::vector<std::string>* dbsP)
 {
-  BSONObj       result;
-  std::string   err;
+  orion::BSONObj  result;
+  std::string     err;
 
-  if (!runCollectionCommand("admin", BSON("listDatabases" << 1), &result, &err))
+  orion::BSONObjBuilder bob;
+  bob.append("listDatabases", 1);
+
+  if (!orion::runCollectionCommand("admin", bob.obj(), &result, &err))
   {
     return false;
   }
@@ -370,12 +368,14 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
     return false;
   }
 
-  std::vector<BSONElement> databases = getFieldF(result, "databases").Array();
-  for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
+  std::vector<orion::BSONElement> databases = getFieldFF(result, "databases").Array();
+  for (std::vector<orion::BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
-    BSONObj      db      = (*i).Obj();
-    std::string  dbName  = getStringFieldF(db, "name");
-    std::string  prefix  = dbPrefix + "-";
+    // FIXME OLD-DR: Obj() same as embeddedObject()
+    //orion::BSONObj  db      = (*i).Obj();
+    orion::BSONObj  db      = (*i).embeddedObject();
+    std::string     dbName  = getStringFieldFF(db, "name");
+    std::string     prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
     {
@@ -718,7 +718,7 @@ bool includedAttribute(const std::string& attrName, const StringList& attrsV)
 *
 * fillQueryEntity -
 */
-static void fillQueryEntity(BSONObjBuilder* bobP, const EntityId* enP)
+static void fillQueryEntity(orion::BSONObjBuilder* bobP, const EntityId* enP)
 {
   const std::string  idString    = "_id." ENT_ENTITY_ID;
   const std::string  typeString  = "_id." ENT_ENTITY_TYPE;
@@ -790,7 +790,7 @@ bool servicePathFilterNeeded(const std::vector<std::string>& servicePath)
 * addServicePathInTokens -
 *
 */
-static void addServicePathInTokens(BSONArrayBuilder* servicePathIn, const std::string& sp)
+static void addServicePathInTokens(orion::BSONArrayBuilder* servicePathIn, const std::string& sp)
 {
   char escapedPath[SERVICE_PATH_MAX_TOTAL * 2];
   slashEscape(sp.c_str(), escapedPath, sizeof(escapedPath));
@@ -818,9 +818,10 @@ static void addServicePathInTokens(BSONArrayBuilder* servicePathIn, const std::s
 * - The servicePath vector has at least one not empty element
 * - The servicePath vector doesn't contain any /# element
 */
-BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath)
+orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath)
 {
-  BSONArrayBuilder servicePathIn;
+  orion::BSONArrayBuilder servicePathIn;
+  orion::BSONObjBuilder   bob;
 
   // Special case (although the most common one): only one service path
   if (servicePath.size() == 1)
@@ -829,13 +830,16 @@ BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::st
     if (sp.at(sp.length() - 1) == '#')
     {
       addServicePathInTokens(&servicePathIn, sp);
-      return BSON(spKey << BSON("$in" << servicePathIn.arr()));
+      orion::BSONObjBuilder bobIn;
+      bobIn.append("$in", servicePathIn.arr());
+      bob.append(spKey, bobIn.obj());
     }
     else
     {
       // Use simple matching. Avoid "$in: [ ... ]" pattern. This is the most common case
-      return BSON(spKey << servicePath[0]);
+      bob.append(spKey, servicePath[0]);
     }
+    return bob.obj();
   }
 
   for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
@@ -851,7 +855,10 @@ BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::st
     }
   }
 
-  return BSON(spKey << BSON("$in" << servicePathIn.arr()));
+  orion::BSONObjBuilder bobIn;
+  bobIn.append("$in", servicePathIn.arr());
+  bob.append(spKey, bobIn.obj());
+  return bob.obj();
 }
 
 
@@ -862,8 +869,11 @@ BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::st
 *
 * Returns true if 'areaQueryP' was filled, false otherwise
 */
-static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
+static bool processAreaScope(const Scope* scoP, orion::BSONObj* areaQueryP)
 {
+  // FIXME OLD-DR: previously this function was based in streamming construction instead of append()
+  // should be changed?
+
   if (!mongoLocationCapable())
   {
     std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
@@ -874,23 +884,31 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
   }
 
   bool     inverted = false;
-  BSONObj  geoWithin;
+  orion::BSONObj  geoWithin;
 
   if (scoP->areaType == orion::CircleType)
   {
     double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
 
-    geoWithin = BSON("$centerSphere" <<
-                     BSON_ARRAY(
-                       BSON_ARRAY(scoP->circle.center.longitude() <<
-                                  scoP->circle.center.latitude()) <<
-                       radians));
+    orion::BSONObjBuilder    bobGeoWithin;
+    orion::BSONArrayBuilder  baOuter;
+    orion::BSONArrayBuilder  baInner;
+
+    baInner.append(scoP->circle.center.longitude());
+    baInner.append(scoP->circle.center.latitude());
+
+    baOuter.append(baInner.arr());
+    baOuter.append(radians);
+
+    bobGeoWithin.append("$centerSphere", baOuter.arr());
+
+    geoWithin = bobGeoWithin.obj();
 
     inverted  = scoP->circle.inverted();
   }
   else if (scoP->areaType == orion::PolygonType)
   {
-    BSONArrayBuilder  vertex;
+    orion::BSONArrayBuilder  vertex;
     double            lat0 = 0;
     double            lon0 = 0;
 
@@ -904,14 +922,33 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
         lat0 = lat;
         lon0 = lon;
       }
-      vertex.append(BSON_ARRAY(lon << lat));
+
+      orion::BSONArrayBuilder baCoords;
+      baCoords.append(lon);
+      baCoords.append(lat);
+
+      vertex.append(baCoords.arr());
     }
 
     /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
-    vertex.append(BSON_ARRAY(lon0 << lat0));
+    orion::BSONArrayBuilder baCoords0;
+    baCoords0.append(lon0);
+    baCoords0.append(lat0);
+    vertex.append(baCoords0.arr());
 
     /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
-    geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+    orion::BSONObjBuilder bobGeoWithin;
+    orion::BSONObjBuilder bobGeometry;
+    orion::BSONArrayBuilder baVertex;
+
+    baVertex.append(vertex.arr());
+
+    bobGeometry.append("type", "Polygon");
+    bobGeometry.append("coordinates", baVertex.arr());
+
+    bobGeoWithin.append("$geometry", bobGeometry.obj());
+    geoWithin = bobGeoWithin.obj();
+
     inverted  = scoP->polygon.inverted();
   }
   else
@@ -924,11 +961,21 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
   {
     /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
      * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
-    *areaQueryP = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
+    orion::BSONObjBuilder bobAreaQuery;
+    orion::BSONObjBuilder bobGeoWithin;
+
+    bobGeoWithin.append("$geoWithin", geoWithin);
+
+    bobAreaQuery.append("$exists", true);
+    bobAreaQuery.append("$not", bobGeoWithin.obj());
+
+    *areaQueryP = bobAreaQuery.obj();
   }
   else
   {
-    *areaQueryP = BSON("$geoWithin" << geoWithin);
+    orion::BSONObjBuilder bobAreaQuery;
+    bobAreaQuery.append("$geoWithin", geoWithin);
+    *areaQueryP = bobAreaQuery.obj();
   }
 
   return true;
@@ -940,7 +987,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
 *
 * addFilterScope -
 */
-static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<BSONObj>* filtersP)
+static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
 {
   if ((apiVersion == V2) && (scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
   {
@@ -956,11 +1003,15 @@ static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector
     // Entity type existence filter only makes sense in NGSIv1
     if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
     {
-      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
-            BSON(entityTypeString << BSON("$exists" << false)) :
-            BSON(entityTypeString << BSON("$exists" << true));
+      bool existValue = scoP->oper == SCOPE_OPERATOR_NOT ? false : true;
 
-      filtersP->push_back(b);
+      orion::BSONObjBuilder bobInner;
+      bobInner.append("$exists", existValue);
+
+      orion::BSONObjBuilder bobOuter;
+      bobOuter.append(entityTypeString, bobInner.obj());
+
+      filtersP->push_back(bobOuter.obj());
     }
     else
     {
@@ -1016,8 +1067,11 @@ static std::string sortCriteria(const std::string& sortToken)
 *
 * Returns true if areaQueryP was filled, false otherwise
 */
-bool processAreaScopeV2(const Scope* scoP, BSONObj* areaQueryP)
+bool processAreaScopeV2(const Scope* scoP, orion::BSONObj* areaQueryP)
 {
+  // FIXME OLD-DR: previously this function was based in streamming construction instead of append()
+  // should be changed?
+
   if (!mongoLocationCapable())
   {
     std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
@@ -1028,49 +1082,87 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj* areaQueryP)
   }
 
   // Fill BSON corresponding to geometry
-  BSONObj geometry;
+  orion::BSONObj geometry;
   if (scoP->areaType == orion::PointType)
   {
-    geometry = BSON("type"        << "Point" <<
-                    "coordinates" << BSON_ARRAY(scoP->point.longitude() << scoP->point.latitude()));
+    orion::BSONArrayBuilder bab;
+    bab.append(scoP->point.longitude());
+    bab.append(scoP->point.latitude());
+    orion::BSONObjBuilder bob;
+    bob.append("type", "Point");
+    bob.append("coordinates", bab.arr());
+    geometry = bob.obj();
   }
   else if (scoP->areaType == orion::LineType)
   {
     // Arbitrary number of points
-    BSONArrayBuilder ps;
+    orion::BSONArrayBuilder ps;
 
     for (unsigned int ix = 0; ix < scoP->line.pointList.size(); ++ix)
     {
       orion::Point* p = scoP->line.pointList[ix];
-      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+      orion::BSONArrayBuilder bab;
+      bab.append(p->longitude());
+      bab.append(p->latitude());
+      ps.append(bab.arr());
     }
-    geometry = BSON("type" << "LineString" << "coordinates" << ps.arr());
+    orion::BSONObjBuilder bob;
+    bob.append("type", "LineString");
+    bob.append("coordinates", ps.arr());
+    geometry = bob.obj();
   }
   else if (scoP->areaType == orion::BoxType)
   {
-    BSONArrayBuilder ps;
+    orion::BSONArrayBuilder ps;
 
-    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
-    ps.append(BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.lowerLeft.latitude()));
-    ps.append(BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.upperRight.latitude()));
-    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.upperRight.latitude()));
-    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
+    orion::BSONArrayBuilder ba1, ba2, ba3, ba4, ba5;
+    ba1.append(scoP->box.lowerLeft.longitude());
+    ba1.append(scoP->box.lowerLeft.latitude());
+    ps.append(ba1.arr());
+    ba2.append(scoP->box.upperRight.longitude());
+    ba2.append(scoP->box.lowerLeft.latitude());
+    ps.append(ba2.arr());
+    ba3.append(scoP->box.upperRight.longitude());
+    ba3.append(scoP->box.upperRight.latitude());
+    ps.append(ba3.arr());
+    ba4.append(scoP->box.lowerLeft.longitude());
+    ba4.append(scoP->box.upperRight.latitude());
+    ps.append(ba4.arr());
+    ba5.append(scoP->box.lowerLeft.longitude());
+    ba5.append(scoP->box.lowerLeft.latitude());
+    ps.append(ba5.arr());
 
-    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+    orion::BSONObjBuilder bob;
+    orion::BSONArrayBuilder baCoords;
+    baCoords.append(ps.arr());
+
+    bob.append("type", "Polygon");
+    bob.append("coordinates", baCoords.arr());
+    geometry = bob.obj();
   }
   else if (scoP->areaType == orion::PolygonType)
   {
     // Arbitrary number of points
-    BSONArrayBuilder ps;
+    orion::BSONArrayBuilder ps;
 
     for (unsigned int ix = 0; ix < scoP->polygon.vertexList.size(); ++ix)
     {
       orion::Point* p = scoP->polygon.vertexList[ix];
 
-      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+      orion::BSONArrayBuilder bab;
+      bab.append(p->longitude());
+      bab.append(p->latitude());
+
+      ps.append(bab.arr());
     }
 
-    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+    orion::BSONObjBuilder bob;
+    orion::BSONArrayBuilder baCoords;
+    baCoords.append(ps.arr());
+
+    bob.append("type", "Polygon");
+    bob.append("coordinates", baCoords.arr());
+    geometry = bob.obj();
   }
   else
   {
@@ -1078,9 +1170,10 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj* areaQueryP)
     return false;
   }
 
+  orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    BSONObjBuilder near;
+    orion::BSONObjBuilder near;
 
     near.append("$geometry", geometry);
 
@@ -1094,19 +1187,33 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj* areaQueryP)
       near.append("$minDistance", scoP->georel.minDistance);
     }
 
-    *areaQueryP = BSON("$near" << near.obj());
+    bobArea.append("$near", near.obj());
+    *areaQueryP = bobArea.obj();
   }
   else if (scoP->georel.type == "coveredBy")
   {
-    *areaQueryP = BSON("$geoWithin" << BSON("$geometry" << geometry));
+    orion::BSONObjBuilder bobGeom;
+    bobGeom.append("$geometry", geometry);
+    bobArea.append("$geoWithin", bobGeom.obj());
+    *areaQueryP = bobArea.obj();
   }
   else if (scoP->georel.type == "intersects")
   {
-    *areaQueryP = BSON("$geoIntersects" << BSON("$geometry" << geometry));
+    orion::BSONObjBuilder bobGeom;
+    bobGeom.append("$geometry", geometry);
+    bobArea.append("$geoIntersects", bobGeom.obj());
+    *areaQueryP = bobArea.obj();
   }
   else if (scoP->georel.type == "disjoint")
   {
-    *areaQueryP = BSON("$exists" << true << "$not" << BSON("$geoIntersects" << BSON("$geometry" << geometry)));
+    orion::BSONObjBuilder bobGeom;
+    orion::BSONObjBuilder bobNot;
+    bobGeom.append("$geometry", geometry);
+    bobNot.append("$geoIntersects", bobGeom.obj());
+    bobArea.append("$exists", true);
+    bobArea.append("$not", bobNot.obj());
+
+    *areaQueryP = bobArea.obj();
   }
   else if (scoP->georel.type == "equals")
   {
@@ -1388,15 +1495,15 @@ bool entitiesQuery
    *
    */
 
-  BSONObjBuilder    finalQuery;
-  BSONArrayBuilder  orEnt;
+  orion::BSONObjBuilder    finalQuery;
+  orion::BSONArrayBuilder  orEnt;
 
   /* Part 1: entities - avoid $or in the case of a single element */
   if (enV.size() == 1)
   {
-    BSONObjBuilder bob;
+    orion::BSONObjBuilder bob;
     fillQueryEntity(&bob, enV[0]);
-    BSONObj entObj = bob.obj();
+    orion::BSONObj entObj = bob.obj();
     finalQuery.appendElements(entObj);
 
     LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
@@ -1405,9 +1512,9 @@ bool entitiesQuery
   {
     for (unsigned int ix = 0; ix < enV.size(); ++ix)
     {
-      BSONObjBuilder bob;
+      orion::BSONObjBuilder bob;
       fillQueryEntity(&bob, enV[ix]);
-      BSONObj entObj = bob.obj();
+      orion::BSONObj entObj = bob.obj();
       orEnt.append(entObj);
 
       LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
@@ -1422,7 +1529,7 @@ bool entitiesQuery
   }
 
   /* Part 3: attributes */
-  BSONArrayBuilder attrs;
+  orion::BSONArrayBuilder attrs;
 
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
@@ -1449,12 +1556,14 @@ bool entitiesQuery
   {
     /* If we don't do this checking, the {$in: [] } in the attribute name part will
      * make the query fail*/
-    finalQuery.append(ENT_ATTRNAMES, BSON("$in" << attrs.arr()));
+    orion::BSONObjBuilder bob;
+    bob.append("$in", attrs.arr());
+    finalQuery.append(ENT_ATTRNAMES, bob.obj());
   }
 
   /* Part 5: scopes */
-  std::vector<BSONObj>  filters;
-  unsigned int          geoScopes = 0;
+  std::vector<orion::BSONObj>  filters;
+  unsigned int                 geoScopes = 0;
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
@@ -1476,7 +1585,7 @@ bool entitiesQuery
       }
       else
       {
-        BSONObj areaQuery;
+        orion::BSONObj areaQuery;
 
         bool result;
         if (scopeP->type == FIWARE_LOCATION_V2)
@@ -1530,14 +1639,16 @@ bool entitiesQuery
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 
   /* Do the query on MongoDB */
-  std::auto_ptr<DBClientCursor>  cursor;
+  orion::DBCursor  cursor;
 
-  BSONObj query = finalQuery.obj();
-  BSONObj sort;
+  orion::BSONObj query = finalQuery.obj();
+  orion::BSONObj sort;
 
   if (sortOrderList == "")
   {
-    sort = BSON(ENT_CREATION_DATE << 1);
+    orion::BSONObjBuilder bobSort;
+    bobSort.append(ENT_CREATION_DATE, 1);
+    sort = bobSort.obj();
   }
   else if ((sortOrderList == ORDER_BY_PROXIMITY))
   {
@@ -1549,7 +1660,7 @@ bool entitiesQuery
   {
     std::vector<std::string>  sortedV;
     int                       components = stringSplit(sortOrderList, ',', sortedV);
-    BSONObjBuilder            sortOrder;
+    orion::BSONObjBuilder     sortOrder;
 
     for (int ix = 0; ix < components; ix++)
     {
@@ -1575,11 +1686,11 @@ bool entitiesQuery
   }
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
+  orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, sort, limit, offset, &cursor, countP, err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
@@ -1588,13 +1699,13 @@ bool entitiesQuery
   /* Process query result */
   unsigned int docs = 0;
 
-  while (moreSafe(cursor))
+  while (orion::moreSafe(&cursor))
   {
-    BSONObj  r;
+    orion::BSONObj  r;
     try
     {
       // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
-      r = cursor->nextSafe();
+      r = cursor.nextSafe();
     }
     catch (const AssertionException &e)
     {
@@ -1851,7 +1962,7 @@ void pruneContextElements
 *
 * processEntity -
 */
-static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector& enV, BSONObj entity)
+static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector& enV, orion::BSONObj entity)
 {
   EntityId en;
 
@@ -1873,7 +1984,7 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const BSONObj& attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const orion::BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
     getStringFieldF(attribute, REG_ATTRS_NAME),
@@ -1894,7 +2005,7 @@ static void processAttribute(ContextRegistrationResponse* crr, const StringList&
 */
 static void processContextRegistrationElement
 (
-  BSONObj                             cr,
+  orion::BSONObj                      cr,
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
@@ -1904,10 +2015,10 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
+  crr.contextRegistration.providingApplication.set(getStringFieldFF(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
 
-  std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
+  std::vector<orion::BSONElement> queryEntityV = getFieldFF(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
@@ -1919,7 +2030,7 @@ static void processContextRegistrationElement
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
     {
-      std::vector<BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
+      std::vector<orion::BSONElement> queryAttrV = getFieldFF(cr, REG_ATTRS).Array();
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
@@ -2009,13 +2120,13 @@ bool registrationsQuery
   std::string       crEntitiesType    = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
   std::string       crEntitiesPattern = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ISPATTERN;
   std::string       crAttrsNames      = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
-  BSONArrayBuilder  entityOr;
-  BSONArrayBuilder  types;
+  orion::BSONArrayBuilder  entityOr;
+  orion::BSONArrayBuilder  types;
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* en = enV[ix];
-    BSONObjBuilder b;
+    orion::BSONObjBuilder b;
 
     if (isTrue(en->isPattern))
     {
@@ -2038,15 +2149,27 @@ bool registrationsQuery
 
   // '.*' pattern match every other pattern and every not pattern entity. We add a query checking only the types
   // and the case of no type
-  entityOr.append(BSON(crEntitiesId      << ".*" <<
-                       crEntitiesPattern << "true" <<
-                       crEntitiesType    << BSON("$in" << types.arr())));
+  orion::BSONObjBuilder bobArrayItem1;
+  orion::BSONObjBuilder bobArrayItem2;
 
-  entityOr.append(BSON(crEntitiesId      << ".*" <<
-                       crEntitiesPattern << "true" <<
-                       crEntitiesType    << BSON("$exists" << false)));
+  orion::BSONObjBuilder bobIn;
+  bobIn.append("$in", types.arr());
 
-  BSONArrayBuilder attrs;
+  orion::BSONObjBuilder bobExistsFalse;
+  bobExistsFalse.append("$exists", false);
+
+  bobArrayItem1.append(crEntitiesId, ".*");
+  bobArrayItem1.append(crEntitiesPattern, "true");
+  bobArrayItem1.append(crEntitiesType, bobIn.obj());
+
+  bobArrayItem2.append(crEntitiesId, ".*");
+  bobArrayItem2.append(crEntitiesPattern, "true");
+  bobArrayItem2.append(crEntitiesType, bobExistsFalse.obj());
+
+  entityOr.append(bobArrayItem1.obj());
+  entityOr.append(bobArrayItem2.obj());
+
+  orion::BSONArrayBuilder attrs;
 
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
@@ -2056,15 +2179,20 @@ bool registrationsQuery
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
   }
 
-  BSONObjBuilder queryBuilder;
+  orion::BSONObjBuilder queryBuilder;
+
+  orion::BSONObjBuilder bobGtCurrentTime;
+  bobGtCurrentTime.append("$gt", (long long) getCurrentTime());
 
   queryBuilder.append("$or", entityOr.arr());
-  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryBuilder.append(REG_EXPIRATION, bobGtCurrentTime.obj());
 
   if (attrs.arrSize() > 0)
   {
     /* If we don't do this check, the {$in: [] } of the attribute name part makes the query fail */
-    queryBuilder.append(crAttrsNames, BSON("$in" << attrs.arr()));
+    orion::BSONObjBuilder bobIn;
+    bobIn.append("$in", attrs.arr());
+    queryBuilder.append(crAttrsNames, bobIn.obj());
   }
 
   //
@@ -2081,19 +2209,22 @@ bool registrationsQuery
   // FIXME P2: Use field selector to include the only relevant field:
   //           contextRegistration array (e.g. "expiration" is not needed)
   //
-  std::auto_ptr<DBClientCursor>  cursor;
+  orion::DBCursor cursor;
 
-  BSONObj query = queryBuilder.obj();
+  orion::BSONObj query = queryBuilder.obj();
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
+  orion::DBConnection connection = orion::getMongoConnection();
   std::string   colName    = getRegistrationsCollectionName(tenant);
 
-  if (!collectionRangedQuery(connection, colName, query, BSON("_id" << 1), limit, offset, &cursor, countP, err))
+  orion::BSONObjBuilder bobSort;
+  bobSort.append("_id", 1);
+
+  if (!orion::collectionRangedQuery(connection, colName, query, bobSort.obj(), limit, offset, &cursor, countP, err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
@@ -2102,10 +2233,10 @@ bool registrationsQuery
   /* Process query result */
   unsigned int docs = 0;
 
-  while (moreSafe(cursor))
+  while (orion::moreSafe(&cursor))
   {
-    BSONObj r;
-    if (!nextSafeOrErrorF(cursor, &r, err))
+    orion::BSONObj r;
+    if (!nextSafeOrErrorFF(cursor, &r, err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err->c_str(), query.toString().c_str()));
       continue;
@@ -2115,8 +2246,8 @@ bool registrationsQuery
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
-    std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-    std::string               format                    = getStringFieldF(r, REG_FORMAT);
+    std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldFF(r, REG_CONTEXT_REGISTRATION).Array();
+    std::string               format                    = getStringFieldFF(r, REG_FORMAT);
     ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
@@ -2131,7 +2262,7 @@ bool registrationsQuery
      * same registration ID. Thus, it could be interesting to post-process the response vector, to
      * "compact" removing duplicated responses.*/
   }
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
 
   return true;
 }
@@ -2175,9 +2306,9 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 *
 * condValueAttrMatch -
 */
-bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
+bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
-  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<orion::BSONElement>  conds = getFieldFF(sub, CSUB_CONDITIONS).Array();
 
   if (conds.size() == 0)
   {
@@ -2209,16 +2340,16 @@ bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modi
 * Extract the entity ID vector from a BSON document (in the format of the csubs/casub
 * collection)
 */
-EntityIdVector subToEntityIdVector(const BSONObj& sub)
+EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
 {
-  EntityIdVector            enV;
-  std::vector<BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
+  EntityIdVector                   enV;
+  std::vector<orion::BSONElement>  subEnts = getFieldFF(sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
-    BSONObj    subEnt = subEnts[ix].embeddedObject();
-    EntityId*  en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
+    orion::BSONObj  subEnt = subEnts[ix].embeddedObject();
+    EntityId*       en     = new EntityId(getStringFieldFF(subEnt, CSUB_ENTITY_ID),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldFF(subEnt, CSUB_ENTITY_TYPE) : "",
                                      getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
@@ -2343,7 +2474,7 @@ void subToNotifyList
 */
 StringList subToAttributeList
 (
-  const BSONObj&                  sub,
+  const orion::BSONObj&           sub,
   const bool&                     onlyChanged,
   const bool&                     blacklist,
   const std::vector<std::string>  modifiedAttrs,
@@ -2355,11 +2486,11 @@ StringList subToAttributeList
   {
     return subToAttributeList(sub);
   }
-  StringList                attrL;
-  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
-  std::vector<std::string>          conditionAttrs;
-  std::vector<std::string>          notificationAttrs;
+  StringList                       attrL;
+  std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<std::string>         conditionAttrs;
+  std::vector<std::string>         notificationAttrs;
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
     std::string subAttr = subAttrs[ix].String();
@@ -2383,10 +2514,10 @@ StringList subToAttributeList
 * Extract the attribute list from a BSON document (in the format of the csubs/casub
 * collection)
 */
-StringList subToAttributeList(const BSONObj& sub)
+StringList subToAttributeList(const orion::BSONObj& sub)
 {
-  StringList                attrL;
-  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  StringList                       attrL;
+  std::vector<orion::BSONElement>  subAttrs = orion::getFieldF(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
@@ -2739,11 +2870,21 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
   LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
   /* Update the document */
-  BSONObj     query  = BSON("_id" << OID(subId));
-  BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) <<
-                            "$inc" << BSON(CASUB_COUNT << 1));
+  orion::BSONObjBuilder bobQuery;
+  bobQuery.append("_id", orion::OID(subId));
 
-  collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), query, update, false, err);
+  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
+  // should be changed?
+
+  orion::BSONObjBuilder bobUpdate;
+  orion::BSONObjBuilder bobTime;
+  orion::BSONObjBuilder bobCount;
+  bobTime.append(CASUB_LASTNOTIFICATION, getCurrentTime());
+  bobCount.append(CASUB_COUNT, 1);
+  bobUpdate.append("$set", bobTime.obj());
+  bobUpdate.append("$inc", bobCount.obj());
+
+  orion::collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), bobQuery.obj(), bobUpdate.obj(), false, err);
 
   return SccOk;
 }

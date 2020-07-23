@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -37,11 +35,13 @@
 #include "rest/HttpStatusCode.h"
 #include "apiTypesV2/Registration.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegistrationDelete.h"
+
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -59,7 +59,7 @@ void mongoRegistrationDelete
 {
   bool         reqSemTaken = false;
   std::string  err;
-  mongo::OID   oid;
+  orion::OID   oid;
   StatusCode   sc;
 
   if (safeGetRegId(regId, &oid, &sc) == false)
@@ -72,21 +72,24 @@ void mongoRegistrationDelete
 
   LM_T(LmtMongo, ("Mongo Delete Registration"));
 
-  std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::BSONObj                        q;
+  orion::DBCursor  cursor;
+  orion::BSONObj   q;
 
-  q = BSON("_id" << oid);
+  orion::BSONObjBuilder  bob;
+  bob.append("_id", oid);
+
+  q = bob.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  mongo::DBClientBase* connection = getMongoConnection();
+  orion::DBConnection connection = orion::getMongoConnection();
 
   // FIXME P5: maybe an implemetnation based in collectionFindOne() would be better, have a look to mongoUnsubscribeContext.cpp
   // Note also that current implementation calls collectionRemove(), which uses a connection internally, without having
   // released the connection object (this is not a big problem, but a bit unneficient).
   // If the change is done, then MB-27 diagram (and related texts) in devel manual should be also changed.
-  if (!collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!orion::collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);
@@ -96,13 +99,13 @@ void mongoRegistrationDelete
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (moreSafe(cursor))
+  if (orion::moreSafe(&cursor))
   {
-    mongo::BSONObj r;
+    orion::BSONObj r;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
@@ -111,18 +114,18 @@ void mongoRegistrationDelete
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    if (moreSafe(cursor))  // There can only be one registration for a given ID
+    if (orion::moreSafe(&cursor))  // There can only be one registration for a given ID
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       LM_T(LmtMongo, ("more than one registration: '%s'", regId.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
       oeP->fill(SccConflict, "");
       return;
     }
 
-    if (!collectionRemove(getRegistrationsCollectionName(tenant), q, &err))
+    if (!orion::collectionRemove(getRegistrationsCollectionName(tenant), q, &err))
     {
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in collectionRemove(): %s - query: %s", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, std::string("exception in collectionRemove(): ") + err.c_str());
@@ -131,7 +134,7 @@ void mongoRegistrationDelete
   }
   else
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     LM_T(LmtMongo, ("registration not found: '%s'", regId.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_REGISTRATION, ERROR_NOT_FOUND);
@@ -139,7 +142,7 @@ void mongoRegistrationDelete
     return;
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
 
   oeP->fill(SccNoContent, "");

@@ -31,8 +31,6 @@
 #include <vector>
 #include <map>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/RenderFormat.h"
@@ -277,7 +275,7 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, mongo::BSONObj* areaQueryP);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObj* areaQueryP);
 
 
 
@@ -343,7 +341,7 @@ extern bool registrationsQuery
 *
 * condValueAttrMatch -
 */
-extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
+extern bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
 
 
 
@@ -354,7 +352,7 @@ extern bool condValueAttrMatch(const mongo::BSONObj& sub, const std::vector<std:
 * Extract the entity ID vector from a BSON document (in the format of the csubs
 * collection)
 */
-extern EntityIdVector subToEntityIdVector(const mongo::BSONObj& sub);
+extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 
 
 
@@ -383,7 +381,7 @@ void subToNotifyList
 */
 extern StringList subToAttributeList
 (
-  const mongo::BSONObj&           attrL,
+  const orion::BSONObj&           attrL,
   const bool&                     onlyChanged,
   const bool&                     blacklist,
   const std::vector<std::string>  modifiedAttrs,
@@ -399,7 +397,7 @@ extern StringList subToAttributeList
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-extern StringList subToAttributeList(const mongo::BSONObj& attrL);
+extern StringList subToAttributeList(const orion::BSONObj& attrL);
 
 
 
@@ -482,7 +480,7 @@ bool servicePathFilterNeeded(const std::vector<std::string>& servicePath);
 *
 * fillQueryServicePath -
 */
-extern mongo::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
+extern orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<std::string>& servicePath);
 
 
 

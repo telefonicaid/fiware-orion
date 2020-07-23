@@ -42,14 +42,10 @@
 #include "rest/OrionError.h"
 #include "parse/CompoundValueNode.h"
 
-#include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/dbFieldEncoding.h"
-
-using namespace mongo;
-using namespace orion;
 
 
 
@@ -58,22 +54,22 @@ using namespace orion;
 * ContextAttribute::bsonAppendAttrValue -
 *
 */
-void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
+void ContextAttribute::bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const
 {
   std::string effectiveStringValue = stringValue;
   bool        effectiveBoolValue   = boolValue;
   double      effectiveNumberValue = numberValue;
-  ValueType   effectiveValueType   = valueType;
+  orion::ValueType   effectiveValueType   = valueType;
 
   // Checking for ValueTypeString is an additional safety measure (ensuring that the attribute came from NGSIv1 in plain text)
-  if ((autocast) && (effectiveValueType == ValueTypeString))
+  if ((autocast) && (effectiveValueType == orion::ValueTypeString))
   {
     // Autocast only for selected attribute types
     if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
     {
       if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
       {
-        effectiveValueType = ValueTypeNumber;
+        effectiveValueType = orion::ValueTypeNumber;
       }
       // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
     }
@@ -84,12 +80,12 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
       if (effectiveStringValue == "true")
       {
         effectiveBoolValue = true;
-        effectiveValueType = ValueTypeBoolean;
+        effectiveValueType = orion::ValueTypeBoolean;
       }
       else if (effectiveStringValue == "false")
       {
         effectiveBoolValue = false;
-        effectiveValueType = ValueTypeBoolean;
+        effectiveValueType = orion::ValueTypeBoolean;
       }
       // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
     }
@@ -98,7 +94,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
       effectiveNumberValue = parse8601Time(effectiveStringValue);
       if (effectiveNumberValue != -1)
       {
-        effectiveValueType = ValueTypeNumber;
+        effectiveValueType = orion::ValueTypeNumber;
       }
       // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
     }
@@ -106,23 +102,23 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
 
   switch (effectiveValueType)
   {
-    case ValueTypeString:
+    case orion::ValueTypeString:
       bsonAttr.append(ENT_ATTRS_VALUE, effectiveStringValue);
       break;
 
-    case ValueTypeNumber:
+    case orion::ValueTypeNumber:
       bsonAttr.append(ENT_ATTRS_VALUE, effectiveNumberValue);
       break;
 
-    case ValueTypeBoolean:
+    case orion::ValueTypeBoolean:
       bsonAttr.append(ENT_ATTRS_VALUE, effectiveBoolValue);
       break;
 
-    case ValueTypeNull:
+    case orion::ValueTypeNull:
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
       break;
 
-    case ValueTypeNotGiven:
+    case orion::ValueTypeNotGiven:
       LM_E(("Runtime Error (value not given in compound value)"));
       break;
 
@@ -139,7 +135,7 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
 *
 * Used to render attribute value to BSON, appended into the bsonAttr builder
 */
-void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers) const
+void ContextAttribute::valueBson(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers) const
 {
   if (compoundValueP == NULL)
   {
@@ -147,40 +143,40 @@ void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr, const std::string& at
   }
   else
   {
-    if (compoundValueP->valueType == ValueTypeVector)
+    if (compoundValueP->valueType == orion::ValueTypeVector)
     {
-      BSONArrayBuilder b;
+      orion::BSONArrayBuilder b;
       compoundValueBson(compoundValueP->childV, b, strings2numbers);
       bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
     }
-    else if (compoundValueP->valueType == ValueTypeObject)
+    else if (compoundValueP->valueType == orion::ValueTypeObject)
     {
-      BSONObjBuilder b;
+      orion::BSONObjBuilder b;
 
       compoundValueBson(compoundValueP->childV, b, strings2numbers);
       bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
     }
-    else if (compoundValueP->valueType == ValueTypeString)
+    else if (compoundValueP->valueType == orion::ValueTypeString)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->stringValue);
     }
-    else if (compoundValueP->valueType == ValueTypeNumber)
+    else if (compoundValueP->valueType == orion::ValueTypeNumber)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->numberValue);
     }
-    else if (compoundValueP->valueType == ValueTypeBoolean)
+    else if (compoundValueP->valueType == orion::ValueTypeBoolean)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->boolValue);
     }
-    else if (compoundValueP->valueType == ValueTypeNull)
+    else if (compoundValueP->valueType == orion::ValueTypeNull)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.appendNull(ENT_ATTRS_VALUE);
     }
-    else if (compoundValueP->valueType == ValueTypeNotGiven)
+    else if (compoundValueP->valueType == orion::ValueTypeNotGiven)
     {
       LM_E(("Runtime Error (value not given in compound value)"));
     }
@@ -249,7 +245,7 @@ ContextAttribute::ContextAttribute()
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, bool cloneCompound)
 {
-  CompoundValueNode* cvnP = NULL;
+  orion::CompoundValueNode* cvnP = NULL;
   if (cloneCompound)
   {
     if (caP->compoundValueP != NULL)
@@ -603,16 +599,16 @@ std::string ContextAttribute::toJsonV1AsObject
 
       switch (valueType)
       {
-      case ValueTypeString:
+      case orion::ValueTypeString:
         effectiveValue = stringValue;
         break;
 
-      case ValueTypeBoolean:
+      case orion::ValueTypeBoolean:
         effectiveValue = boolValue? "true" : "false";
         withoutQuotes  = true;
         break;
 
-      case ValueTypeNumber:
+      case orion::ValueTypeNumber:
         if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           effectiveValue = isodate2str(numberValue);
@@ -624,12 +620,12 @@ std::string ContextAttribute::toJsonV1AsObject
         }
         break;
 
-      case ValueTypeNull:
+      case orion::ValueTypeNull:
         effectiveValue = "null";
         withoutQuotes  = true;
         break;
 
-      case ValueTypeNotGiven:
+      case orion::ValueTypeNotGiven:
         LM_E(("Runtime Error (value not given in compound value)"));
         break;
 
@@ -727,16 +723,16 @@ std::string ContextAttribute::toJsonV1
 
       switch (valueType)
       {
-      case ValueTypeString:
+      case orion::ValueTypeString:
         effectiveValue = stringValue;
         break;
 
-      case ValueTypeBoolean:
+      case orion::ValueTypeBoolean:
         effectiveValue = boolValue? "true" : "false";
         withoutQuotes  = true;
         break;
 
-      case ValueTypeNumber:
+      case orion::ValueTypeNumber:
         if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
         {
           effectiveValue = isodate2str(numberValue);
@@ -748,12 +744,12 @@ std::string ContextAttribute::toJsonV1
         }
         break;
 
-      case ValueTypeNull:
+      case orion::ValueTypeNull:
         effectiveValue = "null";
         withoutQuotes  = true;
         break;
 
-      case ValueTypeNotGiven:
+      case orion::ValueTypeNotGiven:
         LM_E(("Runtime Error (value not given in compound value)"));
         break;
 

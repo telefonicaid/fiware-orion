@@ -25,8 +25,6 @@
 #include <string>
 #include <map>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
@@ -39,20 +37,13 @@
 #include "ngsi9/RegisterContextResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoRegisterContext.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::OID;
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -87,9 +78,9 @@ HttpStatusCode mongoRegisterContext
   }
 
   /* It is not a new registration, so it must be an update */
-  BSONObj      reg;
-  std::string  err;
-  OID          id;
+  orion::BSONObj  reg;
+  std::string     err;
+  orion::OID      id;
 
   if (!safeGetRegId(requestP->registrationId, &id, &(responseP->errorCode)))
   {
@@ -112,9 +103,12 @@ HttpStatusCode mongoRegisterContext
   }
 
   const std::string    colName  = getRegistrationsCollectionName(tenant);
-  const mongo::BSONObj bson     = BSON("_id" << id << REG_SERVICE_PATH << sPath);
 
-  if (!collectionFindOne(colName, bson, &reg, &err))
+  orion::BSONObjBuilder bob;
+  bob.append("_id", id);
+  bob.append(REG_SERVICE_PATH, sPath);
+
+  if (!orion::collectionFindOne(colName, bob.obj(), &reg, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);

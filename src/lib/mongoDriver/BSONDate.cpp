@@ -1,9 +1,7 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
-#define SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,28 +23,42 @@
 *
 * Author: Fermín Galán
 */
-#include <string>
 
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
-#include "apiTypesV2/Registration.h"
+#include "mongoDriver/BSONDate.h"
 
-#include "mongoDriver/OID.h"
+namespace orion
+{
+/* ****************************************************************************
+*
+* BSONDate::BSONDate -
+*/
+BSONDate::BSONDate(unsigned long long m)
+{
+  date = m;
+}
+
 
 
 /* ****************************************************************************
 *
-* processRegisterContext -
+* BSONDate::equal -
 */
-extern HttpStatusCode processRegisterContext
-(
-  RegisterContextRequest*   requestP,
-  RegisterContextResponse*  responseP,
-  orion::OID*               id,
-  const std::string&        tenant,
-  const std::string&        servicePath,
-  const std::string&        format,
-  const std::string&        fiwareCorrelator
-);
+bool BSONDate::equal(unsigned long long m)
+{
+  return date == m;
+}
 
-#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+
+///////// from now on, only methods with low-level driver types in return or parameters /////////
+
+
+
+/* ****************************************************************************
+*
+* BSONDate::get -
+*/
+mongo::Date_t BSONDate::get(void) const
+{
+  return date;
+}
+}

@@ -26,6 +26,7 @@ SET (SOURCES
     BSONArray.cpp
     BSONArrayBuilder.cpp
     BSONElement.cpp
+    BSONDate.cpp
     OID.cpp
     DBConnection.cpp
     DBCursor.cpp
@@ -35,11 +36,13 @@ SET (SOURCES
 )
 
 SET (HEADERS
+    BSONTypes.h
     BSONObj.h
     BSONObjBuilder.h
     BSONArray.h
     BSONArrayBuilder.h
     BSONElement.h
+    BSONDate.h
     OID.h
     DBConnection.h
     DBCursor.h

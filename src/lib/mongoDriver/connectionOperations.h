@@ -148,7 +148,7 @@ extern bool collectionCreateIndex
   const bool&            isTTL,
   std::string*           err
 );
-
+#endif
 
 
 /* ****************************************************************************
@@ -157,10 +157,10 @@ extern bool collectionCreateIndex
 */
 extern bool runCollectionCommand
 (
-  const std::string&     col,
-  const BSONObj&  command,
-  BSONObj*        result,
-  std::string*           err
+  const std::string&  col,
+  const BSONObj&      command,
+  BSONObj*            result,
+  std::string*        err
 );
 
 
@@ -171,15 +171,15 @@ extern bool runCollectionCommand
 */
 extern bool runCollectionCommand
 (
-  DBConnection*   connection,
-  const std::string&     col,
-  const BSONObj&  command,
-  BSONObj*        result,
-  std::string*           err
+  DBConnection        connection,
+  const std::string&  col,
+  const BSONObj&      command,
+  BSONObj*            result,
+  std::string*        err
 );
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * setWriteConcern -

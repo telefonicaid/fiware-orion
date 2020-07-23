@@ -34,26 +34,19 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/dbFieldEncoding.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONArrayBuilder;
-using mongo::BSONObj;
-using mongo::BSONObjBuilder;
-using mongo::BSONArray;
-using mongo::BSONElement;
-using mongo::BSONNULL;
-using mongo::DBClientCursor;
-using mongo::DBClientBase;
+// FIXME OLD-DR: this file uses streamming construction instead of append(). Specially for the contruction
+// of long aggragtion pipeline stages
+// should be changed?
 
 
 
@@ -79,12 +72,25 @@ static void getAttributeTypes
   std::vector<std::string>*        attrTypes
 )
 {
-  BSONObjBuilder bob;
+  orion::BSONObjBuilder bob;
 
   if (entityType == "")
   {
     std::string idType = std::string("_id.") + ENT_ENTITY_TYPE;
-    bob.append("$or", BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ));
+
+    orion::BSONObjBuilder bobType1;
+    bobType1.append(idType, entityType);
+
+    orion::BSONObjBuilder bobExists;
+    bobExists.append("$exists", false);
+    orion::BSONObjBuilder bobType2;
+    bobType2.append(idType, bobExists.obj());
+
+    orion::BSONArrayBuilder baOr;
+    baOr.append(bobType1.obj());
+    baOr.append(bobType2.obj());
+
+    bob.append("$or", baOr.arr());
   }
   if (servicePathFilterNeeded(servicePathV))
   {
@@ -92,17 +98,17 @@ static void getAttributeTypes
   }
   bob.append(ENT_ATTRNAMES, attrName);
 
-  BSONObj query = bob.obj();
+  orion::BSONObj query = bob.obj();
 
-  std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
+  orion::DBCursor  cursor;
+  std::string      err;
 
   TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
+  orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!orion::collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
@@ -110,11 +116,11 @@ static void getAttributeTypes
 
   unsigned int  docs = 0;
 
-  while (moreSafe(cursor))
+  while (orion::moreSafe(&cursor))
   {
-    BSONObj r;
+    orion::BSONObj r;
 
-    if (!nextSafeOrErrorF(cursor, &r, &err))
+    if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
@@ -123,12 +129,12 @@ static void getAttributeTypes
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
-    BSONObj attr  = getObjectFieldF(attrs, attrName);
-    attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+    orion::BSONObj attrs = getObjectFieldFF(r, ENT_ATTRS);
+    orion::BSONObj attr  = getObjectFieldFF(attrs, attrName);
+    attrTypes->push_back(getStringFieldFF(attr, ENT_ATTRS_TYPE));
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
 }
 
 
@@ -145,7 +151,7 @@ static long long countEntities
   const std::string&               entityType
 )
 {
-  BSONObjBuilder bob;
+  orion::BSONObjBuilder bob;
 
   bob.append("_id." ENT_ENTITY_TYPE, entityType);
   if (servicePathFilterNeeded(servicePathV))
@@ -156,7 +162,7 @@ static long long countEntities
   std::string         err;
   unsigned long long  c;
 
-  if (!collectionCount(getEntitiesCollectionName(tenant), bob.obj(), &c, &err))
+  if (!orion::collectionCount(getEntitiesCollectionName(tenant), bob.obj(), &c, &err))
   {
     return -1;
   }
@@ -169,16 +175,22 @@ static long long countEntities
 * countCmd -
 *
 */
-static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelineForCount)
+static unsigned int countCmd(const std::string& tenant, const orion::BSONArray& pipelineForCount)
 {
-  BSONObj result;
-  BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
-                         "cursor" << BSON("batchSize" << BATCH_SIZE) <<
-                         "pipeline"  << pipelineForCount);
+  orion::BSONObj result;
+
+  orion::BSONObjBuilder bobBatchSize;
+  bobBatchSize.append("batchSize", BATCH_SIZE);
+  orion::BSONObjBuilder bobCmd;
+  bobCmd.append("aggregate", COL_ENTITIES);
+  bobCmd.append("cursor", bobBatchSize.obj());
+  bobCmd.append("pipeline", pipelineForCount);
+
+  orion::BSONObj cmd = bobCmd.obj();
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!orion::runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
     LM_E(("Runtime Error (executing: %s, error %s)", cmd.toString().c_str(), err.c_str()));
     return 0;
@@ -187,15 +199,15 @@ static unsigned int countCmd(const std::string& tenant, const BSONArray& pipelin
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
 
   if (result.hasField("cursor"))
   {
     // abcense of "count" field in the "firtBatch" array means "zero result"
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
     if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
     {
-      return getIntFieldF(resultsArray[0].embeddedObject(), "count");
+      return getIntFieldFF(resultsArray[0].embeddedObject(), "count");
     }
   }
   else
@@ -268,44 +280,102 @@ HttpStatusCode mongoEntityTypesValues
    *
    */
 
-  BSONArrayBuilder pipeline;
-  BSONArrayBuilder pipelineForCount;
+  orion::BSONArrayBuilder pipeline;
+  orion::BSONArrayBuilder pipelineForCount;
 
   // Common elements to both pipelines
   if (servicePathFilterNeeded(servicePathV))
   {
-    BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
-    pipeline.append(BSON("$match" << spQuery));
-    pipelineForCount.append(BSON("$match" << spQuery));
-  }
-  BSONObj project = BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1));
-  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
-                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
-                               "" <<
-                               CS_ID_ENTITY));
+    orion::BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
 
-  BSONObj group   = BSON("$group" << BSON("_id" << groupCond));
+    orion::BSONObjBuilder bobMatch;
+    bobMatch.append("$match", spQuery);
+    orion::BSONObj match = bobMatch.obj();
+
+    pipeline.append(match);
+    pipelineForCount.append(match);
+  }
+  // $project
+  orion::BSONArrayBuilder baIfNull;
+  baIfNull.append(CS_ID_ENTITY);
+  baIfNull.appendNull();
+
+  orion::BSONObjBuilder bobIfNull;
+  bobIfNull.append("$ifNull", baIfNull.arr());
+
+  orion::BSONObjBuilder bobProjectContent;
+  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
+  bobProjectContent.append(ENT_ATTRNAMES, 1);
+
+  orion::BSONObjBuilder bobProject;
+  bobProject.append("$project", bobProjectContent.obj());
+  orion::BSONObj project = bobProject.obj();
+
+  // $cond
+  orion::BSONArrayBuilder baNullEmpty;
+  baNullEmpty.appendNull();
+  baNullEmpty.append("");
+
+  orion::BSONArrayBuilder baIn;
+  baIn.append(CS_ID_ENTITY);
+  baIn.append(baNullEmpty.arr());
+
+  orion::BSONObjBuilder bobIn;
+  bobIn.append("$in", baIn.arr());
+
+  orion::BSONArrayBuilder baCond;
+  baCond.append(bobIn.obj());
+  baCond.append("");
+  baCond.append(CS_ID_ENTITY);
+
+  orion::BSONObjBuilder bobCond;
+  bobCond.append("$cond", baCond.arr());
+
+  // $group
+  orion::BSONObjBuilder bobGroupContent;
+  bobGroupContent.append("_id", bobCond.obj());
+
+  orion::BSONObjBuilder bobGroup;
+  bobGroup.append("$group", bobGroupContent.obj());
+  orion::BSONObj group = bobGroup.obj();
+
   pipeline.append(project);
   pipeline.append(group);
   pipelineForCount.append(project);
   pipelineForCount.append(group);
 
   // Specific elements for pipeline
-  pipeline.append(BSON("$sort"  << BSON("_id" << 1)));
-  pipeline.append(BSON("$skip" << offset));
-  pipeline.append(BSON("$limit" << limit));
+  orion::BSONObjBuilder bobSortId;
+  bobSortId.append("_id", 1);
+  orion::BSONObjBuilder bobSort;
+  bobSort.append("$sort", bobSortId.obj());
+  pipeline.append(bobSort.obj());
+
+  orion::BSONObjBuilder bobSkip;
+  bobSkip.append("$skip", (int) offset);
+  pipeline.append(bobSkip.obj());
+
+  orion::BSONObjBuilder bobLimit;
+  bobLimit.append("$limit", (int) limit);
+  pipeline.append(bobLimit.obj());
 
   // Specific elements for pipelineForCount
-  pipelineForCount.append(BSON("$count" << "count"));
+  orion::BSONObjBuilder bobCount;
+  bobCount.append("$count", "count");
+  pipelineForCount.append(bobCount.obj());
 
-  BSONObj result;
-  BSONObj cmd     = BSON("aggregate" << COL_ENTITIES <<
-                         "cursor" << BSON("batchSize" << BATCH_SIZE) <<
-                         "pipeline"  << pipeline.arr());
+  orion::BSONObjBuilder bobBatchSize;
+  bobBatchSize.append("batchSize", BATCH_SIZE);
+  orion::BSONObjBuilder bobCmd;
+  bobCmd.append("aggregate", COL_ENTITIES);
+  bobCmd.append("cursor", bobBatchSize.obj());
+  bobCmd.append("pipeline", pipeline.arr());
+
+  orion::BSONObj result;
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!orion::runCollectionCommand(composeDatabaseName(tenant), bobCmd.obj(), &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -322,11 +392,11 @@ HttpStatusCode mongoEntityTypesValues
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
   }
 
   if (resultsArray.size() == 0)
@@ -339,18 +409,18 @@ HttpStatusCode mongoEntityTypesValues
 
   for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
-    BSONObj     resultItem = resultsArray[ix].embeddedObject();
-    std::string type;
+    orion::BSONObj  resultItem = resultsArray[ix].embeddedObject();
+    std::string     type;
 
     LM_T(LmtMongo, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
 
-    if (getFieldF(resultItem, "_id").isNull())
+    if (getFieldFF(resultItem, "_id").isNull())
     {
       type = "";
     }
     else
     {
-      type = getStringFieldF(resultItem, "_id");
+      type = getStringFieldFF(resultItem, "_id");
     }
 
     responseP->entityTypeVector.push_back(new EntityType(type));
@@ -436,25 +506,58 @@ HttpStatusCode mongoEntityTypes
    * in tag 2.0.0 in the case it could be uselful (for instance, due to a change in the mongo driver).
    */
 
-  BSONObj result;
+  orion::BSONObj result;
 
-  BSONArrayBuilder pipeline;
-  BSONArrayBuilder pipelineForCount;
+  orion::BSONArrayBuilder pipeline;
+  orion::BSONArrayBuilder pipelineForCount;
 
   // Common elements to both pipelines
   if (servicePathFilterNeeded(servicePathV))
   {
-    BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
-    pipeline.append(BSON("$match" << spQuery));
-    pipelineForCount.append(BSON("$match" << spQuery));
+    orion::BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
+    orion::BSONObjBuilder bobMatch;
+    bobMatch.append("$match", spQuery);
+    orion::BSONObj match = bobMatch.obj();
+
+    pipeline.append(match);
+    pipelineForCount.append(match);
   }
 
-  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
-                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
-                               "" <<
-                               CS_ID_ENTITY));
+  // $project - FIXME OLD-DR: duplicated code in another fucntion
+  orion::BSONArrayBuilder baIfNull;
+  baIfNull.append(CS_ID_ENTITY);
+  baIfNull.appendNull();
 
-  BSONObj project = BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1));
+  orion::BSONObjBuilder bobIfNull;
+  bobIfNull.append("$ifNull", baIfNull.arr());
+
+  orion::BSONObjBuilder bobProjectContent;
+  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
+  bobProjectContent.append(ENT_ATTRNAMES, 1);
+
+  orion::BSONObjBuilder bobProject;
+  bobProject.append("$project", bobProjectContent.obj());
+  orion::BSONObj project = bobProject.obj();
+
+  // $cond - FIXME OLD-DR: duplicated code in another fucntion
+  orion::BSONArrayBuilder baNullEmpty;
+  baNullEmpty.appendNull();
+  baNullEmpty.append("");
+
+  orion::BSONArrayBuilder baIn;
+  baIn.append(CS_ID_ENTITY);
+  baIn.append(baNullEmpty.arr());
+
+  orion::BSONObjBuilder bobIn;
+  bobIn.append("$in", baIn.arr());
+
+  orion::BSONArrayBuilder baCond;
+  baCond.append(bobIn.obj());
+  baCond.append("");
+  baCond.append(CS_ID_ENTITY);
+
+  orion::BSONObjBuilder bobCond;
+  bobCond.append("$cond", baCond.arr());
 
   //
   // Building the projection part of the query that includes types that have no attributes
@@ -464,17 +567,50 @@ HttpStatusCode mongoEntityTypes
   // FIXME P3. We are using the $cond: [ .. ] and not the $cond: { .. } one, due to the former was
   // the only one valid in MongoDB 2.4. However, MongoDB 2.4 support was removed time ago, so we could
   // change the syntax
-  BSONObj projection = BSON(
-    "$project" << BSON(
-      ENT_ATTRNAMES << BSON(
-        "$cond" << BSON_ARRAY(
-          BSON("$eq" << BSON_ARRAY(S_ATTRNAMES << BSONArray() )) <<
-          BSON_ARRAY(BSONNULL) <<
-          S_ATTRNAMES))));
+  orion::BSONArrayBuilder baEmpty;
+  orion::BSONArrayBuilder ba1;
+  ba1.append(S_ATTRNAMES);
+  ba1.append(baEmpty.arr());
 
-  BSONObj unwind = BSON("$unwind" << S_ATTRNAMES);
+  orion::BSONObjBuilder bob1;
+  bob1.append("$eq", ba1.arr());
 
-  BSONObj group = BSON("$group" << BSON("_id"   << groupCond << "attrs" << BSON("$addToSet" << S_ATTRNAMES)));
+  orion::BSONArrayBuilder ba2;
+  ba2.appendNull();
+
+  orion::BSONArrayBuilder ba3;
+  ba3.append(bob1.obj());
+  ba3.append(ba2.arr());
+  ba3.append(S_ATTRNAMES);
+
+  orion::BSONObjBuilder bob2;
+  bob2.append("$cond", ba3.arr());
+
+  orion::BSONObjBuilder bob3;
+  bob3.append(ENT_ATTRNAMES, bob2.obj());
+
+  orion::BSONObjBuilder bob4;
+  bob4.append("$project", bob3.obj());
+
+  orion::BSONObj projection = bob4.obj();
+
+  // $unwind
+  orion::BSONObjBuilder bobUnwind;
+  bobUnwind.append("$unwind", S_ATTRNAMES);
+  orion::BSONObj unwind = bobUnwind.obj();
+
+  // $group
+  orion::BSONObjBuilder bobAddToSet;
+  bobAddToSet.append("$addToSet", S_ATTRNAMES);
+
+  orion::BSONObjBuilder bobGroupContent;
+  bobGroupContent.append("_id", bobCond.obj());
+  bobGroupContent.append("attrs", bobAddToSet.obj());
+
+  orion::BSONObjBuilder bobGroup;
+  bobGroup.append("$group", bobGroupContent.obj());
+
+  orion::BSONObj group = bobGroup.obj();
 
   pipeline.append(project);
   pipeline.append(projection);
@@ -486,21 +622,36 @@ HttpStatusCode mongoEntityTypes
   pipelineForCount.append(unwind);
   pipelineForCount.append(group);
 
-  // Specific elements for pipeline
-  pipeline.append(BSON("$sort" << BSON("_id" << 1)));
-  pipeline.append(BSON("$skip" << offset));
-  pipeline.append(BSON("$limit" << limit));
+  // Specific elements for pipeline - FIXME OLD-DR: duplicated code in another function
+  orion::BSONObjBuilder bobSortId;
+  bobSortId.append("_id", 1);
+  orion::BSONObjBuilder bobSort;
+  bobSort.append("$sort", bobSortId.obj());
+  pipeline.append(bobSort.obj());
 
-  // Specific elements for pipelineForCount
-  pipelineForCount.append(BSON("$count" << "count"));
+  orion::BSONObjBuilder bobSkip;
+  bobSkip.append("$skip", (int) offset);
+  pipeline.append(bobSkip.obj());
 
-  BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
-                     "cursor" << BSON("batchSize" << BATCH_SIZE) <<
-                     "pipeline" << pipeline.arr());
+  orion::BSONObjBuilder bobLimit;
+  bobLimit.append("$limit", (int) limit);
+  pipeline.append(bobLimit.obj());
+
+  // Specific elements for pipelineForCount - FIXME OLD-DR: duplicated code in another function
+  orion::BSONObjBuilder bobCount;
+  bobCount.append("$count", "count");
+  pipelineForCount.append(bobCount.obj());
+
+  orion::BSONObjBuilder bobBatchSize;
+  bobBatchSize.append("batchSize", BATCH_SIZE);
+  orion::BSONObjBuilder bobCmd;
+  bobCmd.append("aggregate", COL_ENTITIES);
+  bobCmd.append("cursor", bobBatchSize.obj());
+  bobCmd.append("pipeline", pipeline.arr());
 
   std::string err;
 
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!orion::runCollectionCommand(composeDatabaseName(tenant), bobCmd.obj(), &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -517,11 +668,11 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
   }
 
   // Early return if no element was found
@@ -545,11 +696,11 @@ HttpStatusCode mongoEntityTypes
 
   for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
-    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
-    EntityType*               entityType;
+    orion::BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
+    std::vector<orion::BSONElement>  attrsArray  = getFieldFF(resultItem, "attrs").Array();
+    EntityType*                      entityType;
 
-    entityType = new EntityType(getStringFieldF(resultItem, "_id"));
+    entityType = new EntityType(getStringFieldFF(resultItem, "_id"));
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
@@ -675,34 +826,108 @@ HttpStatusCode mongoAttributesForEntityType
    *
    */
 
-  BSONObj groupCond = BSON("$cond" << BSON_ARRAY(
-                               BSON("$in" << BSON_ARRAY(CS_ID_ENTITY << BSON_ARRAY(BSONNULL << ""))) <<
-                               "" <<
-                               CS_ID_ENTITY));
+  // $cond - FIXME OLD-DR: duplicated code in another function
+  orion::BSONArrayBuilder baNullEmpty;
+  baNullEmpty.appendNull();
+  baNullEmpty.append("");
 
-  BSONObjBuilder match;
+  orion::BSONArrayBuilder baIn;
+  baIn.append(CS_ID_ENTITY);
+  baIn.append(baNullEmpty.arr());
 
-  match.append(C_ID_ENTITY, entityType);
+  orion::BSONObjBuilder bobIn;
+  bobIn.append("$in", baIn.arr());
+
+  orion::BSONArrayBuilder baCond;
+  baCond.append(bobIn.obj());
+  baCond.append("");
+  baCond.append(CS_ID_ENTITY);
+
+  orion::BSONObjBuilder bobCond;
+  bobCond.append("$cond", baCond.arr());
+
+
+  // $match
+  orion::BSONObjBuilder bobMatchContent;
+
+  bobMatchContent.append(C_ID_ENTITY, entityType);
   if (servicePathFilterNeeded(servicePathV))
   {
-    match.appendElements(fillQueryServicePath(C_ID_SERVICEPATH, servicePathV));
+    bobMatchContent.appendElements(fillQueryServicePath(C_ID_SERVICEPATH, servicePathV));
   }
 
-  BSONObj result;
-  BSONObj cmd =
-    BSON("aggregate" << COL_ENTITIES <<
-         "cursor" << BSON("batchSize" << BATCH_SIZE) <<
-         "pipeline" << BSON_ARRAY(
-           BSON("$match" << match.obj()) <<
-           BSON("$project" << BSON(C_ID_ENTITY << BSON("$ifNull" << BSON_ARRAY(CS_ID_ENTITY << BSONNULL)) << ENT_ATTRNAMES << 1)) <<
-           BSON("$unwind" << S_ATTRNAMES) <<
-           BSON("$group" << BSON("_id" << groupCond << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-           BSON("$unwind" << "$attrs") <<
-           BSON("$group" << BSON("_id" << "$attrs")) <<
-           BSON("$sort" << BSON("_id" << 1))));
+  orion::BSONObjBuilder bobMatch;
+  bobMatch.append("$match", bobMatchContent.obj());
+
+  // $project - FIXME OLD-DR: duplicated code in another function
+  orion::BSONArrayBuilder baIfNull;
+  baIfNull.append(CS_ID_ENTITY);
+  baIfNull.appendNull();
+
+  orion::BSONObjBuilder bobIfNull;
+  bobIfNull.append("$ifNull", baIfNull.arr());
+
+  orion::BSONObjBuilder bobProjectContent;
+  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
+  bobProjectContent.append(ENT_ATTRNAMES, 1);
+
+  orion::BSONObjBuilder bobProject;
+  bobProject.append("$project", bobProjectContent.obj());
+
+  // $unwind (first)
+  orion::BSONObjBuilder bobUnwind1;
+  bobUnwind1.append("$unwind", S_ATTRNAMES);
+
+  // $group (first) - FIXME OLD-DR: duplicated code in another function
+  orion::BSONObjBuilder bobAddToSet;
+  bobAddToSet.append("$addToSet", S_ATTRNAMES);
+
+  orion::BSONObjBuilder bobGroupContent1;
+  bobGroupContent1.append("_id", bobCond.obj());
+  bobGroupContent1.append("attrs", bobAddToSet.obj());
+
+  orion::BSONObjBuilder bobGroup1;
+  bobGroup1.append("$group", bobGroupContent1.obj());
+
+  // $unwind (second)
+  orion::BSONObjBuilder bobUnwind2;
+  bobUnwind2.append("$unwind", "$attrs");
+
+  // $group (second)
+  orion::BSONObjBuilder bobGroupContent2;
+  bobGroupContent2.append("_id", "$attrs");
+
+  orion::BSONObjBuilder bobGroup2;
+  bobGroup2.append("$group", bobGroupContent2.obj());
+
+  // $sort - FIXME OLD-DR: duplicated code in another function
+  orion::BSONObjBuilder bobSortId;
+  bobSortId.append("_id", 1);
+  orion::BSONObjBuilder bobSort;
+  bobSort.append("$sort", bobSortId.obj());
+
+  // building pipeline
+  orion::BSONArrayBuilder pipeline;
+  pipeline.append(bobMatch.obj());
+  pipeline.append(bobProject.obj());
+  pipeline.append(bobUnwind1.obj());
+  pipeline.append(bobGroup1.obj());
+  pipeline.append(bobUnwind2.obj());
+  pipeline.append(bobGroup2.obj());
+  pipeline.append(bobSort.obj());
+
+  orion::BSONObj result;
+
+  // FIXME OLD-DR: duplicated code in another function
+  orion::BSONObjBuilder bobBatchSize;
+  bobBatchSize.append("batchSize", BATCH_SIZE);
+  orion::BSONObjBuilder bobCmd;
+  bobCmd.append("aggregate", COL_ENTITIES);
+  bobCmd.append("cursor", bobBatchSize.obj());
+  bobCmd.append("pipeline", pipeline.arr());
 
   std::string err;
-  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
+  if (!orion::runCollectionCommand(composeDatabaseName(tenant), bobCmd.obj(), &result, &err))
   {
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -713,11 +938,11 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
+  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
 
   if (result.hasField("cursor"))
   {
-    resultsArray = getFieldF(getObjectFieldF(result, "cursor"), "firstBatch").Array();
+    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
   }
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
@@ -733,7 +958,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONElement idField = getFieldF(resultsArray[ix].embeddedObject(), "_id");
+    orion::BSONElement idField = getFieldFF(resultsArray[ix].embeddedObject(), "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'

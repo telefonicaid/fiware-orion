@@ -54,20 +54,20 @@ using orion::CompoundValueNode;
 * getDateExpiration -
 *
 * Get the ISO8601 Expiration Date information for the given
-* ContextAttribute provided as parameter, in order to construct the corresponding Mongo Date_t object.
+* ContextAttribute provided as parameter, in order to construct the corresponding Mongo date object.
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
 */
 static bool getDateExpiration
 (
   const ContextAttribute*  caP,
-  mongo::Date_t*           dateExpiration,
+  orion::BSONDate*         dateExpiration,
   std::string*             errDetail
 )
 {
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
-    *dateExpiration = mongo::Date_t(caP->numberValue*1000);
+    *dateExpiration = orion::BSONDate(caP->numberValue*1000);
 
     return true;
   }
@@ -94,7 +94,7 @@ static bool getDateExpiration
 bool processDateExpirationAtEntityCreation
 (
   const ContextAttributeVector&  caV,
-  mongo::Date_t*                 dateExpiration,
+  orion::BSONDate*               dateExpiration,
   std::string*                   errDetail,
   OrionError*                    oe
 )
@@ -128,7 +128,7 @@ bool processDateExpirationAtEntityCreation
 * processDateExpirationAtUpdateAttribute -
 *
 * If the name of the target attribute is the date expiration,
-* check for a number value that will be used in the mongo::Date_t constructor.
+* check for a number value that will be used in the orion::BSONDate constructor.
 * If it is an empty value, is interpreted as a date expiration deletion and the ACTUAL date value
 * is set to 0, in order to signal the caller function.
 * If valid value, also dateExpirationInPayload boolean is set to true, in order to manage the new date value
@@ -137,7 +137,7 @@ bool processDateExpirationAtEntityCreation
 bool processDateExpirationAtUpdateAttribute
 (
   const ContextAttribute*  targetAttr,
-  mongo::Date_t*           dateExpiration,
+  orion::BSONDate*         dateExpiration,
   bool*                    dateExpirationInPayload,
   std::string*             errDetail,
   OrionError*              oe
@@ -174,7 +174,7 @@ bool processDateExpirationAtUpdateAttribute
 */
 bool processDateExpirationAtAppendAttribute
 (
-  mongo::Date_t*                 dateExpiration,
+  orion::BSONDate*               dateExpiration,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
   std::string*                   errDetail,

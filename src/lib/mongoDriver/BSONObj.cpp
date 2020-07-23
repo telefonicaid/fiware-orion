@@ -42,11 +42,33 @@ BSONObj::BSONObj()
 
 /* ****************************************************************************
 *
+* BSONObj::getFieldNames -
+*/
+int BSONObj::getFieldNames(std::set<std::string>& fields) const
+{
+  return bo.getFieldNames(fields);
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONObj::hasField -
 */
 bool BSONObj::hasField(const std::string& field) const
 {
   return bo.hasField(field);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObj::nFields -
+*/
+int BSONObj::nFields(void) const
+{
+  return bo.nFields();
 }
 
 
@@ -84,6 +106,21 @@ void BSONObj::toStringMap(std::map<std::string, std::string>* m)
     mongo::BSONElement e = i.next();
 
     (*m)[e.fieldName()] = e.String();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObj::toElementsVector -
+*/
+void BSONObj::toElementsVector(std::vector<BSONElement>* v)
+{
+  for (mongo::BSONObj::iterator i = bo.begin(); i.more();)
+  {
+    BSONElement e(i.next());
+    v->push_back(e);
   }
 }
 

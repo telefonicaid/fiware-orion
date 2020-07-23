@@ -35,12 +35,12 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 #include "mongoBackend/MongoGlobal.h"       // includedAttribute
 
-using namespace mongo;
+#include "mongoDriver/safeMongo.h"
+
 
 
 /* ****************************************************************************
@@ -97,7 +97,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
 */
 ContextElementResponse::ContextElementResponse
 (
-  const mongo::BSONObj&  entityDoc,
+  const orion::BSONObj&  entityDoc,
   const StringList&      attrL,
   bool                   includeEmpty,
   ApiVersion             apiVersion
@@ -106,41 +106,41 @@ ContextElementResponse::ContextElementResponse
   prune = false;
 
   // Entity
-  BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
+  orion::BSONObj id = getFieldFF(entityDoc, "_id").embeddedObject();
 
-  std::string entityId   = getStringFieldF(id, ENT_ENTITY_ID);
-  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "";
+  std::string entityId   = getStringFieldFF(id, ENT_ENTITY_ID);
+  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldFF(id, ENT_ENTITY_TYPE) : "";
 
   entity.fill(entityId, entityType, "false");
-  entity.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(id, ENT_SERVICE_PATH) : "";
+  entity.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldFF(id, ENT_SERVICE_PATH) : "";
 
   /* Get the location attribute (if it exists) */
   std::string locAttr;
-  if (entityDoc.hasElement(ENT_LOCATION))
+  if (entityDoc.hasField(ENT_LOCATION))
   {
-    locAttr = getStringFieldF(getObjectFieldF(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
+    locAttr = getStringFieldFF(getObjectFieldFF(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
   }
 
 
   //
   // Attribute vector
-  // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
+  // FIXME P5: constructor for orion::BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
+  orion::BSONObj                attrs = getObjectFieldFF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName                = *i;
-    BSONObj            attr                    = getObjectFieldF(attrs, attrName);
+    orion::BSONObj            attr                    = getObjectFieldFF(attrs, attrName);
     ContextAttribute*  caP                     = NULL;
     ContextAttribute   ca;
     bool               noLocationMetadata      = true;
 
     // Name and type
     ca.name           = dbDotDecode(attrName);
-    ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
+    ca.type           = getStringFieldFF(attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
     if (!includedAttribute(ca.name, attrL))
@@ -156,10 +156,10 @@ ContextElementResponse::ContextElementResponse
     }
     else
     {
-      switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
+      switch(getFieldFF(attr, ENT_ATTRS_VALUE).type())
       {
-      case String:
-        ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
+      case orion::String:
+        ca.stringValue = getStringFieldFF(attr, ENT_ATTRS_VALUE);
         if (!includeEmpty && ca.stringValue.length() == 0)
         {
           continue;
@@ -167,42 +167,42 @@ ContextElementResponse::ContextElementResponse
         caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
         break;
 
-      case NumberDouble:
-        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
+      case orion::NumberDouble:
+        ca.numberValue = getNumberFieldFF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
-      case NumberInt:
-        ca.numberValue = (double) getIntFieldF(attr, ENT_ATTRS_VALUE);
+      case orion::NumberInt:
+        ca.numberValue = (double) getIntFieldFF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
-      case Bool:
-        ca.boolValue = getBoolFieldF(attr, ENT_ATTRS_VALUE);
+      case orion::Bool:
+        ca.boolValue = getBoolFieldFF(attr, ENT_ATTRS_VALUE);
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
-      case jstNULL:
+      case orion::jstNULL:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->valueType = orion::ValueTypeNull;
         break;
 
-      case Object:
+      case orion::Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
         caP->valueType = orion::ValueTypeObject;
-        compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        compoundObjectResponse(caP->compoundValueP, getFieldFF(attr, ENT_ATTRS_VALUE));
         break;
 
-      case Array:
+      case orion::Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
         caP->valueType = orion::ValueTypeVector;
-        compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        compoundVectorResponse(caP->compoundValueP, getFieldFF(attr, ENT_ATTRS_VALUE));
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldFF(attr, ENT_ATTRS_VALUE).type()));
       }
     }
 
@@ -215,14 +215,14 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
+      orion::BSONObj                mds = getObjectFieldFF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
       mds.getFieldNames(mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldF(mds, currentMd));
+        Metadata*   md = new Metadata(dbDotDecode(currentMd), getObjectFieldFF(mds, currentMd));
 
         /* The flag below indicates that a location metadata with WGS84 was found during iteration.
         *  It needs to the NGSIV1 check below, in order to add it if the flag is false
@@ -257,12 +257,12 @@ ContextElementResponse::ContextElementResponse
     /* Set creDate and modDate at attribute level */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
-      caP->creDate = getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE);
+      caP->creDate = getNumberFieldFF(attr, ENT_ATTRS_CREATION_DATE);
     }
 
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      caP->modDate = getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE);
+      caP->modDate = getNumberFieldFF(attr, ENT_ATTRS_MODIFICATION_DATE);
     }
 
     entity.attributeVector.push_back(caP);
@@ -271,12 +271,12 @@ ContextElementResponse::ContextElementResponse
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))
   {
-    entity.creDate = getNumberFieldF(entityDoc, ENT_CREATION_DATE);
+    entity.creDate = getNumberFieldFF(entityDoc, ENT_CREATION_DATE);
   }
 
   if (entityDoc.hasField(ENT_MODIFICATION_DATE))
   {
-    entity.modDate = getNumberFieldF(entityDoc, ENT_MODIFICATION_DATE);
+    entity.modDate = getNumberFieldFF(entityDoc, ENT_MODIFICATION_DATE);
   }
 }
 

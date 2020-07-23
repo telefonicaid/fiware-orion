@@ -65,6 +65,17 @@ void BSONObjBuilder::append(const std::string& key, const std::string& value)
 *
 * BSONObjBuilder::append -
 */
+void BSONObjBuilder::append(const std::string& key, const char* value)
+{
+  bob.append(key, value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::append -
+*/
 void BSONObjBuilder::append(const std::string& key, int value)
 {
   bob.append(key, value);
@@ -77,6 +88,17 @@ void BSONObjBuilder::append(const std::string& key, int value)
 * BSONObjBuilder::append -
 */
 void BSONObjBuilder::append(const std::string& key, long long value)
+{
+  bob.append(key, value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::append -
+*/
+void BSONObjBuilder::append(const std::string& key, double value)
 {
   bob.append(key, value);
 }
@@ -123,5 +145,62 @@ void BSONObjBuilder::append(const std::string& key, const BSONObj& value)
 void BSONObjBuilder::append(const std::string& key, const BSONArray& value)
 {
   bob.append(key, value.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::appendCode -
+*/
+void BSONObjBuilder::appendCode(const std::string& key, const std::string& value)
+{
+  bob.appendCode(key, value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::appendRegex -
+*/
+void BSONObjBuilder::appendRegex(const std::string& key, const std::string& value)
+{
+  bob.appendRegex(key, value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::appendDate -
+*/
+void BSONObjBuilder::appendDate(const std::string& key, const BSONDate& value)
+{
+  bob.appendDate(key, value.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::appendNull -
+*/
+void BSONObjBuilder::appendNull(const std::string& key)
+{
+  bob.appendNull(key);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::appendElements -
+*/
+void BSONObjBuilder::appendElements(orion::BSONObj b)
+{
+  // In the case the underlying driver doesn't provide a direct appendElements method
+  // this can be implemented with a loop on b elements with plain append()
+  bob.appendElements(b.get());
 }
 }

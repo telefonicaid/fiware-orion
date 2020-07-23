@@ -37,7 +37,6 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "mongo/client/dbclient.h"
 
 
 

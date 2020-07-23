@@ -41,6 +41,17 @@ BSONArray::BSONArray()
 
 /* ****************************************************************************
 *
+* BSONArray::nFields -
+*/
+int BSONArray::nFields(void) const
+{
+  return ba.nFields();
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONArray::toString -
 */
 std::string BSONArray::toString(void)

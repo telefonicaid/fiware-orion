@@ -71,7 +71,7 @@ static void setExpiration(const SubscriptionUpdate& subUp, const orion::BSONObj&
   {
     if (subOrig.hasField(CSUB_EXPIRATION))
     {
-      int64_t expires = getIntOrLongFieldAsLongF(subOrig, CSUB_EXPIRATION);
+      int64_t expires = getIntOrLongFieldAsLongFF(subOrig, CSUB_EXPIRATION);
 
       b->append(CSUB_EXPIRATION, (long long) expires);
       LM_T(LmtMongo, ("Subscription expiration: %lu", expires));
@@ -94,8 +94,8 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
   else
   {
     // 'reference' is a mandatory field and 'custom' has a clear mapping to false in the case of missing field
-    std::string reference = getStringFieldF(subOrig, CSUB_REFERENCE);
-    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(subOrig, CSUB_CUSTOM) : false;
+    std::string reference = getStringFieldFF(subOrig, CSUB_REFERENCE);
+    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldFF(subOrig, CSUB_CUSTOM) : false;
 
     b->append(CSUB_REFERENCE, reference);
     b->append(CSUB_CUSTOM,    custom);
@@ -105,7 +105,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
     if (subOrig.hasField(CSUB_METHOD))
     {
-      std::string method = getStringFieldF(subOrig, CSUB_METHOD);
+      std::string method = getStringFieldFF(subOrig, CSUB_METHOD);
 
       b->append(CSUB_METHOD, method);
       LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
@@ -113,7 +113,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
     if (subOrig.hasField(CSUB_HEADERS))
     {
-      orion::BSONObj headers = getObjectFieldF(subOrig, CSUB_HEADERS);
+      orion::BSONObj headers = getObjectFieldFF(subOrig, CSUB_HEADERS);
 
       b->append(CSUB_HEADERS, headers);
       LM_T(LmtMongo, ("Subscription headers: %s", headers.toString().c_str()));
@@ -121,7 +121,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
     if (subOrig.hasField(CSUB_QS))
     {
-      orion::BSONObj qs = getObjectFieldF(subOrig, CSUB_QS);
+      orion::BSONObj qs = getObjectFieldFF(subOrig, CSUB_QS);
 
       b->append(CSUB_QS, qs);
       LM_T(LmtMongo, ("Subscription qs: %s", qs.toString().c_str()));
@@ -129,7 +129,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
     if (subOrig.hasField(CSUB_PAYLOAD))
     {
-      std::string payload = getStringFieldF(subOrig, CSUB_PAYLOAD);
+      std::string payload = getStringFieldFF(subOrig, CSUB_PAYLOAD);
 
       b->append(CSUB_PAYLOAD, payload);
       LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
@@ -153,7 +153,7 @@ static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj&
   {
     if (subOrig.hasField(CSUB_THROTTLING))
     {
-      long long throttling = getIntOrLongFieldAsLongF(subOrig, CSUB_THROTTLING);
+      long long throttling = getIntOrLongFieldAsLongFF(subOrig, CSUB_THROTTLING);
 
       b->append(CSUB_THROTTLING, throttling);
       LM_T(LmtMongo, ("Subscription throttling: %lu", throttling));
@@ -177,7 +177,7 @@ static void setDescription(const SubscriptionUpdate& subUp, const orion::BSONObj
   {
     if (subOrig.hasField(CSUB_DESCRIPTION))
     {
-      std::string description = getStringFieldF(subOrig, CSUB_DESCRIPTION);
+      std::string description = getStringFieldFF(subOrig, CSUB_DESCRIPTION);
 
       b->append(CSUB_DESCRIPTION, description);
       LM_T(LmtMongo, ("Subscription description: %s", description.c_str()));
@@ -201,7 +201,7 @@ static void setStatus(const SubscriptionUpdate& subUp, const orion::BSONObj& sub
   {
     if (subOrig.hasField(CSUB_STATUS))
     {
-      std::string status = getStringFieldF(subOrig, CSUB_STATUS);
+      std::string status = getStringFieldFF(subOrig, CSUB_STATUS);
 
       b->append(CSUB_STATUS, status);
       LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
@@ -227,7 +227,7 @@ static void setEntities(const SubscriptionUpdate& subUp, const orion::BSONObj& s
   }
   else
   {
-    orion::BSONArray entities = getArrayFieldF(subOrig, CSUB_ENTITIES);
+    orion::BSONArray entities = getArrayFieldFF(subOrig, CSUB_ENTITIES);
 
     b->append(CSUB_ENTITIES, entities);
     LM_T(LmtMongo, ("Subscription entities: %s", entities.toString().c_str()));
@@ -248,7 +248,7 @@ static void setAttrs(const SubscriptionUpdate& subUp, const orion::BSONObj& subO
   }
   else
   {
-    orion::BSONArray attrs = getArrayFieldF(subOrig, CSUB_ATTRS);
+    orion::BSONArray attrs = getArrayFieldFF(subOrig, CSUB_ATTRS);
 
     b->append(CSUB_ATTRS, attrs);
     LM_T(LmtMongo, ("Subscription attrs: %s", attrs.toString().c_str()));
@@ -288,14 +288,14 @@ static void setCondsAndInitialNotifyNgsiv1
   // that this function is temporal, I don't worry too much about DRY-ness here
 
   std::vector<EntID>        entities;
-  std::vector<orion::BSONElement>  ents = getFieldF(subOrig, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement>  ents = getFieldFF(subOrig, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     orion::BSONObj  ent       = ents[ix].embeddedObject();
-    std::string     id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string     type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string     isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
+    std::string     id        = getStringFieldFF(ent, CSUB_ENTITY_ID);
+    std::string     type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldFF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string     isPattern = getStringFieldFF(ent, CSUB_ENTITY_ISPATTERN);
     EntID           en;
 
     if (isFalse(isPattern))
@@ -314,11 +314,11 @@ static void setCondsAndInitialNotifyNgsiv1
   std::vector<std::string> attributes;
   std::vector<std::string> metadata;
 
-  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
+  setStringVectorFF(subOrig, CSUB_ATTRS, &attributes);
 
   if (subOrig.hasField(CSUB_METADATA))
   {
-    setStringVectorF(subOrig, CSUB_METADATA, &metadata);
+    setStringVectorFF(subOrig, CSUB_METADATA, &metadata);
   }
 
   /* Conds vector (and maybe an initial notification) */
@@ -384,7 +384,7 @@ static void setCondsAndInitialNotify
     }
     else
     {
-      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
+      status = subOrig.hasField(CSUB_STATUS)? getStringFieldFF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
     }
 
     if (subUp.notificationProvided)
@@ -397,12 +397,12 @@ static void setCondsAndInitialNotify
     else
     {
       httpInfo.fill(subOrig);
-      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
-      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
+      blacklist = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldFF(subOrig, CSUB_BLACKLIST) : false;
+      setStringVectorFF(subOrig, CSUB_ATTRS, &notifAttributesV);
 
       if (subOrig.hasField(CSUB_METADATA))
       {
-        setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+        setStringVectorFF(subOrig, CSUB_METADATA, &metadataV);
       }
     }
 
@@ -412,7 +412,7 @@ static void setCondsAndInitialNotify
     }
     else if (subOrig.hasField(CSUB_FORMAT))
     {
-      attrsFormat = stringToRenderFormat(getStringFieldF(subOrig, CSUB_FORMAT));
+      attrsFormat = stringToRenderFormat(getStringFieldFF(subOrig, CSUB_FORMAT));
     }
 
     if (subUp.fromNgsiv1)
@@ -461,7 +461,7 @@ static void setCondsAndInitialNotify
   }
   else
   {
-    orion::BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
+    orion::BSONArray conds = getArrayFieldFF(subOrig, CSUB_CONDITIONS);
 
     b->append(CSUB_CONDITIONS, conds);
     LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
@@ -478,7 +478,7 @@ static void setCount(long long inc, const orion::BSONObj& subOrig, orion::BSONOb
 {
   if (subOrig.hasField(CSUB_COUNT))
   {
-    long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
+    long long count = getIntOrLongFieldAsLongFF(subOrig, CSUB_COUNT);
     setCount(count + inc, b);
   }
   else
@@ -517,7 +517,7 @@ static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscriptio
     return;
   }
 
-  long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
+  long long lastNotification = getIntOrLongFieldAsLongFF(subOrig, CSUB_LASTNOTIFICATION);
 
   //
   // Compare with 'lastNotificationTime', that might come from the sub-cache.
@@ -539,8 +539,8 @@ static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscriptio
 */
 static void setLastFailure(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
 {
-  long long   lastFailure       = subOrig.hasField(CSUB_LASTFAILURE)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE) : -1;
-  std::string lastFailureReason = subOrig.hasField(CSUB_LASTFAILUREASON) ? getStringFieldF(subOrig, CSUB_LASTFAILUREASON)      : "";
+  long long   lastFailure       = subOrig.hasField(CSUB_LASTFAILURE)     ? getIntOrLongFieldAsLongFF(subOrig, CSUB_LASTFAILURE) : -1;
+  std::string lastFailureReason = subOrig.hasField(CSUB_LASTFAILUREASON) ? getStringFieldFF(subOrig, CSUB_LASTFAILUREASON)      : "";
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -563,8 +563,8 @@ static void setLastFailure(const orion::BSONObj& subOrig, CachedSubscription* su
 */
 static void setLastSuccess(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
 {
-  long long lastSuccess     = subOrig.hasField(CSUB_LASTSUCCESS)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS)     : -1;
-  long long lastSuccessCode = subOrig.hasField(CSUB_LASTSUCCESSCODE) ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE) : -1;
+  long long lastSuccess     = subOrig.hasField(CSUB_LASTSUCCESS)     ? getIntOrLongFieldAsLongFF(subOrig, CSUB_LASTSUCCESS)     : -1;
+  long long lastSuccessCode = subOrig.hasField(CSUB_LASTSUCCESSCODE) ? getIntOrLongFieldAsLongFF(subOrig, CSUB_LASTSUCCESSCODE) : -1;
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -597,7 +597,7 @@ static void setExpression(const SubscriptionUpdate& subUp, const orion::BSONObj&
 
     if (subOrig.hasField(CSUB_EXPR))
     {
-      expression = getObjectFieldF(subOrig, CSUB_EXPR);
+      expression = getObjectFieldFF(subOrig, CSUB_EXPR);
     }
     else
     {
@@ -633,7 +633,7 @@ static void setFormat(const SubscriptionUpdate& subUp, const orion::BSONObj& sub
   }
   else
   {
-    std::string format = getStringFieldF(subOrig, CSUB_FORMAT);
+    std::string format = getStringFieldFF(subOrig, CSUB_FORMAT);
 
     b->append(CSUB_FORMAT, format);
     LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
@@ -654,7 +654,7 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const orion::BSONObj& 
   }
   else
   {
-    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
+    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldFF(subOrig, CSUB_BLACKLIST) : false;
 
     b->append(CSUB_BLACKLIST, bList);
     LM_T(LmtMongo, ("Subscription blacklist: %s", bList? "true" : "false"));
@@ -675,7 +675,7 @@ static void setOnlyChanged(const SubscriptionUpdate& subUp, const orion::BSONObj
   }
   else
   {
-    bool oList = subOrig.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(subOrig, CSUB_ONLYCHANGED) : false;
+    bool oList = subOrig.hasField(CSUB_ONLYCHANGED)? getBoolFieldFF(subOrig, CSUB_ONLYCHANGED) : false;
 
     b->append(CSUB_ONLYCHANGED, oList);
     LM_T(LmtMongo, ("Subscription onlyChanged: %s", oList? "true" : "false"));
@@ -704,7 +704,7 @@ static void setMetadata(const SubscriptionUpdate& subUp, const orion::BSONObj& s
 
     if (subOrig.hasField(CSUB_METADATA))
     {
-      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+      metadata = getArrayFieldFF(subOrig, CSUB_METADATA);
     }
 
     b->append(CSUB_METADATA, metadata);
@@ -795,18 +795,18 @@ static void updateInCache
 
   if (doc.hasField(CSUB_FORMAT))
   {
-    renderFormat = stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT));
+    renderFormat = stringToRenderFormat(getStringFieldFF(doc, CSUB_FORMAT));
   }
 
   if (doc.hasField(CSUB_EXPR))
   {
-    orion::BSONObj expr = getObjectFieldF(doc, CSUB_EXPR);
+    orion::BSONObj expr = getObjectFieldFF(doc, CSUB_EXPR);
 
-    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldF(expr, CSUB_EXPR_Q)      : "";
-    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
-    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
-    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
-    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+    q      = expr.hasField(CSUB_EXPR_Q)?      getStringFieldFF(expr, CSUB_EXPR_Q)      : "";
+    mq     = expr.hasField(CSUB_EXPR_MQ)?     getStringFieldFF(expr, CSUB_EXPR_MQ)     : "";
+    geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldFF(expr, CSUB_EXPR_GEOM)   : "";
+    coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldFF(expr, CSUB_EXPR_COORDS) : "";
+    georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldFF(expr, CSUB_EXPR_GEOREL) : "";
   }
 
 
@@ -815,8 +815,8 @@ static void updateInCache
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotification,
-                                          doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
+                                          doc.hasField(CSUB_EXPIRATION)? getLongFieldFF(doc, CSUB_EXPIRATION) : 0,
+                                          doc.hasField(CSUB_STATUS)? getStringFieldFF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
                                           mq,
                                           geom,

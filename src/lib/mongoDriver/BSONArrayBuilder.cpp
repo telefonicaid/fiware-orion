@@ -52,6 +52,17 @@ BSONArray BSONArrayBuilder::arr(void)
 
 /* ****************************************************************************
 *
+* BSONArrayBuilder::arrSize -
+*/
+int BSONArrayBuilder::arrSize(void)
+{
+  return bab.arrSize();
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONArrayBuilder::append -
 */
 void BSONArrayBuilder::append(const BSONObj& value)
@@ -65,8 +76,74 @@ void BSONArrayBuilder::append(const BSONObj& value)
 *
 * BSONArrayBuilder::append -
 */
+void BSONArrayBuilder::append(const BSONArray& value)
+{
+  bab.append(value.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::append -
+*/
 void BSONArrayBuilder::append(const std::string& value)
 {
   bab.append(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::append -
+*/
+void BSONArrayBuilder::append(const char* value)
+{
+  bab.append(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::append -
+*/
+void BSONArrayBuilder::append(double value)
+{
+  bab.append(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::append -
+*/
+void BSONArrayBuilder::append(bool value)
+{
+  bab.append(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::appendNull -
+*/
+void BSONArrayBuilder::appendNull(void)
+{
+  bab.appendNull();
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArrayBuilder::appendRegex -
+*/
+void BSONArrayBuilder::appendRegex(const std::string& value)
+{
+  bab.appendRegex(value);
 }
 }

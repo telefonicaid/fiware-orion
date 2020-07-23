@@ -27,12 +27,18 @@
 */
 
 #include <string>
+#include <vector>
 #include <map>
 
 #include "mongo/bson/bson.h"  // FIXME OLD-DR: change in next PoC stage
 
+#include "mongoDriver/BSONElement.h"
+
 namespace orion
 {
+// Forward declaration
+class BSONElement;
+
 /* ****************************************************************************
 *
 * BSONObj -
@@ -45,10 +51,13 @@ class BSONObj
  public:
   // methods to be used by client code (without references to low-level driver code)
   BSONObj();
+  int getFieldNames(std::set<std::string>& fields) const;
   bool hasField(const std::string& field) const;
+  int nFields(void) const;
   std::string toString(void) const;
   bool isEmpty(void);
   void toStringMap(std::map<std::string, std::string>* m);
+  void toElementsVector(std::vector<BSONElement>* v);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   explicit BSONObj(const mongo::BSONObj& _bo);

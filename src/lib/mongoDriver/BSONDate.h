@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
-#define SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+#ifndef SRC_LIB_MONGODRIVER_BSONDATE_H_
+#define SRC_LIB_MONGODRIVER_BSONDATE_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,28 +25,32 @@
 *
 * Author: Fermín Galán
 */
+
 #include <string>
+#include <vector>
 
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
-#include "apiTypesV2/Registration.h"
+#include "mongo/util/time_support.h"  // FIXME OLD-DR: change in next PoC stage
 
-#include "mongoDriver/OID.h"
-
+namespace orion
+{
 
 /* ****************************************************************************
 *
-* processRegisterContext -
+* BSONDate -
 */
-extern HttpStatusCode processRegisterContext
-(
-  RegisterContextRequest*   requestP,
-  RegisterContextResponse*  responseP,
-  orion::OID*               id,
-  const std::string&        tenant,
-  const std::string&        servicePath,
-  const std::string&        format,
-  const std::string&        fiwareCorrelator
-);
+class BSONDate
+{
+ private:
+  mongo::Date_t date;
 
-#endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONREGISTER_H_
+ public:
+  // methods to be used by client code (without references to low-level driver code)
+  BSONDate(unsigned long long m);
+  bool equal(unsigned long long m);
+
+  // methods to be used only by mongoDriver/ code (with references to low-level driver code)
+  mongo::Date_t get(void) const;
+};
+}
+
+#endif  // SRC_LIB_MONGODRIVER_BSONDATE_H_
