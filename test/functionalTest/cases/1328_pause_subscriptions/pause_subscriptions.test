@@ -242,7 +242,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID1 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 403
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -293,7 +293,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID1 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 405
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -345,7 +345,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 428
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -399,7 +399,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID2 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -453,7 +453,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -507,7 +507,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -561,7 +561,7 @@ Date: REGEX(.*)
 14. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 428
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

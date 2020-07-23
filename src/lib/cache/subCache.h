@@ -100,9 +100,9 @@ struct CachedSubscription
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
+  double                      throttling;
+  double                      expirationTime;
+  double                      lastNotificationTime;
   std::string                 status;
 #ifdef ORIONLD
   std::string                 name;
@@ -113,8 +113,8 @@ struct CachedSubscription
   SubscriptionExpression      expression;
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;
-  int64_t                     lastFailure;  // timestamp of last notification failure
-  int64_t                     lastSuccess;  // timestamp of last successful notification
+  double                      lastFailure;  // timestamp of last notification failure
+  double                      lastSuccess;  // timestamp of last successful notification
   struct CachedSubscription*  next;
 };
 
@@ -194,13 +194,13 @@ extern void subCacheItemInsert
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
-  int64_t                            expiration,
-  int64_t                            throttling,
+  double                             expiration,
+  double                             throttling,
   RenderFormat                       renderFormat,
   bool                               notificationDone,
-  int64_t                            lastNotificationTime,
-  int64_t                            lastNotificationSuccessTime,
-  int64_t                            lastNotificationFailureTime,
+  double                             lastNotificationTime,
+  double                             lastNotificationSuccessTime,
+  double                             lastNotificationFailureTime,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,

@@ -246,11 +246,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:S1",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://mycallback:8080/callback",
 	"custom" : false,
 	"mimeType" : "application/json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"status" : "active",
 	"entities" : [
@@ -266,6 +266,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",
@@ -295,11 +297,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:S2",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://mycallback:8080/callback",
 	"custom" : false,
 	"mimeType" : "application/json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"status" : "active",
 	"entities" : [
@@ -315,6 +317,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [ ],
 	"expression" : {
 		"q" : "",

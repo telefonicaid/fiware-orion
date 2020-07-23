@@ -53,9 +53,10 @@ function logMsg()
 export -f logMsg
 
 
+
 # -----------------------------------------------------------------------------
 #
-# DISABLED - funct tests that are disabled, for some reason
+# DISABLED - functests that are disabled, for some reason
 #
 DISABLED=('test/functionalTest/cases/1156_qfilters_and_compounds/qfilters_and_compounds_equals_null.test' \
           'test/functionalTest/cases/0000_bad_requests/exit.test' \
@@ -82,6 +83,14 @@ export REPO_HOME=$PWD
 cd $dirname
 export SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
+
+
+
+# ------------------------------------------------------------------------------
+#
+# Func test cases may need kjson
+#
+export PATH=$PATH:${REPO_HOME}/../kjson
 
 
 
@@ -899,9 +908,9 @@ function partExecute()
         endDate=$(date)
         if [ $blockDiff == 'yes' ]
         then
-          $CB_DIFF_TOOL $dirname/$filename.regexpect.sorted $dirname/$filename.out.sorted
+          $CB_DIFF_TOOL $dirname/$filename.out.sorted $dirname/$filename.regexpect.sorted
         else
-          $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
+          $CB_DIFF_TOOL $dirname/$filename.out $dirname/$filename.regexpect
         fi
         logMsg "diff tool $CB_DIFF_TOOL finished"
       fi

@@ -69,9 +69,9 @@ static bool checkEntityIdFieldExists(void)
   {
     const char* entityStartTitle       = "Entity - ";
     const char* idEntityFromPayload    = orionldState.payloadIdNode->value.s;
+    char*       titleExpanded;
 
-    char* titleExpanded;
-    titleExpanded = (char*) malloc(1 + strlen(entityStartTitle) + strlen(idEntityFromPayload));
+    titleExpanded = kaAlloc(&orionldState.kalloc, (1 + strlen(entityStartTitle) + strlen(idEntityFromPayload)));
     strcpy(titleExpanded, entityStartTitle);
     strcat(titleExpanded, idEntityFromPayload);
 

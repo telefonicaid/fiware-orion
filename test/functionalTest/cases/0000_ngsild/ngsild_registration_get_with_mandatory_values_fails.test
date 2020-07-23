@@ -183,7 +183,7 @@ Date: REGEX(.*)
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 799
+Content-Length: 819
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 {
     "description": "Description of REG1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2029-10-31T10:00:25Z",
+    "expires": "2029-10-31T10:00:25.000Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
     "information": [
         {
@@ -238,13 +238,13 @@ Date: REGEX(.*)
         "type": "Polygon"
     },
     "managementInterval": {
-        "end": "2028-12-31T10:00:00Z",
-        "start": "2018-12-31T10:00:00Z"
+        "end": "2028-12-31T10:00:00.000Z",
+        "start": "2018-12-31T10:00:00.000Z"
     },
     "name": "REG1",
     "observationInterval": {
-        "end": "2028-12-31T10:00:00Z",
-        "start": "2018-12-31T10:00:00Z"
+        "end": "2028-12-31T10:00:00.000Z",
+        "start": "2018-12-31T10:00:00.000Z"
     },
     "observationSpace": {
         "coordinates": [
@@ -307,7 +307,7 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 341
+Content-Length: 345
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -315,7 +315,7 @@ Date: REGEX(.*)
 {
     "description": "Description of REG2",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2029-10-31T10:00:25Z",
+    "expires": "2029-10-31T10:00:25.000Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:REG2",
     "information": [
         {

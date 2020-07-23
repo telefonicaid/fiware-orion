@@ -35,7 +35,7 @@
 //
 // mongoCppLegacyDbNumberFieldGet -
 //
-bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* fieldName, int* iP)
+bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* fieldName, double* dP)
 {
   if (boP->hasField(fieldName) == false)
     return false;
@@ -45,15 +45,15 @@ bool mongoCppLegacyDbNumberFieldGet(const mongo::BSONObj* boP, const char* field
   switch (valueType)
   {
   case mongo::NumberDouble:
-    *iP = (int) boP->getField(fieldName).Number();
+    *dP = (double) boP->getField(fieldName).Number();
     break;
 
   case mongo::NumberInt:
-    *iP = (int) boP->getIntField(fieldName);
+    *dP = (double) boP->getIntField(fieldName);
     break;
 
   case mongo::NumberLong:
-    *iP = (int) boP->getField(fieldName).Long();
+    *dP = (double) boP->getField(fieldName).Long();
     break;
 
   default:

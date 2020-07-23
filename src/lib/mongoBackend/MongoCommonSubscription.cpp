@@ -165,7 +165,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
 void setThrottling(const Subscription& sub, BSONObjBuilder* b)
 {
   b->append(CSUB_THROTTLING, sub.throttling);
-  LM_T(LmtMongo, ("Subscription throttling: %lu", sub.throttling));
+  LM_T(LmtMongo, ("Subscription throttling: %f", sub.throttling));
 }
 
 
@@ -350,10 +350,10 @@ void setCondsAndInitialNotify
 *
 * setLastNotification -
 */
-void setLastNotification(long long lastNotification, BSONObjBuilder* b)
+void setLastNotification(double lastNotification, BSONObjBuilder* b)
 {
   b->append(CSUB_LASTNOTIFICATION, lastNotification);
-  LM_T(LmtMongo, ("Subscription lastNotification: %lu", lastNotification));
+  LM_T(LmtMongo, ("Subscription lastNotification: %f", lastNotification));
 }
 
 
@@ -374,10 +374,10 @@ void setCount(long long count, BSONObjBuilder* b)
 *
 * setLastFailure -
 */
-void setLastFailure(long long lastFailure, BSONObjBuilder* b)
+void setLastFailure(double lastFailure, BSONObjBuilder* b)
 {
   b->append(CSUB_LASTFAILURE, lastFailure);
-  LM_T(LmtMongo, ("Subscription lastFailure: %lu", lastFailure));
+  LM_T(LmtMongo, ("Subscription lastFailure: %f", lastFailure));
 }
 
 
@@ -386,7 +386,7 @@ void setLastFailure(long long lastFailure, BSONObjBuilder* b)
 *
 * setLastSuccess -
 */
-void setLastSuccess(long long lastSuccess, BSONObjBuilder* b)
+void setLastSuccess(double lastSuccess, BSONObjBuilder* b)
 {
   b->append(CSUB_LASTSUCCESS, lastSuccess);
   LM_T(LmtMongo, ("Subscription lastSuccess: %lu", lastSuccess));

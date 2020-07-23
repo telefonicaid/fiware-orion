@@ -129,7 +129,7 @@ static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 //
 // entityTypeAndCreDateGet -
 //
-static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP, int* creDateP)
+static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP, double* creDateP)
 {
   for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
@@ -138,7 +138,18 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
     else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
       *typeP = nodeP->value.s;
     else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
-      *creDateP = nodeP->value.i;
+    {
+      if (nodeP->type == KjFloat)
+      {
+        *creDateP = nodeP->value.f;
+        LM_TMP(("MILLIS: credate was a float: %f", *creDateP));
+      }
+      else if (nodeP->type == KjInt)
+      {
+        *creDateP = (double) nodeP->value.i;
+        LM_TMP(("MILLIS: credate was an integer: %f", *creDateP));
+      }
+    }
   }
 }
 
@@ -308,7 +319,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     {
       char*                  idInDb        = NULL;
       char*                  typeInDb      = NULL;
-      int                    creDateInDb   = 0;
+      double                 creDateInDb   = 0;
       char*                  typeInPayload = NULL;
       KjNode*                contextNodeP  = NULL;
       OrionldContext*        contextP      = NULL;
@@ -371,7 +382,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       //
       // Add creDate from DB to the entity of the incoming tree
       //
-      KjNode* creDateNodeP = kjInteger(orionldState.kjsonP, idInDb, creDateInDb);
+      KjNode* creDateNodeP = kjFloat(orionldState.kjsonP, idInDb, creDateInDb);
       if (orionldState.creDatesP == NULL)
         orionldState.creDatesP = kjObject(orionldState.kjsonP, NULL);
       kjChildAdd(orionldState.creDatesP, creDateNodeP);

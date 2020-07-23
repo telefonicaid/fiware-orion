@@ -170,7 +170,7 @@ static bool addTriggeredSubscriptions
   {
     queryNoPattern.append(CASUB_ATTRS, BSON("$size" << 0));
   }
-  queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
 
 
   //
@@ -228,7 +228,7 @@ static bool addTriggeredSubscriptions
   BSONObjBuilder  queryPattern;
 
   queryPattern.append(entPatternQ, "true");
-  queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
   queryPattern.appendCode("$where", function);
 
   std::auto_ptr<DBClientCursor>  cursor;
@@ -332,7 +332,7 @@ HttpStatusCode processRegisterContext
   }
 
   /* Calculate expiration (using the current time and the duration field in the request) */
-  long long expiration = getCurrentTime() + requestP->duration.parse();
+  double expiration = getCurrentTime() + requestP->duration.parse();
 
   LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
 

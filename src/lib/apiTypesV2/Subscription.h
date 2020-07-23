@@ -48,11 +48,11 @@ struct Notification
   std::vector<std::string> metadata;
   bool                     blacklist;
   long long                timesSent;
-  long long                lastNotification;
+  double                   lastNotification;
   HttpInfo                 httpInfo;
   std::string              toJson(const std::string& attrsFormat);
-  int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
-  int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
+  double                   lastFailure;
+  double                   lastSuccess;
   Notification():
     attributes(),
     blacklist(false),
@@ -102,14 +102,16 @@ struct Subscription
   std::string   description;
   bool          descriptionProvided;
   Subject       subject;
-  long long     expires;
+  double        expires;
   std::string   status;
   Notification  notification;
-  long long     throttling;
+  double        throttling;
   RenderFormat  attrsFormat;
   Restriction   restriction;
 
 #ifdef ORIONLD
+  double        createdAt;
+  double        modifiedAt;
   std::string   name;
   std::string   ldContext;
   int           timeInterval;

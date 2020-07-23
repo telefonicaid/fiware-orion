@@ -11,3 +11,6 @@
 * Issue #482  Error following the 482 fix, too small buffer of delayed free references - upped to 1001 slots
 * Issue #XXX  Crash in startup if a huge amount of GeoProperties in the database
 * Issue #280  @id and @type can now be used instead of id and type
+* Issue #280  milliseconds for ALL timestamps, including throttling, notifiedAt, observation and management intervals, etc, etc
+* Issue #280  Implemented createdAt and modifiedAt + options=sysAttrs for subscriptions (with milliseconds, of course)
+* Issue #280  createdAt and modifiedAt for registrations were returned as integers - now as ISO8601 strings (with milliseconds)

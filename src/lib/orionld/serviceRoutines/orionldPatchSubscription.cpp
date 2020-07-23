@@ -236,11 +236,11 @@ static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP
 //
 // {
 //   "_id" : "urn:ngsi-ld:subscriptions:01",
-//   "expiration" : NumberLong(1861869600),
+//   "expiration" : 1861869600,
 //   "reference" : "http://valid.url/url",
 //   "custom" : false,
 //   "mimeType" : "application/ld+json",
-//   "throttling" : NumberLong(5),
+//   "throttling" : 5,
 //   "servicePath" : "/",
 //   "status" : "inactive",
 //   "entities" : [
@@ -345,8 +345,8 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
     else if (strcmp(fragmentP->name, "expires") == 0)
     {
       fragmentP->name    = (char*) "expiration";
-      fragmentP->type    = KjInt;
-      fragmentP->value.i = parse8601Time(fragmentP->value.s);  // FIXME: Already done in pcheckSubscription() ...
+      fragmentP->type    = KjFloat;
+      fragmentP->value.f = parse8601Time(fragmentP->value.s);  // FIXME: Already done in pcheckSubscription() ...
     }
   }
 
@@ -429,32 +429,32 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
   KjNode* nodeP;
 
   //
-  // If 'expiration' is an Object, it means it's a NumberLong and it is then changed to a 32 bit integer
+  // If 'expiration' is an Object, it means it's a NumberLong and it is then changed to a double
   //
   if ((nodeP = kjLookup(dbSubscriptionP, "expiration")) != NULL)
   {
     if (nodeP->type == KjObject)
     {
       char*      expirationString = nodeP->value.firstChildP->value.s;
-      long long  expiration       = strtol(expirationString, NULL, 10);
+      double     expiration       = strtold(expirationString, NULL);
 
-      nodeP->type    = KjInt;
-      nodeP->value.i = expiration;
+      nodeP->type    = KjFloat;
+      nodeP->value.f = expiration;
     }
   }
 
   //
-  // If 'throttling' is an Object, it means it's a NumberLong and it is then changed to a 32 bit integer
+  // If 'throttling' is an Object, it means it's a NumberLong and it is then changed to a double
   //
   if ((nodeP = kjLookup(dbSubscriptionP, "throttling")) != NULL)
   {
     if (nodeP->type == KjObject)
     {
       char*      throttlingString = nodeP->value.firstChildP->value.s;
-      long long  throttling       = strtol(throttlingString, NULL, 10);
+      long long  throttling       = strtold(throttlingString, NULL);
 
-      nodeP->type    = KjInt;
-      nodeP->value.i = throttling;
+      nodeP->type    = KjFloat;
+      nodeP->value.f = throttling;
     }
   }
 }
@@ -565,6 +565,18 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   //
   if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
     return false;
+
+  // Update modifiedAt
+  double  now         = getCurrentTime();
+  KjNode* modifiedAtP = kjLookup(dbSubscriptionP, "modifiedAt");
+
+  if (modifiedAtP != NULL)
+    modifiedAtP->value.f = now;
+  else
+  {
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", now);
+    kjChildAdd(dbSubscriptionP, modifiedAtP);
+  }
 
   //
   // Overwrite the current Subscription in the database

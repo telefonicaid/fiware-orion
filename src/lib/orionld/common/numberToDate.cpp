@@ -22,7 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include <time.h>                                              // time, gmtime_r
+#include <stdio.h>                                                  // sprintf
+#include <string.h>                                                 // strlen
+#include <time.h>                                                   // time, gmtime_r
+
+#include "logMsg/logMsg.h"                                          // LM_*
+#include "logMsg/traceLevels.h"                                     // Lmt*
 
 
 
@@ -30,12 +35,29 @@
 //
 // numberToDate -
 //
-bool numberToDate(time_t fromEpoch, char* date, int dateLen, char** detailsP)
+bool numberToDate(double timestamp, char* date, int dateLen, char** detailsP)
 {
   struct tm  tm;
+  time_t     fromEpoch = (time_t) timestamp;
+  double     millis    = timestamp - fromEpoch;
 
+  LM_TMP(("MILLIS: timestamp: %f", timestamp));
   gmtime_r(&fromEpoch, &tm);
-  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%SZ", &tm);
+  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
 
+  int sLen = strlen(date);
+  if (sLen + 5 >= dateLen)
+  {
+    LM_E(("Internal Error (not enough room for the decimals of the timestamp)"));
+    return false;
+  }
+
+  LM_TMP(("MILLIS: millis: %f", millis));
+  int dMicros  = (int) (millis * 1000000) + 1;
+  int dMillis  = dMicros / 1000;
+  LM_TMP(("MILLIS: dMicros: %d", dMicros));
+  snprintf(&date[sLen], dateLen - sLen, ".%03dZ", dMillis);
+  LM_TMP(("MILLIS: %f => '%s'", timestamp, date));
+  LM_TMP(("MILLIS: --------------------------"));
   return true;
 }

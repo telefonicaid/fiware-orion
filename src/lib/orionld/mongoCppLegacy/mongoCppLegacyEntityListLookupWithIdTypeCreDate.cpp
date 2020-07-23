@@ -128,17 +128,17 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
       continue;
     }
 
-    int creDate;
+    double creDate;
     if (mongoCppLegacyDbNumberFieldGet(&bsonObj, "creDate", &creDate) == false)
     {
       LM_E(("Internal Error (unable to extract the field 'creDate' from the entity '%s'", idString));
       continue;
     }
 
-    KjNode* entityTree   = kjObject(orionldState.kjsonP, NULL);
+    KjNode* entityTree   = kjObject(orionldState.kjsonP,  NULL);
     KjNode* idNodeP      = kjString(orionldState.kjsonP,  "id",      idString);
     KjNode* typeNodeP    = kjString(orionldState.kjsonP,  "type",    typeString);
-    KjNode* creDateNodeP = kjInteger(orionldState.kjsonP, "creDate", creDate);
+    KjNode* creDateNodeP = kjFloat(orionldState.kjsonP,   "creDate", creDate);
 
     kjChildAdd(entityTree, idNodeP);
     kjChildAdd(entityTree, typeNodeP);

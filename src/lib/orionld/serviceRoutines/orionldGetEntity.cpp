@@ -32,6 +32,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, ...
 #include "kjson/kjParse.h"                                       // kjParse
+#include "kjson/kjRender.h"  // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -460,7 +461,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 
   orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0], attrsP, attrsMandatory, orionldState.uriParamOptions.sysAttrs, orionldState.uriParamOptions.keyValues, orionldState.uriParams.datasetId);
 #endif
-
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
     if (attrsMandatory == true)

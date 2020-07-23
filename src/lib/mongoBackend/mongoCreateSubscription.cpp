@@ -53,6 +53,17 @@ using ngsiv2::Subscription;
 
 
 
+// -----------------------------------------------------------------------------
+//
+// setTimestamp -
+//
+static void setTimestamp(const char* name, double ts, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(name, ts);
+}
+
+
+
 /* ****************************************************************************
 *
 * insertInCache - insert in csub cache
@@ -64,9 +75,9 @@ static void insertInCache
   const std::string&   tenant,
   const std::string&   servicePath,
   bool                 notificationDone,
-  long long            lastNotification,
-  long long            lastFailure,
-  long long            lastSuccess
+  double               lastNotification,
+  double               lastFailure,
+  double               lastSuccess
 )
 {
   //
@@ -176,10 +187,13 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
 
 #ifdef ORIONLD
+  double now = getCurrentTime();
   setName(sub, &b);
   setContext(sub, &b);
   setCsf(sub, &b);
   setTimeInterval(sub, &b);
+  setTimestamp("createdAt",  now, &b);
+  setTimestamp("modifiedAt", now, &b);
 #endif
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
@@ -209,7 +223,7 @@ std::string mongoCreateSubscription
 
   if (notificationDone)
   {
-    long long  lastNotification = (long long) getCurrentTime();
+    double lastNotification = getCurrentTime();
 
     setLastNotification(lastNotification, &b);
     setCount(1, &b);

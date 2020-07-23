@@ -212,7 +212,7 @@ Date: REGEX(.*)
 05. GET /v2/subscriptions, see only the sub from step 04
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 403
 Content-Type: application/json 
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,7 +220,7 @@ Date: REGEX(.*)
 [
     {
         "description": "expires is a valid ISO8601 with milliseconds and time-zone",
-        "expires": "2016-04-05T13:10:00.00Z",
+        "expires": "2016-04-05T13:10:00.000Z",
         "id": "REGEX([0-9a-f\-]{24})",
         "notification": {
             "attrs": [

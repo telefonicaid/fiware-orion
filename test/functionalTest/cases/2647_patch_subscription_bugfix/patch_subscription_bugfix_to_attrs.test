@@ -125,14 +125,14 @@ Date: REGEX(.*)
 02. Get subscription, see notification.exceptAttrs
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 598
+Content-Length: 599
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "One subscription to rule them all",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2016-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrsFormat": "legacy",
@@ -191,14 +191,14 @@ Date: REGEX(.*)
 04. Get subscription again, see notification.attrs
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 539
+Content-Length: 540
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "One subscription to rule them all",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2016-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
