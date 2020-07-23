@@ -1261,25 +1261,18 @@ extern bool noCache;
 */
 void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
 {
+  double now = getCurrentTime();
+
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
-
-    time_t now = time(NULL);
-
     if (errors == 0)
-    {
       mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
-    }
     else
-    {
       mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
-    }
 
     return;
   }
-
-  time_t now = time(NULL);
 
   cacheSemTake(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 
@@ -1295,13 +1288,9 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
   }
 
   if (errors == 0)
-  {
     subP->lastSuccess  = now;
-  }
   else
-  {
-    subP->lastFailure  = now;
-  }
+   subP->lastFailure  = now;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }

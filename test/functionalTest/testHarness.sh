@@ -899,9 +899,9 @@ function partExecute()
         endDate=$(date)
         if [ $blockDiff == 'yes' ]
         then
-          $CB_DIFF_TOOL $dirname/$filename.regexpect.sorted $dirname/$filename.out.sorted
+          $CB_DIFF_TOOL $dirname/$filename.out.sorted $dirname/$filename.regexpect.sorted
         else
-          $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
+          $CB_DIFF_TOOL $dirname/$filename.out $dirname/$filename.regexpect
         fi
         logMsg "diff tool $CB_DIFF_TOOL finished"
       fi

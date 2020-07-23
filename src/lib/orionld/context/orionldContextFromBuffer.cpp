@@ -47,11 +47,24 @@ extern "C"
 //
 OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblemDetails* pdP)
 {
+  if ((buffer == NULL) || (*buffer == 0))
+  {
+    LM_E(("Empty buffer - can't parse it"));
+    pdP->type   = OrionldBadRequestData;
+    pdP->title  = (char*) "@context without content";
+    pdP->detail = url;
+    pdP->status = 400;
+    return NULL;
+  }
+
   KjNode* tree = kjParse(kjsonP, buffer);
 
   if (tree == NULL)
   {
-    LM_E(("JSON Parse Error in @context '%s'", url));
+    char buf[256];
+
+    strncpy(buf, buffer, sizeof(buf));
+    LM_E(("JSON Parse Error for @context '%s' (first bytes of json: %s)", url, buf));
     pdP->type   = OrionldBadRequestData;
     pdP->title  = (char*) "JSON Parse Error in @context";
     pdP->detail = url;

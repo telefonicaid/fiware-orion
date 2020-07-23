@@ -1,0 +1,348 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Registration timestamps
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create registration R1 with all possible timestamps, all with milliseconds
+# 02. See R1 in mongo, make sure all timestamps have milliseconds
+# 03. GET R1 via REST, make sure all timestamps have milliseconds
+# 04. GET all registrations via REST, make sure all timestamps have milliseconds
+# 05. Update R1 with all new timestamps
+# 06. GET R1 and make sure modifiedAt changed and that all timestamps have milliseconds
+#
+
+echo "01. Create registration R1 with all possible timestamps, all with milliseconds"
+echo "=============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:registrations:R1",
+  "type": "ContextSourceRegistration",
+  "name": "Registration R1",
+  "description": "Description of R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00.123Z",
+    "end": "2028-12-31T10:00:00.456"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00.798",
+    "end": "2027-12-31T10:00:00.120"
+  },
+  "expires": "2028-12-31T10:00:01.234Z",
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See R1 in mongo, make sure all timestamps have milliseconds"
+echo "==============================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET R1 via REST, make sure all timestamps have milliseconds"
+echo "==============================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1?options=sysAttrs
+
+createdAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"createdAt  | awk -F\" '{ print $4}' | head -1)
+modifiedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"modifiedAt| awk -F\" '{ print $4}' | head -1)
+
+echo
+echo
+
+
+
+echo "04. GET all registrations via REST, make sure all timestamps have milliseconds"
+echo "=============================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations?options=sysAttrs
+echo
+echo
+
+
+echo "05. Update R1 with all new timestamps"
+echo "====================================="
+payload='{
+  "observationInterval": {
+    "start": "2019-12-31T10:00:00.123Z",
+    "end": "2020-12-31T10:00:00.456"
+  },
+  "managementInterval": {
+    "start": "2021-12-31T10:00:00.798",
+    "end": "2022-12-31T10:00:00.120"
+  },
+  "expires": "2023-12-31T10:00:01.234Z"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. GET R1 and make sure modifiedAt changed and that all timestamps have milliseconds"
+echo "====================================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1?options=sysAttrs
+
+createdAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"createdAt  | awk -F\" '{ print $4}' | head -1)
+modifiedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"modifiedAt| awk -F\" '{ print $4}' | head -1)
+
+eqTimestamp   createdAt   "$createdAt"   "$createdAt2"
+neqTimestamp  modifiedAt  "$modifiedAt"  "$modifiedAt2"
+
+echo
+echo
+
+
+--REGEXPECT--
+01. Create registration R1 with all possible timestamps, all with milliseconds
+==============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
+Date: REGEX(.*)
+
+
+
+02. See R1 in mongo, make sure all timestamps have milliseconds
+===============================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:registrations:R1",
+	"description" : "Description of R1",
+	"name" : "Registration R1",
+	"expiration" : 1861869601.234,
+	"servicePath" : "/",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property",
+					"isDomain" : "false"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship",
+					"isDomain" : "false"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"format" : "JSON",
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"observationInterval" : {
+		"start" : 1546250400.123,
+		"end" : 1861869600.456
+	},
+	"managementInterval" : {
+		"start" : 1514714400.79REGEX(\d+)
+		"end" : 1830247200.12
+	}
+}
+bye
+
+
+03. GET R1 via REST, make sure all timestamps have milliseconds
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": "REGEX(.*\.\d\d\d)Z",
+    "description": "Description of R1",
+    "endpoint": "http://my.csource.org:1026",
+    "expires": "2028-12-31T10:00:01.234Z",
+    "id": "urn:ngsi-ld:registrations:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:A456",
+                    "type": "Vehicle"
+                }
+            ],
+            "properties": [
+                "brandName",
+                "speed"
+            ],
+            "relationships": [
+                "isParked"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "end": "2027-12-31T10:00:00.120Z",
+        "start": "2017-12-31T10:00:00.798Z"
+    },
+    "modifiedAt": "REGEX(.*\.\d\d\d)Z",
+    "name": "Registration R1",
+    "observationInterval": {
+        "end": "2028-12-31T10:00:00.456Z",
+        "start": "2018-12-31T10:00:00.123Z"
+    },
+    "type": "ContextSourceRegistration"
+}
+
+
+04. GET all registrations via REST, make sure all timestamps have milliseconds
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "createdAt": "REGEX(.*\.\d\d\d)Z",
+        "description": "Description of R1",
+        "endpoint": "http://my.csource.org:1026",
+        "expires": "2028-12-31T10:00:01.234Z",
+        "id": "urn:ngsi-ld:registrations:R1",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Vehicle:A456",
+                        "type": "Vehicle"
+                    }
+                ],
+                "properties": [
+                    "brandName",
+                    "speed"
+                ],
+                "relationships": [
+                    "isParked"
+                ]
+            }
+        ],
+        "managementInterval": {
+            "end": "2027-12-31T10:00:00.120Z",
+            "start": "2017-12-31T10:00:00.798Z"
+        },
+        "modifiedAt": "REGEX(.*\.\d\d\d)Z",
+        "name": "Registration R1",
+        "observationInterval": {
+            "end": "2028-12-31T10:00:00.456Z",
+            "start": "2018-12-31T10:00:00.123Z"
+        },
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+05. Update R1 with all new timestamps
+=====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET R1 and make sure modifiedAt changed and that all timestamps have milliseconds
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": "REGEX(.*\.\d\d\d)Z",
+    "description": "Description of R1",
+    "endpoint": "http://my.csource.org:1026",
+    "expires": "2023-12-31T10:00:01.234Z",
+    "id": "urn:ngsi-ld:registrations:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:A456",
+                    "type": "Vehicle"
+                }
+            ],
+            "properties": [
+                "brandName",
+                "speed"
+            ],
+            "relationships": [
+                "isParked"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "end": "2022-12-31T10:00:00.120Z",
+        "start": "2021-12-31T10:00:00.798Z"
+    },
+    "modifiedAt": "REGEX(.*\.\d\d\d)Z",
+    "name": "Registration R1",
+    "observationInterval": {
+        "end": "2020-12-31T10:00:00.456Z",
+        "start": "2019-12-31T10:00:00.123Z"
+    },
+    "type": "ContextSourceRegistration"
+}
+OK: Timestamp createdAt has not changed
+OK: Timestamp modifiedAt has changed
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

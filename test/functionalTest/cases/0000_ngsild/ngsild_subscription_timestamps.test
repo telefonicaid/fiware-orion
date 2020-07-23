@@ -1,0 +1,510 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription timestamps
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription on everything for the accumulator
+# 02. See the subscription in mongo - make sure all timestamps have milliseconds
+# 03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
+# 04. Create an entity to provoke a notification
+# 05. Dump the accumulator - check milliseconds for all timestamps
+# 06. Update the entity, to provoke a new notification
+# 07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
+# 08. Update the subscription to provoke a newer 'modifiedAt'
+# 09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
+# 10. Kill the accumulator to make room for a failed notification
+# 11. Update the entity, to provoke a new notification - which will fail as the accumulator is dead
+# 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
+#
+# Later - Orion-LD doesn't even support Periodic Notifications right now:
+# 13. Create a subscription with timeInterval in milliseconds
+# 14. See the subscription in mongo - make sure all timestamps have milliseconds
+# 15. GET the subscription via REST - make sure all timestamps have milliseconds
+#
+
+echo "01. Create a subscription on everything for the accumulator"
+echo "==========================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:s1",
+  "type": "Subscription",
+  "name": "Test subscription 01",
+  "description": "Description of Test subscription 01",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  },
+  "expires": "2028-12-31T11:12:13.456",
+  "throttling": 1.459
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See the subscription in mongo - make sure all timestamps have milliseconds"
+echo "=============================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps"
+echo "==============================================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs
+createdAt=$(kjson /tmp/orionCurl.response | grep createdAt | awk -F\" '{ print $4}')
+modifiedAt=$(kjson /tmp/orionCurl.response | grep modifiedAt| awk -F\" '{ print $4}')
+echo
+echo
+
+
+echo "04. Create an entity to provoke a notification"
+echo "=============================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump the accumulator - check milliseconds for all timestamps"
+echo "================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. Update the entity, to provoke a new notification"
+echo "===================================================="
+sleep 2  # Throttling is 1.6 seconds
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 2
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification"
+echo "======================================================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs
+createdAt2=$(kjson /tmp/orionCurl.response | grep createdAt | awk -F\" '{ print $4}')
+modifiedAt2=$(kjson /tmp/orionCurl.response | grep modifiedAt| awk -F\" '{ print $4}')
+lastNotification=$(kjson /tmp/orionCurl.response | grep lastNotification | awk -F\" '{ print $4}')
+lastSuccess=$(kjson /tmp/orionCurl.response | grep lastSuccess | awk -F\" '{ print $4}')
+timesSent=$(kjson /tmp/orionCurl.response | grep timesSent | awk -F:\  '{ print $2}' | awk -F, '{ print $1}')
+
+if [ "$createdAt2" != "$createdAt" ]
+then
+  echo "createdAt has changed - error"
+else
+  echo "createdAt stays the same - good!"
+fi
+
+if [ "$modifiedAt2" == "modifiedAt" ]
+then
+  echo "modifiedAt has not changed - error"
+else
+  echo "modifiedAt has changed - good!"
+fi
+
+if [ "$timesSent" != 2 ]
+then
+  echo "timesSent != 2 ($timesSent) - error"
+else
+  echo "timesSent == 2 - good!"
+fi
+
+echo
+echo
+
+
+echo "08. Update the subscription to provoke a newer 'modifiedAt'"
+echo "==========================================================="
+payload='{
+  "name": "New Name for Test subscription 01"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not"
+echo "=============================================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs
+createdAt3=$(kjson /tmp/orionCurl.response | grep createdAt | awk -F\" '{ print $4}')
+modifiedAt3=$(kjson /tmp/orionCurl.response | grep modifiedAt| awk -F\" '{ print $4}')
+lastNotification2=$(kjson /tmp/orionCurl.response | grep lastNotification | awk -F\" '{ print $4}')
+lastSuccess2=$(kjson /tmp/orionCurl.response | grep lastSuccess | awk -F\" '{ print $4}')
+timesSent2=$(kjson /tmp/orionCurl.response | grep timesSent | awk -F:\  '{ print $2}' | awk -F, '{ print $1}')
+if [ "$createdAt2" != "$createdAt2" ]
+then
+  echo "createdAt has changed - error"
+else
+  echo "createdAt stays the same - good!"
+fi
+
+if [ "$modifiedAt3" == "modifiedAt2" ]
+then
+  echo "modifiedAt has not changed - error"
+else
+  echo "modifiedAt has changed - good!"
+fi
+
+if [ "$timesSent" != 2 ]
+then
+  echo "timesSent != 2 ($timesSent) - error"
+else
+  echo "timesSent == 2 - good!"
+fi
+
+echo
+echo
+
+
+echo "10. Kill the accumulator to make room for a failed notification"
+echo "==============================================================="
+accumulatorStop
+echo Accumulator has been stopped
+echo
+echo
+
+
+echo "11. Update the entity, to provoke a new notification - which will fail as the accumulator is dead"
+echo "================================================================================================="
+sleep 2  # Throttling is 1.6 seconds
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": 3
+  }  
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "12. GET the subscription via REST - make sure lastFailure is present and has milliseconds"
+echo "========================================================================================="
+sleep 2  # The broker needs some time to accept the failure from the accumulator
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1?options=sysAttrs
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription on everything for the accumulator
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:s1
+Date: REGEX(.*)
+
+
+
+02. See the subscription in mongo - make sure all timestamps have milliseconds
+==============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:s1",
+	"expiration" : REGEX(\d+\.\d+),
+	"reference" : "REGEX(.*)",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 1.459,
+	"servicePath" : "/",
+	"description" : "Description of Test subscription 01",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : ".*",
+			"isPattern" : "true",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"name" : "Test subscription 01",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 419
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expires": "2028-12-31T11:12:13.456Z",
+    "id": "urn:ngsi-ld:subscriptions:s1",
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "name": "Test subscription 01",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "REGEX(.*)"
+        },
+        "format": "normalized"
+    },
+    "throttling": 1.459,
+    "type": "Subscription"
+}
+
+
+04. Create an entity to provoke a notification
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+05. Dump the accumulator - check milliseconds for all timestamps
+================================================================
+POST http://REGEX(.*)
+Fiware-Servicepath: /
+Content-Length: 256
+User-Agent: REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property", 
+                "value": 1
+            }, 
+            "id": "urn:ngsi-ld:entities:E1", 
+            "type": "T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*\.\d\d\dZ)", 
+    "subscriptionId": "urn:ngsi-ld:subscriptions:s1", 
+    "type": "Notification"
+}
+=======================================
+
+
+06. Update the entity, to provoke a new notification
+====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
+=======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 520
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expires": "2028-12-31T11:12:13.456Z",
+    "id": "urn:ngsi-ld:subscriptions:s1",
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "name": "Test subscription 01",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "REGEX(.*)"
+        },
+        "format": "normalized",
+        "lastNotification": "REGEX(.*\.\d\d\dZ)",
+        "lastSuccess": "REGEX(.*\.\d\d\dZ)",
+        "timesSent": 2
+    },
+    "throttling": 1.459,
+    "type": "Subscription"
+}
+createdAt stays the same - good!
+modifiedAt has changed - good!
+timesSent == 2 - good!
+
+
+08. Update the subscription to provoke a newer 'modifiedAt'
+===========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 533
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expires": "2028-12-31T11:12:13.456Z",
+    "id": "urn:ngsi-ld:subscriptions:s1",
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "name": "New Name for Test subscription 01",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "REGEX(.*)"
+        },
+        "format": "normalized",
+        "lastNotification": "REGEX(.*\.\d\d\dZ)",
+        "lastSuccess": "REGEX(.*\.\d\d\dZ)",
+        "timesSent": 2
+    },
+    "throttling": 1.459,
+    "type": "Subscription"
+}
+createdAt stays the same - good!
+modifiedAt has changed - good!
+timesSent == 2 - good!
+
+
+10. Kill the accumulator to make room for a failed notification
+===============================================================
+Accumulator has been stopped
+
+
+11. Update the entity, to provoke a new notification - which will fail as the accumulator is dead
+=================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 574
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "description": "Description of Test subscription 01",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expires": "2028-12-31T11:12:13.456Z",
+    "id": "urn:ngsi-ld:subscriptions:s1",
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "name": "New Name for Test subscription 01",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "REGEX(.*)"
+        },
+        "format": "normalized",
+        "lastFailure": "REGEX(.*\.\d\d\dZ)",
+        "lastNotification": "REGEX(.*\.\d\d\dZ)",
+        "lastSuccess": "REGEX(.*\.\d\d\dZ)",
+        "timesSent": 3
+    },
+    "throttling": 1.459,
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

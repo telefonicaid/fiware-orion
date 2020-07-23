@@ -1340,6 +1340,45 @@ function dateDiff()
 }
 
 
+
+# -----------------------------------------------------------------------------
+#
+# eqTimestamp - make sure two timestamps are equal
+#
+function eqTimestamp()
+{
+  name=$1
+  ts1="$2"
+  ts2="$3"
+  if [ "$ts1" != "$ts2" ]
+  then
+    echo ERROR: Timestamp $name has changed: \"$ts1\", \"$ts2\"
+  else
+    echo OK: Timestamp $name has not changed
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# neqTimestamp - make sure two timestamps differ
+#
+function neqTimestamp()
+{
+  name=$1
+  ts1="$2"
+  ts2="$3"
+  if [ "$ts1" == "$ts2" ]
+  then
+    echo ERROR: Timestamp $name has not changed: \"$ts1\"
+  else
+    echo OK: Timestamp $name has changed
+  fi
+}
+
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1368,3 +1407,5 @@ export -f dateDiff
 export -f mqttTestClientStart
 export -f mqttTestClientStop
 export -f mqttTestClientDump
+export -f eqTimestamp
+export -f neqTimestamp
