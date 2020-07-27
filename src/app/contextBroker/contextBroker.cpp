@@ -606,6 +606,12 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 
   /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
+  
+  //WARN about insecureNotifications mode
+  if (insecureNotif == true)
+   {
+      LM_W(("WARNING: contextBroker started in insecure mode (-insecureNotif)"));
+   }
 }
 
 
