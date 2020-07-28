@@ -610,7 +610,7 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
   //WARN about insecureNotifications mode
   if (insecureNotif == true)
    {
-      LM_W(("WARNING: contextBroker started in insecure notifications mode (-insecureNotif)"));
+      LM_W(("contextBroker started in insecure notifications mode (-insecureNotif)"));
    }
 }
 
