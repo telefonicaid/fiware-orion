@@ -1313,7 +1313,7 @@ ConnectionInfo* connectionTreatInit
   //
   // IP Address and port of caller
   //
-  char            ip[32];
+  char            ip[IP_LENGTH_MAX];
   unsigned short  port = 0;
 
   const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
