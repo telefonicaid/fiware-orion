@@ -275,7 +275,6 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"timeInterval" : -1,
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [ ],

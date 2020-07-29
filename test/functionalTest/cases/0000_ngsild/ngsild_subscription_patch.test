@@ -176,7 +176,6 @@ MongoDB server version: REGEX(.*)
 	"name" : "Test subscription S01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
-	"timeInterval" : -1,
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
@@ -320,7 +319,6 @@ MongoDB server version: REGEX(.*)
 	"name" : "Changed Name for Test subscription S01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
-	"timeInterval" : -1,
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
