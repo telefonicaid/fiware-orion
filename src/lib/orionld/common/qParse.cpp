@@ -60,7 +60,7 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   char* endBracketP   = NULL;
   char* mdNameP       = NULL;
   char* rest          = NULL;
-  char  fullPath[512];
+  char  fullPath[1024];
 
   *valueMayBeExpandedP = false;
 

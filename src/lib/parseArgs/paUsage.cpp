@@ -364,7 +364,7 @@ void paExtendedUsage(void)
   while ((aP = paIterateNext(paiList)) != NULL)
   {
     char  name[128];
-    char  vals[128];
+    char  vals[256];
     char  defVal[20];
     char  minVal[20];
     char  maxVal[20];
@@ -429,7 +429,7 @@ void paExtendedUsage(void)
     }
     else
     {
-      char out2[256];
+      char out2[64];
 
       snprintf(vals, sizeof(vals), "%s <= %s <= %s", escape(out, minVal), name, escape(out2, maxVal));
     }
@@ -449,7 +449,7 @@ void paExtendedUsage(void)
   {
     char  optName[128];
     char  varName[128];
-    char  vals[128];
+    char  vals[512];
     char  from[128];
     char  s[512];
 
