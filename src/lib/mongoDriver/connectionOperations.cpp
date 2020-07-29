@@ -571,23 +571,27 @@ bool orion::collectionRemove
 }
 
 
-#if 0
+
 /* ****************************************************************************
 *
-* collectionCreateIndex -
+* orion::collectionCreateIndex -
 */
-bool collectionCreateIndex
+bool orion::collectionCreateIndex
 (
-  const std::string&  col,
-  const BSONObj&      indexes,
-  const bool&         isTTL,
-  std::string*        err
+  const std::string&     col,
+  const orion::BSONObj&  _indexes,
+  const bool&            isTTL,
+  std::string*           err
 )
 {
   TIME_STAT_MONGO_COMMAND_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
 
-  if (connection == NULL)
+  orion::DBConnection connection = orion::getMongoConnection();
+
+  // Getting the "low level" driver objects
+  const mongo::BSONObj indexes = _indexes.get();
+
+  if (connection.isNull())
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     LM_E(("Fatal Error (null DB connection)"));
@@ -606,20 +610,20 @@ bool collectionCreateIndex
      */
     if (isTTL)
     {
-      connection->createIndex(col.c_str(), IndexSpec().addKeys(indexes).expireAfterSeconds(0));
+      connection.get()->createIndex(col.c_str(), mongo::IndexSpec().addKeys(indexes).expireAfterSeconds(0));
     }
     else
     {
-      connection->createIndex(col.c_str(), indexes);
+      connection.get()->createIndex(col.c_str(), indexes);
     }
 
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
   }
   catch (const std::exception &e)
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
     std::string msg = std::string("collection: ") + col.c_str() +
@@ -633,7 +637,7 @@ bool collectionCreateIndex
   }
   catch (...)
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
     std::string msg = std::string("collection: ") + col.c_str() +
@@ -649,7 +653,7 @@ bool collectionCreateIndex
 
   return true;
 }
-#endif
+
 
 
 /* ****************************************************************************

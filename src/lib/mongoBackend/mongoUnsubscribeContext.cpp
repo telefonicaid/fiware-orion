@@ -32,21 +32,14 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
-#include "mongoBackend/safeMongo.h"
 #include "cache/subCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::OID;
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 
 
@@ -84,10 +77,10 @@ HttpStatusCode mongoUnsubscribeContext
   }
 
   /* Look for document */
-  BSONObj sub;
-  OID     id;
+  orion::BSONObj sub;
+  orion::OID     id;
 
-  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
+  if (!orion::safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
 
@@ -108,7 +101,10 @@ HttpStatusCode mongoUnsubscribeContext
     return SccOk;
   }
 
-  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  orion::BSONObjBuilder bobId;
+  bobId.append("_id", id);
+
+  if (!orion::collectionFindOne(getSubscribeContextCollectionName(tenant), bobId.obj(), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
@@ -137,7 +133,10 @@ HttpStatusCode mongoUnsubscribeContext
   //
   std::string colName = getSubscribeContextCollectionName(tenant);
 
-  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  orion::BSONObjBuilder bobId2;
+  bobId2.append("_id", orion::OID(requestP->subscriptionId.get()));
+
+  if (!orion::collectionRemove(colName, bobId2.obj(), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 

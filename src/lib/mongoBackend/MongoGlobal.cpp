@@ -31,8 +31,6 @@
 #include <map>
 #include <set>
 
-#include "mongo/client/dbclient.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -58,9 +56,6 @@
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/ngsiWrappers.h"
 
-#include "mongoBackend/mongoConnectionPool.h"  // FIXME OLD-DR: to be removed
-#include "mongoBackend/connectionOperations.h" // FIXME OLD-DR: to be removed
-#include "mongoBackend/safeMongo.h"            // FIXME OLD-DR: to be removed
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
@@ -78,7 +73,6 @@
 *
 * USING
 */
-using mongo::AssertionException;  // FIXME OLD-DR: to be removed
 using ngsiv2::HttpInfo;
 using ngsiv2::EntID;
 
@@ -219,24 +213,6 @@ void mongoInit
 
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (mongoConnectionPoolInit(dbHost,
-                              dbName.c_str(),
-                              rplSet,
-                              user,
-                              pwd,
-                              mechanism,
-                              authDb,
-                              dbSSL,
-                              mtenant,
-                              tmo,
-                              writeConcern,
-                              dbPoolSize,
-                              mutexTimeStat) != 0)
-  {
-    LM_X(1, ("Fatal Error (MongoDB error)"));
-  }
-
-  // FIXME OLD-DR: only orion::mongoConnectionPoolInit() at the end
   if (orion::mongoConnectionPoolInit(dbHost,
                               dbName.c_str(),
                               rplSet,
@@ -251,7 +227,7 @@ void mongoInit
                               dbPoolSize,
                               mutexTimeStat) != 0)
   {
-    LM_X(1, ("Fatal Error (MongoDB error, 2nd pool)"));
+    LM_X(1, ("Fatal Error (MongoDB error)"));
   }
 
   if (user[0] != 0)
@@ -559,7 +535,7 @@ bool mongoLocationCapable(void)
   int minor;
 
   /* Geo location based on 2dsphere indexes was introduced in MongoDB 2.4 */
-  mongoVersionGet(&mayor, &minor);
+  orion::mongoVersionGet(&mayor, &minor);
 
   return ((mayor == 2) && (minor >= 4)) || (mayor > 2);
 }
@@ -577,7 +553,7 @@ bool mongoExpirationCapable(void)
 
   /* TTL (Time To Live) indexes was introduced in MongoDB 2.2,
    *  although the expireAfterSeconds: 0 usage is not shown in documentation until 2.4 */
-  mongoVersionGet(&mayor, &minor);
+  orion::mongoVersionGet(&mayor, &minor);
 
   return ((mayor == 2) && (minor >= 4)) || (mayor > 2);
 }
@@ -596,7 +572,10 @@ void ensureLocationIndex(const std::string& tenant)
     std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << "2dsphere"), false, &err);
+    orion::BSONObjBuilder bobIndex;
+    bobIndex.append(index, "2dsphere");
+
+    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), bobIndex.obj(), false, &err);
     LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
@@ -615,7 +594,10 @@ void ensureDateExpirationIndex(const std::string& tenant)
     std::string index = ENT_EXPIRATION;
     std::string err;
 
-    collectionCreateIndex(getEntitiesCollectionName(tenant), BSON(index << 1), true, &err);
+    orion::BSONObjBuilder bobIndex;
+    bobIndex.append(index, 1);
+
+    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), bobIndex.obj(), true, &err);
     LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
@@ -1702,40 +1684,16 @@ bool entitiesQuery
   while (orion::moreSafe(&cursor))
   {
     orion::BSONObj  r;
-    try
+    int             errType;
+    std::string     nextSafeErr;
+
+    r = cursor.nextSafe(&errType, &nextSafeErr);
+
+    if (errType == NEXTSAFE_CODE_MONGO_EXCEPTION)
     {
-      // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
-      r = cursor.nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      std::string              exErr = e.what();
       ContextElementResponse*  cer   = new ContextElementResponse();
 
-      //
-      // We can't return the error 'as is', as it may contain forbidden characters.
-      // So, we can just match the error and send a less descriptive text.
-      //
-      const char* invalidPolygon      = "Exterior shell of polygon is invalid";
-      const char* sortError           = "nextSafe(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
-      const char* defaultErrorString  = "Error at querying MongoDB";
-
-      alarmMgr.dbError(exErr);
-
-      if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
-      {
-        exErr = invalidPolygon;
-      }
-      else if (strncmp(exErr.c_str(), sortError, strlen(sortError)) == 0)
-      {
-        exErr = "Sort operation used more than the maximum RAM. "
-                "You should create an index. "
-                "Check the Database Administration section in Orion documentation.";
-      }
-      else
-      {
-        exErr = defaultErrorString;
-      }
+      alarmMgr.dbError(nextSafeErr);
 
       //
       // It would be nice to fill in the entity but it is difficult to do this.
@@ -1753,23 +1711,16 @@ bool entitiesQuery
         cer->entity.fill("", "", "");
       }
 
-      cer->statusCode.fill(SccReceiverInternalError, exErr);
+      cer->statusCode.fill(SccReceiverInternalError, nextSafeErr);
       cerV->push_back(cer);
-      releaseMongoConnection(connection);
+      orion::releaseMongoConnection(connection);
       return true;
     }
-    catch (const std::exception &e)
+    else if (errType == NEXTSAFE_CODE_NO_MONGO_EXCEPTION)
     {
-      *err = e.what();
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", e.what(), query.toString().c_str()));
-      releaseMongoConnection(connection);
-      return false;
-    }
-    catch (...)
-    {
-      *err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe() - query: %s)", query.toString().c_str()));
-      releaseMongoConnection(connection);
+      *err = nextSafeErr;
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", nextSafeErr.c_str(), query.toString().c_str()));
+      orion::releaseMongoConnection(connection);
       return false;
     }
 
@@ -1817,7 +1768,7 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
@@ -1966,9 +1917,9 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
-  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
+  en.id        = getStringFieldFF(entity, REG_ENTITY_ID);
+  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldFF(entity, REG_ENTITY_TYPE)      : "";
+  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldFF(entity, REG_ENTITY_ISPATTERN) : "false";
 
   if (includedEntity(en, enV))
   {
@@ -1987,8 +1938,8 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const orion::BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
-    getStringFieldF(attribute, REG_ATTRS_NAME),
-    getStringFieldF(attribute, REG_ATTRS_TYPE));
+    getStringFieldFF(attribute, REG_ATTRS_NAME),
+    getStringFieldFF(attribute, REG_ATTRS_TYPE));
 
   if (includedAttribute(attr.name, attrL))
   {
@@ -2350,7 +2301,7 @@ EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
     orion::BSONObj  subEnt = subEnts[ix].embeddedObject();
     EntityId*       en     = new EntityId(getStringFieldFF(subEnt, CSUB_ENTITY_ID),
                                      subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldFF(subEnt, CSUB_ENTITY_TYPE) : "",
-                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
+                                     getStringFieldFF(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 
@@ -2487,8 +2438,8 @@ StringList subToAttributeList
     return subToAttributeList(sub);
   }
   StringList                       attrL;
-  std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
+  std::vector<orion::BSONElement>  subAttrs = getFieldFF(sub, CSUB_ATTRS).Array();
+  std::vector<orion::BSONElement>  condAttrs = getFieldFF(sub, CSUB_CONDITIONS).Array();
   std::vector<std::string>         conditionAttrs;
   std::vector<std::string>         notificationAttrs;
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
@@ -2517,7 +2468,7 @@ StringList subToAttributeList
 StringList subToAttributeList(const orion::BSONObj& sub)
 {
   StringList                       attrL;
-  std::vector<orion::BSONElement>  subAttrs = orion::getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<orion::BSONElement>  subAttrs = getFieldFF(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {

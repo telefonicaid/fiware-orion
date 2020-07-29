@@ -37,6 +37,7 @@
 #include "mongoDriver/connectionOperations.h"
 #include "mongoDriver/safeMongo.h"
 #include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/BSONObjBuilder.h"
 
 // FIXME OLD-DR: fix UNIT_TESTX marks in this file
 
@@ -241,29 +242,30 @@ static orion::DBConnection mongoConnect
 #endif
 
   /* Get mongo version with the 'buildinfo' command */
-  // FIXME OLD-DR: this part is not needed by the moment, version will be set
-  // by mongoBackend/mongoConnectionPool
-#if 0
-  BSONObj     result;
-  std::string extra;
-  runCollectionCommand(connection, "admin", BSON("buildinfo" << 1), &result, &err);
-  std::string versionString = std::string(getStringFieldF(result, "version"));
+  orion::BSONObj  result;
+  std::string     extra;
+
+  orion::BSONObjBuilder bob;
+  bob.append("buildinfo", 1);
+
+  orion::runCollectionCommand(orion::DBConnection(connection), "admin", bob.obj(), &result, &err);
+  std::string versionString = std::string(getStringFieldFF(result, "version"));
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
     LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
-    return NULL;
+    return orion::DBConnection(NULL);
   }
   LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)",
                   versionString.c_str(),
                   mongoVersionMayor,
                   mongoVersionMinor,
-                  extra.c_str())); */
-#endif
+                  extra.c_str()));
+
   return orion::DBConnection(connection);
 }
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * shutdownClient -
@@ -276,7 +278,7 @@ static void shutdownClient(void)
     LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
   }
 }
-#endif
+
 
 
 
@@ -302,12 +304,11 @@ int orion::mongoConnectionPoolInit
 )
 {
   // We cannot move status variable declaration outside the if block. That fails at compilation time
-  /* FIXME OLD-DR: avoid double-initialization. mongoBackend/mongoConnectionPool will done for us
   bool statusOk = false;
   std::string statusString;
   if (dbSSL)
   {
-    mongo::Status status = mongo::client::initialize(Options().setSSLMode(mongo::client::Options::kSSLRequired));
+    mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
     statusOk = status.isOK();
     statusString = status.toString();
   }
@@ -324,7 +325,6 @@ int orion::mongoConnectionPoolInit
     return -1;
   }
   atexit(shutdownClient);
-  */
 
 #ifdef UNIT_TESTX
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
@@ -474,12 +474,13 @@ static void mongoPoolConnectionRelease(const orion::DBConnection& connection)
 }
 #endif
 
-#if 0
+
+
 /* ****************************************************************************
 *
-* mongoPoolConnectionSemWaitingTimeGet -
+* orion::mongoPoolConnectionSemWaitingTimeGet -
 */
-float mongoPoolConnectionSemWaitingTimeGet(void)
+float orion::mongoPoolConnectionSemWaitingTimeGet(void)
 {
   return semWaitingTime.tv_sec + ((float) semWaitingTime.tv_nsec) / 1E9;
 }
@@ -488,9 +489,9 @@ float mongoPoolConnectionSemWaitingTimeGet(void)
 
 /* ****************************************************************************
 *
-* mongoPoolConnectionSemWaitingTimeReset -
+* orion::mongoPoolConnectionSemWaitingTimeReset -
 */
-void mongoPoolConnectionSemWaitingTimeReset(void)
+void orion::mongoPoolConnectionSemWaitingTimeReset(void)
 {
   semWaitingTime.tv_sec  = 0;
   semWaitingTime.tv_nsec = 0;
@@ -500,9 +501,9 @@ void mongoPoolConnectionSemWaitingTimeReset(void)
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolSemGet -
+* orion::mongoConnectionPoolSemGet -
 */
-const char* mongoConnectionPoolSemGet(void)
+const char* orion::mongoConnectionPoolSemGet(void)
 {
   int value;
 
@@ -523,9 +524,9 @@ const char* mongoConnectionPoolSemGet(void)
 
 /* ****************************************************************************
 *
-* mongoConnectionSemGet -
+* orion::mongoConnectionSemGet -
 */
-const char* mongoConnectionSemGet(void)
+const char* orion::mongoConnectionSemGet(void)
 {
   int value;
 
@@ -579,7 +580,6 @@ DBClientBase* mongoInitialConnectionGetForUnitTest(void)
 }
 #endif
 
-#endif
 
 
 /* ****************************************************************************

@@ -37,6 +37,8 @@ namespace orion
 /* ****************************************************************************
 *
 * orion::collectionQuery -
+*
+* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool collectionQuery
 (
@@ -52,6 +54,8 @@ extern bool collectionQuery
 /* ****************************************************************************
 *
 * orion::collectionRangedQuery -
+*
+* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool collectionRangedQuery
 (
@@ -74,10 +78,10 @@ extern bool collectionRangedQuery
 */
 extern bool collectionCount
 (
-  const std::string&     col,
-  const BSONObj&  q,
-  unsigned long long*    c,
-  std::string*           err
+  const std::string&   col,
+  const BSONObj&       q,
+  unsigned long long*  c,
+  std::string*         err
 );
 
 
@@ -88,10 +92,10 @@ extern bool collectionCount
 */
 extern bool collectionFindOne
 (
-  const std::string&     col,
-  const BSONObj&  q,
-  BSONObj*        doc,
-  std::string*           err
+  const std::string&  col,
+  const BSONObj&      q,
+  BSONObj*            doc,
+  std::string*        err
 );
 
 
@@ -102,9 +106,9 @@ extern bool collectionFindOne
 */
 extern bool collectionInsert
 (
-  const std::string&     col,
-  const BSONObj&  doc,
-  std::string*           err
+  const std::string&  col,
+  const BSONObj&      doc,
+  std::string*        err
 );
 
 
@@ -115,11 +119,11 @@ extern bool collectionInsert
 */
 extern bool collectionUpdate
 (
-  const std::string&     col,
-  const BSONObj&  q,
-  const BSONObj&  doc,
-  bool                   upsert,
-  std::string*           err
+  const std::string&  col,
+  const BSONObj&      q,
+  const BSONObj&      doc,
+  bool                upsert,
+  std::string*        err
 );
 
 
@@ -130,25 +134,25 @@ extern bool collectionUpdate
 */
 extern bool collectionRemove
 (
-  const std::string&     col,
-  const BSONObj&  q,
-  std::string*           err
+  const std::string&  col,
+  const BSONObj&      q,
+  std::string*        err
 );
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * orion::collectionCreateIndex -
 */
 extern bool collectionCreateIndex
 (
-  const std::string&     col,
-  const BSONObj&  indexes,
-  const bool&            isTTL,
-  std::string*           err
+  const std::string&  col,
+  const BSONObj&      indexes,
+  const bool&         isTTL,
+  std::string*        err
 );
-#endif
+
 
 
 /* ****************************************************************************
@@ -168,6 +172,8 @@ extern bool runCollectionCommand
 /* ****************************************************************************
 *
 * orion::runCollectionCommand -
+*
+* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool runCollectionCommand
 (
@@ -183,6 +189,8 @@ extern bool runCollectionCommand
 /* ****************************************************************************
 *
 * setWriteConcern -
+*
+* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool setWriteConcern
 (
@@ -196,6 +204,8 @@ extern bool setWriteConcern
 /* ****************************************************************************
 *
 * getWriteConcern -
+*
+* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool getWriteConcern
 (
@@ -209,6 +219,8 @@ extern bool getWriteConcern
 /* ****************************************************************************
 *
 * connectionAuth -
+*
+* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool connectionAuth
 (

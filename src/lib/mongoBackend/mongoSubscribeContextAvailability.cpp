@@ -32,22 +32,14 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
-#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/dbConstants.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "rest/uriParamNames.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONArrayBuilder;
-using mongo::BSONObjBuilder;
-using mongo::OID;
-
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 /* ****************************************************************************
@@ -78,8 +70,8 @@ HttpStatusCode mongoSubscribeContextAvailability
   LM_T(LmtMongo, ("Subscription expiration: %d", expiration));
 
   /* Create the mongoDB subscription document */
-  BSONObjBuilder sub;
-  OID            oid;
+  orion::BSONObjBuilder sub;
+  orion::OID            oid;
 
   oid.init();
   sub.append("_id", oid);
@@ -87,29 +79,27 @@ HttpStatusCode mongoSubscribeContextAvailability
   sub.append(CASUB_REFERENCE, requestP->reference.get());
 
   /* Build entities array */
-  BSONArrayBuilder entities;
+  orion::BSONArrayBuilder entities;
 
   for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
   {
     EntityId* en = requestP->entityIdVector[ix];
 
-    if (en->type == "")
+    orion::BSONObjBuilder bobEn;
+    bobEn.append(CASUB_ENTITY_ID, en->id);
+    if (en->type != "")
     {
-      entities.append(BSON(CASUB_ENTITY_ID << en->id <<
-                           CASUB_ENTITY_ISPATTERN << en->isPattern));
+      bobEn.append(CASUB_ENTITY_TYPE, en->type);
     }
-    else
-    {
-      entities.append(BSON(CASUB_ENTITY_ID << en->id <<
-                           CASUB_ENTITY_TYPE << en->type <<
-                           CASUB_ENTITY_ISPATTERN << en->isPattern));
-    }
+    bobEn.append(CASUB_ENTITY_ISPATTERN, en->isPattern);
+
+    entities.append(bobEn.obj());
   }
 
   sub.append(CASUB_ENTITIES, entities.arr());
 
   /* Build attributes array */
-  BSONArrayBuilder attrs;
+  orion::BSONArrayBuilder attrs;
   for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
   {
     attrs.append(requestP->attributeList[ix]);
@@ -126,7 +116,7 @@ HttpStatusCode mongoSubscribeContextAvailability
 
   /* Insert document in database */
   std::string err;
-  if (!collectionInsert(getSubscribeContextAvailabilityCollectionName(tenant), sub.obj(), &err))
+  if (!orion::collectionInsert(getSubscribeContextAvailabilityCollectionName(tenant), sub.obj(), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);

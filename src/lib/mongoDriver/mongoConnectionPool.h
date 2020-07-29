@@ -62,7 +62,7 @@ extern int mongoConnectionPoolInit
 );
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * mongoPoolConnectionSemWaitingTimeGet -
@@ -101,7 +101,6 @@ extern const char* mongoConnectionSemGet(void);
 extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
 #endif
 
-#endif
 
 
 /* ****************************************************************************

@@ -460,7 +460,7 @@ void mongoSubCacheRefresh(const std::string& database)
   orion::DBConnection connection = orion::getMongoConnection();
   if (orion::collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    releaseMongoConnection(connection);
+    orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
@@ -484,7 +484,7 @@ void mongoSubCacheRefresh(const std::string& database)
       ++subNo;
     }
   }
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
 
   LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }

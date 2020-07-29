@@ -40,7 +40,7 @@
 #include "serviceRoutinesV2/semStateTreat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
-#include "mongoBackend/mongoConnectionPool.h"
+#include "mongoDriver/mongoConnectionPool.h"
 
 
 
@@ -85,8 +85,8 @@ std::string semStateTreat
 {
   JsonObjectHelper jh;
 
-  jh.addRaw("dbConnectionPool",    semRender(mongoConnectionPoolSemGet()));
-  jh.addRaw("dbConnection",        semRender(mongoConnectionSemGet()));
+  jh.addRaw("dbConnectionPool",    semRender(orion::mongoConnectionPoolSemGet()));
+  jh.addRaw("dbConnection",        semRender(orion::mongoConnectionSemGet()));
   jh.addRaw("request",             semRender(reqSemGet()));
   jh.addRaw("subCache",            semRender(cacheSemGet()));
   jh.addRaw("transaction",         semRender(transSemGet()));

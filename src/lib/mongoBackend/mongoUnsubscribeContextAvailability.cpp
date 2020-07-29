@@ -32,18 +32,10 @@
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoUnsubscribeContextAvailability.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::OID;
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
 
 
 
@@ -70,8 +62,8 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   responseP->subscriptionId = requestP->subscriptionId;
 
   /* Look for document */
-  BSONObj sub;
-  OID     id;
+  orion::BSONObj sub;
+  orion::OID     id;
 
   if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
   {
@@ -91,7 +83,10 @@ HttpStatusCode mongoUnsubscribeContextAvailability
     return SccOk;
   }
 
-  if (!collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  orion::BSONObjBuilder bobId;
+  bobId.append("_id", id);
+
+  if (!orion::collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), bobId.obj(), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
@@ -116,8 +111,11 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   // to findAndModify for this?
   //
 
+  orion::BSONObjBuilder bobId2;
+  bobId2.append("_id", orion::OID(requestP->subscriptionId.get()));
+
   std::string colName = getSubscribeContextAvailabilityCollectionName(tenant);
-  if (!collectionRemove(colName, BSON("_id" << OID(requestP->subscriptionId.get())), &err))
+  if (!orion::collectionRemove(colName, bobId2.obj(), &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);

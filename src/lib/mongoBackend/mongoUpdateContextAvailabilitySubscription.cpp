@@ -33,23 +33,15 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
-
-
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::BSONObj;
-using mongo::OID;
-using mongo::BSONArrayBuilder;
-using mongo::BSONObjBuilder;
+#include "mongoDriver/connectionOperations.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 
@@ -70,11 +62,11 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request", SemWriteOp, &reqSemTaken);
 
   /* Look for document */
-  BSONObj     sub;
-  std::string err;
-  OID         id;
+  orion::BSONObj  sub;
+  std::string     err;
+  orion::OID      id;
 
-  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->errorCode)))
+  if (!orion::safeGetSubId(requestP->subscriptionId, &id, &(responseP->errorCode)))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
 
@@ -91,7 +83,10 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     return SccOk;
   }
 
-  if (!collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  orion::BSONObjBuilder bobId;
+  bobId.append("_id", id);
+
+  if (!orion::collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), bobId.obj(), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -116,31 +111,29 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
    * update, so detecting if the document was not found, instead of using findOne() + update()
    * with $set operation. One operations to MongoDb. vs two operations.
    */
-  BSONObjBuilder newSub;
+  orion::BSONObjBuilder newSub;
 
   /* Entities (mandatory) */
-  BSONArrayBuilder entities;
+  orion::BSONArrayBuilder entities;
   for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
   {
     EntityId* en = requestP->entityIdVector[ix];
 
-    if (en->type == "")
+    orion::BSONObjBuilder bobEn;
+    bobEn.append(CASUB_ENTITY_ID, en->id);
+    if (en->type != "")
     {
-      entities.append(BSON(CASUB_ENTITY_ID << en->id <<
-                           CASUB_ENTITY_ISPATTERN << en->isPattern));
+      bobEn.append(CASUB_ENTITY_TYPE, en->type);
     }
-    else
-    {
-      entities.append(BSON(CASUB_ENTITY_ID << en->id <<
-                           CASUB_ENTITY_TYPE << en->type <<
-                           CASUB_ENTITY_ISPATTERN << en->isPattern));
-    }
+    bobEn.append(CASUB_ENTITY_ISPATTERN, en->isPattern);
+
+    entities.append(bobEn.obj());
   }
 
   newSub.append(CASUB_ENTITIES, entities.arr());
 
   /* Attributes (always taken into account) */
-  BSONArrayBuilder attrs;
+  orion::BSONArrayBuilder attrs;
 
   for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
   {
@@ -151,7 +144,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Duration (optional) */
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CASUB_EXPIRATION, getIntOrLongFieldAsLongF(sub, CASUB_EXPIRATION));
+    newSub.append(CASUB_EXPIRATION, getIntOrLongFieldAsLongFF(sub, CASUB_EXPIRATION));
   }
   else
   {
@@ -162,14 +155,14 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Reference is not updatable, so it is appended directly */
-  newSub.append(CASUB_REFERENCE, getStringFieldF(sub, CASUB_REFERENCE));
+  newSub.append(CASUB_REFERENCE, getStringFieldFF(sub, CASUB_REFERENCE));
 
-  int count = sub.hasField(CASUB_COUNT) ? getIntFieldF(sub, CASUB_COUNT) : 0;
+  int count = sub.hasField(CASUB_COUNT) ? getIntFieldFF(sub, CASUB_COUNT) : 0;
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
   if (sub.hasField(CASUB_LASTNOTIFICATION))
   {
-    newSub.append(CASUB_LASTNOTIFICATION, getIntFieldF(sub, CASUB_LASTNOTIFICATION));
+    newSub.append(CASUB_LASTNOTIFICATION, getIntFieldFF(sub, CASUB_LASTNOTIFICATION));
   }
 
   if (sub.hasField(CASUB_COUNT))
@@ -188,9 +181,10 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Update document in MongoDB */
 
   std::string  colName = getSubscribeContextAvailabilityCollectionName(tenant);
-  BSONObj      bson    = BSON("_id" << OID(requestP->subscriptionId.get()));
+  orion::BSONObjBuilder  bobId2;
+  bobId2.append("_id", orion::OID(requestP->subscriptionId.get()));
 
-  if (!collectionUpdate(colName, bson, newSub.obj(), false, &err))
+  if (!orion::collectionUpdate(colName, bobId2.obj(), newSub.obj(), false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -207,7 +201,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   processAvailabilitySubscription(requestP->entityIdVector,
                                   requestP->attributeList,
                                   requestP->subscriptionId.get(),
-                                  getStringFieldF(sub, CASUB_REFERENCE),
+                                  getStringFieldFF(sub, CASUB_REFERENCE),
                                   NGSI_V1_LEGACY,
                                   tenant,
                                   fiwareCorrelator);

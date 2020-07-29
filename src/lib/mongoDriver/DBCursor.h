@@ -30,6 +30,9 @@
 
 #include "mongoDriver/BSONObj.h"
 
+#define NEXTSAFE_CODE_NO_ERROR 0
+#define NEXTSAFE_CODE_MONGO_EXCEPTION 1
+#define NEXTSAFE_CODE_NO_MONGO_EXCEPTION 2
 
 namespace orion
 {
@@ -46,7 +49,7 @@ class DBCursor
   // methods to be used by client code (without references to low-level driver code)
   DBCursor();
   bool more(void);
-  BSONObj nextSafe(void);
+  BSONObj nextSafe(int* errCode = NULL, std::string* err = NULL);
   bool isNull(void);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

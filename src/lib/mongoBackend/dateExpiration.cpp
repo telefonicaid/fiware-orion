@@ -33,7 +33,6 @@
 
 // FIXME P5: the following could be not necessary if we optimize the valueBson() thing. See
 // the next FIXME P5 comment in this file
-#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dateExpiration.h"
 
@@ -43,8 +42,6 @@
 *
 * USING
 */
-using mongo::BSONObjBuilder;
-using mongo::BSONArrayBuilder;
 using orion::CompoundValueNode;
 
 

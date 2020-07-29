@@ -46,8 +46,6 @@
 *
 * USING
 */
-using mongo::BSONObjBuilder;
-using mongo::BSONArrayBuilder;
 using orion::CompoundValueNode;
 
 

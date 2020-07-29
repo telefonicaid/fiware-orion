@@ -1552,7 +1552,7 @@ static bool addTriggeredSubscriptions_noCache
             delete bgP;
 
             LM_E(("Runtime Error (%s)", err.c_str()));
-            releaseMongoConnection(connection);
+            orion::releaseMongoConnection(connection);
             return false;
           }
           else
@@ -1565,7 +1565,7 @@ static bool addTriggeredSubscriptions_noCache
               delete bgP;
 
               LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
-              releaseMongoConnection(connection);
+              orion::releaseMongoConnection(connection);
               return false;
             }
 
@@ -1584,7 +1584,7 @@ static bool addTriggeredSubscriptions_noCache
             delete bgP;
 
             LM_E(("Runtime Error (%s)", err.c_str()));
-            releaseMongoConnection(connection);
+            orion::releaseMongoConnection(connection);
             return false;
           }
           else
@@ -1597,7 +1597,7 @@ static bool addTriggeredSubscriptions_noCache
               delete bgP;
 
               LM_E(("Runtime Error (error setting string filter: %s)", errorString.c_str()));
-              releaseMongoConnection(connection);
+              orion::releaseMongoConnection(connection);
               return false;
             }
 
@@ -1610,7 +1610,7 @@ static bool addTriggeredSubscriptions_noCache
     }
   }
 
-  releaseMongoConnection(connection);
+  orion::releaseMongoConnection(connection);
   delete bgP;
 
   return true;

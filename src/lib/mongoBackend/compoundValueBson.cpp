@@ -37,15 +37,6 @@
 
 /* ****************************************************************************
 *
-* namespaces - 
-*/
-using mongo::BSONArrayBuilder;
-using mongo::BSONObjBuilder;
-
-
-
-/* ****************************************************************************
-*
 * compoundValueBson (for arrays) -
 *
 * strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
