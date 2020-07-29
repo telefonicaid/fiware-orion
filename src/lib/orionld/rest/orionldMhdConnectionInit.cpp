@@ -144,7 +144,7 @@ static Verb verbGet(const char* method)
 //
 static void ipAddressAndPort(ConnectionInfo* ciP)
 {
-  char      ip[32];
+  char      ip[IP_LENGTH_MAX];
   uint16_t  port = 0;
 
   const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
