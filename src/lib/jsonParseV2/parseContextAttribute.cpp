@@ -141,10 +141,13 @@ static std::string parseContextAttributeObject
 
       if (r != "OK")
       {
+        LM_TMP(("LEAK: parseMetadataVector failed"));
         std::string details = std::string("error parsing Metadata: ") + r;
         alarmMgr.badInput(clientIp, details);
         return r;
       }
+      else
+        LM_TMP(("LEAK: parseMetadataVector OK"));
     }
     else  // ERROR
     {
@@ -286,6 +289,7 @@ std::string parseContextAttribute
   std::string r = caP->check(ciP->apiVersion, ciP->requestType);
   if (r != "OK")
   {
+    LM_TMP(("LEAK: context-attribute-check failed"));
     alarmMgr.badInput(clientIp, r);
     ciP->httpStatusCode = SccBadRequest;
     return r;

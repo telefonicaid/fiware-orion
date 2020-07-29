@@ -580,13 +580,17 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     if (response != "OK")
     {
+      LM_TMP(("LEAK: payloadParse failed. jsonReqP at %p", jsonReqP));
       alarmMgr.badInput(clientIp, response);
       restReply(ciP, response);
 
       if (jsonReqP != NULL)
       {
+        LM_TMP(("LEAK: releasing jsonReqP"));
         jsonReqP->release(&parseData);
       }
+      else
+        LM_TMP(("LEAK: Not releasing anything!!!"));
 
       if (ciP->apiVersion == V2)
       {
