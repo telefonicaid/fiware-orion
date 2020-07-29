@@ -63,7 +63,7 @@ std::string parseEntityVector
     Entity*      eP = new Entity();
 
     evP->vec.push_back(eP);
-
+    LM_TMP(("LEAK: Created entity %p and pushed it to entity array at %p", eP, evP));
     //
     // FIXME P5: is the logic of this function correct?
     // I mean, parseEntityObject() could result in error, so the push_back maybe

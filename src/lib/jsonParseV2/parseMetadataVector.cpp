@@ -53,15 +53,17 @@ std::string parseMetadataVector(const rapidjson::Value::ConstMemberIterator& nod
   {
     std::string  r;
     Metadata*    mP = new Metadata();
-
     mP->name = iter->name.GetString();
     caP->metadataVector.push_back(mP);
-
+    LM_TMP(("LEAK: Creating metadata '%s' for Attribute '%s'", mP->name.c_str(), caP->name.c_str()));
     r = parseMetadata(iter->value, mP);
     if (r != "OK")
     {
+      LM_TMP(("LEAK: parseMetadata failed, NOT deleting the allocated metadata"));
       return r;
     }
+    else
+      LM_TMP(("LEAK: parseMetadata OK"));
   }
 
   return "OK";
