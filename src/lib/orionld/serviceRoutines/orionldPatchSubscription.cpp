@@ -130,7 +130,7 @@ static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP
         if (okToRemove(fragmentP->name) == false)
         {
           orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name);
-          orionldState.httpStatusCode = SccBadRequest;
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -487,7 +487,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
 
   if ((urlCheck(subscriptionId, NULL) == false) && (urnCheck(subscriptionId, NULL) == false))
   {
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);
     return false;
   }
@@ -507,19 +507,28 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
 
   if (dbSubscriptionP == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription not found", subscriptionId);
+    orionldState.httpStatusCode = 404;
     return false;
   }
+
 
   //
   // Make sure we don't get both watchedAttributed AND timeInterval
   // If so, the PATCH is invalid
+  // Right now, timeInterval id not supported, but once it is, if ever, this code will come in handy
   //
+  if (timeIntervalNodeP != NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented");
+    orionldState.httpStatusCode = 501;
+    return false;
+  }
+
   if ((watchedAttributesNodeP != NULL) && (timeIntervalNodeP != NULL))
   {
     LM_W(("Bad Input (Both 'watchedAttributes' and 'timeInterval' given in Subscription Payload Data)"));
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Both 'watchedAttributes' and 'timeInterval' given");
     return false;
   }
@@ -530,7 +539,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     if ((dbTimeIntervalNodeP != NULL) && (dbTimeIntervalNodeP->value.i != -1))
     {
       LM_W(("Bad Input (Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'"));
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'");
       return false;
     }
@@ -542,7 +551,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     if ((dbConditionsNodeP != NULL) && (dbConditionsNodeP->value.firstChildP != NULL))
     {
       LM_W(("Bad Input (Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes')"));
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'");
       return false;
     }
@@ -583,8 +592,8 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   //
   dbSubscriptionReplace(subscriptionId, dbSubscriptionP);
 
-  // All OK? 204
-  orionldState.httpStatusCode = SccNoContent;
+  // All OK? 204 No Content
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

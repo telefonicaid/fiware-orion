@@ -916,14 +916,14 @@ Date: REGEX(.*)
 
 14. PATCH 'timeInterval' and see error
 ======================================
-HTTP/1.1 400 Bad Request
-Content-Length: 200
+HTTP/1.1 501 Not Implemented
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'",
-    "title": "Invalid Subscription Payload Data",
+    "detail": "Subscription::timeInterval is not implemented",
+    "title": "Not Implemented",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
