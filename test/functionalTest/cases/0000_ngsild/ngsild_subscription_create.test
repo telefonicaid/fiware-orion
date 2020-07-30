@@ -31,6 +31,17 @@ brokerStart CB 0-255
 --SHELL--
 
 #
+# As of today (July 2020), Orion-LD doesn't support periodical notifications.
+# We implemented it in Orion but as nobody was using it, we removed the functionality.
+# For NGSi-LD we'll have to decide whether we want it or not.
+# My personal vote would be not to implement it as I see it as a useless feature that eats CPU resources unnecessarily.
+# That said, a few tests are implemented inside the broker code, to check for incompatible requests, e.g. creation of a subscription
+# with both throttling and timeInterval.
+# I recently implemented a response of 501 for whenever a timeInterval is used with subscriptions, and this response shadows this error handling
+# about throttling and timeInterval and the test case 07 show just that.
+# I've decided to keep the test case though as, perhaps, some day, Orion-LD will support this feature about periodic notifications.
+#
+#
 # 01. POST /ngsi-ld/v1/subscriptions, with sub-id http://a.b.c/subs/sub01
 # 02. Check mongo
 # 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
@@ -576,14 +587,14 @@ Date: REGEX(.*)
 
 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 ===================================================================================================
-HTTP/1.1 400 Bad Request
+HTTP/1.1 501 Not Implemented
 Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "no detail",
-    "title": "Both 'timeInterval' and 'watchedAttributes' present",
+    "detail": "Subscription::timeInterval is not implemented",
+    "title": "Not Implemented",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
