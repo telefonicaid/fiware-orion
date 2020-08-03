@@ -1,7 +1,29 @@
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+#
+
 ARG  IMAGE_TAG=centos7.7.1908
 FROM centos:${IMAGE_TAG}
 
-MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
+ARG GITHUB_ACCOUNT=telefonicaid
+ARG GITHUB_REPOSITORY=fiware-orion
 
 ARG GIT_NAME
 ARG GIT_REV_ORION
@@ -11,6 +33,8 @@ ENV ORION_USER orion
 ENV GIT_NAME ${GIT_NAME:-telefonicaid}
 ENV GIT_REV_ORION ${GIT_REV_ORION:-master}
 ENV CLEAN_DEV_TOOLS ${CLEAN_DEV_TOOLS:-1}
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /opt
 
@@ -127,4 +151,20 @@ RUN \
 WORKDIR /
 ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast" ]
 EXPOSE 1026
+
+LABEL "maintainer"="FIWARE IoTAgent Team. Telefónica I+D"
+LABEL "org.opencontainers.image.authors"="iot_support@tid.es"
+LABEL "org.opencontainers.image.documentation"="https://fiware-orion.rtfd.io/"
+LABEL "org.opencontainers.image.vendor"="Telefónica Investigación y Desarrollo, S.A.U"
+LABEL "org.opencontainers.image.licenses"="AGPL-3.0-only"
+LABEL "org.opencontainers.image.title"="Orion Context Broker"
+LABEL "org.opencontainers.image.description"="The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE, providing an NGSI interface"
+LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${GITHUB_REPOSITORY}
+
+# Create an anonymous user
+RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
+    && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
+USER nobody
+
+
 
