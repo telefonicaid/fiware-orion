@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoQueryTypes.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "orionTypes/EntityTypeResponse.h"

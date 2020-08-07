@@ -54,8 +54,8 @@ echo
 echo
 
 
-T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
-T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="4seconds")
+T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
+T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z" --date="4seconds")
 
 
 echo "02. At T_0: Create subscription with mq: dateModified>T_4"
@@ -163,7 +163,6 @@ Date: REGEX(.*)
 03. At T_1: modify entity E1 (not notif)
 ========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -172,7 +171,6 @@ Date: REGEX(.*)
 04. At T_2: modify entity E1 (not notif)
 ========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -181,7 +179,6 @@ Date: REGEX(.*)
 05. At T_5: modify entity E1 (notif)
 ====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -190,7 +187,6 @@ Date: REGEX(.*)
 06. At T_6: modify entity E1 (notif)
 ====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

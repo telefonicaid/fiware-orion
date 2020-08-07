@@ -47,6 +47,7 @@ std::string parseEntityObject
   ConnectionInfo*                        ciP,
   rapidjson::Value::ConstValueIterator&  valueP,
   Entity*                                eP,
+  bool                                   idPatternAllowed,
   bool                                   attrsAllowed
 )
 {
@@ -88,6 +89,10 @@ std::string parseEntityObject
     }
     else if (name == "idPattern")
     {
+      if (idPatternAllowed == false)
+      {
+        return ERROR_NOTIMPLEMENTED;
+      }
       if (type != "String")
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN;

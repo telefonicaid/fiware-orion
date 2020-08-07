@@ -249,7 +249,7 @@ void setTimer(Timer* t)
 *
 * getCurrentTime - 
 */ 
-int getCurrentTime(void)
+double getCurrentTime(void)
 {
   if (getTimer() == NULL)
   {
@@ -258,7 +258,9 @@ int getCurrentTime(void)
     return -1;
   }
 
-  return getTimer()->getCurrentTime();
+  double t = getTimer()->getCurrentTime();
+
+  return t;
 }
 
 
@@ -500,7 +502,7 @@ static int timezoneOffset(const char* tz)
 * Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */
-int64_t parse8601Time(const std::string& ss)
+double parse8601Time(const std::string& ss)
 {
   int    y = 0;
   int    M = 0;
@@ -561,9 +563,15 @@ int64_t parse8601Time(const std::string& ss)
   time.tm_mday = d;        // 1-31
   time.tm_hour = h;        // 0-23
   time.tm_min  = m;        // 0-59
-  time.tm_sec  = (int)s;   // 0-61 (0-60 in C++11)
+  time.tm_sec  = (int) s;  // 0-61 (0-60 in C++11)
 
-  return (int64_t) (timegm(&time) - offset);
+  int64_t  totalSecs  = timegm(&time) - offset;
+  float    millis     = s - (int) s;
+  double   timestamp  = totalSecs;
+
+  timestamp += millis;  // Must be done in two lines:  timestamp = totalSecs + millis fails ...
+
+  return timestamp;
 }
 
 

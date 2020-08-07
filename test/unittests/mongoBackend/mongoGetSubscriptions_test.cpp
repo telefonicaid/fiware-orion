@@ -32,6 +32,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 
 #include "unittests/testInit.h"
@@ -84,9 +85,9 @@ static void prepareDatabaseV1Subs(void)
     /* Set database */
     setupDatabase();
 
-    // 10000000 -> Sun, 26 Apr 1970 17:46:40 GMT -> "1970-04-26T17:46:40.00Z"
-    // 20000000 -> Thu, 20 Aug 1970 11:33:20 GMT -> "1970-08-20T11:33:20.00Z"
-    // 25000000 -> Sat, 17 Oct 1970 08:26:40 GMT -> "1970-19-17T08:26:40.00Z"
+    // 10000000 -> Sun, 26 Apr 1970 17:46:40 GMT -> "1970-04-26T17:46:40Z"
+    // 20000000 -> Thu, 20 Aug 1970 11:33:20 GMT -> "1970-08-20T11:33:20Z"
+    // 25000000 -> Sat, 17 Oct 1970 08:26:40 GMT -> "1970-19-17T08:26:40Z"
     DBClientBase* connection = getMongoConnection();
 
     BSONObj sub1 = BSON("_id" << OID(SUB_OID1) <<

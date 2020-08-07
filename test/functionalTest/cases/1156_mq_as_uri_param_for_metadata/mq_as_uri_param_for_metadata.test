@@ -401,13 +401,13 @@ Date: REGEX(.*)
 05b. GET subscription to see 'mq' correctly rendered
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 439
+Content-Length: 442
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
@@ -477,7 +477,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Modify E1/A1, setting A1/M1=13
 ==================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -520,7 +519,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Update subscription, without really changing anything
 =========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

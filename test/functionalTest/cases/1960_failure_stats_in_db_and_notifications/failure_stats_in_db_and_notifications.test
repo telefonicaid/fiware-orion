@@ -216,7 +216,7 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 386
+Content-Length: 388
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -254,7 +254,6 @@ Date: REGEX(.*)
 04. Update sub (with OK url), matching E1
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -263,7 +262,7 @@ Date: REGEX(.*)
 05. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -303,7 +302,6 @@ Date: REGEX(.*)
 06. Update E1, to provoke notification that now works
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -312,7 +310,7 @@ Date: REGEX(.*)
 07. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 454
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -406,7 +404,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Update sub (with invalid url)
 =================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -415,7 +412,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

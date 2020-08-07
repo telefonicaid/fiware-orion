@@ -97,6 +97,7 @@ accumulatorStop
 echo
 echo
 
+#
 # We introduced some ward period between updates/notifications. Otherwise, they can
 # be too close so lastFailure == lastSuccess and the CB logic represents this as status: active.
 # lastFailure/lastSuccess precission is 1 second, so that's the time we wait
@@ -108,6 +109,8 @@ payload='{
   "A": 2
 }'
 orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
+echo
+echo
 
 
 echo "07. Get subscription see status: failed, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)"
@@ -175,7 +178,7 @@ Date: REGEX(.*)
 04. Get subscription see status: active, lastSuccessCode: 200
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 400
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -189,8 +192,8 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -217,14 +220,15 @@ Date: REGEX(.*)
 06. Update entity (triggering notification)
 ===========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+
+
 
 07. Get subscription see status: failed, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
 =========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 487
+Content-Length: 490
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -238,10 +242,10 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:9997/giveme200"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
         "timesSent": 2

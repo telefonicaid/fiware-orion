@@ -34,6 +34,7 @@
 #include "common/errorMessages.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
@@ -3264,7 +3265,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ("Database Error (collection: utest.entities "
               "- update(): <{ _id.id: \"E1\", _id.type: \"T1\" },"
               "{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", mdNames: [], "
-              "modDate: 1360232700 }, modDate: 1360232700, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
+              "modDate: 1360232700.0 }, modDate: 1360232700.0, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */

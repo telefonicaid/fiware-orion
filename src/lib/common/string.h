@@ -189,7 +189,7 @@ extern std::string double2string(double f);
 * isodate2str -
 *
 */
-extern std::string isodate2str(long long timestamp);
+extern std::string isodate2str(double timestamp);
 
 
 

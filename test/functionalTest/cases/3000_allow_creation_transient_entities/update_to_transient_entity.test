@@ -82,7 +82,6 @@ Date: REGEX(.*)
 02. POST /v2/entities/E1/attrs, add dateExpires attribute, the entity becomes transient
 =======================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

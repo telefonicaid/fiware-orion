@@ -156,7 +156,6 @@ Date: REGEX(.*)
 02. Create entity with geodata
 ==============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -219,7 +218,6 @@ Date: REGEX(.*)
 05. Update the entity, using /v2/op/update, in CB
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

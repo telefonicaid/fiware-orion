@@ -55,3 +55,19 @@ Orion Context Broker は、サブスクリプション・トリガーを高速�
 参考までに、Orion 1.13.0 が稼働する、4 GB RAM を搭載したマシンのラボ・テストでは、サブスクリプション数が 211.000 を上回ると、Orion がクラッシュしました。
 
 これに関連する改善について、[リポジトリに issue](https://github.com/telefonicaid/fiware-orion/issues/2780) があります。
+
+## 最大ネスト・レベル
+
+複合属性 (compound attributes) とメタデータ値には、最大のネストレベルがあります。この制限は50レベルです。
+この制限を超える値で属性/メタデータを作成または更新しようとすると、このペイロードで 400 Bad Request error
+が発生します :
+
+```
+{
+   "description": "attribute or metadata value has overpassed maximum nesting limit: 50",
+   "error": "ParseError"
+}
+```
+
+JSON を処理する他システムもこの種の制限を使用することに注意してください (たとえば、
+[MongoDB の制限](https://docs.mongodb.com/manual/reference/limits/#Nested-Depth-for-BSON-Documents)).

@@ -516,7 +516,7 @@ Date: REGEX(.*)
 10. Get sub1 see status: active, lastSuccessCode: 200
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 408
+Content-Length: 410
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -530,8 +530,8 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -554,7 +554,7 @@ Date: REGEX(.*)
 11. Get sub2 see status: active, lastSuccessCode: 400
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 408
+Content-Length: 410
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -568,8 +568,8 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme400"
         },
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 400,
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -592,7 +592,7 @@ Date: REGEX(.*)
 12. Get sub3 see status: active, lastSuccessCode: 404
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 408
+Content-Length: 410
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -606,8 +606,8 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme404"
         },
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -630,7 +630,7 @@ Date: REGEX(.*)
 13. Get sub4 see status: active, lastSuccessCode: 500
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 408
+Content-Length: 410
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -644,8 +644,8 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme500"
         },
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
-        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 500,
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -668,7 +668,7 @@ Date: REGEX(.*)
 14. Get sub5 see status: failed, lastFailureReason: Timeout was reached
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 436
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -682,9 +682,9 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:REGEX(\d+)/givemeDelay"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Timeout was reached",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -706,7 +706,7 @@ Date: REGEX(.*)
 15. Get sub6 see status: failed, lastFailureReason: Couldn't connect to server
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 439
+Content-Length: 441
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -720,9 +720,9 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:6699/notify"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -744,7 +744,7 @@ Date: REGEX(.*)
 16. Get sub7 see status: failed, lastFailureReason: Couldn't resolve host name
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -758,9 +758,9 @@ Date: REGEX(.*)
         "http": {
             "url": "http://foo.bar.bar.com:1028/notify"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Couldn't resolve host name",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -782,7 +782,7 @@ Date: REGEX(.*)
 17. Get sub8 see status: failed, lastFailureReason: Timeout was reached
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 437
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -796,9 +796,9 @@ Date: REGEX(.*)
         "http": {
             "url": "http://12.34.76.85:9999/giveme200"
         },
-        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Timeout was reached",
-        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
     },

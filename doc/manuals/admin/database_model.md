@@ -57,21 +57,21 @@ Fields:
     -   **mdNames**: an array of strings. Its elements are the names of the
         metadata of the attribute. Here the "." to "="
         replacement is not done.
-    -   **creDate**: the timestamp (as integer number) corresponding to attribute creation
-        (as a consequence of append).
-    -   **modDate**: the timestamp (as integer number) corresponding to last
-        attribute update. It matches creDate if the attribute has not been
-        modified after creation.
+    -   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+        corresponding to attribute creation (as a consequence of append).
+    -   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+        corresponding to last attribute update. It matches creDate if the attribute has
+        not been modified after creation.
 -   **attrNames**: an array of strings. Its elements are the names of the
     attributes of the entity (without IDs). In this case, the "." to "="
     replacement is not done.
--   **creDate**: the timestamp (as integer number) corresponding
-    to entity creation date (as a consequence of append).
--   **modDate**: the timestamp (as integer number) corresponding to last entity update. Note
-    that it uses to be the same that a modDate corresponding to at least
-    one of the attributes (not always: it will not be the same if the
-    last update was a DELETE operation). It matches creDate if the
-    entity has not been modified after creation.
+-   **creDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+    corresponding to entity creation date (as a consequence of append).
+-   **modDate**: the timestamp (as a floating point number, meaning seconds with milliseconds)
+    corresponding to last entity update. Note that it is usually the same as a
+    modDate corresponding to at least one of the attributes (not always: it will
+    not be the same if the last update was a DELETE operation). It matches creDate
+    if the entity has not been modified after creation.
 -   **location** (optional): geographic location of the entity, composed
     of the following fields:
     -   **attrName**: the attribute name that identifies the geographic
@@ -139,8 +139,8 @@ Example document:
        "A1": {
            "type": "TA1",
            "value": "282",
-           "creDate" : 1389376081,
-           "modDate" : 1389376120,
+           "creDate" : 1389376081.8471954,
+           "modDate" : 1389376120.2154321,
            "md" : {
               "customMD1": {
                  "type" : "string",
@@ -156,19 +156,19 @@ Example document:
        "A2()ID101": {
            "type": "TA2",
            "value": "176",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
+           "creDate" : 1389376244.6651231,
+           "modDate" : 1389376244.6651231
        },
        "position": {
            "type": "location",
            "value": "40.418889, -3.691944",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
+           "creDate" : 1389376244.6651231,
+           "modDate" : 1389376244.6651231
        }
    },
    "attrNames": [ "A1", "A2", "position" ],
-   "creDate": 1389376081,
-   "modDate": 1389376244,
+   "creDate": 1389376081.8471954,
+   "modDate": 1389376244.6651231,
    "location": {
        "attrName": "position",
        "coords": {
@@ -202,7 +202,7 @@ Fields:
 -   **status** (optional): either `active` (for active registrations) or `inactive` (for inactive registrations).
     The default status (i.e. if the document omits this field) is "active".
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
--   **expiration**: this is the timestamp for which the
+-   **expiration**: this is the timestamp (as integer number, meaning seconds) for which the
     registration expires.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
@@ -271,10 +271,10 @@ Fields:
     path](../user/service_path.md) functionality. This is the service path
     associated to the query "encapsulated" by the subscription. Default
     is `/#`.
--   **expiration**: this is the timestamp on which the
+-   **expiration**: this is the timestamp (as integer number, meaning seconds) on which the
     subscription expires. For permanent subscriptions
     an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
--   **lastNotification**: the time when last notification was sent. This
+-   **lastNotification**: the time (as integer number, meaning seconds) when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications
@@ -307,11 +307,11 @@ Fields:
 -   **qs**: optional field to store the query parameters keymap for notification customization functionality in NGSIv2.
 -   **method**: optional field to store the HTTP method for notification customization functionality in NGSIv2.
 -   **payload**: optional field to store the payload for notification customization functionality in NGSIv2.
--   **lastFailure**: the time when last notification failure occurred.
+-   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.
     Not present if the subscription has never failed.
--   **lastSuccess**: the time when last successful notification occurred.
+-   **lastSuccess**: the (as integer number, meaning seconds) time when last successful notification occurred.
     Not present if the subscription has never provoked a successful notification.
 -   **lastSuccessCode**: HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last
     time a successful notification was sent.

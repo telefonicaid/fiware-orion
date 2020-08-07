@@ -42,43 +42,6 @@ namespace orion
 {
 /* ****************************************************************************
 *
-* compoundValueMiddle - 
-*
-* containerType: vector/object/string
-*/
-void compoundValueMiddle
-(
-  ConnectionInfo*     ciP,
-  const std::string&  relPath,
-  const std::string&  name,
-  const std::string&  value,
-  orion::ValueType    type
-)
-{
-  LM_T(LmtCompoundValue, ("Compound MIDDLE %s: %s: NAME: '%s', VALUE: '%s'",
-                          relPath.c_str(),
-                          orion::valueTypeName(type),
-                          name.c_str(),
-                          value.c_str()));
-
-  if ((type == orion::ValueTypeVector) || (type == orion::ValueTypeObject))
-  {
-    // If we enter a vector or an object, the container must change (so that we add to this container from now on).
-    // ciP->compoundValueP points to the current compound container
-    ciP->compoundValueP = ciP->compoundValueP->add(type, name, "");
-
-    LM_T(LmtCompoundValueContainer, ("Set current container to '%s'", ciP->compoundValueP->name.c_str()));
-  }
-  else
-  {
-    ciP->compoundValueP->add(type, name, value);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * compoundValueEnd - 
 */
 void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)

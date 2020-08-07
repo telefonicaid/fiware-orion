@@ -41,7 +41,8 @@ extern std::string parseMetadataCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
   Metadata*                                     mdP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATACOMPOUNDVALUE_H_

@@ -34,6 +34,7 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoNotifyContextAvailability.h"
 
 #include "unittests/commonMocks.h"

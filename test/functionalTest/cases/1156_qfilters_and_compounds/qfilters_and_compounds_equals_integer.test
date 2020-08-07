@@ -65,7 +65,7 @@ payload='{
       "T": true,
       "F": false,
       "N": null,
-      "D": "2016-07-22T10:42:42.00Z"
+      "D": "2016-07-22T10:42:42.000Z"
     }
   },
   "A2": { "value": 22 }
@@ -215,7 +215,7 @@ Date: REGEX(.*)
 02. Equal to Same Integer: GET /v2/entities?q=A1.i:10, see E1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,7 +226,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -249,7 +249,7 @@ Date: REGEX(.*)
 03. Equal to Same Integer: GET /v2/entities?q=A1.i==10, see E1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -260,7 +260,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -316,7 +316,7 @@ Date: REGEX(.*)
 07. Not Equal to Different Integer: GET /v2/entities?q=A1.i!=11, see E1
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -327,7 +327,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -361,7 +361,7 @@ Date: REGEX(.*)
 09. Equal to Correct Int-Range: GET /v2/entities?q=A1.i:1..10, see E1
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -372,7 +372,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -406,7 +406,7 @@ Date: REGEX(.*)
 11. Equal to Correct Int-Range: GET /v2/entities?q=A1.i==1..10, see E1
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -417,7 +417,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -451,7 +451,7 @@ Date: REGEX(.*)
 13. Not Equal to Incorrect Int-Range: GET /v2/entities?q=A1.i!=1..9, see E1
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -462,7 +462,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -485,7 +485,7 @@ Date: REGEX(.*)
 14. Equal to Correct Int-List:  GET /v2/entities?q=A1.i:0,5,10,15, see E1
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -496,7 +496,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -519,7 +519,7 @@ Date: REGEX(.*)
 15. Equal to Correct Int-List: GET /v2/entities?q=A1.i==0,5,10,15, see E1
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -530,7 +530,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,
@@ -586,7 +586,7 @@ Date: REGEX(.*)
 19. Not Equal to Incorrect Int-List: GET /v2/entities?q=A1.i!=0,5,15, see E1
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 225
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -597,7 +597,7 @@ Date: REGEX(.*)
             "metadata": {},
             "type": "StructuredValue",
             "value": {
-                "D": "2016-07-22T10:42:42.00Z",
+                "D": "2016-07-22T10:42:42.000Z",
                 "F": false,
                 "N": null,
                 "T": true,

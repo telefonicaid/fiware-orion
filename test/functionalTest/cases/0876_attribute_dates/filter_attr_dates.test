@@ -44,7 +44,13 @@ brokerStart CB
 # 10. Get entities created in the range from t_3 to t_4 -> E3, E4
 # 11. Get entities modified in the range from t_3 to t_4 -> E4
 #
-
+# NOTE:
+#  The two timestamps t_3 and t_4 are used as start-end for a range with which to capture entities in this test.
+#  As the timestamps are created with current time and milliseconds set to ZERO, as end range, having the milliseconds set to zero doesn't work.
+#  As creation/modification is most likely made not on the exact 000 millisecond some some time after that
+#
+#  So, for t_4, the milliseconds are set to 999 instead of 0.
+#
 
 echo "01. Create entity E1 at t_1"
 echo "==========================="
@@ -53,7 +59,7 @@ payload='{
   "type": "T",
   "A": "entity 1"
 }'
-T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_1=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -67,7 +73,7 @@ payload='{
   "type": "T",
   "A": "entity 2"
 }'
-T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -81,7 +87,7 @@ payload='{
   "type": "T",
   "A": "entity 3"
 }'
-T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_3=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -95,7 +101,7 @@ payload='{
   "type": "T",
   "A": "entity 4"
 }'
-T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.999Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -109,7 +115,7 @@ payload='{
   "type": "T",
   "A": "entity 5"
 }'
-T_5=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_5=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -121,7 +127,7 @@ echo "===================="
 payload='{
   "A": "entity 3 mod"
 }'
-T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities/E3/attrs?options=keyValues' --payload "$payload"
 sleep 1s
 echo
@@ -133,7 +139,7 @@ echo "===================="
 payload='{
   "A": "entity 1 mod"
 }'
-T_7=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
+T_7=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.000Z")
 orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload"
 echo
 echo
@@ -220,7 +226,6 @@ Date: REGEX(.*)
 06. Modify E3 at t_6
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -229,7 +234,6 @@ Date: REGEX(.*)
 07. Modify E1 at t_7
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

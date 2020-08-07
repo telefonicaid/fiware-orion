@@ -51,6 +51,7 @@
 #include "rest/uriParamNames.h"
 
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
@@ -565,7 +566,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getIntFieldF(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -606,7 +607,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -701,7 +702,7 @@ static bool updateAttribute
   if (isReplace)
   {
     BSONObjBuilder newAttr;
-    int            now = getCurrentTime();
+    double         now = getCurrentTime();
 
     *actualUpdate = true;
 
@@ -835,7 +836,7 @@ static bool appendAttribute
   ab.append(ENT_ATTRS_MDNAMES, mdNames);
 
   /* 4. Dates */
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   ab.append(ENT_ATTRS_CREATION_DATE, now);
   ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
@@ -968,7 +969,7 @@ static bool addTriggeredSubscriptions_withCache
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     CachedSubscription* cSubP = subVec[ix];
@@ -976,7 +977,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)",
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%f, DIFF: %f)",
                          cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
@@ -1020,7 +1021,7 @@ static bool addTriggeredSubscriptions_withCache
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
@@ -1032,7 +1033,7 @@ static bool addTriggeredSubscriptions_withCache
       else
       {
         LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f, T: %lu)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
@@ -1329,7 +1330,7 @@ static bool addTriggeredSubscriptions_noCache
   //
   // Allocating buffer to hold all these BIG variables, necessary for the population of
   // the four parts of the final query.
-  // The necessary variables are too big for the stack and thus moved to the head, inside BsonGroup.
+  // The necessary variables are too big for the stack and thus moved to the heap, inside CSubQueryGroup.
   //
   CSubQueryGroup* bgP = new CSubQueryGroup();
 
@@ -1794,18 +1795,20 @@ static unsigned int processSubscriptions
     {
       notifSent++;
 
-      long long rightNow = getCurrentTime();
-      BSONObj query  = BSON("_id" << OID(mapSubId));
-      BSONObj update;
+      long long  rightNow  = getCurrentTime();
+      BSONObj    query     = BSON("_id" << OID(mapSubId));
+      BSONObj    update;
+
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
       if (subCacheActive == false)
       {
-        BSONObj subOrig;
-        std::string newErr;
+        BSONObj      subOrig;
+        std::string  newErr;
+        std::string  status;
+
         collectionFindOne(getSubscribeContextCollectionName(tenant), query, &subOrig, &newErr);
-        std::string status;
         if (!subOrig.isEmpty())
         {
           if (subOrig.hasField(CSUB_STATUS))
@@ -2001,7 +2004,7 @@ static void updateAttrInNotifyCer
       caP->actionType = actionType;
 
       /* Set modification date */
-      int now = getCurrentTime();
+      double now = getCurrentTime();
       caP->modDate = now;
 
       /* Metadata. Note we clean any previous content as updating an attribute means that all
@@ -2066,7 +2069,7 @@ static void updateAttrInNotifyCer
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   caP->creDate = now;
   caP->modDate = now;
 
@@ -2514,13 +2517,12 @@ static bool processContextAttributeVector
 /* ****************************************************************************
 *
 * createEntity -
-*
 */
 static bool createEntity
 (
   Entity*                          eP,
   const ContextAttributeVector&    attrsV,
-  int                              now,
+  double                           now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -2945,8 +2947,8 @@ static unsigned int updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
@@ -3010,7 +3012,7 @@ static unsigned int updateEntity
 
   if (action != ActionTypeReplace)
   {
-    int now = getCurrentTime();
+    double now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
     notifyCerP->entity.modDate = now;
   }
@@ -3070,7 +3072,7 @@ static unsigned int updateEntity
   {
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
-    int            now = getCurrentTime();
+    double         now = getCurrentTime();
 
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // we use a BSONObjBuilder instead the BSON stream macro.
@@ -3561,7 +3563,7 @@ unsigned int processContextElement
     {
       std::string  errReason;
       std::string  errDetail;
-      int          now = getCurrentTime();
+      double       now = getCurrentTime();
 
       if (!createEntity(eP, eP->attributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {

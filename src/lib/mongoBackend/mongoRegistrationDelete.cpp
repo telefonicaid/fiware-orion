@@ -40,6 +40,7 @@
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegistrationDelete.h"
 
 

@@ -39,6 +39,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
@@ -53,7 +54,6 @@ using mongo::BSONObj;
 using mongo::BSONElement;
 using mongo::DBClientCursor;
 using mongo::DBClientBase;
-using mongo::Query;
 using mongo::OID;
 using ngsiv2::Subscription;
 using ngsiv2::EntID;
@@ -277,21 +277,20 @@ void mongoListSubscriptions
    */
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
-  Query                          q;
+  BSONObj                        q;
 
   // FIXME P6: This here is a bug ... See #3099 for more info
   if (!servicePath.empty() && (servicePath != "/#"))
   {
-    q = Query(BSON(CSUB_SERVICE_PATH << servicePath));
+    q = BSON(CSUB_SERVICE_PATH << servicePath);
   }
-
-  q.sort(BSON("_id" << 1));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection,
                              getSubscribeContextCollectionName(tenant),
                              q,
+                             BSON("_id" << 1),
                              limit,
                              offset,
                              &cursor,

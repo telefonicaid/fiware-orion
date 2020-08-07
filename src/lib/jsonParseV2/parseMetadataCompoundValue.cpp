@@ -59,13 +59,25 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 *
 * parseMetadataCompoundValue -
 */
-std::string parseMetadataCompoundValue
+static std::string parseMetadataCompoundValue
 (
   const rapidjson::Value::ConstValueIterator&   node,
   Metadata*                                     mdP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit ce3cf0766
+
+    return "max deep reached";
+  }
+
   if (node->IsObject())
   {
     for (rapidjson::Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
@@ -109,7 +121,11 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -154,7 +170,11 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -172,9 +192,21 @@ std::string parseMetadataCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
   Metadata*                                     mdP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 )
 {
+  if (deep > MAX_JSON_NESTING)
+  {
+    // It would be better to do this at rapidjson parsing stage, but I'm not sure if it can be done.
+    // There is a question about it in SOF https://stackoverflow.com/questions/60735627/limit-json-nesting-level-at-parsing-stage-in-rapidjson
+    // Depending of the answer, this check could be removed (along with the deep parameter
+    // in this an another functions and the returns check for "max deep reached"), i.e.
+    // revert the changes in commit ce3cf0766
+
+    return "max deep reached";
+  }
+
   std::string type   = jsonParseTypeNames[node->value.GetType()];
 
   if (mdP->compoundValueP == NULL)
@@ -227,7 +259,11 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
@@ -271,7 +307,11 @@ std::string parseMetadataCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        parseMetadataCompoundValue(iter, mdP, cvnP);
+        std::string r = parseMetadataCompoundValue(iter, mdP, cvnP, deep + 1);
+        if (r != "OK")
+        {
+          return r;
+        }
       }
     }
   }
