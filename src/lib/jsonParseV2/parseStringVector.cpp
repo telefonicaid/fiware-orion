@@ -75,7 +75,7 @@ bool parseStringVector
        return false;
     }
 
-   if ((emptyStringNotAllowed == true) && (value == ""))
+    if ((emptyStringNotAllowed == true) && (value == ""))
     {
       *errorStringP = "empty string found in string vector /" + fieldName + "/";
       return false;
