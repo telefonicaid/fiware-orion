@@ -78,7 +78,7 @@ std::string HttpInfo::toJson()
 
   if (custom)
   {
-    if(!this->includePayload)
+    if (!this->includePayload)
     {
       jh.addString("payload", this->payload);
     }
