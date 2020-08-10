@@ -78,7 +78,7 @@ std::string HttpInfo::toJson()
 
   if (custom)
   {
-    if (this->payload != "")
+    if(!this->includePayload)
     {
       jh.addString("payload", this->payload);
     }
@@ -116,6 +116,7 @@ void HttpInfo::fill(const BSONObj& bo)
   if (this->custom)
   {
     this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
+    this->includePayload = this->payload==""? true : false;
 
     if (bo.hasField(CSUB_METHOD))
     {
