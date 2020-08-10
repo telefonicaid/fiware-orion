@@ -235,7 +235,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    if (httpInfo.payload == "")
+    if (httpInfo.includePayload)
     {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
