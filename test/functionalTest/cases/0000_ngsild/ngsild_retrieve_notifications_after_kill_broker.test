@@ -1,0 +1,247 @@
+# Copyright 2018 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation and a simple notification
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create an Entity E01 with attr P1 and P2
+# 02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
+# 03. Dump accumulator to see NO notification - NGSI-LD has no initial notifications
+# 04. Add P3 to E01
+# 05. Kill and restart Broker
+# 06. Dump accumulator to see one notification
+#
+
+echo "01. Create an Entity E01 with attr P1 and P2"
+echo "============================================"
+payload='{
+  "id": "urn:ngsi-ld:E01",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P2": {
+    "type": "Property",
+    "value": "ok"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Create a subscription with accumulator receiving notifications for ALL attributes of E01"
+echo "============================================================================================"
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "Sub 01",
+  "description": "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:E01",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "attributes": [ ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/ld+json"
+    }
+  },
+  "expires": "2028-12-31T10:00:00",
+  "throttling": 0,
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. Add P3 to E01"
+echo "================="
+payload='{
+  "P3": {
+    "type": "Property",
+    "value": 3
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E01/attrs?options=noOverwrite' --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "04. Dump accumulator to see NO notification - NGSI-LD has no initial notifications"
+echo "=================================================================================="
+accumulatorDump
+echo
+echo
+
+
+echo "05. Kill and restart Broker"
+echo "==========================="
+brokerStop CB
+accumulatorStop
+
+export BROKER=orionld
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+echo
+echo
+
+
+echo "06. Dump accumulator to see one notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Entity E01 with attr P1 and P2
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
+Date: REGEX(.*)
+
+
+
+02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
+Date: REGEX(.*)
+
+
+
+03. Add P3 to E01
+=================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Dump accumulator to see NO notification - NGSI-LD has no initial notifications
+==================================================================================
+POST http://REGEX(.*):9997/notify
+Fiware-Servicepath: /
+Content-Length: 401
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
+    "data": [
+        {
+            "P1": {
+                "type": "Property", 
+                "value": 1
+            }, 
+            "P2": {
+                "type": "Property", 
+                "value": "ok"
+            }, 
+            "P3": {
+                "type": "Property", 
+                "value": 3
+            }, 
+            "id": "urn:ngsi-ld:E01", 
+            "type": "T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub01", 
+    "type": "Notification"
+}
+=======================================
+
+
+05. Kill and restart Broker
+===========================
+accumulator running as PID REGEX(.*)
+
+
+06. Dump accumulator to see one notification
+============================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 401
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/ld+json
+
+{
+    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
+    "data": [
+        {
+            "P1": {
+                "type": "Property", 
+                "value": 1
+            }, 
+            "P2": {
+                "type": "Property", 
+                "value": "ok"
+            }, 
+            "P3": {
+                "type": "Property", 
+                "value": 3
+            }, 
+            "id": "urn:ngsi-ld:E01", 
+            "type": "T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{24})", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub01", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
