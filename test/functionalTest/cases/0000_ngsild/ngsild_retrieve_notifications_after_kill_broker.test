@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2019 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -34,10 +34,11 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 #
 # 01. Create an Entity E01 with attr P1 and P2
 # 02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
-# 03. Dump accumulator to see NO notification - NGSI-LD has no initial notifications
-# 04. Add P3 to E01
+# 03. Add P3 to E01
+# 04. Dump accumulator to see one notification - NGSI-LD has no initial notifications
 # 05. Kill and restart Broker
-# 06. Dump accumulator to see one notification
+# 06. Add P4 to E01
+# 07. Dump accumulator to see one notification
 #
 
 echo "01. Create an Entity E01 with attr P1 and P2"
@@ -52,10 +53,9 @@ payload='{
   "P2": {
     "type": "Property",
     "value": "ok"
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
 echo
 echo
 
@@ -81,11 +81,9 @@ payload='{
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
-  "throttling": 0,
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  "expires": "2028-12-31T10:00:00"
 }'
-orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
 echo
 echo
 
@@ -96,17 +94,17 @@ payload='{
   "P3": {
     "type": "Property",
     "value": 3
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  }
 }'
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E01/attrs?options=noOverwrite' --payload "$payload" -H "Content-Type: application/ld+json"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E01/attrs?options=noOverwrite' --payload "$payload" -H "Content-Type: application/json"
 echo
 echo
 
 
-echo "04. Dump accumulator to see NO notification - NGSI-LD has no initial notifications"
-echo "=================================================================================="
+echo "04. Dump accumulator to see one notification - NGSI-LD has no initial notifications"
+echo "==================================================================================="
 accumulatorDump
+accumulatorReset
 echo
 echo
 
@@ -114,19 +112,28 @@ echo
 echo "05. Kill and restart Broker"
 echo "==========================="
 brokerStop CB
-accumulatorStop
-
 export BROKER=orionld
 brokerStart CB 0-255
-accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 echo
 echo
 
 
-echo "06. Dump accumulator to see one notification"
+echo "06. Add P4 to E01"
+echo "================="
+payload='{
+  "P4": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:E01/attrs?options=noOverwrite' --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "07. Dump accumulator to see one notification"
 echo "============================================"
 accumulatorDump
-accumulatorReset
 echo
 echo
 
@@ -158,7 +165,7 @@ Date: REGEX(.*)
 
 
 
-04. Dump accumulator to see NO notification - NGSI-LD has no initial notifications
+04. Dump accumulator to see one notification - NGSI-LD has no initial notifications
 ==================================================================================
 POST http://REGEX(.*):9997/notify
 Fiware-Servicepath: /
@@ -170,7 +177,7 @@ Accept: application/json
 Content-Type: application/ld+json
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld", 
     "data": [
         {
             "P1": {
@@ -199,10 +206,16 @@ Content-Type: application/ld+json
 
 05. Kill and restart Broker
 ===========================
-accumulator running as PID REGEX(.*)
 
 
-06. Dump accumulator to see one notification
+06. Add P4 to E01
+=================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+07. Dump accumulator to see one notification
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
@@ -214,7 +227,7 @@ Accept: application/json
 Content-Type: application/ld+json
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld", 
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "data": [
         {
             "P1": {
