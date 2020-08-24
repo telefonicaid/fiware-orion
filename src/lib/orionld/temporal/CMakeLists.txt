@@ -31,7 +31,25 @@ SET (SOURCES
     temporalPostBatchUpsert.cpp
     temporalPostEntities.cpp
     temporalPostEntity.cpp
+    temporalInitialiseTenant.cpp
+    temporalOpenDBConnection.cpp
 )
+
+SET (HEADERS
+    temporalDeleteAttribute.h
+    temporalDeleteEntity.h
+    temporalPatchAttribute.h
+    temporalPatchEntity.h
+    temporalPostBatchCreate.h
+    temporalPostBatchDelete.h
+    temporalPostBatchUpdate.h
+    temporalPostBatchUpsert.h
+    temporalPostEntities.h
+    temporalPostEntity.h
+    temporalInitialiseTenant.h
+    temporalOpenDBConnection.h
+)
+
 
 # Include directories
 # -----------------------------------------------------------------
@@ -40,4 +58,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_temporal STATIC ${SOURCES})
+ADD_LIBRARY(orionld_temporal STATIC ${SOURCES} ${HEADERS})

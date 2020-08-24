@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDBCONNECTION_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDBCONNECTION_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -32,8 +32,12 @@
 
 // ----------------------------------------------------------------------------
 //
-// temporalDeleteAttribute -
+// temporalOpenDBConnection -
 //
-extern bool temporalDeleteAttribute(ConnectionInfo* ciP);
+//
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEATTRIBUTE_H_
+extern void TemporalDBConnectorClose(PGconn* conn);
+
+extern PGconn* TemporalDBConnectorOpen();
+
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDBCONNECTION_H_

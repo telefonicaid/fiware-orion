@@ -259,6 +259,7 @@ SET (DYNAMIC_LIBS
     z
     resolv
     paho-mqtt3c
+    pq #for Temporal & Postgres
 )
 
 #

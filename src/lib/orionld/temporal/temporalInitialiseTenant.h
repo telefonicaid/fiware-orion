@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEATTRIBUTE_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEATTRIBUTE_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -32,8 +32,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// temporalDeleteAttribute -
+// temporalInitialiseTenant -
 //
-extern bool temporalDeleteAttribute(ConnectionInfo* ciP);
+extern PGconn* temporalInitialiseTenant(char *tenantName);
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALDELETEATTRIBUTE_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_
