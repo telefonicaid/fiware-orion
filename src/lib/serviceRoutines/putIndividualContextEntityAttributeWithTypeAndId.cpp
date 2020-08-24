@@ -96,7 +96,7 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
     alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }
-  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     response.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");

@@ -67,7 +67,7 @@ std::string Subscription::toJson(void)
 
   jh.addString("id", this->id);
 
-  if (this->description != "")
+  if (!this->description.empty())
   {
     jh.addString("description", this->description);
   }
@@ -165,7 +165,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastFailure", this->lastFailure);
   }
 
-  if (this->lastFailureReason != "")
+  if (!this->lastFailureReason.empty())
   {
     jh.addString("lastFailureReason", this->lastFailureReason);
   }
@@ -213,11 +213,11 @@ std::string Condition::toJson()
 
   JsonObjectHelper jhe;
 
-  if (this->expression.q        != "")  jhe.addString("q",        this->expression.q);
-  if (this->expression.mq       != "")  jhe.addString("mq",       this->expression.mq);
-  if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
-  if (this->expression.coords   != "")  jhe.addString("coords",   this->expression.coords);
-  if (this->expression.georel   != "")  jhe.addString("georel",   this->expression.georel);
+  if (!this->expression.q.empty())        jhe.addString("q",        this->expression.q);
+  if (!this->expression.mq.empty())       jhe.addString("mq",       this->expression.mq);
+  if (!this->expression.geometry.empty()) jhe.addString("geometry", this->expression.geometry);
+  if (!this->expression.coords.empty())   jhe.addString("coords",   this->expression.coords);
+  if (!this->expression.georel.empty())   jhe.addString("georel",   this->expression.georel);
 
   std::string expressionString = jhe.str();
 

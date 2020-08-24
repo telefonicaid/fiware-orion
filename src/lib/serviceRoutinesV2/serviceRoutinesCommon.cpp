@@ -50,7 +50,7 @@ void setAttrsFilter
 )
 {
   // Add attributes filter
-  if (uriParam[URI_PARAM_ATTRS] != "")
+  if (!uriParam[URI_PARAM_ATTRS].empty())
   {
     stringSplit(uriParam[URI_PARAM_ATTRS], ',', attrsFilter->stringV, true);
   }
@@ -101,7 +101,7 @@ void setMetadataFilter
 )
 {
   // Add metadata filter
-  if (uriParam[URI_PARAM_METADATA] != "")
+  if (!uriParam[URI_PARAM_METADATA].empty())
   {
     stringSplit(uriParam[URI_PARAM_METADATA], ',', metadataFilter->stringV, true);
   }

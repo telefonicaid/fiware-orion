@@ -341,7 +341,7 @@ static bool hostnameIsValid(const char* hostname)
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
   /* Sanity check */
-  if (url == "")
+  if (url.empty())
   {
     return false;
   }
@@ -372,12 +372,12 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   //
   // Ensuring the host is present
   //
-  if ((urlTokens.size() < 3) || (urlTokens[2] == ""))
+  if ((urlTokens.size() < 3) || (urlTokens[2].empty()))
   {
     return false;
   }
 
-  if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
+  if ((components < 3) || (components == 3 && urlTokens[2].empty()))
   {
     return false;
   }
@@ -392,7 +392,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     path += "/" + urlTokens[ix];
   }
 
-  if (path == "")
+  if (path.empty())
   {
     /* Minimum path is always "/" */
     path = "/";
@@ -435,7 +435,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     if (components == 2)
     {
       /* Sanity check (corresponding to http://xxxx:/path) */
-      if (hostTokens[1].length() == 0)
+      if (hostTokens[1].empty())
       {
         return false;
       }

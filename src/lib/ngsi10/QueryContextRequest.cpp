@@ -66,7 +66,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 
   entityIdVector.push_back(new EntityId(eP));
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     attributeList.push_back(attributeName);
   }
@@ -142,7 +142,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
   std::string           res;
   QueryContextResponse  response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
@@ -185,7 +185,7 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
 
   entityIdVector.push_back(eidP);
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     attributeList.push_back(attributeName);
   }
@@ -219,7 +219,7 @@ void QueryContextRequest::fill
     restriction.scopeVector.push_back(scopeP);
   }
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     attributeList.push_back(attributeName);
   }

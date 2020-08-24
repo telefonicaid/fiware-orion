@@ -105,7 +105,7 @@ std::string postIndividualContextEntity
   //
 
   // 01.01. entityId::id
-  if ((entityIdFromPayload != "") && (entityIdFromURL != "") && (entityIdFromPayload != entityIdFromURL))
+  if ((!entityIdFromPayload.empty()) && (!entityIdFromURL.empty()) && (entityIdFromPayload != entityIdFromURL))
   {
     std::string error = "entityId::id differs in URL and payload";
 
@@ -115,10 +115,10 @@ std::string postIndividualContextEntity
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
-  entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
+  entityId = (!entityIdFromPayload.empty())? entityIdFromPayload : entityIdFromURL;
 
   // 01.02. entityId::type
-  if ((entityTypeFromPayload != "") && (entityTypeFromURL != "") && (entityTypeFromPayload != entityTypeFromURL))
+  if ((!entityTypeFromPayload.empty()) && (!entityTypeFromURL.empty()) && (entityTypeFromPayload != entityTypeFromURL))
   {
     std::string error = "entityId::type differs in URL and payload";
 
@@ -128,7 +128,7 @@ std::string postIndividualContextEntity
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
     return out;
   }
-  entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
+  entityType = (!entityTypeFromPayload.empty())? entityTypeFromPayload :entityTypeFromURL;
 
 
   // 01.03. entityId::isPattern
@@ -144,7 +144,7 @@ std::string postIndividualContextEntity
   }
 
   // 01.04. Entity::id must be present, somewhere ...
-  if (entityId == "")
+  if (entityId.empty())
   {
     std::string error = "invalid request: mandatory entityId::id missing";
 

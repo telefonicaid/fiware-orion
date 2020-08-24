@@ -170,12 +170,12 @@ std::string EntityId::toJson(void) const
 */
 std::string EntityId::check(RequestType requestType)
 {
-  if (id == "")
+  if (id.empty())
   {
     return "empty entityId:id";
   }
 
-  if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
+  if (!isTrue(isPattern) && !isFalse(isPattern) && !isPattern.empty())
   {
     return std::string("invalid isPattern value for entity: /") + isPattern + "/";
   }
@@ -227,7 +227,7 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
   creDate       = eidP->creDate;
   modDate       = eidP->modDate;
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && (type.empty()))
   {
     type = DEFAULT_ENTITY_TYPE;
   }

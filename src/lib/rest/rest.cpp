@@ -472,7 +472,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 
   acceptItemParse(ciP, itemStart);
 
-  if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (ciP->acceptHeaderError == ""))
+  if ((ciP->httpHeaders.acceptHeaderV.size() == 0) && (ciP->acceptHeaderError.empty()))
   {
     ciP->httpStatusCode    = SccNotAcceptable;
     ciP->acceptHeaderError = "no acceptable mime-type in accept header";
@@ -797,7 +797,7 @@ void firstServicePath(const char* servicePath, char* servicePath0, int servicePa
 */
 bool isOriginAllowedForCORS(const std::string& requestOrigin)
 {
-  return ((requestOrigin != "") && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin.c_str(), corsOrigin) == 0)));
+  return ((!requestOrigin.empty()) && ((strcmp(corsOrigin, "__ALL") == 0) || (strcmp(requestOrigin.c_str(), corsOrigin) == 0)));
 }
 
 
@@ -816,7 +816,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   //           Must implement a functest to reproduce this situation.
   //           And, if that is not possible, just remove the whole thing
   //
-  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->httpHeaders.servicePath == ""))
+  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->httpHeaders.servicePath.empty()))
   {
     OrionError e(SccBadRequest, "empty service path");
     ciP->answer = e.render();
@@ -827,7 +827,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   char* servicePathCopy = NULL;
   int   servicePaths    = 0;
 
-  if (ciP->httpHeaders.servicePath != "")
+  if (!ciP->httpHeaders.servicePath.empty())
   {
     servicePathCopy = strdup(ciP->httpHeaders.servicePath.c_str());
     servicePaths    = stringSplit(servicePathCopy, ',', ciP->servicePathV);
@@ -931,7 +931,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 2
-  if (ciP->httpHeaders.contentType == "")
+  if (ciP->httpHeaders.contentType.empty())
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -1288,14 +1288,14 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
-    if (ciP->httpHeaders.accept == "")  // No Accept: given, treated as */*
+    if (ciP->httpHeaders.accept.empty())  // No Accept: given, treated as */*
     {
       ciP->httpHeaders.accept = "*/*";
       acceptParse(ciP, "*/*");
     }
 
     char correlator[CORRELATOR_ID_SIZE + 1];
-    if (ciP->httpHeaders.correlator == "")
+    if (ciP->httpHeaders.correlator.empty())
     {
       correlatorGenerate(correlator);
       ciP->httpHeaders.correlator = correlator;
@@ -1322,12 +1322,12 @@ static int connectionTreat
     /* X-Real-IP and X-Forwarded-For (used by a potential proxy on top of Orion) overrides ip.
        X-Real-IP takes preference over X-Forwarded-For, if both appear */
     std::string from;
-    if (ciP->httpHeaders.xrealIp != "")
+    if (!ciP->httpHeaders.xrealIp.empty())
     {
       from = ciP->httpHeaders.xrealIp;
 
     }
-    else if (ciP->httpHeaders.xforwardedFor != "")
+    else if (!ciP->httpHeaders.xforwardedFor.empty())
     {
       from = ciP->httpHeaders.xforwardedFor;
     }
@@ -1468,7 +1468,7 @@ static int connectionTreat
   //
   // Check for error during Accept Header parsing
   //
-  if (ciP->acceptHeaderError != "")
+  if (!ciP->acceptHeaderError.empty())
   {
     OrionError   oe(SccBadRequest, ciP->acceptHeaderError);
 
@@ -1532,7 +1532,7 @@ static int connectionTreat
   //
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
-  if ((ciP->httpHeaders.contentType != "") && (ciP->httpHeaders.contentLength == 0) && ((ciP->verb == GET) || (ciP->verb == DELETE)))
+  if ((!ciP->httpHeaders.contentType.empty()) && (ciP->httpHeaders.contentLength == 0) && ((ciP->verb == GET) || (ciP->verb == DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);
@@ -1561,7 +1561,7 @@ static int connectionTreat
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
   }
-  else if (ciP->answer != "")
+  else if (!ciP->answer.empty())
   {
     alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);

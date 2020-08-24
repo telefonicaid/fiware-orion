@@ -77,7 +77,7 @@ std::string SubscribeError::toJsonV1(RequestType requestType, bool comma)
     // NOTE: the subscriptionId must have come from the request.
     //       If the field is empty, we are in unit tests and I here set it to all zeroes
     //
-    if (subscriptionId.get() == "")
+    if (subscriptionId.get().empty())
     {
       subscriptionId.set("000000000000000000000000");
     }
@@ -85,7 +85,7 @@ std::string SubscribeError::toJsonV1(RequestType requestType, bool comma)
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
-           (subscriptionId.get() != ""))
+           (!subscriptionId.get().empty()))
   {
     out += subscriptionId.toJsonV1(requestType, true);
   }

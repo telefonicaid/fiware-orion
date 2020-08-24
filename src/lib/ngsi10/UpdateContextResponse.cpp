@@ -126,7 +126,7 @@ std::string UpdateContextResponse::check
 {
   std::string  res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }  
@@ -277,7 +277,7 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
     {
       errorCode.fill(upcrsP->errorCode);
     }
-    else if (errorCode.details == "")
+    else if (errorCode.details.empty())
     {
       errorCode.details = upcrsP->errorCode.details;
     }

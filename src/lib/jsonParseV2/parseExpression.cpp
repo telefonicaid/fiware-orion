@@ -209,8 +209,8 @@ std::string parseExpression
     }
   }
 
-  bool atLeastOne = ((georel != "") || (geometry != "") || (coords != ""));
-  bool allThem    = ((georel != "") && (geometry != "") && (coords != ""));
+  bool atLeastOne = ((!georel.empty()) || (!geometry.empty()) || (!coords.empty()));
+  bool allThem    = ((!georel.empty()) && (!geometry.empty()) && (!coords.empty()));
 
   if (atLeastOne && !allThem)
   {

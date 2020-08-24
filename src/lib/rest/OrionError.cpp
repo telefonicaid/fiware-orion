@@ -53,7 +53,7 @@ OrionError::OrionError()
 OrionError::OrionError(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
-  reasonPhrase  = _reasonPhrase == "" ? httpStatusCodeString(code) : _reasonPhrase;
+  reasonPhrase  = _reasonPhrase.empty() ? httpStatusCodeString(code) : _reasonPhrase;
   details       = _details;
 }
 
@@ -79,7 +79,7 @@ OrionError::OrionError(StatusCode& sc)
 void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
-  reasonPhrase  = _reasonPhrase != ""? _reasonPhrase : httpStatusCodeString(code);
+  reasonPhrase  = !_reasonPhrase.empty()? _reasonPhrase : httpStatusCodeString(code);
   details       = _details;
 }
 
@@ -92,7 +92,7 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 void OrionError::fill(const StatusCode& sc)
 {
   code          = sc.code;
-  reasonPhrase  = (sc.reasonPhrase != "")? sc.reasonPhrase : httpStatusCodeString(code);
+  reasonPhrase  = (!sc.reasonPhrase.empty())? sc.reasonPhrase : httpStatusCodeString(code);
   details       = sc.details;
 }
 
@@ -169,9 +169,9 @@ std::string OrionError::toJsonV1(void)
   //
   out += startTag("orionError", false);
   out += valueTag("code",          code,         true);
-  out += valueTag("reasonPhrase",  reasonPhrase, details != "");
+  out += valueTag("reasonPhrase",  reasonPhrase, !details.empty());
 
-  if (details != "")
+  if (!details.empty())
   {
     out += valueTag("details",       details);
   }

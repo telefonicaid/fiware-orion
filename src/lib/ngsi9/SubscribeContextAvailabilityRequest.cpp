@@ -82,7 +82,7 @@ std::string SubscribeContextAvailabilityRequest::check(const std::string& predet
   SubscribeContextAvailabilityResponse response;
   std::string                          res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }

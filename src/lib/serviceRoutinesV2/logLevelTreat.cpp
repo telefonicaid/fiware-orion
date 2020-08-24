@@ -55,7 +55,7 @@ std::string changeLogLevel
   std::string  level   = ciP->uriParam[URI_PARAM_LEVEL];
   const char*  levelP  = level.c_str();
 
-  if (level == "")
+  if (level.empty())
   {
     ciP->httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "no log level in URI param");
