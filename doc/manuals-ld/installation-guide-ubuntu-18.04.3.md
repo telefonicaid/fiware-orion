@@ -117,6 +117,7 @@ tar xfvz v1.0.2.tar.gz
 sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 ```
 
+**_~/git_ folder should be same as the folder where Context Broker cloned folder locally**
 ### kbase
 
 *kbase* is a collection of basic functionality, like string handling, that is used by the rest of the "K-libs".
@@ -126,7 +127,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kbase.git
 cd kbase
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -139,7 +140,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/klog.git
 cd klog
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -149,14 +150,14 @@ make install
 *kalloc* is a library that provides faster allocation by avoiding calls to `malloc`.
 The library allocates *big* buffers by calling `malloc` and then gives out portions of this big allocated buffer.
 The portions cannot be freed, only the *big* buffers allocated via `malloc` and that is done when the kalloc instance dies.
-For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view.
+For a context broker, that treats every request in a separate thread, this is ideal from a performance point of view. 
 
 To download, build and install:
 ```bash
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
 cd kalloc
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -171,7 +172,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -184,7 +185,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -282,6 +283,10 @@ sudo apt-get update
 
 # Install the MongoDB packages
 sudo apt-get install -y mongodb-org
+
+# Once the installation is done, start MongoDB before starting Orionld
+sudo systemctl start mongod
+
 ```
 
 For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
