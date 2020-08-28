@@ -2165,7 +2165,10 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+      details = std::string("action: UPDATE") +
+                " - entity: [" + entityDetail + "]" + ERROR_DESC_NOT_FOUND_ATTRIBUTE +
+                " - offending attribute: " + targetAttr->getName();
+      oe->fill(SccContextElementNotFound, details, ERROR_NOT_FOUND);
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
