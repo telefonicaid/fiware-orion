@@ -166,13 +166,13 @@ Date: REGEX(.*)
 05. PATCH /v2/entities/E1 T1 (error, attribute not exist)
 =========================================================
 HTTP/1.1 404 Not Found
-Content-Length: 79
+Content-Length: 138
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "The entity does not have such an attribute",
+    "description": "action: UPDATE - entity: [E1, T1]The entity does not have such an attribute - offending attribute: A2",
     "error": "NotFound"
 }
 
