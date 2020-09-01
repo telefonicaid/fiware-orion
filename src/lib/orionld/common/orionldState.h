@@ -103,18 +103,18 @@ typedef struct OrionldUriParamOptions
 //
 typedef struct OrionldUriParams
 {
-  char* id;
-  char* type;
-  char* idPattern;
-  char* attrs;
-  char* options;
-  int   offset;
-  int   limit;
-  bool  count;
-  char* geometry;
-  char* geoloc;
-  char* geoproperty;
-  char* datasetId;
+  char*  id;
+  char*  type;
+  char*  idPattern;
+  char*  attrs;
+  char*  options;
+  int    offset;
+  int    limit;
+  bool   count;
+  char*  geometry;
+  char*  geoloc;
+  char*  geoproperty;
+  char*  datasetId;
 } OrionldUriParams;
 
 

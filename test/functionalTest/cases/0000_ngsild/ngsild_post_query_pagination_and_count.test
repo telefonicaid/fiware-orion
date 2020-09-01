@@ -31,7 +31,7 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# Mongo seems to give the entities back in th order they were created, so, no sleep needed when creating entities.
+# Mongo seems to give the entities back in the order they were created, so, no sleep needed when creating entities.
 # As the entities are ordered by Creation Date, I assumed we'd need different creation dates for all entities (only seconds - no fractions).
 # But, this doesn't seem to be necessary - which saves us 20 seconds for this functest :)
 #
