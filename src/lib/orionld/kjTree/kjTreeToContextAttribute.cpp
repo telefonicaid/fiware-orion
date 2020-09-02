@@ -317,6 +317,7 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
   KjNode*   valueNodeP      = NULL;
   KjNode*   objectNodeP     = NULL;
   KjNode*   observedAtP     = NULL;
+  KjNode*   unitCodeP       = NULL;
   bool      isProperty      = false;
   bool      isRelationship  = false;
   char*     shortName       = orionldContextItemAliasLookup(orionldState.contextP, nodeP->name, NULL, NULL);
@@ -331,6 +332,12 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
   {
     isProperty  = true;
     observedAtP = nodeP;
+    valueNodeP  = nodeP;
+  }
+  else if (SCOMPARE9(shortName, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
+  {
+    isProperty  = true;
+    unitCodeP   = nodeP;
     valueNodeP  = nodeP;
   }
   else if (nodeP->type == KjObject)
@@ -435,6 +442,26 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
       else
         mdP->numberValue = observedAtP->value.i;
     }
+  }
+  else if (unitCodeP != NULL)
+  {
+    mdP->valueType   = orion::ValueTypeString;
+    mdP->name        = "unitCode";
+
+    if (unitCodeP->type == KjObject)
+    {
+      // Lookup member "value"
+      KjNode* valueP = kjLookup(unitCodeP, "value");
+      if (valueP != NULL)
+        mdP->stringValue = valueP->value.s;
+      else
+      {
+        LM_E(("Internal Error (no value field from DB)"));
+        mdP->stringValue = "value lost in DB";
+      }
+    }
+    else
+      mdP->stringValue = unitCodeP->value.s;
   }
   else if (isProperty == true)
   {
@@ -649,6 +676,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
       DUPLICATE_CHECK(unitCodeP, "unit code", nodeP);
+      STRING_CHECK(unitCodeP, "unitCode");
       if (metadataAdd(caP, nodeP, caName) == false)
       {
         // metadataAdd calls orionldErrorResponseCreate
@@ -665,7 +693,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     else if (SCOMPARE11(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
     {
       DUPLICATE_CHECK(observedAtP, "observed at", nodeP);
-      STRING_CHECK(nodeP, "observed at");
+      STRING_CHECK(nodeP, "observedAt");
 
       //
       // This is a very special attribute.
