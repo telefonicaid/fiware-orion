@@ -476,13 +476,13 @@ Date: REGEX(.*)
 08. Attempt to upsert with an empty array - see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "[]",
-    "title": "Empty Array",
+    "detail": "Empty Array",
+    "title": "Invalid Payload Body",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
 
