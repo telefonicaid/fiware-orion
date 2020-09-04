@@ -594,14 +594,14 @@ Date: REGEX(.*)
 08. Attempt to update with an empty array - see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
   "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
-  "title": "Empty Array",
-  "detail": "[]"
+  "title": "Invalid Payload Body",
+  "detail": "Empty Array"
 }
 
 
