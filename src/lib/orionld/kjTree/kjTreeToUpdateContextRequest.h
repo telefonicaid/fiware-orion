@@ -42,7 +42,8 @@ extern void kjTreeToUpdateContextRequest
 (
   UpdateContextRequest*  ucrP,
   KjNode*                treeP,
-  KjNode*                errorsArrayP
+  KjNode*                errorsArrayP,
+  KjNode*                idTypeAndCreDateFromDb
 );
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOUPDATECONTEXTREQUEST_H_
