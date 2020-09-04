@@ -132,7 +132,7 @@ std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details
     //
     // Also, if same errorCode.code but no details ...
     //
-    if ((responseP->errorCode.code == vec[0]->errorCode.code) && (responseP->errorCode.details == ""))
+    if ((responseP->errorCode.code == vec[0]->errorCode.code) && (responseP->errorCode.details.empty()))
     {
       responseP->errorCode.details = vec[0]->errorCode.details;
     }

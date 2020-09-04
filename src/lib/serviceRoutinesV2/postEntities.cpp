@@ -139,7 +139,7 @@ std::string postEntities
   {
     // Prepare HTTP headers
     std::string location = "/v2/entities/" + eP->id;
-    if (eP->type != "" )
+    if (!eP->type.empty())
     {
       location += "?type=" + eP->type;
     }

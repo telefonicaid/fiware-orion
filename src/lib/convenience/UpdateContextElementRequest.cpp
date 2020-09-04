@@ -72,7 +72,7 @@ std::string UpdateContextElementRequest::check
   UpdateContextElementResponse  response;
   std::string                   res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }  

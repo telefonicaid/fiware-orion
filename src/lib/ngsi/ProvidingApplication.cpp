@@ -69,7 +69,7 @@ std::string ProvidingApplication::check(void)
 */
 bool ProvidingApplication::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -124,7 +124,7 @@ std::string ProvidingApplication::get(void)
 */
 std::string ProvidingApplication::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

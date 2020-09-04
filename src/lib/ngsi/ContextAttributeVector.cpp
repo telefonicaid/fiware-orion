@@ -96,7 +96,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
       //
       // See the origin of this in mongoQueryTypes.cpp. Look for "NOTE: here we add", in two locations.
       //
-      if ((type != "") || (attrTypes.size() != 1))
+      if ((!type.empty()) || (attrTypes.size() != 1))
       {
         jvh.addString(type);
       }

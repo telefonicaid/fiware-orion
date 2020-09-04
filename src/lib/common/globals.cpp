@@ -327,7 +327,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
 */
 int64_t parse8601(const std::string& s)
 {
-  if (s == "")
+  if (s.empty())
   {
     return -1;
   }

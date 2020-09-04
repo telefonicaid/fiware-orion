@@ -123,7 +123,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Got an attribute: '%s'", value.c_str()));
 
-  if (value == "")
+  if (value.empty())
   {
     alarmMgr.badInput(clientIp, "empty attribute name");
     reqDataP->errorString = "Empty attribute name";
@@ -170,7 +170,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   reqDataP->qcr.res.restriction.attributeExpression.set(value);
 
-  if (value == "")
+  if (value.empty())
   {
     alarmMgr.badInput(clientIp, "empty attribute expression");
     reqDataP->errorString = "Empty attribute expression";

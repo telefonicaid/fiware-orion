@@ -41,7 +41,7 @@
 */
 std::string Reference::check(RequestType requestType)
 {
-  if (string == "")
+  if (string.empty())
   {
     if ((requestType == SubscribeContextAvailability) || (requestType == SubscribeContext))
     {
@@ -71,7 +71,7 @@ std::string Reference::check(RequestType requestType)
 */
 bool Reference::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -104,7 +104,7 @@ std::string Reference::get(void)
 */
 std::string Reference::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

@@ -90,7 +90,7 @@ std::string UpdateContextAttributeRequest::check
   StatusCode       response;
   std::string      res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.fill(SccBadRequest, predetectedError);
   }

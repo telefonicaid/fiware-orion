@@ -101,7 +101,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(const std::stri
 {
   std::string  res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }

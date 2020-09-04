@@ -222,9 +222,9 @@ static std::string getArrayElementName(const std::string& arrayName)
 */
 std::string nodeType(const std::string& nodeName, const std::string& value, orion::ValueType* typeP)
 {
-  bool  isObject  = (nodeName == "") && (value == "");
-  bool  isString  = (nodeName != "") && (value != "");
-  bool  isVector  = (nodeName != "") && (value == "");
+  bool  isObject  = (nodeName.empty()) && (value.empty());
+  bool  isString  = (!nodeName.empty()) && (!value.empty());
+  bool  isVector  = (!nodeName.empty()) && (value.empty());
 
   if (isObject)
   {
@@ -289,7 +289,7 @@ static void eatCompound
   }
   else
   {
-    if ((nodeName != "") && (nodeValue != ""))  // Named String
+    if ((!nodeName.empty()) && (!nodeValue.empty()))  // Named String
     {
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
@@ -306,28 +306,28 @@ static void eatCompound
                               nodeName.c_str(),
                               nodeValue.c_str()));
     }
-    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
+    else if ((nodeName.empty()) && (nodeValue.empty()) && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
     {
       LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
       containerP->add(orion::ValueTypeString, "item", "");
     }
-    else if ((nodeName != "") && (nodeValue == "") && (noOfChildren == 0))  // Named Empty string
+    else if ((!nodeName.empty()) && (nodeValue.empty()) && (noOfChildren == 0))  // Named Empty string
     {
       LM_T(LmtCompoundValue, ("Adding container '%s'", nodeName.c_str()));
       containerP = containerP->add(ValueTypeString, nodeName, "");
     }
-    else if ((nodeName != "") && (nodeValue == ""))  // Named Container
+    else if ((!nodeName.empty()) && (nodeValue.empty()))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s'", nodeName.c_str()));
       containerP = containerP->add(ValueTypeObject, nodeName, "");
     }
-    else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
+    else if ((nodeName.empty()) && (nodeValue.empty()))  // Name-Less container
     {
       LM_T(LmtCompoundValue, ("Adding name-less container (parent may be a Vector!)"));
       containerP->valueType = ValueTypeVector;
       containerP = containerP->add(ValueTypeObject, "item", "");
     }
-    else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
+    else if ((nodeName.empty()) && (!nodeValue.empty()))  // Name-Less String + its container is a vector
     {
       containerP->valueType = ValueTypeVector;
       LM_T(LmtCompoundValue, ("Set to be a vector"));
@@ -370,7 +370,7 @@ static std::string jsonParse
 
   // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
-  if (nodeName != "")
+  if (!nodeName.empty())
   {
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
@@ -394,7 +394,7 @@ static std::string jsonParse
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   int                         noOfChildren = subtree.size();
-  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0) && (treated == true))
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue.empty()) && (noOfChildren != 0) && (treated == true))
   {
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
@@ -411,7 +411,7 @@ static std::string jsonParse
   else if (treated == false)
   {
     ciP->httpStatusCode = SccBadRequest;
-    if (ciP->answer == "")
+    if (ciP->answer.empty())
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
       alarmMgr.badInput(clientIp, ciP->answer);

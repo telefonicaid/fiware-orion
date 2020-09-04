@@ -68,7 +68,7 @@ bool parseStringVector
 
     std::string value = iter->GetString();
 
-    if ((emptyStringNotAllowed == true) && (value == ""))
+    if ((emptyStringNotAllowed == true) && (value.empty()))
     {
       *errorStringP = "empty string found in string vector /" + fieldName + "/";
       return false;

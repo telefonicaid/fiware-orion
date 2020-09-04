@@ -75,7 +75,7 @@ std::string NotifyContextAvailabilityRequest::check(ApiVersion apiVersion, const
   std::string                        res;
   NotifyContextAvailabilityResponse  response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
