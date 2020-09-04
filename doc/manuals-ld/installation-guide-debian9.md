@@ -48,11 +48,11 @@ Some libraries are built from source code and those sources must be downloaded a
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.48
 * rapidjson:      1.0.2
-* kbase:          0.3
-* klog:           0.3
-* kalloc:         0.3
-* kjson:          0.3
-* khash:          0.3
+* kbase:          0.5
+* klog:           0.5
+* kalloc:         0.5
+* kjson:          0.5
+* khash:          0.5
 * gtest:          1.5 (needed for unit testing only)
 * gmock:          1.5 (needed for unit testing only)
 
@@ -136,7 +136,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kbase.git
 cd kbase
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -149,7 +149,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/klog.git
 cd klog
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -166,7 +166,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
 cd kalloc
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -181,7 +181,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -194,7 +194,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
