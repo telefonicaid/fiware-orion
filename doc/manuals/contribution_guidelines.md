@@ -752,9 +752,9 @@ void myFunction(const std::string s, std::string* err);
 
 #### S16 (Use empty() for checking zero-length strings)
 
-*Rule*: Use empty() for all checkings with "" and usages of length()
+*Rule*: Use empty() for all string empty-ness checking, avoiding comparisons with `""` or `length() == 0`
 
-*Rationale*: empty() is the best way of checking for zero-length strings.
+*Rationale*: empty() is [the best way of checking for zero-length strings](http://stackoverflow.com/questions/41425569/checking-for-empty-string-in-c-alternatives).
 
 *How to check*: manually
 
