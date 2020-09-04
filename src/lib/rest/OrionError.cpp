@@ -79,7 +79,7 @@ OrionError::OrionError(StatusCode& sc)
 void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
-  reasonPhrase  = !_reasonPhrase.empty()? _reasonPhrase : httpStatusCodeString(code);
+  reasonPhrase  = _reasonPhrase.empty()? httpStatusCodeString(code) : _reasonPhrase;
   details       = _details;
 }
 
