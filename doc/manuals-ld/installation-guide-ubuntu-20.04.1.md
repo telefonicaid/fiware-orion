@@ -191,9 +191,9 @@ To download, build and install:
 The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
 
 ```bash
-apt-get -y install doxygen
-apt-get -y install graphviz
-rm -f /usr/local/lib/libpaho*
+sudo aptitude -y install doxygen
+sudo aptitude -y install graphviz
+sudo rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
 cd paho.mqtt.c
@@ -211,7 +211,7 @@ pip install paho-mqtt
 *Eclipse Mosquitto* is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers. Source: https://mosquitto.org
 
 ```bash
-sudo apt-get install mosquitto
+sudo aptitude install mosquitto
 sudo systemctl start mosquitto
 
 # If you wish to enable `mosquitto` to have it start automatically on system reboot:
@@ -256,10 +256,10 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
+For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
-This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Ubuntu 18.04:
+This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Ubuntu 20.04:
 
 ```bash
 # Import the MongoDB public GPG Key
@@ -270,10 +270,10 @@ wget -qO - https://www.mongodb.org/static/pgp/server-4.0.asc | sudo apt-key add 
 echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
 
 # Reload local package database
-sudo apt-get update
+sudo aptitude update
 
 # Install the MongoDB packages
-sudo apt-get install -y mongodb-org
+sudo aptitude install -y mongodb-org
 
 # Start the MongoDB
 sudo systemctl start mongod.service
@@ -283,10 +283,3 @@ sudo systemctl enable mongod.service
 ```
 
 For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
-
-## Start the orion-ld
-```bash
-orionld
-```
-
-

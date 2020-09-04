@@ -280,7 +280,7 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/).
+For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
 This is what the MongoDB documentation tells us to do to install MongoDB server 4.2 under Debian 9.
