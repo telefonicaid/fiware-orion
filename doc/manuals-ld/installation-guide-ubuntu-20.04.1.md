@@ -1,46 +1,41 @@
-# Orion-LD Installation Guide for CentOS 7
+# Orion-LD Installation Guide for Ubuntu 20.04.1
 
-In order to write this guide, CentOS 7 (Desktop image) was downloaded from [here](http://isoredirect.centos.org/centos/8/isos/x86_64/CentOS-8-x86_64-1905-dvd1.iso), and installed as a virtual machine under VMWare.
-
-*Obs.: If you don't have internet access execute this command:*
-```bash
-dhclient
-```
+In order to write this guide, Ubuntu 20.04.01 LTS (Desktop image) was downloaded from [here](https://releases.ubuntu.com/20.04/), and installed as a virtual machine under VMWare.
 
 ## Installation of dependency packages
 
 To be installed via package manager:
+* boost (plenty of libraries)
+* libssl-dev
+* libcurl4
+* libsasl2
+* libgcrypt
+* libuuid
+* libz-dev
 
-* boost: 1.53
-* libmicrohttpd: 0.9.48 (from source)
-* libcurl: 7.29.0
-* openssl: 1.0.2k
-* libuuid: 2.23.2
-* Mongo Driver: legacy-1.1.2 (from source)
-* rapidjson: 1.0.2 (from source)
+Now, a whole bunch of packages are to be installed. Personally I prefer *aptitude* over *apt-get*, so the first thing I do is to install *aptitude*:
+
+```bash
+sudo apt-get install aptitude
+```
 
 Tools needed for compilation and testing:
 
-Install OKay repository that offers an alternate to complement missing packages from CENTOS and EPEL. Source (https://okay.network/blog-news/rpm-repositories-for-centos-6-and-7.html)
-
 ```bash
-sudo yum install http://repo.okay.com.mx/centos/7/x86_64/release/okay-release-1-1.noarch.rpm
-```
-
-```bash
-sudo yum install make cmake gcc-c++ scons curl wget
+sudo aptitude install build-essential cmake scons curl
 ```
 
 Libraries that aren't built from source code:
 
 ```bash
-sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel cyrus-sasl-devel libicu libicu-devel
+sudo aptitude install libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
+                      libgcrypt-dev uuid-dev libboost1.67-dev libboost-regex1.67-dev libboost-thread1.67-dev \
+                      libboost-filesystem1.67-dev libz-dev
 
 ```
 
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
-
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.48
 * rapidjson:      1.0.2
@@ -62,7 +57,7 @@ mkdir ~/git
 And, as `git` will be used, we might as well install it:
 
 ```bash
-sudo yum install git
+sudo aptitude install git
 ```
 
 ### Mongo Driver
@@ -72,22 +67,13 @@ Plans are to migrate, at least all the NGSI-LD requests to the newest C driver o
 To download, build and install:
 
 ```bash
-sudo mkdir /opt/mongoclient
-sudo chown $USER:$GROUP /opt/mongoclient  # (1)
-cd /opt/mongoclient
-wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz
-tar xfvz legacy-1.1.2.tar.gz
-cd mongo-cxx-driver-legacy-1.1.2
-scons --disable-warnings-as-errors --ssl --use-sasl-client
-sudo scons install --prefix=/usr/local --disable-warnings-as-errors --ssl --use-sasl-client
+sudo aptitude install libmongoclient-dev
 ```
 (1) To make you the owner of a file, you need to state your username and group.
     The env var **USER** already exists, but if you want to cut 'n paste this "sudo chown" command, you'll need to create the env var **GROUP**, to reflect your group. In my case, I do this:
 ```bash
 export GROUP=kz
 ```
-
-After this, you should have the library *libmongoclient.a* under `/usr/local/lib/` and the header directory *mongo* under `/usr/local/include/`.
 
 ### libmicrohttpd
 
@@ -191,9 +177,6 @@ cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
 git checkout release/0.5
-vi makefile
-# Edit makefile and add/write that content at CFLAGS after "-g"
-CFLAGS= -g -std=c99
 make install
 ```
 
@@ -208,8 +191,8 @@ To download, build and install:
 The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
 
 ```bash
-sudo yum -y install doxygen
-sudo yum -y install graphviz
+sudo aptitude -y install doxygen
+sudo aptitude -y install graphviz
 sudo rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
@@ -221,20 +204,14 @@ make
 sudo make install
 
 # Python library
-
-# If you don't have pip installed:
-sudo yum update
-sudo yum install python-pip
-
-sudo pip install paho-mqtt
+pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
 
 *Eclipse Mosquitto* is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers. Source: https://mosquitto.org
 
 ```bash
-sudo yum -y install epel-release
-sudo yum -y install mosquitto
+sudo aptitude install mosquitto
 sudo systemctl start mosquitto
 
 # If you wish to enable `mosquitto` to have it start automatically on system reboot:
@@ -279,41 +256,31 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/).
+For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
-This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under CentOS 7:
+This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under Ubuntu 20.04:
 
 ```bash
-# Create a .repo file for yum, the package management utility for CentOS:
-sudo vi /etc/yum.repos.d/mongodb-org.repo
+# Import the MongoDB public GPG Key
+sudo aptitude install gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-4.0.asc | sudo apt-key add -
+# Should respond with "OK"
 
-# Copy & paste that content into mongodb-org.repo file:
-[mongodb-org-3.4]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
-gpgcheck=1
-enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
+# Create the list file /etc/apt/sources.list.d/mongodb-org-4.0.list
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 
-# Verify that the MongoDB repository exists
-yum repolist
-# Output
-. . .
-repo id                          repo name
-base/7/x86_64                    CentOS-7 - Base
-extras/7/x86_64                  CentOS-7 - Extras
-mongodb-org-${VERSION}/7/x86_64  MongoDB Repository
-updates/7/x86_64                 CentOS-7 - Updates
-. . .
+# Reload local package database
+sudo aptitude update
 
 # Install the MongoDB packages
-sudo yum install mongodb-org
+sudo aptitude install -y mongodb-org
 
-# Start the MongoDB service with the systemctl utility:
-sudo systemctl start mongod
+# Start the MongoDB
+sudo systemctl start mongod.service
+
+# Enable the MongoDB
+sudo systemctl enable mongod.service
 ```
-*Mongo Server for CentOS 7, tutorial from: [Digital Ocean: How To Install MongoDB on CentOS 7](https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-centos-7)
-
 
 For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
