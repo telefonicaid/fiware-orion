@@ -102,7 +102,7 @@ std::string getNgsi10ContextEntityTypes
     parseDataP->qcr.res.release();
     return answer;
   }
-  else if ((typeNameFromUriParam != typeName) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != typeName) && (!typeNameFromUriParam.empty()))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");

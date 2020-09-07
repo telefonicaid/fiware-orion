@@ -60,7 +60,7 @@ Duration::Duration()
 */
 std::string Duration::check(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "OK";
   }
@@ -109,7 +109,7 @@ std::string Duration::get(void)
 */
 bool Duration::isEmpty(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return true;
   }
@@ -140,7 +140,7 @@ int64_t Duration::parse(void)
 */
 std::string Duration::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

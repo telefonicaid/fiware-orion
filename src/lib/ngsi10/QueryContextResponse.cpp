@@ -110,7 +110,7 @@ std::string QueryContextResponse::toJsonV1(bool asJsonObject)
   {
     errorCodeRendered = true;
   }
-  else if (errorCode.details != "")
+  else if (!errorCode.details.empty())
   {
     if (errorCode.code == SccNone)
     {
@@ -168,7 +168,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
 {
   std::string  res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }

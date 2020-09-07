@@ -116,11 +116,11 @@ std::string EntityType::toJsonV1
 */
 std::string EntityType::check(ApiVersion apiVersion, const std::string&  predetectedError)
 {
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     return predetectedError;
   }
-  else if (type == "")
+  else if (type.empty())
   {
     return "Empty Type";
   }

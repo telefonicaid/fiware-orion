@@ -280,7 +280,7 @@ static void processGenericEntities
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* enP = enV[ix];
-    if (enP->type == "" || isTrue(enP->isPattern))
+    if (enP->type.empty() || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);
     }

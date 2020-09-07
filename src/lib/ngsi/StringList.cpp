@@ -115,7 +115,7 @@ std::string StringList::check(void)
 {
   for (unsigned int ix = 0; ix < stringV.size(); ++ix)
   {
-    if (stringV[ix] == "")
+    if (stringV[ix].empty())
     {
       return "empty string";
     }

@@ -128,7 +128,7 @@ int Scope::fill
   //
   // Parse georel?
   //
-  if (georelString != "")
+  if (!georelString.empty())
   {
     if (georel.parse(georelString.c_str(), errorStringP) != 0)
     {
@@ -176,7 +176,7 @@ int Scope::fill
   //
   // Split coordsString into a vector of points, or pairs of coordinates
   //
-  if (coordsString == "")
+  if (coordsString.empty())
   {
     *errorStringP = "no coordinates for geometry";
     return -1;
@@ -435,12 +435,12 @@ std::string Scope::check(void)
         alarmMgr.badInput(clientIp, "radius zero for a circle area");
         return "Radius zero for a circle area";
       }
-      else if (circle.radiusString() == "")
+      else if (circle.radiusString().empty())
       {
         alarmMgr.badInput(clientIp, "missing radius for circle area");
         return "Missing radius for circle area";
       }
-      else if (circle.invertedString() != "")
+      else if (!circle.invertedString().empty())
       {
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
         {
@@ -449,12 +449,12 @@ std::string Scope::check(void)
           return "bad value for circle/inverted: /" + circle.invertedString() + "/";
         }
       }
-      else if (circle.center.latitudeString() == "")
+      else if (circle.center.latitudeString().empty())
       {
         alarmMgr.badInput(clientIp, "missing latitude for circle center");
         return "Missing latitude for circle center";
       }
-      else if (circle.center.longitudeString() == "")
+      else if (circle.center.longitudeString().empty())
       {
         alarmMgr.badInput(clientIp, "missing longitude for circle center");
         return "Missing longitude for circle center";
@@ -492,7 +492,7 @@ std::string Scope::check(void)
 
         return "too few vertices for a polygon";
       }
-      else if (polygon.invertedString() != "")
+      else if (!polygon.invertedString().empty())
       {
         if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
         {
@@ -504,13 +504,13 @@ std::string Scope::check(void)
 
       for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
       {
-        if (polygon.vertexList[ix]->latitudeString() == "")
+        if (polygon.vertexList[ix]->latitudeString().empty())
         {
           alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex");
           return std::string("missing latitude value for polygon vertex");
         }
 
-        if (polygon.vertexList[ix]->longitudeString() == "")
+        if (polygon.vertexList[ix]->longitudeString().empty())
         {
           alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex");
           return std::string("missing longitude value for polygon vertex");
@@ -542,13 +542,13 @@ std::string Scope::check(void)
 
   if ((type != FIWARE_LOCATION) && (type != FIWARE_LOCATION_DEPRECATED))
   {
-    if (type == "")
+    if (type.empty())
     {
       alarmMgr.badInput(clientIp, "empty type in restriction scope");
       return "Empty type in restriction scope";
     }
 
-    if (value == "")
+    if (value.empty())
     {
       alarmMgr.badInput(clientIp, "empty value in restriction scope");
       return "Empty value in restriction scope";

@@ -73,7 +73,7 @@ HttpStatusCode mongoUnsubscribeContext
    */
   responseP->subscriptionId = requestP->subscriptionId;
 
-  if (responseP->subscriptionId.get() == "")
+  if (responseP->subscriptionId.get().empty())
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
     responseP->statusCode.fill(SccContextElementNotFound);

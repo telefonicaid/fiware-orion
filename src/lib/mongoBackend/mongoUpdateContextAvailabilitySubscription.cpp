@@ -124,7 +124,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   {
     EntityId* en = requestP->entityIdVector[ix];
 
-    if (en->type == "")
+    if (en->type.empty())
     {
       entities.append(BSON(CASUB_ENTITY_ID << en->id <<
                            CASUB_ENTITY_ISPATTERN << en->isPattern));

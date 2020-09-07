@@ -235,7 +235,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    if (httpInfo.payload == "")
+    if (httpInfo.payload.empty())
     {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
@@ -289,7 +289,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         return paramsV;  // empty vector
       }
 
-      if ((value == "") || (key == ""))
+      if ((value.empty()) || (key.empty()))
       {
         // To avoid e.g '?a=&b=&c='
         continue;
@@ -312,7 +312,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         return paramsV;  // empty vector
       }
 
-      if (key == "")
+      if (key.empty())
       {
         // To avoid empty header name
         continue;
@@ -457,7 +457,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     {
       Entity* eP = &ncr.contextElementResponseVector[ix]->entity;
 
-      if (spathList != "")
+      if (!spathList.empty())
       {
         spathList += ",";
       }
