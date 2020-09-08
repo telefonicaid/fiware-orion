@@ -228,13 +228,13 @@ echo
 01a. /v2//
 ==========
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -242,13 +242,13 @@ Date: REGEX(.*)
 01b. /v2///
 ===========
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -270,13 +270,13 @@ Date: REGEX(.*)
 02b. /v2/entities///
 ====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -284,13 +284,13 @@ Date: REGEX(.*)
 03a. /v2/entities/E1//
 ======================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -298,13 +298,13 @@ Date: REGEX(.*)
 03b. /v2/entities/E1///
 =======================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -326,13 +326,13 @@ Date: REGEX(.*)
 04b. /v2/entities/E1/attrs///
 =============================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -340,13 +340,13 @@ Date: REGEX(.*)
 05a. /v2/entities/E1/attrs/A1//
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -354,13 +354,13 @@ Date: REGEX(.*)
 05b. /v2/entities/E1/attrs/A1///
 ================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -368,13 +368,13 @@ Date: REGEX(.*)
 06a. /v2/entities/E1/attrs/A1/value//
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -382,13 +382,13 @@ Date: REGEX(.*)
 06b. /v2/entities/E1/attrs/A1/value///
 ======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -410,13 +410,13 @@ Date: REGEX(.*)
 07b. /v2/types///
 =================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -424,13 +424,13 @@ Date: REGEX(.*)
 08a. /v2/types/T1//
 ===================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -438,13 +438,13 @@ Date: REGEX(.*)
 08b. /v2/types/T1///
 ====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -466,13 +466,13 @@ Date: REGEX(.*)
 09b. /v2/subscriptions///
 =========================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -480,13 +480,13 @@ Date: REGEX(.*)
 10a. /v2/subscriptions/subId//
 ==============================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -494,13 +494,13 @@ Date: REGEX(.*)
 10b. /v2/subscriptions/subId///
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -508,13 +508,13 @@ Date: REGEX(.*)
 11a. /v2/op/query//
 ===================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -522,13 +522,13 @@ Date: REGEX(.*)
 11b. /v2/op/query///
 ====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -536,13 +536,13 @@ Date: REGEX(.*)
 12a. /v2/op/update//
 ====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -550,13 +550,13 @@ Date: REGEX(.*)
 12b. /v2/op/update///
 =====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
