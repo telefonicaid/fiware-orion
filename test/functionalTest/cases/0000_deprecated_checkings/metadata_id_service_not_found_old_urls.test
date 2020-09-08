@@ -172,7 +172,7 @@ Date: REGEX(.*)
 02. Service not found for GET /v1/contextEntities/E/attributes/A/ID1
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -180,7 +180,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -189,7 +189,7 @@ Date: REGEX(.*)
 03. Service not found for GET /v1/contextEntities/type/T/id/E/attributes/A/ID1
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +197,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -206,7 +206,7 @@ Date: REGEX(.*)
 04. Service not found for POST /v1/contextEntities/type/T/id/E/attributes/A/ID1
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -223,7 +223,7 @@ Date: REGEX(.*)
 05. Service not found for PUT /v1/contextEntities/E/attributes/A/ID1
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -231,7 +231,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -240,7 +240,7 @@ Date: REGEX(.*)
 06. Service not found for PUT /v1/contextEntities/type/T/id/E/attributes/A/ID1
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -257,7 +257,7 @@ Date: REGEX(.*)
 07. Service not found for DELETE /v1/contextEntities/E/attributes/A/ID1
 =======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,7 +265,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 08. Service not found for DELETE /v1/contextEntities/type/T/id/E/attributes/A/ID1
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -282,7 +282,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
