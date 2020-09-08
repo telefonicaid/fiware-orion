@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "parse/forbiddenChars.h"
 
 #include "rapidjson/document.h"
 
@@ -67,6 +68,12 @@ bool parseStringVector
     }
 
     std::string value = iter->GetString();
+
+    if (forbiddenIdCharsV2(value.c_str()))
+    {
+      *errorStringP = "forbidden characters in attribute name";
+       return false;
+    }
 
     if ((emptyStringNotAllowed == true) && (value.empty()))
     {
