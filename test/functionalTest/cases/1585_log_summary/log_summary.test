@@ -143,13 +143,13 @@ echo
 01. PUT /v2/noService
 =====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -239,13 +239,13 @@ Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new
 10. PUT /v2/noService
 =====================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
