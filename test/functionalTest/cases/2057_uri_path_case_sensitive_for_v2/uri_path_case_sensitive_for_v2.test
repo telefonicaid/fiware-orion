@@ -126,7 +126,7 @@ Date: REGEX(.*)
 03. v1 unknown service /v1/no_service - see error
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 04. v2 query with all uppercase - see error (NGSIv1 error response as not /v2 but /V2)
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -151,7 +151,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
