@@ -151,7 +151,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
   LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
 
 #ifdef ORIONLD
-  if (sub.notification.httpInfo.headers.size() > 0)
+  if ((sub.notification.httpInfo.headers.size() > 0) && (disableCusNotif == false))
   {
     BSONObjBuilder headersBuilder;
 
@@ -164,6 +164,7 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
     b->append(CSUB_HEADERS, headersObj);
   }
 #endif
+
   if (sub.notification.httpInfo.custom)
   {
     setCustomHttpInfo(sub.notification.httpInfo, b);

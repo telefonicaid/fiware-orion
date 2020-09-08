@@ -609,19 +609,21 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
 
     //
-    // HTTP Headers defined for the subscription
+    // HTTP Headers defined for the subscription - if not disabled
     //
-    for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+    if (disableCusNotif == false)
     {
-      std::string key   = it->first;
-      std::string value = it->second;
+      for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+      {
+        std::string key   = it->first;
+        std::string value = it->second;
 
-      if ((key == "") || (key == "Link"))  // To avoid empty header name AND an extra Link header
-        continue;
+        if ((key == "") || (key == "Link"))  // To avoid empty header name AND an extra Link header
+          continue;
 
-      params->extraHeaders[key] = value;
+        params->extraHeaders[key] = value;
+      }
     }
-
 #endif
 
     paramsV->push_back(params);
