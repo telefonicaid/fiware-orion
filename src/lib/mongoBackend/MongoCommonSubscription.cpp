@@ -150,6 +150,20 @@ void setHttpInfo(const Subscription& sub, BSONObjBuilder* b)
   LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
   LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
 
+#ifdef ORIONLD
+  if (sub.notification.httpInfo.headers.size() > 0)
+  {
+    BSONObjBuilder headersBuilder;
+
+    for (std::map<std::string, std::string>::const_iterator it = sub.notification.httpInfo.headers.begin(); it != sub.notification.httpInfo.headers.end(); ++it)
+    {
+      headersBuilder.append(it->first, it->second);
+    }
+    BSONObj headersObj = headersBuilder.obj();
+
+    b->append(CSUB_HEADERS, headersObj);
+  }
+#endif
   if (sub.notification.httpInfo.custom)
   {
     setCustomHttpInfo(sub.notification.httpInfo, b);
