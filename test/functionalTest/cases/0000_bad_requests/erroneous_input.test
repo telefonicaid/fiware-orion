@@ -37,7 +37,7 @@ orionCurl --url "/v1/registry/nothingAtAll"
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -45,13 +45,13 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
 1: ++++++++++++++++++++
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -59,7 +59,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
