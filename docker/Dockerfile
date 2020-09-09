@@ -152,7 +152,7 @@ WORKDIR /
 ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast" ]
 EXPOSE 1026
 
-LABEL "maintainer"="FIWARE IoTAgent Team. Telefónica I+D"
+LABEL "maintainer"="Orion Team. Telefónica I+D"
 LABEL "org.opencontainers.image.authors"="iot_support@tid.es"
 LABEL "org.opencontainers.image.documentation"="https://fiware-orion.rtfd.io/"
 LABEL "org.opencontainers.image.vendor"="Telefónica Investigación y Desarrollo, S.A.U"
@@ -165,6 +165,5 @@ LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${G
 RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
     && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
 USER nobody
-
 
 
