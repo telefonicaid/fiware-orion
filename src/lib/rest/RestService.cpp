@@ -759,7 +759,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string  details = std::string("service '") + ciP->url + "' not recognized";
   std::string  answer;
 
-  restErrorReplyGet(ciP, SccBadRequest, "service not found. Check your URL as probably it is wrong.", &answer);
+  restErrorReplyGet(ciP, SccBadRequest, "Service not found. Check your URL as probably it is wrong.", &answer);
   alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
   restReply(ciP, answer);
