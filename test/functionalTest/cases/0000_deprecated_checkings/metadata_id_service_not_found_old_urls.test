@@ -180,7 +180,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -197,7 +197,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -231,7 +231,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -265,7 +265,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
@@ -282,7 +282,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found. Check your URL as probably it is wrong.",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }
