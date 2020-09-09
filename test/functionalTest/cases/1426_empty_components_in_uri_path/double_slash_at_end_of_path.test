@@ -234,7 +234,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -248,7 +248,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -276,7 +276,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -290,7 +290,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -304,7 +304,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -332,7 +332,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -346,7 +346,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -360,7 +360,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -374,7 +374,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -388,7 +388,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -416,7 +416,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -430,7 +430,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -444,7 +444,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -472,7 +472,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -486,7 +486,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -500,7 +500,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -514,7 +514,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -528,7 +528,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -542,7 +542,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
@@ -556,7 +556,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found. Check your URL as probably it is wrong.",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 
