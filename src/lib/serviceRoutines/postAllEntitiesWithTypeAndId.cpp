@@ -100,7 +100,7 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 02. Check that the entity is NOT filled in the payload
-  if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
+  if ((!reqP->entity.id.empty()) || (!reqP->entity.type.empty()) || (!reqP->entity.isPattern.empty()))
   {
     std::string  out;
 
@@ -126,7 +126,7 @@ std::string postAllEntitiesWithTypeAndId
     parseDataP->acer.res.release();
     return answer;
   }
-  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 

@@ -486,7 +486,7 @@ int Georel::parse(const char* in, std::string* errorString)
 
     if ((items[ix] == "near") || (items[ix] == "coveredBy") || (items[ix] == "intersects") || (items[ix] == "equals") || (items[ix] == "disjoint"))
     {
-      if (type != "")
+      if (!type.empty())
       {
         *errorString = "georel type present more than once";
         return -1;
@@ -597,7 +597,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
   {
     if ((apiVersion == V1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
     {
-      if (areaType != "")
+      if (!areaType.empty())
       {
         *errorString = "polygon/circle present more than once";
         return -1;
@@ -606,7 +606,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
     }
     else if ((apiVersion == V2) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
     {
-      if (areaType != "")
+      if (!areaType.empty())
       {
         *errorString = "geometry-type present more than once";
         return -1;

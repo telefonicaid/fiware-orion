@@ -61,7 +61,7 @@ std::string UnsubscribeContextAvailabilityRequest::check(const std::string& pred
    UnsubscribeContextAvailabilityResponse  response(subscriptionId);
    std::string                             res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.statusCode.fill(SccBadRequest, predetectedError);
   }

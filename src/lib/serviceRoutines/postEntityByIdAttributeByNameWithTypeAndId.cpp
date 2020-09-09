@@ -102,7 +102,7 @@ std::string postEntityByIdAttributeByNameWithTypeAndId
 
     TIMED_RENDER(answer = parseDataP->rcrs.res.toJsonV1());
   }
-  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     parseDataP->rcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");

@@ -81,7 +81,7 @@ static void getAttributeTypes
 {
   BSONObjBuilder bob;
 
-  if (entityType == "")
+  if (entityType.empty())
   {
     std::string idType = std::string("_id.") + ENT_ENTITY_TYPE;
     bob.append("$or", BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ));

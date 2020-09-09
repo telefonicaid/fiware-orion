@@ -150,7 +150,7 @@ std::string mongoCreateSubscription
   reqSemTake(__FUNCTION__, "ngsiv2 create subscription request", SemWriteOp, &reqSemTaken);
 
   BSONObjBuilder     b;
-  std::string        servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
+  std::string        servicePath      = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
   bool               notificationDone = false;
   const std::string  subId            = setNewSubscriptionId(&b);
 
@@ -167,7 +167,7 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
 
-  std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
+  std::string status = sub.status.empty()?  STATUS_ACTIVE : sub.status;
 
   // We need to insert the csub in the cache before (potentially) sending the
   // initial notification (have a look to issue #2974 for details)

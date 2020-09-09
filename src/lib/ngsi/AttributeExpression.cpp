@@ -50,7 +50,7 @@ std::string AttributeExpression::check(void)
 */
 bool AttributeExpression::isEmpty(void)
 {
-  if (string == "")
+  if (string.empty())
   {
     return true;
   }
@@ -88,7 +88,7 @@ std::string AttributeExpression::get(void)
 */
 std::string AttributeExpression::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

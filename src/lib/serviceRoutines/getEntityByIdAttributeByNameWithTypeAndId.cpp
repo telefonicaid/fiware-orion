@@ -103,7 +103,7 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
 
     TIMED_RENDER(answer = parseDataP->dcars.res.toJsonV1());
   }
-  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  else if ((entityTypeFromUriParam != entityType) && (!entityTypeFromUriParam.empty()))
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");

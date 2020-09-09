@@ -54,7 +54,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::toJsonV1(void)
   std::string   out                      = "";
   bool          subscriptionRendered     = subscriptionId.rendered(UpdateContextAvailabilitySubscription);
   bool          restrictionRendered      = restrictions != 0;
-  bool          durationRendered         = duration.get() != "";
+  bool          durationRendered         = !duration.get().empty();
   bool          attributeListRendered    = attributeList.size() != 0;
   bool          commaAfterSubscriptionId = false; // last element
   bool          commaAfterRestriction    = subscriptionRendered;
@@ -86,7 +86,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(const std::strin
 
   response.subscriptionId = subscriptionId;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }

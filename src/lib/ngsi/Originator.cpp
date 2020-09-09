@@ -51,7 +51,7 @@ std::string Originator::check(void)
 */
 bool Originator::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -84,7 +84,7 @@ std::string Originator::get(void)
 */
 std::string Originator::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

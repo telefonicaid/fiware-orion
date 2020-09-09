@@ -73,7 +73,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (aP->providingApplication.get() != "")
+      if (!aP->providingApplication.get().empty())
       {
         return true;
       }
@@ -171,7 +171,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     resource = prefix + "/entities/" + eP->id + "/attrs";
     verb     = "PATCH";
 
-    if (eP->type != "")
+    if (!eP->type.empty())
     {
       // Add ?type=<TYPE> to 'resource'
       resource += "?type=" + eP->type;
@@ -417,7 +417,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     // Add EntityId::id to StatusCode::details if 404, but only if StatusCode::details is empty
     //
-    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details == ""))
+    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details.empty()))
     {
       cerP->statusCode.details = cerP->entity.id;
     }
@@ -534,7 +534,7 @@ std::string postUpdateContext
 
     return answer;
   }
-  else if (ciP->servicePathV[0] == "")
+  else if (ciP->servicePathV[0].empty())
   {
     ciP->servicePathV[0] = SERVICE_PATH_ROOT;
   }
@@ -670,7 +670,7 @@ std::string postUpdateContext
         //
         // 1. If the attribute is found locally - just add the attribute to the outgoing response
         //
-        if (aP->providingApplication.get() == "")
+        if (aP->providingApplication.get().empty())
         {
           ContextAttribute ca(aP);
           response.foundPush(&cerP->entity, &ca);
@@ -724,7 +724,7 @@ std::string postUpdateContext
 
   for (unsigned int ix = 0; ix < requestV.size() && ix < cprForwardLimit; ++ix)
   {
-    if (requestV[ix]->contextProvider == "")
+    if (requestV[ix]->contextProvider.empty())
     {
       LM_E(("Internal Error (empty context provider string)"));
       continue;

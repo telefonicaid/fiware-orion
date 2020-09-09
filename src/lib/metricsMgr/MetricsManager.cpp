@@ -177,7 +177,7 @@ int64_t MetricsManager::semWaitTimeGet(void)
 */
 bool MetricsManager::servicePathForMetrics(const std::string& spathIn, std::string* subServiceP)
 {
-  if (spathIn == "")
+  if (spathIn.empty())
   {
     *subServiceP = "";
     return true;
@@ -438,7 +438,7 @@ std::string MetricsManager::_toJson(void)
 
       if (subServiceString != "{}")
       {
-        if (subService != "")
+        if (!subService.empty())
         {
           jhSubService.addRaw(subService, subServiceString);
         }
@@ -470,7 +470,7 @@ std::string MetricsManager::_toJson(void)
 
     subServiceTop.addRaw("sum", serviceSumString);
 
-    if (service != "")
+    if (!service.empty())
     {
       services.addRaw(service, subServiceTop.str());
     }
@@ -495,7 +495,7 @@ std::string MetricsManager::_toJson(void)
 
     subServiceString = metricsRender(&it->second);
 
-    if (subService != "")
+    if (!subService.empty())
     {
       jhSubServ.addRaw(subService, subServiceString);
     }

@@ -134,7 +134,7 @@ std::string RegisterContextResponse::check(const std::string& predetectedError)
   RegisterContextResponse  response;
   std::string              res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }

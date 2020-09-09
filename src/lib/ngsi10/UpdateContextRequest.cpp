@@ -118,7 +118,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
   std::string            res;
   UpdateContextResponse  response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
     return response.toJsonV1(asJsonObject);
@@ -209,7 +209,7 @@ void UpdateContextRequest::fill
 
   updateActionType = _updateActionType;
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
     eP->attributeVector.push_back(caP);
