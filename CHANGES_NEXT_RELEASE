@@ -1,4 +1,5 @@
 - Fix: improve error response when incorrect URL used (#2231)
+- Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
 - Fix: log WARN about insecureNotifications mode (#3013)
 - Fix: avoid creating orion database in -multiservice mode (#3179)
 - Fix: upgrade rapidjson dependecy from 1.0.2 to 1.1.0
