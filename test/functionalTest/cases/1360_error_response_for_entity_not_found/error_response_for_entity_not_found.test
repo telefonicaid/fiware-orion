@@ -94,14 +94,14 @@ Date: REGEX(.*)
 03. Attempt to update attribute dfgdfgdf of entity room_2 (the attribute does not exist)
 ========================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 150
+Content-Length: 109
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "action: UPDATE - entity: [room_2, Room]The entity does not have such an attribute - offending attribute: dfgdfgdf",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: dfgdfgdf",
+    "error": "Unprocessable"
 }
 
 

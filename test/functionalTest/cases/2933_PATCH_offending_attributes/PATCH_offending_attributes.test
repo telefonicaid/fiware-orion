@@ -104,14 +104,14 @@ Date: REGEX(.*)
 02. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 149
+Content-Length: 108
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "action: UPDATE - entity: [Room1, Thing]The entity does not have such an attribute - offending attribute: pressur",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: pressur",
+    "error": "Unprocessable"
 }
 
 

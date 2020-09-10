@@ -1,5 +1,6 @@
 
 - Fix: PATCH /v2/entities/ID/attrs error doesn't provide info about offending attributes (#2933)
+- Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
 - Fix: log WARN about insecureNotifications mode (#3013)
 - Fix: avoid creating orion database in -multiservice mode (#3179)
 - Fix: upgrade rapidjson dependecy from 1.0.2 to 1.1.0

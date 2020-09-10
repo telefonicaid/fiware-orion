@@ -186,14 +186,14 @@ Date: REGEX(.*)
 05. Try to UPDATE non-existing attribute A3, see error
 ======================================================
 HTTP/1.1 404 Not Found
-Content-Length: 138
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "action: UPDATE - entity: [E1, T1]The entity does not have such an attribute - offending attribute: A3",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: A3",
+    "error": "Unprocessable"
 }
 
 
