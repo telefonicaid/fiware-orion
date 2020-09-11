@@ -290,3 +290,83 @@ sudo systemctl start mongod
 ```
 
 For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+
+### Installation of Postgres 12 on Ubuntu 18.04
+
+Add the postgres repo
+```bash
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
+```
+
+#### Install Postgres
+```bash
+sudo apt update
+sudo apt -y install postgresql-12 postgresql-client-12
+sudo apt install postgis postgresql-12-postgis-3
+sudo apt-get install postgresql-12-postgis-3-scripts
+```
+
+Add Postgres development libraries
+```bash
+apt-get install libpq-dev
+```
+
+Add timescale db and posgis
+```bash
+sudo add-apt-repository ppa:timescale/timescaledb-ppa
+sudo apt-get update
+sudo apt install timescaledb-postgresql-12
+```
+
+Command for checking postgres
+```bash
+systemctl status postgresql.service
+```
+The output will be something like this
+```text
+postgresql.service - PostgreSQL RDBMS
+    Loaded: loaded (/lib/systemd/system/postgresql.service; enabled; vendor preset: enabled)
+    Active: active (exited) since Sun 2019-10-06 10:23:46 UTC; 6min ago
+  Main PID: 8159 (code=exited, status=0/SUCCESS)
+     Tasks: 0 (limit: 2362)
+    CGroup: /system.slice/postgresql.service
+ Oct 06 10:23:46 ubuntu18 systemd[1]: Starting PostgreSQL RDBMS…
+ Oct 06 10:23:46 ubuntu18 systemd[1]: Started PostgreSQL RDBMS.
+```
+
+```bash
+systemctl status postgresql@12-main.service 
+```
+The output will be something like this
+```text
+postgresql@12-main.service - PostgreSQL Cluster 12-main
+    Loaded: loaded (/lib/systemd/system/postgresql@.service; indirect; vendor preset: enabled)
+    Active: active (running) since Sun 2019-10-06 10:23:49 UTC; 5min ago
+  Main PID: 9242 (postgres)
+     Tasks: 7 (limit: 2362)
+    CGroup: /system.slice/system-postgresql.slice/postgresql@12-main.service
+            ├─9242 /usr/lib/postgresql/12/bin/postgres -D /var/lib/postgresql/12/main -c config_file=/etc/postgresql/12/main/postgresql.conf
+            ├─9254 postgres: 12/main: checkpointer   
+            ├─9255 postgres: 12/main: background writer   
+            ├─9256 postgres: 12/main: walwriter   
+            ├─9257 postgres: 12/main: autovacuum launcher   
+            ├─9258 postgres: 12/main: stats collector   
+            └─9259 postgres: 12/main: logical replication launcher   
+ Oct 06 10:23:47 ubuntu18 systemd[1]: Starting PostgreSQL Cluster 12-main…
+ Oct 06 10:23:49 ubuntu18 systemd[1]: Started PostgreSQL Cluster 12-main.
+ ```
+ 
+ Enable postgres
+ ```bash
+ systemctl is-enabled postgresql
+```
+
+Edit postgresql.conf
+```bash
+sudo nano /etc/postgresql/12/main/postgresql.conf
+```
+Add this line and save it
+```bash
+shared_preload_libraries = 'timescaledb'
+```
