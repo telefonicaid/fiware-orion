@@ -149,7 +149,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       std::string errorString;
 
       cSubP->expression.q = getStringFieldF(expression, CSUB_EXPR_Q);
-      if (cSubP->expression.q != "")
+      if (!cSubP->expression.q.empty())
       {
         if (!cSubP->expression.stringFilter.parse(cSubP->expression.q.c_str(), &errorString))
         {
@@ -166,7 +166,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       std::string errorString;
 
       cSubP->expression.mq = getStringFieldF(expression, CSUB_EXPR_MQ);
-      if (cSubP->expression.mq != "")
+      if (!cSubP->expression.mq.empty())
       {
         if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
         {
@@ -632,7 +632,7 @@ void mongoSubCountersUpdate
 {
   std::string  collection = getSubscribeContextCollectionName(tenant);
 
-  if (subId == "")
+  if (subId.empty())
   {
     LM_E(("Runtime Error (empty subscription id)"));
     return;

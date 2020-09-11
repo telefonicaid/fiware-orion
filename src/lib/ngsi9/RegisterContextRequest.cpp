@@ -45,8 +45,8 @@
 std::string RegisterContextRequest::toJsonV1(void)
 {
   std::string  out                                 = "";
-  bool         durationRendered                    = duration.get() != "";
-  bool         registrationIdRendered              = registrationId.get() != "";
+  bool         durationRendered                    = !duration.get().empty();
+  bool         registrationIdRendered              = !registrationId.get().empty();
   bool         commaAfterRegistrationId            = false; // Last element
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
@@ -73,7 +73,7 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
   RegisterContextResponse  response(this);
   std::string              res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     alarmMgr.badInput(clientIp, predetectedError);
     response.errorCode.fill(SccBadRequest, predetectedError);
@@ -130,7 +130,7 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
   crP->entityIdVector.push_back(entityIdP);
   crP->entityIdVectorPresent = true;
 
-  if (attributeName != "")
+  if (!attributeName.empty())
   {
     ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
 

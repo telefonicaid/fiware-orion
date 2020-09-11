@@ -358,7 +358,7 @@ std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& ordere
     jh.addString("id", id);
 
     /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    jh.addString("type", (type != "")? type : DEFAULT_ENTITY_TYPE);
+    jh.addString("type", (!type.empty())? type : DEFAULT_ENTITY_TYPE);
   }
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
@@ -385,7 +385,7 @@ std::string Entity::toJsonNormalized(const std::vector<ContextAttribute*>& order
     jh.addString("id", id);
 
     /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    jh.addString("type", (type != "")? type : DEFAULT_ENTITY_TYPE);
+    jh.addString("type", (!type.empty())? type : DEFAULT_ENTITY_TYPE);
   }
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
@@ -434,12 +434,12 @@ std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
   {
     std::string res;
 
-    if (id == "")
+    if (id.empty())
     {
       return "empty entityId:id";
     }
 
-    if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
+    if (!isTrue(isPattern) && !isFalse(isPattern) && !isPattern.empty())
     {
       return std::string("invalid isPattern value for entity: /") + isPattern + "/";
     }
@@ -624,7 +624,7 @@ void Entity::fill(const Entity& en, bool useDefaultType, bool cloneCompounds)
   creDate       = en.creDate;
   modDate       = en.modDate;
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && (type.empty()))
   {
     type = DEFAULT_ENTITY_TYPE;
   }

@@ -70,7 +70,7 @@ std::string ConditionValueList::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if (vec[ix] == "")
+    if (vec[ix].empty())
     {
       return "empty condValue name";
     }

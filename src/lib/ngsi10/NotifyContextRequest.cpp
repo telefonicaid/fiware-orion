@@ -106,7 +106,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
   std::string            res;
   NotifyContextResponse  response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }

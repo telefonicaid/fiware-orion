@@ -85,7 +85,7 @@ std::string ContextRegistrationAttribute::toJsonV1(bool comma)
 std::string ContextRegistrationAttribute::check(ApiVersion apiVersion)
 {
 
-  if (name == "")
+  if (name.empty())
   {
     return "missing name for registration attribute";
   }

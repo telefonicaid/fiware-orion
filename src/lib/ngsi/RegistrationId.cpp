@@ -63,7 +63,7 @@ std::string RegistrationId::check(void)
 {
   std::string out = "OK";
 
-  if (string != "")
+  if (!string.empty())
   {
     out = idCheck(string);
   }
@@ -79,7 +79,7 @@ std::string RegistrationId::check(void)
 */
 bool RegistrationId::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -112,7 +112,7 @@ std::string RegistrationId::get(void) const
 */
 std::string RegistrationId::toJsonV1(RequestType requestType, bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     if (requestType == RegisterResponse)  // registrationId is MANDATORY for RegisterContextResponse
     {

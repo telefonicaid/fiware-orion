@@ -78,7 +78,7 @@ std::string ContextAttributeResponse::check
 {
   std::string  res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
@@ -156,7 +156,7 @@ void ContextAttributeResponse::fill
       statusCode.fill(SccContextElementNotFound, "");
     }
 
-    if ((statusCode.code != SccOk) && (statusCode.details == ""))
+    if ((statusCode.code != SccOk) && (statusCode.details.empty()))
     {
       statusCode.details = "Entity-Attribute pair: /" + entityId + "-" + attributeName + "/";
     }

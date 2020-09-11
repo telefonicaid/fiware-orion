@@ -68,7 +68,7 @@ std::string NotifyCondition::toJsonV1(bool notLastInVector)
   std::string out = "";
 
   bool condValueListRendered   = condValueList.size() != 0;
-  bool restrictionRendered     = restriction.get() != "";
+  bool restrictionRendered     = !restriction.get().empty();
   bool commaAfterRestriction   = false;  // last element
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
@@ -99,7 +99,7 @@ std::string NotifyCondition::check
 {
   std::string res;
 
-  if (type == "")
+  if (type.empty())
   {
     return "empty type for NotifyCondition";
   }

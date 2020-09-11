@@ -685,6 +685,14 @@ void myFunction(const std::string s, std::string* err);
 
 *チェック方法* : 手動
 
+#### S16 (empty()を使用して長さがゼロの文字列をチェックする)
+
+*ルール*: すべての文字列の空かどうかのチェックに empty() を使用し、`""` または `length() == 0` との比較を回避します。
+
+*根拠*: empty() は、[長さゼロの文字列をチェックする最良の方法](http://stackoverflow.com/questions/41425569/checking-for-empty-string-in-c-alternatives) です。
+
+*チェック方法* : 手動
+
 ## プログラミングパターン
 
 いくつかのパターンは、強い理由がある場合を除いて、Orion Context Broker のコードでは許可されていません。それらの一部を使用する予定の場合は、コア開発者と事前に相談してください。

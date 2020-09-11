@@ -95,7 +95,7 @@ static bool dataProvidedParse
   {
     ngsiv2::EntID* eP = &dataProvidedP->entities[eIx];
 
-    if ((eP->idPattern != "") && (eP->idPattern != ".*"))
+    if ((!eP->idPattern.empty()) && (eP->idPattern != ".*"))
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
@@ -105,7 +105,7 @@ static bool dataProvidedParse
       return false;
     }
 
-    if (eP->typePattern != "")
+    if (!eP->typePattern.empty())
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
@@ -167,7 +167,7 @@ static bool httpParse
 
   httpP->url = url.GetString();
 
-  if (httpP->url == "")
+  if (httpP->url.empty())
   {
     *errorStringP = "/url/ field of /" + fieldName + "/ cannot be the empty string";
     return false;

@@ -58,7 +58,7 @@ std::string AppendContextElementRequest::toJsonV1
 
   out += startTag();
 
-  if (entity.id != "")
+  if (!entity.id.empty())
   {
     out += entity.toJsonV1(false);
   }
@@ -91,7 +91,7 @@ std::string AppendContextElementRequest::check
   AppendContextElementResponse  response;
   std::string                   res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }

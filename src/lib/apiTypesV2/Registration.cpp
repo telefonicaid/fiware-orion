@@ -72,7 +72,7 @@ std::string Registration::toJson(void)
 
   jh.addString("id", id);
 
-  if (description != "")
+  if (!description.empty())
   {
     jh.addString("description", description);
   }
@@ -84,7 +84,7 @@ std::string Registration::toJson(void)
 
   jh.addRaw("dataProvided", dataProvided.toJson());
   jh.addRaw("provider", provider.toJson());
-  jh.addString("status", (status != "")? status : "active");
+  jh.addString("status", (!status.empty())? status : "active");
 
   //
   // FIXME P6: once forwarding is implemented for APIv2, include this call

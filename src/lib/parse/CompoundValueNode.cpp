@@ -379,7 +379,7 @@ void CompoundValueNode::shortShow(const std::string& indent)
 */
 void CompoundValueNode::show(const std::string& indent)
 {
-  if (name != "")
+  if (!name.empty())
   {
     LM_T(LmtCompoundValueShow, ("%sname:      %s",
                                 indent.c_str(),
@@ -487,7 +487,7 @@ std::string CompoundValueNode::check(const std::string& path)
       {
         if (childV[ix]->name == childV[ix2]->name)
         {
-          std::string fullPath = (path == "" ? "/" : path + name + "/");
+          std::string fullPath = (path.empty() ? "/" : path + name + "/");
           std::string error = "duplicated tag-name: /" + childV[ix]->name + "/ in path: " + fullPath;
           alarmMgr.badInput(clientIp, error);
 

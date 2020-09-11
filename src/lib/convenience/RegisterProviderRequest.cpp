@@ -60,8 +60,8 @@ RegisterProviderRequest::RegisterProviderRequest()
 std::string RegisterProviderRequest::toJsonV1(void)
 {
   std::string  out                            = "";
-  bool         providingApplicationRendered   = providingApplication.get() != "";
-  bool         registrationIdRendered         = registrationId.get() != "";
+  bool         providingApplicationRendered   = !providingApplication.get().empty();
+  bool         registrationIdRendered         = !registrationId.get().empty();
   bool         commaAfterProvidingApplication = registrationIdRendered;
   bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
 
@@ -90,7 +90,7 @@ std::string RegisterProviderRequest::check
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
