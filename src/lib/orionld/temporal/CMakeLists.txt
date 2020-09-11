@@ -33,6 +33,7 @@ SET (SOURCES
     temporalPostEntity.cpp
     temporalInitialiseTenant.cpp
     temporalOpenDBConnection.cpp
+    temporalOpenTenantDBConnection.cpp
 )
 
 SET (HEADERS
@@ -48,6 +49,7 @@ SET (HEADERS
     temporalPostEntity.h
     temporalInitialiseTenant.h
     temporalOpenDBConnection.h
+    temporalOpenTenantDBConnection.h
 )
 
 

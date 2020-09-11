@@ -60,7 +60,9 @@ typedef enum HttpStatusCode
   SccAttributeListRequired  = 482,   // The Attribute List is required by the receiver
   SccReceiverInternalError  = 500,   // An unknown error at the receiver has occurred
   SccNotImplemented         = 501,   // The given operation is not implemented
-  SccServiceUnavailable     = 503    // The server is currently unable to handle the request
+  SccServiceUnavailable     = 503,   // The server is currently unable to handle the request
+  SccPGConnHasProblem       = 601,   // Postgrest connection problem
+  SccPGTenantConnHasProblem = 602    // Postgrest Tenant DB cannot be accessed
 } HttpStatusCode;
 
 

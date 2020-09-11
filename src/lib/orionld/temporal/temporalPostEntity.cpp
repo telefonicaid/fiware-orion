@@ -31,6 +31,8 @@
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/temporal/temporalPostEntity.h"               // Own interface
+#include "orionld/temporal/temporalOpenDBConnection.h"	       // Temporal Include
+#include "orionld/temporal/temporalOpenTenantDBConnection.h"   // Temporal Include
 
 
 // ----------------------------------------------------------------------------
@@ -39,6 +41,66 @@
 //
 bool temporalPostEntity(ConnectionInfo* ciP)
 {
+  char oldTenantName[] = "tbd-chandra";
+  
+  PGconn* oldTenantPgConn = TemporalTenantDBConnectorOpen(oldTenantName);
+  
+  PGresult *oldTenantDBEntityRes = PQexec(oldTenantPgConn, "BEGIN"); 
+  if (PQresultStatus(oldTenantDBEntityRes) != PGRES_COMMAND_OK) 
+  {
+
+        LM_E(("BEGIN command failed for inserting single Entity into DB %s\n",oldTenantName));
+        PQclear(oldTenantDBEntityRes);
+        TemporalTenantDBConnectorClose(oldTenantPgConn);
+	return false;
+  }
+  PQclear(oldTenantDBEntityRes);  
+
+  char oldPGTenantPostEntityCloseBraces[] = ")";
+
+  char oldPGTenantPostEntity_entity_id[] = "tbd-chandra";
+  char oldPGTenantPostEntity_entity_type[] = "tbd-chandra";
+  char oldPGTenantPostEntity_geo_property[] = "tbd-chandra";
+  char oldPGTenantPostEntity_created_at[] = "tbd-chandra";
+  char oldPGTenantPostEntity_modified_at[] = "tbd-chandra";
+  char oldPGTenantPostEntity_observed_at[] = "tbd-chandra";
+
+  char oldPGTenantPostEntity[] = "INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at) VALUES (";
+
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntity_entity_id);
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntity_entity_type);
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntity_geo_property);
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntity_created_at);
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntity_modified_at);
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntity_observed_at); 
+  strcat (oldPGTenantPostEntity, oldPGTenantPostEntityCloseBraces);
+
+  oldTenantDBEntityRes = PQexec(oldTenantPgConn, oldPGTenantPostEntity);    
+
+  if (PQresultStatus(oldTenantDBEntityRes) != PGRES_COMMAND_OK)
+  {
+
+        LM_E(("INSERT command failed for inserting single Entity into DB %s\n",oldTenantName));
+        PQclear(oldTenantDBEntityRes);
+        TemporalTenantDBConnectorClose(oldTenantPgConn);
+	return false;
+  }
+  PQclear(oldTenantDBEntityRes);
+
+  oldTenantDBEntityRes = PQexec(oldTenantPgConn, "COMMIT");
+  if (PQresultStatus(oldTenantDBEntityRes) != PGRES_COMMAND_OK)
+  {
+
+        LM_E(("COMMIT command failed for inserting single Entity into DB %s\n",oldTenantName));
+        PQclear(oldTenantDBEntityRes);
+        TemporalTenantDBConnectorClose(oldTenantPgConn);
+	return false;
+  }
+  PQclear(oldTenantDBEntityRes);
+  TemporalTenantDBConnectorClose(oldTenantPgConn);
+  return true;
+
+
   LM_E(("Not Implemented"));
   orionldState.httpStatusCode  = SccNotImplemented;
   orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
