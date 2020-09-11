@@ -238,6 +238,8 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
+* **Orion extension**:
+    * **includePayload**: Additional fields in httpInfo for custom notifications
 
 [Top](#top)
 
