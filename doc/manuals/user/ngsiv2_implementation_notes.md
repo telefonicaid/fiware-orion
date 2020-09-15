@@ -23,6 +23,7 @@
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
+* [Additional fields in `httpInfo` for custom notifications](#additional-fields-in-`httpInfo`-for-custom-notifications)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
@@ -238,8 +239,6 @@ The particular validations that Orion implements on NGSIv2 subscription payloads
 * **throttling**: optional (must be an integer)
 * **expires**: optional (must be a date or empty string "")
 * **status**: optional (must be a valid status keyword)
-* **Orion extension**:
-    * **includePayload**: Additional fields in httpInfo for custom notifications
 
 [Top](#top)
 
@@ -457,3 +456,11 @@ which attributes to include in the response to the query) and unary attribute fi
 `expression` (to return only entities which have these attributes). Use them instead.
 
 [Top](#top)
+
+## Additional fields in `httpInfo` for custom notifications
+
+* includePayload: Additional field in `httpInfo` for custom notifications to check not including payload or 0-length requests.
+set 'true' in the case of not including payload in the request.
+
+[Top](#top)
+
