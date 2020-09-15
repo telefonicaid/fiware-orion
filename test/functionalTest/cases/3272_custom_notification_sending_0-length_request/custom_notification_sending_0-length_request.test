@@ -32,13 +32,14 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create E1/T1
-# 02. Create custom subscription with empty PAYLOAD and URL
-# 03. Create custom subscription with empty PAYLOAD, URL and VERB
-# 04. Create custom subscription with non-empty PAYLOAD, URL, VERB
-# 05. Create custom subscription with empty PAYLOAD, URL and VERB
-# 06. Dump accumulator to see the notification
+# 02. Create custom subscription with payload="", includePayload=false
+# 03. Create custom subscription with payload="", includePayload=true
+# 04. Create custom subscription without payload, includePayload=false
+# 05. Create custom subscription without paylaod, includePayload=true
+# 06. Create custom subscription with payload="{ %22x%22: 1}", includePayload=false
+# 07. Create custom subscription with paylaod="{ %22x%22: 1}", includePayload=true
+# 08. Dump accumulator to see the notifications
 #
-
 
 echo "01. Create E1/T1"
 echo "================"
@@ -52,8 +53,8 @@ echo
 echo
 
 
-echo '02. Create custom subscription with empty PAYLOAD and URL'
-echo "========================================================="
+echo '02. Create custom subscription with payload="", includePayload=false'
+echo "===================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -68,7 +69,8 @@ payload='{
   "notification": {
     "httpCustom": {
       "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "payload": ""
+      "payload": "",
+      "includePayload":false
     }
   }
 }'
@@ -77,33 +79,7 @@ echo
 echo
 
 
-echo '03. Create custom subscription with empty PAYLOAD, URL and VERB'
-echo "==============================================================="
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "id" : "E1"
-      }
-    ],
-    "condition": {
-      "attrs": []
-    }
-  },
-  "notification": {
-    "httpCustom": {
-      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "method": "GET",
-      "payload": ""
-    }
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
-echo '04. Create custom subscription with non-empty PAYLOAD, URL and VERB'
+echo '03. Create custom subscription with payload="", includePayload=true'
 echo "==================================================================="
 payload='{
   "subject": {
@@ -119,8 +95,8 @@ payload='{
   "notification": {
     "httpCustom": {
       "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "method": "PUT",
-      "payload": "{ %22A1%22: %22${A1}%22, %22A2%22: %22${A2}%22, %22A3%22: %22${A3}%22 }"
+      "payload": "",
+      "includePayload":true
     }
   }
 }'
@@ -129,8 +105,8 @@ echo
 echo
 
 
-echo '05. Create custom subscription with empty PAYLOAD, URL and VERB'
-echo "==============================================================="
+echo '04. Create custom subscription without payload, includePayload=false'
+echo "===================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -145,8 +121,7 @@ payload='{
   "notification": {
     "httpCustom": {
       "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "method": "DELETE",
-      "payload": ""
+      "includePayload":false
     }
   }
 }'
@@ -155,7 +130,84 @@ echo
 echo
 
 
-echo "06. Dump accumulator to see the notification"
+echo '05. Create custom subscription without paylaod, includePayload=true'
+echo "==================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
+      "includePayload":true
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '06. Create custom subscription with paylaod="{ %22x%22: 1}", includePayload=false'
+echo "================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
+      "payload":"{ %22x%22: 1}",
+      "includePayload":false
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '07. Create custom subscription with paylaod="{ %22x%22: 1}", includePayload=true'
+echo "================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url":      "http://localhost:'${LISTENER_PORT}'/notify",
+      "payload":"{ %22x%22: 1}",
+      "includePayload":true
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator to see the notification"
 echo "============================================"
 accumulatorDump
 echo
@@ -173,8 +225,8 @@ Date: REGEX(.*)
 
 
 
-02. Create custom subscription with empty PAYLOAD and URL
-=========================================================
+02. Create custom subscription with payload="", includePayload=false
+====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -183,17 +235,7 @@ Date: REGEX(.*)
 
 
 
-03. Create custom subscription with empty PAYLOAD, URL and VERB
-===============================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-04. Create custom subscription with non-empty PAYLOAD, URL and VERB
+03. Create custom subscription with payload="", includePayload=true
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -203,8 +245,8 @@ Date: REGEX(.*)
 
 
 
-05. Create custom subscription with empty PAYLOAD, URL and VERB
-===============================================================
+04. Create custom subscription without payload, includePayload=false
+====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -213,7 +255,37 @@ Date: REGEX(.*)
 
 
 
-06. Dump accumulator to see the notification
+05. Create custom subscription without paylaod, includePayload=true
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Create custom subscription with paylaod="{ %22x%22: 1}", includePayload=false
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Create custom subscription with paylaod="{ %22x%22: 1}", includePayload=true
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Dump accumulator to see the notification
 ============================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -237,10 +309,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "type": "T1"
         }
     ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-GET http://localhost:REGEX(\d+)/notify 
+POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -262,26 +334,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "type": "T1"
         }
     ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-PUT http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 36
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{24})
-
-{
-    "A1": "true",
-    "A2": "",
-    "A3": ""
-}
-=======================================
-DELETE http://localhost:REGEX(\d+)/notify
+POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -289,7 +345,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
     "data": [
@@ -303,7 +359,60 @@ Fiware-Correlator: REGEX([0-9a-f\-]{24})
             "type": "T1"
         }
     ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 129
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "E1",
+            "type": "T1"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 9
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "x": 1
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 9
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "x": 1
 }
 =======================================
 
