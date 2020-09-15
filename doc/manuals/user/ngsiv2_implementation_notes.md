@@ -459,8 +459,7 @@ which attributes to include in the response to the query) and unary attribute fi
 
 ## Additional fields in `httpInfo` for custom notifications
 
-* includePayload: Additional field in `httpInfo` for custom notifications to check not including payload or 0-length requests.
-set 'true' in the case of not including payload in the request.
+Orion supports a boolean field `includePayload` in `httpInfo` for custom notifications that can be used to avoid payload in the outgoing notification. If `includePayload` is set to `true` then no payload is included in the notification (and `payload` field, if used, is ignored).
+Default value if `includePayload` is omitted is `false`.
 
 [Top](#top)
-
