@@ -17,4 +17,5 @@
 * Issue #280  Returning 501 Not Implemented if timeInterval is used for subscriptions
 * Issue #430  Accepting "?options=count" as well as "?count=true" in NGSI-LD queries, for backwards compatibility
 * Issue #507  Core context instead of the one in the Link header used in Batch Update
-* Issie #280  User defined HTTP headers for notifications (part of NGSI-LD 1.3.1)
+* Issue #280  User defined HTTP headers for notifications (part of NGSI-LD 1.3.1)
+* Issue #521  Fixed bug in POST /entities with datasetId
