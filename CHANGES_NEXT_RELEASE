@@ -20,3 +20,4 @@
 * Issue #280  User defined HTTP headers for notifications (part of NGSI-LD 1.3.1)
 * Issue #520  Fixed bug in POST /entities with datasetId
 * Issue #521  Implemented datasetId for POST entities/*/attrs
+* Issue #525  Error handling in responses to forwarded GET /entities/{entityId} (the broker used to crash)
