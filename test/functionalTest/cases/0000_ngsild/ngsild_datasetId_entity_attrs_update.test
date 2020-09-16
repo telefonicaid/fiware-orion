@@ -1,0 +1,459 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Modification of entity attributes with datasetId
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with an attribute 'name' with 3 datasets (including the default one)
+# 02. See the entity in the DB
+# 03. GET the entity - see the 3 datasetIds of 'name'
+# 04. Update the attribute 'name' of the entity, with datasets 1 and 3
+# 05. See the entity in the DB
+# 06. GET the entity - see 'name' with 4 datasets, 1 and 3 being updated in step 4
+# 07. Update the attribute 'name' of the entity, with datasets 2, 4, and default
+# 08. See the entity in the DB
+# 09. GET the entity - see 'name' with 5 datasets
+#
+
+echo "01. Create an entity E1 with an attribute 'name' with 3 datasets (including the default one)"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "name": [
+    {
+      "type": "Property",
+      "value": "no dataset id - from step 01"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1 - from step 01",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:2 - from step 01",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in the DB"
+echo "============================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET the entity - see the 3 datasetIds of 'name'"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "04. Update the attribute 'name' of the entity, with datasets 1 and 3"
+echo "===================================================================="
+payload='{
+  "name": [
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:1 - from step 04",
+      "datasetId": "urn:ngsi-ld/dataset:1"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:3 - from step 04",
+      "datasetId": "urn:ngsi-ld/dataset:3"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+
+echo "05. See the entity in the DB"
+echo "============================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. GET the entity - see 'name' with 4 datasets, 1 and 3 being updated in step 4"
+echo "================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "07. Update the attribute 'name' of the entity, with datasets 2, 4, and default"
+echo "=============================================================================="
+payload='{
+  "name": [
+    {
+      "type": "Property",
+      "value": "no dataset id - from step 07"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:2 - from step 07",
+      "datasetId": "urn:ngsi-ld/dataset:2"
+    },
+    {
+      "type": "Property",
+      "value": "dataset urn:ngsi-ld/dataset:4 - from step 07",
+      "datasetId": "urn:ngsi-ld/dataset:4"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "08. See the entity in the DB"
+echo "============================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "09. GET the entity - see 'name' with 5 datasets"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with an attribute 'name' with 3 datasets (including the default one)
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in the DB
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/name"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "no dataset id - from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/name" : [
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:1 - from step 01",
+				"datasetId" : "urn:ngsi-ld/dataset:1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:2 - from step 01",
+				"datasetId" : "urn:ngsi-ld/dataset:2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+03. GET the entity - see the 3 datasetIds of 'name'
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 333
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "name": [
+        {
+            "type": "Property",
+            "value": "no dataset id - from step 01"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:1",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:1 - from step 01"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:2",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:2 - from step 01"
+        }
+    ],
+    "type": "T"
+}
+
+
+04. Update the attribute 'name' of the entity, with datasets 1 and 3
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. See the entity in the DB
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/name"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "no dataset id - from step 01",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/name" : [
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:1 - from step 04",
+				"datasetId" : "urn:ngsi-ld/dataset:1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:2 - from step 01",
+				"datasetId" : "urn:ngsi-ld/dataset:2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:3 - from step 04",
+				"datasetId" : "urn:ngsi-ld/dataset:3",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+06. GET the entity - see 'name' with 4 datasets, 1 and 3 being updated in step 4
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 444
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "name": [
+        {
+            "type": "Property",
+            "value": "no dataset id - from step 01"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:1",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:1 - from step 04"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:2",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:2 - from step 01"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:3",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:3 - from step 04"
+        }
+    ],
+    "type": "T"
+}
+
+
+07. Update the attribute 'name' of the entity, with datasets 2, 4, and default
+==============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. See the entity in the DB
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/name"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/name" : {
+			"value" : "no dataset id - from step 07",
+			"type" : "Property",
+			"mdNames" : [ ],
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*)
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : "",
+	"@datasets" : {
+		"https://uri=etsi=org/ngsi-ld/name" : [
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:1 - from step 04",
+				"datasetId" : "urn:ngsi-ld/dataset:1",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:2 - from step 07",
+				"datasetId" : "urn:ngsi-ld/dataset:2",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:3 - from step 04",
+				"datasetId" : "urn:ngsi-ld/dataset:3",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			},
+			{
+				"type" : "Property",
+				"value" : "dataset urn:ngsi-ld/dataset:4 - from step 07",
+				"datasetId" : "urn:ngsi-ld/dataset:4",
+				"createdAt" : REGEX(.*),
+				"modifiedAt" : REGEX(.*)
+			}
+		]
+	}
+}
+bye
+
+
+09. GET the entity - see 'name' with 5 datasets
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 555
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:entities:E1",
+    "name": [
+        {
+            "type": "Property",
+            "value": "no dataset id - from step 07"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:1",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:1 - from step 04"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:2",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:2 - from step 07"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:3",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:3 - from step 04"
+        },
+        {
+            "datasetId": "urn:ngsi-ld/dataset:4",
+            "type": "Property",
+            "value": "dataset urn:ngsi-ld/dataset:4 - from step 07"
+        }
+    ],
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -94,6 +94,112 @@ static void attributeUpdated(KjNode* updatedP, const char* attrName)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attrDatasetIdInsert -
+//
+bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, const char* datasetId)
+{
+  double  timestamp  = getCurrentTime();
+  char*   eqAttrName = kaStrdup(&orionldState.kalloc, attrName);
+
+  dotForEq(eqAttrName);
+
+  KjNode* didAttrArrayP = kjLookup(datasetsP, eqAttrName);
+
+  if (didAttrArrayP == NULL)  // Creating a new slot for this attribute, in the @datasets field of the entity
+  {
+    didAttrArrayP = kjArray(orionldState.kjsonP, attrObjP->name);
+    kjChildAdd(datasetsP, didAttrArrayP);
+
+    // Create new
+    KjNode* attrInstanceP = kjObject(orionldState.kjsonP, NULL);
+    KjNode* valueP        = kjString(orionldState.kjsonP, "value",      "New Instance");
+    KjNode* typeP         = kjString(orionldState.kjsonP, "type",       "Property");
+    KjNode* createdAtP    = kjFloat(orionldState.kjsonP,  "createdAt",  timestamp);
+    KjNode* modifiedAtP   = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+    KjNode* datasetIdP    = kjString(orionldState.kjsonP, "datasetId",  datasetId);
+
+    kjChildAdd(attrInstanceP, typeP);
+    kjChildAdd(attrInstanceP, valueP);
+    kjChildAdd(attrInstanceP, createdAtP);
+    kjChildAdd(attrInstanceP, modifiedAtP);
+    kjChildAdd(attrInstanceP, datasetIdP);
+
+    kjChildAdd(didAttrArrayP, attrInstanceP);
+  }
+  else  // datasetId already present - replace, but keep createdAt and type
+  {
+    //
+    // Lookup the dataset in the array of datasets for the attribute
+    //
+    KjNode* oldDidAttrInstanceP = NULL;
+    for (KjNode* iP = didAttrArrayP->value.firstChildP; iP != NULL; iP = iP->next)
+    {
+      KjNode* iDatasetP = kjLookup(iP, "datasetId");
+
+      if (iDatasetP == NULL)
+      {
+        LM_E(("Internal Error (no datasetId in attribute instance of @datasets for attribute '%s')", attrObjP->name));
+        orionldErrorResponseCreate(OrionldInternalError, "No datasetId in attribute instance of @datasets for attribute", attrObjP->name);
+        return false;
+      }
+
+      if (strcmp(iDatasetP->value.s, datasetId) == 0)
+      {
+        oldDidAttrInstanceP = iP;
+        break;
+      }
+    }
+
+
+    //
+    // If already present, replace it (and don't forget to set 'modifiedAt').
+    // If not present, create a new one (createadAt + modifiedAt)
+    //
+    if (oldDidAttrInstanceP != NULL)
+    {
+      KjNode* createdAtP  = kjLookup(oldDidAttrInstanceP, "createdAt");
+
+      //
+      // Make the datasetId instance point to the incoming attribute instance instead of the old one - overwrite!
+      //
+      oldDidAttrInstanceP->value.firstChildP = attrObjP->value.firstChildP;
+      oldDidAttrInstanceP->lastChild         = attrObjP->lastChild;
+
+      // Add createdAt and modifiedAt
+      KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+
+      kjChildAdd(oldDidAttrInstanceP, createdAtP);
+      kjChildAdd(oldDidAttrInstanceP, modifiedAtP);
+    }
+    else
+    {
+      // Create new
+      KjNode* attrInstanceP = kjObject(orionldState.kjsonP, NULL);
+
+      //
+      // Getting entire incoming object (from payload body)
+      //
+      attrInstanceP->value.firstChildP = attrObjP->value.firstChildP;
+      attrInstanceP->lastChild         = attrObjP->lastChild;
+
+      // Add createdAt and modifiedAt
+      KjNode* createdAtP  = kjFloat(orionldState.kjsonP,  "createdAt",  timestamp);
+      KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+
+      kjChildAdd(attrInstanceP, createdAtP);
+      kjChildAdd(attrInstanceP, modifiedAtP);
+
+      kjChildAdd(didAttrArrayP, attrInstanceP);
+    }
+  }
+
+  return true;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostEntity -
@@ -176,7 +282,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   // 5. How many attributes are there (in the payload), and are they valid (if overwrite == false)?
   //    Those that are invalid are removed from the tree "orionldState.requestTree"
   int     attrsInPayload = 0;
-  KjNode* attrP          = orionldState.requestTree->value.firstChildP;
   KjNode* next;
   KjNode* responseP      = kjObject(orionldState.kjsonP, NULL);
   KjNode* updatedP       = kjArray(orionldState.kjsonP, "updated");
@@ -193,6 +298,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   kjChildAdd(responseP, updatedP);
   kjChildAdd(responseP, notUpdatedP);
 
+  KjNode* attrP = orionldState.requestTree->value.firstChildP;
   while (attrP != NULL)
   {
     next = attrP->next;
@@ -259,60 +365,164 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   // 8. Save all attribute long names in attrNameV, also - replace all '.' for '='
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    attrNameV[attrNameIx] = attrP->name;
+    attrNameV[attrNameIx] = kaStrdup(&orionldState.kalloc, attrP->name);
     dotForEq(attrNameV[attrNameIx]);
     ++attrNameIx;
   }
 
-  // 8. Remove those attributes that need to be removed before adding attributes to the entity
-  dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
-
   //
-  // 9. Convert the remaining attributes in orionldState.requestTree to an UpdateContextRequest to prepare for call to mongoBackend
+  // 8. Convert the remaining attributes in orionldState.requestTree to an UpdateContextRequest to prepare for call to mongoBackend
   //
   UpdateContextRequest ucr;
-  ContextElement*      ceP = new ContextElement();
+  ContextElement*      ceP              = new ContextElement();
+  KjNode*              datasetsP        = kjLookup(dbEntityP, "@datasets");
+  bool                 notOnlyDatasets  = false;
 
   ceP->entityId.id = entityId;
 
   ucr.contextElementVector.push_back(ceP);
 
+
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     ContextAttribute* caP     = new ContextAttribute();
     char*             detail;
+    int               defaultInstances = 0;
 
-    if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
+    //
+    // datasetIds?
+    //
+    if (attrP->type == KjArray)
     {
-      LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
-      attributeNotUpdated(notUpdatedP, attrP->name, detail);
-      caP->release();
-      free(caP);
-      continue;
-    }
+      KjNode* attrObjP = attrP->value.firstChildP;
+      KjNode* next;
 
-    attributeUpdated(updatedP, attrP->name);
-    ceP->contextAttributeVector.push_back(caP);
+      while (attrObjP != NULL)
+      {
+        OBJECT_CHECK(attrObjP, "attribute instance");
+        next = attrObjP->next;
+
+        KjNode* datasetIdP = kjLookup(attrObjP, "datasetId");
+
+        if (datasetIdP != NULL)  // datasetId present
+        {
+          STRING_CHECK(datasetIdP, "datasetId");
+          URI_CHECK(datasetIdP, "datasetId");
+
+          if (datasetsP == NULL)
+            datasetsP = kjObject(orionldState.kjsonP, "@datasets");
+
+          kjChildRemove(attrP, attrObjP);
+
+          if (attrDatasetIdInsert(datasetsP, attrP->name, attrObjP, datasetIdP->value.s) == false)
+            return false;
+        }
+        else
+          ++defaultInstances;
+
+        attrObjP = next;
+      }
+
+      // There can be a maximum of ONE item left in the array
+      if (defaultInstances > 1)
+      {
+        LM_E(("Bad Input (more than one instance without datasetId)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "more than one instance without datasetId for an attribute", attrP->name);
+        return false;
+      }
+      else if (defaultInstances == 1)
+      {
+        notOnlyDatasets = true;
+        //
+        // It's the only instance left in the array
+        // So, lift it up and make it the value of the attribute, as a JSON Object
+        //
+        attrP->type               = KjObject;
+        attrP->value.firstChildP  = attrP->value.firstChildP->value.firstChildP;
+        attrP->lastChild          = attrP->value.firstChildP->lastChild;
+        attrP->next               = NULL;  // Just in case - should be NULL already
+
+        if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
+        {
+          LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
+          attributeNotUpdated(notUpdatedP, attrP->name, detail);
+          caP->release();
+          free(caP);
+          continue;
+        }
+
+        attributeUpdated(updatedP, attrP->name);
+        ceP->contextAttributeVector.push_back(caP);
+      }
+    }
+    else
+    {
+      notOnlyDatasets = true;
+
+      KjNode* datasetIdP = kjLookup(attrP, "datasetId");
+      if (datasetIdP != NULL)
+      {
+        LM_E(("Bad Input (datasetId given but not an array - should this be allowed?)"));
+        detail = (char*) "datasetId given but not an array";
+        attributeNotUpdated(notUpdatedP, attrP->name, detail);
+        caP->release();
+        free(caP);
+        continue;
+      }
+
+      if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
+      {
+        LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
+        attributeNotUpdated(notUpdatedP, attrP->name, detail);
+        caP->release();
+        free(caP);
+        continue;
+      }
+
+      attributeUpdated(updatedP, attrP->name);
+      ceP->contextAttributeVector.push_back(caP);
+    }
   }
 
-  // 10. Call mongoBackend to do the Update
-  HttpStatusCode            status;
-  UpdateContextResponse     ucResponse;
+  // 9. Remove those attributes that need to be removed before adding attributes to the entity
+  // dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
-  ucr.updateActionType = ActionTypeAppend;
-  status = mongoUpdateContext(&ucr,
-                              &ucResponse,
-                              orionldState.tenant,
-                              ciP->servicePathV,
-                              ciP->uriParam,
-                              ciP->httpHeaders.xauthToken,
-                              ciP->httpHeaders.correlator,
-                              ciP->httpHeaders.ngsiv2AttrsFormat,
-                              ciP->apiVersion,
-                              NGSIV2_NO_FLAVOUR);
+  // 10.1 Update the @datasets field, if necessary
+  if (datasetsP != NULL)
+  {
+    if (dbEntityFieldReplace(entityId, "@datasets", datasetsP) == false)
+    {
+      LM_E(("DID: dbEntityUpdate failed"));
+      orionldErrorResponseCreate(OrionldInternalError, "Error updating @datasets for entity", entityId);
+      return false;
+    }
+  }
 
-  if (status != SccOk)
-    LM_E(("mongoUpdateContext: %d", status));
+  // 10.2. Call mongoBackend to do the Update - if there are any attributes without datasetId
+  if (notOnlyDatasets == true)
+  {
+    HttpStatusCode            status;
+    UpdateContextResponse     ucResponse;
+
+    ucr.updateActionType = ActionTypeAppend;
+
+    if (attrNameIx > 0)
+      dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
+
+    status = mongoUpdateContext(&ucr,
+                                &ucResponse,
+                                orionldState.tenant,
+                                ciP->servicePathV,
+                                ciP->uriParam,
+                                ciP->httpHeaders.xauthToken,
+                                ciP->httpHeaders.correlator,
+                                ciP->httpHeaders.ngsiv2AttrsFormat,
+                                ciP->apiVersion,
+                                NGSIV2_NO_FLAVOUR);
+
+    if (status != SccOk)
+      LM_E(("mongoUpdateContext: %d", status));
+  }
 
   //
   // 11. Prepare the response
