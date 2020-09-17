@@ -385,7 +385,6 @@ bool orionldPostEntity(ConnectionInfo* ciP)
 
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    ContextAttribute* caP     = new ContextAttribute();
     char*             detail;
     int               defaultInstances = 0;
 
@@ -442,6 +441,7 @@ bool orionldPostEntity(ConnectionInfo* ciP)
         attrP->lastChild          = attrP->value.firstChildP->lastChild;
         attrP->next               = NULL;  // Just in case - should be NULL already
 
+        ContextAttribute* caP = new ContextAttribute();
         if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
         {
           LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
@@ -465,11 +465,10 @@ bool orionldPostEntity(ConnectionInfo* ciP)
         LM_E(("Bad Input (datasetId given but not an array - should this be allowed?)"));
         detail = (char*) "datasetId given but not an array";
         attributeNotUpdated(notUpdatedP, attrP->name, detail);
-        caP->release();
-        free(caP);
         continue;
       }
 
+      ContextAttribute* caP = new ContextAttribute();
       if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
       {
         LM_E(("kjTreeToContextAttribute(%s): %s", attrP->name, detail));
