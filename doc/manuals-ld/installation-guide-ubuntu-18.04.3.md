@@ -199,8 +199,8 @@ To download, build and install:
 The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
 
 ```bash
-apt-get -y install doxygen
-apt-get -y install graphviz
+sudo aptitude install doxygen
+sudo aptitude install graphviz
 rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
@@ -212,6 +212,7 @@ make
 sudo make install
 
 # Python library
+sudo apt install python-pip
 pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
@@ -219,7 +220,7 @@ pip install paho-mqtt
 *Eclipse Mosquitto* is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers. Source: https://mosquitto.org
 
 ```bash
-sudo apt-get install mosquitto
+sudo aptitude install mosquitto
 sudo systemctl start mosquitto
 
 # If you wish to enable `mosquitto` to have it start automatically on system reboot:
@@ -255,7 +256,7 @@ sudo chown $USER:$GROUP /etc/default/orionld
 
 &nbsp;2.  Run `sudo make install` and let the files be owned by root.
 
-Personally I prefer option 1. I really dislike to use `sudo`.
+Personally I prefer option 1. I really dislike using `sudo`.
 
 You now have *orionld*, the NGSI-LD Context Broker compiled, installed and ready to work!
 
@@ -278,10 +279,16 @@ wget -qO - https://www.mongodb.org/static/pgp/server-4.0.asc | sudo apt-key add 
 echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
 
 # Reload local package database
-sudo apt-get update
+sudo aptitude update
 
 # Install the MongoDB packages
-sudo apt-get install -y mongodb-org
+sudo aptitude install -y mongodb-org
 ```
+
+# Start the mongodb daemon
+sudo systemctl start mongod
+
+# Ensure that MongoDB will start following a system reboot
+sudo systemctl enable mongod
 
 For more detail on the MongoDB installation process, or if something goes wrong, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
