@@ -198,7 +198,7 @@ static DBClientBase* mongoConnect
   }
   alarmMgr.dbErrorReset();
 
-  LM_I(("Successful connection to database"));
+  LM_T(LmtOldInfo, ("Successful connection to database"));
 
   //
   // WriteConcern

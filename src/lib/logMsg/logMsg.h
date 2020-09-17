@@ -44,6 +44,8 @@
 
 #include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
 
+#include "logMsg/traceLevels.h"
+
 
 /******************************************************************************
 *
@@ -1841,7 +1843,7 @@ inline void lmTransactionStart(
   strncpy(service,    __service,    sizeof(service));
   strncpy(subService, __subService, sizeof(subService));
   strncpy(fromIp,     _fromIp,      sizeof(fromIp));
-  LM_I(("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
+  LM_T(LmtOldInfo, ("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }
 
 
@@ -1859,7 +1861,7 @@ inline void lmTransactionStart(
 inline void lmTransactionStart_URL(const char* url)
 {
   transactionIdSet();
-  LM_I(("Starting transaction from %s", url));
+  LM_T(LmtOldInfo, ("Starting transaction from %s", url));
 }
 #endif
 
@@ -1871,7 +1873,7 @@ inline void lmTransactionStart_URL(const char* url)
 */
 inline void lmTransactionEnd()
 {
-  LM_I(("Transaction ended"));
+  LM_T(LmtOldInfo, ("Transaction ended"));
   lmTransactionReset();
 }
 

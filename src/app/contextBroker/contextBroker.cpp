@@ -492,7 +492,7 @@ void daemonize(void)
 */
 void sigHandler(int sigNo)
 {
-  LM_I(("Signal Handler (caught signal %d)", sigNo));
+  LM_T(LmtOldInfo, ("Signal Handler (caught signal %d)", sigNo));
 
   switch (sigNo)
   {

@@ -871,7 +871,7 @@ int servicePathSplit(ConnectionInfo* ciP)
     // This was previously an LM_T trace, but we have "promoted" it to INFO due to
     // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
     //
-    LM_I(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+    LM_T(LmtOldInfo, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
 
