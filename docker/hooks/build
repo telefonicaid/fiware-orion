@@ -19,8 +19,10 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 #
-docker build --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
+
+docker image build --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
 	--label "org.opencontainers.image.created"=$(date +%Y-%m-%d) \
 	--label "org.opencontainers.image.revision"=$SOURCE_COMMIT \
 	--label "org.opencontainers.image.version"=$DOCKER_TAG \
-	-t $IMAGE_NAME .
+	-t $IMAGE_NAME \
+	.
