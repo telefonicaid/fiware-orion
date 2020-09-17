@@ -84,6 +84,9 @@ static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
 static unsigned int              mhdConnectionTimeout  = 0;
 
+// FIXME P5: replace 1025 with a proper value, based on literature for URL max length
+__thread char                    uriForLogs[1024];
+
 
 
 /* ****************************************************************************
@@ -567,6 +570,13 @@ static void requestCompleted
   }
 
   *con_cls = NULL;
+
+  LM_I(("Request finishes: %s %s", ciP->method.c_str(), uriForLogs));
+  if ((ciP->verb != GET) && (ciP->verb != DELETE) && (strlen(ciP->payload) > 0))
+  {
+    LM_I(("Request payload (%d bytes): %s", strlen(ciP->payload), ciP->payload));
+  }
+  LM_I(("Response code: %d", ciP->httpStatusCode));
 
   lmTransactionEnd();  // Incoming REST request ends
 
@@ -1125,6 +1135,30 @@ RestService restServiceForBadVerb;
 
 /* ****************************************************************************
 *
+* getUriForLog -
+*
+* This handle is described at: https://www.gnu.org/software/libmicrohttpd/manual/html_node/microhttpd_002dconst.html
+*
+*/
+static void* getUriForLog(void* cls, const char* uri, struct MHD_Connection *con)
+{
+  // We need this for getting raw URL (path + query params) for logs. Note we
+  // cannot use ciP->url, as it only has the path part
+
+  // Probably, it would  be better to have uriForLogs as part of ciP, but note that at the
+  // momentthis getUriForLog callback is called that object doesn't exist
+  // so we use a thread variable
+
+  strncpy(uriForLogs, uri, sizeof(uriForLogs));
+
+  return NULL;
+}
+
+
+
+
+/* ****************************************************************************
+*
 * connectionTreat -
 *
 * This is the MHD_AccessHandlerCallback function for MHD_start_daemon
@@ -1654,6 +1688,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                   MHD_OPTION_URI_LOG_CALLBACK,         getUriForLog, NULL,
                                    MHD_OPTION_END);
 
     }
@@ -1671,6 +1706,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                   MHD_OPTION_URI_LOG_CALLBACK,         getUriForLog, NULL,
                                    MHD_OPTION_END);
 
     }
@@ -1711,6 +1747,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                      MHD_OPTION_URI_LOG_CALLBACK,         getUriForLog, NULL,
                                       MHD_OPTION_END);
     }
     else
@@ -1727,6 +1764,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_CONNECTION_TIMEOUT,       mhdConnectionTimeout,
+                                      MHD_OPTION_URI_LOG_CALLBACK,         getUriForLog, NULL,
                                       MHD_OPTION_END);
     }
 
