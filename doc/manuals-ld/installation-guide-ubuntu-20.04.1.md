@@ -204,6 +204,7 @@ make
 sudo make install
 
 # Python library
+sudo apt install python-pip
 pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
@@ -247,7 +248,7 @@ sudo chown $USER:$GROUP /etc/default/orionld
 
 &nbsp;2.  Run `sudo make install` and let the files be owned by root.
 
-Personally I prefer option 1. I really dislike to use `sudo`.
+Personally I prefer option 1. I really dislike using `sudo`.
 
 You now have *orionld*, the NGSI-LD Context Broker compiled, installed and ready to work!
 
@@ -276,10 +277,10 @@ sudo aptitude update
 # Install the MongoDB packages
 sudo aptitude install -y mongodb-org
 
-# Start the MongoDB
+# Start the mongodb daemon
 sudo systemctl start mongod.service
 
-# Enable the MongoDB
+# Ensure that MongoDB will start following a system reboot
 sudo systemctl enable mongod.service
 ```
 
