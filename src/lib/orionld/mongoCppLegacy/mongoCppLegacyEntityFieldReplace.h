@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREETOUPDATECONTEXTREQUEST_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREETOUPDATECONTEXTREQUEST_H_
+#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYFIELDREPLACE_H_
+#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYFIELDREPLACE_H_
 
 /*
 *
@@ -23,27 +23,21 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma and Ken Zangelin
+* Author: Ken Zangelin
 */
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                 // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
-
-#include "ngsi10/UpdateContextRequest.h"                  // UpdateContextRequest
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeToUpdateContextRequest -
+// mongoCppLegacyEntityFieldReplace -
 //
-extern void kjTreeToUpdateContextRequest
-(
-  UpdateContextRequest*  ucrP,
-  KjNode*                treeP,
-  KjNode*                errorsArrayP,
-  KjNode*                idTypeAndCreDateFromDb
-);
+extern bool mongoCppLegacyEntityFieldReplace(const char* entityId, const char* fieldName, KjNode* fieldValeNodeP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREETOUPDATECONTEXTREQUEST_H_
+#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYFIELDREPLACE_H_

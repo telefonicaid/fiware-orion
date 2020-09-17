@@ -194,6 +194,7 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
       else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
       else if (strcmp(optionStart, "sysAttrs")    == 0)  orionldState.uriParamOptions.sysAttrs    = true;
+      else if (strcmp(optionStart, "count")       == 0)  orionldState.uriParams.count             = true;  // NGSIv2 compatibility
       else
       {
         LM_W(("Unknown 'options' value: %s", optionStart));

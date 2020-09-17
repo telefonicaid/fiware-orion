@@ -432,7 +432,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
   mongoRequest.updateActionType = ActionTypeAppendStrict;
 
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP);
+  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
 
 
   //

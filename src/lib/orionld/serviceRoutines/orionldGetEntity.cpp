@@ -168,7 +168,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
   if (kjTreeRegistrationInfoExtract(registrationP, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, registrationAttrV, 100, &registrationAttrs, &detail) == false)
     return NULL;
 
-  char* newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, 200 * 30);  // Assuming max 20 attrs, max 200 chars per attr ...
+  char* newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, 200 * 30);  // Assuming max 30 attrs, max 200 chars per attr ...
 
   if ((uriParamAttrs == 0) && (registrationAttrs == 0))
     newUriParamAttrsString = (char*) "";
@@ -315,37 +315,50 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
   {
     KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, uriParamAttrsV, uriParamAttrs);
 
-    if (partTree != NULL)  // Move all attributes from 'partTree' into responseP
+    if (partTree == NULL)
     {
-      KjNode* nodeP = partTree->value.firstChildP;
-      KjNode* next;
+      LM_E(("Internal Error (forwarded request failed)"));
+      continue;
+    }
 
-      while (nodeP != NULL)
+    if (partTree->type != KjObject)
+    {
+      LM_W(("Garbage from Context Provider (the response to a forwarded GET /entities/{EID} must be a JSON object - not %s)",
+            kjValueType(partTree->type)));
+      continue;
+    }
+
+    //
+    // Move all attributes from 'partTree' into responseP
+    //
+    KjNode* nodeP = partTree->value.firstChildP;
+    KjNode* next;
+
+    while (nodeP != NULL)
+    {
+      next = nodeP->next;
+
+      if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
       {
-        next = nodeP->next;
-
-        if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
-        {
-          // Do Nothing
-        }
-        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
-        {
-          if (needEntityType)
-          {
-            //
-            // We're taking the entity::type from the Response to the forwarded request
-            // because no local entity was found.
-            // It could also be taken from the registration.
-            //
-            kjChildAdd(responseP, nodeP);
-            needEntityType = false;
-          }
-        }
-        else
-          kjChildAdd(responseP, nodeP);
-
-        nodeP = next;
+        // Do Nothing
       }
+      else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
+      {
+        if (needEntityType)
+        {
+          //
+          // We're taking the entity::type from the Response to the forwarded request
+          // because no local entity was found.
+          // It could also be taken from the registration.
+          //
+          kjChildAdd(responseP, nodeP);
+          needEntityType = false;
+        }
+      }
+      else
+        kjChildAdd(responseP, nodeP);
+
+      nodeP = next;
     }
   }
 

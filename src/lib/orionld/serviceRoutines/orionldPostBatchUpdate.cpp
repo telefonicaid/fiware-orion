@@ -187,12 +187,13 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         continue;
       }
 
-
       OrionldContext*        contextP;
       OrionldProblemDetails  pd;
 
       if (contextNodeP != NULL)
         contextP = orionldContextFromTree(NULL, false, contextNodeP, &pd);
+      else if (orionldState.contextP != NULL)
+        contextP = orionldState.contextP;
       else
         contextP = orionldCoreContextP;
 
@@ -204,7 +205,6 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         kjChildRemove(incomingTree, entityP);
         continue;
       }
-
 
       KjNode*  inTypeP = kjLookup(entityP, "type");
 
@@ -244,7 +244,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
   mongoRequest.updateActionType = ActionTypeUpdate;
 
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP);
+  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
 
   //
   // 03. Set 'modDate' to "RIGHT NOW"

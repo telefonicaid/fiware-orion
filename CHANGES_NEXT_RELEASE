@@ -15,3 +15,9 @@
 * Issue #280  Implemented createdAt and modifiedAt + options=sysAttrs for subscriptions (with milliseconds, of course)
 * Issue #280  createdAt and modifiedAt for registrations were returned as integers - now as ISO8601 strings (with milliseconds)
 * Issue #280  Returning 501 Not Implemented if timeInterval is used for subscriptions
+* Issue #430  Accepting "?options=count" as well as "?count=true" in NGSI-LD queries, for backwards compatibility
+* Issue #507  Core context instead of the one in the Link header used in Batch Update
+* Issue #280  User defined HTTP headers for notifications (part of NGSI-LD 1.3.1)
+* Issue #520  Fixed bug in POST /entities with datasetId
+* Issue #521  Implemented datasetId for POST entities/*/attrs
+* Issue #525  Error handling in responses to forwarded GET /entities/{entityId} (the broker used to crash)

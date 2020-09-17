@@ -103,18 +103,18 @@ typedef struct OrionldUriParamOptions
 //
 typedef struct OrionldUriParams
 {
-  char* id;
-  char* type;
-  char* idPattern;
-  char* attrs;
-  char* options;
-  int   offset;
-  int   limit;
-  bool  count;
-  char* geometry;
-  char* geoloc;
-  char* geoproperty;
-  char* datasetId;
+  char*  id;
+  char*  type;
+  char*  idPattern;
+  char*  attrs;
+  char*  options;
+  int    offset;
+  int    limit;
+  bool   count;
+  char*  geometry;
+  char*  geoloc;
+  char*  geoproperty;
+  char*  datasetId;
 } OrionldUriParams;
 
 
@@ -158,7 +158,8 @@ typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
   ConnectionInfo*         ciP;
-  struct timespec         timestamp;  // the time when the request entered
+  struct timespec         timestamp;    // The time when the request entered
+  double                  requestTime;  // Same same, but at a floating point
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;

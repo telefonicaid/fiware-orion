@@ -334,6 +334,16 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   }
 
   //
+  // All requests are either arrays or objects
+  //
+  if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
+  {
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
+    orionldState.httpStatusCode = 400;
+    return false;
+  }
+
+  //
   // Empty payload object?  ("{}" resulting in a tree with one Object that has no children)
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
@@ -348,7 +358,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Array", "[]");
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload Body", "Empty Array");
     orionldState.httpStatusCode = 400;
     return false;
   }

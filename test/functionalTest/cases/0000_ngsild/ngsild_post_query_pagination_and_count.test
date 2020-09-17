@@ -31,16 +31,16 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# Mongo seems to give the entities back in th order they were created, so, no sleep needed when creating entities.
+# Mongo seems to give the entities back in the order they were created, so, no sleep needed when creating entities.
 # As the entities are ordered by Creation Date, I assumed we'd need different creation dates for all entities (only seconds - no fractions).
 # But, this doesn't seem to be necessary - which saves us 20 seconds for this functest :)
 #
 # 01. Create 21 entities, E00 - E20, sleeping 1.1 seconds between each 
 # 02. Query entities without and URI parameters - see E00 - E19
-# 03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Count: 21 as HTTP header in response
+# 03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Results-Count: 21 as HTTP header in response
 # 04. Query entities with limit=4 - see E00-E03
 # 05. Query entities with limit=4, offset=12 - see E12-E15
-# 06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Count: 21 as HTTP header
+# 06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Results-Count: 21 as HTTP header
 # 07. Query entities with limit=-1, see error
 # 08. Query entities with limit=1001 - see error
 # 09. Query entities with offset=-1 - see error
@@ -85,8 +85,8 @@ echo
 echo
 
 
-echo "03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Count: 21 as HTTP header in response"
-echo "======================================================================================================================================="
+echo "03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Results-Count: 21 as HTTP header in response"
+echo "==============================================================================================================================================="
 payload='{
   "entities": [
     {
@@ -127,8 +127,8 @@ echo
 echo
 
 
-echo "06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Count: 21 as HTTP header"
-echo "========================================================================================================="
+echo "06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Results-Count: 21 as HTTP header"
+echo "================================================================================================================="
 payload='{
   "entities": [
     {
@@ -247,12 +247,12 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E20
     "id": "urn:ngsi-ld:entities:E19",
 
 
-03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Count: 21 as HTTP header in response
-=======================================================================================================================================
+03. Query entities with 'count' set to true and limit set to 0 - see empty entity array and NGSILD-Results-Count: 21 as HTTP header in response
+===============================================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: application/json
-NGSILD-Count: 21
+NGSILD-Results-Count: 21
 Date: REGEX(.*)
 
 []
@@ -275,9 +275,9 @@ Date: REGEX(.*)
     "id": "urn:ngsi-ld:entities:E15",
 
 
-06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Count: 21 as HTTP header
-=========================================================================================================
-NGSILD-Count: 21
+06. Query entities with limit=4, offset=12, count=true - see E12-E15, and NGSILD-Results-Count: 21 as HTTP header
+=================================================================================================================
+NGSILD-Results-Count: 21
     "id": "urn:ngsi-ld:entities:E12",
     "id": "urn:ngsi-ld:entities:E13",
     "id": "urn:ngsi-ld:entities:E14",

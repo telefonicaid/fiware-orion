@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -314,8 +315,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
     KjNode* attrType = kjLookup(kNodeP, "type");
 
-    LM_T(LmtUriExpansion, ("treating attribute '%s'", kNodeP->name));
-
     if ((kNodeP == createdAtP) || (kNodeP == modifiedAtP))
     {
       kNodeP = next;
@@ -366,6 +365,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
+    eqForDot(kNodeP->name);
     if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       // kjTreeToContextAttribute calls orionldErrorResponseCreate
