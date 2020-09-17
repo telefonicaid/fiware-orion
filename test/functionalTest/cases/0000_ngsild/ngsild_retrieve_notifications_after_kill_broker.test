@@ -120,6 +120,7 @@ echo
 
 echo "06. Add P4 to E01"
 echo "================="
+sleep 2  # Throttling is 1.6 seconds
 payload='{
   "P4": {
     "type": "Property",
@@ -166,7 +167,7 @@ Date: REGEX(.*)
 
 
 04. Dump accumulator to see one notification - NGSI-LD has no initial notifications
-==================================================================================
+===================================================================================
 POST http://REGEX(.*):9997/notify
 Fiware-Servicepath: /
 Content-Length: 401
