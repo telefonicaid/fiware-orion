@@ -1592,6 +1592,7 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
 )
@@ -1654,6 +1655,7 @@ static bool processOnChangeConditionForUpdateContext
                                           tenant,
                                           xauthToken,
                                           fiwareCorrelator,
+                                          correlatorCounter,
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
@@ -1788,6 +1790,7 @@ static unsigned int processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
+                                                                notifSent + 1,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 

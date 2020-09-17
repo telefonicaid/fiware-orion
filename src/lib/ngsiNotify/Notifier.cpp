@@ -69,6 +69,7 @@ void Notifier::sendNotifyContextRequest
     const std::string&               tenant,
     const std::string&               xauthToken,
     const std::string&               fiwareCorrelator,
+    unsigned int                     correlatorCounter,
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsFilter,
     bool                             blacklist,
@@ -81,6 +82,7 @@ void Notifier::sendNotifyContextRequest
                                                                           tenant,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
+                                                                          correlatorCounter,
                                                                           renderFormat,
                                                                           attrsFilter,
                                                                           blacklist,
@@ -190,6 +192,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   tenant,
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
+    unsigned int                         correlatorCounter,
     RenderFormat                         renderFormat,
     const std::vector<std::string>&      attrsFilter,
     bool                                 blacklist,
@@ -375,10 +378,22 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->content          = payload;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
+
+    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
+    // case of initial notification)
+    if (correlatorCounter > 0)
+    {
+      char suffix[STRING_SIZE_FOR_INT];
+      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+      params->fiwareCorrelator = fiwareCorrelator + "; notif=" + suffix;
+    }
+    else
+    {
+      params->fiwareCorrelator = fiwareCorrelator;
+    }
 
     paramsV->push_back(params);
   }
@@ -399,6 +414,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
@@ -438,6 +454,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                                      tenant,
                                      xauthToken,
                                      fiwareCorrelator,
+                                     correlatorCounter,
                                      renderFormat,
                                      attrsFilter,
                                      blacklist,
@@ -523,9 +540,21 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->content          = payloadString;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
+
+    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
+    // case of initial notification)
+    if (correlatorCounter > 0)
+    {
+      char suffix[STRING_SIZE_FOR_INT];
+      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+      params->fiwareCorrelator = fiwareCorrelator + "; notif=" + suffix;
+    }
+    else
+    {
+      params->fiwareCorrelator = fiwareCorrelator;
+    }
 
     paramsV->push_back(params);
     return paramsV;

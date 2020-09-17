@@ -56,6 +56,7 @@ public:
                                 const std::string&               tenant,
                                 const std::string&               xauthToken,
                                 const std::string&               fiwareCorrelator,
+                                unsigned int                     correlatorCounter,
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsFilter,
                                 bool                             blacklist,
