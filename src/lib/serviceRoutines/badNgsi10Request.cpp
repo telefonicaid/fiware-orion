@@ -52,7 +52,7 @@ std::string badNgsi10Request
   std::string details = std::string("service '") + ciP->url + "' not found";
 
   alarmMgr.badInput(clientIp, details);
-  restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
+  restErrorReplyGet(ciP, SccBadRequest, "Service not found. Check your URL as probably it is wrong.", &answer);
 
   return answer;
 }
