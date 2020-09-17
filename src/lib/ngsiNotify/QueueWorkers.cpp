@@ -120,6 +120,14 @@ static void* workerFunc(void* pSyncQ)
                          params->resource.c_str(),
                          params->content_type.c_str()));
 
+      char                portV[STRING_SIZE_FOR_INT];
+      std::string         url;
+
+      snprintf(portV, sizeof(portV), "%d", params->port);
+      url = params->ip + ":" + portV + params->resource;
+
+      long long    statusCode = -1;
+
       if (simulatedNotification)
       {
         LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
@@ -129,7 +137,6 @@ static void* workerFunc(void* pSyncQ)
       {
         std::string  out;
         int          r;
-        long long    statusCode = -1;
 
         r =  httpRequestSendWithCurl(curl,
                                      params->from,
@@ -153,10 +160,6 @@ static void* workerFunc(void* pSyncQ)
         // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
         // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
         //
-        char portV[STRING_SIZE_FOR_INT];
-        snprintf(portV, sizeof(portV), "%d", params->port);
-        std::string url = params->ip + ":" + portV + params->resource;
-
         if (r == 0)
         {
           statisticsUpdate(NotifyContextSent, params->mimeType);
@@ -179,6 +182,10 @@ static void* workerFunc(void* pSyncQ)
           }
         }
       }
+
+      // Add notificacion result summary in log INFO level
+      LM_I(("Notification transaction finishes: %s %s", params->verb.c_str(), url.c_str()));
+      LM_I(("Response code: %d", statusCode));
 
       // End transaction
       lmTransactionEnd();

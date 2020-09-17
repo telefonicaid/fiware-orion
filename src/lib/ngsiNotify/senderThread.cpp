@@ -62,11 +62,12 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
+    long long    statusCode = -1;
+
     if (!simulatedNotification)
     {
       std::string  out;
       int          r;
-      long long    statusCode = -1;
 
       r = httpRequestSend(params->from,
                           params->ip,
@@ -110,6 +111,10 @@ void* startSenderThread(void* p)
       LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
       __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
     }
+
+    // Add notificacion result summary in log INFO level
+    LM_I(("Notification transaction finishes: %s %s", params->verb.c_str(), url.c_str()));
+    LM_I(("Response code: %d", statusCode));
 
     // End transaction
     lmTransactionEnd();
