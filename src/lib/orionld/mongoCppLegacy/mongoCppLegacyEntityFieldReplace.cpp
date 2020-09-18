@@ -65,8 +65,6 @@ bool mongoCppLegacyEntityFieldReplace(const char* entityId, const char* fieldNam
   //
   mongo::BSONObj update = BSON("$set" << BSON(fieldName << payloadAsBsonObj << "modDate" << orionldState.requestTime));
 
-  LM_TMP(("DID: REPLACE: %s", update.toString().c_str()));
-
   // semTake()
   mongo::DBClientBase*  connectionP = getMongoConnection();
   bool                  upsert      = false;
