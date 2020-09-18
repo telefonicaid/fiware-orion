@@ -177,6 +177,8 @@ grep "HTTP request to send is too large" /tmp/${BROKER}.log | wc -l
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
 grep "to HTTP server" /tmp/${BROKER}.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }'
+
+
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 85
