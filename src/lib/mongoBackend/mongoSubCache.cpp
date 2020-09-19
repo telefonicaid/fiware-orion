@@ -143,7 +143,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   if (ldContext != "")  // NGSI-LD subscription
   {
-    LM_TMP(("SLI: NGSI-LD subscription. ldContext == '%s'", ldContext.c_str()));
     cSubP->ldContext = strdup(ldContext.c_str());
 
     if (renderFormat == NGSI_V2_NORMALIZED)

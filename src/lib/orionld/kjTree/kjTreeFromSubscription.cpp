@@ -400,7 +400,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // throttling
-  LM_TMP(("THROT: throttling: %f", subscriptionP->throttling));
   if (subscriptionP->throttling != 0)
   {
     nodeP = kjFloat(orionldState.kjsonP, "throttling", subscriptionP->throttling);

@@ -499,7 +499,6 @@ static int timezoneOffset(const char* tz)
 */
 double parse8601Time(const std::string& ss)
 {
-  LM_TMP(("MILLIS: incoming string: '%s'", ss.c_str()));
   int    y = 0;
   int    M = 0;
   int    d = 0;
@@ -564,7 +563,6 @@ double parse8601Time(const std::string& ss)
 
   timestamp += millis;  // Must be done in two lines:  timestamp = totalSecs + millis fails ...
 
-  LM_TMP(("MILLIS: outgoing double: %f", timestamp));
   return timestamp;
 }
 

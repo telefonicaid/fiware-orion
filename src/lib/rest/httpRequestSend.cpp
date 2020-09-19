@@ -272,8 +272,6 @@ int httpRequestSendWithCurl
   std::map<std::string, bool>     usedExtraHeaders;
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
-  LM_TMP(("HTTP Request to %s:%d, resource: '%s'", _ip.c_str(), port, resource.c_str()));
-
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 

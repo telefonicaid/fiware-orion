@@ -86,7 +86,6 @@ static void longToFloat(KjNode* nodeP)
     char*     longString  = nodeP->value.firstChildP->value.s;
     double    floatValue  = strtold(longString, NULL);
 
-    LM_TMP(("MILLIS: string '%s': %f", longString, floatValue));
     nodeP->type    = KjFloat;
     nodeP->value.f = floatValue;
   }

@@ -140,15 +140,9 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
     else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
     {
       if (nodeP->type == KjFloat)
-      {
         *creDateP = nodeP->value.f;
-        LM_TMP(("MILLIS: credate was a float: %f", *creDateP));
-      }
       else if (nodeP->type == KjInt)
-      {
         *creDateP = (double) nodeP->value.i;
-        LM_TMP(("MILLIS: credate was an integer: %f", *creDateP));
-      }
     }
   }
 }
