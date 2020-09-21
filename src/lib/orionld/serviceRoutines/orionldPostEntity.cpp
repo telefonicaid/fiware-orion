@@ -32,6 +32,7 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjRender
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
@@ -105,35 +106,17 @@ bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, co
 
   dotForEq(eqAttrName);
 
-  KjNode* didAttrArrayP = kjLookup(datasetsP, eqAttrName);
+  KjNode* didAttrArrayP       = kjLookup(datasetsP, eqAttrName);
+  KjNode* oldDidAttrInstanceP = NULL;
 
   if (didAttrArrayP == NULL)  // Creating a new slot for this attribute, in the @datasets field of the entity
   {
-    didAttrArrayP = kjArray(orionldState.kjsonP, attrObjP->name);
+    didAttrArrayP = kjArray(orionldState.kjsonP, eqAttrName);
     kjChildAdd(datasetsP, didAttrArrayP);
-
-    // Create new
-    KjNode* attrInstanceP = kjObject(orionldState.kjsonP, NULL);
-    KjNode* valueP        = kjString(orionldState.kjsonP, "value",      "New Instance");
-    KjNode* typeP         = kjString(orionldState.kjsonP, "type",       "Property");
-    KjNode* createdAtP    = kjFloat(orionldState.kjsonP,  "createdAt",  timestamp);
-    KjNode* modifiedAtP   = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
-    KjNode* datasetIdP    = kjString(orionldState.kjsonP, "datasetId",  datasetId);
-
-    kjChildAdd(attrInstanceP, typeP);
-    kjChildAdd(attrInstanceP, valueP);
-    kjChildAdd(attrInstanceP, createdAtP);
-    kjChildAdd(attrInstanceP, modifiedAtP);
-    kjChildAdd(attrInstanceP, datasetIdP);
-
-    kjChildAdd(didAttrArrayP, attrInstanceP);
   }
   else  // datasetId already present - replace, but keep createdAt and type
   {
-    //
     // Lookup the dataset in the array of datasets for the attribute
-    //
-    KjNode* oldDidAttrInstanceP = NULL;
     for (KjNode* iP = didAttrArrayP->value.firstChildP; iP != NULL; iP = iP->next)
     {
       KjNode* iDatasetP = kjLookup(iP, "datasetId");
@@ -151,48 +134,43 @@ bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, co
         break;
       }
     }
+  }
 
+  //
+  // If already present, replace it (and don't forget to set 'modifiedAt').
+  // If not present, create a new one (createadAt + modifiedAt)
+  //
+  if (oldDidAttrInstanceP != NULL)
+  {
+    KjNode* createdAtP  = kjLookup(oldDidAttrInstanceP, "createdAt");
 
-    //
-    // If already present, replace it (and don't forget to set 'modifiedAt').
-    // If not present, create a new one (createadAt + modifiedAt)
-    //
-    if (oldDidAttrInstanceP != NULL)
-    {
-      KjNode* createdAtP  = kjLookup(oldDidAttrInstanceP, "createdAt");
+    // Make the datasetId instance point to the incoming attribute instance instead of the old one - overwrite!
+    oldDidAttrInstanceP->value.firstChildP = attrObjP->value.firstChildP;
+    oldDidAttrInstanceP->lastChild         = attrObjP->lastChild;
 
-      //
-      // Make the datasetId instance point to the incoming attribute instance instead of the old one - overwrite!
-      //
-      oldDidAttrInstanceP->value.firstChildP = attrObjP->value.firstChildP;
-      oldDidAttrInstanceP->lastChild         = attrObjP->lastChild;
+    // Add createdAt and modifiedAt
+    KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
 
-      // Add createdAt and modifiedAt
-      KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+    kjChildAdd(oldDidAttrInstanceP, createdAtP);
+    kjChildAdd(oldDidAttrInstanceP, modifiedAtP);
+  }
+  else
+  {
+    // Create new, based on incoming object (from payload body)
+    KjNode* attrInstanceP = kjObject(orionldState.kjsonP, NULL);
 
-      kjChildAdd(oldDidAttrInstanceP, createdAtP);
-      kjChildAdd(oldDidAttrInstanceP, modifiedAtP);
-    }
-    else
-    {
-      // Create new
-      KjNode* attrInstanceP = kjObject(orionldState.kjsonP, NULL);
+    // Use entire incoming object (from payload body)
+    attrInstanceP->value.firstChildP = attrObjP->value.firstChildP;
+    attrInstanceP->lastChild         = attrObjP->lastChild;
 
-      //
-      // Getting entire incoming object (from payload body)
-      //
-      attrInstanceP->value.firstChildP = attrObjP->value.firstChildP;
-      attrInstanceP->lastChild         = attrObjP->lastChild;
+    // Add createdAt and modifiedAt
+    KjNode* createdAtP  = kjFloat(orionldState.kjsonP,  "createdAt",  timestamp);
+    KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
 
-      // Add createdAt and modifiedAt
-      KjNode* createdAtP  = kjFloat(orionldState.kjsonP,  "createdAt",  timestamp);
-      KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+    kjChildAdd(attrInstanceP, createdAtP);
+    kjChildAdd(attrInstanceP, modifiedAtP);
 
-      kjChildAdd(attrInstanceP, createdAtP);
-      kjChildAdd(attrInstanceP, modifiedAtP);
-
-      kjChildAdd(didAttrArrayP, attrInstanceP);
-    }
+    kjChildAdd(didAttrArrayP, attrInstanceP);
   }
 
   return true;
