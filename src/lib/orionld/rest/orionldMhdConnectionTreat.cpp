@@ -65,6 +65,7 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
+#include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
@@ -658,6 +659,34 @@ static void dbGeoIndexes(void)
 
 // -----------------------------------------------------------------------------
 //
+// uriParamSupport - are all given URI parameters supported by the service?
+//
+bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
+{
+  int shifts = 0;
+
+  while (given != 0)
+  {
+    if ((given & 1) != 0)
+    {
+      if ((supported & (1 << shifts)) == 0)
+      {
+        *detailP = (char*) uriParamName(1 << shifts);
+        return false;
+      }
+    }
+
+    given = given >> 1;
+    ++shifts;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
@@ -724,6 +753,18 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((orionldState.serviceP = serviceLookup(ciP)) == NULL)
     goto respond;
+
+  //
+  // Any URI param given but not supported?
+  //
+  char* detail;
+  if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
+  {
+    LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
+    orionldState.httpStatusCode = 400;
+    goto respond;
+  }
 
   //
   // If a tenant is used (HTTP Header NGSILD-Tenant) and it's not any of:
