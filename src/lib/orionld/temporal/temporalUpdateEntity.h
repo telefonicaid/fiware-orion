@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITY_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITY_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALUPDATEENTITY_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALUPDATEENTITY_H_
 
 /*
 *
@@ -31,8 +31,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// temporalPostEntity -
+// temporalUpdateEntity -
 //
-extern bool temporalPostEntity(ConnectionInfo* ciP);
+extern bool temporalUpdateEntity(ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITY_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALUPDATEENTITY_H_
