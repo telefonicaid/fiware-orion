@@ -58,6 +58,7 @@ style_check src/lib/orionld/rest
 style_check src/lib/orionld/serviceRoutines
 style_check src/lib/orionld/temporal
 style_check src/lib/orionld/types
+style_check src/lib/orionld/temporal
 
 style_check src/lib/serviceRoutinesV2
 style_check src/lib/logSummary

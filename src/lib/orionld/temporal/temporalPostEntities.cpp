@@ -22,6 +22,13 @@
 *
 * Author: Ken Zangelin, Chandra Challagonda
 */
+extern "C"
+{
+#include "kbase/kMacros.h"                                     // K_FT
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -40,10 +47,47 @@
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-  LM_E(("Not Implemented"));
-  orionldState.httpStatusCode  = SccNotImplemented;
-  orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
+  char*  entityId   = orionldState.payloadIdNode->value.s;
+  char*  entityType = orionldState.payloadTypeNode->value.s;
+
+
+  //
+  // Some traces just to see how the KjNode tree works
+  //
+  LM_TMP(("TMPF: Entity Id:   '%s'", entityId));
+  LM_TMP(("TMPF: Entity Type: '%s'", entityType));
+  LM_TMP(("TMPF: Context:     '%s'", orionldState.contextP->url));
+  LM_TMP(("TMPF:"));
+
+  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    KjNode* attrValueP = kjLookup(attrP, "value");
+    KjNode* attrTypeP  = kjLookup(attrP, "type");
+
+    if (attrValueP == NULL)
+      attrValueP = kjLookup(attrP, "object");  // Relationships have no "value" but an "object"
+
+    LM_TMP(("TMPF: Attribute:   '%s':", attrP->name));
+    LM_TMP(("TMPF:   Type:      '%s'", attrTypeP->value.s));
+
+    if (attrValueP->type == KjString)
+      LM_TMP(("TMPF:   Value:     '%s'", attrValueP->value.s));
+    else if (attrValueP->type == KjInt)
+      LM_TMP(("TMPF:   Value:     %d", attrValueP->value.i));
+    else if (attrValueP->type == KjFloat)
+      LM_TMP(("TMPF:   Value:     %f", attrValueP->value.f));
+    else if (attrValueP->type == KjBoolean)
+      LM_TMP(("TMPF:   Value:     '%s'", K_FT(attrValueP->value.b)));
+    else if (attrValueP->type == KjNull)
+      LM_TMP(("TMPF:   Value:     NULL"));
+    else if (attrValueP->type == KjArray)
+      LM_TMP(("TMPF:   Value:     ARRAY"));
+    else if (attrValueP->type == KjObject)
+      LM_TMP(("TMPF:   Value:     OBJECT"));
+    else
+      LM_TMP(("TMPF:   Value:     UNKNOWN: %d", attrValueP->type));
+    LM_TMP(("TMPF:"));
+  }
 
   return false;
 }

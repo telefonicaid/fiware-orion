@@ -42,7 +42,8 @@ Some libraries are built from source code and those sources must be downloaded a
 * gmock:          1.5 (needed for unit testing only)
 
 For those libraries that are cloned repositories, I myself keep all repositories in a directory I call *git* directly under my home directory: `~/git`.
-This guide follows that example, so, let's start by creating the directory for repositories:
+For this guide to work, you will need to do the same.
+So, let's start by creating the directory for repositories:
 
 ```bash
 mkdir ~/git
@@ -121,7 +122,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kbase.git
 cd kbase
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -134,7 +135,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/klog.git
 cd klog
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -151,7 +152,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kalloc.git
 cd kalloc
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -166,7 +167,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/kjson.git
 cd kjson
-git checkout release/0.3
+git checkout release/0.5
 make install
 ```
 
@@ -179,7 +180,7 @@ To download, build and install:
 cd ~/git
 git clone https://gitlab.com/kzangeli/khash.git
 cd khash
-git checkout release/0.3
+git checkout release/0.5
 vi makefile
 # Edit makefile and add/write that content at CFLAGS after "-g"
 CFLAGS= -g -std=c99
