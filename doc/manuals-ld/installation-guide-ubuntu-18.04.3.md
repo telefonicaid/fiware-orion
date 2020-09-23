@@ -53,7 +53,7 @@ This guide follows that example, so, let's start by creating the directory for r
 mkdir ~/git
 ```
 
-And, as `git` will be used, we might as well install it:
+And, as `git` will be used, we might as well install it right away:
 
 ```bash
 sudo aptitude install git
@@ -201,7 +201,7 @@ The *Eclipse Paho* project provides open-source client implementations of MQTT a
 ```bash
 sudo aptitude install doxygen
 sudo aptitude install graphviz
-rm -f /usr/local/lib/libpaho*
+sudo rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
 cd paho.mqtt.c
@@ -237,14 +237,29 @@ Now that we have all the dependencies installed, it's time to clone the Orion-LD
 cd ~/git
 git clone https://github.com/FIWARE/context.Orion-LD.git
 cd context.Orion-LD
-make install
 ```
 
 At the end of `make install`, the makefile wants to copy the executable (orionld) to /usr/bin, and more files under /usr.
-As the compilation hasn't been (and shouldn't be) run as root (sudo), these copies will fail.
-So, you have two options here:
+Unless we do something, this will fail, as privileges are needed to create/modify files in system directories.
+What we will do is to create the files by hand, using `sudo` and then set ourselves as owner of the files.
+For this you need to know your user and group id.
+Your user id you already have in the env var `USER`. Your GROUP you have to look up.
+Normally the group id is the same as the user id (but, you can be in more than one group).
+See your group using the command `id`:
 
-&nbsp;1.  Create the files by hand, using `sudo` and then set yourself as owner of the files:
+```bash
+$ id
+uid=1000(kz) gid=1000(kz) groups=1000(kz),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),120(lpadmin),131(lxd),132(sambashare)
+```
+As you can see in this example, my USER is 'kz' and my group is also 'kz', only, I'm in a few more groups as well.
+The first one is the one we'll use: `groups=1000(kz)`.
+To use it we'll create an env var:
+```bash
+export GROUP=kz  # *
+```
+(*): Please don't blindly use 'kz' - use the group that `id` gave you!
+
+After that, we create and change owner of three files:
 ```bash
 sudo touch /usr/bin/orionld
 sudo chown $USER:$GROUP /usr/bin/orionld
@@ -253,12 +268,12 @@ sudo chown $USER:$GROUP /etc/init.d/orionld
 sudo touch /etc/default/orionld
 sudo chown $USER:$GROUP /etc/default/orionld
 ```
+And finally we can compile the broker:
+```bash
+make install
+```
 
-&nbsp;2.  Run `sudo make install` and let the files be owned by root.
-
-Personally I prefer option 1. I really dislike using `sudo`.
-
-You now have *orionld*, the NGSI-LD Context Broker compiled, installed and ready to work!
+You now have *orionld*, the NGSI-LD Context Broker compiled, installed and ready to work :)
 
 Except, of course, you need to install the MongoDB server as well.
 So far, we have only installed the mongo client library, so that *orionld* can speak to the MongoDB server.
@@ -272,6 +287,7 @@ This is what the MongoDB documentation tells us to do to install MongoDB server 
 
 ```bash
 # Import the MongoDB public GPG Key
+sudo aptitude install gnupg
 wget -qO - https://www.mongodb.org/static/pgp/server-4.0.asc | sudo apt-key add -
 # Should respond with "OK"
 
