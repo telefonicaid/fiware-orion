@@ -1003,17 +1003,19 @@ std::string double2string(double f)
 *
 * isodate2str -
 *
-* FIXME P6: change implementation to use gmtime_r
-*
 */
 std::string isodate2str(long long timestamp)
 {
   // 80 bytes is enough to store any ISO8601 string safely
-  // We use gmtime() to get UTC strings, otherwise we would use localtime()
+  // We use gmtime_r() to get UTC strings, otherwise we would use localtime()
   // Date pattern: 1970-04-26T17:46:40.00Z
   char   buffer[80];
+
+  // Unused, but needed to fullfill gmtime_r() signature
+  struct tm  tmP;
+
   time_t rawtime = (time_t) timestamp;
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime_r(&rawtime, &tmP));
   return std::string(buffer);
 }
 

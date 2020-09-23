@@ -176,6 +176,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Sep 23 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.1-1
+- Fix: potencial race condition related with DateTime attributes due to the usage of thread unsafe functions
+
 * Tue Mar 31 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.0-1
 - Add: TextUnrestricted attribute type to avoid forbidden chars checking (#3550)
 - Add: notification flow control on update (#3568)
