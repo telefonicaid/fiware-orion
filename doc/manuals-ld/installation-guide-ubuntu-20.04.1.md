@@ -236,8 +236,8 @@ cd context.Orion-LD
 
 At the end of `make install`, the makefile wants to copy the executable (orionld) to /usr/bin, and more files under /usr.
 Unless we do something, this will fail, as privileges are needed to create/modify files in system directories.
-What we do is to create the files by hand, using `sudo` and then set oueselves as owner of the files.
-For this yoiu need to know your user and group ids.
+What we will do is to create the files by hand, using `sudo` and then set ourselves as owner of the files.
+For this you need to know your user and group id.
 Your user id you already have in the env var `USER`. Your GROUP you have to look up.
 Normally the group id is the same as the user id (but, you can be in more than one group).
 See your group using the command `id`:
