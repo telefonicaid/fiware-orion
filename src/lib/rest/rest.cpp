@@ -2042,7 +2042,7 @@ void restInit
 
   mhdConnectionTimeout = _mhdTimeoutInSeconds;
 
-  strncpy(corsOrigin, _corsOrigin, sizeof(corsOrigin));
+  strncpy(corsOrigin, _corsOrigin, sizeof(corsOrigin) - 1);
   corsEnabled = (corsOrigin[0] != 0);
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);

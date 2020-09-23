@@ -527,7 +527,7 @@ std::string tenantFromDb(const std::string& database)
   {
     char tenant[SERVICE_NAME_MAX_LEN];
 
-    strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant));
+    strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant) - 1);
     r = std::string(tenant);
   }
   else

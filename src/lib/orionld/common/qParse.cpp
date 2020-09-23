@@ -60,7 +60,7 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   char* endBracketP   = NULL;
   char* mdNameP       = NULL;
   char* rest          = NULL;
-  char  fullPath[1024];
+  char  fullPath[1100];
 
   *valueMayBeExpandedP = false;
 
@@ -216,7 +216,7 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   char longName[512];    // 512 seems like an OK limit for max length of an expanded attribute name
   char mdLongName[512];  // 512 seems like an OK limit for max length of an expanded metadata name
 
-  strncpy(longName, longNameP, sizeof(longName));
+  strncpy(longName, longNameP, sizeof(longName) - 1);
 
   // Turn '.' into '=' for longName
   char* sP = longName;
@@ -236,7 +236,7 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
     {
       char* mdLongNameP  = orionldContextItemExpand(orionldState.contextP, mdNameP, NULL, true, NULL);
 
-      strncpy(mdLongName, mdLongNameP, sizeof(mdLongName));
+      strncpy(mdLongName, mdLongNameP, sizeof(mdLongName) - 1);
 
       // Turn '.' into '=' for md-longname
       char* sP = mdLongName;
@@ -252,13 +252,13 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   }
 
   if (caseNo == 1)
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.value", longName);
+    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value", longName);
   else if (caseNo == 2)
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.value.%s", longName, rest);
+    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value.%s", longName, rest);
   else if (caseNo == 3)
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value", longName, mdNameP);
+    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value", longName, mdNameP);
   else
-    snprintf(fullPath, sizeof(fullPath), "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
+    snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
 
   return kaStrdup(&orionldState.kalloc, fullPath);
 }

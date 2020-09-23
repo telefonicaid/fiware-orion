@@ -63,7 +63,7 @@ OrionldContext* orionldContextFromBuffer(char* url, char* buffer, OrionldProblem
   {
     char buf[256];
 
-    strncpy(buf, buffer, sizeof(buf));
+    strncpy(buf, buffer, sizeof(buf) - 1);
     LM_E(("JSON Parse Error for @context '%s' (first bytes of json: %s)", url, buf));
     pdP->type   = OrionldBadRequestData;
     pdP->title  = (char*) "JSON Parse Error in @context";
