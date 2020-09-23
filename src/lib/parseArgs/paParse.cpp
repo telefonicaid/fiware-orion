@@ -346,7 +346,7 @@ static int paArgInit(PaArgument* paList)
 static char* paProgNameSet(char* pn, int levels, bool pid, const char* extra = NULL)
 {
   char*        start;
-  static char  pName[128];
+  static char  pName[256];
 
   if (pn == NULL)
   {
@@ -379,7 +379,7 @@ static char* paProgNameSet(char* pn, int levels, bool pid, const char* extra = N
     ++start;
   }
 
-  strncpy(pName, start, sizeof(pName));
+  strncpy(pName, start, sizeof(pName) - 1);
 
   if (paUsageProgName == NULL)
     paUsageProgName = strdup(pName);
@@ -448,7 +448,7 @@ int paParse
   {
     int ix;
 
-    strncpy(paCommandLine, argV[1], sizeof(paCommandLine));
+    strncpy(paCommandLine, argV[1], sizeof(paCommandLine) - 1);
     for (ix = 2; ix < argC; ix++)
     {
       if (sizeof(paCommandLine) - strlen(paCommandLine) > 1)
@@ -603,20 +603,27 @@ int paParse
     }
     else
     {
-      char s[64000];
+      char warnings[256];
+      int  paResultStringLen = strlen(paResultString);
 
       snprintf(paResultString, sizeof(paResultString), "\nEntire command line options: '%s'\n\n", paCommandLine);
 
-      snprintf(s, sizeof(s), "--- %s warnings ---\n", progName);
-      strncat(paResultString, s, sizeof(paResultString) - 1);
+      snprintf(warnings, sizeof(warnings), "--- %s warnings ---\n", progName);
+
+      if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
+	strcat(paResultString, warnings);
 
       for (ix = 0; ix < paWarnings; ix++)
       {
-        snprintf(s, sizeof(s), "Severity % 2d: %s\n\n", paWarning[ix].severity, paWarning[ix].string);
-        strncat(paResultString, s, sizeof(paResultString) - 1);
+        snprintf(warnings, sizeof(warnings), "Severity % 2d: %s\n\n", paWarning[ix].severity, paWarning[ix].string);
+
+	if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
+	  strcat(paResultString, warnings);
+	paResultStringLen = strlen(paResultString);
       }
 
-      strncat(paResultString, "\n\n", sizeof(paResultString) - 1);
+      if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
+	strcat(paResultString, "\n\n");
 
       if (paUsageOnAnyWarning)
       {
