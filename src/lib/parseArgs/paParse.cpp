@@ -611,19 +611,19 @@ int paParse
       snprintf(warnings, sizeof(warnings), "--- %s warnings ---\n", progName);
 
       if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
-	strcat(paResultString, warnings);
+        strcat(paResultString, warnings);
 
       for (ix = 0; ix < paWarnings; ix++)
       {
         snprintf(warnings, sizeof(warnings), "Severity % 2d: %s\n\n", paWarning[ix].severity, paWarning[ix].string);
 
-	if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
-	  strcat(paResultString, warnings);
-	paResultStringLen = strlen(paResultString);
+        if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
+          strcat(paResultString, warnings);
+        paResultStringLen = strlen(paResultString);
       }
 
       if (sizeof(paResultString) > paResultStringLen + strlen(warnings) + 1)
-	strcat(paResultString, "\n\n");
+        strcat(paResultString, "\n\n");
 
       if (paUsageOnAnyWarning)
       {
