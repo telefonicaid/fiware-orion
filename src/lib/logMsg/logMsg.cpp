@@ -510,7 +510,7 @@ char* lmProgName(char* pn, int levels, bool pid, const char* extra)
     ++start;
   }
 
-  strncpy(pName, start, sizeof(pName));
+  strncpy(pName, start, sizeof(pName) - 1);
 
   if (pid == true)
   {
@@ -2209,7 +2209,7 @@ LmStatus lmPathRegister
       exit(1);
     }
 
-    strncpy(fileName, path, sizeof(fileName));
+    strncpy(fileName, path, sizeof(fileName) - 1);
   }
 
   if (appendToLogFile == false)
@@ -3426,12 +3426,12 @@ void lmAddMsgBuf
 
   if (text)
   {
-    strncpy(newMsg->msg, text, sizeof(newMsg->msg));
+    strncpy(newMsg->msg, text, sizeof(newMsg->msg) - 1);
   }
 
   if (file)
   {
-    strncpy(newMsg->file, file, sizeof(newMsg->file));
+    strncpy(newMsg->file, file, sizeof(newMsg->file) - 1);
   }
 
   newMsg->line = line;
@@ -3439,12 +3439,12 @@ void lmAddMsgBuf
 
   if (func)
   {
-    strncpy(newMsg->func, func, sizeof(newMsg->func));
+    strncpy(newMsg->func, func, sizeof(newMsg->func) - 1);
   }
 
   if (stre)
   {
-    strncpy(newMsg->stre, stre, sizeof(newMsg->stre));
+    strncpy(newMsg->stre, stre, sizeof(newMsg->stre) - 1);
   }
 
   if (tLev)

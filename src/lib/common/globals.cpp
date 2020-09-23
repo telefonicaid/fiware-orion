@@ -132,7 +132,7 @@ void transactionIdSet(void)
 */
 void correlatorIdSet(const char* corrId)
 {
-  strncpy(correlatorId, corrId, sizeof(correlatorId));
+  strncpy(correlatorId, corrId, sizeof(correlatorId) - 1);
 }
 
 

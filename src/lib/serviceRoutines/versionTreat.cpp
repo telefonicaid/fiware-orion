@@ -57,7 +57,7 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 */
 void versionSet(const char* version)
 {
-  strncpy(versionString, version, sizeof(versionString));
+  strncpy(versionString, version, sizeof(versionString) - 1);
 }
 
 
