@@ -1,0 +1,1 @@
+- Fix: potencial race condition related with DateTime attributes due to the usage of thread unsafe functions
