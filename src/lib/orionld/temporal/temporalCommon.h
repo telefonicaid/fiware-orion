@@ -102,7 +102,7 @@ typedef struct OrionldTemporalDbAttributeTable
   char*                                     entityId;
   char*                                     attributeId;
   char*                                     attributeName;
-  char*                                     atrtributeType; // Chandra-TBD
+  char*                                     attibuteType; // Chandra-TBD
   OrionldTemporalAttributeValueTypeEnum     attributeValueType;
   bool                                      subProperty;
   char*                                     unitCode;
