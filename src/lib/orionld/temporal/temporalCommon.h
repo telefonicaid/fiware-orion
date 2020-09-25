@@ -53,7 +53,7 @@ extern "C"
 // OrionldTemporalAttributeValueTypeEnum
 //
 //
-typedef enum OrionldTemporalAttributeValueTypeEnum
+enum OrionldTemporalAttributeValueTypeEnum
 {
   EnumValueString = 0,
   EnumValueNumber,
