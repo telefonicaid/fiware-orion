@@ -89,6 +89,8 @@ char*  temporalCommonExtractTree()
         char* entityId   = orionldState.payloadIdNode->value.s;
         char* entityType = orionldState.payloadTypeNode->value.s;
 
+        OrionldTemporalDbEntityTable.entityId = orionldState.payloadIdNode->value.s;
+
         strncat(oldTemporalSQLBuffer,entityId,oldTemporalSQLRemainingBufferSize);
         oldTemporalSQLUsedBufferSize += strlen(entityId);
 
@@ -407,7 +409,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
   	}
   	PQclear(oldPgTenandDbResult);
 
-        
+
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "COMMIT");
   	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   	{
