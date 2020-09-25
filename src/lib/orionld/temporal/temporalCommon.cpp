@@ -54,6 +54,7 @@ PGconn* oldPgDbConnection = NULL;
 PGconn* oldPgDbTenantConnection = NULL;
 PGresult* oldPgTenandDbResult = NULL;
 OrionldTemporalDbEntityTable OrionldTemporalDbEntityTableLocal;
+OrionldTemporalDbAttributeTable OrionldTemporalDbAttributeTableLocal;
 
 // -----------------------------------------------------------------------------
 //
@@ -134,20 +135,20 @@ char*  temporalCommonExtractTree()
         for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
         {
                 KjNode* attrTypeP  = kjLookup(attrP, "type");
-                OrionldTemporalDbEntityTableLocal.attributeType = attrTypeP->value.s;
+                OrionldTemporalDbAttributeTableLocal.attributeType = attrTypeP->value.s;
 
-                if (strcmp (OrionldTemporalDbEntityTableLocal.attributeType,"Relationship") == 0)
+                if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"Relationship") == 0)
                 {
                         // OrionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                        OrionldTemporalDbEntityTableLocal.attributeValueType  = OrionldTemporalAttributeValueTypeEnum.valueObject;
-                        OrionldTemporalDbEntityTableLocal.ValueRelation = attributeObject->value.s;
-                        LM_TMP(("CCSR:  Relationship : '%s'", OrionldTemporalDbEntityTableLocal.ValueRelation));
+                        OrionldTemporalDbAttributeTableLocal.attributeValueType  = OrionldTemporalAttributeValueTypeEnum.valueObject;
+                        OrionldTemporalDbAttributeTableLocal.ValueRelation = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", OrionldTemporalDbAttributeTableLocal.ValueRelation));
                 }
-                else if (strcmp (attributeType,"Property") == 0)
+                else if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"Property") == 0)
                 {
 
                 }
-                else if (strcmp (attributeType,"GeoProperty") == 0)
+                else if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"GeoProperty") == 0)
                 {
                 }
 
