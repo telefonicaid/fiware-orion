@@ -87,8 +87,8 @@ char*  temporalCommonExtractTree()
         oldTemporalSQLUsedBufferSize = strlen(oldTemporalSQLInsertIntoTable);  // string length of "INSERT INTO entity_table(....."
         oldTemporalSQLRemainingBufferSize = oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize;
 
-        char* entityId   = orionldState.payloadIdNode->value.s;
-        char* entityType = orionldState.payloadTypeNode->value.s;
+        // char* entityId   = orionldState.payloadIdNode->value.s;
+        // char* entityType = orionldState.payloadTypeNode->value.s;
 
         OrionldTemporalDbEntityTableLocal.entityId = orionldState.payloadIdNode->value.s;
         OrionldTemporalDbEntityTableLocal.entityType = orionldState.payloadTypeNode->value.s;
@@ -108,7 +108,7 @@ char*  temporalCommonExtractTree()
         oldTemporalSQLUsedBufferSize += 8;
 
         // Created At
-        double entityCreatedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+        OrionldTemporalDbEntityTableLocal.entityCreatedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
         char entityCreateAtCharBuffer[64];
         snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", entityCreatedAt);
         strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize);
@@ -134,12 +134,14 @@ char*  temporalCommonExtractTree()
         for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
         {
                 KjNode* attrTypeP  = kjLookup(attrP, "type");
-                char* attributeType = attrTypeP->value.s;
+                OrionldTemporalDbEntityTableLocal.attributeType = attrTypeP->value.s;
 
-                if (strcmp (attributeType,"Relationship") == 0)
+                if (strcmp (OrionldTemporalDbEntityTableLocal.attributeType,"Relationship") == 0)
                 {
-                        KjNode* attributeObject  = kjLookup(attrP, "object");
-                        LM_TMP(("CCSR:  Relationship : '%s'", attributeObject->value.s));
+                        // OrionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                        OrionldTemporalDbEntityTableLocal.attributeValueType  = OrionldTemporalAttributeValueTypeEnum.valueObject;
+                        OrionldTemporalDbEntityTableLocal.ValueRelation = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", OrionldTemporalDbEntityTableLocal.ValueRelation));
                 }
                 else if (strcmp (attributeType,"Property") == 0)
                 {

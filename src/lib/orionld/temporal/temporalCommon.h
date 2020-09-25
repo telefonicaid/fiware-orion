@@ -26,8 +26,6 @@
 * Author: Chandra Challagonda
 */
 
-#include <time.h>                                                // struct timespec
-
 #include "orionld/db/dbDriver.h"                                 // database driver header
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 
@@ -87,9 +85,9 @@ typedef struct OrionldTemporalDbEntityTable
 {
   char*           entityId;
   char*           entityType;
-  struct timespec createdAt;
-  struct timespec modifiedAt;
-  struct timespec observedAt;
+  double          createdAt;
+  double          modifiedAt;
+  double          observedAt;
   float           geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbEntityTable;
 
@@ -111,12 +109,12 @@ typedef struct OrionldTemporalDbAttributeTable
   char*                                     valueString;
   bool                                      valueBoolean;
   double                                    valueNumber;
-  char*                                     value_relation;
+  char*                                     valueRelation;
   char*                                     valueObject;
-  struct timespec                           valueDatetime;
-  struct timespec                           createdAt;
-  struct timespec                           modifiedAt;
-  struct timespec                           observedAt;
+  double                                    valueDatetime;
+  double                                    createdAt;
+  double                                    modifiedAt;
+  double                                    observedAt;
   float                                     geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbAttributeTable;
 
@@ -140,10 +138,10 @@ typedef struct OrionldTemporalDbSubAttributeTable
   double                                    valueNumber;
   char*                                     value_relation;
   char*                                     valueObject;
-  struct timespec                           valueDatetime;
-  struct timespec                           createdAt;
-  struct timespec                           modifiedAt;
-  struct timespec                           observedAt;
+  double                                    valueDatetime;
+  double                                    createdAt;
+  double                                    modifiedAt;
+  double                                    observedAt;
   float                                     geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbSubAttributeTable;
 
