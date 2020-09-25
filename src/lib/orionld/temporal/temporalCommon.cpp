@@ -53,6 +53,7 @@ extern "C"
 PGconn* oldPgDbConnection = NULL;
 PGconn* oldPgDbTenantConnection = NULL;
 PGresult* oldPgTenandDbResult = NULL;
+OrionldTemporalDbEntityTable OrionldTemporalDbEntityTableLocal;
 
 // -----------------------------------------------------------------------------
 //
@@ -89,8 +90,8 @@ char*  temporalCommonExtractTree()
         char* entityId   = orionldState.payloadIdNode->value.s;
         char* entityType = orionldState.payloadTypeNode->value.s;
 
-        OrionldTemporalDbEntityTable.entityId = orionldState.payloadIdNode->value.s;
-        OrionldTemporalDbEntityTable.entityType = orionldState.payloadTypeNode->value.s;
+        OrionldTemporalDbEntityTableLocal.entityId = orionldState.payloadIdNode->value.s;
+        OrionldTemporalDbEntityTableLocal.entityType = orionldState.payloadTypeNode->value.s;
 
         strncat(oldTemporalSQLBuffer,entityId,oldTemporalSQLRemainingBufferSize);
         oldTemporalSQLUsedBufferSize += strlen(entityId);
