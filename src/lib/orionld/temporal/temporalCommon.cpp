@@ -90,6 +90,7 @@ char*  temporalCommonExtractTree()
         char* entityType = orionldState.payloadTypeNode->value.s;
 
         OrionldTemporalDbEntityTable.entityId = orionldState.payloadIdNode->value.s;
+        OrionldTemporalDbEntityTable.entityType = orionldState.payloadTypeNode->value.s;
 
         strncat(oldTemporalSQLBuffer,entityId,oldTemporalSQLRemainingBufferSize);
         oldTemporalSQLUsedBufferSize += strlen(entityId);
