@@ -139,6 +139,7 @@ char*  temporalCommonExtractTree()
 
                 if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"Relationship") == 0)
                 {
+                        KjNode* attributeObject  = kjLookup(attrP, "object");
                         // OrionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
                         OrionldTemporalDbAttributeTableLocal.attributeValueType  = OrionldTemporalAttributeValueTypeEnum.ValueObject;
                         OrionldTemporalDbAttributeTableLocal.valueObject = attributeObject->value.s;
