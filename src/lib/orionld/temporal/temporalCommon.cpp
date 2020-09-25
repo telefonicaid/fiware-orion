@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Chandra Challagonda
+* Author: Chandra Challagonda & Ken Zangelin
 */
 #include <string.h>                                              // strlen
 
@@ -163,8 +163,17 @@ bool TemporalPgDBConnectorClose()
           PQfinish(oldPgDbTenantConnection); // Closes the TenantDB connection
     }
 
-    PQfinish(oldPgDbConnection); //Closes connection and and also frees memory used by the PGconn* conn variable
-    return false;
+
+    if(oldPgDbConnection != NULL)
+    {
+    	PQfinish(oldPgDbConnection); //Closes connection and and also frees memory used by the PGconn* conn variable
+    }
+    else
+    {
+    	return false;
+    }
+
+    return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -252,19 +261,55 @@ bool temporalInitialiseTenant(char *tenantName)
         {
                 LM_K(("Trying to create database for Tenant %s\n", tenantName));
 
-                char oldPgDbSqlSyntax[]= ";";
-                char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";
-                strcat (oldPgDbSqlCreateTDbSQL, tenantName);
-                strcat (oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
-                char oldPgTDbConnSQL[] = "user=postgres password=orion dbname= ";
-                strcat (oldPgTDbConnSQL, tenantName);
+		int oldPgDbSqlCreateTDbSQLBufferSize = 1024;
+		int oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
+        	char* oldPgDbSqlCreateTDbSQL = kaAlloc(&orionldState.kalloc, oldPgDbSqlCreateTDbSQLBufferSize);
+
+                // char oldPgDbSqlSyntax[]= ";";
+                // char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";
+                // strcat (oldPgDbSqlCreateTDbSQL, tenantName);
+                // strcat (oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
+                // char oldPgTDbConnSQL[] = "user=postgres password=orion dbname= ";
+                // strcat (oldPgTDbConnSQL, tenantName);
+
+
+		strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
+		oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
+		strncat(oldPgDbSqlCreateTDbSQL, tenantName, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+		oldPgDbSqlCreateTDbSQLUsedBufferSize += sizeof(tenantName);
+                strncpy(oldPgDbSqlCreateTDbSQL, ";", oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+                oldPgDbSqlCreateTDbSQLUsedBufferSize += 1;
+
+		int oldPgTDbConnSQLBufferSize = 1024;
+		int oldPgTDbConnSQLUsedBufferSize = 0;
+		char oldPgTDbConnSQLUser[] = "postgres"; // Chandra-TBD
+		char oldPgTDbConnSQLPasswd[] = "orion"; // Chandra-TBD
+		char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
+
+		strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
+                oldPgTDbConnSQLUsedBufferSize += 5;
+		strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+		oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
+                strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+		oldPgTDbConnSQLUsedBufferSize += 1;
+		strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+		oldPgTDbConnSQLUsedBufferSize += 9;
+                strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+                oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
+		strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+                oldPgTDbConnSQLUsedBufferSize += 1;
+		strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+                oldPgTDbConnSQLUsedBufferSize += 7;
+		strncat(oldTemporalSQLBuffer, tenantName, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+                oldPgTDbConnSQLUsedBufferSize += sizeof(tenantName);
+
 
                 LM_K(("Command to create database for Tenant %s\n", tenantName));
 
                 PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
                 LM_K(("Opening database connection for Tenant %s\n", tenantName));
 
-                oldPgDbTenantConnection = PQconnectdb(oldPgTDbConnSQL);
+                oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
                 if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
                 {
                         LM_E(("Connection to %s database is not achieved or created", tenantName));
@@ -355,7 +400,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, oldTemporalSQLBuffer);
 	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   	{
-        	LM_E(("INSERT command failed for inserting single Entity into DB %s\n",oldTenantName));
+        	LM_E(("i%s command failed for inserting single Entity into DB %s\n",oldTemporalSQLBuffer, oldTenantName));
         	PQclear(oldPgTenandDbResult);
         	TemporalPgDBConnectorClose();
         	return false;
@@ -377,3 +422,50 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
   	return true;
 }
 
+// ----------------------------------------------------------------------------
+//
+// PGconn* TemporalPgTenantDBConnectorOpen(char* tenantName) - function to open the Postgres database connection
+//
+// ----------------------------------------------------------------------------
+bool TemporalPgTenantDBConnectorOpen(char* tenantName)
+{
+    int oldPgTDbConnSQLBufferSize = 1024;
+    int oldPgTDbConnSQLUsedBufferSize = 0;
+    char oldPgTDbConnSQLUser[] = "postgres"; // Chandra-TBD
+    char oldPgTDbConnSQLPasswd[] = "orion"; // Chandra-TBD
+    char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
+
+    strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += 5;
+    strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
+    strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += 1;
+    strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += 9;
+    strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
+    strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += 1;
+    strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += 7;
+    strncat(oldTemporalSQLBuffer, tenantName, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += sizeof(tenantName);
+
+    oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
+
+    if (PQstatus(oldPgDbTenantConnection) == CONNECTION_BAD)
+    {
+        LM_E(("Connection to Tenant database is not achieved"));
+        LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
+        TemporalPgDBConnectorClose(); //close connection and cleanup
+        return false;
+    }
+    else if (PQstatus(oldPgDbConnection) == CONNECTION_OK)
+    {
+        //puts("CONNECTION_OK");
+        LM_K(("Connection is ok with the Postgres database\n"));
+        return true; //Return the connection handler
+    }
+    return false;
+}

@@ -181,4 +181,12 @@ extern bool temporalExecSqlStatement(char* oldTemporalSQLBuffer);
 //
 extern bool temporalInitialiseTenant(char *tenantName);
 
+
+// ----------------------------------------------------------------------------
+//
+// PGconn* TemporalPgTenantDBConnectorOpen(ichar* tenantName) - function to open the Postgres database connection
+//
+// ----------------------------------------------------------------------------
+extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
+
 #endif  // TEMPORAL_COMMON_H_

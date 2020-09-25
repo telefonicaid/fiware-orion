@@ -26,7 +26,7 @@
 * Author: Ken Zangelin, Chandra Challagonda
 */
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-
+#include "orionld/temporal/temporalCommon.h"              // common include
 
 
 // ----------------------------------------------------------------------------
