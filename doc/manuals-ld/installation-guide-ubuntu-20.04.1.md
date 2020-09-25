@@ -207,9 +207,11 @@ make html
 make
 sudo make install
 
-# Python library
-sudo aptitude install python3-paho-mqtt
+# Install the python library for MQTT: **paho-mqtt**
+sudo aptitude install python3-pip
+pip3 install paho-mqtt
 ```
+
 #### Eclipse Mosquitto
 
 *Eclipse Mosquitto* is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers. Source: https://mosquitto.org
