@@ -55,14 +55,14 @@ extern "C"
 //
 typedef enum OrionldTemporalAttributeValueTypeEnum
 {
-  ValueString = 0,
-  ValueNumber,
-  ValueBool,
-  ValueRelation,
-  ValueObject,
-  ValueGeo,
-  ValueDateTime,
-} OrionldTemporalAttributeValueTypeEnum;
+  EnumValueString = 0,
+  EnumValueNumber,
+  EnumValueBool,
+  EnumValueRelation,
+  EnumValueObject,
+  EnumValueGeo,
+  EnumValueDateTime
+};
 
 
 // -----------------------------------------------------------------------------

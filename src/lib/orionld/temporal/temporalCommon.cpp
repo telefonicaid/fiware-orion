@@ -141,7 +141,7 @@ char*  temporalCommonExtractTree()
                 {
                         KjNode* attributeObject  = kjLookup(attrP, "object");
                         // OrionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                        OrionldTemporalDbAttributeTableLocal.attributeValueType  = OrionldTemporalAttributeValueTypeEnum.ValueObject;
+                        OrionldTemporalDbAttributeTableLocal.attributeValueType  = EnumValueObject;
                         OrionldTemporalDbAttributeTableLocal.valueObject = attributeObject->value.s;
                         LM_TMP(("CCSR:  Relationship : '%s'", OrionldTemporalDbAttributeTableLocal.valueObject));
                 }
