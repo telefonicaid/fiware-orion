@@ -53,8 +53,8 @@ extern "C"
 PGconn* oldPgDbConnection = NULL;
 PGconn* oldPgDbTenantConnection = NULL;
 PGresult* oldPgTenandDbResult = NULL;
-OrionldTemporalDbEntityTable OrionldTemporalDbEntityTableLocal;
-OrionldTemporalDbAttributeTable OrionldTemporalDbAttributeTableLocal;
+OrionldTemporalDbEntityTable* OrionldTemporalDbEntityTableLocal;
+OrionldTemporalDbAttributeTable* OrionldTemporalDbAttributeTableLocal;
 
 // -----------------------------------------------------------------------------
 //
