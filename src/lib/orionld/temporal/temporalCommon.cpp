@@ -94,14 +94,14 @@ char*  temporalCommonExtractTree()
         OrionldTemporalDbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
         OrionldTemporalDbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
 
-        strncat(oldTemporalSQLBuffer,OrionldTemporalDbEntityTableLocal.entityId,oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(OrionldTemporalDbEntityTableLocal.entityId);
+        strncat(oldTemporalSQLBuffer,OrionldTemporalDbEntityTableLocal[0].entityId,oldTemporalSQLRemainingBufferSize);
+        oldTemporalSQLUsedBufferSize += strlen(OrionldTemporalDbEntityTableLocal[0].entityId);
 
         strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
         oldTemporalSQLUsedBufferSize += 2;
 
-        strncat(oldTemporalSQLBuffer,OrionldTemporalDbEntityTableLocal.entityType,oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(OrionldTemporalDbEntityTableLocal.entityType);
+        strncat(oldTemporalSQLBuffer,OrionldTemporalDbEntityTableLocal[0].entityType,oldTemporalSQLRemainingBufferSize);
+        oldTemporalSQLUsedBufferSize += strlen(OrionldTemporalDbEntityTableLocal[0].entityType);
 
 
         // Geo Property
@@ -109,9 +109,9 @@ char*  temporalCommonExtractTree()
         oldTemporalSQLUsedBufferSize += 8;
 
         // Created At
-        OrionldTemporalDbEntityTableLocal.createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+        OrionldTemporalDbEntityTableLocal[0].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
         char entityCreateAtCharBuffer[64];
-        snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", OrionldTemporalDbEntityTableLocal.createdAt);
+        snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", OrionldTemporalDbEntityTableLocal[0].createdAt);
         strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize);
         oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
         strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
