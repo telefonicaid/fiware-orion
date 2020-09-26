@@ -53,8 +53,8 @@ extern "C"
 PGconn* oldPgDbConnection = NULL;
 PGconn* oldPgDbTenantConnection = NULL;
 PGresult* oldPgTenandDbResult = NULL;
-OrionldTemporalDbEntityTable* OrionldTemporalDbEntityTableLocal;
-OrionldTemporalDbAttributeTable OrionldTemporalDbAttributeTableLocal;
+OrionldTemporalDbEntityTable* orionldTemporalDbEntityTableLocal;
+OrionldTemporalDbAttributeTable* orionldTemporalDbAttributeTableLocal;
 
 // -----------------------------------------------------------------------------
 //
@@ -91,17 +91,17 @@ char*  temporalCommonExtractTree()
         // char* entityId   = orionldState.payloadIdNode->value.s;
         // char* entityType = orionldState.payloadTypeNode->value.s;
 
-        OrionldTemporalDbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
-        OrionldTemporalDbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
+        orionldTemporalDbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
+        orionldTemporalDbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
 
-        strncat(oldTemporalSQLBuffer,OrionldTemporalDbEntityTableLocal[0].entityId,oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(OrionldTemporalDbEntityTableLocal[0].entityId);
+        strncat(oldTemporalSQLBuffer,orionldTemporalDbEntityTableLocal[0].entityId,oldTemporalSQLRemainingBufferSize);
+        oldTemporalSQLUsedBufferSize += strlen(orionldTemporalDbEntityTableLocal[0].entityId);
 
         strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
         oldTemporalSQLUsedBufferSize += 2;
 
-        strncat(oldTemporalSQLBuffer,OrionldTemporalDbEntityTableLocal[0].entityType,oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(OrionldTemporalDbEntityTableLocal[0].entityType);
+        strncat(oldTemporalSQLBuffer,orionldTemporalDbEntityTableLocal[0].entityType,oldTemporalSQLRemainingBufferSize);
+        oldTemporalSQLUsedBufferSize += strlen(orionldTemporalDbEntityTableLocal[0].entityType);
 
 
         // Geo Property
@@ -109,16 +109,15 @@ char*  temporalCommonExtractTree()
         oldTemporalSQLUsedBufferSize += 8;
 
         // Created At
-        OrionldTemporalDbEntityTableLocal[0].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+        orionldTemporalDbEntityTableLocal[0].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
         char entityCreateAtCharBuffer[64];
-        snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", OrionldTemporalDbEntityTableLocal[0].createdAt);
+        snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", orionldTemporalDbEntityTableLocal[0].createdAt);
         strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize);
         oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
         strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
         oldTemporalSQLUsedBufferSize += 2;
 
         // Modified At
-
         strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize);
         oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
 
@@ -132,27 +131,62 @@ char*  temporalCommonExtractTree()
         LM_TMP(("CCSR: oldTemporalSQLBuffer:     '%s'", oldTemporalSQLBuffer));
         LM_TMP(("CCSR:"));
 
+        int oldTemporalTreeNodeLevel = 0;
+
         for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
         {
                 KjNode* attrTypeP  = kjLookup(attrP, "type");
-                OrionldTemporalDbAttributeTableLocal.attributeType = attrTypeP->value.s;
+                orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType = attrTypeP->value.s;
 
-                if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"Relationship") == 0)
+                if (strcmp (orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
                 {
                         KjNode* attributeObject  = kjLookup(attrP, "object");
-                        // OrionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                        OrionldTemporalDbAttributeTableLocal.attributeValueType  = EnumValueObject;
-                        OrionldTemporalDbAttributeTableLocal.valueObject = attributeObject->value.s;
-                        LM_TMP(("CCSR:  Relationship : '%s'", OrionldTemporalDbAttributeTableLocal.valueObject));
+                        // orionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueObject = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueObject));
                 }
-                else if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"Property") == 0)
+                else if (strcmp (orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"string") == 0)
                 {
+                        KjNode* attributeObject  = kjLookup(attrP, "string");  //Chandra-TBD
+                        // orionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
 
                 }
-                else if (strcmp (OrionldTemporalDbAttributeTableLocal.attributeType,"GeoProperty") == 0)
+                else if (strcmp (orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"number") == 0)
+                {
+                        KjNode* attributeObject  = kjLookup(attrP, "number");  //Chandra-TBD
+                        // orionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber));
+
+                }
+                else if (strcmp (orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"bool") == 0)
+                {
+                        KjNode* attributeObject  = kjLookup(attrP, "bool");  //Chandra-TBD
+                        // orionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueBoolean = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueBoolean));
+
+                }
+                else if (strcmp (orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"time") == 0)
+                {
+                        KjNode* attributeObject  = kjLookup(attrP, "time");  //Chandra-TBD
+                        // orionldTemporalDbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueDateTime;
+                        orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueDatetime = attributeObject->value.s;
+                        LM_TMP(("CCSR:  Relationship : '%s'", orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].valueDatetime));
+
+                }
+                else if (strcmp (orionldTemporalDbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
                 {
                 }
 
+                oldTemporalTreeNodeLevel++;
         }
 
         return oldTemporalSQLBuffer;
