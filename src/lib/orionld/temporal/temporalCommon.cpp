@@ -67,7 +67,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         OrionldTemporalDbAllTables dbAllTablesLocal;
         OrionldTemporalDbEntityTable* dbEntityTableLocal;
         OrionldTemporalDbAttributeTable* dbAttributeTableLocal;
-        OrionldTemporalDbAttributeTable* dbSubAttributeTableLocal;
+        OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal;
 
         char buff [1024];  // Chandra-TBR
         kjRender(orionldState.kjsonP,orionldState.requestTree,buff,sizeof(buff));  // Chandra-TBR
