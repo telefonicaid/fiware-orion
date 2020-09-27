@@ -62,7 +62,7 @@ PGresult* oldPgTenandDbResult = NULL;
 // INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
 //      VALUES ("%s,%s,%s,%s");
 //
-OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
+OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
 {
         char buff [1024];  // Chandra-TBR
         kjRender(orionldState.kjsonP,orionldState.requestTree,buff,sizeof(buff));  // Chandra-TBR
@@ -317,9 +317,9 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
         }
 
         OrionldTemporalDbAllTables dbAllTablesLocal;
-        dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-        dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-        dbAllTablesLocal->subAttributeTableArray = dbAttributeTableLocal;
+        dbAllTablesLocal.entityTableArray = dbEntityTableLocal;
+        dbAllTablesLocal.attributeTableArray = dbAttributeTableLocal;
+        dbAllTablesLocal.subAttributeTableArray = dbAttributeTableLocal;
 
         return dbAllTablesLocal;
 }

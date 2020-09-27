@@ -180,7 +180,7 @@ extern bool TemporalPgDBConnectorClose();
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
-OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable();
+OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable();
 
 // -----------------------------------------------------------------------------
 //
