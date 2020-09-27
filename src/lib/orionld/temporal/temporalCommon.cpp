@@ -252,8 +252,8 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                                 KjNode* attributeObject  = kjLookup(attrP, "object");
                                                 // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
                                                 dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueRelation;
-                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueString = attributeObject->value.s;
-                                                LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal[oldTemporalTreeNodeLevel].subAtributeValueString));
+                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = attributeObject->value.s;
+                                                LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal[oldTemporalTreeNodeLevel].subAttributeValueString));
                                         }
 
                                         if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"Property") == 0)
@@ -274,14 +274,14 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                                 else if (valueP->type == KjArray)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueArray;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueString, 1024);
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString, 1024);
                                                 }
                                                 else if (valueP->type == KjObject)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueObject;
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueString, 1024);
+                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString, 1024);
                                                 }
                                                 else if (valueP->type == KjBoolean)
                                                 {
