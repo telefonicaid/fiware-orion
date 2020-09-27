@@ -64,6 +64,11 @@ PGresult* oldPgTenandDbResult = NULL;
 //
 OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
 {
+        OrionldTemporalDbAllTables dbAllTablesLocal;
+        OrionldTemporalDbEntityTable* dbEntityTableLocal;
+        OrionldTemporalDbAttributeTable* dbAttributeTableLocal;
+        OrionldTemporalDbAttributeTable* dbSubAttributeTableLocal;
+
         char buff [1024];  // Chandra-TBR
         kjRender(orionldState.kjsonP,orionldState.requestTree,buff,sizeof(buff));  // Chandra-TBR
         LM_TMP(("CCSR: The entire tree:     '%s'", buff));  // Chandra-TBR
@@ -143,7 +148,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         }
 
         int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
-        OrionldTemporalDbAttributeTable* dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
+        dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
         bzero(dbAttributeTableLocal, attribArrayTotalSize);
 
 
@@ -163,48 +168,58 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                 // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
                 {
                         KjNode* attributeObject  = kjLookup(attrP, "object");
-                        // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                        dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueRelation;
-                        dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
-                        LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
+                        if(attributeObject != NULL)
+                        {
+                              // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueRelation;
+                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
+                              LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
+                        }
+                }
+                else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
+                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
+                {
+                        // Chandra-TBI
                 }
                 else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Property") == 0)
                 // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
                 {
                         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
-                        if (valueP->type == KjFloat)
+                        if (valueP != NULL)
                         {
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.f;
-                        }
-                        else if (valueP->type == KjInt)
-                        {
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.i;
-                        }
-                        else if (valueP->type == KjArray)
-                        {
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueArray;
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
-                        }
-                        else if (valueP->type == KjObject)
-                        {
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
-                        }
-                        else if (valueP->type == KjBoolean)
-                        {
-                          dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
-                          dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.b;
+                                if (valueP->type == KjFloat)
+                                {
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.f;
+                                }
+                                else if (valueP->type == KjInt)
+                                {
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.i;
+                                }
+                                else if (valueP->type == KjArray)
+                                {
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueArray;
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                                      kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
+                                }
+                                else if (valueP->type == KjObject)
+                                {
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                                      kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
+                                }
+                                else if (valueP->type == KjBoolean)
+                                {
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.b;
 
-                        }
-                        else if (valueP->type == KjString)
-                        {
-                          dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
-                          dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
-
+                                }
+                                else if (valueP->type == KjString)
+                                {
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
+                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
+                                }
                         }
                         else // if (valueP->type == "p")  //Chandra - TBCKZ
                         {
@@ -218,7 +233,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                 }
 
                                 int subAttribArrayTotalSize = subAtrributeNumbers * sizeof(OrionldTemporalDbSubAttributeTable);
-                                OrionldTemporalDbAttributeTable* dbSubAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+                                dbSubAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
                                 bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
                                 for (KjNode* subAttrP = valueP->value.firstChildP; subAttrP != NULL; subAttrP = attrP->next)
                                 {
@@ -299,11 +314,6 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                 }
                         }
                 }
-                else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
-                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
-                {
-                        // Chandra-TBI
-                }
 
                 dbAttributeTableLocal[oldTemporalTreeNodeLevel].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
                 dbAttributeTableLocal[oldTemporalTreeNodeLevel].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
@@ -317,7 +327,6 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                 oldTemporalTreeNodeLevel++;
         }
 
-        OrionldTemporalDbAllTables dbAllTablesLocal;
         dbAllTablesLocal.entityTableArray = dbEntityTableLocal;
         dbAllTablesLocal.attributeTableArray = dbAttributeTableLocal;
         dbAllTablesLocal.subAttributeTableArray = dbSubAttributeTableLocal;
