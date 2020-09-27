@@ -77,22 +77,20 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	// LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
   //       LM_TMP(("CCSR:temporalPostEntities "));
 
-	if(oldTemporalSQLFullBuffer == NULL)
+	// if(oldTemporalSQLFullBuffer == NULL)
+	// {
+	//	return false;
+	// }
+	//else
+	//{
+	if(TemporalConstructInsterUpdateSQLStatement(dbAllTables) == true)
 	{
-		return false;
+		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
+		return true;
 	}
 	else
 	{
-		if(TemporalConstructInsterUpdateSQLStatement(dbAllTables) == true)
-		{
-			LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
-
 	return false;
 }
