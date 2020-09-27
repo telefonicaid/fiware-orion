@@ -598,6 +598,7 @@ bool TemporalConstructInsterUpdateSQLStatement(char* tableName)
 {
     if (strcmp (tableName,"Entity") == 0)
     temporalSQLStatementLengthBuffer = sizeof(dbEntityTableLocal);
+    return false;
 }
 
 // ----------------------------------------------------------------------------
