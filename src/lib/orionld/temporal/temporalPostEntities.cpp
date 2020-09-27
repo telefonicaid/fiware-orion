@@ -55,7 +55,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 			LM_TMP(("CCSR: connection to postgress db is open"));
 			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
 			{
-				LM_TMP(("CCSR: connection to tenant db is open")); 	
+				LM_TMP(("CCSR: connection to tenant db is open"));
 			}
 			else
 			{
@@ -70,7 +70,9 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 		}
 	}
 
-	char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
+	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
+
+	OrionldTemporalDbAllTables*  dbAllTables = temporalCommonExtractFullAttributeTable();
 
 	LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
         LM_TMP(("CCSR:temporalPostEntities "));
