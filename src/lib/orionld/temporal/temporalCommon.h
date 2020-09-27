@@ -187,7 +187,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable();
 // temporalExecSqlStatement
 //
 //
-extern bool TemporalConstructInsterUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal);
+extern bool TemporalConstructInsterUpdateSQLStatement(OrionldTemporalDbAllTables dbAllTablesLocal);
 
 // ----------------------------------------------------------------------------
 //
