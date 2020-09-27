@@ -84,7 +84,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	}
 	else
 	{
-		if(temporalExecSqlStatement(oldTemporalSQLFullBuffer) == true)
+		if(TemporalConstructInsterUpdateSQLStatement(dbAllTables) == true)
 		{
 			LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
 			return true;
