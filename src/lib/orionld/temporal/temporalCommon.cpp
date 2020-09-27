@@ -91,7 +91,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         // char* entityType = orionldState.payloadTypeNode->value.s;
 
         int entityArrayTotalSize = sizeof(OrionldTemporalDbAttributeTable);
-        OrionldTemporalDbEntityTable* dbEntityTableLocal = kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
+        OrionldTemporalDbEntityTable* dbEntityTableLocal = (OrionldTemporalDbEntityTable)kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
 
 
         dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
