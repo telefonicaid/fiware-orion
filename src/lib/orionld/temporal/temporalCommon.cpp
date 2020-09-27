@@ -264,7 +264,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                                 if (valueP->type == KjFloat)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueNumber;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueNumber = subAttrValueP->value.f;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueBoolean = subAttrValueP->value.f;
                                                 }
                                                 else if (valueP->type == KjInt)
                                                 {
@@ -295,7 +295,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = subAttrValueP->value.s;
                                                 }
                                         }
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType,"GeoProperty") == 0)
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"GeoProperty") == 0)
                                         // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "GeoProperty")
                                         {
                                                 // Chandra-TBI
