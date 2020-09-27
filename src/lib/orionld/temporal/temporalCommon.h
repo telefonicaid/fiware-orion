@@ -131,20 +131,21 @@ typedef struct OrionldTemporalDbSubAttributeTable
   char*                                     entityId;
   char*                                     attributeId;
   char*                                     subAtrributeId;
-  OrionldTemporalAttributeValueTypeEnum     attributeValueType;
-  bool                                      subProperty;
-  char*                                     unitCode;
-  char*                                     dataSetId;
-  char*                                     valueString;
-  bool                                      valueBoolean;
-  double                                    valueNumber;
-  char*                                     value_relation;
-  char*                                     valueObject;
-  double                                    valueDatetime;
-  double                                    createdAt;
-  double                                    modifiedAt;
-  double                                    observedAt;
-  float                                     geoProperty[];  // Chandra-TBD
+  char*                                     subAttributeName;
+  char*                                     subAttributeType; // Chandra-TBD
+  OrionldTemporalAttributeValueTypeEnum     subAttributeValueType;
+  char*                                     subAtributeUnitCode;
+  char*                                     subAtributeDataSetId;
+  char*                                     subAtributeValueString;
+  bool                                      subAtributeValueBoolean;
+  double                                    subAtributeValueNumber;
+  char*                                     subAtributeValueRelation;
+  char*                                     subAtributeValueObject;
+  double                                    subAtributeValueDatetime;
+  double                                    subAtributeCreatedAt;
+  double                                    subAtributeModifiedAt;
+  double                                    subAtributeObservedAt;
+  float                                     subAtributeGeoProperty[];  // Chandra-TBD
 } OrionldTemporalDbSubAttributeTable;
 
 

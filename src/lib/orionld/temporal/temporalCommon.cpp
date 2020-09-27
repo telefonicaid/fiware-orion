@@ -244,58 +244,58 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                         }
 
                                         KjNode* attrTypeP  = kjLookup(attrP, "type");
-                                        dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType = attrTypeP->value.s;
+                                        dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType = attrTypeP->value.s;
 
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"Relationship") == 0)
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"Relationship") == 0)
                                         // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Relationship")
                                         {
                                                 KjNode* attributeObject  = kjLookup(attrP, "object");
                                                 // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueRelation;
-                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = attributeObject->value.s;
+                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueRelation;
+                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueString = attributeObject->value.s;
                                                 LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
                                         }
 
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"Property") == 0)
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"Property") == 0)
                                         // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Property")
                                         {
 
                                                 KjNode* subAttrValueP  = kjLookup(subAttrP, "value");  //Chandra-TBD
                                                 if (valueP->type == KjFloat)
                                                 {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueNumber;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueNumber = subAttrValueP->value.f;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueNumber;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueNumber = subAttrValueP->value.f;
                                                 }
                                                 else if (valueP->type == KjInt)
                                                 {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueNumber;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueNumber = subAttrValueP->value.i;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueNumber;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType = subAttrValueP->value.i;
                                                 }
                                                 else if (valueP->type == KjArray)
                                                 {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueArray;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueArray;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
                                                       kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString, 1024);
                                                 }
                                                 else if (valueP->type == KjObject)
                                                 {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueObject;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueObject;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
                                                       kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString, 1024);
                                                 }
                                                 else if (valueP->type == KjBoolean)
                                                 {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueBool;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueNumber = subAttrValueP->value.b;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueBool;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType = subAttrValueP->value.b;
 
                                                 }
                                                 else if (valueP->type == KjString)
                                                 {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueString;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = subAttrValueP->value.s;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueString;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = subAttrValueP->value.s;
                                                 }
                                         }
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"GeoProperty") == 0)
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType,"GeoProperty") == 0)
                                         // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "GeoProperty")
                                         {
                                                 // Chandra-TBI
