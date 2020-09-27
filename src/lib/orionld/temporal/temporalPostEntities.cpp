@@ -73,8 +73,9 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables*  dbAllTables = temporalCommonExtractFullAttributeTable();
 
-	LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
-        LM_TMP(("CCSR:temporalPostEntities "));
+
+	// LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
+  //       LM_TMP(("CCSR:temporalPostEntities "));
 
 	if(oldTemporalSQLFullBuffer == NULL)
 	{
