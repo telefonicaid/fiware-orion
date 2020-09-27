@@ -96,7 +96,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         // char* entityType = orionldState.payloadTypeNode->value.s;
 
         int entityArrayTotalSize = sizeof(OrionldTemporalDbAttributeTable);
-        OrionldTemporalDbEntityTable* dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
+        dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
 
 
         dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
@@ -233,7 +233,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                 }
 
                                 int subAttribArrayTotalSize = subAtrributeNumbers * sizeof(OrionldTemporalDbSubAttributeTable);
-                                dbSubAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+                                dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
                                 bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
                                 for (KjNode* subAttrP = valueP->value.firstChildP; subAttrP != NULL; subAttrP = attrP->next)
                                 {
