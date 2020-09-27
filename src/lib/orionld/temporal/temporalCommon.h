@@ -58,7 +58,6 @@ enum OrionldTemporalAttributeValueTypeEnum
   EnumValueString = 0,
   EnumValueNumber,
   EnumValueBool,
-  EnumValueString,
   EnumValueObject,
   EnumValueGeo,
   EnumValueArray,
