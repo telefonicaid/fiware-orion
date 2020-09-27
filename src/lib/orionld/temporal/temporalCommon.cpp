@@ -286,7 +286,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                                 else if (valueP->type == KjBoolean)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueBool;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAtributeValueBoolean = subAttrValueP->value.b;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueBoolean = subAttrValueP->value.b;
 
                                                 }
                                                 else if (valueP->type == KjString)
