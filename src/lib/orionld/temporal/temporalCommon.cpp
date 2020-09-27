@@ -91,7 +91,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         // char* entityType = orionldState.payloadTypeNode->value.s;
 
         int entityArrayTotalSize = sizeof(OrionldTemporalDbAttributeTable);
-        OrionldTemporalDbEntityTable* dbEntityTableLocal = (OrionldTemporalDbEntityTable*)kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
+        OrionldTemporalDbEntityTable* dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
 
 
         dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
@@ -143,7 +143,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         }
 
         int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
-        OrionldTemporalDbAttributeTable* dbAttributeTableLocal = kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
+        OrionldTemporalDbAttributeTable* dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
         bzero(dbAttributeTableLocal, attribArrayTotalSize);
 
 
@@ -206,20 +206,21 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                           dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
 
                         }
-                        else if (valueP->type == "p")  //Chandra - TBCKZ
+                        else // if (valueP->type == "p")  //Chandra - TBCKZ
                         {
                                 dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
                                 int subAttributeTreeNodeLevel = 0;
                                 int subAtrributeNumbers = 0;
-                                // for (KjNode* subAttrP = valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-                                for (valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)  // Chandra-TBCKZ
+                                for (KjNode* subAttrP = valueP->value.firstChildP; subAttrP != NULL; subAttrP = attrP->next)
+                                // for (valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)  // Chandra-TBCKZ
                                 {
                                         subAtrributeNumbers++;
                                 }
+                                free(subAttrP);
                                 int subAttribArrayTotalSize = subAtrributeNumbers * sizeof(OrionldTemporalDbSubAttributeTable);
-                                OrionldTemporalDbAttributeTable* dbSubAttributeTableLocal = kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+                                OrionldTemporalDbAttributeTable* dbSubAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
                                 bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
-                                for (KjNode* subAttrP = valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+                                for (KjNode* subAttrP = valueP->value.firstChildP; subAttrP != NULL; subAttrP = attrP->next)
                                 {
                                         if (attrP->type != KjObject)
                                         {
