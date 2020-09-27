@@ -134,18 +134,18 @@ typedef struct OrionldTemporalDbSubAttributeTable
   char*                                     subAttributeName;
   char*                                     subAttributeType; // Chandra-TBD
   OrionldTemporalAttributeValueTypeEnum     subAttributeValueType;
-  char*                                     subAtributeUnitCode;
-  char*                                     subAtributeDataSetId;
-  char*                                     subAtributeValueString;
-  bool                                      subAtributeValueBoolean;
-  double                                    subAtributeValueNumber;
-  char*                                     subAtributeValueRelation;
-  char*                                     subAtributeValueObject;
-  double                                    subAtributeValueDatetime;
-  double                                    subAtributeCreatedAt;
-  double                                    subAtributeModifiedAt;
-  double                                    subAtributeObservedAt;
-  float                                     subAtributeGeoProperty[];  // Chandra-TBD
+  char*                                     subAttributeUnitCode;
+  char*                                     subAttributeDataSetId;
+  char*                                     subAttributeValueString;
+  bool                                      subAttributeValueBoolean;
+  double                                    subAttributeValueNumber;
+  char*                                     subAttributeValueRelation;
+  char*                                     subAttributeValueObject;
+  double                                    subAttributeValueDatetime;
+  double                                    createdAt;
+  double                                    modifiedAt;
+  double                                    observedAt;
+  float                                     subAttributeGeoProperty[];  // Chandra-TBD
 } OrionldTemporalDbSubAttributeTable;
 
 
