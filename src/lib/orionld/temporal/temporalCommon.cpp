@@ -136,7 +136,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
 
         int oldTemporalTreeNodeLevel = 0;
 
-        int attributes = 0;
+        int attributesNumbers = 0;
         for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
         {
                 attributesNumbers++;
@@ -186,7 +186,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                         {
                               dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueArray;
                               dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                              kjRender(orionldState.kjsonP, valueP->value.firstChildP, 1024);
+                              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
                         }
                         else if (valueP->type == KjObject)
                         {
@@ -194,7 +194,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                               dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
                               kjRender(orionldState.kjsonP, valueP->value.firstChildP, 1024);
                         }
-                        else if (valueP->type == KjBool)
+                        else if (valueP->type == KjBoolean)
                         {
                           dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
                           dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.b;
@@ -203,15 +203,15 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                         else if (valueP->type == KjString)
                         {
                           dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
-                          dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.s;
+                          dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
 
                         }
                         else if (valueP->type == "p")  //Chandra - TBCKZ
                         {
                                 dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
                                 int subAttributeTreeNodeLevel = 0;
-                                int subAtrributeNumbers;
-                                for (KjNode* subAttrP = valueP.->value.firstChildP; attrP != NULL; attrP = attrP->next)
+                                int subAtrributeNumbers = 0;
+                                for (KjNode* subAttrP = valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)
                                 {
                                         subAtrributeNumbers++;
                                 }
@@ -258,13 +258,13 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueArray;
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, 1024);
+                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString, 1024);
                                                 }
                                                 else if (valueP->type == KjObject)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueObject;
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, 1024);
+                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString, 1024);
                                                 }
                                                 else if (valueP->type == KjBool)
                                                 {
@@ -275,7 +275,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                                 else if (valueP->type == KjString)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueString;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueNumber = subAttrValueP->value.s;
+                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = subAttrValueP->value.s;
                                                 }
                                         }
                                         if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"GeoProperty") == 0)
@@ -577,7 +577,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 
 
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "COMMIT");
-  	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK),
+  	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   	{
         	LM_E(("COMMIT command failed for inserting single Entity into DB %s\n",oldTenantName));
         	PQclear(oldPgTenandDbResult);
