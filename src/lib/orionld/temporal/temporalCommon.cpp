@@ -192,7 +192,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                         {
                               dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
                               dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                              kjRender(orionldState.kjsonP, valueP->value.firstChildP, 1024);
+                              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
                         }
                         else if (valueP->type == KjBoolean)
                         {
@@ -211,7 +211,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                 dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
                                 int subAttributeTreeNodeLevel = 0;
                                 int subAtrributeNumbers = 0;
-                                for (KjNode* subAttrP = valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+                                // for (KjNode* subAttrP = valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+                                for (valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)  // Chandra-TBCKZ
                                 {
                                         subAtrributeNumbers++;
                                 }
@@ -266,7 +267,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
                                                       kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueString, 1024);
                                                 }
-                                                else if (valueP->type == KjBool)
+                                                else if (valueP->type == KjBoolean)
                                                 {
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeValueType  = EnumValueBool;
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueNumber = subAttrValueP->value.b;
@@ -315,7 +316,12 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                 oldTemporalTreeNodeLevel++;
         }
 
-        return oldTemporalSQLBuffer;
+        OrionldTemporalDbAllTables dbAllTablesLocal;
+        dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+        dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+        dbAllTablesLocal->subAttributeTableArray = dbAttributeTableLocal;
+
+        return dbAllTablesLocal;
 }
 
 
@@ -598,8 +604,9 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 // ----------------------------------------------------------------------------
 bool TemporalConstructInsterUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal)
 {
-    if (strcmp (tableName,"Entity") == 0);
-    int temporalSQLStatementLengthBuffer = sizeof(dbEntityTableLocal);
+    //if (strcmp (tableName,"Entity") == 0);
+    //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
+    //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     return false;
 }
 

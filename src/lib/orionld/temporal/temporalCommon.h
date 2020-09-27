@@ -61,7 +61,8 @@ enum OrionldTemporalAttributeValueTypeEnum
   EnumValueObject,
   EnumValueGeo,
   EnumValueArray,
-  EnumValueDateTime
+  EnumValueDateTime,
+  EnumValueRelation
 };
 
 
