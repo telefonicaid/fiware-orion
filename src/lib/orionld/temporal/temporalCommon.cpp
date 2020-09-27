@@ -609,10 +609,10 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 
 // ----------------------------------------------------------------------------
 //
-// PGconn* TemporalConstructInsterUpdateSQLStatement(char* tableName) - function to buil update SQL statement
+// PGconn* TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal) - function to buil update SQL statement
 //
 // ----------------------------------------------------------------------------
-bool TemporalConstructInsterUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal)
+bool TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal)
 {
     //if (strcmp (tableName,"Entity") == 0);
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);

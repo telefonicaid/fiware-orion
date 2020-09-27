@@ -83,7 +83,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	// }
 	//else
 	//{
-	if(TemporalConstructInsterUpdateSQLStatement(dbAllTables) == true)
+	if(TemporalConstructUpdateSQLStatement(dbAllTables) == true)
 	{
 		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
 		return true;

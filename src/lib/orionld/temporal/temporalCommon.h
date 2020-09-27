@@ -188,7 +188,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable();
 // temporalExecSqlStatement
 //
 //
-extern bool TemporalConstructInsterUpdateSQLStatement(OrionldTemporalDbAllTables dbAllTablesLocal);
+extern bool TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables dbAllTablesLocal);
 
 // ----------------------------------------------------------------------------
 //
@@ -204,11 +204,5 @@ extern bool temporalInitialiseTenant(char *tenantName);
 // ----------------------------------------------------------------------------
 extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
 
-// ----------------------------------------------------------------------------
-//
-// PGconn* TemporalConstructInsterUpdateSQLStatement(char* tableName) - function to buil update SQL statement
-//
-// ----------------------------------------------------------------------------
-extern bool TemporalConstructInsterUpdateSQLStatement(char* tableName);
 
 #endif  // TEMPORAL_COMMON_H_
