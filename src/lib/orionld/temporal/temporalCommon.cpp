@@ -216,7 +216,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
                                 {
                                         subAtrributeNumbers++;
                                 }
-                                free(subAttrP);
+
                                 int subAttribArrayTotalSize = subAtrributeNumbers * sizeof(OrionldTemporalDbSubAttributeTable);
                                 OrionldTemporalDbAttributeTable* dbSubAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
                                 bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
@@ -320,7 +320,7 @@ OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
         OrionldTemporalDbAllTables dbAllTablesLocal;
         dbAllTablesLocal.entityTableArray = dbEntityTableLocal;
         dbAllTablesLocal.attributeTableArray = dbAttributeTableLocal;
-        dbAllTablesLocal.subAttributeTableArray = dbAttributeTableLocal;
+        dbAllTablesLocal.subAttributeTableArray = dbSubAttributeTableLocal;
 
         return dbAllTablesLocal;
 }
