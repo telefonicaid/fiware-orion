@@ -90,7 +90,7 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
         // char* entityId   = orionldState.payloadIdNode->value.s;
         // char* entityType = orionldState.payloadTypeNode->value.s;
 
-        int entityArrayTotalSize = attributes * sizeof(OrionldTemporalDbAttributeTable);
+        int entityArrayTotalSize = sizeof(OrionldTemporalDbAttributeTable);
         OrionldTemporalDbEntityTable* dbEntityTableLocal = kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
 
 
@@ -159,8 +159,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                 KjNode* attrTypeP  = kjLookup(attrP, "type");
                 dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType = attrTypeP->value.s;
 
-                // if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
-                if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
+                 if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
+                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
                 {
                         KjNode* attributeObject  = kjLookup(attrP, "object");
                         // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
@@ -168,8 +168,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                         dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
                         LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
                 }
-                // else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Property") == 0)
-                if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
+                else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Property") == 0)
+                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
                 {
                         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
                         if (valueP->type == KjFloat)
@@ -229,8 +229,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                         KjNode* attrTypeP  = kjLookup(attrP, "type");
                                         dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType = attrTypeP->value.s;
 
-                                        // if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
-                                        if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Relationship")
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"Relationship") == 0)
+                                        // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Relationship")
                                         {
                                                 KjNode* attributeObject  = kjLookup(attrP, "object");
                                                 // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
@@ -239,7 +239,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                                 LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
                                         }
 
-                                        if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Property")
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"Property") == 0)
+                                        // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Property")
                                         {
 
                                                 KjNode* subAttrValueP  = kjLookup(subAttrP, "value");  //Chandra-TBD
@@ -277,7 +278,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                                       dbSubAttributeTableLocal[subAttributeTreeNodeLevel].valueNumber = subAttrValueP->value.s;
                                                 }
                                         }
-                                        if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "GeoProperty")
+                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType,"GeoProperty") == 0)
+                                        // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "GeoProperty")
                                         {
                                                 // Chandra-TBI
                                         }
@@ -295,8 +297,8 @@ OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable()
                                 }
                         }
                 }
-                // else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
-                if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
+                else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
+                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
                 {
                         // Chandra-TBI
                 }
