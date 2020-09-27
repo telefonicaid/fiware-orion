@@ -58,9 +58,10 @@ enum OrionldTemporalAttributeValueTypeEnum
   EnumValueString = 0,
   EnumValueNumber,
   EnumValueBool,
-  EnumValueRelation,
+  EnumValueString,
   EnumValueObject,
   EnumValueGeo,
+  EnumValueArray,
   EnumValueDateTime
 };
 
@@ -116,7 +117,7 @@ typedef struct OrionldTemporalDbAttributeTable
   double                                    createdAt;
   double                                    modifiedAt;
   double                                    observedAt;
-  float                                     geoProperty[];  // Chandra-TBD
+  double                                    geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbAttributeTable;
 
 // -----------------------------------------------------------------------------
@@ -147,6 +148,20 @@ typedef struct OrionldTemporalDbSubAttributeTable
 } OrionldTemporalDbSubAttributeTable;
 
 
+// -----------------------------------------------------------------------------
+//
+// OrionldTemporalDbAllTables - Contains all the PostGress Db Table contents
+//
+//
+//
+
+typedef struct OrionldTemporalDbAllTables
+{
+  OrionldTemporalDbEntityTable*         entityTableArray;
+  OrionldTemporalDbAttributeTable*      attributeTableArray;
+  OrionldTemporalDbSubAttributeTable*   subAttributeTableArray;
+}
+
 // ----------------------------------------------------------------------------
 //
 // bool TemporalPgDBConnectorOpen() - function to open the Postgres database connection
@@ -165,7 +180,7 @@ extern bool TemporalPgDBConnectorClose();
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
-extern char* temporalCommonExtractTree();
+OrionldTemporalDbAllTables*  temporalCommonExtractFullAttributeTable();
 
 // -----------------------------------------------------------------------------
 //
@@ -187,5 +202,15 @@ extern bool temporalInitialiseTenant(char *tenantName);
 //
 // ----------------------------------------------------------------------------
 extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
+
+// ----------------------------------------------------------------------------
+//
+// PGconn* TemporalConstructInsterUpdateSQLStatement(char* tableName) - function to buil update SQL statement
+//
+// ----------------------------------------------------------------------------
+bool TemporalConstructInsterUpdateSQLStatement(char* tableName)
+{
+
+}
 
 #endif  // TEMPORAL_COMMON_H_
