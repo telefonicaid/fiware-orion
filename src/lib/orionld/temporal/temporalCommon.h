@@ -187,7 +187,7 @@ OrionldTemporalDbAllTables*  attrSubattrExtract();
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
-OrionldTemporalDbAllTables*  singleTemporalEntityExtract();
+OrionldTemporalDbAllTables&  singleTemporalEntityExtract();
 
 // -----------------------------------------------------------------------------
 //

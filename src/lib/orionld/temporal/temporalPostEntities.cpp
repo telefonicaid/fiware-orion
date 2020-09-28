@@ -71,7 +71,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	}
 
 	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
-	OrionldTemporalDbAllTables dbAllTables = singleTemporalEntityExtract();
+	OrionldTemporalDbAllTables& dbAllTables = singleTemporalEntityExtract();
 
 
 	// LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
@@ -83,7 +83,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	// }
 	//else
 	//{
-	if(TemporalConstructUpdateSQLStatement(dbAllTables) == true)
+	if(TemporalConstructInsertSQLStatement(dbAllTables) == true)
 	{
 		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
 		return true;
