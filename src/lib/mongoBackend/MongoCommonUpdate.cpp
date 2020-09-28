@@ -83,6 +83,39 @@ using orion::CompoundValueNode;
 
 /* ****************************************************************************
 *
+* correlatorRoot -
+*
+* This functions returns the "correlator root", i.e. correlator without the "cbnotif" decorator
+*
+* For instance if full correlator is
+*
+*   f320136c-0192-11eb-a893-000c29df7908; cbnotif=32
+*
+* then the correlator root is:
+*
+*   f320136c-0192-11eb-a893-000c29df7908
+*
+* This is needed as the self-notification loop protection logic is based on the correlator root
+* so we store that in the DB.
+*
+*/
+inline std::string correlatorRoot(const std::string& fullCorrelator)
+{
+  size_t p = fullCorrelator.find(";");
+  if (p == std::string::npos)
+  {
+    return fullCorrelator;
+  }
+  else
+  {
+    return fullCorrelator.substr(0, p);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * isNotCustomMetadata -
 *
 * Check that the parameter is a not custom metadata, i.e. one metadata without
@@ -2653,7 +2686,9 @@ static bool createEntity
   }
 
   // Correlator (for notification loop detection logic)
-  insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  // Note entity creation could come be caused by a notification rquest
+  // (with cbnotif= in the correlator) so we need to use correlatorRoot()
+  insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
@@ -2958,7 +2993,7 @@ static unsigned int updateEntity
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == correlatorRoot(fiwareCorrelator));
   }
 
   if (!processContextAttributeVector(eP,
@@ -3058,9 +3093,11 @@ static unsigned int updateEntity
 
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
+  // Note entity update could come be caused by a notification rquest
+  // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   if (action != ActionTypeReplace)
   {
-    toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+    toSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
   }
 
   /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
@@ -3079,10 +3116,12 @@ static unsigned int updateEntity
 
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // we use a BSONObjBuilder instead the BSON stream macro.
+    // Note entity replacement could come be caused by a notification rquest
+    // (with cbnotif= in the correlator) so we need to use correlatorRoot()
     replaceSet.append(ENT_ATTRS, toSetObj);
     replaceSet.append(ENT_ATTRNAMES, toPushArr);
     replaceSet.append(ENT_MODIFICATION_DATE, now);
-    replaceSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+    replaceSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
     if (dateExpirationInPayload)
     {

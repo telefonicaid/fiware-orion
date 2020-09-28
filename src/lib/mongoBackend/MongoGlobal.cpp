@@ -2531,12 +2531,13 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
+        // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
         getNotifier()->sendNotifyContextRequest(ncr,
                                                 notifyHttpInfo,
                                                 tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
-                                                -1,
+                                                0,
                                                 renderFormat,
                                                 attrsOrder,
                                                 blacklist,
@@ -2551,12 +2552,13 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
+      // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
       getNotifier()->sendNotifyContextRequest(ncr,
                                               notifyHttpInfo,
                                               tenant,
                                               xauthToken,
                                               fiwareCorrelator,
-                                              -1,
+                                              0,
                                               renderFormat,
                                               attrsOrder,
                                               blacklist,

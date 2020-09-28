@@ -564,19 +564,19 @@ static void requestCompleted
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
+  LM_I(("Request finishes: %s %s", ciP->method.c_str(), uriForLogs));
+  if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
+  {
+    LM_I(("Request payload (%d bytes): %s", strlen(ciP->payload), ciP->payload));
+  }
+  LM_I(("Response code: %d", ciP->httpStatusCode));
+
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
   }
 
   *con_cls = NULL;
-
-  LM_I(("Request finishes: %s %s", ciP->method.c_str(), uriForLogs));
-  if ((ciP->verb != GET) && (ciP->verb != DELETE) && (strlen(ciP->payload) > 0))
-  {
-    LM_I(("Request payload (%d bytes): %s", strlen(ciP->payload), ciP->payload));
-  }
-  LM_I(("Response code: %d", ciP->httpStatusCode));
 
   lmTransactionEnd();  // Incoming REST request ends
 

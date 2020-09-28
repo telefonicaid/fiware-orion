@@ -388,7 +388,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     {
       char suffix[STRING_SIZE_FOR_INT];
       snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-      params->fiwareCorrelator = fiwareCorrelator + "; notif=" + suffix;
+      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
     }
     else
     {
@@ -549,7 +549,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     {
       char suffix[STRING_SIZE_FOR_INT];
       snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-      params->fiwareCorrelator = fiwareCorrelator + "; notif=" + suffix;
+      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
     }
     else
     {
