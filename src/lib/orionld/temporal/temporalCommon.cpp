@@ -62,277 +62,578 @@ PGresult* oldPgTenandDbResult = NULL;
 // INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
 //      VALUES ("%s,%s,%s,%s");
 //
-OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable()
+OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
 {
-        OrionldTemporalDbAllTables dbAllTablesLocal;
-        OrionldTemporalDbEntityTable* dbEntityTableLocal;
-        OrionldTemporalDbAttributeTable* dbAttributeTableLocal;
-        OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal;
+    OrionldTemporalDbAllTables* dbAllTablesLocal; // Chandra - TBI
+    OrionldTemporalDbEntityTable* dbEntityTableLocal;
+    OrionldTemporalDbAttributeTable* dbAttributeTableLocal;
+    OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal;
 
-        char buff [1024];  // Chandra-TBR
-        kjRender(orionldState.kjsonP,orionldState.requestTree,buff,sizeof(buff));  // Chandra-TBR
-        LM_TMP(("CCSR: The entire tree:     '%s'", buff));  // Chandra-TBR
+    int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
+    dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
+    bzero(dbAllTablesLocal, dbAllTablesSize);
 
-        int oldTemporalSQLFullBufferSize = 10 * 1024;
-        char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldTemporalSQLFullBufferSize);
-        bzero(oldTemporalSQLBuffer, oldTemporalSQLFullBufferSize);
+    int entityArrayTotalSize = sizeof(OrionldTemporalDbEntityTable);
+    dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
+    bzero(dbEntityTableLocal, entityArrayTotalSize);
+
+    dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
+    dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
+
+/*
+    char buff [1024];  // Chandra-TBR
+    kjRender(orionldState.kjsonP,orionldState.requestTree,buff,sizeof(buff));  // Chandra-TBR
+    LM_TMP(("CCSR: The entire tree:     '%s'", buff));  // Chandra-TBR
+
+
+    dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
+    dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
+
+    int oldTemporalSQLFullBufferSize = 10 * 1024;
+    char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldTemporalSQLFullBufferSize);
+    bzero(oldTemporalSQLBuffer, oldTemporalSQLFullBufferSize);
 #if 0
-        snprintf(oldTemporalSQLBuffer, oldTemporalSQLFullBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
-                "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %s, %s, NULL)",
-                orionldState.payloadIdNode->value.s,
-                orionldState.payloadTypeNode->value.s,
-                "createdAt",
-                "modifiedAt");
+    snprintf(oldTemporalSQLBuffer, oldTemporalSQLFullBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
+            "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %s, %s, NULL)",
+            orionldState.payloadIdNode->value.s,
+            orionldState.payloadTypeNode->value.s,
+            "createdAt",
+            "modifiedAt");
 #else
-        int oldTemporalSQLUsedBufferSize = 0;
-        int oldTemporalSQLRemainingBufferSize = 10* 1024;
-        const char* oldTemporalSQLInsertIntoTable = "INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at) VALUES (";
+    int oldTemporalSQLUsedBufferSize = 0;
+    int oldTemporalSQLRemainingBufferSize = 10* 1024;
+    const char* oldTemporalSQLInsertIntoTable = "INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at) VALUES (";
 
-        strncpy(oldTemporalSQLBuffer, oldTemporalSQLInsertIntoTable, oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize = strlen(oldTemporalSQLInsertIntoTable);  // string length of "INSERT INTO entity_table(....."
-        oldTemporalSQLRemainingBufferSize = oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize;
+    strncpy(oldTemporalSQLBuffer, oldTemporalSQLInsertIntoTable, oldTemporalSQLRemainingBufferSize);
+    oldTemporalSQLUsedBufferSize = strlen(oldTemporalSQLInsertIntoTable);  // string length of "INSERT INTO entity_table(....."
+    oldTemporalSQLRemainingBufferSize = oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize;
 
-        // char* entityId   = orionldState.payloadIdNode->value.s;
-        // char* entityType = orionldState.payloadTypeNode->value.s;
+    // char* entityId   = orionldState.payloadIdNode->value.s;
+    // char* entityType = orionldState.payloadTypeNode->value.s;
 
-        int entityArrayTotalSize = sizeof(OrionldTemporalDbAttributeTable);
-        dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
+    strncat(oldTemporalSQLBuffer,dbEntityTableLocal[0].entityId,oldTemporalSQLRemainingBufferSize);
+    oldTemporalSQLUsedBufferSize += strlen(dbEntityTableLocal[0].entityId);
 
+    strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
+    oldTemporalSQLUsedBufferSize += 2;
 
-        dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
-        dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
-
-        strncat(oldTemporalSQLBuffer,dbEntityTableLocal[0].entityId,oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(dbEntityTableLocal[0].entityId);
-
-        strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
-        oldTemporalSQLUsedBufferSize += 2;
-
-        strncat(oldTemporalSQLBuffer,dbEntityTableLocal[0].entityType,oldTemporalSQLRemainingBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(dbEntityTableLocal[0].entityType);
+    strncat(oldTemporalSQLBuffer,dbEntityTableLocal[0].entityType,oldTemporalSQLRemainingBufferSize);
+    oldTemporalSQLUsedBufferSize += strlen(dbEntityTableLocal[0].entityType);
 
 
-        // Geo Property
-        strncat(oldTemporalSQLBuffer,", NULL, ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize);
-        oldTemporalSQLUsedBufferSize += 8;
+    // Geo Property
+    strncat(oldTemporalSQLBuffer,", NULL, ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize);
+    oldTemporalSQLUsedBufferSize += 8;
 
-        // Created At
-        dbEntityTableLocal[0].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000; //same for modififedAt
-        char entityCreateAtCharBuffer[64];
-        snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", dbEntityTableLocal[0].createdAt);
-        strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
-        strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
-        oldTemporalSQLUsedBufferSize += 2;
+    // Created At
+    dbEntityTableLocal[0].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000; //same for modififedAt
+    char entityCreateAtCharBuffer[64];
+    snprintf(entityCreateAtCharBuffer, sizeof(entityCreateAtCharBuffer), "%.3f", dbEntityTableLocal[0].createdAt);
+    strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize - oldTemporalSQLUsedBufferSize);
+    oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
+    strncat(oldTemporalSQLBuffer,", ",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
+    oldTemporalSQLUsedBufferSize += 2;
 
-        // Modified At
-        strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize);
-        oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
+    // Modified At
+    strncat(oldTemporalSQLBuffer,entityCreateAtCharBuffer, oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize);
+    oldTemporalSQLUsedBufferSize += strlen(entityCreateAtCharBuffer);
 
-        // To be removed
-        strncat(oldTemporalSQLBuffer,", NULL)",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
-        oldTemporalSQLUsedBufferSize += 7;
+    // To be removed
+    strncat(oldTemporalSQLBuffer,", NULL)",oldTemporalSQLFullBufferSize-oldTemporalSQLUsedBufferSize); // Chandra-TBD
+    oldTemporalSQLUsedBufferSize += 7;
 #endif
-        //
-        // Some traces just to see how the KjNode tree works
-        //
-        LM_TMP(("CCSR: oldTemporalSQLBuffer:     '%s'", oldTemporalSQLBuffer));
-        LM_TMP(("CCSR:"));
+*/
+    //
+    // Some traces just to see how the KjNode tree works
+    //
+    LM_TMP(("CCSR: oldTemporalSQLBuffer:     '%s'", oldTemporalSQLBuffer));
+    LM_TMP(("CCSR:"));
 
-        int oldTemporalTreeNodeLevel = 0;
+    int oldTemporalTreeNodeLevel = 0;
 
-        int attributesNumbers = 0;
-        for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    int attributesNumbers = 0;
+    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+       attributesNumbers++;
+    }
+
+    int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
+    dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
+    bzero(dbAttributeTableLocal, attribArrayTotalSize);
+
+    int attrIndex=0;
+    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+       attrSubattrExtract ( attrP, &dbAttributeTableLocal[attrIndex++]);
+    }
+
+
+/*
+    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+        dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeName = attrP->name;
+        if (attrP->type != KjObject)
         {
-                attributesNumbers++;
+            LM_W(("Teamporal - Bad Input - Key values not supported"));
+            continue;
         }
 
-        int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
-        dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
-        bzero(dbAttributeTableLocal, attribArrayTotalSize);
+        KjNode* attrTypeP  = kjLookup(attrP, "type");
+        kjChildRemove (attrP,attrTypeP);
+        dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType = attrTypeP->value.s;
 
-
-        for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+         if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
+        // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
         {
-                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeName = attrP->name;
-                if (attrP->type != KjObject)
-                {
-                        LM_W(("Teamporal - Bad Input - Key values not supported"));
-                        continue;
-                }
+            KjNode* attributeObject  = kjLookup(attrP, "object");
+            kjChildRemove (attrP,attributeObject);
 
-                KjNode* attrTypeP  = kjLookup(attrP, "type");
-                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType = attrTypeP->value.s;
+            // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+            dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueRelation;
+            dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
+            LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
 
-                 if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
-                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
-                {
-                        KjNode* attributeObject  = kjLookup(attrP, "object");
-                        if(attributeObject != NULL)
-                        {
-                              // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueRelation;
-                              dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
-                              LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
-                        }
-                }
-                else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
-                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
-                {
-                        // Chandra-TBI
-                }
-                else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Property") == 0)
-                // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
-                {
-                        KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
-                        if (valueP != NULL)
-                        {
-                                if (valueP->type == KjFloat)
-                                {
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.f;
-                                }
-                                else if (valueP->type == KjInt)
-                                {
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.i;
-                                }
-                                else if (valueP->type == KjArray)
-                                {
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueArray;
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                      kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
-                                }
-                                else if (valueP->type == KjObject)
-                                {
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                      kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
-                                }
-                                else if (valueP->type == KjBoolean)
-                                {
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.b;
+        }
+        else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
+        // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
+        {
+            KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
+            kjChildRemove (attrP,valueP);
+            // Chandra-TBI
+        }
+        else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Property") == 0)
+        // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
+        {
+            KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
+            kjChildRemove (attrP,valueP);
 
-                                }
-                                else if (valueP->type == KjString)
-                                {
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
-                                      dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
-                                }
-                        }
-                        else // if (valueP->type == "p")  //Chandra - TBCKZ
-                        {
-                                dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
-                                int subAttributeTreeNodeLevel = 0;
-                                int subAtrributeNumbers = 0;
-                                for (KjNode* subAttrP = valueP->value.firstChildP; subAttrP != NULL; subAttrP = attrP->next)
-                                // for (valueP->value.firstChildP; attrP != NULL; attrP = attrP->next)  // Chandra-TBCKZ
-                                {
-                                        subAtrributeNumbers++;
-                                }
+            if (valueP->type == KjFloat)
+            {
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.f;
+            }
+            else if (valueP->type == KjInt)
+            {
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.i;
+            }
+            else if (valueP->type == KjArray)
+            {
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueArray;
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                  kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
+            }
+            else if (valueP->type == KjObject)
+            {
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                  kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
+            }
+            else if (valueP->type == KjBoolean)
+            {
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.b;
 
-                                int subAttribArrayTotalSize = subAtrributeNumbers * sizeof(OrionldTemporalDbSubAttributeTable);
-                                dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
-                                bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
-                                for (KjNode* subAttrP = valueP->value.firstChildP; subAttrP != NULL; subAttrP = attrP->next)
-                                {
-                                        if (attrP->type != KjObject)
-                                        {
-                                                LM_W(("Teamporal - Bad Input - Key values not supported"));
-                                                continue;
-                                        }
-
-                                        KjNode* attrTypeP  = kjLookup(attrP, "type");
-                                        dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType = attrTypeP->value.s;
-
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"Relationship") == 0)
-                                        // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Relationship")
-                                        {
-                                                KjNode* attributeObject  = kjLookup(attrP, "object");
-                                                // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueRelation;
-                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = attributeObject->value.s;
-                                                LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal[oldTemporalTreeNodeLevel].subAttributeValueString));
-                                        }
-
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"Property") == 0)
-                                        // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "Property")
-                                        {
-
-                                                KjNode* subAttrValueP  = kjLookup(subAttrP, "value");  //Chandra-TBD
-                                                if (valueP->type == KjFloat)
-                                                {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueNumber;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueBoolean = subAttrValueP->value.f;
-                                                }
-                                                else if (valueP->type == KjInt)
-                                                {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueNumber;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueNumber = subAttrValueP->value.i;
-                                                }
-                                                else if (valueP->type == KjArray)
-                                                {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueArray;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString, 1024);
-                                                }
-                                                else if (valueP->type == KjObject)
-                                                {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueObject;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                                                      kjRender(orionldState.kjsonP, subAttrValueP->value.firstChildP, dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString, 1024);
-                                                }
-                                                else if (valueP->type == KjBoolean)
-                                                {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueBool;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueBoolean = subAttrValueP->value.b;
-
-                                                }
-                                                else if (valueP->type == KjString)
-                                                {
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueType  = EnumValueString;
-                                                      dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeValueString = subAttrValueP->value.s;
-                                                }
-                                        }
-                                        if (strcmp (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].subAttributeType,"GeoProperty") == 0)
-                                        // if (dbSubAttributeTableLocal[subAttributeTreeNodeLevel].attributeType == "GeoProperty")
-                                        {
-                                                // Chandra-TBI
-                                        }
-
-                                        dbSubAttributeTableLocal[subAttributeTreeNodeLevel].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-                                        dbSubAttributeTableLocal[subAttributeTreeNodeLevel].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-
-                                        KjNode* subAttrObservedAtP = kjLookup(attrP, "observedAt");
-                                        if (subAttrObservedAtP != NULL)
-                                        {
-                                                dbSubAttributeTableLocal[subAttributeTreeNodeLevel].observedAt = parse8601Time(subAttrObservedAtP->value.s);
-                                        }
-
-                                        subAttributeTreeNodeLevel++;
-                                }
-                        }
-                }
-
-                dbAttributeTableLocal[oldTemporalTreeNodeLevel].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-                dbAttributeTableLocal[oldTemporalTreeNodeLevel].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-
-                KjNode* observedAtP = kjLookup(attrP, "observedAt");
-                if (observedAtP != NULL)
-                {
-                        dbAttributeTableLocal[oldTemporalTreeNodeLevel].observedAt = parse8601Time(observedAtP->value.s);
-                }
-
-                oldTemporalTreeNodeLevel++;
+            }
+            else if (valueP->type == KjString)
+            {
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
+                  dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
+            }
         }
 
-        dbAllTablesLocal.entityTableArray = dbEntityTableLocal;
-        dbAllTablesLocal.attributeTableArray = dbAttributeTableLocal;
-        dbAllTablesLocal.subAttributeTableArray = dbSubAttributeTableLocal;
+        // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
+        KjNode* nodeP  = kjLookup(attrP, "unitCode");
+        if(nodeP != NULL)
+        {
+            kjChildRemove (attrP,nodeP);
+            // Chandra-TBI
+        }
 
-        return dbAllTablesLocal;
+        nodeP  = kjLookup(attrP, "observationSpace");
+        if(nodeP != NULL)
+        {
+            kjChildRemove (attrP,nodeP);
+            // Chandra-TBI
+        }
+
+        nodeP  = kjLookup(attrP, "datasetId");
+        if(nodeP != NULL)
+        {
+            kjChildRemove (attrP,nodeP);
+            // Chandra-TBI
+        }
+
+        nodeP  = kjLookup(attrP, "instanceid");
+        if(nodeP != NULL)
+        {
+            kjChildRemove (attrP,nodeP);
+            // Chandra-TBI
+        }
+
+        nodeP  = kjLookup(attrP, "location");
+        if(nodeP != NULL)
+        {
+            kjChildRemove (attrP,nodeP);
+            // Chandra-TBI
+        }
+
+        nodeP  = kjLookup(attrP, "operationSpace");
+        if(nodeP != NULL)
+        {
+            kjChildRemove (attrP,nodeP);
+            // Chandra-TBI
+        }
+
+
+        if (attrP->value.firstChildP != NULL)
+        {
+            dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
+            int subAttrs = 0;
+            for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+            {
+                    subAttrs++;
+            }
+
+            int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
+            dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+            bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
+
+            int subAttrIx=0;
+            for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+            {
+                    subAttrTreat (subAttrP, &dbSubAttributeTableLocal[subAttrIx++]);
+            }
+
+        }
+
+        dbAttributeTableLocal[oldTemporalTreeNodeLevel].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+        dbAttributeTableLocal[oldTemporalTreeNodeLevel].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+
+        KjNode* observedAtP = kjLookup(attrP, "observedAt");
+        if (observedAtP != NULL)
+        {
+            dbAttributeTableLocal[oldTemporalTreeNodeLevel].observedAt = parse8601Time(observedAtP->value.s);
+        }
+
+        oldTemporalTreeNodeLevel++;
+    }
+*/
+    dbAllTablesLocal.entityTableArray = dbEntityTableLocal;
+    dbAllTablesLocal.attributeTableArray = dbAttributeTableLocal;
+    dbAllTablesLocal.subAttributeTableArray = dbSubAttributeTableLocal;
+
+    return &dbAllTablesLocal;
 }
+
+
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable& dbAttributeTableLocal)
+{
+   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+   {
+      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeName = attrP->name;
+      if (attrP->type != KjObject)
+      {
+          LM_W(("Teamporal - Bad Input - Key values not supported"));
+          continue;
+      }
+
+      KjNode* attrTypeP  = kjLookup(attrP, "type");
+      kjChildRemove (attrP,attrTypeP);
+      dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType = attrTypeP->value.s;
+
+       if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Relationship") == 0)
+      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
+      {
+          KjNode* attributeObject  = kjLookup(attrP, "object");
+          kjChildRemove (attrP,attributeObject);
+
+          // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+          dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueRelation;
+          dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = attributeObject->value.s;
+          LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString));
+
+      }
+      else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"GeoProperty") == 0)
+      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
+      {
+          KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
+          kjChildRemove (attrP,valueP);
+          // Chandra-TBI
+      }
+      else if (strcmp (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType,"Property") == 0)
+      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
+      {
+          KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
+          kjChildRemove (attrP,valueP);
+
+          if (valueP->type == KjFloat)
+          {
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.f;
+          }
+          else if (valueP->type == KjInt)
+          {
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueNumber;
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.i;
+          }
+          else if (valueP->type == KjArray)
+          {
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueArray;
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
+          }
+          else if (valueP->type == KjObject)
+          {
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueObject;
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString, 1024);
+          }
+          else if (valueP->type == KjBoolean)
+          {
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueBool;
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueNumber = valueP->value.b;
+
+          }
+          else if (valueP->type == KjString)
+          {
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeValueType  = EnumValueString;
+                dbAttributeTableLocal[oldTemporalTreeNodeLevel].valueString = valueP->value.s;
+          }
+      }
+
+      // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
+      KjNode* nodeP  = kjLookup(attrP, "unitCode");
+      if(nodeP != NULL)
+      {
+          kjChildRemove (attrP,nodeP);
+          // Chandra-TBI
+      }
+
+      nodeP  = kjLookup(attrP, "observationSpace");
+      if(nodeP != NULL)
+      {
+          kjChildRemove (attrP,nodeP);
+          // Chandra-TBI
+      }
+
+      nodeP  = kjLookup(attrP, "datasetId");
+      if(nodeP != NULL)
+      {
+          kjChildRemove (attrP,nodeP);
+          // Chandra-TBI
+      }
+
+      nodeP  = kjLookup(attrP, "instanceid");
+      if(nodeP != NULL)
+      {
+          kjChildRemove (attrP,nodeP);
+          // Chandra-TBI
+      }
+
+      nodeP  = kjLookup(attrP, "location");
+      if(nodeP != NULL)
+      {
+          kjChildRemove (attrP,nodeP);
+          // Chandra-TBI
+      }
+
+      nodeP  = kjLookup(attrP, "operationSpace");
+      if(nodeP != NULL)
+      {
+          kjChildRemove (attrP,nodeP);
+          // Chandra-TBI
+      }
+
+      if (attrP->value.firstChildP != NULL)
+      {
+          dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
+          int subAttrs = 0;
+          for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+          {
+                  subAttrs++;
+          }
+
+          int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
+          dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+          bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
+
+          int subAttrIx=0;
+          for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+          {
+                  subAttrExtract (subAttrP, &dbSubAttributeTableLocal[subAttrIx++]);
+          }
+
+      }
+
+      dbAttributeTableLocal[oldTemporalTreeNodeLevel].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+      dbAttributeTableLocal[oldTemporalTreeNodeLevel].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+
+      KjNode* observedAtP = kjLookup(attrP, "observedAt");
+      if (observedAtP != NULL)
+      {
+          dbAttributeTableLocal[oldTemporalTreeNodeLevel].observedAt = parse8601Time(observedAtP->value.s);
+      }
+
+   oldTemporalTreeNodeLevel++;
+   }
+
+}
+
+
+void  subAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSubAttributeTableLocal)
+{
+    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+       dbSubAttributeTableLocal.subAttributeName = attrP->name;
+       if (attrP->type != KjObject)
+       {
+           LM_W(("Teamporal - Bad Input - Key values not supported"));
+           continue;
+       }
+
+       KjNode* attrTypeP  = kjLookup(attrP, "type");
+       kjChildRemove (attrP,attrTypeP);
+       dbSubAttributeTableLocal.subAttributeType = attrTypeP->value.s;
+
+        if (strcmp (dbSubAttributeTableLocal.subAttributeType,"Relationship") == 0)
+       // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
+       {
+           KjNode* attributeObject  = kjLookup(attrP, "object");
+           kjChildRemove (attrP,attributeObject);
+
+           // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
+           dbSubAttributeTableLocal.subAttributeValueType  = EnumValueRelation;
+           dbSubAttributeTableLocal.subAttributeValueString = attributeObject->value.s;
+           LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal.subAttributeValueString));
+
+       }
+       else if (strcmp (dbSubAttributeTableLocal.subAttributeType,"GeoProperty") == 0)
+       // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
+       {
+           KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
+           kjChildRemove (attrP,valueP);
+           // Chandra-TBI
+       }
+       else if (strcmp (dbSubAttributeTableLocal.subAttributeType,"Property") == 0)
+       // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
+       {
+           KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
+           kjChildRemove (attrP,valueP);
+
+           if (valueP->type == KjFloat)
+           {
+                 dbSubAttributeTableLocal.subAttributeValueType  = EnumValueNumber;
+                 dbSubAttributeTableLocal.subAttributeValueNumber = valueP->value.f;
+           }
+           else if (valueP->type == KjInt)
+           {
+                 dbSubAttributeTableLocal.subAttributeValueType  = EnumValueNumber;
+                 dbSubAttributeTableLocal.subAttributeValueNumber = valueP->value.i;
+           }
+           else if (valueP->type == KjArray)
+           {
+                 dbSubAttributeTableLocal.subAttributeValueType  = EnumValueArray;
+                 dbSubAttributeTableLocal.subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                 kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbSubAttributeTableLocal.subAttributeValueString, 1024);
+           }
+           else if (valueP->type == KjObject)
+           {
+                 dbSubAttributeTableLocal.subAttributeValueType  = EnumValueObject;
+                 dbSubAttributeTableLocal.subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+                 kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].subAttributeValueString, 1024);
+           }
+           else if (valueP->type == KjBoolean)
+           {
+                 dbSubAttributeTableLocal.subAttributeValueType  = EnumValueBool;
+                 dbSubAttributeTableLocal.subAttributeValueNumber = valueP->value.b;
+
+           }
+           else if (valueP->type == KjString)
+           {
+                 dbSubAttributeTableLocal.subAttributeValueType  = EnumValueString;
+                 dbSubAttributeTableLocal.subAttributeValueString = valueP->value.s;
+           }
+       }
+
+       // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
+       KjNode* nodeP  = kjLookup(attrP, "unitCode");
+       if(nodeP != NULL)
+       {
+           kjChildRemove (attrP,nodeP);
+           // Chandra-TBI
+       }
+
+       nodeP  = kjLookup(attrP, "observationSpace");
+       if(nodeP != NULL)
+       {
+           kjChildRemove (attrP,nodeP);
+           // Chandra-TBI
+       }
+
+       nodeP  = kjLookup(attrP, "datasetId");
+       if(nodeP != NULL)
+       {
+           kjChildRemove (attrP,nodeP);
+           // Chandra-TBI
+       }
+
+       nodeP  = kjLookup(attrP, "instanceid");
+       if(nodeP != NULL)
+       {
+           kjChildRemove (attrP,nodeP);
+           // Chandra-TBI
+       }
+
+       nodeP  = kjLookup(attrP, "location");
+       if(nodeP != NULL)
+       {
+           kjChildRemove (attrP,nodeP);
+           // Chandra-TBI
+       }
+
+       nodeP  = kjLookup(attrP, "operationSpace");
+       if(nodeP != NULL)
+       {
+           kjChildRemove (attrP,nodeP);
+           // Chandra-TBI
+       }
+
+       /*if (attrP->value.firstChildP != NULL)  //Chandra-TBCKZ (Can we safely assume that there are sub attributes to sub attributes?)
+       {
+           dbAttributeTableLocal[oldTemporalTreeNodeLevel].subProperty = true;
+           int subAttrs = 0;
+           for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+           {
+                   subAttrs++;
+           }
+
+           int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
+           dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+           bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
+
+           int subAttrIx=0;
+           for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+           {
+                   subAttrExtract (subAttrP, &dbSubAttributeTableLocal[subAttrIx++]);
+           }
+
+       }*/
+
+       dbSubAttributeTableLocal.createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+       dbSubAttributeTableLocal.modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+
+       KjNode* observedAtP = kjLookup(attrP, "observedAt");
+       if (observedAtP != NULL)
+       {
+           dbSubAttributeTableLocal.observedAt = parse8601Time(observedAtP->value.s);
+       }
+
+       oldTemporalTreeNodeLevel++;
+    }
+}
+
+
 
 
 // ----------------------------------------------------------------------------
@@ -438,125 +739,125 @@ bool TemporalPgDBConnectorOpen(char *tenantName)
 //
 bool temporalInitialiseTenant(char *tenantName)
 {
-        LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
+    LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
 
-        //  oldPgDbConnection = TemporalDBConnectorOpen();
-        if(TemporalPgDBConnectorOpen() != false)
+    //  oldPgDbConnection = TemporalDBConnectorOpen();
+    if(TemporalPgDBConnectorOpen() != false)
+    {
+        LM_K(("Trying to create database for Tenant %s\n", tenantName));
+
+    		int oldPgDbSqlCreateTDbSQLBufferSize = 1024;
+    		int oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
+      	char* oldPgDbSqlCreateTDbSQL = kaAlloc(&orionldState.kalloc, oldPgDbSqlCreateTDbSQLBufferSize);
+
+        // char oldPgDbSqlSyntax[]= ";";
+        // char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";
+        // strcat (oldPgDbSqlCreateTDbSQL, tenantName);
+        // strcat (oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
+        // char oldPgTDbConnSQL[] = "user=postgres password=orion dbname= ";
+        // strcat (oldPgTDbConnSQL, tenantName);
+
+
+    		strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
+    		oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
+    		strncat(oldPgDbSqlCreateTDbSQL, tenantName, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+    		oldPgDbSqlCreateTDbSQLUsedBufferSize += sizeof(tenantName);
+        strncpy(oldPgDbSqlCreateTDbSQL, ";", oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+        oldPgDbSqlCreateTDbSQLUsedBufferSize += 1;
+
+    		int oldPgTDbConnSQLBufferSize = 1024;
+    		int oldPgTDbConnSQLUsedBufferSize = 0;
+    		char oldPgTDbConnSQLUser[] = "postgres"; // Chandra-TBD
+    		char oldPgTDbConnSQLPasswd[] = "orion"; // Chandra-TBD
+    		char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
+
+        strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += 5;
+    		strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    		oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
+        strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += 1;
+        strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += 9;
+        strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
+        strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += 1;
+        strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += 7;
+        strncat(oldTemporalSQLBuffer, tenantName, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+        oldPgTDbConnSQLUsedBufferSize += sizeof(tenantName);
+
+
+        LM_K(("Command to create database for Tenant %s\n", tenantName));
+
+        PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
+        LM_K(("Opening database connection for Tenant %s\n", tenantName));
+
+        oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
+        if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
         {
-                LM_K(("Trying to create database for Tenant %s\n", tenantName));
-
-		int oldPgDbSqlCreateTDbSQLBufferSize = 1024;
-		int oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
-        	char* oldPgDbSqlCreateTDbSQL = kaAlloc(&orionldState.kalloc, oldPgDbSqlCreateTDbSQLBufferSize);
-
-                // char oldPgDbSqlSyntax[]= ";";
-                // char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";
-                // strcat (oldPgDbSqlCreateTDbSQL, tenantName);
-                // strcat (oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
-                // char oldPgTDbConnSQL[] = "user=postgres password=orion dbname= ";
-                // strcat (oldPgTDbConnSQL, tenantName);
-
-
-		strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
-		oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
-		strncat(oldPgDbSqlCreateTDbSQL, tenantName, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
-		oldPgDbSqlCreateTDbSQLUsedBufferSize += sizeof(tenantName);
-                strncpy(oldPgDbSqlCreateTDbSQL, ";", oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
-                oldPgDbSqlCreateTDbSQLUsedBufferSize += 1;
-
-		int oldPgTDbConnSQLBufferSize = 1024;
-		int oldPgTDbConnSQLUsedBufferSize = 0;
-		char oldPgTDbConnSQLUser[] = "postgres"; // Chandra-TBD
-		char oldPgTDbConnSQLPasswd[] = "orion"; // Chandra-TBD
-		char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
-
-		strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
-                oldPgTDbConnSQLUsedBufferSize += 5;
-		strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-		oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
-                strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-		oldPgTDbConnSQLUsedBufferSize += 1;
-		strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-		oldPgTDbConnSQLUsedBufferSize += 9;
-                strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-                oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
-		strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-                oldPgTDbConnSQLUsedBufferSize += 1;
-		strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-                oldPgTDbConnSQLUsedBufferSize += 7;
-		strncat(oldTemporalSQLBuffer, tenantName, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-                oldPgTDbConnSQLUsedBufferSize += sizeof(tenantName);
-
-
-                LM_K(("Command to create database for Tenant %s\n", tenantName));
-
-                PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-                LM_K(("Opening database connection for Tenant %s\n", tenantName));
-
-                oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
-                if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
-                {
-                        LM_E(("Connection to %s database is not achieved or created", tenantName));
-                        LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
-                        TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
-                        return false;
-                }
-                else if (PQstatus(oldPgDbTenantConnection) == CONNECTION_OK)
-                {
-                        LM_K(("Connection is ok with the %s database\n", tenantName));
-                        LM_K(("Now crreating the tables for the teanant %s \n", tenantName));
-                        const char *oldPgDbCreateTenantTables[9][250] =
-                        {
-                                "CREATE EXTENSION IF NOT EXISTS postgis",
-
-                                //  "CREATE EXTENSION IF NOT EXISTS timescaledb",
-
-                                "drop table attribute_sub_properties_table",
-
-                                "drop table attributes_table",
-
-                                "drop type attribute_value_type_enum",
-
-                                "drop table entity_table",
-
-                                "CREATE TABLE IF NOT EXISTS entity_table (entity_id TEXT NOT NULL,entity_type TEXT, geo_property GEOMETRY,created_at TIMESTAMP,modified_at TIMESTAMP, observed_at TIMESTAMP,PRIMARY KEY (entity_id))",
-
-                                "create type attribute_value_type_enum as enum ('value_string', 'value_number', 'value_boolean', 'value_relation', 'value_object', 'value_datetime', 'value_geo')",
-
-                                "CREATE TABLE IF NOT EXISTS attributes_table (entity_id TEXT NOT NULL REFERENCES entity_table(entity_id),id TEXT NOT NULL, name TEXT,"
-                                        "value_type attribute_value_type_enum, sub_property BOOL, unit_code TEXT, data_set_id TEXT,"
-                                        "instance_id bigint GENERATED BY DEFAULT AS IDENTITY(START WITH 1 INCREMENT BY 1), value_string TEXT, value_boolean BOOL, value_number float8,"
-                                        "value_relation TEXT,value_object TEXT, value_datetime TIMESTAMP,geo_property GEOMETRY,created_at TIMESTAMP NOT NULL,modified_at TIMESTAMP NOT NULL,"
-                                        "observed_at TIMESTAMP NOT NULL,PRIMARY KEY (entity_id,id,observed_at,created_at,modified_at))",
-
-                                //  "SELECT create_hypertable('attributes_table', 'modified_at')",
-
-                                "CREATE TABLE IF NOT EXISTS attribute_sub_properties_table (entity_id TEXT NOT NULL,attribute_id TEXT NOT NULL,attribute_instance_id bigint, id TEXT NOT NULL,"
-                                        "value_type attribute_value_type_enum,value_string TEXT, value_boolean BOOL, value_number float8, value_relation TEXT,name TEXT,geo_property GEOMETRY,"
-                                        "unit_code TEXT, value_object TEXT, value_datetime TIMESTAMP,instance_id bigint GENERATED BY DEFAULT AS IDENTITY(START WITH 1 INCREMENT BY 1),PRIMARY KEY (instance_id))"
-
-                        };
-			PQclear(oldPgTenandDbResult);
-
-                        for(int oldPgDbNumObj = 0; oldPgDbNumObj < 11; oldPgDbNumObj++)
-                        {
-                                oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, *oldPgDbCreateTenantTables[oldPgDbNumObj]);
-
-                                if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
-                                {
-                                        LM_K(("Postgres DB command failed for database for Tenant %s%s\n", tenantName,oldPgDbCreateTenantTables[oldPgDbNumObj]));
-                                        break;
-                                }
-                                PQclear(oldPgTenandDbResult);
-                        }
-                }
+            LM_E(("Connection to %s database is not achieved or created", tenantName));
+            LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
+            TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
+            return false;
         }
-        else
+        else if (PQstatus(oldPgDbTenantConnection) == CONNECTION_OK)
         {
-                TemporalPgDBConnectorClose(); //close Postgres DB connection and cleanup
-                return false;
+            LM_K(("Connection is ok with the %s database\n", tenantName));
+            LM_K(("Now crreating the tables for the teanant %s \n", tenantName));
+            const char *oldPgDbCreateTenantTables[9][250] =
+            {
+                    "CREATE EXTENSION IF NOT EXISTS postgis",
+
+                    //  "CREATE EXTENSION IF NOT EXISTS timescaledb",
+
+                    "drop table attribute_sub_properties_table",
+
+                    "drop table attributes_table",
+
+                    "drop type attribute_value_type_enum",
+
+                    "drop table entity_table",
+
+                    "CREATE TABLE IF NOT EXISTS entity_table (entity_id TEXT NOT NULL,entity_type TEXT, geo_property GEOMETRY,created_at TIMESTAMP,modified_at TIMESTAMP, observed_at TIMESTAMP,PRIMARY KEY (entity_id))",
+
+                    "create type attribute_value_type_enum as enum ('value_string', 'value_number', 'value_boolean', 'value_relation', 'value_object', 'value_datetime', 'value_geo')",
+
+                    "CREATE TABLE IF NOT EXISTS attributes_table (entity_id TEXT NOT NULL REFERENCES entity_table(entity_id),id TEXT NOT NULL, name TEXT,"
+                            "value_type attribute_value_type_enum, sub_property BOOL, unit_code TEXT, data_set_id TEXT,"
+                            "instance_id bigint GENERATED BY DEFAULT AS IDENTITY(START WITH 1 INCREMENT BY 1), value_string TEXT, value_boolean BOOL, value_number float8,"
+                            "value_relation TEXT,value_object TEXT, value_datetime TIMESTAMP,geo_property GEOMETRY,created_at TIMESTAMP NOT NULL,modified_at TIMESTAMP NOT NULL,"
+                            "observed_at TIMESTAMP NOT NULL,PRIMARY KEY (entity_id,id,observed_at,created_at,modified_at))",
+
+                    //  "SELECT create_hypertable('attributes_table', 'modified_at')",
+
+                    "CREATE TABLE IF NOT EXISTS attribute_sub_properties_table (entity_id TEXT NOT NULL,attribute_id TEXT NOT NULL,attribute_instance_id bigint, id TEXT NOT NULL,"
+                            "value_type attribute_value_type_enum,value_string TEXT, value_boolean BOOL, value_number float8, value_relation TEXT,name TEXT,geo_property GEOMETRY,"
+                            "unit_code TEXT, value_object TEXT, value_datetime TIMESTAMP,instance_id bigint GENERATED BY DEFAULT AS IDENTITY(START WITH 1 INCREMENT BY 1),PRIMARY KEY (instance_id))"
+
+            };
+            PQclear(oldPgTenandDbResult);
+
+            for(int oldPgDbNumObj = 0; oldPgDbNumObj < 11; oldPgDbNumObj++)
+            {
+                oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, *oldPgDbCreateTenantTables[oldPgDbNumObj]);
+
+                if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+                {
+                        LM_K(("Postgres DB command failed for database for Tenant %s%s\n", tenantName,oldPgDbCreateTenantTables[oldPgDbNumObj]));
+                        break;
+                }
+                PQclear(oldPgTenandDbResult);
+            }
         }
-        return true;
+    }
+    else
+    {
+            TemporalPgDBConnectorClose(); //close Postgres DB connection and cleanup
+            return false;
+    }
+    return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -612,12 +913,47 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 // PGconn* TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal) - function to buil update SQL statement
 //
 // ----------------------------------------------------------------------------
-bool TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables dbAllTablesLocal)
+bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal)
 {
     //if (strcmp (tableName,"Entity") == 0);
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
-    return false;
+    int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
+    int dbAttribTable = sizeof(dbAllTablesLocal.attributeTableArray);
+    int dbSubAttribTable = sizeof(dbAllTablesLocal.subAttributeTableArray)
+
+
+    for (int dbEntityLoop=0, dbEntityLoop < dbEntityTable, dbEntityLoop++)
+    {
+        int dbEntityBufferSize = 10 * 1024;
+        char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
+        bzero(dbEntityStrBuffer, dbEntityBufferSize);
+
+        snprintf(dbEntityStrBuffer, dbEntityBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
+                "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %s, %s, NULL)",
+                dbEntityTable[dbEntityLoop].entityId,
+                dbEntityTable[dbEntityLoop].entityType,
+                "createdAt",
+                "modifiedAt");
+    }
+
+    for (int dbAttribLoop=0, dbAttribLoop < dbAttribTable, dbAttribLoop++)
+    {
+        int dbAttribBufferSize = 10 * 1024;
+        char* dbAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbAttribBufferSize);
+        bzero(dbAttribStrBuffer, dbAttribBufferSize);
+            //Chandra-TBI
+    }
+
+    for (int dbSubAttribLoop=0, dbSubAttribLoop < dbSubAttribTable, dbSubAttribLoop++)
+    {
+        int dbSubAttribBufferSize = 10 * 1024;
+        char* dbSubAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbSubAttribBufferSize);
+        bzero(dbSubAttribStrBuffer, dbSubAttribBufferSize);
+        //Chandra-TBI
+    }
+
+    return true;
 }
 
 // ----------------------------------------------------------------------------

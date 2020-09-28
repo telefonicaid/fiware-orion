@@ -101,9 +101,9 @@ typedef struct OrionldTemporalDbEntityTable
 typedef struct OrionldTemporalDbAttributeTable
 {
   char*                                     entityId;
-  char*                                     attributeId;
+  char*                                     attributeId;  // Chandra-TBR
   char*                                     attributeName;
-  char*                                     attributeType; // Chandra-TBD
+  char*                                     attributeType;  // Chandra to change this to Enum - Property, Geo-property & Relationship kjType
   OrionldTemporalAttributeValueTypeEnum     attributeValueType;
   bool                                      subProperty;
   char*                                     unitCode;
@@ -130,9 +130,9 @@ typedef struct OrionldTemporalDbSubAttributeTable
 {
   char*                                     entityId;
   char*                                     attributeId;
-  char*                                     subAtrributeId;
+  char*                                     subAtrributeId;  // Chandra-TBR
   char*                                     subAttributeName;
-  char*                                     subAttributeType; // Chandra-TBD
+  char*                                     subAttributeType;  // Chandra to change this to Enum - Property, Geo-property & Relationship kjType
   OrionldTemporalAttributeValueTypeEnum     subAttributeValueType;
   char*                                     subAttributeUnitCode;
   char*                                     subAttributeDataSetId;
@@ -181,14 +181,20 @@ extern bool TemporalPgDBConnectorClose();
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
-OrionldTemporalDbAllTables  temporalCommonExtractFullAttributeTable();
+OrionldTemporalDbAllTables*  attrSubattrExtract();
+
+// -----------------------------------------------------------------------------
+//
+// temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
+//
+OrionldTemporalDbAllTables*  singleTemporalEntityExtract();
 
 // -----------------------------------------------------------------------------
 //
 // temporalExecSqlStatement
 //
 //
-extern bool TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables dbAllTablesLocal);
+extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal);
 
 // ----------------------------------------------------------------------------
 //
