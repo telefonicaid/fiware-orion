@@ -103,7 +103,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://uri.fiware.org/ns/data-models#industrial",
+			"value" : "industrial",
 			"mdNames" : [ ]
 		}
 	},
@@ -135,7 +135,7 @@ Date: REGEX(.*)
 04. GET E2 and see the long value of 'category', as the data-model context is NOT used
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 183
+Content-Length: 145
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 {
     "https://uri.fiware.org/ns/data-models#category": {
         "type": "Property",
-        "value": "https://uri.fiware.org/ns/data-models#industrial"
+        "value": "industrial"
     },
     "id": "urn:ngsi-ld:test:value-expansion:E2",
     "type": "T"
