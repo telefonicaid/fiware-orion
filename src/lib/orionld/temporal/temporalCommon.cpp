@@ -143,11 +143,7 @@ OrionldTemporalDbAllTables&  singleTemporalEntityExtract()
     oldTemporalSQLUsedBufferSize += 7;
 #endif
 */
-    //
-    // Some traces just to see how the KjNode tree works
-    //
-    LM_TMP(("CCSR: oldTemporalSQLBuffer:     '%s'", oldTemporalSQLBuffer));
-    LM_TMP(("CCSR:"));
+
 
     int oldTemporalTreeNodeLevel = 0;
 
@@ -935,6 +931,11 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
                 dbEntityTable[dbEntityLoop].entityType,
                 "createdAt",
                 "modifiedAt");
+        //
+        // Some traces just to see how the KjNode tree works
+        //
+        LM_TMP(("CCSR: dbEntityStrBuffer:     '%s'", dbEntityStrBuffer));
+        LM_TMP(("CCSR:"));
     }
 
     for (int dbAttribLoop=0, dbAttribLoop < dbAttribTable, dbAttribLoop++)
