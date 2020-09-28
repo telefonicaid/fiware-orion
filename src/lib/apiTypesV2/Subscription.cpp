@@ -146,6 +146,15 @@ std::string Notification::toJson(const std::string& attrsFormat)
 
   jh.addString("attrsFormat", attrsFormat);
 
+  if (this->httpInfo.payload.empty() && this->includePayload)
+  {
+    jh.addBool("includePayload", true);
+  }
+  else
+  {
+    jh.addBool("includePayload", false);
+  }
+
   if (this->httpInfo.custom)
   {
     jh.addRaw("httpCustom", this->httpInfo.toJson());

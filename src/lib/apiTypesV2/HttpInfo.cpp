@@ -116,7 +116,7 @@ void HttpInfo::fill(const BSONObj& bo)
   if (this->custom)
   {
     this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
-    this->includePayload = bo.hasField(CSUB_INCLUDEPAYLOAD)? getBoolFieldF(bo, CSUB_INCLUDEPAYLOAD) : false;
+    this->includePayload = bo.hasField(CSUB_INCLUDEPAYLOAD)? getBoolFieldF(bo, CSUB_INCLUDEPAYLOAD) : true;
 
     if (bo.hasField(CSUB_METHOD))
     {
