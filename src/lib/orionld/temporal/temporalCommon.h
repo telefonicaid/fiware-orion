@@ -211,4 +211,10 @@ extern bool temporalInitialiseTenant(char *tenantName);
 extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
 
 
+void  attrSubattrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSubAttributeTableLocal);
+
+
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable& dbAttributeTableLocal);
+
+
 #endif  // TEMPORAL_COMMON_H_

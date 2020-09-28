@@ -32,6 +32,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kalloc/kaBufferInit.h"                                 // kaBufferInit
 #include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjBuilder.h"                                     // kjBuilder
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -143,9 +144,6 @@ OrionldTemporalDbAllTables&  singleTemporalEntityExtract()
     oldTemporalSQLUsedBufferSize += 7;
 #endif
 */
-
-
-    int oldTemporalTreeNodeLevel = 0;
 
     int attributesNumbers = 0;
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -315,9 +313,9 @@ OrionldTemporalDbAllTables&  singleTemporalEntityExtract()
         oldTemporalTreeNodeLevel++;
     }
 */
-    dbAllTablesLocal.entityTableArray = dbEntityTableLocal;
-    dbAllTablesLocal.attributeTableArray = dbAttributeTableLocal;
-    dbAllTablesLocal.subAttributeTableArray = dbSubAttributeTableLocal;
+    dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+    dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+    dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
 
     return &dbAllTablesLocal;
 }
@@ -325,6 +323,7 @@ OrionldTemporalDbAllTables&  singleTemporalEntityExtract()
 
 void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable& dbAttributeTableLocal)
 {
+   int oldTemporalTreeNodeLevel = 0;
    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
    {
       dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeName = attrP->name;
@@ -477,7 +476,8 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable& dbAttributeTab
 }
 
 
-void  subAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSubAttributeTableLocal)
+
+void  attrSubattrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSubAttributeTableLocal)
 {
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
@@ -537,7 +537,7 @@ void  subAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSub
            {
                  dbSubAttributeTableLocal.subAttributeValueType  = EnumValueObject;
                  dbSubAttributeTableLocal.subAttributeValueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-                 kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal[oldTemporalTreeNodeLevel].subAttributeValueString, 1024);
+                 kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbSubAttributeTableLocal.subAttributeValueString, 1024);
            }
            else if (valueP->type == KjBoolean)
            {
@@ -624,8 +624,6 @@ void  subAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSub
        {
            dbSubAttributeTableLocal.observedAt = parse8601Time(observedAtP->value.s);
        }
-
-       oldTemporalTreeNodeLevel++;
     }
 }
 
@@ -914,12 +912,12 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
     //if (strcmp (tableName,"Entity") == 0);
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
-    int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
+    //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
     int dbAttribTable = sizeof(dbAllTablesLocal.attributeTableArray);
-    int dbSubAttribTable = sizeof(dbAllTablesLocal.subAttributeTableArray)
+    int dbSubAttribTable = sizeof(dbAllTablesLocal.subAttributeTableArray);
 
 
-    for (int dbEntityLoop=0, dbEntityLoop < dbEntityTable, dbEntityLoop++)
+    for (int dbEntityLoop=0; dbEntityLoop < dbEntityTable; dbEntityLoop++)
     {
         int dbEntityBufferSize = 10 * 1024;
         char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
@@ -938,7 +936,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
         LM_TMP(("CCSR:"));
     }
 
-    for (int dbAttribLoop=0, dbAttribLoop < dbAttribTable, dbAttribLoop++)
+    for (int dbAttribLoop=0; dbAttribLoop < dbAttribTable; dbAttribLoop++)
     {
         int dbAttribBufferSize = 10 * 1024;
         char* dbAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbAttribBufferSize);
@@ -946,7 +944,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
             //Chandra-TBI
     }
 
-    for (int dbSubAttribLoop=0, dbSubAttribLoop < dbSubAttribTable, dbSubAttribLoop++)
+    for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
     {
         int dbSubAttribBufferSize = 10 * 1024;
         char* dbSubAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbSubAttribBufferSize);
