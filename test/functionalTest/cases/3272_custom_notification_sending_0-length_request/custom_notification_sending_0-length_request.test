@@ -29,7 +29,6 @@ brokerStart CB 0
 accumulatorStart --pretty-print
 
 --SHELL--
-
 #
 # 01. Create E1/T1
 # 02. Create custom subscription with payload="", includePayload=false
@@ -39,6 +38,7 @@ accumulatorStart --pretty-print
 # 06. Create custom subscription with payload="{ %22x%22: 1}", includePayload=false
 # 07. Create custom subscription with paylaod="{ %22x%22: 1}", includePayload=true
 # 08. Dump accumulator to see the notifications
+# 09. GET /v2/subscriptions to check subscriptions payload
 #
 
 echo "01. Create E1/T1"
@@ -207,11 +207,20 @@ echo
 echo
 
 
+
 echo "08. Dump accumulator to see the notification"
 echo "============================================"
 accumulatorDump
 echo
 echo
+
+
+
+echo "09. GET the subscription"
+echo "========================"
+orionCurl --url /v2/subscriptions
+echo
+
 
 
 --REGEXPECT--
@@ -339,6 +348,20 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
+Content-Length: 9
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "x": 1
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
 Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
@@ -362,62 +385,183 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 129
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {},
-                "type": "Boolean",
-                "value": true
+
+09. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 2409
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "payload": "",
+                "url": "http://localhost:9997/notify"
             },
-            "id": "E1",
-            "type": "T1"
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Content-Type present but there is no content",
+            "lastNotification": "REGEX(.*)",
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
         }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 9
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "x": 1
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 9
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "x": 1
-}
-=======================================
-
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "payload": "",
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "payload": "",
+                "url": "http://localhost:9997/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Content-Type present but there is no content",
+            "lastNotification": "REGEX(.*)",
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "failed",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "payload": "",
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "payload": "{ %22x%22: 1}",
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "httpCustom": {
+                "payload": "{ %22x%22: 1}",
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1"
+                }
+            ]
+        }
+    }
+]
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
 accumulatorStop
+

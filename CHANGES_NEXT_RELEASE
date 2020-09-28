@@ -1,4 +1,4 @@
-- Fix: Custom notification: sending 0-length request #3272
+- Fix: notification.includePayload to avoid sending payloads in custom notification (#3272)
 - Fix: improve error response when incorrect URL used (#2231)
 - Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
 - Fix: log WARN about insecureNotifications mode (#3013)
