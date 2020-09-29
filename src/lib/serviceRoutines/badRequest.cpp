@@ -53,7 +53,7 @@ std::string badRequest
 
   alarmMgr.badInput(ciP->ip, details);
 
-  restErrorReplyGet(ciP, SccBadRequest, "Service not found. Check your URL as probably it is wrong.", &answer);
+  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
 
   return answer;
 }
