@@ -235,7 +235,7 @@ MongoDB server version: REGEX(.*)
 				},
 				"https://fiware=github=io/tutorials=Step-by-Step/schema/statusOfWork" : {
 					"type" : "Property",
-					"value" : "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
+					"value" : "completed"
 				}
 			},
 			"mdNames" : [
@@ -263,7 +263,7 @@ bye
 05. Get the entity and see the five attributes
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 1108
+Content-Length: 1053
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -298,7 +298,7 @@ Date: REGEX(.*)
     },
     "https://fiware.github.io/tutorials.Step-by-Step/schema/statusOfWork": {
       "type": "Property",
-      "value": "https://fiware.github.io/tutorials.Step-by-Step/schema/completed"
+      "value": "completed"
     }
   },
   "https://fiware.github.io/tutorials.Step-by-Step/schema/stocks": {

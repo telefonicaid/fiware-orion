@@ -158,7 +158,7 @@ MongoDB server REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://uri.fiware.org/ns/data-models#commercial",
+			"value" : "commercial",
 			"mdNames" : [ ]
 		},
 		"https://schema=org/address" : {
@@ -332,10 +332,10 @@ MongoDB server version: REGEX(.*)
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : [
-				"https://uri.fiware.org/ns/data-models#commercial",
-				"https://uri.fiware.org/ns/data-models#office",
-				"https://uri.fiware.org/ns/data-models#industrial",
-				"https://uri.fiware.org/ns/data-models#retail"
+				"commercial",
+				"office",
+				"industrial",
+				"retail"
 			],
 			"mdNames" : [ ]
 		}

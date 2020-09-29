@@ -3428,6 +3428,9 @@ static void updateEntity
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
+    if (orionldState.apiVersion == NGSI_LD_V1)
+      return;
+
     //
     // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
     // in only one place
@@ -3615,18 +3618,15 @@ static void updateEntity
 
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
-   * add the corresponding ContextElementResponse to the global response */
-  if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
-  {
+   * add the corresponding ContextElementResponse to the global response
+   */
+  if ((orionldState.apiVersion != NGSI_LD_V1) && ((action == ActionTypeUpdate) || (action == ActionTypeReplace)))
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-  }
 
   // StatusCode may be set already (if so, we keep the existing value)
 
   if (cerP->statusCode.code == SccNone)
-  {
     cerP->statusCode.fill(SccOk);
-  }
 
   responseP->contextElementResponseVector.push_back(cerP);
 }
@@ -3947,15 +3947,18 @@ void processContextElement
 
     if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
-      /* In the case of UPDATE or REPLACE we look for context providers */
-      searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-      cerP->statusCode.fill(SccOk);
-      responseP->contextElementResponseVector.push_back(cerP);
+      if (orionldState.apiVersion != NGSI_LD_V1)
+      {
+        /* In the case of UPDATE or REPLACE we look for context providers */
+        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+        cerP->statusCode.fill(SccOk);
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
 
       //
       // If no context providers found, then the UPDATE was simply for a non-found entity and an error should be returned
       //
-      if (forwardsPending(responseP) == false)
+      if ((orionldState.apiVersion == NGSI_LD_V1) || (forwardsPending(responseP) == false))
       {
         cerP->statusCode.fill(SccContextElementNotFound);
 
