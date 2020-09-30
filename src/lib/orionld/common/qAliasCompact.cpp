@@ -108,7 +108,7 @@ bool qAliasCompact(KjNode* qP, bool compact)
       else
       {
         // Expand the variable
-        alias = orionldContextItemExpand(orionldState.contextP, varStart, NULL, true, NULL);
+        alias = orionldContextItemExpand(orionldState.contextP, varStart, true, NULL);
       }
 
       if (alias != NULL)

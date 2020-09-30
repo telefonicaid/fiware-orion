@@ -279,7 +279,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
       entityType = dbEntityTypeP->value.s;
     }
 
-    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, NULL, true, NULL);
+    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, true, NULL);
     if (entityTypeExpanded == NULL)
     {
       LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));

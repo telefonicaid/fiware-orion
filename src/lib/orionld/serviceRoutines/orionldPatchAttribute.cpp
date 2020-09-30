@@ -349,7 +349,7 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
       (strcmp(attrName, "operationSpace")   != 0) &&
       (strcmp(attrName, "observedAt")       != 0))
   {
-    attrName = orionldContextItemExpand(orionldState.contextP, attrName, NULL, true, NULL);
+    attrName = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
   }
 
   //

@@ -42,7 +42,6 @@ extern "C"
 #include "orionld/common/urnCheck.h"                            // urnCheck
 #include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"          // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
@@ -609,13 +608,12 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   while (propertyP != NULL)
   {
-    bool    valueMayBeExpanded;
     KjNode* dbPropertyP;
 
     next = propertyP->next;
 
     if (orionldContextItemAlreadyExpanded(propertyP->name) == false)
-      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, &valueMayBeExpanded, true, NULL);
+      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, true, NULL);
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)
     {
@@ -623,9 +621,6 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
       orionldErrorResponseCreate(OrionldBadRequestData, "non-existing registration property", propertyP->name);
       return false;
     }
-
-    if (valueMayBeExpanded)
-      orionldContextValueExpand(propertyP);
 
     //
     // Replace the registration properties

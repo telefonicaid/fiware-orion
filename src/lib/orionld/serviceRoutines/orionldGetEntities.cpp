@@ -260,7 +260,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     // No expansion desired if the type is already a FQN
     if (urlCheck(type, &detail) == false)
-      type = orionldContextItemExpand(orionldState.contextP, type, NULL, true, NULL);
+      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
 
     isTypePattern = false;  // Just in case ...
   }
@@ -278,7 +278,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     for (int ix = 0; ix < typeVecItems; ix++)
     {
       if (urlCheck(typeVector[ix], &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], NULL, true, NULL);
+        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);
       else
         typeExpanded = typeVector[ix];
 
@@ -301,7 +301,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     for (int ix = 0; ix < vecItems; ix++)
     {
-      const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], NULL, true, NULL);
+      const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], true, NULL);
 
       mongoRequest.attributeList.push_back(longName);
     }

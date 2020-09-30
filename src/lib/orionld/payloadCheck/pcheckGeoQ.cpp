@@ -203,7 +203,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
 
     if (strcmp(pName, "location") != 0)
     {
-      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, NULL, true, NULL);
+      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, true, NULL);
       dotForEq(geopropertyP->value.s);
     }
   }

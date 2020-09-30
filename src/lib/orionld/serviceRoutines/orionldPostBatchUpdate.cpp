@@ -229,7 +229,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
           continue;
         }
 
-        char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, NULL, true, NULL);
+        char* expandedType = orionldContextItemExpand(contextP, inTypeP->value.s, true, NULL);
         if (strcmp(expandedType, dbTypeP->value.s) != 0)
         {
           entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", inTypeP->value.s, 400);

@@ -137,7 +137,7 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
   //
   for (int ix = 0; ix < attrs; ix++)
   {
-    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], NULL, true, NULL);
+    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], true, NULL);
   }
 
   *attrListExpandedVecP = expandedV;

@@ -35,7 +35,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // Own interface
 
 
@@ -69,12 +68,7 @@ bool kjTreeToMetadata(ContextAttribute* caP, KjNode* nodeP, char* caName, char**
   //
   // Expand sub-attribute name
   //
-  bool  valueMayBeExpanded  = false;
-
-  nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, &valueMayBeExpanded, true, NULL);
-
-  if (valueMayBeExpanded == true)
-    orionldContextValueExpand(nodeP);
+  nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, true, NULL);
 
   if (caP->metadataVector.lookupByName(nodeP->name) != NULL)
   {

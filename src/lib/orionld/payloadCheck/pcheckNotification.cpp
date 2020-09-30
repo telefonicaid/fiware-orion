@@ -63,7 +63,7 @@ bool pcheckNotification(KjNode* notificationP)
       for (KjNode* attrP = nItemP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         STRING_CHECK(attrP, "attributes array item");
-        attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, NULL, true, NULL);
+        attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
       }
     }
     else if (strcmp(nItemP->name, "format") == 0)

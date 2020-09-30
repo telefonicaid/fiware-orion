@@ -1431,7 +1431,7 @@ bool entitiesQuery
             //
             if (orionldState.uriParams.geoproperty != NULL)
             {
-              attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, NULL, true, NULL);
+              attrNameP = orionldContextItemExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);
               dotForEq(attrNameP);
             }
 
