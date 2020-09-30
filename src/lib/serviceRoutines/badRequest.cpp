@@ -27,7 +27,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
