@@ -3,16 +3,16 @@ FROM centos:${IMAGE_TAG}
 
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
-ARG GIT_NAME
-ARG GIT_REV_ORION
 ARG CLEAN_DEV_TOOLS
 
 ENV ORION_USER orion
-ENV GIT_NAME ${GIT_NAME:-telefonicaid}
-ENV GIT_REV_ORION ${GIT_REV_ORION:-master}
 ENV CLEAN_DEV_TOOLS ${CLEAN_DEV_TOOLS:-1}
 
+ENV ORION_SOURCES=/opt/fiware-orion
+
 WORKDIR /opt
+
+COPY / ${ORION_SOURCES}
 
 RUN \
     adduser --comment "${ORION_USER}" ${ORION_USER} && \
@@ -57,10 +57,7 @@ RUN \
     tar xfz v1.0.2.tar.gz && \
     mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include && \
     # Install orion from source
-    cd /opt && \
-    git clone https://github.com/${GIT_NAME}/fiware-orion && \
-    cd fiware-orion && \
-    git checkout ${GIT_REV_ORION} && \
+    cd ${ORION_SOURCES} && \
     make && \
     make install && \
     # reduce size of installed binaries
@@ -84,7 +81,7 @@ RUN \
            /opt/rapidjson-1.0.2 \
            /opt/v1.0.2.tar.gz \
            /usr/local/include/rapidjson \
-           /opt/fiware-orion \
+           ${ORION_SOURCES} \
            # We don't need to manage Linux account passwords requisites: lenght, mays/mins, etc.
            # This cannot be removed using yum as yum uses hard dependencies and doing so will 
            # uninstall essential packages
