@@ -120,7 +120,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         {
           STRING_CHECK(propP, "PropertyInfo::name");
 
-          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, NULL, true, NULL);
+          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, true, NULL);
           regP->dataProvided.propertyV.push_back(propP->value.s);
         }
       }
@@ -138,7 +138,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         {
           STRING_CHECK(relP, "RelationInfo::name");
 
-          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, NULL, true, NULL);
+          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, true, NULL);
           regP->dataProvided.relationshipV.push_back(relP->value.s);
         }
       }
@@ -336,7 +336,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       //
       // Expand the name of the property
       //
-      kNodeP->name = orionldContextItemExpand(orionldState.contextP, kNodeP->name, NULL, true, NULL);
+      kNodeP->name = orionldContextItemExpand(orionldState.contextP, kNodeP->name, true, NULL);
     }
 
     kNodeP = next;

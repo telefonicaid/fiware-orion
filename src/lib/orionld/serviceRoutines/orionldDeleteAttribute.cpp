@@ -86,7 +86,7 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
     attrNameP = attrName;
   else
   {
-    attrNameP = orionldContextItemExpand(orionldState.contextP, attrName, NULL, true, NULL);
+    attrNameP = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
     // attrNameP might point to a field inside the context cache - must make our own copy as 'dotForEq' will modifyit
     attrNameP = kaStrdup(&orionldState.kalloc, attrNameP);
   }

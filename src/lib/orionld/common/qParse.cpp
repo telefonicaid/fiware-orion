@@ -50,7 +50,7 @@ extern "C"
 //
 // After implementing expansion in metadata names, for attr.b.c, 'b' needs expansion also
 //
-static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
+static char* varFix(char* varPath, char** detailsP)
 {
   char* cP            = varPath;
   char* attrNameP     = varPath;
@@ -62,7 +62,6 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   char* rest          = NULL;
   char  fullPath[1100];
 
-  *valueMayBeExpandedP = false;
 
   //
   // Cases:
@@ -207,7 +206,7 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   //
   // All OK - let's compose ...
   //
-  char* longNameP = orionldContextItemExpand(orionldState.contextP, attrNameP, valueMayBeExpandedP, true, NULL);
+  char* longNameP = orionldContextItemExpand(orionldState.contextP, attrNameP, true, NULL);
 
   //
   // Now 'longNameP' needs to be adjusted forthe DB model, that changes '.' for '=' in the database.
@@ -234,7 +233,7 @@ static char* varFix(char* varPath, bool* valueMayBeExpandedP, char** detailsP)
   {
     if (strcmp(mdNameP, "observedAt") != 0)  // Don't expand "observedAt", nor ...
     {
-      char* mdLongNameP  = orionldContextItemExpand(orionldState.contextP, mdNameP, NULL, true, NULL);
+      char* mdLongNameP  = orionldContextItemExpand(orionldState.contextP, mdNameP, true, NULL);
 
       strncpy(mdLongName, mdLongNameP, sizeof(mdLongName) - 1);
 
@@ -319,7 +318,6 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
   QNode*     prevP      = NULL;
   QNode*     leftP      = NULL;
   QNode*     expressionStart;
-  bool       valueMayBeExpanded = false;
 
   while (qLexP != NULL)
   {
@@ -364,7 +362,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
       break;
 
     case QNodeVariable:
-      qLexP->value.v = varFix(qLexP->value.v, &valueMayBeExpanded, detailsP);
+      qLexP->value.v = varFix(qLexP->value.v, detailsP);
       if (qLexP->next == NULL)
       {
         if (compOpP == NULL)
@@ -428,9 +426,6 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
               return NULL;
             }
 
-            if ((valueP->type == QNodeStringValue) && (valueMayBeExpanded == true))
-              valueP->value.s = orionldContextItemExpand(orionldState.contextP, valueP->value.s, NULL, true, NULL);
-
             qNodeAppend(commaP, valueP);  // OK to enlist commaP and valueP as qLexP point to after valueP
           }
 
@@ -438,9 +433,6 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
           // Appending last list item
           //
           QNode* valueP = qLexP;
-
-          if ((valueP->type == QNodeStringValue) && (valueMayBeExpanded == true))
-            valueP->value.s = orionldContextItemExpand(orionldState.contextP, valueP->value.s, NULL, true, NULL);
 
           qNodeAppend(commaP, valueP);
         }
@@ -456,12 +448,7 @@ QNode* qParse(QNode* qLexList, char** titleP, char** detailsP)
         else if (commaP != NULL)
           qNodeAppend(compOpP, commaP);
         else
-        {
-          if ((qLexP->type == QNodeStringValue) && (valueMayBeExpanded == true))
-            qLexP->value.s = orionldContextItemExpand(orionldState.contextP, qLexP->value.s, NULL, true, NULL);
-
           qNodeAppend(compOpP, qLexP);
-        }
 
         qNodeV[qNodeIx++] = compOpP;
         compOpP    = NULL;

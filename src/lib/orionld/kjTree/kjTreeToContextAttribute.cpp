@@ -42,7 +42,6 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/payloadCheck/pcheckGeoProperty.h"              // pcheckGeoProperty
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
@@ -551,12 +550,8 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       (strcmp(kNodeP->name, "operationSpace")   != 0))
   {
     char*                longName;
-    bool                 valueMayBeExpanded  = false;
 
-    longName = orionldContextItemExpand(contextP, kNodeP->name, &valueMayBeExpanded, true, &contextItemP);
-
-    if (valueMayBeExpanded)
-      orionldContextValueExpand(kNodeP);
+    longName = orionldContextItemExpand(contextP, kNodeP->name, true, &contextItemP);
 
     kNodeP->name = longName;
     caP->name    = longName;

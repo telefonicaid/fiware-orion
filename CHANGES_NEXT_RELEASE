@@ -25,3 +25,4 @@
 * Issue #532  Return error if unknown URI parameter is used
 * Issue #527  Bug in update of relationships with datasetId
 * Issue #XXX  Fixed Release Mode compilation errors in Ubuntu 20.04
+* Issue #XXX  Removed the feature of expanding attribute values as it doesn't fit with JSON-LD

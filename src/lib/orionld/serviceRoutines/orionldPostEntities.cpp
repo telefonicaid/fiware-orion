@@ -89,9 +89,8 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
   KjNode*          modifiedAt;
   KjNode*          createdAt;
   char*            longName = NULL;
-  bool             valueMayBeExpanded;
 
-  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, &valueMayBeExpanded, true, NULL);
+  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
   attributeName = kaStrdup(&orionldState.kalloc, longName);
   dotForEq(attributeName);
 
@@ -263,7 +262,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   entityIdP->creDate       = getCurrentTime();
   entityIdP->modDate       = getCurrentTime();
   entityIdP->isTypePattern = false;
-  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
+  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);
 
 
   //
@@ -349,8 +348,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       kjChildAdd(kNodeP, modifiedAt);
 
       // Change to longName
-      bool   valueMayBeExpanded;
-      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, NULL);
+      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, true, NULL);
 
       longName = kaStrdup(&orionldState.kalloc, longName);
       dotForEq(longName);

@@ -304,7 +304,7 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
     //
     for (int ix = 0; ix < uriParamAttrs; ix++)
     {
-      uriParamAttrsV[ix] = orionldContextItemExpand(orionldState.contextP, uriParamAttrsV[ix], NULL, true, NULL);
+      uriParamAttrsV[ix] = orionldContextItemExpand(orionldState.contextP, uriParamAttrsV[ix], true, NULL);
     }
   }
 
@@ -375,7 +375,7 @@ static char** attrsListToArray(char* attrList, char* attrV[], int attrVecLen)
 
   for (int ix = 0; ix < items; ix++)
   {
-    attrV[ix] = orionldContextItemExpand(orionldState.contextP, attrV[ix], NULL, true, NULL);
+    attrV[ix] = orionldContextItemExpand(orionldState.contextP, attrV[ix], true, NULL);
     attrV[ix] = kaStrdup(&orionldState.kalloc, attrV[ix]);
     dotForEq(attrV[ix]);
   }

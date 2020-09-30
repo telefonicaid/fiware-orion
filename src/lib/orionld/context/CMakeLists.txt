@@ -33,7 +33,6 @@ SET (SOURCES
     orionldContextItemValueLookup.cpp
     orionldContextPrefixExpand.cpp
     orionldContextItemLookup.cpp
-    orionldContextValueExpand.cpp
     orionldContextItemExpand.cpp
     orionldContextFromBuffer.cpp
     orionldContextFromUrl.cpp
