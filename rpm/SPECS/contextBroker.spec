@@ -176,6 +176,8 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Oct 01 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.2-1
+
 * Wed Sep 23 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.1-1
 - Fix: potencial race condition related with DateTime attributes due to the usage of thread unsafe functions
 
