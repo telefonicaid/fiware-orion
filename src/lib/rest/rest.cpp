@@ -564,12 +564,17 @@ static void requestCompleted
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
-  LM_I(("Request finishes: %s %s", ciP->method.c_str(), uriForLogs));
   if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
   {
-    LM_I(("Request payload (%d bytes): %s", strlen(ciP->payload), ciP->payload));
+    // Payload variant
+    LM_I(("Request received: %s %s, request payload (%d bytes): %s, resonse code: %d",
+          ciP->method.c_str(), uriForLogs, strlen(ciP->payload), ciP->payload, ciP->httpStatusCode));
   }
-  LM_I(("Response code: %d", ciP->httpStatusCode));
+  else
+  {
+    // No-payload variant
+    LM_I(("Request received: %s %s, resonse code: %d", ciP->method.c_str(), uriForLogs, ciP->httpStatusCode));
+  }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {

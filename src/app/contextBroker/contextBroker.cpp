@@ -73,6 +73,9 @@
 #include "parseArgs/paBuiltin.h"
 #include "parseArgs/paIsSet.h"
 #include "parseArgs/paUsage.h"
+#include "parseArgs/paIterate.h"
+#include "parseArgs/paPrivate.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -813,6 +816,69 @@ static void notifFlowControlParse
 }
 
 
+/* ****************************************************************************
+*
+* cmdLineString -
+*
+* Exceptionally, this function return value doesn't follow the coding style rule
+* of not returning objects. It is due to simplicity. Note this function is
+* used only at startup, so no impact in performance is expected
+*/
+static std::string cmdLineString(int argC, char* argV[])
+{
+  std::string s;
+  for (int ix =  0; ix < argC; ix++)
+  {
+    s += std::string(argV[ix]);
+    if (ix != argC -1)
+    {
+      s += " ";
+    }
+  }
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* logEnvVars -
+*
+* Print env var configuration in INFO traces
+*/
+static void logEnvVars(void)
+{
+  PaiArgument* aP;
+  paIterateInit();
+  while ((aP = paIterateNext(paiList)) != NULL)
+  {
+    if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
+    {
+      if (aP->type == PaString)
+      {
+        LM_I(("env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
+      }
+      else if (aP->type == PaBool)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
+      }
+      else if (aP->type == PaInt)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
+      }
+      else if (aP->type == PaDouble)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
+      }
+      else
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+      }
+    }
+  }
+}
+
+
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -874,7 +940,6 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
-
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
@@ -910,6 +975,10 @@ int main(int argC, char* argV[])
   {
     _exit(s);
   }
+
+  // print startup info in logs
+  LM_I(("start command line <%s>", cmdLineString(argC, argV).c_str()));
+  logEnvVars();
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))

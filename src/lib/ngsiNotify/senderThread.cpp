@@ -113,9 +113,8 @@ void* startSenderThread(void* p)
     }
 
     // Add notificacion result summary in log INFO level
-    LM_I(("Notification transaction finishes (subId: %s): %s %s",
-          params->subscriptionId.c_str(), params->verb.c_str(), url.c_str()));
-    LM_I(("Response code: %d", statusCode));
+    LM_I(("Notif delivered (subId: %s): %s %s, response code: %d",
+          params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode));
 
     // End transaction
     lmTransactionEnd();
