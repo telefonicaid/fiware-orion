@@ -936,8 +936,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
                 "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %s, %s, NULL)",
                 dbAllTablesLocal.entityTableArray[dbEntityLoop].entityId,
                 dbAllTablesLocal.entityTableArray[dbEntityLoop].entityType,
-                "createdAt",
-                "modifiedAt");
+                dbAllTablesLocal.entityTableArray[dbEntityLoop].createdAt,
+                dbAllTablesLocal.entityTableArray[dbEntityLoop].modifiedAt);
         //
         // Some traces just to see how the KjNode tree works
         //
@@ -950,15 +950,24 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
         int dbAttribBufferSize = 10 * 1024;
         char* dbAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbAttribBufferSize);
         bzero(dbAttribStrBuffer, dbAttribBufferSize);
+
+        int allValuesSize = 2048;
+        char* allValues = kaAlloc(&orionldState.kalloc,allValuesSize);
+
+        allValuesRender (&dbAllTablesLocal.attributeTableArray[dbAttribLoop], allValues, allValuesSize);
+
             //Chandra-TBI
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
-            "value_object, value_datetime, geo_property, created_at, modified_at, observed_at) "
-                " VALUES (%s, %s, NULL, %s, %s, NULL)",
+            "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 dbAllTablesLocal.attributeTableArray[dbAttribLoop].entityId,
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].entityType,
-                "createdAt",
-                "modifiedAt");
+                dbAllTablesLocal.attributeTableArray[dbAttribLoop].attributeId,
+                dbAllTablesLocal.attributeTableArray[dbAttribLoop].attributeValueType,
+                dbAllTablesLocal.attributeTableArray[dbAttribLoop].subProperty,
+                allValues,
+                dbAllTablesLocal.attributeTableArray[dbAttribLoop].createdAt,
+                dbAllTablesLocal.attributeTableArray[dbAttribLoop].modifiedAt);
     }
 
     for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
@@ -971,6 +980,79 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
 
     return true;
 }
+
+void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)
+{
+    switch (attrLocalP->attributeValueType)
+    {
+      case EnumValueString:
+        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->valueString);
+
+        case EnumValueNumber:
+          snprintf(allValues, allValuesSize, "NULL, %s, NULL, NULL, NULL",attrLocalP->valueNumber);
+
+        case EnumValueBool:
+          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",attrLocalP->valueBool);
+
+        case EnumValueNumber:
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->EnumValueArray);
+
+        case EnumValueNumber:
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->valueRelation);
+
+        default:
+          LM_W(("Teamporal - Bad Input - Key values not supported"));
+          return;
+    }
+
+    char* int unitCodeValuesSize = 128;
+    char* unitCodeValue = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
+    if (attrLocalP->unitCode == NULL)
+    {
+        snprintf(unitCodeValue, unitCodeValuesSize, "NULL", attrLocalP->unitCode);
+    }
+    else
+    {
+        snprintf(unitCodeValue, unitCodeValuesSize, "%s", attrLocalP->unitCode);
+    }
+
+    char* int dataSetIdSize = 128;
+    char* dataSetIdValue = kaAlloc(&orionldState.kalloc, dataSetIdSize);
+    if (attrLocalP->dataSetId == NULL)
+    {
+        snprintf(dataSetIdValue, dataSetIdSize, "NULL", attrLocalP->dataSetId);
+    }
+    else
+    {
+        snprintf(dataSetIdValue, dataSetIdSize, "%s", attrLocalP->dataSetId);
+    }
+
+    char* int geoProprtySize = 512;
+    char* geoProprtyValue = kaAlloc(&orionldState.kalloc, geoProprtySize);
+    if (attrLocalP->geoProperty == NULL)
+    {
+        snprintf(geoProprtyValue, geoProprtySize, "NULL", attrLocalP->geoProperty);
+    }
+    else
+    {
+        snprintf(geoProprtyValue, geoProprtySize, "%s", attrLocalP->geoProperty);
+    }
+
+    char* int observedAtSize = 512;
+    char* observedAtValue = kaAlloc(&orionldState.kalloc, observedAtSize);
+    if (attrLocalP->observedAt == NULL)
+    {
+        snprintf(geoProprtyValue, observedAtSize, "NULL", attrLocalP->observedAt);
+    }
+    else
+    {
+        snprintf(geoProprtyValue, observedAtSize, "%s", attrLocalP->observedAt);
+    }
+
+    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
+        unitCodeValue, dataSetIdValue, allValues, geoProprtyValue, observedAtSize);
+}
+
 
 // ----------------------------------------------------------------------------
 //

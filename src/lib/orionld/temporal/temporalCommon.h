@@ -101,7 +101,6 @@ typedef struct OrionldTemporalDbEntityTable
 typedef struct OrionldTemporalDbAttributeTable
 {
   char*                                     entityId;
-  char*                                     attributeId;  // Chandra-TBR
   char*                                     attributeName;
   char*                                     attributeType;  // Chandra to change this to Enum - Property, Geo-property & Relationship kjType
   OrionldTemporalAttributeValueTypeEnum     attributeValueType;
@@ -109,9 +108,9 @@ typedef struct OrionldTemporalDbAttributeTable
   char*                                     unitCode;
   char*                                     dataSetId;
   char*                                     valueString;
-  bool                                      valueBoolean;
-  double                                    valueNumber;
-  char*                                     valueRelation;
+  bool                                      valueNumber;
+  double                                    valueBool;
+  char*                                     valueArray;
   char*                                     valueObject;
   double                                    valueDatetime;
   double                                    createdAt;
@@ -130,7 +129,6 @@ typedef struct OrionldTemporalDbSubAttributeTable
 {
   char*                                     entityId;
   char*                                     attributeId;
-  char*                                     subAtrributeId;  // Chandra-TBR
   char*                                     subAttributeName;
   char*                                     subAttributeType;  // Chandra to change this to Enum - Property, Geo-property & Relationship kjType
   OrionldTemporalAttributeValueTypeEnum     subAttributeValueType;
