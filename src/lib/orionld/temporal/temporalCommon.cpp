@@ -78,7 +78,7 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
     bzero(dbEntityTableLocal, entityArrayTotalSize);
 
-    dbEntityTableLocal[0].entityName = orionldState.payloadIdNode->value.s;
+    dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
     dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
 
 /*
@@ -160,8 +160,8 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     int attrIndex=0;
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
-       dbAttributeTableLocal[attrIndex++].entityName = dbEntityTableLocal[0].entityName;
-       attrExtract ( attrP, &dbAttributeTableLocal[attrIndex], attrIndex);
+       dbAttributeTableLocal[attrIndex++].entityId = dbEntityTableLocal[0].entityId;
+        ( attrP, &dbAttributeTableLocal[attrIndex], attrIndex);
        attrIndex++;
     }
 
@@ -330,7 +330,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
    //int oldTemporalTreeNodeLevel = 0;
    //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
    //{
-    dbAttributeTableLocal.attributeName = attrP->name;
+    dbAttributeTableLocal->attributeName = attrP->name;
     if (attrP->type != KjObject)
     {
         LM_W(("Teamporal - Bad Input - Key values not supported"));
@@ -339,28 +339,28 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
 
     KjNode* attrTypeP  = kjLookup(attrP, "type");
     kjChildRemove (attrP,attrTypeP);
-    dbAttributeTableLocal.attributeType = attrTypeP->value.s;
+    dbAttributeTableLocal->attributeType = attrTypeP->value.s;
 
-     if (strcmp (dbAttributeTableLocal.attributeType,"Relationship") == 0)
+     if (strcmp (dbAttributeTableLocal->attributeType,"Relationship") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
     {
         KjNode* attributeObject  = kjLookup(attrP, "object");
         kjChildRemove (attrP,attributeObject);
 
         // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-        dbAttributeTableLocal.attributeValueType  = EnumValueRelation;
-        dbAttributeTableLocal.valueString = attributeObject->value.s;
-        LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal.valueString));
+        dbAttributeTableLocal->attributeValueType  = EnumValueRelation;
+        dbAttributeTableLocal->valueString = attributeObject->value.s;
+        LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal->valueString));
 
     }
-    else if (strcmp (dbAttributeTableLocal.attributeType,"GeoProperty") == 0)
+    else if (strcmp (dbAttributeTableLocal->attributeType,"GeoProperty") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
     {
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
         kjChildRemove (attrP,valueP);
         // Chandra-TBI
     }
-    else if (strcmp (dbAttributeTableLocal.attributeType,"Property") == 0)
+    else if (strcmp (dbAttributeTableLocal->attributeType,"Property") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
     {
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
@@ -368,36 +368,36 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
 
         if (valueP->type == KjFloat)
         {
-              dbAttributeTableLocal.attributeValueType  = EnumValueNumber;
-              dbAttributeTableLocal.valueNumber = valueP->value.f;
+              dbAttributeTableLocal->attributeValueType  = EnumValueNumber;
+              dbAttributeTableLocal->valueNumber = valueP->value.f;
         }
         else if (valueP->type == KjInt)
         {
-              dbAttributeTableLocal.attributeValueType  = EnumValueNumber;
-              dbAttributeTableLocal.valueNumber = valueP->value.i;
+              dbAttributeTableLocal->attributeValueType  = EnumValueNumber;
+              dbAttributeTableLocal->valueNumber = valueP->value.i;
         }
         else if (valueP->type == KjArray)
         {
-              dbAttributeTableLocal.attributeValueType  = EnumValueArray;
-              dbAttributeTableLocal.valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal.valueString, 1024);
+              dbAttributeTableLocal->attributeValueType  = EnumValueArray;
+              dbAttributeTableLocal->valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal->valueString, 1024);
         }
         else if (valueP->type == KjObject)
         {
-              dbAttributeTableLocal.attributeValueType  = EnumValueObject;
-              dbAttributeTableLocal.valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
-              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal.valueString, 1024);
+              dbAttributeTableLocal->attributeValueType  = EnumValueObject;
+              dbAttributeTableLocal->valueString = kaAlloc(&orionldState.kalloc, 1024); //Chandra-TBD Not smart
+              kjRender(orionldState.kjsonP, valueP->value.firstChildP, dbAttributeTableLocal->valueString, 1024);
         }
         else if (valueP->type == KjBoolean)
         {
-              dbAttributeTableLocal.attributeValueType  = EnumValueBool;
-              dbAttributeTableLocal.valueNumber = valueP->value.b;
+              dbAttributeTableLocal->attributeValueType  = EnumValueBool;
+              dbAttributeTableLocal->valueNumber = valueP->value.b;
 
         }
         else if (valueP->type == KjString)
         {
-              dbAttributeTableLocal.attributeValueType  = EnumValueString;
-              dbAttributeTableLocal.valueString = valueP->value.s;
+              dbAttributeTableLocal->attributeValueType  = EnumValueString;
+              dbAttributeTableLocal->valueString = valueP->value.s;
         }
     }
 
@@ -446,7 +446,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
 
     if (attrP->value.firstChildP != NULL)
     {
-        dbAttributeTableLocal.subProperty = true;
+        dbAttributeTableLocal->subProperty = true;
         int subAttrs = 0;
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
@@ -460,21 +460,21 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         int subAttrIx=0;
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
-            dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal.attributeName;
+            dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
             subAttrExtract (subAttrP, dbSubAttributeTableLocal[subAttrIx++]);
         }
     }
 
-    dbAttributeTableLocal.createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-    dbAttributeTableLocal.modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    dbAttributeTableLocal->createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    dbAttributeTableLocal->modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
 
     KjNode* observedAtP = kjLookup(attrP, "observedAt");
     if (observedAtP != NULL)
     {
         if (observedAtP->type == KjString)
-            dbAttributeTableLocal.observedAt = parse8601Time(observedAtP->value.s);
+            dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
         else
-            dbAttributeTableLocal.observedAt = observedAtP->value.f;
+            dbAttributeTableLocal->observedAt = observedAtP->value.f;
     }
 
      //oldTemporalTreeNodeLevel++;
@@ -933,7 +933,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
         bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
         snprintf(dbEntityStrBuffer, dbEntityBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
-                "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %s, %s, NULL)",
+                "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %f, %f, NULL)",
                 dbAllTablesLocal.entityTableArray[dbEntityLoop].entityId,
                 dbAllTablesLocal.entityTableArray[dbEntityLoop].entityType,
                 dbAllTablesLocal.entityTableArray[dbEntityLoop].createdAt,
@@ -960,11 +960,11 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesL
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                " VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal.attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal.attributeTableArray[dbAttribLoop].attributeId,
                 dbAllTablesLocal.attributeTableArray[dbAttribLoop].attributeValueType,
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].subProperty,
+                (dbAllTablesLocal.attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 allValues,
                 dbAllTablesLocal.attributeTableArray[dbAttribLoop].createdAt,
                 dbAllTablesLocal.attributeTableArray[dbAttribLoop].modifiedAt);

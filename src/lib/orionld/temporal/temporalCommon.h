@@ -108,8 +108,8 @@ typedef struct OrionldTemporalDbAttributeTable
   char*                                     unitCode;
   char*                                     dataSetId;
   char*                                     valueString;
-  bool                                      valueNumber;
-  double                                    valueBool;
+  long long int                             valueNumber;
+  bool                                      valueBool;
   char*                                     valueArray;
   char*                                     valueObject;
   double                                    valueDatetime;
@@ -136,7 +136,7 @@ typedef struct OrionldTemporalDbSubAttributeTable
   char*                                     subAttributeDataSetId;
   char*                                     subAttributeValueString;
   bool                                      subAttributeValueBoolean;
-  double                                    subAttributeValueNumber;
+  long long int                             subAttributeValueNumber;
   char*                                     subAttributeValueRelation;
   char*                                     subAttributeValueObject;
   double                                    subAttributeValueDatetime;
@@ -185,7 +185,7 @@ OrionldTemporalDbAllTables*  attrSubattrExtract();
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
-OrionldTemporalDbAllTables&  singleTemporalEntityExtract();
+OrionldTemporalDbAllTables*  singleTemporalEntityExtract();
 
 // -----------------------------------------------------------------------------
 //
@@ -212,7 +212,7 @@ extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
 void  attrSubattrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSubAttributeTableLocal);
 
 
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable& dbAttributeTableLocal);
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
 
 
 #endif  // TEMPORAL_COMMON_H_
