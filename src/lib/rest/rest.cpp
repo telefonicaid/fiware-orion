@@ -567,13 +567,13 @@ static void requestCompleted
   if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
   {
     // Payload variant
-    LM_I(("Request received: %s %s, request payload (%d bytes): %s, resonse code: %d",
+    LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d",
           ciP->method.c_str(), uriForLogs, strlen(ciP->payload), ciP->payload, ciP->httpStatusCode));
   }
   else
   {
     // No-payload variant
-    LM_I(("Request received: %s %s, resonse code: %d", ciP->method.c_str(), uriForLogs, ciP->httpStatusCode));
+    LM_I(("Request received: %s %s, response code: %d", ciP->method.c_str(), uriForLogs, ciP->httpStatusCode));
   }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))

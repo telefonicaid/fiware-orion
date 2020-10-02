@@ -328,6 +328,17 @@ extern int transactionIdGet(bool readonly = true);
 
 /* ****************************************************************************
 *
+* transactionIdGetAsString -
+*
+* Different from transactionIdGet(), this function returns the full transID,
+* not only the integer counter
+*/
+extern char* transactionIdGetAsString(void);
+
+
+
+/* ****************************************************************************
+*
 * transactionIdSet - set the transaction ID
 *
 * To ensure a unique identifier of the transaction, the startTime down to milliseconds
@@ -341,6 +352,24 @@ extern int transactionIdGet(bool readonly = true);
 *
 */
 extern void transactionIdSet(void);
+
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - set the transaction ID string
+*
+*/
+extern void transactionIdSet(const char* transId);
+
+
+
+/* ****************************************************************************
+*
+* correlationIdGet -
+*
+*/
+extern  char* correlationIdGet(void);
 
 
 

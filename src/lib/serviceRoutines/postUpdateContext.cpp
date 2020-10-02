@@ -101,7 +101,13 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 * 7. Freeing memory
 *
 */
-static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP)
+static bool updateForward
+(
+  ConnectionInfo*         ciP,
+  UpdateContextRequest*   upcrP,
+  const std::string&      regId,
+  unsigned int            correlatorCounter,
+  UpdateContextResponse*  upcrsP)
 {
   std::string      ip;
   std::string      protocol;
@@ -138,6 +144,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   std::string     verb;
   std::string     resource;
+  std::string     op;
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = "application/json";
@@ -148,15 +155,13 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
 
-    verb     = "POST";
-    resource = prefix + "/updateContext";
+    op = "/updateContext";
   }
   else
   {
     TIMED_RENDER(payload = upcrP->toJson());
 
-    verb     = "POST";
-    resource = prefix + "/op/update";
+    op = "/op/update";
 #if 0
     // FIXME #3485: this part is not removed by the moment, in the case it may be useful in the
     // context of issue #3485
@@ -179,6 +184,9 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 #endif
   }
 
+  verb     = "POST";
+  resource = prefix + op;
+
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
 
@@ -189,6 +197,10 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   std::map<std::string, std::string>  noHeaders;
   long long                           statusCode;
+
+  char suffix[STRING_SIZE_FOR_INT];
+  snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+  std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
 
   r = httpRequestSend(fromIp,   // thread variable
                       ip,
@@ -201,7 +213,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       resource,
                       mimeType,
                       cleanPayload,
-                      ciP->httpHeaders.correlator,
+                      effectiveCorrelator,
                       "",
                       &out,
                       &statusCode,
@@ -212,6 +224,10 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
+
+    LM_I(("Request forwarded (regId: %s): %s %s%s, request payload (%d bytes): %s, response payload (0 bytes): , response code: %s",
+          regId.c_str(), verb.c_str(), upcrP->contextProvider.c_str(), op.c_str(), payload.length(), payload.c_str(), out.c_str()));
+
     return false;
   }
 
@@ -248,6 +264,9 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
       upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
+
+    LM_I(("Request forwarded (regId: %s): %s %s%s, request payload (%d bytes): %s, response payload (%d bytes): %s, response code: %d",
+          regId.c_str(), verb.c_str(), upcrP->contextProvider.c_str(), op.c_str(), payload.length(), payload.c_str(), strlen(cleanPayload), cleanPayload, statusCode));
 
     //
     // NOTE
@@ -638,6 +657,8 @@ std::string postUpdateContext
   UpdateContextRequestVector  requestV;
   UpdateContextResponse       response;
 
+  std::vector<std::string>    regIdsV;
+
   response.errorCode.fill(SccOk);
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
@@ -687,6 +708,7 @@ std::string postUpdateContext
           reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
           reqP->updateActionType = ActionTypeUpdate;
           requestV.push_back(reqP);
+          regIdsV.push_back(aP->providingApplication.getRegId());
         }
 
         //
@@ -722,6 +744,14 @@ std::string postUpdateContext
   //
   bool forwardOk = true;
 
+  // Note that queryForward() (due to internal calls to httpRequestSend())
+  // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
+  // FIXME P5: maybe this is not the right place to store&recover old transaction.
+  // What about inside httpRequestSend?
+
+  std::string prevCoorId  = correlationIdGet();
+  std::string prevTransId = transactionIdGetAsString();
+
   for (unsigned int ix = 0; ix < requestV.size() && ix < cprForwardLimit; ++ix)
   {
     if (requestV[ix]->contextProvider.empty())
@@ -733,7 +763,7 @@ std::string postUpdateContext
     UpdateContextResponse upcrs;
     bool                  b;
 
-    b = updateForward(ciP, requestV[ix], &upcrs);
+    b = updateForward(ciP, requestV[ix], regIdsV[ix], ix + 1, &upcrs);
 
     if (b == false)
     {
@@ -745,6 +775,9 @@ std::string postUpdateContext
     //
     response.merge(&upcrs);
   }
+
+  correlatorIdSet(prevCoorId.c_str());
+  transactionIdSet(prevTransId.c_str());
 
   //
   // Note this is a slight break in the separation of concerns among the different layers (i.e.

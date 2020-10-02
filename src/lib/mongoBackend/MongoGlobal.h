@@ -514,7 +514,8 @@ extern void cprLookupByAttribute
   MimeType*                                perEntPaMimeType,
   std::string*                             perAttrPa,
   MimeType*                                perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP
+  ProviderFormat*                          providerFormatP,
+  std::string*                             regId
 );
 
 
