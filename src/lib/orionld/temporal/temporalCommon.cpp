@@ -156,12 +156,13 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     bzero(dbAttributeTableLocal, attribArrayTotalSize);
 
     dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
+    bzero(dbSubAttributeTableLocal, attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
 
     int attrIndex=0;
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
-       dbAttributeTableLocal[attrIndex++].entityId = dbEntityTableLocal[0].entityId;
-       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], &&dbSubAttributeTableLocal, attrIndex);
+       dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
+       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], *dbSubAttributeTableLocal[attrIndex], attrIndex);
        attrIndex++;
     }
 
@@ -325,8 +326,7 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
 }
 
 
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
-  OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex)  
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex)
 {
    //int oldTemporalTreeNodeLevel = 0;
    //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -464,7 +464,8 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
-            attrSubAttrExtract (subAttrP, dbSubAttributeTableLocal[subAttrIx++]);
+            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[subAttrIx]);
+            subAttrIx++;
         }
     }
 
