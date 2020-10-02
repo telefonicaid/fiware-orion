@@ -161,7 +161,7 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
        dbAttributeTableLocal[attrIndex++].entityId = dbEntityTableLocal[0].entityId;
-        ( attrP, &dbAttributeTableLocal[attrIndex], attrIndex);
+       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], attrIndex);
        attrIndex++;
     }
 
@@ -319,7 +319,7 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
 */
     dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
     dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-    dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
+    dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
 
     return dbAllTablesLocal;
 }
@@ -461,7 +461,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
-            subAttrExtract (subAttrP, dbSubAttributeTableLocal[subAttrIx++]);
+            attrSubAttrExtract (subAttrP, dbSubAttributeTableLocal[subAttrIx++]);
         }
     }
 
@@ -483,7 +483,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
 
 
 
-void  attrSubattrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal)
+void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal)
 {
     //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     //{
