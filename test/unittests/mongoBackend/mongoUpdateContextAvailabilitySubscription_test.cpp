@@ -300,25 +300,25 @@ static void prepareDatabasePatternTrue(void)
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
   BSONObj reg1 = BSON(
-              "_id" << "ff37" <<
+              "_id" << OID("51307b66f481db11bf86ff37") <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr1 << cr2));
 
   BSONObj reg2 = BSON(
-              "_id" << "ee48" <<
+              "_id" << OID("51307b66f481db11bf86ee48") <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr3));
 
   BSONObj reg3 = BSON(
-              "_id" << "ee00" <<
+              "_id" << OID("51307b66f481db11bf86ee00") <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr4));
 
   BSONObj reg4 = BSON(
-              "_id" << "ff00" <<
+              "_id" << OID("51307b66f481db11bf86ff00") <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr5));
