@@ -921,9 +921,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbAttribTable = sizeof(dbAllTablesLocal.attributeTableArray);
-    int dbSubAttribTable = sizeof(dbAllTablesLocal.subAttributeTableArray);
+    int dbEntityTable = sizeof(dbAllTablesLocal->entityTableArray);
+    int dbAttribTable = sizeof(dbAllTablesLocal->attributeTableArray);
+    int dbSubAttribTable = sizeof(dbAllTablesLocal->subAttributeTableArray);
 
 
     for (int dbEntityLoop=0; dbEntityLoop < dbEntityTable; dbEntityLoop++)
@@ -934,10 +934,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
         snprintf(dbEntityStrBuffer, dbEntityBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
                 "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %f, %f, NULL)",
-                dbAllTablesLocal.entityTableArray[dbEntityLoop].entityId,
-                dbAllTablesLocal.entityTableArray[dbEntityLoop].entityType,
-                dbAllTablesLocal.entityTableArray[dbEntityLoop].createdAt,
-                dbAllTablesLocal.entityTableArray[dbEntityLoop].modifiedAt);
+                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId,
+                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType,
+                dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
+                dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt);
         //
         // Some traces just to see how the KjNode tree works
         //
@@ -954,20 +954,20 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         int allValuesSize = 2048;
         char* allValues = kaAlloc(&orionldState.kalloc,allValuesSize);
 
-        allValuesRender (&dbAllTablesLocal.attributeTableArray[dbAttribLoop], allValues, allValuesSize);
+        allValuesRender (&dbAllTablesLocal->attributeTableArray[dbAttribLoop], allValues, allValuesSize);
 
             //Chandra-TBI
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
                 " VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].entityId,
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].attributeId,
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].attributeValueType,
-                (dbAllTablesLocal.attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeId,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
+                (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 allValues,
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].createdAt,
-                dbAllTablesLocal.attributeTableArray[dbAttribLoop].modifiedAt);
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt);
     }
 
     for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
