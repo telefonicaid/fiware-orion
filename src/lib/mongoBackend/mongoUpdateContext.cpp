@@ -160,6 +160,7 @@ HttpStatusCode mongoUpdateContext
                                          fiwareCorrelator,
                                          ngsiV2AttrsFormat,
                                          forcedUpdate,
+                                         notifSent,
                                          apiVersion,
                                          ngsiv2Flavour);
     }

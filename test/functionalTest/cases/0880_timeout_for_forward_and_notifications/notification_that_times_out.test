@@ -94,7 +94,7 @@ echo
 
 echo "04. Grep in brokers logfile to see that the notification failed and that the broker thread continued"
 echo "===================================================================================================="
-grep "Timeout was reached" /tmp/contextBroker.log | awk -F 'notification failure for sender-thread: ' '{ print $2 }'
+grep "notification failure for sender-thread: Timeout was reached" /tmp/contextBroker.log | awk -F 'notification failure for sender-thread: ' '{ print $2 }'
 echo
 echo
 

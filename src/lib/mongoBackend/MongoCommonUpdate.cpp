@@ -1712,7 +1712,8 @@ static unsigned int processSubscriptions
   std::string*                                   err,
   const std::string&                             tenant,
   const std::string&                             xauthToken,
-  const std::string&                             fiwareCorrelator
+  const std::string&                             fiwareCorrelator,
+  unsigned int                                   notifStartCounter
 )
 {
   *err = "";
@@ -1823,7 +1824,7 @@ static unsigned int processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
-                                                                notifSent + 1,
+                                                                notifStartCounter + notifSent + 1,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -2871,6 +2872,7 @@ static unsigned int updateEntity
   const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
+  unsigned int                    notifStartCounter,
   const std::string&              ngsiV2AttrsFormat
 )
 {
@@ -3218,7 +3220,8 @@ static unsigned int updateEntity
                                                 &err,
                                                 tenant,
                                                 xauthToken,
-                                                fiwareCorrelator);
+                                                fiwareCorrelator,
+                                                notifStartCounter);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -3364,6 +3367,7 @@ unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
+  unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3537,6 +3541,7 @@ unsigned int processContextElement
                              forcedUpdate,
                              apiVersion,
                              fiwareCorrelator,
+                             notifStartCounter,
                              ngsiV2AttrsFormat);
   }
 
@@ -3674,7 +3679,8 @@ unsigned int processContextElement
                                          &errReason,
                                          tenant,
                                          xauthToken,
-                                         fiwareCorrelator);
+                                         fiwareCorrelator,
+                                         notifStartCounter);
 
         notifyCerP->release();
         delete notifyCerP;

@@ -127,6 +127,7 @@ static void* workerFunc(void* pSyncQ)
       url = params->ip + ":" + portV + params->resource;
 
       long long    statusCode = -1;
+      std::string  out;
 
       if (simulatedNotification)
       {
@@ -135,7 +136,6 @@ static void* workerFunc(void* pSyncQ)
       }
       else // we'll send the notification
       {
-        std::string  out;
         int          r;
 
         r =  httpRequestSendWithCurl(curl,
@@ -184,8 +184,15 @@ static void* workerFunc(void* pSyncQ)
       }
 
       // Add notificacion result summary in log INFO level
-      LM_I(("Notif delivered (subId: %s): %s %s, response code: %d",
-            params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode));
+      if (statusCode != -1) {
+        LM_I(("Notif delivered (subId: %s): %s %s, response code: %d",
+              params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode));
+      }
+      else
+      {
+        LM_I(("Notif delivered (subId: %s): %s %s, response code: %s",
+              params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str()));
+      }
 
       // End transaction
       lmTransactionEnd();

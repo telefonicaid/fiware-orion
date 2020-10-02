@@ -2519,7 +2519,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _)).Times(0);
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
