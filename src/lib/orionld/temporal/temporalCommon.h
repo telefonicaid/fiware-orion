@@ -192,7 +192,7 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract();
 // temporalExecSqlStatement
 //
 //
-extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables dbAllTablesLocal);
+extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal);
 
 // ----------------------------------------------------------------------------
 //
