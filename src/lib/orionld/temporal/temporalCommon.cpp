@@ -161,7 +161,7 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
        dbAttributeTableLocal[attrIndex++].entityId = dbEntityTableLocal[0].entityId;
-       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], attrIndex);
+       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], &&dbSubAttributeTableLocal, attrIndex);
        attrIndex++;
     }
 
@@ -325,7 +325,8 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
 }
 
 
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex)  //Chandra-TBC . to ->
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
+  OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex)  
 {
    //int oldTemporalTreeNodeLevel = 0;
    //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -443,6 +444,8 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
+
+
 
     if (attrP->value.firstChildP != NULL)
     {

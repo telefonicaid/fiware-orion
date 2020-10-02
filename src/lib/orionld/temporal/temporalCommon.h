@@ -212,7 +212,8 @@ extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
 void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& dbSubAttributeTableLocal);
 
 
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
-
+//void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
+  OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex);
 
 #endif  // TEMPORAL_COMMON_H_
