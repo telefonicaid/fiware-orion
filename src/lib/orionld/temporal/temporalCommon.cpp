@@ -156,13 +156,13 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     bzero(dbAttributeTableLocal, attribArrayTotalSize);
 
     dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
-    bzero(dbSubAttributeTableLocal, attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
+    bzero(dbSubAttributeTableLocal, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
 
     int attrIndex=0;
     for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
        dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
-       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], *dbSubAttributeTableLocal[attrIndex], attrIndex);
+       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], &dbSubAttributeTableLocal[attrIndex], attrIndex);
        attrIndex++;
     }
 
@@ -491,11 +491,11 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
 {
     //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
     //{
-     dbSubAttributeTableLocal->subAttributeName = attrP->name;
-     if (attrP->type != KjObject)
+     dbSubAttributeTableLocal->subAttributeName = subAttrP->name;
+     if (subAttrP->type != KjObject)
      {
-         LM_W(("Teamporal - Bad Input - Key values not supported"));
-         continue;
+         LM_W(("Temporal - Bad Input - Key values not supported"));
+         return;
      }
 
      KjNode* attrTypeP  = kjLookup(attrP, "type");
@@ -996,12 +996,12 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
           snprintf(allValues, allValuesSize, "NULL, %s, NULL, NULL, NULL",attrLocalP->valueNumber);
 
         case EnumValueBool:
-          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",attrLocalP->valueBool);
+          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
 
-        case EnumValueNumber:
+        case EnumValueArray:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->EnumValueArray);
 
-        case EnumValueNumber:
+        case EnumValueObject:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->valueRelation);
 
         default:
@@ -1009,7 +1009,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
           return;
     }
 
-    char* int unitCodeValuesSize = 128;
+    int unitCodeValuesSize = 128;
     char* unitCodeValue = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
     if (attrLocalP->unitCode == NULL)
     {
@@ -1020,7 +1020,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(unitCodeValue, unitCodeValuesSize, "%s", attrLocalP->unitCode);
     }
 
-    char* int dataSetIdSize = 128;
+    int dataSetIdSize = 128;
     char* dataSetIdValue = kaAlloc(&orionldState.kalloc, dataSetIdSize);
     if (attrLocalP->dataSetId == NULL)
     {
@@ -1031,7 +1031,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(dataSetIdValue, dataSetIdSize, "%s", attrLocalP->dataSetId);
     }
 
-    char* int geoProprtySize = 512;
+    int geoProprtySize = 512;
     char* geoProprtyValue = kaAlloc(&orionldState.kalloc, geoProprtySize);
     if (attrLocalP->geoProperty == NULL)
     {
@@ -1042,7 +1042,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(geoProprtyValue, geoProprtySize, "%s", attrLocalP->geoProperty);
     }
 
-    char* int observedAtSize = 512;
+    int observedAtSize = 512;
     char* observedAtValue = kaAlloc(&orionldState.kalloc, observedAtSize);
     if (attrLocalP->observedAt == NULL)
     {

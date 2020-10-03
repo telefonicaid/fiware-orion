@@ -59,10 +59,8 @@ enum OrionldTemporalAttributeValueTypeEnum
   EnumValueNumber,
   EnumValueBool,
   EnumValueObject,
-  EnumValueGeo,
   EnumValueArray,
   EnumValueDateTime,
-  EnumValueRelation
 };
 
 
@@ -128,7 +126,7 @@ typedef struct OrionldTemporalDbAttributeTable
 typedef struct OrionldTemporalDbSubAttributeTable
 {
   char*                                     entityId;
-  char*                                     attributeId;
+  char*                                     attributeName;
   char*                                     subAttributeName;
   char*                                     subAttributeType;  // Chandra to change this to Enum - Property, Geo-property & Relationship kjType
   OrionldTemporalAttributeValueTypeEnum     subAttributeValueType;
@@ -213,6 +211,8 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& d
 
 
 //void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex);
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex);
+
+void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
 #endif  // TEMPORAL_COMMON_H_
