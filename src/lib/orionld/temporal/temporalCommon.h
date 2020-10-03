@@ -60,7 +60,7 @@ enum OrionldTemporalAttributeValueTypeEnum
   EnumValueBool,
   EnumValueObject,
   EnumValueArray,
-  EnumValueDateTime,
+  EnumValueDateTime
 };
 
 

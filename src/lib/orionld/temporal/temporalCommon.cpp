@@ -349,7 +349,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         kjChildRemove (attrP,attributeObject);
 
         // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-        dbAttributeTableLocal->attributeValueType  = EnumValueRelation;
+        dbAttributeTableLocal->attributeValueType  = EnumValueObject;
         dbAttributeTableLocal->valueString = attributeObject->value.s;
         LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal->valueString));
 
@@ -509,7 +509,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
          kjChildRemove (attrP,attributeObject);
 
          // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-         dbSubAttributeTableLocal->subAttributeValueType  = EnumValueRelation;
+         dbSubAttributeTableLocal->subAttributeValueType  = EnumValueObject;
          dbSubAttributeTableLocal->subAttributeValueString = attributeObject->value.s;
          LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal->subAttributeValueString));
 
@@ -966,7 +966,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
                 " VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeId,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 allValues,
