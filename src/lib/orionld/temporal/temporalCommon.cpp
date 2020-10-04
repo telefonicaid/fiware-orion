@@ -1053,7 +1053,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(geoProprtyValue, observedAtSize, "%f", attrLocalP->observedAt);
     }
 
-    snprintf(allValues, allValuesSize, "%s, %s, %s, %f, %f",
+    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %f",
         unitCodeValue, dataSetIdValue, allValues, geoProprtyValue, observedAtSize);
 }
 
