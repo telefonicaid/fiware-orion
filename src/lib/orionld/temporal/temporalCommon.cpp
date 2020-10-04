@@ -1039,7 +1039,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     }
     else
     {
-        snprintf(geoProprtyValue, geoProprtySize, "%s", attrLocalP->geoProperty);
+        snprintf(geoProprtyValue, geoProprtySize, "%f", attrLocalP->geoProperty);
     }
 
     int observedAtSize = 512;
@@ -1050,10 +1050,10 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     }
     else
     {
-        snprintf(geoProprtyValue, observedAtSize, "%s", attrLocalP->observedAt);
+        snprintf(geoProprtyValue, observedAtSize, "%f", attrLocalP->observedAt);
     }
 
-    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
+    snprintf(allValues, allValuesSize, "%s, %s, %s, %f, %f",
         unitCodeValue, dataSetIdValue, allValues, geoProprtyValue, observedAtSize);
 }
 
