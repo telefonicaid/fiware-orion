@@ -999,10 +999,10 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
           snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
 
         case EnumValueArray:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->EnumValueArray);
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->valueArray);
 
         case EnumValueObject:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->valueRelation);
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->valueObject);
 
         default:
           LM_W(("Teamporal - Bad Input - Key values not supported"));
