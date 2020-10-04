@@ -457,7 +457,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         }
 
         int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
-        dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+        *dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
         bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
 
         int subAttrIx=0;
@@ -498,7 +498,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
          return;
      }
 
-     KjNode* attrTypeP  = kjLookup(attrP, "type");
+     KjNode* attrTypeP  = kjLookup(subAttrP, "type");
      kjChildRemove (subAttrP,attrTypeP);
      dbSubAttributeTableLocal->subAttributeType = attrTypeP->value.s;
 
@@ -964,7 +964,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                " VALUES (%s, %s, %s, %s, %s, %f, %f)",
+                " VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
