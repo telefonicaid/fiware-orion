@@ -499,7 +499,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
      }
 
      KjNode* attrTypeP  = kjLookup(attrP, "type");
-     kjChildRemove (attrP,attrTypeP);
+     kjChildRemove (subAttrP,attrTypeP);
      dbSubAttributeTableLocal->subAttributeType = attrTypeP->value.s;
 
       if (strcmp (dbSubAttributeTableLocal->subAttributeType,"Relationship") == 0)
@@ -964,7 +964,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                " VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
+                " VALUES (%s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
@@ -993,7 +993,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->valueString);
 
         case EnumValueNumber:
-          snprintf(allValues, allValuesSize, "NULL, %s, NULL, NULL, NULL",attrLocalP->valueNumber);
+          snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
 
         case EnumValueBool:
           snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
