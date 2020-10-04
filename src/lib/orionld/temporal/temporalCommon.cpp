@@ -457,14 +457,14 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         }
 
         int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
-        *dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+        dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
         bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
 
         int subAttrIx=0;
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
-            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[subAttrIx]);
+            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[attrIndex][subAttrIx]);
             subAttrIx++;
         }
     }
