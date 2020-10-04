@@ -1039,22 +1039,23 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     }
     else
     {
-        snprintf(geoProprtyValue, geoProprtySize, "%f", attrLocalP->geoProperty);
+        // Chandra-TBI
+        // snprintf(geoProprtyValue, geoProprtySize, "%f", attrLocalP->geoProperty);
     }
 
     int observedAtSize = 512;
     char* observedAtValue = kaAlloc(&orionldState.kalloc, observedAtSize);
     if (attrLocalP->observedAt == NULL)
     {
-        snprintf(geoProprtyValue, observedAtSize, "NULL", attrLocalP->observedAt);
+        snprintf(observedAtValue, observedAtSize, "NULL", attrLocalP->observedAt);
     }
     else
     {
-        snprintf(geoProprtyValue, observedAtSize, "%f", attrLocalP->observedAt);
+        snprintf(observedAtValue, observedAtSize, "%f", attrLocalP->observedAt);
     }
 
     snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %f",
-        unitCodeValue, dataSetIdValue, allValues, geoProprtyValue, observedAtSize);
+        unitCodeValue, dataSetIdValue, allValues, geoProprtyValue, observedAtValue);
 }
 
 
