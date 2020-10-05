@@ -964,7 +964,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                " VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
@@ -1013,7 +1013,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     char* unitCodeValue = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
     if (attrLocalP->unitCode == NULL)
     {
-        snprintf(unitCodeValue, unitCodeValuesSize, "NULL", attrLocalP->unitCode);
+        snprintf(unitCodeValue, unitCodeValuesSize, "NULL");
     }
     else
     {
@@ -1024,7 +1024,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     char* dataSetIdValue = kaAlloc(&orionldState.kalloc, dataSetIdSize);
     if (attrLocalP->dataSetId == NULL)
     {
-        snprintf(dataSetIdValue, dataSetIdSize, "NULL", attrLocalP->dataSetId);
+        snprintf(dataSetIdValue, dataSetIdSize, "NULL");
     }
     else
     {
@@ -1035,7 +1035,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     char* geoProprtyValue = kaAlloc(&orionldState.kalloc, geoProprtySize);
     if (attrLocalP->geoProperty == NULL)
     {
-        snprintf(geoProprtyValue, geoProprtySize, "NULL", attrLocalP->geoProperty);
+        snprintf(geoProprtyValue, geoProprtySize, "NULL");
     }
     else
     {
@@ -1047,7 +1047,7 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     char* observedAtValue = kaAlloc(&orionldState.kalloc, observedAtSize);
     if (attrLocalP->observedAt == NULL)
     {
-        snprintf(observedAtValue, observedAtSize, "NULL", attrLocalP->observedAt);
+        snprintf(observedAtValue, observedAtSize, "NULL");
     }
     else
     {
