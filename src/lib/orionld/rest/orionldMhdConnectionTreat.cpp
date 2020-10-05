@@ -1009,7 +1009,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     restReply(ciP, "");
 
   //
-  // Calling Temporal Routine to save the temporal data (if applicable)
+  // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
+  //
+  // Call Temporal Routine (if there is one) to save the temporal data.
   // Only if the Service Routine was successful, of course
   //
   if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
