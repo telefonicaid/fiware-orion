@@ -1,0 +1,1 @@
+* Issue  #280   Made GET /entities?id=EID call the service routine for /entities/{EID}, if just one single entity id
