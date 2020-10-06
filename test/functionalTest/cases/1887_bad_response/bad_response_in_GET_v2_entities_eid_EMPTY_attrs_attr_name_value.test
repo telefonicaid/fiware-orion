@@ -44,13 +44,13 @@ echo
 01. GET /v2/entities/house_//attrs/temperature_0/value
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 97
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 

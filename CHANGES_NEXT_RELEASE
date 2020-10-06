@@ -1,9 +1,11 @@
 - Fix: Custom notification: sending 0-length request #3272
+- Fix: improve error response when incorrect URL used (#2231)
 - Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
 - Fix: log WARN about insecureNotifications mode (#3013)
 - Fix: avoid creating orion database in -multiservice mode (#3179)
 - Fix: upgrade rapidjson dependecy from 1.0.2 to 1.1.0
 - Fix: upgrade microhttpd dependency from 0.9.48 to 0.9.70
+- Fix: potencial race condition related with DateTime attributes due to the usage of thread unsafe functions
 - Fix: wrong 204 code was responded (instead of 501) when using idPattern in POST /v2/op/update operation (#3427)
 - Fix: changed the name of pretty much all the environment variables for Orion. E.g. adding prefix 'ORION_'
 - Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
