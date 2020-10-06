@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 
 
@@ -60,18 +61,31 @@ extern "C"
 // orionldGetEntities -
 //
 // URI params:
+// - options=keyValues
+// - limit
+// - offset
 // - id
 // - idPattern
-// - type         (can't point to NULL as its converted to a std::string)
+// - type
 // - typePattern  (not possible - ignored (need an exact type name to lookup alias))
 // - q
 // - attrs
-// - mq          - Not used in ngsi-ld. []/. is used instead of q/mq
 // - geometry
 // - coordinates
 // - georel
 // - maxDistance
-// - options=keyValues
+//
+// If "id" is given, then all other URI params are just to hint the broker on where to look for the
+// entity (except for pagination params 'offset' and 'limit', and 'attrs' that has an additional function).
+//
+// This is necessary in a federated system using for example only entity type in the registrations.
+//
+// Orion-LD doesn't support federation right now (Oct 2020) and has ALL entities in its local database and thus
+// need no help to find the entity.
+//
+// So, all URI params to help finding the entity are ignored (idPattern, type, q, geometry, coordinates, georel, maxDistance)
+// Note that the pagination params (limit, offset) make no sense when returning a single entity.
+// 'attrs' is a different deal though. 'attrs' will filter the attributes to be returned.
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
 {
@@ -105,6 +119,43 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if ((id          != NULL) && (*id          == 0)) id          = NULL;
   if ((coordinates != NULL) && (*coordinates == 0)) coordinates = NULL;
 
+  //
+  // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
+  // GET /entities/{EID} do the work
+  //
+  if ((id != NULL) && (strchr(id, ',') == NULL))
+  {
+    //
+    // The entity 'id' is given, so we'll just pretend that `GET /entities/{EID}` was called and not `GET /entities`
+    //
+    orionldState.wildcard[0] = id;
+
+    //
+    // An array must be returned
+    //
+    KjNode* arrayP  = kjArray(orionldState.kjsonP, NULL);
+
+    // GET /entities return 200 OK and payload data [] if not found
+    // GET /entities/{EID} returns 404 not found ...
+    // Need to fix this:
+    // * return true even if orionldGetEntity returns false
+    // * change the 404 to a 200
+    //
+    // If the entity id found, it is added to the array
+    //
+    if (orionldGetEntity(ciP) == true)
+    {
+      KjNode* entityP = orionldState.responseTree;
+
+      entityP->next             = NULL;
+      arrayP->value.firstChildP = entityP;
+    }
+    else
+      orionldState.httpStatusCode = 200;  // Overwrite the 404 from orionldGetEntity
+
+    orionldState.responseTree = arrayP;
+    return true;
+  }
 
   if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
   {
