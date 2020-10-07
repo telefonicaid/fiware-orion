@@ -32,6 +32,7 @@
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "mongoBackend/dbConstants.h"
+#include "orionld/common/orionldState.h"             // orionldState
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -148,11 +149,11 @@ void SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
   // Convert duration
   if (duration.isEmpty())
   {
-    sub->expires = DEFAULT_DURATION_IN_SECONDS + getCurrentTime();
+    sub->expires = DEFAULT_DURATION_IN_SECONDS + orionldState.requestTime;
   }
   else
   {
-    sub->expires = duration.parse() + getCurrentTime();
+    sub->expires = duration.parse() + orionldState.requestTime;
   }
 
   // Convert restriction

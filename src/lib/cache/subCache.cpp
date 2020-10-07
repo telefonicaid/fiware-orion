@@ -38,8 +38,9 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
-#include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
+#include "orionld/common/orionldState.h"        // orionldState
+#include "cache/subCache.h"
 
 using std::map;
 
@@ -894,13 +895,12 @@ void subCacheStatisticsGet
       //
       // FIXME P5: To be removed once sub-update is OK in QA
       //
-      int now = getCurrentTime();
       snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|DUR:%lu",
                cSubP->subscriptionId,
                cSubP->lastNotificationTime,
                cSubP->expirationTime,
                cSubP->throttling,
-               cSubP->expirationTime - now);
+               cSubP->expirationTime - orionldState.requestTime);
 #else
         snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
 #endif
@@ -1261,15 +1261,13 @@ extern bool noCache;
 */
 void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors)
 {
-  double now = getCurrentTime();
-
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
     if (errors == 0)
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime);  // lastFailure == -1
     else
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1);  // lastSuccess == -1, count == 0
 
     return;
   }
@@ -1288,9 +1286,9 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
   }
 
   if (errors == 0)
-    subP->lastSuccess  = now;
+    subP->lastSuccess  = orionldState.requestTime;
   else
-    subP->lastFailure  = now;
+    subP->lastFailure  = orionldState.requestTime;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }

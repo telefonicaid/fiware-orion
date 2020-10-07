@@ -34,6 +34,7 @@
 #include "apiTypesV2/Subscription.h"
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
+#include "orionld/common/orionldState.h"             // orionldState
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -187,7 +188,7 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
 
 #ifdef ORIONLD
-  double now = getCurrentTime();
+  double now = orionldState.requestTime;
   setName(sub, &b);
   setContext(sub, &b);
   setCsf(sub, &b);
@@ -235,7 +236,7 @@ std::string mongoCreateSubscription
 
   if (notificationDone)
   {
-    double lastNotification = getCurrentTime();
+    double lastNotification = orionldState.requestTime;
 
     setLastNotification(lastNotification, &b);
     setCount(1, &b);

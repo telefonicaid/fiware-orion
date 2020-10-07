@@ -33,6 +33,7 @@
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
 #include "cache/subCache.h"
+#include "orionld/common/orionldState.h"             // orionldState
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -922,7 +923,7 @@ std::string mongoUpdateSubscription
   {
     int64_t countInc = 1;
 
-    lastNotification = getCurrentTime();
+    lastNotification = orionldState.requestTime;
 
     // Update sub-cache
     if (subCacheP != NULL)

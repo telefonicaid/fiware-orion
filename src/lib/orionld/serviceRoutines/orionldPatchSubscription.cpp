@@ -576,14 +576,13 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     return false;
 
   // Update modifiedAt
-  double  now         = getCurrentTime();
   KjNode* modifiedAtP = kjLookup(dbSubscriptionP, "modifiedAt");
 
   if (modifiedAtP != NULL)
-    modifiedAtP->value.f = now;
+    modifiedAtP->value.f = orionldState.requestTime;
   else
   {
-    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", now);
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
     kjChildAdd(dbSubscriptionP, modifiedAtP);
   }
 

@@ -645,14 +645,13 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
   ngsildRegistrationPatch(dbRegistrationP, orionldState.requestTree);
 
   // Update modifiedAt
-  double  now         = getCurrentTime();
   KjNode* modifiedAtP = kjLookup(dbRegistrationP, "modifiedAt");
 
   if (modifiedAtP != NULL)
-    modifiedAtP->value.f = now;
+    modifiedAtP->value.f = orionldState.requestTime;
   else
   {
-    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", now);
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
     kjChildAdd(dbRegistrationP, modifiedAtP);
   }
 
