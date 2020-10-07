@@ -100,8 +100,7 @@ static void attributeUpdated(KjNode* updatedP, const char* attrName)
 //
 bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, const char* datasetId)
 {
-  double  timestamp  = getCurrentTime();
-  char*   eqAttrName = kaStrdup(&orionldState.kalloc, attrName);
+  char* eqAttrName = kaStrdup(&orionldState.kalloc, attrName);
 
   dotForEq(eqAttrName);
 
@@ -148,7 +147,7 @@ bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, co
     oldDidAttrInstanceP->lastChild         = attrObjP->lastChild;
 
     // Add createdAt and modifiedAt
-    KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+    KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", orionldState.requestTime);
 
     kjChildAdd(oldDidAttrInstanceP, createdAtP);
     kjChildAdd(oldDidAttrInstanceP, modifiedAtP);
@@ -163,8 +162,8 @@ bool attrDatasetIdInsert(KjNode* datasetsP, char* attrName, KjNode* attrObjP, co
     attrInstanceP->lastChild         = attrObjP->lastChild;
 
     // Add createdAt and modifiedAt
-    KjNode* createdAtP  = kjFloat(orionldState.kjsonP,  "createdAt",  timestamp);
-    KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", timestamp);
+    KjNode* createdAtP  = kjFloat(orionldState.kjsonP,  "createdAt",  orionldState.requestTime);
+    KjNode* modifiedAtP = kjFloat(orionldState.kjsonP,  "modifiedAt", orionldState.requestTime);
 
     kjChildAdd(attrInstanceP, createdAtP);
     kjChildAdd(attrInstanceP, modifiedAtP);

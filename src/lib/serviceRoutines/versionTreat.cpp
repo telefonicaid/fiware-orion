@@ -107,7 +107,7 @@ std::string versionTreat
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";
 #else
-  std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
+  std::string uptime = parsedUptime(orionldState.requestTime - startTime);
 #endif
 
   out += "{\n";

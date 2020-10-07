@@ -293,10 +293,8 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // status
-  double  now    = getCurrentTime();
-  char*   status = NULL;
-
-  if (subscriptionP->expires < now)
+  char* status = NULL;
+  if (subscriptionP->expires < orionldState.requestTime)
     status = (char*) "expired";
   else if (subscriptionP->status != "active")
     status = (char*) "paused";

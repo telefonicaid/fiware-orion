@@ -34,6 +34,7 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kalloc/kaBufferReset.h"                                // kaBufferReset
 #include "kjson/kjFree.h"                                        // kjFree
 }
@@ -1287,10 +1288,13 @@ ConnectionInfo* connectionTreatInit
   //
   // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
   //
+  kTimeGet(&orionldState.timestamp);
+
+  orionldState.requestTime  = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.responseTree = NULL;
   orionldState.notify       = false;
 
-  *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
+    *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics
   if (metricsMgr.isOn())
@@ -1634,7 +1638,7 @@ static int connectionTreat
     //
     // Seems like an NGSI-LD request, but, let's make sure
     //
-    if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/'))
+    if ((url[0] == '/') && (url[1] == 'n') && (url[2] == 'g') && (url[3] == 's') && (url[4] == 'i') && (url[5] == '-') && (url[6] == 'l') && (url[7] == 'd') && (url[8] == '/'))
     {
       orionldState.apiVersion = NGSI_LD_V1;
 

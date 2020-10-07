@@ -1988,7 +1988,7 @@ bool registrationsQuery
    * it has no impact on MongoDB query optimizer
    */
   queryBuilder.append("$or", entityOr.arr());
-  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << getCurrentTime()));
+  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << orionldState.requestTime));
 
   if (attrs.arrSize() > 0)
   {
@@ -2543,7 +2543,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 
   /* Update the document */
   BSONObj     query  = BSON("_id" << OID(subId));
-  BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) <<
+  BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << orionldState.requestTime) <<
                             "$inc" << BSON(CASUB_COUNT << 1));
 
   collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), query, update, false, err);

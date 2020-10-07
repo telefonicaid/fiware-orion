@@ -326,10 +326,8 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
-  double now = getCurrentTime();
-
-  setTimestamp("createdAt",  now, &bob);
-  setTimestamp("modifiedAt", now, &bob);
+  setTimestamp("createdAt",  orionldState.requestTime, &bob);
+  setTimestamp("modifiedAt", orionldState.requestTime, &bob);
 
   if (regP->observationInterval.start != 0)
     setTimeInterval("observationInterval", &regP->observationInterval, &bob);

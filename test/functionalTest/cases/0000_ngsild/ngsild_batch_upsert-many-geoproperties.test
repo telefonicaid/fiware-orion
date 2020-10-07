@@ -271,6 +271,22 @@ Date: REGEX(.*)
 
 [
   {
+    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
+    "type": "GtfsStation",
+    "name": "Leipzig, Hauptbahnhof",
+    "hasStop": [
+      "urn:ngsi-ld:GtfsStop:000008010205:MS",
+      "urn:ngsi-ld:GtfsStop:000008098205:MS"
+    ],
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        12.381321,
+        51.344817
+      ]
+    }
+  },
+  {
     "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
     "type": "GtfsStation",
     "name": "Rangsdorf, Bahnhof II",
@@ -284,22 +300,6 @@ Date: REGEX(.*)
       "coordinates": [
         13.431112,
         52.294125
-      ]
-    }
-  },
-  {
-    "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
-    "type": "GtfsStation",
-    "name": "Leipzig, Hauptbahnhof",
-    "hasStop": [
-      "urn:ngsi-ld:GtfsStop:000008010205:MS",
-      "urn:ngsi-ld:GtfsStop:000008098205:MS"
-    ],
-    "location": {
-      "type": "Point",
-      "coordinates": [
-        12.381321,
-        51.344817
       ]
     }
   },
