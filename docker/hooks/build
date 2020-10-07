@@ -20,9 +20,17 @@
 # iot_support at tid dot es
 #
 
-docker image build --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
+# -e, to end execution immediately if 'cd ..' fails
+# -x, to print output as we go
+set -ex
+
+# due to Dockerfile is not in the repository root, but in a subdirectory and we use -f docker/Dockerfile
+cd ..
+
+docker image build --build-arg GIT_REV_ORION=$SOURCE_BRANCH \
 	--label "org.opencontainers.image.created"=$(date +%Y-%m-%d) \
 	--label "org.opencontainers.image.revision"=$SOURCE_COMMIT \
 	--label "org.opencontainers.image.version"=$DOCKER_TAG \
+	-f docker/Dockerfile \
 	-t $IMAGE_NAME \
 	.
