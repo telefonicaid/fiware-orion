@@ -211,7 +211,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable& d
 
 
 //void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex);
+void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex);
 
 void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
