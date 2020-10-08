@@ -629,7 +629,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
        dbSubAttributeTableLocal->createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
        dbSubAttributeTableLocal->modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
 
-       KjNode* observedAtP = kjLookup(attrP, "observedAt");
+       KjNode* observedAtP = kjLookup(subAttrP, "observedAt");
        if (observedAtP != NULL)
        {
           if (observedAtP->type == KjString)
@@ -967,7 +967,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 "VALUES (%s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
+                dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType),  //Chandra-TBD
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 allValues,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
@@ -1011,6 +1011,8 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
 
     int unitCodeValuesSize = 128;
     char* unitCodeValue = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
+    bzero(unitCodeValue, unitCodeValuesSize);
+
     if (attrLocalP->unitCode == NULL)
     {
         snprintf(unitCodeValue, unitCodeValuesSize, "NULL");
@@ -1022,6 +1024,8 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
 
     int dataSetIdSize = 128;
     char* dataSetIdValue = kaAlloc(&orionldState.kalloc, dataSetIdSize);
+    bzero(dataSetIdValue, dataSetIdSize);
+
     if (attrLocalP->dataSetId == NULL)
     {
         snprintf(dataSetIdValue, dataSetIdSize, "NULL");
@@ -1031,8 +1035,10 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(dataSetIdValue, dataSetIdSize, "%s", attrLocalP->dataSetId);
     }
 
-    int geoProprtySize = 512;
-    char* geoProprtyValue = kaAlloc(&orionldState.kalloc, geoProprtySize);
+    int geoPropertySize = 512;
+    char* geoPropertyValue = kaAlloc(&orionldState.kalloc, geoPropertySize);
+    bzero(geoPropertyValue, geoPropertySize);
+
     if (attrLocalP->geoProperty == NULL)
     {
         snprintf(geoProprtyValue, geoProprtySize, "NULL");
@@ -1045,7 +1051,9 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
 
     int observedAtSize = 512;
     char* observedAtValue = kaAlloc(&orionldState.kalloc, observedAtSize);
-    if (attrLocalP->observedAt == NULL)
+    bzero(observedAtValue, observedAtSize);
+
+    if (attrLocalP->observedAt == 0)  // Chandra - Need to be initialize the value
     {
         snprintf(observedAtValue, observedAtSize, "NULL");
     }
