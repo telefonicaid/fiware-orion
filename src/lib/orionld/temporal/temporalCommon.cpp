@@ -57,6 +57,11 @@ PGresult* oldPgTenandDbResult = NULL;
 //OrionldTemporalDbEntityTable* dbEntityTableLocal;
 //OrionldTemporalDbAttributeTable* dbAttributeTableLocal;
 
+static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumValueType)
+{
+    return "value_string";  // Chandra - TBI
+}
+
 // -----------------------------------------------------------------------------
 //
 // temporalOrionldCommonExtractTree - initialize the thread-local variables of temporalOrionldCommonState
@@ -1041,12 +1046,12 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
 
     if (attrLocalP->geoProperty == NULL)
     {
-        snprintf(geoProprtyValue, geoProprtySize, "NULL");
+        snprintf(geoPropertyValue, geoPropertySize, "NULL");
     }
     else
     {
         // Chandra-TBI
-        // snprintf(geoProprtyValue, geoProprtySize, "%f", attrLocalP->geoProperty);
+        // snprintf(geoPropertyValue, geoPropertySize, "%f", attrLocalP->geoProperty);
     }
 
     int observedAtSize = 512;
@@ -1063,8 +1068,10 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
     }
 
     snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
-        unitCodeValue, dataSetIdValue, allValues, geoProprtyValue, observedAtValue);
+        unitCodeValue, dataSetIdValue, allValues, geoPropertyValue, observedAtValue);
 }
+
+
 
 
 // ----------------------------------------------------------------------------
