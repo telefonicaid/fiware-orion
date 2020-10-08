@@ -578,6 +578,7 @@ std::string postQueryContext
 
       requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.providingApplicationList[ix].providerFormat);
       requestV.push_back(requestP);
+      regIdsV.push_back(cerP->entity.providingApplicationList[ix].getRegId());
     }
 
     //
