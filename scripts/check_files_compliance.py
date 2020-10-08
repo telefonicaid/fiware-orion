@@ -108,6 +108,8 @@ def ignore(root, file):
     # Some files in docker/ directory are not processed
     if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
         return True
+    if 'hooks' in root and file in ['build']:
+        return True
 
     # Some file in CI are not processed
     if 'ci' in root and file in ['Dockerfile', 'mongodb.repo']:
