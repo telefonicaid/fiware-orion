@@ -505,8 +505,8 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
       if (strcmp (dbSubAttributeTableLocal->subAttributeType,"Relationship") == 0)
      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
      {
-         KjNode* attributeObject  = kjLookup(attrP, "object");
-         kjChildRemove (attrP,attributeObject);
+         KjNode* attributeObject  = kjLookup(subAttrP, "object");
+         kjChildRemove (subAttrP,attributeObject);
 
          // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
          dbSubAttributeTableLocal->subAttributeValueType  = EnumValueObject;
@@ -517,15 +517,15 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
      else if (strcmp (dbSubAttributeTableLocal->subAttributeType,"GeoProperty") == 0)
      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
      {
-         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
-         kjChildRemove (attrP,valueP);
+         KjNode* valueP  = kjLookup(subAttrP, "value");  //Chandra-TBD
+         kjChildRemove (subAttrP,valueP);
          // Chandra-TBI
      }
      else if (strcmp (dbSubAttributeTableLocal->subAttributeType,"Property") == 0)
      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
      {
-         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
-         kjChildRemove (attrP,valueP);
+         KjNode* valueP  = kjLookup(subAttrP, "value");  //Chandra-TBD
+         kjChildRemove (subAttrP,valueP);
 
          if (valueP->type == KjFloat)
          {
@@ -563,45 +563,45 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
        }
 
        // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
-       KjNode* nodeP  = kjLookup(attrP, "unitCode");
+       KjNode* nodeP  = kjLookup(subAttrP, "unitCode");
        if(nodeP != NULL)
        {
-           kjChildRemove (attrP,nodeP);
+           kjChildRemove (subAttrP,nodeP);
            // Chandra-TBI
        }
 
-       nodeP  = kjLookup(attrP, "observationSpace");
+       nodeP  = kjLookup(subAttrP, "observationSpace");
        if(nodeP != NULL)
        {
-           kjChildRemove (attrP,nodeP);
+           kjChildRemove (subAttrP,nodeP);
            // Chandra-TBI
        }
 
-       nodeP  = kjLookup(attrP, "datasetId");
+       nodeP  = kjLookup(subAttrP, "datasetId");
        if(nodeP != NULL)
        {
-           kjChildRemove (attrP,nodeP);
+           kjChildRemove (subAttrP,nodeP);
            // Chandra-TBI
        }
 
-       nodeP  = kjLookup(attrP, "instanceid");
+       nodeP  = kjLookup(subAttrP, "instanceid");
        if(nodeP != NULL)
        {
-           kjChildRemove (attrP,nodeP);
+           kjChildRemove (subAttrP,nodeP);
            // Chandra-TBI
        }
 
-       nodeP  = kjLookup(attrP, "location");
+       nodeP  = kjLookup(subAttrP, "location");
        if(nodeP != NULL)
        {
-           kjChildRemove (attrP,nodeP);
+           kjChildRemove (subAttrP,nodeP);
            // Chandra-TBI
        }
 
-       nodeP  = kjLookup(attrP, "operationSpace");
+       nodeP  = kjLookup(subAttrP, "operationSpace");
        if(nodeP != NULL)
        {
-           kjChildRemove (attrP,nodeP);
+           kjChildRemove (subAttrP,nodeP);
            // Chandra-TBI
        }
 
@@ -964,7 +964,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
             "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                "VALUES (%s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType,
