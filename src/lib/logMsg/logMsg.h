@@ -56,6 +56,9 @@ extern char*           progName;
 extern __thread char   transactionId[64];
 extern __thread char   correlatorId[64];
 
+// cames from -logLineMaxSize at the end (default 32 * 1024)
+extern unsigned long   logLineMaxSize;
+
 
 
 /* ****************************************************************************

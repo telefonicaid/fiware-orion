@@ -31,6 +31,7 @@
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/limits.h"
+#include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "cache/subCache.h"
@@ -184,14 +185,13 @@ static void* workerFunc(void* pSyncQ)
       }
 
       // Add notificacion result summary in log INFO level
-      if (statusCode != -1) {
-        LM_I(("Notif delivered (subId: %s): %s %s, response code: %d",
-              params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode));
+      if (statusCode != -1)
+      {
+        logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode);
       }
       else
       {
-        LM_I(("Notif delivered (subId: %s): %s %s, response code: %s",
-              params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str()));
+        logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str());
       }
 
       // End transaction

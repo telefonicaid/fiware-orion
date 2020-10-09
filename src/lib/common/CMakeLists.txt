@@ -34,6 +34,7 @@ SET (SOURCES
     clockFunctions.cpp
     JsonHelper.cpp
     macroSubstitute.cpp
+    logTracing.cpp
 )
 
 SET (HEADERS
@@ -51,6 +52,7 @@ SET (HEADERS
     SyncQOverflow.h
     errorMessages.h
     macroSubstitute.h
+    logTracing.h
 )
 
 

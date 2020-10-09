@@ -34,6 +34,7 @@
 #include "common/errorMessages.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "jsonParse/jsonRequest.h"
@@ -224,10 +225,7 @@ static bool updateForward
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
-
-    LM_I(("Request forwarded (regId: %s): %s %s%s, request payload (%d bytes): %s, response payload (0 bytes): , response code: %s",
-          regId.c_str(), verb.c_str(), upcrP->contextProvider.c_str(), op.c_str(), payload.length(), payload.c_str(), out.c_str()));
-
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     return false;
   }
 
@@ -265,8 +263,7 @@ static bool updateForward
       return false;
     }
 
-    LM_I(("Request forwarded (regId: %s): %s %s%s, request payload (%d bytes): %s, response payload (%d bytes): %s, response code: %d",
-          regId.c_str(), verb.c_str(), upcrP->contextProvider.c_str(), op.c_str(), payload.length(), payload.c_str(), strlen(cleanPayload), cleanPayload, statusCode));
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
     //
     // NOTE

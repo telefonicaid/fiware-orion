@@ -45,6 +45,7 @@
 #include "common/statistics.h"
 #include "common/tag.h"
 #include "common/limits.h"                // SERVICE_NAME_MAX_LEN
+#include "common/logTracing.h"
 
 #include "alarmMgr/alarmMgr.h"
 #include "metricsMgr/metricsMgr.h"
@@ -566,14 +567,13 @@ static void requestCompleted
 
   if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
   {
-    // Payload variant
-    LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d",
-          ciP->method.c_str(), uriForLogs, strlen(ciP->payload), ciP->payload, ciP->httpStatusCode));
+    // Variant with payload
+    logInfoRequestWithPayload(ciP->method.c_str(), uriForLogs, ciP->payload, ciP->httpStatusCode);
   }
   else
   {
-    // No-payload variant
-    LM_I(("Request received: %s %s, response code: %d", ciP->method.c_str(), uriForLogs, ciP->httpStatusCode));
+    // Variant without payload
+    logInfoRequestWithoutPayload(ciP->method.c_str(), uriForLogs, ciP->httpStatusCode);
   }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))

@@ -176,6 +176,8 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
+unsigned long   logLineMaxSize;
+unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
 int             reqTimeout;
 bool            insecureNotif;
@@ -243,8 +245,9 @@ unsigned long   fcMaxInterval;
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
-#define LOG_TO_SCREEN_DESC     "log to screen"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
+#define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
 #define METRICS_DESC           "turn off the 'metrics' feature"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
@@ -324,6 +327,9 @@ PaArgument paArgs[] =
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,             DISABLE_CUSTOM_NOTIF         },
 
   { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,             LOG_FOR_HUMANS_DESC          },
+  { "-logLineMaxSize ",             &logLineMaxSize,        "LOG_LINE_MAX_SIZES",       PaLong,   PaOpt, (32 * 1024),                     0,     PaNL,             LOG_LINE_MAX_SIZE_DESC       },
+  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,             LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
+
   { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,             METRICS_DESC                 },
 
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,             INSECURE_NOTIF               },
