@@ -1,3 +1,4 @@
+- Fix: RPM file name should include in the name #2122
 - Fix: improve error response when incorrect URL used (#2231)
 - Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
 - Fix: log WARN about insecureNotifications mode (#3013)
