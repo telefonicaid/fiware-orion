@@ -27,7 +27,7 @@
 Summary:   Orion Context Broker
 Name:      %{name}
 Version:   %{broker_version}
-Release:   %{broker_release}
+Release:   %{broker_release}%{?dist}
 License:   AGPLv3
 Group:     Applications/Engineering
 Vendor:     Telefónica I+D
