@@ -80,6 +80,27 @@ void logInfoRequestWithoutPayload
 }
 
 
+/* ****************************************************************************
+*
+* truncatePayload -
+*
+* NOTE: this function allocated dynamic memory, be careful with memory leaks!
+*/
+static char* truncatePayload(const char* payload)
+{
+  // +5 due to "(...)"
+  // +1 due to '\0'
+  unsigned int truncatedPayloadLengh = logInfoPayloadMaxSize + 5 + 1;
+
+  char* truncatedPayload = (char*) malloc(logInfoPayloadMaxSize + 5 + 1);
+  strncpy(truncatedPayload, payload, logInfoPayloadMaxSize);
+  strncpy(truncatedPayload + logInfoPayloadMaxSize, "(...)", 5);
+  truncatedPayload[truncatedPayloadLengh - 1] = '\0';
+
+  return truncatedPayload;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -93,7 +114,25 @@ void logInfoRequestWithPayload
   int          rc
 )
 {
-  LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), payload, rc));
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
 }
 
 
@@ -133,8 +172,44 @@ void logInfoFwdRequest
   const char*  rc
 )
 {
+  bool cleanAfterUseReq = false;
+  bool cleanAfterUseRes = false;
+  char* effectivePayloadReq;
+  char* effectivePayloadRes;
+
+  if (strlen(requestPayload) > logInfoPayloadMaxSize)
+  {
+    effectivePayloadReq = truncatePayload(requestPayload);
+    cleanAfterUseReq = true;
+  }
+  else
+  {
+    effectivePayloadReq = (char*) requestPayload;
+  }
+
+  if (strlen(responsePayload) > logInfoPayloadMaxSize)
+  {
+    effectivePayloadRes = truncatePayload(responsePayload);
+    cleanAfterUseRes = true;
+  }
+  else
+  {
+    effectivePayloadRes = (char*) responsePayload;
+  }
+
   LM_I(("Request forwarded (regId: %s): %s %s, request payload (%d bytes): %s, response payload (%d bytes): %s, response code: %d",
-    regId, verb, url, strlen(requestPayload), requestPayload, strlen(responsePayload), responsePayload, rc));
+    regId, verb, url, strlen(requestPayload), effectivePayloadReq, strlen(responsePayload), effectivePayloadRes, rc));
+
+  if (cleanAfterUseReq)
+  {
+    free(effectivePayloadReq);
+  }
+
+  if (cleanAfterUseRes)
+  {
+    free(effectivePayloadRes);
+  }
+
 }
 
 

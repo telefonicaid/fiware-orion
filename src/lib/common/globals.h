@@ -230,6 +230,8 @@ extern double             fcGauge;
 extern unsigned long      fcStepDelay;
 extern unsigned long      fcMaxInterval;
 
+extern unsigned long      logInfoPayloadMaxSize;
+
 
 /* ****************************************************************************
 *
