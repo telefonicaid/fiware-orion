@@ -52,8 +52,8 @@
 class TriggeredSubscription
 {
  public:
-  long long                 throttling;
-  long long                 lastNotification;
+  double                    throttling;
+  double                    lastNotification;
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
   StringList                attrL;
@@ -71,8 +71,8 @@ class TriggeredSubscription
     std::string               georel;
   }                        expression;      // Only used by NGSIv2 subscription
 
-  TriggeredSubscription(long long                _throttling,
-                        long long                _lastNotification,
+  TriggeredSubscription(double                   _throttling,
+                        double                   _lastNotification,
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
                         const StringList&        _attrL,

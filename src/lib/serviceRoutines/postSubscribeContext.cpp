@@ -69,8 +69,8 @@ std::string postSubscribeContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    char  noOfV[STRING_SIZE_FOR_INT];
-    snprintf(noOfV, sizeof(noOfV), "%lu", ciP->servicePathV.size());
+    char  noOfV[STRING_SIZE_FOR_LONG + 3];
+    snprintf(noOfV, sizeof(noOfV) - 1, "%lu", ciP->servicePathV.size());
     ciP->httpStatusCode           = SccOk;  // NGSIv1 is weird... it uses 200 OK at HTTP level for errors
     std::string details           = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
 

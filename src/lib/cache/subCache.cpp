@@ -38,8 +38,9 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
-#include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
+#include "orionld/common/orionldState.h"        // orionldState
+#include "cache/subCache.h"
 
 using std::map;
 
@@ -735,13 +736,13 @@ void subCacheItemInsert
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
   const char*                        subscriptionId,
-  int64_t                            expirationTime,
-  int64_t                            throttling,
+  double                             expirationTime,
+  double                             throttling,
   RenderFormat                       renderFormat,
   bool                               notificationDone,
-  int64_t                            lastNotificationTime,
-  int64_t                            lastNotificationSuccessTime,
-  int64_t                            lastNotificationFailureTime,
+  double                             lastNotificationTime,
+  double                             lastNotificationSuccessTime,
+  double                             lastNotificationFailureTime,
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
@@ -894,13 +895,12 @@ void subCacheStatisticsGet
       //
       // FIXME P5: To be removed once sub-update is OK in QA
       //
-      int now = getCurrentTime();
       snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|DUR:%lu",
                cSubP->subscriptionId,
                cSubP->lastNotificationTime,
                cSubP->expirationTime,
                cSubP->throttling,
-               cSubP->expirationTime - now);
+               cSubP->expirationTime - orionldState.requestTime);
 #else
         snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
 #endif
@@ -1046,10 +1046,10 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  int64_t  lastNotificationTime;
+  double   lastNotificationTime;
   int64_t  count;
-  int64_t  lastFailure;
-  int64_t  lastSuccess;
+  double   lastFailure;
+  double   lastSuccess;
 } CachedSubSaved;
 
 
@@ -1264,22 +1264,13 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
-
-    time_t now = time(NULL);
-
     if (errors == 0)
-    {
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now);  // lastFailure == -1
-    }
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime);  // lastFailure == -1
     else
-    {
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1);  // lastSuccess == -1, count == 0
-    }
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1);  // lastSuccess == -1, count == 0
 
     return;
   }
-
-  time_t now = time(NULL);
 
   cacheSemTake(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 
@@ -1295,13 +1286,9 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
   }
 
   if (errors == 0)
-  {
-    subP->lastSuccess  = now;
-  }
+    subP->lastSuccess  = orionldState.requestTime;
   else
-  {
-    subP->lastFailure  = now;
-  }
+    subP->lastFailure  = orionldState.requestTime;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }

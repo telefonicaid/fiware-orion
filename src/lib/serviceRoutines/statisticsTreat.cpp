@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/common/orionldState.h"        // orionldState
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -327,9 +328,9 @@ std::string statisticsTreat
   }
 
   // Unconditional stats
-  int now = getCurrentTime();
-  js.addNumber("uptime_in_secs",(long long)(now - startTime));
-  js.addNumber("measuring_interval_in_secs", (long long)(now - statisticsTime));
+  int now = orionldState.requestTime;
+  js.addNumber("uptime_in_secs",(long long) (now - startTime));
+  js.addNumber("measuring_interval_in_secs", (long long) (now - statisticsTime));
 
   // Special case: simulated notifications
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);

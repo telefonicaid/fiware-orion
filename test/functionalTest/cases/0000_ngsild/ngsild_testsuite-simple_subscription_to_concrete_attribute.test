@@ -135,7 +135,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 346
+Content-Length: 350
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 ==========================================
 POST http://REGEX(.*)
 Fiware-Servicepath: /
-Content-Length: 345
+Content-Length: 349
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(.*)

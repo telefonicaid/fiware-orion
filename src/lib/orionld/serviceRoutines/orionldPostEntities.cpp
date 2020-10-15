@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -88,9 +89,8 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
   KjNode*          modifiedAt;
   KjNode*          createdAt;
   char*            longName = NULL;
-  bool             valueMayBeExpanded;
 
-  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, &valueMayBeExpanded, true, NULL);
+  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
   attributeName = kaStrdup(&orionldState.kalloc, longName);
   dotForEq(attributeName);
 
@@ -259,10 +259,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   entityIdP->id            = entityId;
   entityIdP->isPattern     = "false";
-  entityIdP->creDate       = getCurrentTime();
-  entityIdP->modDate       = getCurrentTime();
+  entityIdP->creDate       = orionldState.requestTime;
+  entityIdP->modDate       = orionldState.requestTime;
   entityIdP->isTypePattern = false;
-  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
+  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);
 
 
   //
@@ -314,8 +314,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
     KjNode* attrType = kjLookup(kNodeP, "type");
 
-    LM_T(LmtUriExpansion, ("treating attribute '%s'", kNodeP->name));
-
     if ((kNodeP == createdAtP) || (kNodeP == modifiedAtP))
     {
       kNodeP = next;
@@ -350,8 +348,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       kjChildAdd(kNodeP, modifiedAt);
 
       // Change to longName
-      bool   valueMayBeExpanded;
-      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, NULL);
+      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, true, NULL);
 
       longName = kaStrdup(&orionldState.kalloc, longName);
       dotForEq(longName);
@@ -366,6 +363,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
+    eqForDot(kNodeP->name);
     if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       // kjTreeToContextAttribute calls orionldErrorResponseCreate

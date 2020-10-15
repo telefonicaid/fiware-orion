@@ -588,8 +588,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (subP != NULL)
     {
-      if (subP->ldContext != "")  // Subscriptions created using ngsi-ld have a context. those from APIV1/2 do not
+      if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
       {
+        // Subscriptions created using ngsi-ld have a context. those from APIV1/2 do not
+        // This code adds the  Link  header if needed
         if (httpInfo.mimeType == JSON)
         {
           if (subP->ldContext == "")
@@ -604,6 +606,24 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
           // Best choice seems to be to simply send the notification without the Link header.
           //
         }
+      }
+    }
+
+
+    //
+    // HTTP Headers defined for the subscription - if not disabled
+    //
+    if (disableCusNotif == false)
+    {
+      for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+      {
+        std::string key   = it->first;
+        std::string value = it->second;
+
+        if ((key == "") || (key == "Link"))  // To avoid empty header name AND an extra Link header
+          continue;
+
+        params->extraHeaders[key] = value;
       }
     }
 #endif

@@ -43,7 +43,6 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
@@ -267,7 +266,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   while (newAttrP != NULL)
   {
     KjNode*  dbAttrP;
-    bool     valueMayBeExpanded = false;
     char*    title;
     char*    detail;
 
@@ -278,7 +276,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
         (strcmp(newAttrP->name, "operationSpace")   != 0) &&
         (strcmp(newAttrP->name, "observedAt")       != 0))
     {
-      newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, NULL, true, NULL);
+      newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
     }
 
     // Is the attribute in the incoming payload a valid attribute?
@@ -299,10 +297,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       newAttrP = next;
       continue;
     }
-
-    // All good, time to expand the value, if applicable
-    if (valueMayBeExpanded)
-      orionldContextValueExpand(newAttrP);
 
     // Steal createdAt from dbAttrP?
 

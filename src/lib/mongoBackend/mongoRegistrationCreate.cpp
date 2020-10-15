@@ -98,7 +98,7 @@ static void setName(const std::string& name, mongo::BSONObjBuilder* bobP)
 *
 * setExpiration -
 */
-static void setExpiration(long long expires, mongo::BSONObjBuilder* bobP)
+static void setExpiration(double expires, mongo::BSONObjBuilder* bobP)
 {
   if (expires != -1)
   {
@@ -204,7 +204,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 //
 // setTimestamp -
 //
-static void setTimestamp(const char* name, int ts, mongo::BSONObjBuilder* bobP)
+static void setTimestamp(const char* name, double ts, mongo::BSONObjBuilder* bobP)
 {
   bobP->append(name, ts);
 }
@@ -219,8 +219,8 @@ static void setTimeInterval(const char* name, const OrionldTimeInterval* interva
 {
   mongo::BSONObjBuilder intervalObj;
 
-  intervalObj.append("start", (long long) intervalP->start);
-  intervalObj.append("end",   (long long) intervalP->end);
+  intervalObj.append("start", intervalP->start);
+  intervalObj.append("end",   intervalP->end);
 
   bobP->append(name, intervalObj.obj());
 }
@@ -326,10 +326,8 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
-  int now = getCurrentTime();
-
-  setTimestamp("createdAt",  now, &bob);
-  setTimestamp("modifiedAt", now, &bob);
+  setTimestamp("createdAt",  orionldState.requestTime, &bob);
+  setTimestamp("modifiedAt", orionldState.requestTime, &bob);
 
   if (regP->observationInterval.start != 0)
     setTimeInterval("observationInterval", &regP->observationInterval, &bob);

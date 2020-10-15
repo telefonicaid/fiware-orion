@@ -81,22 +81,47 @@ using mongo::OID;
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
   //
-  // 01. Check validity of subP parameter
+  // Check validity of 'sub' parameter
   //
-  BSONElement  idField = getFieldF(sub, "_id");
+  std::string subId;
 
-  if (idField.eoo() == true)
+  if (!sub.hasField("_id"))
+  {
+    LM_E(("Database Error (subscription without subscription-id in database)"));
+    return -1;
+  }
+
+  mongo::BSONElement _id = sub.getField("_id");
+
+  if (_id.eoo() == true)
   {
     std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    LM_E(("Database Error (%s)", details.c_str()));
     alarmMgr.dbError(details);
     return -1;
   }
+
+  if (_id.type() == mongo::String)
+    subId = _id.String().c_str();
+  else if (_id.type() == mongo::jstOID)
+    subId = _id.OID().toString().c_str();
+  else
+  {
+    LM_E(("Database Error (invalid type for _id field in a subscription)"));
+    alarmMgr.dbError("Database Error (invalid type for _id field in a subscription)");
+    return -1;
+  }
+
   alarmMgr.dbErrorReset();
 
   //
-  // 03. Create CachedSubscription
+  // Create CachedSubscription
   //
   CachedSubscription* cSubP = new CachedSubscription();
+
+  if (subId != "")
+    cSubP->subscriptionId = strdup(subId.c_str());
+
   LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   if (cSubP == NULL)
@@ -112,38 +137,35 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
+  std::string    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(sub, CSUB_LDCONTEXT) : "";
   std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
-  cSubP->tenant = (tenant[0] == 0)? strdup("") : strdup(tenant);
+  if (ldContext != "")  // NGSI-LD subscription
+  {
+    cSubP->ldContext = strdup(ldContext.c_str());
 
-#ifdef ORIONLD
-  //
-  // Make sure 'idField' is an OID before calling OID.
-  // Subs created with NGSI-LD aren't OIDs, so ...
-  // Using idField.OID() on a sub-id that isn't an OID gets an exception and the broker crashes.
-  //
-  char oid[128];
+    if (renderFormat == NGSI_V2_NORMALIZED)
+      renderFormat = NGSI_LD_V1_NORMALIZED;
+    else if (renderFormat == NGSI_V2_KEYVALUES)
+      renderFormat = NGSI_LD_V1_KEYVALUES;
+    else
+    {
+      LM_W(("No render format in DB for NGSI-LD subscription - using NGSI-LD NORMALIZED"));
+      renderFormat = NGSI_LD_V1_NORMALIZED;
+    }
+  }
 
-  strncpy(oid, idField.toString().c_str(), sizeof(oid));
-
-  if (strncmp(oid, "_id: ObjectId('", 15) == 0)
-    cSubP->subscriptionId  = strdup(idField.OID().toString().c_str());
-  else
-    cSubP->subscriptionId  = strdup(idField.toString().c_str());
-#else
-  cSubP->subscriptionId    = strdup(idField.OID().toString().c_str());
-#endif
-
+  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
-  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(sub, CSUB_EXPIRATION)       : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS).c_str()            : "active";
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
-  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(sub, CSUB_LASTSUCCESS)      : -1;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(sub, CSUB_LASTFAILURE)      : -1;
+  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(sub, CSUB_LASTSUCCESS)      : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -287,10 +309,10 @@ int mongoSubCacheItemInsert
   const BSONObj&      sub,
   const char*         subscriptionId,
   const char*         servicePath,
-  int                 lastNotificationTime,
-  int                 lastFailure,
-  int                 lastSuccess,
-  long long           expirationTime,
+  double              lastNotificationTime,
+  double              lastFailure,
+  double              lastSuccess,
+  double              expirationTime,
   const std::string&  status,
   const std::string&  q,
   const std::string&  mq,
@@ -375,14 +397,14 @@ int mongoSubCacheItemInsert
     // if the database objuect contains lastNotificationTime,
     // then use the value from the database
     //
-    lastNotificationTime = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
+    lastNotificationTime = getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION);
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
@@ -427,7 +449,7 @@ int mongoSubCacheItemInsert
     cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
   }
 
-  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
+  LM_T(LmtSubCache, ("set lastNotificationTime to %f for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
 
   //
@@ -549,7 +571,7 @@ static void mongoSubCountersUpdateLastNotificationTime
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastNotificationTime
+  double              lastNotificationTime
 )
 {
   BSONObj      condition;
@@ -577,7 +599,7 @@ static void mongoSubCountersUpdateLastFailure
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastFailure
+  double              lastFailure
 )
 {
   BSONObj      condition;
@@ -605,7 +627,7 @@ static void mongoSubCountersUpdateLastSuccess
 (
   const std::string&  collection,
   const std::string&  subId,
-  long long           lastSuccess
+  double              lastSuccess
 )
 {
   BSONObj      condition;
@@ -635,9 +657,9 @@ void mongoSubCountersUpdate
   const std::string& tenant,
   const std::string& subId,
   long long          count,
-  long long          lastNotificationTime,
-  long long          lastFailure,
-  long long          lastSuccess
+  double             lastNotificationTime,
+  double             lastFailure,
+  double             lastSuccess
 )
 {
   std::string  collection = getSubscribeContextCollectionName(tenant);

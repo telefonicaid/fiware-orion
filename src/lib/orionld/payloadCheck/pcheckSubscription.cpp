@@ -135,7 +135,7 @@ bool pcheckSubscription
       for (KjNode* itemP = nodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
       {
         STRING_CHECK(itemP, "watchedAttributes item");
-        itemP->value.s = orionldContextItemExpand(orionldState.contextP, itemP->value.s, NULL, true, NULL);
+        itemP->value.s = orionldContextItemExpand(orionldState.contextP, itemP->value.s, true, NULL);
       }
       *watchedAttributesPP = watchedAttributesP;
     }

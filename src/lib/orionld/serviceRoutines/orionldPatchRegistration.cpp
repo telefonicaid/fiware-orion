@@ -24,8 +24,10 @@
 */
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                    // kaStrdup
 #include "kjson/kjLookup.h"                                     // kjLookup
 #include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
+#include "kjson/kjRender.h"                                     // kjRender (DEBUG)
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
@@ -38,8 +40,8 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/common/urlCheck.h"                            // urlCheck
 #include "orionld/common/urnCheck.h"                            // urnCheck
+#include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"          // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
@@ -74,17 +76,17 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
-// longToInt -
+// longToFloat -
 //
-static void longToInt(KjNode* nodeP)
+static void longToFloat(KjNode* nodeP)
 {
   if (nodeP->type == KjObject)
   {
-    char*     longString = nodeP->value.firstChildP->value.s;
-    long long longValue  = strtol(longString, NULL, 10);
+    char*     longString  = nodeP->value.firstChildP->value.s;
+    double    floatValue  = strtold(longString, NULL);
 
-    nodeP->type    = KjInt;
-    nodeP->value.i = longValue;
+    nodeP->type    = KjFloat;
+    nodeP->value.f = floatValue;
   }
 }
 
@@ -104,19 +106,24 @@ static void fixDbRegistration(KjNode* dbRegistrationP)
   KjNode* nodeP;
 
   if ((nodeP = kjLookup(dbRegistrationP, "expiration")) != NULL)
-    longToInt(nodeP);
+  {
+    if (nodeP->type == KjInt)
+      longToFloat(nodeP);
+  }
   if ((nodeP = kjLookup(dbRegistrationP, "observationInterval")) != NULL)
   {
     for (KjNode* oiItem = nodeP->value.firstChildP; oiItem != NULL; oiItem = oiItem->next)
     {
-      longToInt(oiItem);
+      if (oiItem->type == KjInt)
+        longToFloat(oiItem);
     }
   }
   if ((nodeP = kjLookup(dbRegistrationP, "managementInterval")) != NULL)
   {
     for (KjNode* oiItem = nodeP->value.firstChildP; oiItem != NULL; oiItem = oiItem->next)
     {
-      longToInt(oiItem);
+      if (oiItem->type == KjInt)
+        longToFloat(oiItem);
     }
   }
 }
@@ -252,15 +259,15 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
 {
   KjNode* startP = kjLookup(tiP, "start");
   KjNode* endP   = kjLookup(tiP, "end");
-  int     dateTime;
+  double  dateTime;
 
   dateTime        = parse8601Time(startP->value.s);
-  startP->type    = KjInt;
-  startP->value.i = dateTime;
+  startP->type    = KjFloat;
+  startP->value.f = dateTime;
 
   dateTime        = parse8601Time(endP->value.s);
-  endP->type      = KjInt;
-  endP->value.i   = dateTime;
+  endP->type      = KjFloat;
+  endP->value.f   = dateTime;
 }
 
 
@@ -271,8 +278,8 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
 //
 void ngsildExpiresToAPIv1Datamodel(KjNode* expiresP)
 {
-  expiresP->value.i  = parse8601Time(expiresP->value.s);
-  expiresP->type     = KjInt;
+  expiresP->value.f  = parse8601Time(expiresP->value.s);
+  expiresP->type     = KjFloat;
 
   expiresP->name = (char*) "expiration";
 }
@@ -601,13 +608,12 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   while (propertyP != NULL)
   {
-    bool    valueMayBeExpanded;
     KjNode* dbPropertyP;
 
     next = propertyP->next;
 
     if (orionldContextItemAlreadyExpanded(propertyP->name) == false)
-      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, &valueMayBeExpanded, true, NULL);
+      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, true, NULL);
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)
     {
@@ -615,9 +621,6 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
       orionldErrorResponseCreate(OrionldBadRequestData, "non-existing registration property", propertyP->name);
       return false;
     }
-
-    if (valueMayBeExpanded)
-      orionldContextValueExpand(propertyP);
 
     //
     // Replace the registration properties
@@ -640,6 +643,18 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   // Now we're ready to merge to patch into what's already there ...
   ngsildRegistrationPatch(dbRegistrationP, orionldState.requestTree);
+
+  // Update modifiedAt
+  KjNode* modifiedAtP = kjLookup(dbRegistrationP, "modifiedAt");
+
+  if (modifiedAtP != NULL)
+    modifiedAtP->value.f = orionldState.requestTime;
+  else
+  {
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
+    kjChildAdd(dbRegistrationP, modifiedAtP);
+  }
+
 
   //
   // Overwrite the current Registration in the database

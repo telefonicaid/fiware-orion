@@ -1,0 +1,254 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity and attribute timestamps
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E1 with attribute A1,A2 and all possible timestamps, all with milliseconds
+# 02. See the entity in mongo, make sure all timestamps have milliseconds
+# 03. GET the entity via REST, make sure all timestamps have milliseconds
+# 04. Update A1
+# 05. GET E1 and make sure all 6 createdAt,modifiedAt are as they should (modifiedAt for entity and A1 new - all others as in step 3)
+#
+
+echo "01. Create entity E1 with attribute A1,A2 and all possible timestamps, all with milliseconds"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "observedAt": "2020-07-23T10:31:25.001",
+    "value": 1
+  },
+  "A2": {
+    "type": "Relationship",
+    "observedAt": "2020-07-23T10:31:24.999",
+    "object": "urn:a"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See the entity in mongo, make sure all timestamps have milliseconds"
+echo "======================================================================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "03. GET the entity via REST, make sure all timestamps have milliseconds"
+echo "======================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=sysAttrs
+
+entityCreatedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"createdAt  | awk -F\" '{ print $4}' | head -1)
+entityModifiedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"modifiedAt| awk -F\" '{ print $4}' | head -1)
+a1CreatedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"createdAt  | awk -F\" '{ print $4}' | head -1)
+a1ModifiedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"modifiedAt| awk -F\" '{ print $4}' | head -1)
+a2CreatedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"createdAt  | awk -F\" '{ print $4}' | tail -1)
+a2ModifiedAt=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"modifiedAt| awk -F\" '{ print $4}' | tail -1)
+
+echo
+echo
+
+
+echo "04. Update A1"
+echo "============="
+payload='{
+  "value": 4
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/A1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. GET E1 and make sure all 6 createdAt,modifiedAt are as they should (modifiedAt for entity and A1 new - all others as in step 3)"
+echo "==================================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?options=sysAttrs
+
+entityCreatedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"createdAt  | awk -F\" '{ print $4}' | head -1)
+entityModifiedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \"modifiedAt| awk -F\" '{ print $4}' | head -1)
+a1CreatedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"createdAt  | awk -F\" '{ print $4}' | head -1)
+a1ModifiedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"modifiedAt| awk -F\" '{ print $4}' | head -1)
+a2CreatedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"createdAt  | awk -F\" '{ print $4}' | tail -1)
+a2ModifiedAt2=$(kjson /tmp/orionCurl.response | egrep ^\ \ \ \ \"modifiedAt| awk -F\" '{ print $4}' | tail -1)
+
+eqTimestamp   entityCreatedAt   "$entityCreatedAt"   "$entityCreatedAt2"
+eqTimestamp   a1CreatedAt       "$a1CreatedAt"       "$a1CreatedAt2"
+eqTimestamp   a2CreatedAt       "$a2CreatedAt"       "$a2CreatedAt2"
+neqTimestamp  entityModifiedAt  "$entityModifiedAt"  "$entityModifiedAt2"
+neqTimestamp  a1ModifiedAt      "$a1ModifiedAt"      "$a1ModifiedAt2"
+eqTimestamp   a2ModifiedAt      "$a2ModifiedAt"      "$a2ModifiedAt2"
+
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with attribute A1,A2 and all possible timestamps, all with milliseconds
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See the entity in mongo, make sure all timestamps have milliseconds
+=======================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A1",
+		"https://uri.etsi.org/ngsi-ld/default-context/A2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(\d+\.\d+),
+			"modDate" : REGEX(\d+\.\d+),
+			"value" : 1,
+			"md" : {
+				"observedAt" : {
+					"value" : 1595500285.001
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/A2" : {
+			"type" : "Relationship",
+			"creDate" : REGEX(\d+\.\d+),
+			"modDate" : REGEX(\d+\.\d+),
+			"value" : "urn:a",
+			"md" : {
+				"observedAt" : {
+					"value" : 1595500284.999
+				}
+			},
+			"mdNames" : [
+				"observedAt"
+			]
+		}
+	},
+	"creDate" : REGEX(\d+\.\d+),
+	"modDate" : REGEX(\d+\.\d+),
+	"lastCorrelator" : ""
+}
+bye
+
+
+03. GET the entity via REST, make sure all timestamps have milliseconds
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 441
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "createdAt": "REGEX(.*\.\d\d\dZ)",
+        "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+        "observedAt": "2020-07-23T10:31:25.001Z",
+        "type": "Property",
+        "value": 1
+    },
+    "A2": {
+        "createdAt": "REGEX(.*\.\d\d\dZ)",
+        "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+        "object": "urn:a",
+        "observedAt": "2020-07-23T10:31:24.999Z",
+        "type": "Relationship"
+    },
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "id": "urn:ngsi-ld:entities:E1",
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "type": "T"
+}
+
+
+04. Update A1
+=============
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET E1 and make sure all 6 createdAt,modifiedAt are as they should (modifiedAt for entity and A1 new - all others as in step 3)
+===================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 481
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "createdAt": "REGEX(.*\.\d\d\dZ)",
+        "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+        "observedAt": "2020-07-23T10:31:25.001Z",
+        "type": "Property",
+        "value": 4
+    },
+    "A2": {
+        "createdAt": "REGEX(.*\.\d\d\dZ)",
+        "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+        "object": "urn:a",
+        "observedAt": "2020-07-23T10:31:24.999Z",
+        "type": "Relationship"
+    },
+    "createdAt": "REGEX(.*\.\d\d\dZ)",
+    "id": "urn:ngsi-ld:entities:E1",
+    "modifiedAt": "REGEX(.*\.\d\d\dZ)",
+    "type": "T"
+}
+OK: Timestamp entityCreatedAt has not changed
+OK: Timestamp a1CreatedAt has not changed
+OK: Timestamp a2CreatedAt has not changed
+OK: Timestamp entityModifiedAt has changed
+OK: Timestamp a1ModifiedAt has changed
+OK: Timestamp a2ModifiedAt has not changed
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

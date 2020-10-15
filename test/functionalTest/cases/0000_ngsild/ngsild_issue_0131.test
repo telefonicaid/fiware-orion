@@ -156,7 +156,7 @@ Date: REGEX(.*)
 03. GET the entity, without context, see long names
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 723
+Content-Length: 685
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -166,7 +166,7 @@ Date: REGEX(.*)
   "type": "https://uri.fiware.org/ns/data-models#Building",
   "https://uri.fiware.org/ns/data-models#category": {
     "type": "Property",
-    "value": "https://uri.fiware.org/ns/data-models#commercial"
+    "value": "commercial"
   },
   "https://schema.org/address": {
     "type": "Property",

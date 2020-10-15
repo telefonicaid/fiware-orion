@@ -48,9 +48,13 @@ echo "==========================================================================
 payload='{
   "id": "http://a.b.c/entity/E1",
   "type": "T",
-  "A1": {
+  "P1": {
     "type": "Property",
     "value": "E1"
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "http://a.b.c/entity/E1"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
@@ -64,9 +68,13 @@ echo "==========================================================================
 payload='{
   "id": "http://a.b.c/entity/E2",
   "type": "T2",
-  "A1": {
+  "P1": {
     "type": "Property",
     "value": "E2"
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "http://a.b.c/entity/E2"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
@@ -80,9 +88,13 @@ echo "==========================================================================
 payload='{
   "id": "http://a.b.c/entity/E3",
   "type": "T",
-  "A1": {
+  "P1": {
     "type": "Property",
     "value": "E3"
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "http://a.b.c/entity/E3"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
@@ -96,9 +108,13 @@ echo "==========================================================================
 payload='{
   "id": "http://a.b.c/entity/E4",
   "type": "T2",
-  "A1": {
+  "P1": {
     "type": "Property",
     "value": "E4"
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "http://a.b.c/entity/E4"
   },
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
@@ -188,7 +204,7 @@ Date: REGEX(.*)
 05. GET all entities of type T, see E1 and E3
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 617
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -197,18 +213,26 @@ Date: REGEX(.*)
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E1"
     }
   },
   {
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E3",
     "type": "T",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E3"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E3"
     }
   }
 ]
@@ -218,7 +242,7 @@ Date: REGEX(.*)
 06. GET all entities of type T2, see E2 and E4
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 439
+Content-Length: 619
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -227,18 +251,26 @@ Date: REGEX(.*)
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E2"
     }
   },
   {
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E4"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E4"
     }
   }
 ]
@@ -248,7 +280,7 @@ Date: REGEX(.*)
 07. GET all entities with id E1, see entity E1 only
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 220
+Content-Length: 310
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -257,9 +289,13 @@ Date: REGEX(.*)
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E1"
     }
   }
 ]
@@ -269,7 +305,7 @@ Date: REGEX(.*)
 08. GET all entities with id E.*, see all four entities
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 873
+Content-Length: 1233
 Content-Type: application/ld+json
 NGSILD-Results-Count: 4
 Date: REGEX(.*)
@@ -279,36 +315,52 @@ Date: REGEX(.*)
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E1",
     "type": "T",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E1"
     }
   },
   {
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E2"
     }
   },
   {
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E3",
     "type": "T",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E3"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E3"
     }
   },
   {
     "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
-    "A1": {
+    "P1": {
       "type": "Property",
       "value": "E4"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "http://a.b.c/entity/E4"
     }
   }
 ]

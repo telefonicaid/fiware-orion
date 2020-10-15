@@ -510,7 +510,7 @@ char* lmProgName(char* pn, int levels, bool pid, const char* extra)
     ++start;
   }
 
-  strncpy(pName, start, sizeof(pName));
+  strncpy(pName, start, sizeof(pName) - 1);
 
   if (pid == true)
   {
@@ -2082,7 +2082,7 @@ LmStatus lmFdRegister
     if (lmPreamble == true)
     {
       char  startMsg[256];
-      char  dt[256];
+      char  dt[128];
       int   sz;
 
       strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
@@ -2181,7 +2181,7 @@ LmStatus lmPathRegister
 {
   int       fd;
   LmStatus  s;
-  char      fileName[512];
+  char      fileName[256];
   int       index;
 
   PROGNAME_CHECK();
@@ -2209,14 +2209,14 @@ LmStatus lmPathRegister
       exit(1);
     }
 
-    strncpy(fileName, path, sizeof(fileName));
+    strncpy(fileName, path, sizeof(fileName) - 1);
   }
 
   if (appendToLogFile == false)
   {
     if (access(fileName, F_OK) == 0)
     {
-      char newName[512];
+      char newName[260];
 
       snprintf(newName, sizeof(newName), "%s.old", fileName);
       rename(fileName, newName);
@@ -2231,7 +2231,7 @@ LmStatus lmPathRegister
 
   if (fd == -1)
   {
-    char str[256];
+    char str[300];
 
     printf("Error opening '%s': %s\n", fileName, strerror(errno));
 
@@ -2778,7 +2778,7 @@ LmStatus lmReopen(int index)
       time_t     now = time(NULL);
       struct tm tmP;
       char       tm[80];
-      char       buf[80];
+      char       buf[128];
 
       lm::gmtime_r(&now, &tmP);
       strftime(tm, 80, TIME_FORMAT_DEF, &tmP);
@@ -3196,7 +3196,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         time_t     now = time(NULL);
         struct tm  tmP;
         char       tm[80];
-        char       buf[80];
+        char       buf[128];
 
         lm::gmtime_r(&now, &tmP);
         strftime(tm, 80, TIME_FORMAT_DEF, &tmP);
@@ -3426,12 +3426,12 @@ void lmAddMsgBuf
 
   if (text)
   {
-    strncpy(newMsg->msg, text, sizeof(newMsg->msg));
+    strncpy(newMsg->msg, text, sizeof(newMsg->msg) - 1);
   }
 
   if (file)
   {
-    strncpy(newMsg->file, file, sizeof(newMsg->file));
+    strncpy(newMsg->file, file, sizeof(newMsg->file) - 1);
   }
 
   newMsg->line = line;
@@ -3439,12 +3439,12 @@ void lmAddMsgBuf
 
   if (func)
   {
-    strncpy(newMsg->func, func, sizeof(newMsg->func));
+    strncpy(newMsg->func, func, sizeof(newMsg->func) - 1);
   }
 
   if (stre)
   {
-    strncpy(newMsg->stre, stre, sizeof(newMsg->stre));
+    strncpy(newMsg->stre, stre, sizeof(newMsg->stre) - 1);
   }
 
   if (tLev)

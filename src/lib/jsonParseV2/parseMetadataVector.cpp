@@ -53,15 +53,11 @@ std::string parseMetadataVector(const rapidjson::Value::ConstMemberIterator& nod
   {
     std::string  r;
     Metadata*    mP = new Metadata();
-
     mP->name = iter->name.GetString();
     caP->metadataVector.push_back(mP);
-
     r = parseMetadata(iter->value, mP);
     if (r != "OK")
-    {
       return r;
-    }
   }
 
   return "OK";

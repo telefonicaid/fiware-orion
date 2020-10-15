@@ -48,7 +48,7 @@ header.append('\s*For those usages not covered by this license please contact wi
 header.append('\s*iot_support at tid dot es$')
 
 header2 = []
-header2.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
+header2.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0] FIWARE Foundation e.V.$')
 header2.append('\s*$')
 header2.append('\s*This file is part of Orion-LD Context Broker.$')
 header2.append('\s*$')
@@ -142,7 +142,7 @@ def ignore(root, file):
     if 'SRPMS' in root or 'SOURCES' in root or 'RPMS' in root:
         return True
 
-    # Files in the test/valdring directory ending with .out are not processed
+    # Files in the test/valgrind directory ending with .out are not processed
     if 'valgrind' in root and file.endswith('.out'):
         return True
 
@@ -178,6 +178,14 @@ def ignore(root, file):
     # Apib files have an "inline" license, so they are ignored
     extensions_to_ignore = [ 'apib', 'md' ]
     if os.path.splitext(file)[1][1:] in extensions_to_ignore:
+        return True
+
+    # JMX files in test/jMeter are ignored
+    if 'jMeter' in root and file.endswith('.jmx'):
+        return True
+
+    # JSON files in test/jMeter/cases are ignored
+    if 'cases' in root and file.endswith('.json'):
         return True
 
     # Particular cases of files that are also ignored

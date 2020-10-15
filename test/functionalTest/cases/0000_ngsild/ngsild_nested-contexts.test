@@ -125,7 +125,7 @@ MongoDB server version: REGEX(.*)
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "https://uri.fiware.org/ns/data-models#commercial",
+			"value" : "commercial",
 			"mdNames" : [ ]
 		},
 		"https://schema=org/address" : {

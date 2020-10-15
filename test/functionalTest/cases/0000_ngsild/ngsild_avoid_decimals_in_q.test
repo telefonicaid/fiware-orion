@@ -44,6 +44,7 @@ payload='{
   "type": "Subscription",
   "name": "Test subscription 01",
   "description": "Description of Test subscription 01",
+  "expires": "2028-12-31T10:11:12.123",
   "entities": [
     {
       "id": "urn:ngsi-ld:E01",
@@ -95,11 +96,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "http://a.b.c/subs/sub01",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(\d+\.\d+),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "active",
@@ -116,7 +117,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -136,7 +138,7 @@ bye
 03. GET the subscription and see the Q String Filter P2>10
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 444
+Content-Length: 485
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -162,7 +164,8 @@ Date: REGEX(.*)
       "uri": "http://valid.url/url",
       "accept": "application/ld+json"
     }
-  }
+  },
+  "expires": "2028-12-31T10:11:12.123Z"
 }
 
 

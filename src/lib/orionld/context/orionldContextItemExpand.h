@@ -37,7 +37,6 @@
 // PARAMETERS
 //   contextP                the context
 //   shortName               the name to expand
-//   valueMayBeExpandedP     pointer to a bool that is set to true if @type == @vocab
 //   contextItemPP           to give the caller the complete result of the lookup
 //
 // RETURN VALUE
@@ -55,7 +54,6 @@ extern char* orionldContextItemExpand
 (
   OrionldContext*       contextP,
   const char*           shortName,
-  bool*                 valueMayBeExpandedP,
   bool                  useDefaultUrlIfNotFound,
   OrionldContextItem**  contextItemPP
 );

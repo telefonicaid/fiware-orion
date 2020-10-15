@@ -1,0 +1,213 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 507
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create three entities
+# 02. Update two of them using batch update
+# 03. Get the entities
+# 04. Update two of them using batch upsert
+# 05. Get the entities
+
+echo "01. Create three entities"
+echo "========================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:002",
+    "type": "TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": "sensor"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 20,
+      "unitCode": "CEL"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:003",
+    "type": "TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": "sensor"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 2,
+      "unitCode": "CEL"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:004",
+    "type": "TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": "sensor"
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 100,
+      "unitCode": "CEL"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' -H 'Cookie: _csrf=MAPTGFPcoPnewsGCWklHi4Mq'
+echo
+echo
+
+
+echo "02. Update two of them using batch update"
+echo "========================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:003",
+    "type": "https://uri.fiware.org/ns/data-models#TemperatureSensor",
+    "category": {
+      "type": "Property",
+      "value": [
+        "actuator",
+        "sensor"
+      ]
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:TemperatureSensor:004",
+    "type": "TemperatureSensor",
+    "temperature": {
+      "type": "Property",
+      "value": [
+        "actuator",
+        "sensor"
+      ]
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update?options=replace --payload "$payload" -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' -H 'Cookie: _csrf=MAPTGFPcoPnewsGCWklHi4Mq'
+echo
+echo
+
+
+
+echo "03. Get the entities"
+echo "===================="
+orionCurl --url '/ngsi-ld/v1/entities?type=TemperatureSensor' -H 'Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' -H 'Cookie: _csrf=MAPTGFPcoPnewsGCWklHi4Mq'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create three entities
+=========================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:TemperatureSensor:002",
+        "urn:ngsi-ld:TemperatureSensor:003",
+        "urn:ngsi-ld:TemperatureSensor:004"
+    ]
+}
+
+
+02. Update two of them using batch update
+=========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. Get the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "category": {
+            "type": "Property",
+            "value": "sensor"
+        },
+        "id": "urn:ngsi-ld:TemperatureSensor:002",
+        "temperature": {
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 20
+        },
+        "type": "TemperatureSensor"
+    },
+    {
+        "category": {
+            "type": "Property",
+            "value": [
+                "actuator",
+                "sensor"
+            ]
+        },
+        "id": "urn:ngsi-ld:TemperatureSensor:003",
+        "temperature": {
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": 2
+        },
+        "type": "TemperatureSensor"
+    },
+    {
+        "category": {
+            "type": "Property",
+            "value": "sensor"
+        },
+        "id": "urn:ngsi-ld:TemperatureSensor:004",
+        "temperature": {
+            "type": "Property",
+            "unitCode": "CEL",
+            "value": [
+                "actuator",
+                "sensor"
+            ]
+        },
+        "type": "TemperatureSensor"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -38,7 +38,10 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
+#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
+#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
 
 
@@ -144,7 +147,7 @@ static Verb verbGet(const char* method)
 //
 static void ipAddressAndPort(ConnectionInfo* ciP)
 {
-  char      ip[32];
+  char      ip[IP_LENGTH_MAX];
   uint16_t  port = 0;
 
   const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
@@ -194,12 +197,13 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "noOverwrite") == 0)  orionldState.uriParamOptions.noOverwrite = true;
       else if (strcmp(optionStart, "keyValues")   == 0)  orionldState.uriParamOptions.keyValues   = true;
       else if (strcmp(optionStart, "sysAttrs")    == 0)  orionldState.uriParamOptions.sysAttrs    = true;
+      else if (strcmp(optionStart, "count")       == 0)  orionldState.uriParams.count             = true;  // NGSIv2 compatibility
       else
       {
         LM_W(("Unknown 'options' value: %s", optionStart));
-        // orionldState.httpStatusCode = 400;
-        // orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
-        // return;
+        orionldState.httpStatusCode = 400;
+        orionldErrorResponseCreate(OrionldBadRequestData, "Unknown value for 'options' URI parameter", optionStart);
+        return;
       }
 
       if (done == true)
@@ -227,6 +231,7 @@ static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
 #endif
 
 
+
 // -----------------------------------------------------------------------------
 //
 // orionldUriArgumentGet -
@@ -234,13 +239,25 @@ static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
 static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (SCOMPARE3(key, 'i', 'd', 0))
+  {
     orionldState.uriParams.id = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_IDLIST;
+  }
   else if (SCOMPARE5(key, 't', 'y', 'p', 'e', 0))
+  {
     orionldState.uriParams.type = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_TYPELIST;
+  }
   else if (SCOMPARE10(key, 'i', 'd', 'P', 'a', 't', 't', 'e', 'r', 'n', 0))
+  {
     orionldState.uriParams.idPattern = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_IDPATTERN;
+  }
   else if (SCOMPARE6(key, 'a', 't', 't', 'r', 's', 0))
+  {
     orionldState.uriParams.attrs = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_ATTRS;
+  }
   else if (SCOMPARE7(key, 'o', 'f', 'f', 's', 'e', 't', 0))
   {
     if (value[0] == '-')
@@ -252,6 +269,8 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     }
 
     orionldState.uriParams.offset = atoi(value);
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_OFFSET;
   }
   else if (SCOMPARE6(key, 'l', 'i', 'm', 'i', 't', 0))
   {
@@ -272,14 +291,35 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.httpStatusCode = 400;
       return false;
     }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_LIMIT;
   }
   else if (SCOMPARE8(key, 'o', 'p', 't', 'i', 'o', 'n', 's', 0))
   {
     orionldState.uriParams.options = (char*) value;
     optionsParse(value);
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_OPTIONS;
+  }
+  else if (SCOMPARE9(key, 'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', 0))
+  {
+    orionldState.uriParams.geometry = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_GEOMETRY;
+  }
+  else if (SCOMPARE12(key, 'c', 'o', 'o', 'r', 'd', 'i', 'n', 'a', 't', 'e', 's', 0))
+  {
+    orionldState.uriParams.coordinates = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_COORDINATES;
+  }
+  else if (SCOMPARE7(key, 'g', 'e', 'o', 'r', 'e', 'l', 0))
+  {
+    orionldState.uriParams.georel = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_GEOREL;
   }
   else if (SCOMPARE12(key, 'g', 'e', 'o', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+  {
     orionldState.uriParams.geoproperty = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_GEOPROPERTY;
+  }
   else if (SCOMPARE6(key, 'c', 'o', 'u', 'n', 't', 0))
   {
     if (strcmp(value, "true") == 0)
@@ -291,11 +331,107 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       orionldState.httpStatusCode = 400;
       return false;
     }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_COUNT;
+  }
+  else if (SCOMPARE2(key, 'q', 0))
+  {
+    orionldState.uriParams.q = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_Q;
   }
   else if (SCOMPARE10(key, 'd', 'a', 't', 'a', 's', 'e', 't', 'I', 'd', 0))
   {
+    char* detail;
+
+    if (!urlCheck((char*) value, &detail) && !urnCheck((char*) value, &detail))
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
     orionldState.uriParams.datasetId = (char*) value;
-    // Check that it's a URI
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_DATASETID;
+  }
+  else if (SCOMPARE10(key, 'd', 'e', 'l', 'e', 't', 'e', 'A', 'l', 'l', 0))
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.deleteAll = true;
+    else if (strcmp(value, "false") == 0)
+      orionldState.uriParams.deleteAll = false;
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'deleteAll'", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_DELETEALL;
+  }
+  else if (SCOMPARE13(key, 't', 'i', 'm', 'e', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+  {
+    orionldState.uriParams.timeproperty = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_TIMEPROPERTY;
+  }
+  else if (SCOMPARE8(key, 't', 'i', 'm', 'e', 'r', 'e', 'l', 0))
+  {
+    // FIXME: Check the value of timerel
+    orionldState.uriParams.timerel = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_TIMEREL;
+  }
+  else if (SCOMPARE7(key, 't', 'i', 'm', 'e', 'A', 't', 0))
+  {
+    // FIXME: Check the value
+    orionldState.uriParams.timeAt = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_TIMEAT;
+  }
+  else if (SCOMPARE10(key, 'e', 'n', 'd', 'T', 'i', 'm', 'e', 'A', 't', 0))
+  {
+    // FIXME: Check the value
+    orionldState.uriParams.endTimeAt = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_ENDTIMEAT;
+  }
+  else if (SCOMPARE8(key, 'd', 'e', 't', 'a', 'i', 'l', 's', 0))
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.details = true;
+    else if (strcmp(value, "false") == 0)
+      orionldState.uriParams.details = false;
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'details'", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_DETAILS;
+  }
+  else if (SCOMPARE12(key, 'p', 'r', 'e', 't', 't', 'y', 'P', 'r', 'i', 'n', 't', 0))
+  {
+    if (strcmp(value, "yes") == 0)
+      orionldState.uriParams.prettyPrint = true;
+    else if (strcmp(value, "no") == 0)
+      orionldState.uriParams.prettyPrint = false;
+    else
+    {
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'prettyPrint'", value);
+      orionldState.httpStatusCode = 400;
+      return false;
+    }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_PRETTYPRINT;
+  }
+  else if (SCOMPARE7(key, 's', 'p', 'a', 'c', 'e', 's', 0))
+  {
+    orionldState.uriParams.spaces = atoi(value);
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_SPACES;
+  }
+  else
+  {
+    LM_W(("Bad Input (unknown URI parameter: '%s')", key));
+    orionldState.httpStatusCode = 400;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Unknown URI parameter", key);
+    return MHD_YES;
   }
 
   return MHD_YES;

@@ -143,6 +143,24 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// ARRAY_OR_OBJECT_CHECK -
+//
+#define ARRAY_OR_OBJECT_CHECK(nodeP, what)                                                                   \
+do                                                                                                           \
+{                                                                                                            \
+  if ((nodeP->type != KjArray) && (nodeP->type != KjObject))                                                 \
+  {                                                                                                          \
+    LM_T(LmtPayloadCheck, ("the node is a '%s'", kjValueType(nodeP->type)));                                 \
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Array nor an Object", what);               \
+    orionldState.httpStatusCode = SccBadRequest;                                                             \
+    return false;                                                                                            \
+  }                                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // ATTRIBUTE_IS_OBJECT_CHECK -
 //
 #define ATTRIBUTE_IS_OBJECT_CHECK(nodeP)                                                                     \

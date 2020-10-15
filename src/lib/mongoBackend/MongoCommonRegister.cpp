@@ -38,6 +38,7 @@
 #include "common/RenderFormat.h"
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
+#include "orionld/common/orionldState.h"             // orionldState
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -170,7 +171,7 @@ static bool addTriggeredSubscriptions
   {
     queryNoPattern.append(CASUB_ATTRS, BSON("$size" << 0));
   }
-  queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << orionldState.requestTime));
 
 
   //
@@ -228,7 +229,7 @@ static bool addTriggeredSubscriptions
   BSONObjBuilder  queryPattern;
 
   queryPattern.append(entPatternQ, "true");
-  queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << orionldState.requestTime));
   queryPattern.appendCode("$where", function);
 
   std::auto_ptr<DBClientCursor>  cursor;
@@ -332,7 +333,7 @@ HttpStatusCode processRegisterContext
   }
 
   /* Calculate expiration (using the current time and the duration field in the request) */
-  long long expiration = getCurrentTime() + requestP->duration.parse();
+  double expiration = orionldState.requestTime + requestP->duration.parse();
 
   LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
 

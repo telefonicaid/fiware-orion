@@ -116,7 +116,7 @@ void orionldStateInit(void)
   kaBufferInit(&orionldState.kalloc, orionldState.kallocBuffer, sizeof(orionldState.kallocBuffer), 16 * 1024, NULL, "Thread KAlloc buffer");
 
   kTimeGet(&orionldState.timestamp);
-
+  orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;
   orionldState.tenant                  = (char*) "";
@@ -206,12 +206,14 @@ void orionldStateErrorAttributeAdd(const char* attributeName)
   {
     if (orionldState.errorAttributeArrayP == orionldState.errorAttributeArray)
     {
-      orionldState.errorAttributeArrayP = (char*) malloc(sizeof(orionldState.errorAttributeArray) + growSize);
+      int size = sizeof(orionldState.errorAttributeArray) + growSize;
+
+      orionldState.errorAttributeArrayP = (char*) malloc(size);
       if (orionldState.errorAttributeArrayP == NULL)
         LM_X(1, ("error allocating Error Attribute Array"));
 
-      strncpy(orionldState.errorAttributeArrayP, orionldState.errorAttributeArray, sizeof(orionldState.errorAttributeArray));
-      orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray) + growSize;
+      strncpy(orionldState.errorAttributeArrayP, orionldState.errorAttributeArray, size);
+      orionldState.errorAttributeArraySize = size;
     }
     else
     {

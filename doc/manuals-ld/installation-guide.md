@@ -72,6 +72,7 @@ To install Orion-LD from source code, please follow the instructions for your se
 
 Installation guides for different distributions:
 * [Ubuntu 18.04.3 LTS](installation-guide-ubuntu-18.04.3.md) - the Official Distribution
+* [Ubuntu 20.04.1 LTS](installation-guide-ubuntu-20.04.1.md)
 * [CentOS 7](installation-guide-centos7.md)
 * [Debian 9](installation-guide-debian9.md)
 
@@ -298,7 +299,8 @@ Now please continue to learn about Orion-LD with the (Getting Started Guide)[get
 
 If you feel like running tests, to **really** make sure your Orion-LD Context Broker is working correctly,
 please follow the instructions in your respective Installation Guide for Functional Tests:
-* [Ubuntu 18.04.3](installation-guide-functional-tests-ubuntu18.04.3.md)
+* [Ubuntu 18.04](installation-guide-functional-tests-ubuntu18.04.3.md)
+* [Ubuntu 20.04](installation-guide-functional-tests-ubuntu20.04.1.md)
 * [CentOS 7](installation-guide-functional-tests-centos7.md)
 * [Debian 9](installation-guide-functional-tests-debian9.md)
 

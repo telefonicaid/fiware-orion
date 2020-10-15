@@ -33,6 +33,7 @@
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
 #include "cache/subCache.h"
+#include "orionld/common/orionldState.h"             // orionldState
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -74,10 +75,10 @@ static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_EXPIRATION))
     {
-      int64_t expires = getIntOrLongFieldAsLongF(subOrig, CSUB_EXPIRATION);
+      double expires = getNumberFieldAsDoubleF(subOrig, CSUB_EXPIRATION);
 
-      b->append(CSUB_EXPIRATION, (long long) expires);
-      LM_T(LmtMongo, ("Subscription expiration: %lu", expires));
+      b->append(CSUB_EXPIRATION, expires);
+      LM_T(LmtMongo, ("Subscription expiration: %f", expires));
     }
   }
 }
@@ -156,10 +157,10 @@ static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_THROTTLING))
     {
-      long long throttling = getIntOrLongFieldAsLongF(subOrig, CSUB_THROTTLING);
+      double throttling = getNumberFieldAsDoubleF(subOrig, CSUB_THROTTLING);
 
       b->append(CSUB_THROTTLING, throttling);
-      LM_T(LmtMongo, ("Subscription throttling: %lu", throttling));
+      LM_T(LmtMongo, ("Subscription throttling: %f", throttling));
     }
   }
 }
@@ -513,7 +514,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
     return;
   }
 
-  long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
+  double lastNotification = getNumberFieldAsDoubleF(subOrig, CSUB_LASTNOTIFICATION);
 
   //
   // Compare with 'lastNotificationTime', that might come from the sub-cache.
@@ -533,9 +534,9 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 *
 * setLastFailure -
 */
-static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+static double setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastFailure = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE);
+  double lastFailure = getNumberFieldAsDoubleF(subOrig, CSUB_LASTFAILURE);
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -557,9 +558,9 @@ static long long setLastFailure(const BSONObj& subOrig, CachedSubscription* subC
 *
 * setLastSuccess -
 */
-static long long setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
+static double setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  long long lastSuccess = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS);
+  double lastSuccess = getNumberFieldAsDoubleF(subOrig, CSUB_LASTSUCCESS);
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -694,9 +695,9 @@ void updateInCache
   const BSONObj&             doc,
   const SubscriptionUpdate&  subUp,
   const std::string&         tenant,
-  long long                  lastNotification,
-  long long                  lastFailure,
-  long long                  lastSuccess
+  double                     lastNotification,
+  double                     lastFailure,
+  double                     lastSuccess
 )
 {
   //
@@ -790,7 +791,7 @@ void updateInCache
                                           lastNotification,
                                           lastFailure,
                                           lastSuccess,
-                                          doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
+                                          doc.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(doc, CSUB_EXPIRATION) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
                                           mq,
@@ -888,9 +889,9 @@ std::string mongoUpdateSubscription
   BSONObjBuilder      b;
   std::string         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
   bool                notificationDone = false;
-  long long           lastNotification = 0;
-  long long           lastFailure      = 0;
-  long long           lastSuccess      = 0;
+  double              lastNotification = 0;
+  double              lastFailure      = 0;
+  double              lastSuccess      = 0;
   CachedSubscription* subCacheP        = NULL;
 
   if (!noCache)
@@ -922,7 +923,7 @@ std::string mongoUpdateSubscription
   {
     int64_t countInc = 1;
 
-    lastNotification = (long long) getCurrentTime();
+    lastNotification = orionldState.requestTime;
 
     // Update sub-cache
     if (subCacheP != NULL)

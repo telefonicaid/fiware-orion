@@ -45,13 +45,62 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// kjTreeToReceiverInfo -
+//
+static bool kjTreeToReceiverInfo(KjNode* receiverInfoP, ngsiv2::HttpInfo* httpInfoP)
+{
+  for (KjNode* kvP = receiverInfoP->value.firstChildP; kvP != NULL; kvP = kvP->next)
+  {
+    char* key   = NULL;
+    char* value = NULL;
+
+    OBJECT_CHECK(kvP, "receiverInfo key-value");
+
+    for (KjNode* nodeP = kvP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      if (SCOMPARE4(nodeP->name, 'k', 'e', 'y', 0))
+      {
+        DUPLICATE_CHECK(key, "Endpoint::receiverInfo::key", nodeP->value.s);
+        STRING_CHECK(nodeP, "Endpoint::receiverInfo::key");
+      }
+      else if (SCOMPARE6(nodeP->name, 'v', 'a', 'l', 'u', 'e', 0))
+      {
+        DUPLICATE_CHECK(value, "Endpoint::receiverInfo::value", nodeP->value.s);
+        STRING_CHECK(nodeP, "Endpoint::receiverInfo::value");
+      }
+      else
+      {
+        LM_E(("Bad Input (Invalid Endpoint::receiverInfo field: '%s')", nodeP->name));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::receiverInfo field", nodeP->name);
+        return false;
+      }
+    }
+
+    if ((key == NULL) || (value == NULL))
+    {
+        LM_E(("Bad Input (Incomplete Endpoint::receiverInfo key-value pair)"));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Bad Input", "Incomplete Endpoint::receiverInfo key-value pair");
+        return false;
+    }
+
+    httpInfoP->headers[key] = value;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjTreeToEndpoint -
 //
 bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
 {
-  char* uriP    = NULL;
-  char* acceptP = NULL;
-  char* detail;
+  char*   uriP          = NULL;
+  char*   acceptP       = NULL;
+  KjNode* receiverInfoP = NULL;
+  char*   detail;
 
   // Set default values
   httpInfoP->mimeType = JSON;
@@ -104,6 +153,14 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s);
         return false;
       }
+    }
+    else if (SCOMPARE13(itemP->name, 'r', 'e', 'c', 'e', 'i', 'v', 'e', 'r', 'I', 'n', 'f', 'o', 0))
+    {
+      DUPLICATE_CHECK(receiverInfoP, "Endpoint::receiverInfo", itemP);
+      ARRAY_CHECK(itemP, "Endpoint::receiverInfo");
+
+      if (kjTreeToReceiverInfo(receiverInfoP, httpInfoP) == false)
+        return false;
     }
     else
     {
