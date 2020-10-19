@@ -63,14 +63,18 @@ extern "C"
 //
 KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, char** detailsP)
 {
-  bool     valueMayBeCompacted;
-  char*    nameAlias = orionldContextItemAliasLookup(contextP, caP->name.c_str(), &valueMayBeCompacted, NULL);
+  char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
 
-  if (nameAlias == NULL)
-    nameAlias = (char*) caP->name.c_str();
+  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+  {
+    char* alias = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
-  if (renderFormat == NGSI_LD_V1_KEYVALUES)
+    if (alias != NULL)
+      attrName = alias;
+  }
+
+  if ((renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES))
   {
     //
     // FIXME: This almost identical switch is in many places. Time to unite ...
@@ -79,44 +83,34 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     switch (caP->valueType)
     {
     case orion::ValueTypeString:
-      if (valueMayBeCompacted == true)
-      {
-        char* compactedValue = orionldContextItemAliasLookup(contextP, caP->stringValue.c_str(), NULL, NULL);
-
-        if (compactedValue != NULL)
-          nodeP = kjString(orionldState.kjsonP, nameAlias, compactedValue);
-        else
-          nodeP = kjString(orionldState.kjsonP, nameAlias, caP->stringValue.c_str());
-      }
-      else
-        nodeP = kjString(orionldState.kjsonP, nameAlias, caP->stringValue.c_str());
+      nodeP = kjString(orionldState.kjsonP, attrName, caP->stringValue.c_str());
       ALLOCATION_CHECK(nodeP);
       break;
 
     case orion::ValueTypeNumber:
-      nodeP = kjFloat(orionldState.kjsonP, nameAlias, caP->numberValue);  // FIXME: kjInteger or kjFloat ...
+      nodeP = kjFloat(orionldState.kjsonP, attrName, caP->numberValue);  // FIXME: kjInteger or kjFloat ...
       ALLOCATION_CHECK(nodeP);
       break;
 
     case orion::ValueTypeBoolean:
-      nodeP = kjBoolean(orionldState.kjsonP, nameAlias, (KBool) caP->boolValue);
+      nodeP = kjBoolean(orionldState.kjsonP, attrName, (KBool) caP->boolValue);
       ALLOCATION_CHECK(nodeP);
       break;
 
     case orion::ValueTypeNull:
-      nodeP = kjNull(orionldState.kjsonP, nameAlias);
+      nodeP = kjNull(orionldState.kjsonP, attrName);
       ALLOCATION_CHECK(nodeP);
       break;
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
-      nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, valueMayBeCompacted, detailsP);
+      nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
       if (nodeP == NULL)
         return NULL;
       break;
 
     case orion::ValueTypeNotGiven:
-      nodeP = kjString(orionldState.kjsonP, nameAlias, "UNKNOWN TYPE");
+      nodeP = kjString(orionldState.kjsonP, attrName, "UNKNOWN TYPE");
       ALLOCATION_CHECK(nodeP);
       break;
     }
@@ -124,7 +118,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     return nodeP;
   }
 
-  KjNode* aTopNodeP = kjObject(orionldState.kjsonP, nameAlias);  // Top node for the attribute
+  KjNode* aTopNodeP = kjObject(orionldState.kjsonP, attrName);  // Top node for the attribute
 
   if (aTopNodeP == NULL)
   {
@@ -145,7 +139,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     }
 
     kjChildAdd(aTopNodeP, typeNodeP);
-    if (strcmp(typeNodeP->value.s, "Relationship") == 0)
+    if ((strcmp(typeNodeP->value.s, "Relationship") == 0) && (renderFormat != NGSI_LD_V1_V2_NORMALIZED))  // && (renderFormat != NGSI_LD_V1_V2_KEYVALUES)
       isRelationship = true;
   }
 
@@ -175,7 +169,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
   case orion::ValueTypeVector:
   case orion::ValueTypeObject:
-    nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, valueMayBeCompacted, detailsP);
+    nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
     nodeP->name = (char*) "value";
     if (nodeP == NULL)
       return NULL;
@@ -197,7 +191,18 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     isGeoProperty = true;
   }
 
+  //
   // Metadata
+  //   If NGSIv2 rendering, the metadatas are put inside a "metadata" object.
+  //   Empty of not, it is always rendered
+  //
+  KjNode* mdArrayNodeP = NULL;
+  if (renderFormat == NGSI_LD_V1_V2_NORMALIZED)
+  {
+    mdArrayNodeP = kjObject(orionldState.kjsonP, "metadata");
+    kjChildAdd(aTopNodeP, mdArrayNodeP);
+  }
+
   for (unsigned int ix = 0; ix < caP->metadataVector.size(); ix++)
   {
     Metadata*   mdP    = caP->metadataVector[ix];
@@ -233,8 +238,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     }
     else
     {
-      bool    valueMayBeCompacted;
-      char*   mdLongName     = orionldContextItemAliasLookup(contextP, mdName, &valueMayBeCompacted, NULL);
+      char*   mdLongName     = orionldContextItemAliasLookup(contextP, mdName, NULL, NULL);
       KjNode* typeNodeP      = kjString(orionldState.kjsonP, "type", mdP->type.c_str());
       KjNode* valueNodeP     = NULL;
 
@@ -243,24 +247,17 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       kjChildAdd(nodeP, typeNodeP);
       if (strcmp(mdP->type.c_str(), "Relationship") == 0)
       {
-        valueNodeP = kjString(orionldState.kjsonP, "object", mdP->stringValue.c_str());
+        if (renderFormat == NGSI_LD_V1_V2_NORMALIZED)
+          valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
+        else
+          valueNodeP = kjString(orionldState.kjsonP, "object", mdP->stringValue.c_str());
       }
       else if (strcmp(mdP->type.c_str(), "Property") == 0)
       {
         switch (mdP->valueType)
         {
         case orion::ValueTypeString:
-          if (valueMayBeCompacted == true)
-          {
-            char* compactedValue = orionldContextItemAliasLookup(contextP, mdP->stringValue.c_str(), NULL, NULL);
-
-            if (compactedValue != NULL)
-              valueNodeP = kjString(orionldState.kjsonP, "value", compactedValue);
-            else
-              valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
-          }
-          else
-            valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
+          valueNodeP = kjString(orionldState.kjsonP, "value", mdP->stringValue.c_str());
           break;
 
         case orion::ValueTypeNumber:
@@ -277,7 +274,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
         case orion::ValueTypeVector:
         case orion::ValueTypeObject:
-          valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, valueMayBeCompacted, detailsP);
+          valueNodeP = kjTreeFromCompoundValue(mdP->compoundValueP, NULL, false, detailsP);
           break;
 
         case orion::ValueTypeNotGiven:
@@ -293,7 +290,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       kjChildAdd(nodeP, valueNodeP);
     }
 
-    kjChildAdd(aTopNodeP, nodeP);
+    if (mdArrayNodeP != NULL)
+      kjChildAdd(mdArrayNodeP, nodeP);
+    else
+      kjChildAdd(aTopNodeP, nodeP);
   }
 
   return aTopNodeP;
