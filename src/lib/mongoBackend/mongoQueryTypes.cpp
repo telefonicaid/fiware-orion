@@ -74,7 +74,7 @@ static void getAttributeTypes
 {
   orion::BSONObjBuilder bob;
 
-  if (entityType == "")
+  if (entityType.empty())
   {
     std::string idType = std::string("_id.") + ENT_ENTITY_TYPE;
 

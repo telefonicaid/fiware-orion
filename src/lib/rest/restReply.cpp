@@ -93,7 +93,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
-  if (answer != "")
+  if (!answer.empty())
   {
     if (ciP->outMimeType == JSON)
     {
@@ -106,7 +106,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
+  if ((corsEnabled == true) && (!ciP->httpHeaders.origin.empty()) && (ciP->httpStatusCode != SccBadVerb))
   {
     // Only GET method is supported for V1 API
     if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))

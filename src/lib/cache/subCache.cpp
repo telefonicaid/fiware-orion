@@ -169,7 +169,7 @@ bool EntityInfo::match
       // REGEX-comparison this->entityTypePattern VS type
       matchedType = (regexec(&entityTypePattern, type.c_str(), 0, NULL, 0) == 0);
     }
-    else if ((type != "")  && (entityType != "") && (entityType != type))
+    else if ((!type.empty())  && (!entityType.empty()) && (entityType != type))
     {
       matchedType = false;
     }
@@ -823,10 +823,10 @@ void subCacheItemInsert
   for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
     const ngsiv2::EntID* eIdP = &entIdVector[ix];
-    std::string          isPattern      = (eIdP->id   == "")? "true" : "false";
-    bool                 isTypePattern  = (eIdP->type == "");
-    std::string          id             = (eIdP->id   == "")? eIdP->idPattern   : eIdP->id;
-    std::string          type           = (eIdP->type == "")? eIdP->typePattern : eIdP->type;
+    std::string          isPattern      = (eIdP->id.empty())? "true" : "false";
+    bool                 isTypePattern  = (eIdP->type.empty());
+    std::string          id             = (eIdP->id.empty())? eIdP->idPattern   : eIdP->id;
+    std::string          type           = (eIdP->type.empty())? eIdP->typePattern : eIdP->type;
 
     EntityInfo* eP = new EntityInfo(id, type, isPattern, isTypePattern);
 

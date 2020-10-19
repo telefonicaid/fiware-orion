@@ -160,7 +160,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   reqDataP->dcar.res.restriction.attributeExpression.set(value);
 
-  if (value == "")
+  if (value.empty())
   {
     alarmMgr.badInput(clientIp, "empty attribute expression");
     return "Empty attribute expression";

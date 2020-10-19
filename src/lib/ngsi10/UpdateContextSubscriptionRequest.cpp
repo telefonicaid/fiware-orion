@@ -59,7 +59,7 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& predetect
   std::string                       res;
   UpdateContextSubscriptionResponse response;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     response.subscribeError.subscriptionId = subscriptionId;
     response.subscribeError.errorCode.fill(SccBadRequest, predetectedError);

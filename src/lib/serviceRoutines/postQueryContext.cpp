@@ -164,7 +164,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     // FIXME #3068: For requests where the type comes in the payload (batch op + NGSIv1), we'd need to add an else part
     //              to extract the type from the incoming payload
     //
-    if (ciP->uriParam["type"] != "")
+    if (!ciP->uriParam["type"].empty())
     {
       extraParams += "&type=";
       extraParams += ciP->uriParam["type"];
@@ -212,7 +212,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
       }
     }
 
-    if (ciP->uriParam["attrs"] != "")
+    if (!ciP->uriParam["attrs"].empty())
     {
       extraParams += "&attrs=";
       extraParams += ciP->uriParam["attrs"];
@@ -229,7 +229,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
       }
     }
 
-    if (extraParams != "")
+    if (!extraParams.empty())
     {
       char* xParams = (char*) &(extraParams.c_str())[1];  // Remove first '&'
 
@@ -411,7 +411,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (aP->providingApplication.get() != "")
+      if (!aP->providingApplication.get().empty())
       {
         return true;
       }
@@ -583,7 +583,7 @@ std::string postQueryContext
         // An empty providingApplication means the attribute is local
         // In such a case, the response is already in our hand, we just need to copy it to responseV
         //
-        if (aP->providingApplication.get() == "")
+        if (aP->providingApplication.get().empty())
         {
           if (aP->found == false)
           {
@@ -668,7 +668,7 @@ std::string postQueryContext
 
   for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
   {
-    if (requestV[fIx]->contextProvider == "")
+    if (requestV[fIx]->contextProvider.empty())
     {
       LM_E(("Internal Error (empty context provider string)"));
       continue;

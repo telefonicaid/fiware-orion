@@ -51,7 +51,7 @@ std::string RestrictionString::check(void)
 */
 bool RestrictionString::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -84,7 +84,7 @@ std::string RestrictionString::get(void)
 */
 std::string RestrictionString::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

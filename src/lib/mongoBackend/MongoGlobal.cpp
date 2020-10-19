@@ -464,7 +464,7 @@ std::string composeDatabaseName(const std::string& tenant)
 {
   std::string result;
 
-  if (!multitenant || (tenant == ""))
+  if (!multitenant || (tenant.empty()))
   {
     result = dbPrefix;
   }
@@ -635,8 +635,8 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     idMatch = (en2->id == en1->id);
   }
 
-  // Note that type == "" is like a * wildcard for type
-  return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
+  // Note that type.empty() is like a * wildcard for type
+  return idMatch && (en1->type.empty() || en2->type.empty() || en2->type == en1->type);
 }
 
 
@@ -718,7 +718,7 @@ static void fillQueryEntity(orion::BSONObjBuilder* bobP, const EntityId* enP)
     bobP->append(idString, enP->id);
   }
 
-  if (enP->type != "")
+  if (!enP->type.empty())
   {
     if (enP->isTypePattern)
     {
@@ -747,7 +747,7 @@ bool servicePathFilterNeeded(const std::vector<std::string>& servicePath)
   // Note that by construction servicePath vector must have at least one element. Note that the
   // case in which first element is "" is special, it means that the SP were not provided and
   // we have to apply the default
-  if (servicePath[0] == "")
+  if (servicePath[0].empty())
   {
     return false;
   }
@@ -1399,7 +1399,7 @@ void addBuiltins(ContextElementResponse* cerP)
     }
 
     // actionType
-    if (caP->actionType != "")
+    if (!caP->actionType.empty())
     {
       addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
     }
@@ -1626,7 +1626,7 @@ bool entitiesQuery
   orion::BSONObj query = finalQuery.obj();
   orion::BSONObj sort;
 
-  if (sortOrderList == "")
+  if (sortOrderList.empty())
   {
     orion::BSONObjBuilder bobSort;
     bobSort.append(ENT_CREATION_DATE, 1);
@@ -2088,7 +2088,7 @@ bool registrationsQuery
       b.append(crEntitiesId, en->id);
     }
 
-    if (en->type != "")
+    if (!en->type.empty())
     {
       b.append(crEntitiesType, en->type);
       // FIXME P3: this way of accumulating types in the BSONBuilder doesn't avoid duplication. It doesn't
@@ -2199,7 +2199,7 @@ bool registrationsQuery
     MimeType                  mimeType = JSON;
     std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldFF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldFF(r, REG_FORMAT);
-    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
+    ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
@@ -3011,9 +3011,9 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
                          &providerFormat);
 
     /* Looking results after crrV processing */
-    ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->providingApplication.set(perAttrPa.empty() ? perEntPa : perAttrPa);
     ca->providingApplication.setProviderFormat(providerFormat);
-    ca->found = (ca->providingApplication.get() != "");
+    ca->found = (!ca->providingApplication.get().empty());
   }
 }
 
@@ -3079,13 +3079,13 @@ void cprLookupByAttribute
       {
         // By the moment the only supported pattern is .*. In this case matching is
         // based exclusively in type
-        if (regEn->type != en.type && regEn->type != "")
+        if (regEn->type != en.type && !regEn->type.empty())
         {
           /* No match (keep searching the CRR) */
           continue;
         }
       }
-      else if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      else if (regEn->id != en.id || (regEn->type != en.type && !regEn->type.empty()))
       {
         /* No match (keep searching the CRR) */
         continue;

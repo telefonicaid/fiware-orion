@@ -211,7 +211,7 @@ std::string parseScope(ConnectionInfo* ciP, rapidjson::Value::ConstValueIterator
     }
 
     std::string r = parseScopeValueLocation(iter, scopeP);
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }

@@ -379,7 +379,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
-  if (tenant != "")
+  if (!tenant.empty())
   {
     std::string fiwareServiceHeaderValue = tenant;
     httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -390,7 +390,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_SERVICEPATH, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
-  if (xauthToken != "")
+  if (!xauthToken.empty())
   {
     std::string xauthTokenHeaderValue = xauthToken;
     httpHeaderAdd(&headers, HTTP_X_AUTH_TOKEN, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -398,7 +398,7 @@ int httpRequestSendWithCurl
 
   // ----- Accept
   std::string acceptedFormats = "application/json";
-  if (acceptFormat != "")
+  if (!acceptFormat.empty())
   {
     acceptedFormats = acceptFormat;
   }
@@ -439,7 +439,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_CORRELATOR, correlationHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Notify Format
-  if ((ngsiv2AttrFormat != "") && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
+  if ((!ngsiv2AttrFormat.empty()) && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
   {
     std::string nFormatHeaderValue = ngsiv2AttrFormat;
 

@@ -110,9 +110,9 @@ std::string StatusCode::toJsonV1(bool comma, bool showKey)
 
   out += startTag(showKey? keyName : "");
   out += valueTag("code", code, true);
-  out += valueTag("reasonPhrase", reasonPhrase, details != "");
+  out += valueTag("reasonPhrase", reasonPhrase, !details.empty());
 
-  if (details != "")
+  if (!details.empty())
   {
     out += valueTag("details", details, false);
   }
@@ -213,7 +213,7 @@ std::string StatusCode::check(void)
     return "no code";
   }
 
-  if (reasonPhrase == "")
+  if (reasonPhrase.empty())
   {
     return "no reason phrase";
   }

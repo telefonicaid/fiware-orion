@@ -80,7 +80,7 @@ std::string EntityTypeResponse::check
 {
   std::string res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }

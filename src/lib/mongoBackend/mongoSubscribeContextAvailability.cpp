@@ -87,7 +87,7 @@ HttpStatusCode mongoSubscribeContextAvailability
 
     orion::BSONObjBuilder bobEn;
     bobEn.append(CASUB_ENTITY_ID, en->id);
-    if (en->type != "")
+    if (!en->type.empty())
     {
       bobEn.append(CASUB_ENTITY_TYPE, en->type);
     }

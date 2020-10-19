@@ -67,7 +67,7 @@ static void setRegistrationId(orion::BSONObjBuilder* bobP, std::string* regIdP)
 */
 static void setDescription(const std::string& description, orion::BSONObjBuilder* bobP)
 {
-  if (description != "")
+  if (!description.empty())
   {
     bobP->append(REG_DESCRIPTION, description);
   }
@@ -95,7 +95,7 @@ static void setExpiration(long long expires, orion::BSONObjBuilder* bobP)
 */
 static void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* bobP)
 {
-  if (servicePath != "")
+  if (!servicePath.empty())
   {
     bobP->append(REG_SERVICE_PATH, servicePath);
   }
@@ -118,10 +118,10 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
     orion::BSONObjBuilder bob;
-    if (eP->idPattern == "")
+    if (eP->idPattern.empty())
     {
       bob.append(REG_ENTITY_ID, eP->id);
-      if (eP->type != "")
+      if (!eP->type.empty())
       {
         bob.append(REG_ENTITY_TYPE, eP->type);
       }
@@ -130,7 +130,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
     {
       bob.append(REG_ENTITY_ID, eP->idPattern);
       bob.append(REG_ENTITY_ISPATTERN, "true");
-      if (eP->type != "")
+      if (!eP->type.empty())
       {
         bob.append(REG_ENTITY_TYPE, eP->type);
       }
@@ -166,7 +166,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
 */
 static void setStatus(const std::string& status, orion::BSONObjBuilder* bobP)
 {
-  if (status != "")
+  if (!status.empty())
   {
     bobP->append(REG_STATUS, status);
   }
@@ -180,7 +180,7 @@ static void setStatus(const std::string& status, orion::BSONObjBuilder* bobP)
 */
 static void setFormat(const std::string& format, orion::BSONObjBuilder* bobP)
 {
-  if (format != "")
+  if (!format.empty())
   {
     bobP->append(REG_FORMAT, format);
   }

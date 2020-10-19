@@ -654,7 +654,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
     if (type == SftMq)
     {
-      if (metadataName == "")
+      if (metadataName.empty())
       {
         *errorStringP = "no metadata in right-hand-side of q-item";
         free(toFree);
@@ -1757,13 +1757,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     //
     if (type == SftMq)
     {
-      if (itemP->attributeName == "")
+      if (itemP->attributeName.empty())
       {
         *errorStringP = "no attribute name - not valid for metadata filters";
         return false;
       }
 
-      if (itemP->metadataName == "")
+      if (itemP->metadataName.empty())
       {
         *errorStringP = "no metadata name - not valid for metadata filters";
         return false;

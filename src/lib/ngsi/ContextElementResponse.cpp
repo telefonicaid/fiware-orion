@@ -160,7 +160,7 @@ ContextElementResponse::ContextElementResponse
       {
       case orion::String:
         ca.stringValue = getStringFieldFF(attr, ENT_ATTRS_VALUE);
-        if (!includeEmpty && ca.stringValue.length() == 0)
+        if (!includeEmpty && ca.stringValue.empty())
         {
           continue;
         }
@@ -400,7 +400,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
     statusCode.fill(&qcrP->errorCode);
     entity.fill(entityId, entityType, "false");
 
-    if ((statusCode.code != SccOk) && (statusCode.details == ""))
+    if ((statusCode.code != SccOk) && (statusCode.details.empty()))
     {
       statusCode.details = "Entity id: /" + entityId + "/";
     }

@@ -1,1 +1,1 @@
-{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"service not found"}}
+{"errorCode":{"code":"400","reasonPhrase":"Bad Request","details":"Service not found. Check your URL as probably it is wrong."}}

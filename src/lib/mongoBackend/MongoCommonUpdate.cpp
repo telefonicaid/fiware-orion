@@ -276,7 +276,7 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
   {
-    return (caP->valueType != orion::ValueTypeString || caP->stringValue != "");
+    return (caP->valueType != orion::ValueTypeString || !caP->stringValue.empty());
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
@@ -343,7 +343,7 @@ static void appendMetadata
   std::string effectiveName = dbDotEncode(mdP->name);
 
   // FIXME P8: this code probably should be refactored to be clearer and cleaner
-  if (type != "")
+  if (!type.empty())
   {
     orion::BSONObjBuilder bob;
     bob.append(ENT_ATTRS_MD_TYPE, type);
@@ -499,7 +499,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
   }
 
   /* 2. Add type, if present in request. If not, just use the one that is already present in the database. */
-  if (caP->type != "")
+  if (!caP->type.empty())
   {
     ab.append(ENT_ATTRS_TYPE, caP->type);
   }
@@ -591,7 +591,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
     actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                    ((caP->type != "") &&
+                    ((!caP->type.empty()) &&
                      (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldFF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                     mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
   }
@@ -909,7 +909,7 @@ static void servicePathSubscription(const std::string& servicePath, orion::BSONA
   //
   // Split Service Path in 'path components'
   //
-  if (servicePath != "")
+  if (!servicePath.empty())
   {
     spathComponents = stringSplit(servicePath, '/', spathV);
   }
@@ -1542,7 +1542,7 @@ static bool addTriggeredSubscriptions_noCache
         trigs->fillExpression(georel, geometry, coords);
 
         // Parsing q
-        if (q != "")
+        if (!q.empty())
         {
           StringFilter* stringFilterP = new StringFilter(SftQ);
 
@@ -1574,7 +1574,7 @@ static bool addTriggeredSubscriptions_noCache
         }
 
         // Parsing mq
-        if (mq != "")
+        if (!mq.empty())
         {
           StringFilter* mdStringFilterP = new StringFilter(SftMq);
 
@@ -1801,7 +1801,7 @@ static unsigned int processSubscriptions
     /* Check 3: expression (georel, which also uses geometry and coords)
      * This should be always the last check, as it is the most expensive one, given that it interacts with DB
      * (Issue #2396 should solve that) */
-    if ((tSubP->expression.georel != "") && (tSubP->expression.coords != "") && (tSubP->expression.geometry != ""))
+    if ((!tSubP->expression.georel.empty()) && (!tSubP->expression.coords.empty()) && (!tSubP->expression.geometry.empty()))
     {
       Scope        geoScope;
       std::string  filterErr;
@@ -1926,7 +1926,7 @@ static unsigned int processSubscriptions
       //
       // Saving lastNotificationTime and count for cached subscription
       //
-      if (tSubP->cacheSubId != "")
+      if (!tSubP->cacheSubId.empty())
       {
         cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
 
@@ -2091,7 +2091,7 @@ static void updateAttrInNotifyCer
       }
 
       /* Set attribute type (except if new value is "", which means that the type is not going to change) */
-      if (targetAttr->type != "")
+      if (!targetAttr->type.empty())
       {
         caP->type = targetAttr->type;
       }
@@ -2140,7 +2140,7 @@ static void updateAttrInNotifyCer
             mdP->compoundValueP       = targetMdP->compoundValueP;
             targetMdP->compoundValueP = NULL;
 
-            if (targetMdP->type != "")
+            if (!targetMdP->type.empty())
             {
               mdP->type = targetMdP->type;
             }
@@ -2376,7 +2376,7 @@ static bool deleteContextAttributeItem
     *entityModified = true;
 
     /* Check aspects related with location */
-    if (targetAttr->getLocation(apiVersion).length() > 0)
+    if (!targetAttr->getLocation(apiVersion).empty())
     {
       std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +
@@ -2709,7 +2709,7 @@ static bool createEntity
 
   bsonId.append(ENT_ENTITY_ID, eP->id);
 
-  if (eP->type == "")
+  if (eP->type.empty())
   {
     if (apiVersion == V2)
     {
@@ -2722,7 +2722,7 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? SERVICE_PATH_ROOT : servicePathV[0]);
+  bsonId.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
 
   orion::BSONObjBuilder insertedDoc;
 
@@ -2733,7 +2733,7 @@ static bool createEntity
   insertedDoc.append(ENT_MODIFICATION_DATE, now);
 
   /* Add location information in the case it was found */
-  if (locAttr.length() > 0)
+  if (!locAttr.empty())
   {
     orion::BSONObjBuilder bobLocation;
     bobLocation.append(ENT_LOCATION_ATTRNAME, locAttr);
@@ -2782,7 +2782,7 @@ static bool removeEntity
   orion::BSONObjBuilder  bob;
 
   bob.append(idString, entityId);
-  if (entityType == "")
+  if (entityType.empty())
   {
     orion::BSONObjBuilder bobExist;
     bobExist.append("$exists", false);
@@ -2793,7 +2793,7 @@ static bool removeEntity
     bob.append(typeString, entityType);
   }
 
-  if (servicePath == "")
+  if (servicePath.empty())
   {
     orion::BSONObjBuilder bobExist;
     bobExist.append("$exists", false);
@@ -2903,7 +2903,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (aP->providingApplication.get() != "")
+      if (!aP->providingApplication.get().empty())
       {
         return true;
       }
@@ -3122,7 +3122,7 @@ static unsigned int updateEntity
 
   // We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (locAttr.length() > 0)
+  if (!locAttr.empty())
   {
     newGeoJson = geoJson.obj();
 
@@ -3249,7 +3249,7 @@ static unsigned int updateEntity
   // idString, typeString from earlier in this function
   query.append(idString, entityId);
 
-  if (entityType == "")
+  if (entityType.empty())
   {
     orion::BSONObjBuilder bob;
     bob.append("$exists", false);
@@ -3378,7 +3378,7 @@ static bool contextElementPreconditionsCheck
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
       ContextAttribute* aP = eP->attributeVector[ix];
-      if (aP->valueType == orion::ValueTypeNotGiven && aP->type == "" && (aP->metadataVector.size() == 0))
+      if (aP->valueType == orion::ValueTypeNotGiven && aP->type.empty() && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
@@ -3457,7 +3457,7 @@ unsigned int processContextElement
 
   bob.append(idString, eP->id);
 
-  if (eP->type != "")
+  if (!eP->type.empty())
   {
     bob.append(typeString, eP->type);
   }

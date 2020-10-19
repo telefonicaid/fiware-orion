@@ -44,7 +44,7 @@ echo
 01. Request with empty URL - see Bad Request
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
+Content-Length: 129
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -52,7 +52,7 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "service not found",
+        "details": "Service not found. Check your URL as probably it is wrong.",
         "reasonPhrase": "Bad Request"
     }
 }

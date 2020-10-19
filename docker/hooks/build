@@ -1,4 +1,5 @@
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#!/bin/bash
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -17,35 +18,19 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+#
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# -e, to end execution immediately if 'cd ..' fails
+# -x, to print output as we go
+set -ex
 
---NAME--
-Service not recognized
+# due to Dockerfile is not in the repository root, but in a subdirectory and we use -f docker/Dockerfile
+cd ..
 
---SHELL-INIT--
-dbInit CB
-brokerStart CB
-
---SHELL--
-echo "1: +++++++++++++++++++++++++++++"
-orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/foo/bar"
-
---REGEXPECT--
-1: +++++++++++++++++++++++++++++
-HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orionError": {
-        "code": "400", 
-        "details": "Service not found. Check your URL as probably it is wrong.",
-        "reasonPhrase": "Bad Request"
-    }
-}
---TEARDOWN--
-brokerStop CB
-dbDrop CB
+docker image build --build-arg GIT_REV_ORION=$SOURCE_BRANCH \
+	--label "org.opencontainers.image.created"=$(date +%Y-%m-%d) \
+	--label "org.opencontainers.image.revision"=$SOURCE_COMMIT \
+	--label "org.opencontainers.image.version"=$DOCKER_TAG \
+	-f docker/Dockerfile \
+	-t $IMAGE_NAME \
+	.

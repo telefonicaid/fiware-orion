@@ -184,7 +184,7 @@ Metadata::Metadata(const std::string& _name, const orion::BSONObj& mdB)
 {
   name            = _name;
   type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldFF(mdB, ENT_ATTRS_MD_TYPE) : "";
-  typeGiven       = (type == "")? false : true;
+  typeGiven       = (type.empty())? false : true;
   compoundValueP  = NULL;
   shadowed        = false;
 
@@ -298,7 +298,7 @@ std::string Metadata::check(ApiVersion apiVersion)
     return std::string(errorMsg);
   }
 
-  if (name == "")
+  if (name.empty())
   {
     alarmMgr.badInput(clientIp, "missing metadata name");
     return "missing metadata name";
@@ -346,7 +346,7 @@ std::string Metadata::check(ApiVersion apiVersion)
       return "Invalid characters in metadata value";
     }
 
-    if (apiVersion == V1 && stringValue == "")
+    if (apiVersion == V1 && stringValue.empty())
     {
       alarmMgr.badInput(clientIp, "missing metadata value");
       return "missing metadata value";
@@ -448,7 +448,7 @@ std::string Metadata::toJson(void)
     defType = defaultType(orion::ValueTypeVector);
   }
 
-  jh.addString("type", (type != "")? type : defType);
+  jh.addString("type", (!type.empty())? type : defType);
 
   if (compoundValueP != NULL)
   {
@@ -501,7 +501,7 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
   orion::CompoundValueNode*  current = compoundValueP;
   int                        levels;
 
-  if (compoundPath == "")
+  if (compoundPath.empty())
   {
     return false;
   }

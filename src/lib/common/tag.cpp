@@ -155,7 +155,7 @@ std::string startTag
   // Empty key is legal JSON. However, Orion doesn't use that kind of keys,
   // so we can use an empty key string as argument instead of a showkey boolean
   // parameter, keeping the function signature simpler
-  bool showKey = (key != "");
+  bool showKey = (!key.empty());
 
   if (isVector && showKey)
   {
@@ -215,7 +215,7 @@ std::string valueTag
 {
   char* value;
 
-  if (unescapedValue == "")
+  if (unescapedValue.empty())
   {
     value = (char*) malloc(1);
 
