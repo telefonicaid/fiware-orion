@@ -43,15 +43,17 @@
 */
 typedef enum RenderFormat
 {
-  NO_FORMAT              = 0,
-  NGSI_V1_LEGACY         = 1,
-  NGSI_V2_NORMALIZED     = 2,
-  NGSI_V2_KEYVALUES      = 3,
-  NGSI_V2_VALUES         = 4,
-  NGSI_V2_UNIQUE_VALUES  = 5,
-  NGSI_V2_CUSTOM         = 6,
-  NGSI_LD_V1_NORMALIZED  = 10,
-  NGSI_LD_V1_KEYVALUES   = 11
+  NO_FORMAT                 = 0,
+  NGSI_V1_LEGACY            = 1,
+  NGSI_V2_NORMALIZED        = 2,
+  NGSI_V2_KEYVALUES         = 3,
+  NGSI_V2_VALUES            = 4,
+  NGSI_V2_UNIQUE_VALUES     = 5,
+  NGSI_V2_CUSTOM            = 6,
+  NGSI_LD_V1_NORMALIZED     = 10,
+  NGSI_LD_V1_KEYVALUES      = 11,
+  NGSI_LD_V1_V2_NORMALIZED  = 12,
+  NGSI_LD_V1_V2_KEYVALUES   = 13
 } RenderFormat;
 
 
