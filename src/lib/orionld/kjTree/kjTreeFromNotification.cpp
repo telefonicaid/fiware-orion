@@ -155,5 +155,5 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     }
   }
 
-   return rootP;
+  return rootP;
 }
