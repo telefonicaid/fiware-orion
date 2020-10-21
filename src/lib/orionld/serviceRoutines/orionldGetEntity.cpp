@@ -255,12 +255,21 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
     headerV[header].value = orionldState.tenant;
     ++header;
   }
+
   if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
   {
     headerV[header].type  = HttpHeaderPath;
     headerV[header].value = orionldState.servicePath;
     ++header;
   }
+
+  if (orionldState.xauthHeader != NULL)
+  {
+    headerV[header].type  = HttpHeaderXauth;
+    headerV[header].value = orionldState.xauthHeader;
+    ++header;
+  }
+
   headerV[header].type = HttpHeaderNone;
 
   if (orionldState.linkHttpHeaderPresent)

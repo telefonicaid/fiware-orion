@@ -188,6 +188,7 @@ typedef struct OrionldConnectionState
   char*                   link;
   bool                    linkHeaderAdded;
   bool                    noLinkHeader;
+  char*                   xauthHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;
