@@ -197,7 +197,7 @@ void logInfoFwdRequest
     effectivePayloadRes = (char*) responsePayload;
   }
 
-  LM_I(("Request forwarded (regId: %s): %s %s, request payload (%d bytes): %s, response payload (%d bytes): %s, response code: %d",
+  LM_I(("Request forwarded (regId: %s): %s %s, request payload (%d bytes): %s, response payload (%d bytes): %s, response code: %s",
     regId, verb, url, strlen(requestPayload), effectivePayloadReq, strlen(responsePayload), effectivePayloadRes, rc));
 
   if (cleanAfterUseReq)

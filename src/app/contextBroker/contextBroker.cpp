@@ -327,7 +327,7 @@ PaArgument paArgs[] =
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,             DISABLE_CUSTOM_NOTIF         },
 
   { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,             LOG_FOR_HUMANS_DESC          },
-  { "-logLineMaxSize ",             &logLineMaxSize,        "LOG_LINE_MAX_SIZES",       PaLong,   PaOpt, (32 * 1024),                     0,     PaNL,             LOG_LINE_MAX_SIZE_DESC       },
+  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZES",       PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,             LOG_LINE_MAX_SIZE_DESC       },
   { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,             LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
   { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,             METRICS_DESC                 },

@@ -322,6 +322,8 @@ static bool updateForward
   {
     // NGSIv2 forward - no payload to be received
 
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", statusCode);
+
     if (statusCode == SccNoContent)
     {
       upcrsP->fill(upcrP, SccOk);
