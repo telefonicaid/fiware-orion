@@ -628,7 +628,13 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   else if (strcasecmp(ckey, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;
 #endif
-  else if (strcasecmp(key.c_str(), HTTP_X_AUTH_TOKEN) == 0)        headerP->xauthToken         = value;
+  else if (strcasecmp(key.c_str(), HTTP_X_AUTH_TOKEN) == 0)
+  {
+#ifdef ORIONLD
+    orionldState.xauthHeader    = (char*) value;
+#endif
+    headerP->xauthToken         = value;
+  }
   else if (strcasecmp(key.c_str(), HTTP_X_REAL_IP) == 0)           headerP->xrealIp            = value;
   else if (strcasecmp(key.c_str(), HTTP_X_FORWARDED_FOR) == 0)     headerP->xforwardedFor      = value;
   else if (strcasecmp(key.c_str(), HTTP_FIWARE_CORRELATOR) == 0)   headerP->correlator         = value;
