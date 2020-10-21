@@ -37,7 +37,7 @@ The test script has been developed in the Python programming language. The param
 * HTTP Verb (GET, POST, PATCH and DELETE).
 
 ### How to use the test performance script
-* Create json test file
+* Create a test file with extention *.jmeter.json*
 
   ``` bash
   {
