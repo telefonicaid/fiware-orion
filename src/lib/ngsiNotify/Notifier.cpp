@@ -503,7 +503,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       payloadString = ncrP->render(ci.apiVersion, asJsonObject);
     }
 #ifdef ORIONLD
-    else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
+    else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_NORMALIZED))
     {
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
       if (subP == NULL)
@@ -530,9 +530,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
 #endif
     else
-    {
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
-    }
 
     /* Parse URL */
     std::string  host;
