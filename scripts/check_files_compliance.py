@@ -181,7 +181,7 @@ def ignore(root, file):
         return True
 
     # JMX files in test/jMeter are ignored
-    if 'jMeter' in root and file.endswith('.jmx'):
+    if 'jMeter' in root and (file.endswith('.jmx') or file.endswith('.jmeter.json')):
         return True
 
     # JSON files in test/jMeter/cases are ignored
