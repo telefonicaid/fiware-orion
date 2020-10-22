@@ -278,7 +278,7 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
 For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
-The version 4.4 is recommended for Ununtu 20.04, as older versions of mongodb don't seem to be supported bu mongodb 4.4 (there are no
+The version 4.4 is recommended for Ubuntu 20.04, as older versions of mongodb don't seem to be supported bu mongodb 4.4 (there are no
 installation instructions in the mongodb website for Ubuntu 20.04 and mongodb 4.0, nor 4.2 - only 4.4).
 
 This is what the MongoDB documentation tells us to do to install MongoDB server 4.4 under Ubuntu 20.04:

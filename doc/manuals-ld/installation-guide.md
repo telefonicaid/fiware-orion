@@ -75,6 +75,7 @@ Installation guides for different distributions:
 * [Ubuntu 20.04.1 LTS](installation-guide-ubuntu-20.04.1.md)
 * [CentOS 7](installation-guide-centos7.md)
 * [Debian 9](installation-guide-debian9.md)
+* [Debian 10](installation-guide-debian10.md)
 
 
 ### Sanity check
@@ -303,6 +304,7 @@ please follow the instructions in your respective Installation Guide for Functio
 * [Ubuntu 20.04](installation-guide-functional-tests-ubuntu20.04.1.md)
 * [CentOS 7](installation-guide-functional-tests-centos7.md)
 * [Debian 9](installation-guide-functional-tests-debian9.md)
+* [Debian 10](installation-guide-functional-tests-debian10.md)
 
 
 And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).
