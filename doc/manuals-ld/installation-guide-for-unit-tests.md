@@ -6,7 +6,7 @@ installed. The version 1.5 is used and it must be downloaded and compiled.
 ```bash
 cd /opt
 sudo mkdir gmock
-sudo chown $USER:$GROUP gmock
+sudo chown $USER:$GROUP gmock  # export GROUP with the value of your group name
 cd gmock
 wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
 tar xfvj gmock-1.5.0.tar.bz2
