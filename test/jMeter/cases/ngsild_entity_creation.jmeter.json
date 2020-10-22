@@ -1,0 +1,27 @@
+{
+    "NUM_OF_THREADS": 1,
+    "LOOPS": 3,
+    "RAMP_TIME": 1,
+    "DOMAIN_IP": "localhost",
+    "PORT": 1026,
+    "PATH_SERVICE": "ngsi-ld/v1/entities",
+    "HTTP_VERB": "POST",
+    "HEADERS": {
+        "Content-Type": "application/ld+json",
+        "Accept": "application/ld+json"
+    },
+    "BODY_DATA": {
+        "json": {
+            "id": "http://a.b.c/entity/${__UUID()}",
+            "type": "A",
+            "name": {
+                "type": "Property",
+                "value": "John 6"
+            },
+            "@context": [
+                "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+                "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+            ]
+        }
+    }
+}

@@ -32,6 +32,7 @@ test/functionalTest/cases/*/*.log
 test/functionalTest/cases/*.log
 test/jMeter/output/
 test/jMeter/*.log
+test/jMeter/*.csv
 
 core*
 test/valgrind/*.out

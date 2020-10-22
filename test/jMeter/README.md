@@ -21,19 +21,10 @@ source ~/.bashrc
 
 - In another machine, this one with Linux, install the Orion LD broker - instructions available on the Orion-LD github repo.
 - Install the [Plugins Manager](https://jmeter-plugins.org/install/Install/) on Apache JMeter and put it into lib/ext directory, then restart JMeter;
-- Install the plugin: *jpgc - Standard Set*, which will allow to use graph generators listeners, about:
-  * Transactions per seconds,
-  * Performance metrics,
-  * etc
-  However, to use the performance metrics listener, it is necessary to use the
-  [Server Agent tool](https://github.com/undera/perfmon-agent/blob/master/README.md) on both machines,
-  to get help monitoring the CPU, RAM and others parameter of the machine on which the broker runs.
-  The usage of the Server Agent tool is easy:
-  In the machine with Apache JMeter, execute `startAgent.[bat|sh]` (`.bat` for Windows, `.sh` for Linux)
-  and in the broker's machine, execute `startAgent.sh`.
-  This process establishes the communication between both machines.
-  In the JMeter machine - collect data about CPU and RAM usage.
-  In the Broker machine - generate a real time graph, ready to save as an image or a csv file.
+- Install the plugins for performance metrics: 
+
+  - *SSHMon Sample Collector*
+  - *SSH Protocol Support*
 
 ### Performance test script structure
 The test script has been developed in the Python programming language. The parameters used are: 
@@ -46,7 +37,7 @@ The test script has been developed in the Python programming language. The param
 * HTTP Verb (GET, POST, PATCH and DELETE).
 
 ### How to use the test performance script
-* Create json test file
+* Create a test file with extention *.jmeter.json*
 
   ``` bash
   {
@@ -59,22 +50,73 @@ The test script has been developed in the Python programming language. The param
     "HTTP_VERB": "GET",
     "HEADERS": {
         "Content-Type": "application/json",
-        "client-id": "app_devboard"
+        "client-id": "app"
     },
     "BODY_DATA": {
-        "raw": "username=gerente_app_devboard&password=1234"
+        "raw": "username=manager&password=1234"
     }
   }
   ```
 
   * **"BODY_DATA"** can be **"raw"** for **"application/x-www-form-urlencoded"** or **"json"** for **"application/json"**
 
-* Choose one of the following options:
-	* Generate complete report (.csv + HTML)
-	* Generate .csv file
-	* Only results on screen
+  * You can use a counter variable:
 
-* Run command:
+    ``` bash
+      "raw": "username=manager${counter_value}&password=1234"
+    ```
+
+  * You can use, too, a random variable:
+
+    ``` bash
+      "raw": "username=manager${__UUID()}&password=1234"
+    ```
+    or
+    ``` bash
+      "raw": "username=manager${random}&password=1234"
+    ```
+
+### Use performance metrics 
+
+Follow the example below.
+
+  ``` bash
+  "PERFORMANCE_METRICS": {
+    "CPU": [
+        {
+            "label": "CPU label",
+            "host": "111111",
+            "port": 22,
+            "username": "test_user",
+            "private_key": "key_true",
+            "password": "15987"
+        }
+    ],
+    "RAM": [
+        {
+            "label": "RAM label",
+            "host": "111111",
+            "port": 22,
+            "username": "test_user",
+            "private_key": "key_true",
+            "password": "15987"
+        },
+        {
+            "label": "RAM label 2",
+            "host": "111111",
+            "port": 22,
+            "username": "test_user",
+            "private_key": "key_true",
+            "password": "15987"
+        }
+    ]
+  }
+  ```
+
+
+### Execute load test
+
+Run command:
 
   ``` bash
   # For a particular test case:
@@ -83,3 +125,8 @@ The test script has been developed in the Python programming language. The param
   # For all test cases:
   python generateTestJMeter.py
   ```
+Choose one of the following options:
+
+* Generate complete report (.csv + HTML)
+* Generate .csv file
+* Only results on screen

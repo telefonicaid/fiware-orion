@@ -1,0 +1,42 @@
+{
+    "NUM_OF_THREADS": 1,
+    "LOOPS": 1,
+    "RAMP_TIME": 1,
+    "DOMAIN_IP": "localhost",
+    "PORT": 1026,
+    "PATH_SERVICE": "ngsi-ld/v1/entities?type=T&options=sysAttrs",
+    "HTTP_VERB": "GET",
+    "HEADERS": {
+        "Content-Type": "application/json"
+    },
+    "PERFORMANCE_METRICS": {
+        "CPU": [
+            {
+                "label": "CPU label",
+                "host": "111111",
+                "port": 22,
+                "username": "test_user",
+                "private_key": "key_true",
+                "password": "15987"
+            }
+        ],
+        "RAM": [
+            {
+                "label": "RAM label",
+                "host": "111111",
+                "port": 22,
+                "username": "test_user",
+                "private_key": "key_true",
+                "password": "15987"
+            },
+            {
+                "label": "RAM label 2",
+                "host": "111111",
+                "port": 22,
+                "username": "test_user",
+                "private_key": "key_true",
+                "password": "15987"
+            }
+        ]
+    }
+}
