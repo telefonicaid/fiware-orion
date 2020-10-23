@@ -1004,8 +1004,6 @@ std::string double2string(double f)
 *
 * isodate2str -
 *
-* FIXME P6: change implementation to use gmtime_r
-*
 */
 std::string isodate2str(double timestamp)
 {
@@ -1052,7 +1050,10 @@ std::string isodate2str(double timestamp)
   int     micros    = ms * 1000000;
   int     millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
 
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime(&seconds));
+  // Unused, but needed to fullfill gmtime_r() signature
+  struct tm  tmP;
+
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime_r(&seconds, &tmP));
 
   char* eob = &buffer[strlen(buffer)];
   sprintf(eob, ".%03dZ", millis);
