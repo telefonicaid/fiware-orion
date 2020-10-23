@@ -277,8 +277,8 @@ function brokerStartAwait
       break;
     fi
 
-    logMsg Awaiting valgrind to fully start the orion context broker '('$loopNo')' ...
-    sleep .2
+    logMsg Awaiting orion context to fully start '(loop '$loopNo')' ...
+    sleep .1
     loopNo=$loopNo+1
   done
 
