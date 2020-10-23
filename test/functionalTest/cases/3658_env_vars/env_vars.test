@@ -124,7 +124,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]     ORION_CHECK_ID_V1                 FALSE /FALSE/
                                [option '-disableCustomNotifications' (disable NGSIv2 custom notifications)]        ORION_DISABLE_CUSTOM_NOTIF        FALSE /FALSE/
                                [option '-logForHumans' (human readible log to screen)]                             ORION_LOG_FOR_HUMANS              FALSE /FALSE/
-                               [option '-logLineMaxSize ' <log line maximum size (in bytes)>]                      ORION_LOG_LINE_MAX_SIZES          32768 /32768/ >= 0
+                               [option '-logLineMaxSize' <log line maximum size (in bytes)>]                       ORION_LOG_LINE_MAX_SIZES          32768 /32768/ >= 100
                                [option '-logInfoPayloadMaxSize' <maximum length for request or response payload]   ORION_LOG_INFO_PAYLOAD_MAX_SIZE   5120 /5120/ >= 0
                                [option '-disableMetrics' (turn off the 'metrics' feature)]                         ORION_DISABLE_METRICS             FALSE /FALSE/
                                [option '-insecureNotif' (allow HTTPS notifications to peers which certificate c]   ORION_INSECURE_NOTIF              FALSE /FALSE/

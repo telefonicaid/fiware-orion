@@ -85,7 +85,7 @@ static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
 static unsigned int              mhdConnectionTimeout  = 0;
 
-// FIXME P5: replace 1025 with a proper value, based on literature for URL max length
+// FIXME P5: replace 1024 with a proper value, based on literature for URL max length
 __thread char                    uriForLogs[1024];
 
 
@@ -568,12 +568,12 @@ static void requestCompleted
   if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
   {
     // Variant with payload
-    logInfoRequestWithPayload(ciP->method.c_str(), uriForLogs, ciP->payload, ciP->httpStatusCode);
+    logInfoRequestWithPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->payload, ciP->httpStatusCode);
   }
   else
   {
     // Variant without payload
-    logInfoRequestWithoutPayload(ciP->method.c_str(), uriForLogs, ciP->httpStatusCode);
+    logInfoRequestWithoutPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->httpStatusCode);
   }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
@@ -1150,9 +1150,10 @@ static void* getUriForLog(void* cls, const char* uri, struct MHD_Connection *con
   // We need this for getting raw URL (path + query params) for logs. Note we
   // cannot use ciP->url, as it only has the path part
 
-  // Probably, it would  be better to have uriForLogs as part of ciP, but note that at the
-  // momentthis getUriForLog callback is called that object doesn't exist
-  // so we use a thread variable
+  // Note that the uriForLogs variable set by this handler is later used to
+  // set ciP->uriForLogs in connectionTreat(). We cannot do this assignment
+  // direclty, as at the moment this getUriForLog callback is called the ciP object
+  // doesn't exist so we use a thread variable
 
   strncpy(uriForLogs, uri, sizeof(uriForLogs));
 
@@ -1309,6 +1310,10 @@ static int connectionTreat
 
     ++reqNo;
 
+    // To be used by logs during the processing of the request
+    // It is assumed that as this point of code the getUriForLog handler has been
+    // previously called, so uriForLogs is not null
+    ciP->uriForLogs = std::string(uriForLogs);
 
     //
     // URI parameters

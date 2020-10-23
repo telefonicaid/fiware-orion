@@ -150,6 +150,7 @@ public:
   MimeType                   inMimeType;
   MimeType                   outMimeType;
   std::string                url;
+  std::string                uriForLogs;  // as url, but it also includes the query params
   std::string                method;
   std::string                version;
   std::string                charset;

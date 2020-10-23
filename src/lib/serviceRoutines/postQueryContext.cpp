@@ -690,6 +690,11 @@ std::string postQueryContext
   std::string prevCoorId  = correlationIdGet();
   std::string prevTransId = transactionIdGetAsString();
 
+  if (requestV.size() > 0)
+  {
+    logInfoFwdStart(ciP->method.c_str(), ciP->uriForLogs.c_str());
+  }
+
   for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
   {
     if (requestV[fIx]->contextProvider.empty())

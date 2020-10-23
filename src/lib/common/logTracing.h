@@ -87,6 +87,14 @@ extern void logInfoRequestWithPayload
 
 /* ****************************************************************************
 *
+* logInfoFwdStart
+*/
+extern void logInfoFwdStart(const char*  verb, const char* url);
+
+
+
+/* ****************************************************************************
+*
 * logInfoFwdRequest - rc as int
 */
 extern void logInfoFwdRequest
@@ -114,6 +122,8 @@ extern void logInfoFwdRequest
   const char*  responsePayload,
   const char*  rc
 );
+
+
 
 #endif // SRC_LIB_COMMON_LOGTRACING_H_
 

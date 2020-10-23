@@ -55,6 +55,7 @@ brokerStart CP5
 # 13. Query E1/T1 in CB
 # 14. Check request forwarded logs (some of them are cut)
 # 15. Check notification correlators (three series of 5 elements)
+# 16. Check three messages about starting forwarding
 #
 
 echo "01. Create E1/T1/A1 in CP1"
@@ -330,6 +331,13 @@ echo
 echo
 
 
+echo "16. Check three messages about starting forwarding"
+echo "=================================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Starting' | awk -F '|' '{print $10}'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create E1/T1/A1 in CP1
 ==========================
@@ -553,6 +561,13 @@ POST http://localhost:9805/v2/op/query, request payload (53 bytes): {"entities":
  corr=REGEX([0-9a-f\-]{36}); cbfwd=3
  corr=REGEX([0-9a-f\-]{36}); cbfwd=4
  corr=REGEX([0-9a-f\-]{36}); cbfwd=5
+
+
+16. Check three messages about starting forwarding
+==================================================
+ msg=Starting forwarding for GET /v2/entities/E1?type=T1
+ msg=Starting forwarding for PATCH /v2/entities/E1/attrs?type=T1
+ msg=Starting forwarding for GET /v2/entities/E1?type=T1
 
 
 --TEARDOWN--

@@ -139,6 +139,17 @@ void logInfoRequestWithPayload
 
 /* ****************************************************************************
 *
+* logInfoFwdStart
+*/
+void logInfoFwdStart(const char* verb, const char*  url)
+{
+  LM_I(("Starting forwarding for %s %s", verb, url));
+}
+
+
+
+/* ****************************************************************************
+*
 * logInfoFwdRequest - rc as int
 */
 void logInfoFwdRequest

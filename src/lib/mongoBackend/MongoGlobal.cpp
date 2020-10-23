@@ -240,11 +240,11 @@ void mongoInit
 
   if (user[0] != 0)
   {
-    LM_I(("Connected to mongo at %s:%s as user '%s' (poolsize: %d)", dbHost, dbName.c_str(), user, dbPoolSize));
+    LM_I(("Connected to mongo at %s/%s, as user '%s' (poolsize: %d)", dbHost, dbName.c_str(), user, dbPoolSize));
   }
   else
   {
-    LM_I(("Connected to mongo at %s:%s (poolsize: %d)", dbHost, dbName.c_str(), dbPoolSize));
+    LM_I(("Connected to mongo at %s/%s (poolsize: %d)", dbHost, dbName.c_str(), dbPoolSize));
   }
 
   setDbPrefix(dbName);
