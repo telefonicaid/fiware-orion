@@ -37,6 +37,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
+#include "common/uuidGenerate.h"                                 // for uuidGenerate
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/HttpStatusCode.h"                               // SccNotImplemented
@@ -967,7 +968,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
             //Chandra-TBI
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
-            "sub_property,unit_code, data_set_id,value_string, value_boolean, value_number, value_relation,"
+            "sub_property,unit_code, data_set_id, instance_id, value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
                 "VALUES (%s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
@@ -1067,8 +1068,11 @@ void allValuesRender (OrionldTemporalDbAttributeTable* attrLocalP, char* allValu
         snprintf(observedAtValue, observedAtSize, "%f", attrLocalP->observedAt);
     }
 
-    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
-        unitCodeValue, dataSetIdValue, allValues, geoPropertyValue, observedAtValue);
+    char* uuidBuffer = kaAlloc(&orionldState.kalloc, 64);
+    uuidGenerate(uuidBuffer);
+
+    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s, %s",
+        unitCodeValue, dataSetIdValue, uuidBuffer, allValues, geoPropertyValue, observedAtValue);
 }
 
 
