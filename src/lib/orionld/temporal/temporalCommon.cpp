@@ -37,7 +37,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
-#include "common/uuidGenerate.h"                                 // for uuidGenerate
+#include "orionld/common/uuidGenerate.h"                                 // for uuidGenerate
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "rest/HttpStatusCode.h"                               // SccNotImplemented
