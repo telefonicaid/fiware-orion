@@ -834,7 +834,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -872,7 +872,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=2
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -910,7 +910,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=3
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -948,7 +948,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=4
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -986,7 +986,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=5
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -1024,7 +1024,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=6
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -1062,7 +1062,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=7
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
@@ -1100,7 +1100,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345678])
 
 {
     "data": [
