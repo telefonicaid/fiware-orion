@@ -146,7 +146,7 @@ time=2020-10-26T09:45:17.301Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv
 time=2020-10-26T09:45:17.304Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1180]:main | msg=Startup completed
 ```
 
-At runtime, the INFO level shows relevant information about client request, notifications and
+At runtime, the INFO level shows relevant information about client requests, notifications and
 forwarded requests. In particular:
 
 * For each client request *without payload*, Orion shows a trace like this when the processing of the
@@ -175,7 +175,7 @@ time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df
 
 * For each forwarded request to a [Context Provider](../user/context_providers.md) (either queries or updates),
   Orion shows a trace like this. Note that Orion adds the `cbfwd=` suffix  to the "root correlator" associated
-  to the client request (in this example, the client request uses `eabce3e2-149f-11eb-a2e8-000c29df7908`). The value
+  to the client request (in this example, the client request uses `corr=eabce3e2-149f-11eb-a2e8-000c29df7908`). The value
   of this suffix is an auto increment counter (starting with 1 for the first forwarded request) so every forwarded
   request triggered by the same update has a strictly different value for the correlator.
 
@@ -187,8 +187,8 @@ Some additional considerations:
 
 * The `-logInfoPayloadMaxSize` setting is used to specify the maximum size that the payloads in the
   above traces may have. If the payload overpasses this limit, then only the first `-logInfoPayloadMaxSize`
-  bytes are printed (and an ellipsis in the form of `(...)` is shown). Default value: 5 Kbytes.
-* The status code in notifications and forwarding traces can be either a number (corresponding to the
+  bytes are printed (and an ellipsis in the form of `(...)` is shown in traces). Default value: 5 Kbytes.
+* The response code in notifications and forwarding traces can be either a number (corresponding to the
   HTTP response code of the notification or forwarded request) or a string when some connectivity problem
   occurs. For instance:
 
@@ -345,7 +345,6 @@ Notification endpoint response with 500 (a WARN trace is printed)
 ```
 time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
 time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
-
 ```
 
 Endpoint not responding within 10 seconds timeout or some other connection error (alarm is raised in WARN level):

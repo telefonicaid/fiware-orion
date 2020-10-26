@@ -2684,7 +2684,7 @@ static bool createEntity
   }
 
   // Correlator (for notification loop detection logic)
-  // Note entity creation could come be caused by a notification rquest
+  // Note entity creation could be caused by a notification request
   // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
@@ -3092,7 +3092,7 @@ static unsigned int updateEntity
 
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  // Note entity update could come be caused by a notification rquest
+  // Note entity update could be caused by a notification request
   // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   if (action != ActionTypeReplace)
   {
@@ -3115,7 +3115,7 @@ static unsigned int updateEntity
 
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // we use a BSONObjBuilder instead the BSON stream macro.
-    // Note entity replacement could come be caused by a notification rquest
+    // Note entity replacement could be caused by a notification request
     // (with cbnotif= in the correlator) so we need to use correlatorRoot()
     replaceSet.append(ENT_ATTRS, toSetObj);
     replaceSet.append(ENT_ATTRNAMES, toPushArr);

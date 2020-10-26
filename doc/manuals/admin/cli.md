@@ -168,7 +168,7 @@ The list of available options is the following:
     * No `${...}` macro substitution is performed.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
 -   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes.
--   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown). Default value: 5KBytes.
+-   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes.
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
