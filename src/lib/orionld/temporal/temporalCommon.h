@@ -114,6 +114,7 @@ typedef struct OrionldTemporalDbAttributeTable
   double                                    createdAt;
   double                                    modifiedAt;
   double                                    observedAt;
+  char*                                     instanceId;
   double                                    geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbAttributeTable;
 
@@ -141,6 +142,7 @@ typedef struct OrionldTemporalDbSubAttributeTable
   double                                    createdAt;
   double                                    modifiedAt;
   double                                    observedAt;
+  char*                                     attrInstanceId;
   float                                     subAttributeGeoProperty[];  // Chandra-TBD
 } OrionldTemporalDbSubAttributeTable;
 

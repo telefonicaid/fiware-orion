@@ -408,6 +408,10 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         }
     }
 
+    //  adding instance id to map to sub attributes
+    dbAttributeTableLocal->instanceId = kaAlloc(&orionldState.kalloc, 64);
+    uuidGenerate(dbAttributeTableLocal->instanceId);
+
     // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
     KjNode* nodeP  = kjLookup(attrP, "unitCode");
     if(nodeP != NULL)
@@ -430,12 +434,12 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         // Chandra-TBI
     }
 
-    nodeP  = kjLookup(attrP, "instanceid");
-    if(nodeP != NULL)
-    {
-        kjChildRemove (attrP,nodeP);
-        // Chandra-TBI
-    }
+    //nodeP  = kjLookup(attrP, "instanceid");
+    //if(nodeP != NULL)
+    //{
+    //    kjChildRemove (attrP,nodeP);
+    //    // Chandra-TBI
+    //}
 
     nodeP  = kjLookup(attrP, "location");
     if(nodeP != NULL)
@@ -470,6 +474,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx]->attributeName = dbAttributeTableLocal->attributeName;
+            dbSubAttributeTableLocal[attrIndex][subAttrIx]->attrInstanceId = dbAttributeTableLocal->instanceId;
             attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[attrIndex][subAttrIx]);
             subAttrIx++;
         }
