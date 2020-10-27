@@ -1022,32 +1022,6 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
-
-    //
-    // FIXME P4: See issue #2076.
-    //           aList is just a copy of cSubP->attributes - would be good to avoid
-    //           as a reference to the CachedSubscription is already in TriggeredSubscription
-    //           cSubP->attributes is of type    std::vector<std::string>
-    //           while AttributeList contains a  std::vector<std::string>
-    //           Practically the same, except for the methods that AttributeList offers.
-    //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
-    //           instead of its std::vector<std::string> ... ?
-    //
-    StringList aList;
-    bool op = false;
-    if (cSubP->onlyChanged)
-    {
-      subToNotifyList(modifiedAttrs, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
-      if (op)
-      {
-        continue;
-      }
-    }
-    else
-    {
-      aList.fill(cSubP->attributes);
-    }
-
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
@@ -1082,6 +1056,31 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->lastNotificationTime,
                          now,
                          now - cSubP->lastNotificationTime));
+    }
+
+    //
+    // FIXME P4: See issue #2076.
+    //           aList is just a copy of cSubP->attributes - would be good to avoid
+    //           as a reference to the CachedSubscription is already in TriggeredSubscription
+    //           cSubP->attributes is of type    std::vector<std::string>
+    //           while AttributeList contains a  std::vector<std::string>
+    //           Practically the same, except for the methods that AttributeList offers.
+    //           Perhaps CachedSubscription should include an AttributeList (cSubP->attributes)
+    //           instead of its std::vector<std::string> ... ?
+    //
+    StringList aList;
+    bool op = false;
+    if (cSubP->onlyChanged)
+    {
+      subToNotifyList(modifiedAttrs, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
+      if (op)
+      {
+        continue;
+      }
+    }
+    else
+    {
+      aList.fill(cSubP->attributes);
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
