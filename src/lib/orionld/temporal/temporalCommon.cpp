@@ -474,7 +474,7 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx]->attributeName = dbAttributeTableLocal->attributeName;
-            dbSubAttributeTableLocal[attrIndex][subAttrIx]->attrInstanceId = dbAttributeTableLocal->instanceId;
+            dbSubAttributeTableLocal[attrIndex][subAttrIx].attrInstanceId = dbAttributeTableLocal->instanceId;
             attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[attrIndex][subAttrIx]);
             subAttrIx++;
         }
