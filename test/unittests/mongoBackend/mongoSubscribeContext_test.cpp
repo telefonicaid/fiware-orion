@@ -293,7 +293,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -373,7 +373,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -457,7 +457,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -541,7 +541,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -623,7 +623,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -714,7 +714,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -803,7 +803,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -889,7 +889,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -979,7 +979,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1069,7 +1069,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1157,7 +1157,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1251,7 +1251,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1365,6 +1365,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -1468,6 +1469,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -1572,6 +1574,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -1680,6 +1683,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -1804,6 +1808,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -1928,6 +1933,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -2044,6 +2050,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -2160,6 +2167,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -2290,6 +2298,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -2420,6 +2429,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -2526,6 +2536,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -2632,6 +2643,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -2739,6 +2751,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -2844,6 +2857,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -2956,6 +2970,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -3068,6 +3083,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -3180,6 +3196,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -3292,6 +3309,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -3414,6 +3432,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -3531,6 +3550,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -3652,6 +3672,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -3774,6 +3795,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         emptyV,
                                                         false,
@@ -3893,6 +3915,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -4016,6 +4039,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
                                                         "",
                                                         "",
                                                         "no correlator",
+                                                        0,
                                                         NGSI_V1_LEGACY,
                                                         attrsFilter,
                                                         false,
@@ -4112,7 +4136,7 @@ TEST(mongoSubscribeContext, defaultDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4197,7 +4221,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_, _, _, _, _, _, _, _, _, _))
             .Times(0);
     setNotifier(notifierMock);
 

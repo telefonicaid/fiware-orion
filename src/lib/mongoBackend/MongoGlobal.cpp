@@ -240,11 +240,11 @@ void mongoInit
 
   if (user[0] != 0)
   {
-    LM_I(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
+    LM_I(("Connected to mongo at %s/%s, as user '%s' (poolsize: %d)", dbHost, dbName.c_str(), user, dbPoolSize));
   }
   else
   {
-    LM_I(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
+    LM_I(("Connected to mongo at %s/%s (poolsize: %d)", dbHost, dbName.c_str(), dbPoolSize));
   }
 
   setDbPrefix(dbName);
@@ -1878,7 +1878,8 @@ static void processContextRegistrationElement
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   MimeType                            mimeType,
-  ProviderFormat                      providerFormat
+  ProviderFormat                      providerFormat,
+  const std::string&                  regId
 )
 {
   ContextRegistrationResponse crr;
@@ -1927,6 +1928,7 @@ static void processContextRegistrationElement
 
     crrP->contextRegistration = crr.contextRegistration;
     crrP->providerFormat      = providerFormat;
+    crrP->regId               = regId;
 
     crrV->push_back(crrP);
   }
@@ -2097,10 +2099,11 @@ bool registrationsQuery
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
     ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
+    std::string               regId                     = getFieldF(r, "_id").OID().toString();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -2531,11 +2534,13 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
+        // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
         getNotifier()->sendNotifyContextRequest(ncr,
                                                 notifyHttpInfo,
                                                 tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
+                                                0,
                                                 renderFormat,
                                                 attrsOrder,
                                                 blacklist,
@@ -2550,11 +2555,13 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
+      // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
       getNotifier()->sendNotifyContextRequest(ncr,
                                               notifyHttpInfo,
                                               tenant,
                                               xauthToken,
                                               fiwareCorrelator,
+                                              0,
                                               renderFormat,
                                               attrsOrder,
                                               blacklist,
@@ -2887,6 +2894,7 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     MimeType        perEntPaMimeType  = NOMIMETYPE;
     MimeType        perAttrPaMimeType = NOMIMETYPE;
     ProviderFormat  providerFormat;
+    std::string     regId;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
@@ -2895,11 +2903,13 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
                          &perEntPaMimeType,
                          &perAttrPa,
                          &perAttrPaMimeType,
-                         &providerFormat);
+                         &providerFormat,
+                         &regId);
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa.empty() ? perEntPa : perAttrPa);
     ca->providingApplication.setProviderFormat(providerFormat);
+    ca->providingApplication.setRegId(regId);
     ca->found = (!ca->providingApplication.get().empty());
   }
 }
@@ -2947,11 +2957,13 @@ void cprLookupByAttribute
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
   MimeType*                                 perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP
+  ProviderFormat*                           providerFormatP,
+  std::string*                              regId
 )
 {
   *perEntPa  = "";
   *perAttrPa = "";
+  *regId = "";
 
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
@@ -2982,7 +2994,8 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+        *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
+        *regId            = crr->regId;
 
         break;  /* enIx */
       }
@@ -2994,8 +3007,9 @@ void cprLookupByAttribute
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
-          *perAttrPa         = crr->contextRegistration.providingApplication.get();
-          *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+          *perAttrPa        = crr->contextRegistration.providingApplication.get();
+          *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
+          *regId            = crr->regId;
 
           return;
         }

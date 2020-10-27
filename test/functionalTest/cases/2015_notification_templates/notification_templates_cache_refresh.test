@@ -141,7 +141,7 @@ A2: a2
 A1: a1
 Entity-Type: Thing
 Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "A1": "a1", 

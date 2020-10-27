@@ -83,6 +83,39 @@ using orion::CompoundValueNode;
 
 /* ****************************************************************************
 *
+* correlatorRoot -
+*
+* This functions returns the "correlator root", i.e. correlator without the "cbnotif" decorator
+*
+* For instance if full correlator is
+*
+*   f320136c-0192-11eb-a893-000c29df7908; cbnotif=32
+*
+* then the correlator root is:
+*
+*   f320136c-0192-11eb-a893-000c29df7908
+*
+* This is needed as the self-notification loop protection logic is based on the correlator root
+* so we store that in the DB.
+*
+*/
+inline std::string correlatorRoot(const std::string& fullCorrelator)
+{
+  size_t p = fullCorrelator.find(";");
+  if (p == std::string::npos)
+  {
+    return fullCorrelator;
+  }
+  else
+  {
+    return fullCorrelator.substr(0, p);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * isNotCustomMetadata -
 *
 * Check that the parameter is a not custom metadata, i.e. one metadata without
@@ -1589,6 +1622,7 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
 )
@@ -1651,6 +1685,7 @@ static bool processOnChangeConditionForUpdateContext
                                           tenant,
                                           xauthToken,
                                           fiwareCorrelator,
+                                          correlatorCounter,
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
@@ -1674,7 +1709,8 @@ static unsigned int processSubscriptions
   std::string*                                   err,
   const std::string&                             tenant,
   const std::string&                             xauthToken,
-  const std::string&                             fiwareCorrelator
+  const std::string&                             fiwareCorrelator,
+  unsigned int                                   notifStartCounter
 )
 {
   *err = "";
@@ -1785,6 +1821,7 @@ static unsigned int processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
+                                                                notifStartCounter + notifSent + 1,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -2647,7 +2684,9 @@ static bool createEntity
   }
 
   // Correlator (for notification loop detection logic)
-  insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  // Note entity creation could be caused by a notification request
+  // (with cbnotif= in the correlator) so we need to use correlatorRoot()
+  insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
@@ -2830,6 +2869,7 @@ static unsigned int updateEntity
   const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
+  unsigned int                    notifStartCounter,
   const std::string&              ngsiV2AttrsFormat
 )
 {
@@ -2952,7 +2992,7 @@ static unsigned int updateEntity
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == correlatorRoot(fiwareCorrelator));
   }
 
   if (!processContextAttributeVector(eP,
@@ -3052,9 +3092,11 @@ static unsigned int updateEntity
 
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
+  // Note entity update could be caused by a notification request
+  // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   if (action != ActionTypeReplace)
   {
-    toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+    toSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
   }
 
   /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
@@ -3073,10 +3115,12 @@ static unsigned int updateEntity
 
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // we use a BSONObjBuilder instead the BSON stream macro.
+    // Note entity replacement could be caused by a notification request
+    // (with cbnotif= in the correlator) so we need to use correlatorRoot()
     replaceSet.append(ENT_ATTRS, toSetObj);
     replaceSet.append(ENT_ATTRNAMES, toPushArr);
     replaceSet.append(ENT_MODIFICATION_DATE, now);
-    replaceSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+    replaceSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
     if (dateExpirationInPayload)
     {
@@ -3173,7 +3217,8 @@ static unsigned int updateEntity
                                                 &err,
                                                 tenant,
                                                 xauthToken,
-                                                fiwareCorrelator);
+                                                fiwareCorrelator,
+                                                notifStartCounter);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -3319,6 +3364,7 @@ unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
+  unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3492,6 +3538,7 @@ unsigned int processContextElement
                              forcedUpdate,
                              apiVersion,
                              fiwareCorrelator,
+                             notifStartCounter,
                              ngsiV2AttrsFormat);
   }
 
@@ -3629,7 +3676,8 @@ unsigned int processContextElement
                                          &errReason,
                                          tenant,
                                          xauthToken,
-                                         fiwareCorrelator);
+                                         fiwareCorrelator,
+                                         notifStartCounter);
 
         notifyCerP->release();
         delete notifyCerP;

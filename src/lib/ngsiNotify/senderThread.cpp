@@ -26,6 +26,7 @@
 #include "common/statistics.h"
 #include "common/limits.h"
 #include "common/globals.h"
+#include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
@@ -62,11 +63,12 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
+    long long    statusCode = -1;
+    std::string  out;
+
     if (!simulatedNotification)
     {
-      std::string  out;
       int          r;
-      long long    statusCode = -1;
 
       r = httpRequestSend(params->from,
                           params->ip,
@@ -109,6 +111,16 @@ void* startSenderThread(void* p)
     {
       LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
       __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
+    }
+
+    // Add notificacion result summary in log INFO level
+    if (statusCode != -1)
+    {
+      logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode);
+    }
+    else
+    {
+      logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str());
     }
 
     // End transaction

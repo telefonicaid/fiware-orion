@@ -87,6 +87,20 @@ int transactionIdGet(bool readonly)
 
 /* ****************************************************************************
 *
+* transactionIdGetAsString -
+*
+* Different from transactionIdGet(), this function returns the full transID,
+* not only the integer counter
+*/
+char* transactionIdGetAsString(void)
+{
+  return transactionId;
+}
+
+
+
+/* ****************************************************************************
+*
 * transactionIdSet - set the transaction ID
 *
 * To ensure a unique identifier of the transaction, the startTime down to milliseconds
@@ -125,6 +139,33 @@ void transactionIdSet(void)
   transSemGive("transactionIdSet", "changing the transaction id");
 
   firstTime = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - set the transaction ID string
+*
+* Different from the argument-less version of this function, this one
+* just sets the thread variable for transaction ID. It's pretty
+* similar to correlatorIdSet()
+*/
+void transactionIdSet(const char* transId)
+{
+  strncpy(transactionId, transId, sizeof(transactionId));
+}
+
+
+
+/* ****************************************************************************
+*
+* correlationIdGet -
+*
+*/
+char* correlationIdGet(void)
+{
+  return correlatorId;
 }
 
 

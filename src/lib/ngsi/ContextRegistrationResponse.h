@@ -43,6 +43,7 @@ typedef struct ContextRegistrationResponse
   StatusCode            errorCode;                  // Optional
   ProviderFormat        providerFormat;             // During forwarding, this field is used to record the 'format' from the registration that provoked
                                                     // this Context Element to be forwarded.
+  std::string           regId;                      // During forwarding, this field is used to record the regId (for logging purposes)
 
   ContextRegistrationResponse();
 

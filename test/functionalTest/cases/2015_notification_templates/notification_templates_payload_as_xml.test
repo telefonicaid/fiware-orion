@@ -116,7 +116,7 @@ Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/xml
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 <attributes><a1>a1</a1><a2>a2</a2><a3>13</a3></attributes>=======================================
 
