@@ -93,6 +93,8 @@ broker はデフォルトでバックグラウンドで実行されるため、�
     * `httpCustom` は、`http` として解釈されます。すなわち、`url` を除くすべてのサブフィールドが l 無視されます
     * `${...}` マクロ置換は実行されません
 -   **-logForHumans** : 人のために標準化されたトレースを作成します。ログ・ファイルのトレースは影響を受けないことに注意してください
+-   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト
+-   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 
@@ -163,6 +165,8 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_CHECK_ID_V1   |   strictNgsiv1Ids |
 |   ORION_DISABLE_CUSTOM_NOTIF  |   disableCustomNotifications  |
 |   ORION_LOG_FOR_HUMANS    |   logForHumans    |
+|   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
+|   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |   ORION_DISABLE_METRICS   |   disableMetrics  |
 |   ORION_INSECURE_NOTIF    |   insecureNotif   |
 |   ORION_NGSIV1_AUTOCAST   |   ngsiv1Autocast  |
