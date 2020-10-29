@@ -63,10 +63,7 @@ std::string libVersions(void)
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
 
-  char         mhdVersion[64];
   char*        curlVersion = curl_version();
-
-  snprintf(mhdVersion, sizeof(mhdVersion), "0x%08x", MHD_VERSION);
 
   total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
