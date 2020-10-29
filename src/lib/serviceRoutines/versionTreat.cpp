@@ -41,6 +41,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rapidjson/rapidjson.h"
 #include "serviceRoutines/versionTreat.h"
+#include "mongo/version.h"
 
 
 
@@ -56,12 +57,17 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 */
 std::string libVersions(void)
 {
+  // libuuid should also be included here, but we haven't found fo sar any way
+  // of getting its version without hardcoding it. If somebody knows how to
+  // get it, please tell us about :)
+
   std::string  total  = "\"libversions\": {\n";
   std::string  boost  = "     \"boost\": ";
   std::string  curl   = "     \"libcurl\": ";
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
+  std::string  mongo  = "     \"mongodriver\": ";
 
   char*        curlVersion = curl_version();
 
@@ -69,7 +75,8 @@ std::string libVersions(void)
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
-  total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + "\n";
+  total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
+  total += mongo   + "\"legacy-" + mongo::client::kVersionString + "\"" + "\n";
 
   return total;
 }

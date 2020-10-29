@@ -150,7 +150,8 @@ Date: REGEX(.*)
      "libcurl": "REGEX(.*)",
      "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)"
+     "rapidjson": "REGEX(.*)",
+     "mongodriver": "REGEX(.*)"
   }
 }
 }
@@ -177,7 +178,8 @@ Date: REGEX(.*)
      "libcurl": "REGEX(.*)",
      "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)"
+     "rapidjson": "REGEX(.*)",
+     "mongodriver": "REGEX(.*)"
   }
 }
 }
