@@ -66,7 +66,14 @@ Date: REGEX(.*)
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
-  "doc" : "REGEX(.*)
+  "doc" : "REGEX(.*)",
+  "libversions": {
+     "boost": "REGEX(.*)",
+     "libcurl": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
+     "openssl": "REGEX(.*)",
+     "rapidjson": "REGEX(.*)"
+  }
 }
 }
 
@@ -89,7 +96,14 @@ Date: REGEX(.*)
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
-  "doc" : "REGEX(.*)"
+  "doc" : "REGEX(.*)",
+  "libversions": {
+     "boost": "REGEX(.*)",
+     "libcurl": "REGEX(.*)",
+     "libmicrohttpd": "REGEX(.*)",
+     "openssl": "REGEX(.*)",
+     "rapidjson": "REGEX(.*)"
+  }
 }
 }
 
