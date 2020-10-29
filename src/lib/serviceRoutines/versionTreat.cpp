@@ -70,7 +70,7 @@ std::string libVersions(void)
 
   total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
-  total += mhd     + "\"" + mhdVersion    +   "\"" + ",\n";
+  total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + "\n";
 
