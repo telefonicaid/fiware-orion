@@ -198,14 +198,15 @@ MongoDB ReplicaSet を Docker Swarm にデプロイする方法の詳細につ�
 
     {
     "orion" : {
-      "version" : "1.12.0-next",
+      "version" : "2.4.0-next",
       "uptime" : "0 d, 0 h, 0 m, 27 s",
-      "git_hash" : "2c5323f6513aca87b309750260b2db2f10059a20",
-      "compile_time" : "Wed Feb 21 15:56:28 UTC 2018",
+      "git_hash" : "f2a3d436b2b507c5fd1611492ad7fad386901952",
+      "compile_time" : "Thu Oct 29 15:56:28 UTC 2020",
       "compiled_by" : "root",
       "compiled_in" : "4d72f1940cd1",
-      "release_date" : "Wed Feb 21 15:56:28 UTC 2018",
-      "doc" : "https://fiware-orion.rtfd.io/"
+      "release_date" : "Thu Oct 29 15:56:28 UTC 2020",
+      "doc" : "https://fiware-orion.rtfd.io/",
+      "libversions": ...
     }
     }
     ```
