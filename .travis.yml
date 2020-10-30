@@ -41,41 +41,41 @@ jobs:
     - env: STAGE=debian_functional_1001_1400
       name: "Functional Tests 1001-1400 (Debian)"
       stage: test
-    - env: STAGE=debian_release
-      name: "Deploy to Docker Hub"
-      stage: deploy
-      install: >
-        if [[ "${PUSH_STATUS}" ]]; then
-          echo -e " \033[1;33mBuilding Debian Docker image for Release";
-          travis_wait 30 docker build --no-cache --quiet \
-            --build-arg TOKEN=${TOKEN} \
-            --build-arg REV=${TRAVIS_COMMIT} \
-            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
-            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-        fi
-      script: true
-      after_success: >
-        if [[ "${PUSH_STATUS}" ]]; then
-          echo -e " \033[1;33mPushing Debian Release to Docker Hub";
-          docker push ${IMAGE_RELEASE_DEBIAN};
-        fi
-    - env: STAGE=debian_deps
-      name: "Deploy to Docker Hub - Image with Deps"
-      stage: deploy
-      install: >
-        if [[ "${PUSH_STATUS}" ]]; then
-          travis_wait 30 docker build --no-cache --quiet \
-            --build-arg TOKEN=${TOKEN} \
-            --build-arg REV=${TRAVIS_COMMIT} \
-            --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
-            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-        fi
-      script: true
-      after_success: >
-        if [[ "${PUSH_STATUS}" ]]; then
-          echo -e " \033[1;33mPushing Debian Release (with Dependencies) to Docker Hub";
-          docker push ${IMAGE_DEPS_DEBIAN};
-        fi
+    # - env: STAGE=debian_release
+    #   name: "Deploy to Docker Hub"
+    #   stage: deploy
+    #   install: >
+    #     if [[ "${PUSH_STATUS}" ]]; then
+    #       echo -e " \033[1;33mBuilding Debian Docker image for Release";
+    #       travis_wait 30 docker build --no-cache --quiet \
+    #         --build-arg TOKEN=${TOKEN} \
+    #         --build-arg REV=${TRAVIS_COMMIT} \
+    #         --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
+    #         -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+    #     fi
+    #   script: true
+    #   after_success: >
+    #     if [[ "${PUSH_STATUS}" ]]; then
+    #       echo -e " \033[1;33mPushing Debian Release to Docker Hub";
+    #       docker push ${IMAGE_RELEASE_DEBIAN};
+    #     fi
+    # - env: STAGE=debian_deps
+    #   name: "Deploy to Docker Hub - Image with Deps"
+    #   stage: deploy
+    #   install: >
+    #     if [[ "${PUSH_STATUS}" ]]; then
+    #       travis_wait 30 docker build --no-cache --quiet \
+    #         --build-arg TOKEN=${TOKEN} \
+    #         --build-arg REV=${TRAVIS_COMMIT} \
+    #         --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
+    #         -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+    #     fi
+    #   script: true
+    #   after_success: >
+    #     if [[ "${PUSH_STATUS}" ]]; then
+    #       echo -e " \033[1;33mPushing Debian Release (with Dependencies) to Docker Hub";
+    #       docker push ${IMAGE_DEPS_DEBIAN};
+    #     fi
 
   allow_failures:
     - env: STAGE=debian_integration
