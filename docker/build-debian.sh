@@ -95,7 +95,7 @@ echo "Builder: update apt"
 apt-get -y update
 
 echo "Builder: installing tools and dependencies"
-apt-get -y install --no-install-recommends \
+apt-get -y install -f --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
 
