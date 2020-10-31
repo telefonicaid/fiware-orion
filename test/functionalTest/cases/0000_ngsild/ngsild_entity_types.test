@@ -189,17 +189,23 @@ Date: REGEX(.*)
 04. GET Entity Types - see four types
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 21
+Content-Length: 131
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-[
-    "T1",
-    "T2",
-    "T3",
-    "T4"
-]
+{
+    "id": "urn:ngsi-ld:EntityTypeList:REGEX(.*)",
+    "type": "EntityTypeList",
+    "typeList": [
+        [
+            "T1",
+            "T2",
+            "T3",
+            "T4"
+        ]
+    ]
+}
 
 
 05. Creating an Entity E1 with type T2
@@ -214,17 +220,23 @@ Date: REGEX(.*)
 06. GET Entity Types - see four types
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 21
+Content-Length: 131
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-[
-    "T1",
-    "T2",
-    "T3",
-    "T4"
-]
+{
+    "id": "urn:ngsi-ld:EntityTypeList:REGEX(.*)",
+    "type": "EntityTypeList",
+    "typeList": [
+        [
+            "T1",
+            "T2",
+            "T3",
+            "T4"
+        ]
+    ]
+}
 
 
 07. Creating an Entity E2 with type T0
@@ -239,18 +251,24 @@ Date: REGEX(.*)
 08. GET Entity Types - see five types
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 26
+Content-Length: 136
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
-[
-    "T0",
-    "T1",
-    "T2",
-    "T3",
-    "T4"
-]
+{
+    "id": "urn:ngsi-ld:EntityTypeList:REGEX(.*)",
+    "type": "EntityTypeList",
+    "typeList": [
+        [
+            "T0",
+            "T1",
+            "T2",
+            "T3",
+            "T4"
+        ]
+    ]
+}
 
 
 --TEARDOWN--
