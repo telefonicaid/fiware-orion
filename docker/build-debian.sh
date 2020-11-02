@@ -128,8 +128,8 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 #echo ln to /bin/systemctl solves the issue.
 echo
 echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
-sudo dpkg -l | grep systemd
-sudo dpkg -L systemd
+dpkg -l | grep systemd
+dpkg -L systemd
 
 echo
 echo -e "\e[1;32m Builder: installing mongo \e[0m"
