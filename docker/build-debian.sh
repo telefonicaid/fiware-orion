@@ -129,6 +129,9 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 echo
 echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
 dpkg -l | grep systemd
+echo $PATH
+whereis systemctl
+dpkg-query -S /bin/systemctl 
 dpkg -L systemd
 
 echo
