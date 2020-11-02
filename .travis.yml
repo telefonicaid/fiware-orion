@@ -1,6 +1,9 @@
 dist: xenial
 language: minimal
 
+services:
+  - docker
+
 env:
   global:
     - IMAGE_RELEASE_DEBIAN=fiware/orion-ld
