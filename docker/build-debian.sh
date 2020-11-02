@@ -85,13 +85,6 @@ TO_CLEAN=(
  'openssh-client' \
 )
 
-echo -e "\e[1;32m This is red text \e[0m"
-
-# Resolve the issue in travis about docker build
-# the postinst for server includes "systemctl daemon-reload" (and we don't have "systemctl")
-
-#echo ln to /bin/systemctl solves the issue.
-
 echo -e "\e[1;32m Builder: create folders and user \e[0m"
 useradd -s /bin/false -r ${ORION_USER}
 mkdir -p /var/{log,run}/${BROKER}
@@ -136,6 +129,15 @@ apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DC
 echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
 apt-get -y update
 apt-get -y install mongodb-org mongodb-org-shell
+
+# Resolve the issue in travis about docker build
+# the postinst for server includes "systemctl daemon-reload" (and we don't have "systemctl")
+
+#echo ln to /bin/systemctl solves the issue.
+echo
+echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
+sudo dpkg -l | grep systemd
+sudo dpkg -L systemd
 
 echo
 echo -e "\e[1;32m Debian Builder: installing k libs \e[0m"
