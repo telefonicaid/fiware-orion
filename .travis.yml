@@ -27,11 +27,11 @@ jobs:
       stage: test
       install: true
       script: >
-        echo -e " \033[1;33mRunning Compliance Tests";
+        echo -e "\e[1;33mRunning Compliance Tests\e[0m"
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
-    - env: STAGE=debian_unit
-      name: "Unit Tests (Debian)"
-      stage: test
+    #    - env: STAGE=debian_unit
+    #      name: "Unit Tests (Debian)"
+    #      stage: test
     - env: STAGE=debian_functional_1_450
       name: "Functional Tests 1-450 (Debian)"
       stage: test
@@ -44,48 +44,46 @@ jobs:
     - env: STAGE=debian_functional_1001_1400
       name: "Functional Tests 1001-1400 (Debian)"
       stage: test
-    # - env: STAGE=debian_release
-    #   name: "Deploy to Docker Hub"
-    #   stage: deploy
-    #   install: >
-    #     if [[ "${PUSH_STATUS}" ]]; then
-    #       echo -e " \033[1;33mBuilding Debian Docker image for Release";
-    #       travis_wait 30 docker build --no-cache --quiet \
-    #         --build-arg TOKEN=${TOKEN} \
-    #         --build-arg REV=${TRAVIS_COMMIT} \
-    #         --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
-    #         -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-    #     fi
-    #   script: true
-    #   after_success: >
-    #     if [[ "${PUSH_STATUS}" ]]; then
-    #       echo -e " \033[1;33mPushing Debian Release to Docker Hub";
-    #       docker push ${IMAGE_RELEASE_DEBIAN};
-    #     fi
-    # - env: STAGE=debian_deps
-    #   name: "Deploy to Docker Hub - Image with Deps"
-    #   stage: deploy
-    #   install: >
-    #     if [[ "${PUSH_STATUS}" ]]; then
-    #       travis_wait 30 docker build --no-cache --quiet \
-    #         --build-arg TOKEN=${TOKEN} \
-    #         --build-arg REV=${TRAVIS_COMMIT} \
-    #         --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
-    #         -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
-    #     fi
-    #   script: true
-    #   after_success: >
-    #     if [[ "${PUSH_STATUS}" ]]; then
-    #       echo -e " \033[1;33mPushing Debian Release (with Dependencies) to Docker Hub";
-    #       docker push ${IMAGE_DEPS_DEBIAN};
-    #     fi
+    - env: STAGE=debian_release
+      name: "Deploy to Docker Hub"
+      stage: deploy
+      install: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          echo -e "\e[1;33mBuilding Debian Docker image for Release\e[0m"
+          travis_wait 30 docker build --no-cache --quiet \
+            --build-arg TOKEN=${TOKEN} \
+            --build-arg REV=${TRAVIS_COMMIT} \
+            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
+            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+        fi
+      script: true
+      after_success: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          echo -e "\e[1;33mPushing Debian Release to Docker Hub\e[0m"
+          docker push ${IMAGE_RELEASE_DEBIAN};
+        fi
+    - env: STAGE=debian_deps
+      name: "Deploy to Docker Hub - Image with Deps"
+      stage: deploy
+      install: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          travis_wait 30 docker build --no-cache --quiet \
+            --build-arg TOKEN=${TOKEN} \
+            --build-arg REV=${TRAVIS_COMMIT} \
+            --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
+            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+        fi
+      script: true
+      after_success: >
+        if [[ "${PUSH_STATUS}" ]]; then
+          echo -e "\e[1;33mPushing Debian Release (with Dependencies) to Docker Hub\e[0m"
+          docker push ${IMAGE_DEPS_DEBIAN};
+        fi
 
   allow_failures:
     - env: STAGE=debian_integration
 
 before_install: >
-  # sudo apt-get update
-
   export PLATFORM=$(echo ${STAGE} | cut -c1-6);
   export STAGE_TYPE=$(echo ${STAGE} | cut -c8-);
 
@@ -107,7 +105,7 @@ before_install: >
   fi
 
 install: >
-  echo -e " \033[1;33mRebuilding Debian Docker Images (with deps)";
+  echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m"
   travis_wait 30 docker build --no-cache --quiet \
     --build-arg TOKEN=${TOKEN} \
     --build-arg REV=${TRAVIS_COMMIT} \
@@ -115,7 +113,7 @@ install: >
     -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
 
 script: >
-  echo -e " \033[1;33mRunning Tests against Debian Image";
+  echo -e "\e[1;33mRunning Tests against Debian Image\e[0m"
   docker run \
     -t --rm -v $(pwd):${HOME} --entrypoint bash             \
     -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts  \
