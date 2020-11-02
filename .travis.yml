@@ -18,7 +18,7 @@ env:
 stages:
   - test
   - name: deploy
-    if: branch = develop
+    if: branch = bug/travis_problem # develop
 
 jobs:
   include:
