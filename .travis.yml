@@ -84,7 +84,7 @@ jobs:
     - env: STAGE=debian_integration
 
 before_install: >
-  sudo apt-get update
+  # sudo apt-get update
 
   export PLATFORM=$(echo ${STAGE} | cut -c1-6);
   export STAGE_TYPE=$(echo ${STAGE} | cut -c8-);

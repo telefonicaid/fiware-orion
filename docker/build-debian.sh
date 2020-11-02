@@ -85,33 +85,47 @@ TO_CLEAN=(
  'openssh-client' \
 )
 
-echo "Builder: building started"
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
-echo "Builder: create folders and user"
+echo
+echo "${GREEN}Builder: building started${NC}"
+
+# Resolve the issue in travis about docker build
+# the postinst for server includes "systemctl daemon-reload" (and we don't have "systemctl")
+
+#echo ln to /bin/systemctl solves the issue.
+
+echo "${GREEN}Builder: create folders and user${NC}"
 useradd -s /bin/false -r ${ORION_USER}
 mkdir -p /var/{log,run}/${BROKER}
 
-echo "Builder: update apt"
+echo
+echo "${GREEN}Builder: update apt${NC}"
 apt-get -y update
 
-echo "Builder: installing tools and dependencies"
+echo
+echo "${GREEN}Builder: installing tools and dependencies${NC}"
 apt-get -y install -f --no-install-recommends \
     ${BUILD_TOOLS[@]} \
     ${BUILD_DEPS[@]}
 
-echo "Builder: installing mongo cxx driver"
+echo
+echo "${GREEN}Builder: installing mongo cxx driver${NC}"
 git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT}/mongo-cxx-driver
 cd ${ROOT}/mongo-cxx-driver
 scons --disable-warnings-as-errors --use-sasl-client --ssl
 scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
 cd ${ROOT} && rm -Rf mongo-cxx-driver
 
-echo "Builder: installing rapidjson"
+echo
+echo "${GREEN}Builder: installing rapidjson${NC}"
 curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC ${ROOT}
 mv ${ROOT}/rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 cd ${ROOT} && rm -Rf rapidjson-1.0.2
 
-echo "Builder: installing libmicrohttpd"
+echo
+echo "${GREEN}Builder: installing libmicrohttpd${NC}"
 curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC ${ROOT}
 cd ${ROOT}/libmicrohttpd-0.9.48
 ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -119,14 +133,16 @@ make
 make install
 cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 
-echo "Builder: installing mongo"
+echo
+echo "${GREEN}Builder: installing mongo${NC}"
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
 
 echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
 apt-get -y update
 apt-get -y install mongodb-org mongodb-org-shell
 
-echo "Debian Builder: installing k libs"
+echo
+echo "${GREEN}Debian Builder: installing k libs${NC}"
 for kproj in kbase klog kalloc kjson khash
 do
     git clone https://gitlab.com/kzangeli/${kproj}.git ${ROOT}/$kproj
@@ -140,7 +156,8 @@ do
     make install
 done
 
-echo "Debian Builder: installing Paho MQTT C library"
+echo
+echo "${GREEN}Debian Builder: installing Paho MQTT C library${NC}"
 apt-get -y install doxygen                                                    # OK - with -y. NOT OK without -y !!!
 apt-get -y install graphviz 
 rm -f /usr/local/lib/libpaho*                                                 # OK
@@ -150,21 +167,22 @@ git fetch -a
 git checkout tags/v1.3.1                                                      # OK - git checkout develop ...
 make html                                                                     # OK
 
-echo Building Paho MQTT C Library
+echo "${GREEN}Building Paho MQTT C Library${NC}"
 make > /tmp/paho-build 2&>1 || /bin/true
-echo Paho Built ...
+echo "${GREEN}Paho Built ...${NC}"
 echo "============== PAHO BUILD TRACES START ============================="
 cat /tmp/paho-build
 echo "============== PAHO BUILD TRACES END ==============================="
 
-echo Installing Paho MQTT C Library
+echo "${GREEN}Installing Paho MQTT C Library${NC}"
 make install > /tmp/paho-install 2&>1 || /bin/true                            # ... ?
-echo Paho Installed ...
+echo "${GREEN}Paho Installed ...${NC}"
 echo "============== PAHO INSTALLATION TRACES START ============================="
 cat /tmp/paho-install
 echo "============== PAHO INSTALLATION TRACES END ==============================="
 
-echo "Builder: installing MQTT - not!"
+echo
+echo "${GREEN}Builder: installing MQTT - not!${NC}"
 #
 # FIXME
 #   For unknown reasons, 'mosquitto' can't be installed in this repo
@@ -179,7 +197,8 @@ echo "Builder: installing MQTT - not!"
 ldconfig
 
 if [[ "${STAGE}" == 'deps' ]]; then
-    echo "Builder: installing gmock"
+    echo
+    echo "${GREEN}Builder: installing gmock${NC}"
     curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
     cd ${ROOT}/gmock-1.5.0
     ./configure
@@ -187,19 +206,21 @@ if [[ "${STAGE}" == 'deps' ]]; then
     make install
     cd ${ROOT} && rm -Rf gmock-1.5.0
 
-    echo "Builder: installing  tools and dependencies"
+    echo
+    echo "${GREEN}Builder: installing  tools and dependencies${NC}"
     apt-get -y install --no-install-recommends \
         ${TEST_TOOLS[@]}
 
-    echo "Builder: installing python dependencies"
+    echo
+    echo "${GREEN}Builder: installing python dependencies${NC}"
     pip install --upgrade setuptools wheel
     pip install Flask==1.0.2 pyOpenSSL==19.0.0 # paho-mqtt
     yes | pip uninstall setuptools wheel
 fi
 
 if [[ ${STAGE} == 'release' ]]; then
-
-    echo "Debian Builder: compiling and installing orion as a DEBUGGABLE executable"
+    echo
+    echo "${GREEN}Debian Builder: compiling and installing orion as a DEBUGGABLE executable${NC}"
     git clone ${REPOSITORY} ${PATH_TO_SRC}
     cd ${PATH_TO_SRC}
     git checkout ${REV}
@@ -208,28 +229,34 @@ if [[ ${STAGE} == 'release' ]]; then
 
     BOOST_VER=$(apt-cache policy libboost-all-dev | grep Installed | awk '{ print $2 }' | cut -c -6)
 
-    echo "Builder: cleaning1"
+    echo
+    echo "${GREEN}Builder: cleaning1${NC}"
     apt-get -y remove --purge ${BUILD_DEPS[@]}
     apt-get -y autoremove
 
-    echo "Builder: installing boost ops deps"
+    echo
+    echo "${GREEN}Builder: installing boost ops deps${NC}"
     for i in ${OPS_DEPS_BOOST[@]}; do TO_INSTALL="${TO_INSTALL} ${i}${BOOST_VER}"; done
     apt-get install -y ${TO_INSTALL[@]}
 
-    echo "Builder: cleaning2"
+    echo
+    echo "${GREEN}Builder: cleaning2${NC}"
     apt-get -y remove --purge \
         ${TO_CLEAN[@]} \
         ${BUILD_TOOLS[@]}
 
-    echo "Builder: cleaning3"
+    echo
+    echo "${GREEN}Builder: cleaning3${NC}"
     apt-get -y autoremove
     apt-get -y clean autoclean
 
-    echo "Builder: installing core ops deps"
+    echo
+    echo "${GREEN}Builder: installing core ops deps${NC}"
     apt-get -y install --no-install-recommends \
         ${OPS_DEPS_CORE[@]}
 
-    echo "Builder: cleaning4"
+    echo
+    echo "${GREEN}Builder: cleaning4${NC}"
     rm -Rf \
         ${ROOT}/* \
         /usr/local/include/microhttpd.h \
@@ -239,7 +266,8 @@ if [[ ${STAGE} == 'release' ]]; then
         /usr/local/lib/libmongoclient.a
 fi
 
-echo "Builder: cleaning last"
+echo
+echo "${GREEN}Builder: cleaning last${NC}"
 rm -Rf \
     /var/lib/apt/lists/* \
     /var/log/*
