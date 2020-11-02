@@ -29,9 +29,9 @@ jobs:
       script: >
         echo -e "\e[1;33mRunning Compliance Tests\e[0m"
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
-    #    - env: STAGE=debian_unit
-    #      name: "Unit Tests (Debian)"
-    #      stage: test
+    - env: STAGE=debian_unit
+      name: "Unit Tests (Debian)"
+      stage: test
     - env: STAGE=debian_functional_1_450
       name: "Functional Tests 1-450 (Debian)"
       stage: test

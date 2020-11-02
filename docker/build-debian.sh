@@ -207,7 +207,7 @@ if [[ "${STAGE}" == 'deps' ]]; then
     #make
     #make install
     #cd ${ROOT} && rm -Rf gmock-1.5.0
-    apt-get -y install google-mock
+    apt-get -y install libgtest-dev google-mock
 
     echo
     echo -e "\e[1;32m Builder: installing  tools and dependencies \e[0m"
