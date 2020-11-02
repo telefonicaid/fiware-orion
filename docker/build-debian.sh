@@ -90,6 +90,8 @@ NC='\033[0m' # No Color
 
 echo
 echo "${GREEN}Builder: building started${NC}"
+echo "^[[0;31;40mIn Color^[[0;31;0m"
+echo -e "\e[1;31m This is red text \e[0m"
 
 # Resolve the issue in travis about docker build
 # the postinst for server includes "systemctl daemon-reload" (and we don't have "systemctl")
