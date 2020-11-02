@@ -201,12 +201,13 @@ ldconfig
 if [[ "${STAGE}" == 'deps' ]]; then
     echo
     echo -e "\e[1;32m Builder: installing gmock \e[0m"
-    curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
-    cd ${ROOT}/gmock-1.5.0
-    ./configure
-    make
-    make install
-    cd ${ROOT} && rm -Rf gmock-1.5.0
+    #curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
+    #cd ${ROOT}/gmock-1.5.0
+    #./configure
+    #make
+    #make install
+    #cd ${ROOT} && rm -Rf gmock-1.5.0
+    apt-get -y install gmock=1.5.0 -V
 
     echo
     echo -e "\e[1;32m Builder: installing  tools and dependencies \e[0m"
