@@ -131,7 +131,7 @@ echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
 dpkg -l | grep systemd
 echo $PATH
 whereis systemctl
-apt-get install --reinstall systemd
+apt-get -y install --reinstall systemd
 dpkg-query -S /bin/systemctl 
 dpkg -L systemd
 
