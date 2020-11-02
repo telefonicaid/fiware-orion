@@ -124,15 +124,14 @@ script: >
     ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
 
 after_success: true
-
-notifications:
-  email:
-    recipients:
-      - ken.zangelin@fiware.org
-    on_success: never
-    on_failure: always
-  webhooks:
-    urls:
-      secure: sLALYcxSpbz7KMZsHyGtNPc+jpVpdps26DljK7sNONOmn0QPxpr1q4y/+cnKzPQO1cN0sTJV15t2OQ46aI4Mo3hJpUGAgbFomELtlH87V+4w+Q+nDJQj9ijR/T5vi2z3PP3u7rh3Y+IjIqJmfo6LfQ6/G9I72GVNkOcQ/3VncjRGTLqd0w5UFVczg2AcHP5C6diohVsjIYA9+r9s0oGrntawfNmXvExn0xvxWkpEKTuICoMDHj2uw2Bl9WMRbgzrWAyPa3dwb9oBB4ATpE11QMthm/zoDfUvoKFRHmmL1eqSiMDE/MfIuRtE9yy0eEtwRMMLjLrDNmtPK+s+oPR+Ofz2WVu8q8AcXXjEw89YfnPpq9ox/MkS5N409OM/hJDhdLcjj1eC45McoKZiw2JUaEoX0lfMsbD+OOIJHSBuHtMyWD4XDZWwzwMTUiRRs3ND8iOTIbs4CXfr5ubTQCqu3Sr2CNH6hL7fGqolvv100Z4vl83gPsPb6yRz8VgDOTK+CR2erYAV89b8M/NC0QJ/6l/qRQShnfli3BiEi5qvvMaFf0mPW+vjAVuqtwjrT+1ytkD0YQAiJXP9Lds2A5u1ONJbOHARzKykx0ecCrSzUE6PZnvsRZkwebnjCsS85/TNYInni/FNo5IdDfK4M65yKiZf8cSm138ZtoYWFuosB5M=
-    on_success: always
-    on_failure: never
+#notifications:
+#  email:
+#    recipients:
+#      - ken.zangelin@fiware.org
+#    on_success: never
+#    on_failure: always
+#  webhooks:
+#    urls:
+#      secure: sLALYcxSpbz7KMZsHyGtNPc+jpVpdps26DljK7sNONOmn0QPxpr1q4y/+cnKzPQO1cN0sTJV15t2OQ46aI4Mo3hJpUGAgbFomELtlH87V+4w+Q+nDJQj9ijR/T5vi2z3PP3u7rh3Y+IjIqJmfo6LfQ6/G9I72GVNkOcQ/3VncjRGTLqd0w5UFVczg2AcHP5C6diohVsjIYA9+r9s0oGrntawfNmXvExn0xvxWkpEKTuICoMDHj2uw2Bl9WMRbgzrWAyPa3dwb9oBB4ATpE11QMthm/zoDfUvoKFRHmmL1eqSiMDE/MfIuRtE9yy0eEtwRMMLjLrDNmtPK+s+oPR+Ofz2WVu8q8AcXXjEw89YfnPpq9ox/MkS5N409OM/hJDhdLcjj1eC45McoKZiw2JUaEoX0lfMsbD+OOIJHSBuHtMyWD4XDZWwzwMTUiRRs3ND8iOTIbs4CXfr5ubTQCqu3Sr2CNH6hL7fGqolvv100Z4vl83gPsPb6yRz8VgDOTK+CR2erYAV89b8M/NC0QJ/6l/qRQShnfli3BiEi5qvvMaFf0mPW+vjAVuqtwjrT+1ytkD0YQAiJXP9Lds2A5u1ONJbOHARzKykx0ecCrSzUE6PZnvsRZkwebnjCsS85/TNYInni/FNo5IdDfK4M65yKiZf8cSm138ZtoYWFuosB5M=
+#    on_success: always
+#    on_failure: never
