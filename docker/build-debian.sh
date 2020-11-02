@@ -128,12 +128,12 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 #echo ln to /bin/systemctl solves the issue.
 echo
 echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
-dpkg -l | grep systemd
-echo $PATH
-whereis systemctl
-apt-get -y install --reinstall systemd
-dpkg-query -S /bin/systemctl 
-dpkg -L systemd
+# dpkg -l | grep systemd      # Library exist
+# echo $PATH           # No place to find in path
+# whereis systemctl    # It is not found systemctl in the system
+apt-get -y install --reinstall systemd  # force reinstall systemd
+# dpkg-query -S /bin/systemctl # Query if systemctl is installed
+service dbus start
 
 echo
 echo -e "\e[1;32m Builder: installing mongo \e[0m"
