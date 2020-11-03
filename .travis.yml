@@ -48,8 +48,6 @@ jobs:
       name: "Deploy to Docker Hub"
       stage: deploy
       install: >
-        # Just for testing purposes
-        PUSH_STATUS=True
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e "\e[1;33mBuilding Debian Docker image for Release\e[0m"
           travis_wait 30 docker build --no-cache --quiet \
@@ -60,8 +58,6 @@ jobs:
         fi
       script: true
       after_success: >
-        # Just for testing purposes
-        PUSH_STATUS=True
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e "\e[1;33mPushing Debian Release to Docker Hub\e[0m"
           docker push ${IMAGE_RELEASE_DEBIAN};
@@ -70,8 +66,6 @@ jobs:
       name: "Deploy to Docker Hub - Image with Deps"
       stage: deploy
       install: >
-        # Just for testing purposes
-        PUSH_STATUS=True
         if [[ "${PUSH_STATUS}" ]]; then
           travis_wait 30 docker build --no-cache --quiet \
             --build-arg TOKEN=${TOKEN} \
@@ -81,8 +75,6 @@ jobs:
         fi
       script: true
       after_success: >
-        # Just for testing purposes
-        PUSH_STATUS=True
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e "\e[1;33mPushing Debian Release (with Dependencies) to Docker Hub\e[0m"
           docker push ${IMAGE_DEPS_DEBIAN};
@@ -130,14 +122,14 @@ script: >
     ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
 
 after_success: true
-#notifications:
-#  email:
-#    recipients:
-#      - ken.zangelin@fiware.org
-#    on_success: never
-#    on_failure: always
-#  webhooks:
-#    urls:
-#      secure: sLALYcxSpbz7KMZsHyGtNPc+jpVpdps26DljK7sNONOmn0QPxpr1q4y/+cnKzPQO1cN0sTJV15t2OQ46aI4Mo3hJpUGAgbFomELtlH87V+4w+Q+nDJQj9ijR/T5vi2z3PP3u7rh3Y+IjIqJmfo6LfQ6/G9I72GVNkOcQ/3VncjRGTLqd0w5UFVczg2AcHP5C6diohVsjIYA9+r9s0oGrntawfNmXvExn0xvxWkpEKTuICoMDHj2uw2Bl9WMRbgzrWAyPa3dwb9oBB4ATpE11QMthm/zoDfUvoKFRHmmL1eqSiMDE/MfIuRtE9yy0eEtwRMMLjLrDNmtPK+s+oPR+Ofz2WVu8q8AcXXjEw89YfnPpq9ox/MkS5N409OM/hJDhdLcjj1eC45McoKZiw2JUaEoX0lfMsbD+OOIJHSBuHtMyWD4XDZWwzwMTUiRRs3ND8iOTIbs4CXfr5ubTQCqu3Sr2CNH6hL7fGqolvv100Z4vl83gPsPb6yRz8VgDOTK+CR2erYAV89b8M/NC0QJ/6l/qRQShnfli3BiEi5qvvMaFf0mPW+vjAVuqtwjrT+1ytkD0YQAiJXP9Lds2A5u1ONJbOHARzKykx0ecCrSzUE6PZnvsRZkwebnjCsS85/TNYInni/FNo5IdDfK4M65yKiZf8cSm138ZtoYWFuosB5M=
-#    on_success: always
-#    on_failure: never
+notifications:
+  email:
+    recipients:
+      - ken.zangelin@fiware.org
+    on_success: never
+    on_failure: always
+  webhooks:
+    urls:
+      secure: sLALYcxSpbz7KMZsHyGtNPc+jpVpdps26DljK7sNONOmn0QPxpr1q4y/+cnKzPQO1cN0sTJV15t2OQ46aI4Mo3hJpUGAgbFomELtlH87V+4w+Q+nDJQj9ijR/T5vi2z3PP3u7rh3Y+IjIqJmfo6LfQ6/G9I72GVNkOcQ/3VncjRGTLqd0w5UFVczg2AcHP5C6diohVsjIYA9+r9s0oGrntawfNmXvExn0xvxWkpEKTuICoMDHj2uw2Bl9WMRbgzrWAyPa3dwb9oBB4ATpE11QMthm/zoDfUvoKFRHmmL1eqSiMDE/MfIuRtE9yy0eEtwRMMLjLrDNmtPK+s+oPR+Ofz2WVu8q8AcXXjEw89YfnPpq9ox/MkS5N409OM/hJDhdLcjj1eC45McoKZiw2JUaEoX0lfMsbD+OOIJHSBuHtMyWD4XDZWwzwMTUiRRs3ND8iOTIbs4CXfr5ubTQCqu3Sr2CNH6hL7fGqolvv100Z4vl83gPsPb6yRz8VgDOTK+CR2erYAV89b8M/NC0QJ/6l/qRQShnfli3BiEi5qvvMaFf0mPW+vjAVuqtwjrT+1ytkD0YQAiJXP9Lds2A5u1ONJbOHARzKykx0ecCrSzUE6PZnvsRZkwebnjCsS85/TNYInni/FNo5IdDfK4M65yKiZf8cSm138ZtoYWFuosB5M=
+    on_success: always
+    on_failure: never

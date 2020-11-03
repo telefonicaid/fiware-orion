@@ -124,15 +124,9 @@ cd ${ROOT} && rm -Rf libmicrohttpd-0.9.48
 
 # Resolve the issue in travis about docker build
 # the postinst for server includes "systemctl daemon-reload" (and we don't have "systemctl")
-
-#echo ln to /bin/systemctl solves the issue.
 echo
 echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
-# dpkg -l | grep systemd      # Library exist
-# echo $PATH           # No place to find in path
-# whereis systemctl    # It is not found systemctl in the system
 apt-get -y install --reinstall systemd  # force reinstall systemd
-# dpkg-query -S /bin/systemctl # Query if systemctl is installed
 service dbus start
 
 echo
@@ -201,12 +195,6 @@ ldconfig
 if [[ "${STAGE}" == 'deps' ]]; then
     echo
     echo -e "\e[1;32m Builder: installing gmock \e[0m"
-    #curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC ${ROOT}
-    #cd ${ROOT}/gmock-1.5.0
-    #./configure
-    #make
-    #make install
-    #cd ${ROOT} && rm -Rf gmock-1.5.0
     apt-get -y install libgtest-dev google-mock
 
     echo
