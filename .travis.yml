@@ -27,7 +27,7 @@ jobs:
       stage: test
       install: true
       script: >
-        echo -e "\e[1;33mRunning Compliance Tests\e[0m"
+        echo -e "\e[1;33mRunning Compliance Tests\e[0m";
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
     - env: STAGE=debian_unit
       name: "Unit Tests (Debian)"
@@ -49,7 +49,7 @@ jobs:
       stage: deploy
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
-          echo -e "\e[1;33mBuilding Debian Docker image for Release\e[0m"
+          echo -e "\e[1;33mBuilding Debian Docker image for Release\e[0m";
           travis_wait 30 docker build --no-cache --quiet \
             --build-arg TOKEN=${TOKEN} \
             --build-arg REV=${TRAVIS_COMMIT} \
@@ -59,7 +59,7 @@ jobs:
       script: true
       after_success: >
         if [[ "${PUSH_STATUS}" ]]; then
-          echo -e "\e[1;33mPushing Debian Release to Docker Hub\e[0m"
+          echo -e "\e[1;33mPushing Debian Release to Docker Hub\e[0m";
           docker push ${IMAGE_RELEASE_DEBIAN};
         fi
     - env: STAGE=debian_deps
@@ -76,7 +76,7 @@ jobs:
       script: true
       after_success: >
         if [[ "${PUSH_STATUS}" ]]; then
-          echo -e "\e[1;33mPushing Debian Release (with Dependencies) to Docker Hub\e[0m"
+          echo -e "\e[1;33mPushing Debian Release (with Dependencies) to Docker Hub\e[0m";
           docker push ${IMAGE_DEPS_DEBIAN};
         fi
 
@@ -105,7 +105,7 @@ before_install: >
   fi
 
 install: >
-  echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m"
+  echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m";
   travis_wait 30 docker build --no-cache --quiet \
     --build-arg TOKEN=${TOKEN} \
     --build-arg REV=${TRAVIS_COMMIT} \
@@ -113,7 +113,7 @@ install: >
     -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
 
 script: >
-  echo -e "\e[1;33mRunning Tests against Debian Image\e[0m"
+  echo -e "\e[1;33mRunning Tests against Debian Image\e[0m";
   docker run \
     -t --rm -v $(pwd):${HOME} --entrypoint bash             \
     -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts  \
