@@ -75,6 +75,7 @@
 #include "parseArgs/paUsage.h"
 #include "parseArgs/paIterate.h"
 #include "parseArgs/paPrivate.h"
+#include "parseArgs/paLogSetup.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -179,6 +180,7 @@ bool            logForHumans;
 unsigned long   logLineMaxSize;
 unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
+bool            disableFileLog;
 int             reqTimeout;
 bool            insecureNotif;
 bool            ngsiv1Autocast;
@@ -245,6 +247,7 @@ unsigned long   fcMaxInterval;
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
+#define DISABLE_FILE_LOG       "disable logging into files"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
 #define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
@@ -326,6 +329,7 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,             CHECK_v1_ID_DESC             },
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,             DISABLE_CUSTOM_NOTIF         },
 
+  { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,             DISABLE_FILE_LOG             },
   { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,             LOG_FOR_HUMANS_DESC          },
   { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,             LOG_LINE_MAX_SIZE_DESC       },
   { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,             LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
@@ -936,7 +940,6 @@ int main(int argC, char* argV[])
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
   paConfig("man version",                   (void*) versionString.c_str());
-  paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("screen time format",            (void*) "%Y-%m-%dT%H:%M:%S");
@@ -947,14 +950,15 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
+  paParse(paArgs, argC, (char**) argV, 1, false);
+  
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (paIsSet(argC, argV, "-fg"))
+  if (fg)
   {
-    paConfig("log to screen",                 (void*) true);
-
-    if (paIsSet(argC, argV, "-logForHumans"))
+    paConfig("log to screen",                 (void*) true);  
+    if (logForHumans)
     {
       paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
     }
@@ -964,7 +968,24 @@ int main(int argC, char* argV[])
     }
   }
 
-  paParse(paArgs, argC, (char**) argV, 1, false);
+  //
+  // disable file logging if the corresponding option is set. 
+  //
+  if (disableFileLog)
+  {
+    paConfig("log to file",                   (void*) false);
+  } 
+  else
+  {
+    paConfig("log to file",                   (void*) true);
+  }
+  
+  // setup logging after the env vars evaluated and log config is set.
+  if(paLogSetup() == -1) {
+    printf("Was not able to set up the logging system.");
+    exit(1);
+  }
+
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
