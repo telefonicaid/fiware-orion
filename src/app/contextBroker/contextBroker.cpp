@@ -939,7 +939,6 @@ int main(int argC, char* argV[])
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
   paConfig("man version",                   (void*) versionString.c_str());
-  paConfig("log to file",                   (void*) !disableFileLog);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("screen time format",            (void*) "%Y-%m-%dT%H:%M:%S");
@@ -990,6 +989,7 @@ int main(int argC, char* argV[])
   LM_I(("start command line <%s>", cmdLineString(argC, argV).c_str()));
   logEnvVars();
 
+  paConfig("log to file",                   (void*) !disableFileLog);
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
   {
