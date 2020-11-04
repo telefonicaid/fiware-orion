@@ -954,13 +954,10 @@ int main(int argC, char* argV[])
   //
   if (paIsSet(argC, argV, "-fg"))
   {
-    paConfig("log to screen",                 (void*) true);
+    paConfig("log to screen",                 (void*) true);  
   }
 
-  paParse(paArgs, argC, (char**) argV, 1, false);
-  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
-  if (logForHumans)
+  if (paIsSet(argC, argV, "-logForHumans"))
   {
     paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   }
@@ -968,6 +965,9 @@ int main(int argC, char* argV[])
   {
     paConfig("screen line format", LOG_FILE_LINE_FORMAT);
   }
+
+  paParse(paArgs, argC, (char**) argV, 1, false);
+  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
   // disable file logging if the corresponding option is set. 
