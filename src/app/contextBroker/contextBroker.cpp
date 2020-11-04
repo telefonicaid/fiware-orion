@@ -971,12 +971,12 @@ int main(int argC, char* argV[])
   //
   if (paIsSet(argC, argV, "-disableFileLog"))
   {
-    LM_X(("File log disabled"));
+    LM_X(1, ("File log disabled"));
     paConfig("log to file",                   (void*) false);
   } 
   else
   {
-    LM_X(("File log enabled"));
+    LM_X(1, ("File log enabled"));
     paConfig("log to file",                   (void*) true);
   }
 
