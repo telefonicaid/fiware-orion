@@ -949,27 +949,25 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
-
-  paParse(paArgs, argC, (char**) argV, 1, false);
-  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
   if (paIsSet(argC, argV, "-fg"))
   {
     paConfig("log to screen",                 (void*) true);
-
-    if (logForHumans)
-    {
-      paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
-    }
-    else
-    {
-      paConfig("screen line format", LOG_FILE_LINE_FORMAT);
-    }
   }
 
+  paParse(paArgs, argC, (char**) argV, 1, false);
+  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  if (logForHumans)
+  {
+    paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  }
+  else
+  {
+    paConfig("screen line format", LOG_FILE_LINE_FORMAT);
+  }
 
   //
   // disable file logging if the corresponding option is set. 
