@@ -960,7 +960,7 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-  if (logForHumans)
+  if (!logForHumans)
   {
     paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   }
