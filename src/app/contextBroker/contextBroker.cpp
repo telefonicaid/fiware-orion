@@ -861,23 +861,23 @@ static void logEnvVars(void)
   paIterateInit();
   while ((aP = paIterateNext(paiList)) != NULL)
   {
-    if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
+    if ((aP->isBuiltin == false))
     {
       if (aP->type == PaString)
       {
-        LM_I(("String env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
+        LM_I(("env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
       }
       else if (aP->type == PaBool)
       {
-        LM_I(("Boolean env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
       }
       else if (aP->type == PaInt)
       {
-        LM_I(("Int env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
       }
       else if (aP->type == PaDouble)
       {
-        LM_I(("Double env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
       }
       else
       {
