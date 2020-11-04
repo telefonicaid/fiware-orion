@@ -966,6 +966,9 @@ int main(int argC, char* argV[])
     }
   }
 
+  paParse(paArgs, argC, (char**) argV, 1, false);
+  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
   //
   // disable file logging if the corresponding option is set. 
   //
@@ -979,9 +982,6 @@ int main(int argC, char* argV[])
     LM_X(1, ("File log enabled"));
     paConfig("log to file",                   (void*) true);
   }
-
-  paParse(paArgs, argC, (char**) argV, 1, false);
-  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
   // NOTE: Calling '_exit()' and not 'exit()' if 'pidFile()' returns error.
