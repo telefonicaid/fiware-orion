@@ -223,11 +223,12 @@ class NotifierMock : public Notifier
      */
   }
 
-  MOCK_METHOD9(sendNotifyContextRequest, void(NotifyContextRequest&            ncr,
+  MOCK_METHOD10(sendNotifyContextRequest, void(NotifyContextRequest&            ncr,
                                               const ngsiv2::HttpInfo&          httpInfo,
                                               const std::string&               tenant,
                                               const std::string&               xauthToken,
                                               const std::string&               fiwareCorrelator,
+                                              unsigned int                     correlatorCounter,
                                               RenderFormat                     renderFormat,
                                               const std::vector<std::string>&  attrsFilter,
                                               bool                             blacklist,
@@ -245,6 +246,7 @@ class NotifierMock : public Notifier
                                          const std::string&               tenant,
                                          const std::string&               xauthToken,
                                          const std::string&               fiwareCorrelator,
+                                         unsigned int                     correlatorCounter,
                                          RenderFormat                     renderFormat,
                                          const std::vector<std::string>&  attrsFilter,
                                          bool                             blacklist,
@@ -255,6 +257,7 @@ class NotifierMock : public Notifier
                                          tenant,
                                          xauthToken,
                                          fiwareCorrelator,
+                                         correlatorCounter,
                                          renderFormat,
                                          attrsFilter,
                                          blacklist,

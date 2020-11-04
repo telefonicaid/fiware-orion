@@ -306,6 +306,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setProviderFormat(caP->providingApplication.getProviderFormat());
+  providingApplication.setRegId(caP->providingApplication.getRegId());
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
                   compoundValueP,

@@ -80,6 +80,7 @@ source code of the broker:
 * string: string parsing/manipulation functions
 * tag: macros/functions for JSON rendering
 * wsStrip: function that strips a string from leading and trailing whitespace
+* logTracing: helper functions for the logging subsystem
 
 [Top](#top)
 

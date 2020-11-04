@@ -53,12 +53,15 @@ typedef struct ProvidingApplication
 {
   std::string     string;
   ProviderFormat  providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
+  std::string     regId;           // RegId associated to the provider (for log purposes)
 
   ProvidingApplication();
   void            set(const std::string& value);
   void            setProviderFormat(const ProviderFormat _providerFormat);
-  ProviderFormat  getProviderFormat(void);
+  void            setRegId(const std::string& _regId);
   std::string     get(void);
+  ProviderFormat  getProviderFormat(void);
+  std::string     getRegId(void);
   bool            isEmpty(void);
   std::string     toJsonV1(bool comma);
   const char*     c_str(void);
