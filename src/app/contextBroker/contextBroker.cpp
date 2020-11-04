@@ -949,6 +949,10 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
+
+  paParse(paArgs, argC, (char**) argV, 1, false);
+  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
@@ -966,8 +970,6 @@ int main(int argC, char* argV[])
     }
   }
 
-  paParse(paArgs, argC, (char**) argV, 1, false);
-  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
   // disable file logging if the corresponding option is set. 
