@@ -869,7 +869,7 @@ static void logEnvVars(void)
       }
       else if (aP->type == PaBool)
       {
-        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
+        LM_I(("Bool env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
       }
       else if (aP->type == PaInt)
       {
@@ -960,7 +960,7 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-  if (!logForHumans)
+  if (logForHumans)
   {
     paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   }
