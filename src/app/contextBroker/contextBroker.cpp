@@ -980,7 +980,7 @@ int main(int argC, char* argV[])
     paConfig("log to file",                   (void*) true);
   }
   // setup logging after the env vars are evaluated.
-  paLogSetup()
+  paLogSetup();
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
