@@ -956,7 +956,7 @@ int main(int argC, char* argV[])
   {
     paConfig("log to screen",                 (void*) true);
 
-    if (paIsSet(argC, argV, "-logForHumans"))
+    if (logForHumans)
     {
       paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
     }
@@ -974,12 +974,10 @@ int main(int argC, char* argV[])
   //
   if (disableFileLog)
   {
-    LM_I(("File log disabled"));
     paConfig("log to file",                   (void*) false);
   } 
   else
   {
-    LM_I(("File log enabled"));
     paConfig("log to file",                   (void*) true);
   }
 
