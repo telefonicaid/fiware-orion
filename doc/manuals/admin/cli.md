@@ -136,10 +136,10 @@ The list of available options is the following:
 -   **-noCache**. Disables the context subscription cache, so subscriptions searches are
     always done in DB (not recommended but useful for debugging).
 -   **-notificationMode**. Allows to select notification mode, either:
-    `transient`, `permanent` or `threadpool:q:n`. Default mode is `transient`.
+    `transient`, `persistent` or `threadpool:q:n`. Default mode is `transient`.
     * In transient mode, connections are closed by the CB right after sending the notification.
-    * In permanent connection mode, a permanent connection is created the first time a notification
-      is sent to a given URL path (if the receiver supports permanent connections). Following notifications to the same
+    * In persistent connection mode, a persistent connection is created the first time a notification
+      is sent to a given URL path (if the receiver supports persistent connections). Following notifications to the same
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
