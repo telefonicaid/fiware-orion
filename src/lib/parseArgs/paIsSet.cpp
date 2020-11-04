@@ -39,7 +39,7 @@ bool paIsSet(int argC, char* argV[], const char* option)
 
   for (i = 1; i < argC; i++)
   {
-    LM_I(argV[i])
+    LM_I((argV[i]))
     if (strcmp(argV[i], option) == 0)
     {
       return true;
