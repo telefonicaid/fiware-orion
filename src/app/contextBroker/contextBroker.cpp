@@ -972,7 +972,7 @@ int main(int argC, char* argV[])
   //
   // disable file logging if the corresponding option is set. 
   //
-  if (paIsSet(argC, argV, "-disableFileLog"))
+  if (paIsSet(argC, argV, "-disableFileLog") || paIsSet(argC, argV, "DISABLE_FILE_LOG"))
   {
     LM_I(("File log disabled"));
     paConfig("log to file",                   (void*) false);
