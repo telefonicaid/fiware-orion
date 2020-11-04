@@ -861,7 +861,7 @@ static void logEnvVars(void)
   paIterateInit();
   while ((aP = paIterateNext(paiList)) != NULL)
   {
-    if ((aP->isBuiltin == false))
+    if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
     {
       if (aP->type == PaString)
       {
@@ -972,7 +972,7 @@ int main(int argC, char* argV[])
   //
   // disable file logging if the corresponding option is set. 
   //
-  if (paIsSet(argC, argV, "-disableFileLog") || paIsSet(argC, argV, "DISABLE_FILE_LOG") || paIsSet(argC, argV, "ORION_DISABLE_FILE_LOG"))
+  if (disableFileLog)
   {
     LM_I(("File log disabled"));
     paConfig("log to file",                   (void*) false);
