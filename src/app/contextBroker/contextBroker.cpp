@@ -967,6 +967,7 @@ int main(int argC, char* argV[])
   }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
+  paConfig("log to file",                   (void*) !disableFileLog);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
@@ -989,7 +990,6 @@ int main(int argC, char* argV[])
   LM_I(("start command line <%s>", cmdLineString(argC, argV).c_str()));
   logEnvVars();
 
-  paConfig("log to file",                   (void*) !disableFileLog);
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
   {
