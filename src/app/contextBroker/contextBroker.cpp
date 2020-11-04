@@ -75,6 +75,7 @@
 #include "parseArgs/paUsage.h"
 #include "parseArgs/paIterate.h"
 #include "parseArgs/paPrivate.h"
+#include "parseArgs/paLogSetup.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -979,11 +980,7 @@ int main(int argC, char* argV[])
     paConfig("log to file",                   (void*) true);
   }
   // setup logging after the env vars are evaluated.
-  if (paLogSetup() == -1)
-  {
-    RETURN_ERROR("paLogSetup error");
-  }
-
+  paLogSetup()
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
