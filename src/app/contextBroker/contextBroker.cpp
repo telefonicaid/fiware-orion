@@ -966,8 +966,19 @@ int main(int argC, char* argV[])
     }
   }
 
+  //
+  // disable file logging if the corresponding option is set. 
+  //
+  if (paIsSet(argC, argV, "-disableFileLog"))
+  {
+    paConfig("log to file",                   (void*) false);
+  } 
+  else
+  {
+    paConfig("log to file",                   (void*) true);
+  }
+
   paParse(paArgs, argC, (char**) argV, 1, false);
-  paConfig("log to file",                   (void*) !disableFileLog);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
