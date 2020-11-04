@@ -955,7 +955,7 @@ int main(int argC, char* argV[])
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (paIsSet(argC, argV, "-fg"))
+  if (fg)
   {
     paConfig("log to screen",                 (void*) true);  
     if (logForHumans)
@@ -979,7 +979,7 @@ int main(int argC, char* argV[])
   {
     paConfig("log to file",                   (void*) true);
   }
-  // setup logging after the env vars are evaluated.
+  // setup logging after the env vars evaluated and log config is set.
   paLogSetup();
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
