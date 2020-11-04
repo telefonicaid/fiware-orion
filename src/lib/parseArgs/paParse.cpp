@@ -565,11 +565,6 @@ int paParse
     RETURN_ERROR("paOptionsParse");
   }
 
-  if (paLogSetup() == -1)
-  {
-    RETURN_ERROR("paLogSetup error");
-  }
-
   if ((s != -2) && ((s = paLimitCheck(paiList)) == -1))
   {
     RETURN_ERROR("paLimitCheck");
