@@ -985,6 +985,7 @@ int main(int argC, char* argV[])
     printf("Was not able to set up the logging system.");
     exit(1);
   }
+  paConfigActions(false);
 
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
