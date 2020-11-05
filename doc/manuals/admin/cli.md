@@ -166,7 +166,7 @@ The list of available options is the following:
 -   **-disableCustomNotifications**. Disabled NGSIv2 custom notifications. In particular:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
--   **-disableFileLog**. To prevent orion from logging into a file. This option might be usefull if you are running on kubernetes.
+-   **-disableFileLog**. To prevent Orion from logging into a file (default behaviour is use a log file). This option might be useful if you are running on kubernetes.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
 -   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes.
 -   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes.
