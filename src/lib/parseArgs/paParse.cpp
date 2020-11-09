@@ -570,6 +570,17 @@ int paParse
     RETURN_ERROR("paLimitCheck");
   }
 
+  if ((s != -2) && (paConfigActions(false) == -1))
+  {
+    RETURN_ERROR("paConfigActions");
+  }
+
+  if ((s != -2) && (paConfigActions(false) == -1))
+  {
+    RETURN_ERROR("paConfigActions");
+  }
+
+
   fP = NULL;
   if (paMsgsToStdout)
   {
