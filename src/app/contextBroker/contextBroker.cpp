@@ -52,7 +52,6 @@
 * To override the security added with the certificate, curl can always be called using the
 * CLI option '--insecure'.
 */
-#include <stdio.h>
 #include <unistd.h>                             // getppid, for, setuid, etc.
 #include <string.h>
 #include <fcntl.h>                              // open
@@ -64,6 +63,7 @@
 #include <string>
 #include <vector>
 #include <limits.h>
+#include <stdio.h>             /* snprintf                                    */
 
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
@@ -247,7 +247,7 @@ unsigned long   fcMaxInterval;
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
-#define DISABLE_FILE_LOG       "disable logging into files"
+#define DISABLE_FILE_LOG       "disable logging into file"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
 #define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
@@ -870,7 +870,7 @@ static void logEnvVars(void)
       }
       else if (aP->type == PaBool)
       {
-        LM_I(("Bool env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
       }
       else if (aP->type == PaInt)
       {
@@ -887,8 +887,6 @@ static void logEnvVars(void)
     }
   }
 }
-
-
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -950,15 +948,14 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
-  paParse(paArgs, argC, (char**) argV, 1, false);
   
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (fg)
+  if (paIsSet(argC, argV, (PaArgument*) paArgs, "-fg"))
   {
     paConfig("log to screen",                 (void*) true);  
-    if (logForHumans)
+    if (paIsSet(argC, argV, (PaArgument*) paArgs, "-logForHumans"))
     {
       paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
     }
@@ -971,21 +968,16 @@ int main(int argC, char* argV[])
   //
   // disable file logging if the corresponding option is set. 
   //
-  if (disableFileLog)
+  if (paIsSet(argC, argV, (PaArgument *) paArgs, "-disableFileLog"))
   {
-    paConfig("log to file",                   (void*) false);
+    paConfig("log to file", (void*) false);
   } 
   else
   {
-    paConfig("log to file",                   (void*) true);
-  }
-  
-  // setup logging after the env vars evaluated and log config is set.
-  if(paLogSetup() == -1) {
-    printf("Was not able to set up the logging system.");
-    exit(1);
+    paConfig("log to file", (void*) true);
   }
 
+  paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
