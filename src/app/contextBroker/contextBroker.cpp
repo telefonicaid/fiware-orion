@@ -888,6 +888,8 @@ static void logEnvVars(void)
   }
 }
 
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
