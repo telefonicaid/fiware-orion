@@ -52,6 +52,7 @@
 * To override the security added with the certificate, curl can always be called using the
 * CLI option '--insecure'.
 */
+#include <stdio.h>                              // snprintf       
 #include <unistd.h>                             // getppid, for, setuid, etc.
 #include <string.h>
 #include <fcntl.h>                              // open
@@ -62,8 +63,7 @@
 #include <openssl/ssl.h>
 #include <string>
 #include <vector>
-#include <limits.h>
-#include <stdio.h>             /* snprintf                                    */
+#include <limits.h>                            
 
 #include "mongoBackend/MongoGlobal.h"
 #include "cache/subCache.h"
