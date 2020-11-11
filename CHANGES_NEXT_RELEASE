@@ -1,1 +1,1 @@
-- Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logggin into a file
+- Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
