@@ -1,1 +1,2 @@
 - Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
+- Add: support 'true' and 'false' literals (in addition to 'TRUE' and 'FALSE') in flag-like env vars
