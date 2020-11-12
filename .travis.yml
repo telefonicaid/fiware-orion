@@ -16,16 +16,19 @@ env:
     - secure: aTkQKOSU2eSx5DjEqj5/GPiu0UiyBKNmXPoGYd6wQFajnKbk6ErEW66onFJGMiL3g/yiyP6Utwm4JaBgqxQ1WJDHSn8MbljFJ03xAtJsyz+E0Wh65kshK3IFxF2M7glt0ZHH3kvLEH9czFrNcZ3eusMC8GEWAkXQ0jwK7DVW4+rVaajHpZLsxgU3TOwxMML0AT+kfSPnOKBsjUwOtLmU+ffatGxA1r5leYvVTpzza9di6bqJf/hQN6z07gnhkAX3Ypz3JNPDYuFjK0jHwhkDFeN91FmoShuB5dOuvs16fXojjxYJDwMQIW/Eo0WjVEV6qhGtnYI6RnGFDI6Cc/NjDN4CAmssarj8pXdAQSzQVzSXohxsILIMuY1QdQpwLjJJdmHMwtPegeS49PCIaRKpgKPR9/FuqUpRFFkAX6Hy0fxC9rRkSTCSIwpFL37PWpRZKE5e12wNZPPDK2A2gpFIruv/upDmL1dhK5YjNoMENtBgOrG3Uo/YfCIEngDesNzE9XwGisW1u4TqaQ1rNVrdezS4KzC1njnjqw6MC+w9rCUNk4d/lR1y/h0q68Pa3c7IdLWUhdKDjLPAZdH0G4dpRxpZzwV/ocBmWSwcWT+74hBe1BC8kWPL7J2Q0T7IxcLDEKQvnfT1q2/Gg4oPrgh3Zp2mOrXtTKgmCHo5FrNdTnI=
 
 stages:
+  - build
   - test
   - name: deploy
     if: branch = develop
 
 jobs:
   include:
+    - stage: build
+      install: true
     - env: STAGE=compliance
       name: "Compliance Tests"
       stage: test
-      install: true
+      install: false
       script: >
         echo -e "\e[1;33mRunning Compliance Tests\e[0m";
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
