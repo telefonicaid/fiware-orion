@@ -35,6 +35,7 @@ jobs:
       name: "Compliance Tests"
       stage: test
       install: skip
+      after_failure: true
       script: >
         echo -e "\e[1;33mRunning Compliance Tests\e[0m";
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
@@ -42,22 +43,27 @@ jobs:
       name: "Unit Tests (Debian)"
       stage: test
       install: skip
+      after_failure: true
     - env: STAGE=debian_functional_1_450
       name: "Functional Tests 1-450 (Debian)"
       stage: test
       install: skip
+      after_failure: true
     - env: STAGE=debian_functional_451_700
       name: "Functional Tests 451-700 (Debian)"
       stage: test
       install: skip
+      after_failure: true
     - env: STAGE=debian_functional_701_1000
       name: "Functional Tests 701-1000 (Debian)"
       stage: test
       install: skip
+      after_failure: true
     - env: STAGE=debian_functional_1001_1400
       name: "Functional Tests 1001-1400 (Debian)"
       stage: test
       install: skip
+      after_failure: true
     - env: STAGE=debian_release
       name: "Deploy to Docker Hub"
       stage: deploy
