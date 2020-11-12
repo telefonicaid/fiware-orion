@@ -30,7 +30,7 @@ jobs:
           --build-arg TOKEN=${TOKEN} \
           --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
           -f $(pwd)/docker/Dockerfile-debian $(pwd) ;
-        docker push ${IMAGE_DEPS_DEBIAN}
+        docker push ${IMAGE_DEPS_DEBIAN};
     - env: STAGE=compliance
       name: "Compliance Tests"
       stage: test
