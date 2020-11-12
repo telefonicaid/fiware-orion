@@ -24,29 +24,39 @@ stages:
 jobs:
   include:
     - stage: build
-      install: true
+      install: >
+        echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m";
+        travis_wait 30 docker build --no-cache --quiet \
+          --build-arg TOKEN=${TOKEN} \
+          --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
+          -f $(pwd)/docker/Dockerfile-debian $(pwd) ;
     - env: STAGE=compliance
       name: "Compliance Tests"
       stage: test
-      install: false
+      install: skip
       script: >
         echo -e "\e[1;33mRunning Compliance Tests\e[0m";
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
     - env: STAGE=debian_unit
       name: "Unit Tests (Debian)"
       stage: test
+      install: skip
     - env: STAGE=debian_functional_1_450
       name: "Functional Tests 1-450 (Debian)"
       stage: test
+      install: skip
     - env: STAGE=debian_functional_451_700
       name: "Functional Tests 451-700 (Debian)"
       stage: test
+      install: skip
     - env: STAGE=debian_functional_701_1000
       name: "Functional Tests 701-1000 (Debian)"
       stage: test
+      install: skip
     - env: STAGE=debian_functional_1001_1400
       name: "Functional Tests 1001-1400 (Debian)"
       stage: test
+      install: skip
     - env: STAGE=debian_release
       name: "Deploy to Docker Hub"
       stage: deploy
@@ -106,14 +116,6 @@ before_install: >
     echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}'| sudo tee /etc/docker/daemon.json; 
     sudo service docker restart; 
   fi
-
-install: >
-  echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m";
-  travis_wait 30 docker build --no-cache --quiet \
-    --build-arg TOKEN=${TOKEN} \
-    --build-arg REV=${TRAVIS_COMMIT} \
-    --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
-    -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
 
 script: >
   echo -e "\e[1;33mRunning Tests against Debian Image\e[0m";
