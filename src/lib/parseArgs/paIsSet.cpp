@@ -103,9 +103,9 @@ bool paIsSet(int argC, char* argV[], PaArgument* pArguments, const char* option)
 
     //
     // Equivalent to a command-line option being set is, that the var is set to
-    // TRUE therefore we only return true in that cases.
+    // "TRUE" or "true" therefore we only return true in that cases.
     //
-    return strcmp(envVarValue, "TRUE") == 0;
+    return ((strcmp(envVarValue, "TRUE") == 0) || (strcmp(envVarValue, "true") == 0));
   }
 }
 

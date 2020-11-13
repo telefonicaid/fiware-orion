@@ -185,8 +185,8 @@ Two facts have to be taken into account:
 
 * Environment variables for CLI parameters that work in a "flag" way 
   (i.e. they are either enabled or not, but don't have an actual value - `-fg` is one of them)
-  can take the case-sensitive values `TRUE` (to enable the parameter) or
-  `FALSE` (to disable it).
+  can take the case-sensitive values `TRUE` or `true`(to enable the parameter) or
+  `FALSE` or `false` (to disable it).
 * In case of conflict (i.e. using at the same time the environment variable
   and the CLI parameter) the CLI parameter is used.
 
