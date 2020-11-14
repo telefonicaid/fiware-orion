@@ -90,7 +90,7 @@ echo "========================================="
 payload='[
   {
     "id": "urn:ngsi-ld:TemperatureSensor:003",
-    "type": "https://uri.fiware.org/ns/data-models#TemperatureSensor",
+    "type": "TemperatureSensor",
     "category": {
       "type": "Property",
       "value": [
@@ -210,4 +210,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB
