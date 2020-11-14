@@ -1,0 +1,297 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Basic Test
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entities E1 and E2 with attributes P1 and R1
+# 02. Modify E1 with Batch Upsert (replacing with attrs P2 and R2) and add E3, also with attrs P2 and R2
+# 03. GET all three entities, see E1 and E3 with attrs P2 and R2, E2 with P1 and R1
+# 04. Modify E2 with Batch Upsert (updating with attrs P2 and R2) and add E4, also with attrs P2 and R2
+# 05. GET all four entities, see E1 and E3 with attrs P2 and R2, E2 with P1,P2 and R1,R2, and E4 with attrs P2 and R2
+#
+
+echo "01. Create entities E1 and E2 with attributes P1 and R1"
+echo "======================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E1:R1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E2:R1"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Modify E1 with Batch Upsert (replacing with attrs P2 and R2) and add E3, also with attrs P2 and R2"
+echo "======================================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "Vehicle",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 02"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E1:R2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "Vehicle",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 02"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E3:R2"
+    }    
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. GET all three entities, see E1 and E3 with attrs P2 and R2, while E2 has P1 and R1"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=Vehicle
+echo
+echo
+
+
+echo "04. Modify E2 with Batch Upsert (updating with attrs P2 and R2) and add E4, also with attrs P2 and R2"
+echo "====================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "Vehicle",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 04"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E2:R2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "Vehicle",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 04"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E4:R2"
+    }    
+  }
+]'
+orionCurl --url "/ngsi-ld/v1/entityOperations/upsert?options=update" -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. GET all four entities, see E1 and E3 with attrs P2 and R2, E2 with P1,P2 and R1,R2, and E4 with attrs P2 and R2"
+echo "==================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=Vehicle
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1 and E2 with attributes P1 and R1
+=======================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. Modify E1 with Batch Upsert (replacing with attrs P2 and R2) and add E3, also with attrs P2 and R2
+======================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. GET all three entities, see E1 and E3 with attrs P2 and R2, while E2 has P1 and R1
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 424
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "object": "urn:E2:R1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "Vehicle"
+    },
+    {
+        "P2": {
+            "type": "Property",
+            "value": "STEP 02"
+        },
+        "R2": {
+            "object": "urn:E1:R2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "Vehicle"
+    },
+    {
+        "P2": {
+            "type": "Property",
+            "value": "STEP 02"
+        },
+        "R2": {
+            "object": "urn:E3:R2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "Vehicle"
+    }
+]
+
+
+04. Modify E2 with Batch Upsert (updating with attrs P2 and R2) and add E4, also with attrs P2 and R2
+=====================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET all four entities, see E1 and E3 with attrs P2 and R2, E2 with P1,P2 and R1,R2, and E4 with attrs P2 and R2
+===================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 658
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "STEP 04"
+        },
+        "R1": {
+            "object": "urn:E2:R1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "object": "urn:E2:R2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "Vehicle"
+    },
+    {
+        "P2": {
+            "type": "Property",
+            "value": "STEP 02"
+        },
+        "R2": {
+            "object": "urn:E1:R2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "Vehicle"
+    },
+    {
+        "P2": {
+            "type": "Property",
+            "value": "STEP 02"
+        },
+        "R2": {
+            "object": "urn:E3:R2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "Vehicle"
+    },
+    {
+        "P2": {
+            "type": "Property",
+            "value": "STEP 04"
+        },
+        "R2": {
+            "object": "urn:E4:R2",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E4",
+        "type": "Vehicle"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
