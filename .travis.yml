@@ -7,71 +7,93 @@ services:
 env:
   global:
     - IMAGE_RELEASE_DEBIAN=fiware/orion-ld
-    - IMAGE_RELEASE_CENTOS=fiware/orion-ld:centos
-    - IMAGE_DEPS_DEBIAN=fiware/orion-ld:deps-debian
-    - IMAGE_DEPS_CENTOS=fiware/orion-ld:deps-centos
+    - IMAGE_TEMP_DEPS_DEBIAN=fiware/orion-ld:temp-${TRAVIS_COMMIT}
+    - IMAGE_DEPS_DEBIAN=fiware/orion-ld:deps
     - HOME=/opt/orion
     - secure: tVGPaHVXk+oRNs3civESLFQImhM5bpYTbjk9SXwHg/2hdX5laANEtxAKS8k7X5TZwj2oMV8nDzJojU1NOm3292IZsP/0BijCnkwSrLgN2zi/AK8FmiO0KT9+jkQH7T8/K9KisqVSUIaBFlIlFhhDwR2OPGjlPWZpt7DuTePNV4jgFhkMjfROzLZDc4aWA7uzKvw4XTegMvP/lRiU3urlTqJGXuKaCmkQeTHr1cGPbnycAqwDKYKxzKQdRhyQT96+MsZnfwgg8JLKQJpqEIFVQ22rxoZWUZaYbMpDJP1ZPnoF7v12ODNoFoZM7xWom98VAQ6L7SBcY7laInfa/N7zzu0GeIjGa7RwigLy9BPmOfpXBOSifdcAE6sZ9vLYoMKdE4SOYZ8uOfeuK5kJe0AY4tqVvCvuTdsQp0wmCnd8spH3L9sHlt7QJz+q+RklhFk2h9duyPNr5mfv/maWF8lJz/9eR8Lmmzeg/B79nvZEd2eCOYi2I9HcAucYZL4bZXIW6ROnf5WFdPcbHZtbeB5iBWKwhHp2gcDwTZtS6Ugx9axXMV4pAOS5qPKZNmH6n1GSCj25iGzluObje72xDy0s0lsLDlym7xvey3Ox/udSj17nEZf1ylQ9HR+ey7YS3UBRadopfvAyWy7ss03Tj2dobI7HcICknuztb+IdlAXceqE=
     - secure: dGrPDCxNNZe72esWl6Lvj7mn9IFYT8rbOJ9QPjsU0CsRFTu2t2XwDAMNRzbwlLIO3ANWTuMXuURsjQwdIh+fIjIG48rS4iTn7TiI4q3kP5pDbw0tZ5twpleZ5xh7twkb5CYTUeOtkBAbL/onOFavqAwZN3lu8sqFqOSbWi1VTAW2ZRTEX6QXUTd6fs0rXpdzSRzIqVZceHcDKcy1X07LmEWcm92jZf1jlJ2snhxOoSx/Ox29gSsbfyIyAl1HByVxqq20od6IViWh8Gpt4HJZU6+4Gp0MU+0yQI34heD7q02PB+/TQElVMmnadsd9HU1HfVF5uv4TuYO0zcmEgQHfwLKLD+d/mZhwrH2RgRwLSiCol6DJkpMHPbDEpB5l8Z32Ex+E6h7CtIE9l3nCGLJu4m+wbL0TT1wHGI8lpXW4RifW4vd6Zf+71CVW3OjFptXEjJPtrdGH51r3BH4LnTTMrOXzI8ZRyFpBi8EorLJAnrMc+7EwzVd1NTU07gDB22jNmtJkDty7BfE31GL4C04q9BBQSefFuZI92EnMKbYHHQUPdl9rLxn1QACcS2W+CYYA78X+R8RoTeu4Lrmcb7x6ByQuzenwj//Udu+0TBh3F5O1S4hC3FMDjwi5RC8u8GiEdLxmnKQXuhD/839SeFJXtmFnyN27wfrceAOivsP1rjw=
     - secure: aTkQKOSU2eSx5DjEqj5/GPiu0UiyBKNmXPoGYd6wQFajnKbk6ErEW66onFJGMiL3g/yiyP6Utwm4JaBgqxQ1WJDHSn8MbljFJ03xAtJsyz+E0Wh65kshK3IFxF2M7glt0ZHH3kvLEH9czFrNcZ3eusMC8GEWAkXQ0jwK7DVW4+rVaajHpZLsxgU3TOwxMML0AT+kfSPnOKBsjUwOtLmU+ffatGxA1r5leYvVTpzza9di6bqJf/hQN6z07gnhkAX3Ypz3JNPDYuFjK0jHwhkDFeN91FmoShuB5dOuvs16fXojjxYJDwMQIW/Eo0WjVEV6qhGtnYI6RnGFDI6Cc/NjDN4CAmssarj8pXdAQSzQVzSXohxsILIMuY1QdQpwLjJJdmHMwtPegeS49PCIaRKpgKPR9/FuqUpRFFkAX6Hy0fxC9rRkSTCSIwpFL37PWpRZKE5e12wNZPPDK2A2gpFIruv/upDmL1dhK5YjNoMENtBgOrG3Uo/YfCIEngDesNzE9XwGisW1u4TqaQ1rNVrdezS4KzC1njnjqw6MC+w9rCUNk4d/lR1y/h0q68Pa3c7IdLWUhdKDjLPAZdH0G4dpRxpZzwV/ocBmWSwcWT+74hBe1BC8kWPL7J2Q0T7IxcLDEKQvnfT1q2/Gg4oPrgh3Zp2mOrXtTKgmCHo5FrNdTnI=
 
+
+## Stages
+# build: build the image with dependencies for test and push it with a temporary tag
+# compliance: run compliance tests on the plain repo
+# unit: run only unit tests on test docker images
+# funcitonal-test: run parallelize functional tests on docker image
+# deploy: build and push release image, retag test image
+# cleanup: delete the temporary tag
 stages:
-  - test
+  - build
+  - compliance-test
+  - unit-test
+  - functional-test
   - name: deploy
     if: branch = develop
+  - clean-up
 
 jobs:
   include:
+    - stage: build
+      install: >
+        echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m";
+        travis_wait 30 docker build --no-cache --quiet \
+          --build-arg TOKEN=${TOKEN} \
+          --build-arg STAGE=deps -t ${IMAGE_TEMP_DEPS_DEBIAN} \
+          -f $(pwd)/docker/Dockerfile-debian $(pwd) ;
+        docker push ${IMAGE_TEMP_DEPS_DEBIAN};
     - env: STAGE=compliance
       name: "Compliance Tests"
-      stage: test
-      install: true
+      stage: compliance-test
+      install: skip
       script: >
         echo -e "\e[1;33mRunning Compliance Tests\e[0m";
         $(pwd)/docker/build.sh -s compliance -t -p $(pwd);
     - env: STAGE=debian_unit
       name: "Unit Tests (Debian)"
-      stage: test
+      stage: unit-test
+      install: skip
     - env: STAGE=debian_functional_1_450
       name: "Functional Tests 1-450 (Debian)"
-      stage: test
+      stage: functional-test
+      install: skip
     - env: STAGE=debian_functional_451_700
       name: "Functional Tests 451-700 (Debian)"
-      stage: test
+      stage: functional-test
+      install: skip
     - env: STAGE=debian_functional_701_1000
       name: "Functional Tests 701-1000 (Debian)"
-      stage: test
+      stage: functional-test
+      install: skip
     - env: STAGE=debian_functional_1001_1400
       name: "Functional Tests 1001-1400 (Debian)"
-      stage: test
+      stage: functional-test
+      install: skip
     - env: STAGE=debian_release
       name: "Deploy to Docker Hub"
       stage: deploy
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e "\e[1;33mBuilding Debian Docker image for Release\e[0m";
+          export VERSION=$(cat src/lib/orionld/common/orionldState.h | grep "#define ORIONLD_VERSION" | sed -e 's/#define ORIONLD_VERSION "//' -e 's/"//')
           travis_wait 30 docker build --no-cache --quiet \
             --build-arg TOKEN=${TOKEN} \
             --build-arg REV=${TRAVIS_COMMIT} \
-            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN} \
+            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN}:${VERSION} \
             -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
         fi
       script: true
       after_success: >
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e "\e[1;33mPushing Debian Release to Docker Hub\e[0m";
-          docker push ${IMAGE_RELEASE_DEBIAN};
+          docker push ${IMAGE_RELEASE_DEBIAN}:${VERSION};
         fi
     - env: STAGE=debian_deps
       name: "Deploy to Docker Hub - Image with Deps"
       stage: deploy
+      # apply a meaningful tag to the tested image and remove the temporary one.
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
-          travis_wait 30 docker build --no-cache --quiet \
-            --build-arg TOKEN=${TOKEN} \
-            --build-arg REV=${TRAVIS_COMMIT} \
-            --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
-            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+          docker tag ${IMAGE_TEMP_DEPS_DEBIAN} ${IMAGE_DEPS_DEBIAN};
         fi
       script: true
       after_success: >
@@ -79,9 +101,13 @@ jobs:
           echo -e "\e[1;33mPushing Debian Release (with Dependencies) to Docker Hub\e[0m";
           docker push ${IMAGE_DEPS_DEBIAN};
         fi
-
+    - name: "Cleanup"
+      stage: clean-up
+      install: skip
+      script: >
+        docker run --rm lumir/remove-dockerhub-tag --user ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD} ${IMAGE_TEMP_DEPS_DEBIAN}
   allow_failures:
-    - env: STAGE=debian_integration
+    - stage: clean-up
 
 before_install: >
   export PLATFORM=$(echo ${STAGE} | cut -c1-6);
@@ -104,13 +130,8 @@ before_install: >
     sudo service docker restart; 
   fi
 
-install: >
-  echo -e "\e[1;33mRebuilding Debian Docker Images (with deps)\e[0m";
-  travis_wait 30 docker build --no-cache --quiet \
-    --build-arg TOKEN=${TOKEN} \
-    --build-arg REV=${TRAVIS_COMMIT} \
-    --build-arg STAGE=deps -t ${IMAGE_DEPS_DEBIAN} \
-    -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+after_failure: >
+  docker run --rm lumir/remove-dockerhub-tag --user ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD} ${IMAGE_DEPS_DEBIAN}
 
 script: >
   echo -e "\e[1;33mRunning Tests against Debian Image\e[0m";
@@ -119,7 +140,7 @@ script: >
     -e ORIONLD_CACHED_CONTEXT_DIRECTORY=${HOME}/ldcontexts  \
     -e CB_SKIP_FUNC_TESTS="${CB_SKIP_FUNC_TESTS}"           \
     -e TRAVIS=${TRAVIS}                                     \
-    ${IMAGE_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
+    ${IMAGE_TEMP_DEPS_DEBIAN} build.sh -s ${STAGE_TYPE} -dqt;
 
 after_success: true
 notifications:
