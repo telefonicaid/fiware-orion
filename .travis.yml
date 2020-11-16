@@ -28,7 +28,7 @@ stages:
   - unit-test
   - functional-test
   - name: deploy
-    if: branch = develop
+    if: branch = "fix-travis"
   - clean-up
 
 jobs:
