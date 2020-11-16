@@ -24,11 +24,11 @@ env:
 # cleanup: delete the temporary tag
 stages:
   - build
-  #- compliance-test
-  #- unit-test
-  #- functional-test
+  - compliance-test
+  - unit-test
+  - functional-test
   - name: deploy
-    if: branch = "fix-travis"
+    if: branch =develop
   - clean-up
 
 jobs:
@@ -114,7 +114,7 @@ before_install: >
   export PLATFORM=$(echo ${STAGE} | cut -c1-6);
   export STAGE_TYPE=$(echo ${STAGE} | cut -c8-);
 
-  if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "fix-travis" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then 
+  if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then 
     export PUSH_STATUS="True"; 
   fi
 
