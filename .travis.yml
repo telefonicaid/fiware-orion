@@ -24,9 +24,9 @@ env:
 # cleanup: delete the temporary tag
 stages:
   - build
-  - compliance-test
-  - unit-test
-  - functional-test
+  #- compliance-test
+  #- unit-test
+  #- functional-test
   - name: deploy
     if: branch = "fix-travis"
   - clean-up
