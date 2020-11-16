@@ -222,9 +222,7 @@ fi
 if [[ ${STAGE} == 'release' ]]; then
     echo
     echo -e "\e[1;32m Debian Builder: compiling and installing orion as a DEBUGGABLE executable \e[0m"
-    git clone ${REPOSITORY} ${PATH_TO_SRC}
-    cd ${PATH_TO_SRC}
-    git checkout ${REV}
+
     make debug install
     strip /usr/bin/${BROKER}
 
