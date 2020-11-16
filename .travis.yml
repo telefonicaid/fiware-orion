@@ -28,7 +28,7 @@ stages:
   - unit-test
   - functional-test
   - name: deploy
-    if: branch = develop
+    if: branch =develop
   - clean-up
 
 jobs:
@@ -74,12 +74,11 @@ jobs:
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
           echo -e "\e[1;33mBuilding Debian Docker image for Release\e[0m";
-          export VERSION=$(cat src/lib/orionld/common/orionldState.h | grep "#define ORIONLD_VERSION" | sed -e 's/#define ORIONLD_VERSION "//' -e 's/"//')
           travis_wait 30 docker build --no-cache --quiet \
             --build-arg TOKEN=${TOKEN} \
             --build-arg REV=${TRAVIS_COMMIT} \
-            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN}:${VERSION} \
-            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+            --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN}:latest \
+            -f $(pwd)/docker/Dockerfile-debian $(pwd) ;
         fi
       script: true
       after_success: >
@@ -93,6 +92,7 @@ jobs:
       # apply a meaningful tag to the tested image and remove the temporary one.
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
+          docker pull ${IMAGE_TEMP_DEPS_DEBIAN};
           docker tag ${IMAGE_TEMP_DEPS_DEBIAN} ${IMAGE_DEPS_DEBIAN};
         fi
       script: true
