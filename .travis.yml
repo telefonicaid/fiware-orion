@@ -79,7 +79,7 @@ jobs:
             --build-arg TOKEN=${TOKEN} \
             --build-arg REV=${TRAVIS_COMMIT} \
             --build-arg STAGE=release -t ${IMAGE_RELEASE_DEBIAN}:${VERSION} \
-            -f $(pwd)/docker/Dockerfile-debian $(pwd)/docker/ ;
+            -f $(pwd)/docker/Dockerfile-debian $(pwd) ;
         fi
       script: true
       after_success: >
@@ -93,6 +93,7 @@ jobs:
       # apply a meaningful tag to the tested image and remove the temporary one.
       install: >
         if [[ "${PUSH_STATUS}" ]]; then
+          docker pull ${IMAGE_TEMP_DEPS_DEBIAN};
           docker tag ${IMAGE_TEMP_DEPS_DEBIAN} ${IMAGE_DEPS_DEBIAN};
         fi
       script: true
@@ -113,7 +114,7 @@ before_install: >
   export PLATFORM=$(echo ${STAGE} | cut -c1-6);
   export STAGE_TYPE=$(echo ${STAGE} | cut -c8-);
 
-  if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "develop" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then 
+  if [[ "${PUSH}" && ${TRAVIS_BRANCH} == "fix-travis" && ${TRAVIS_EVENT_TYPE} == "push" ]]; then 
     export PUSH_STATUS="True"; 
   fi
 
