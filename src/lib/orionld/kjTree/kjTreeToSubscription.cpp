@@ -22,28 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                              // std::string
+#include <string>                                                // std::string
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "apiTypesV2/Subscription.h"                           // Subscription
-#include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
+#include "apiTypesV2/Subscription.h"                             // Subscription
+#include "mongoBackend/MongoGlobal.h"                            // mongoIdentifier
 
-#include "orionld/common/CHECK.h"                              // CHECKx()
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
-#include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
-#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // kjTreeToSubscriptionExpression
-#include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
-#include "orionld/kjTree/kjTreeToSubscription.h"               // Own interface
+#include "orionld/common/CHECK.h"                                // CHECKx()
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
+#include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
+#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"       // kjTreeToSubscriptionExpression
+#include "orionld/kjTree/kjTreeToNotification.h"                 // kjTreeToNotification
+#include "orionld/kjTree/kjTreeToSubscription.h"                 // Own interface
 
 
 
@@ -107,10 +106,13 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   else
     subP->id = orionldState.payloadIdNode->value.s;
 
-  if ((urlCheck((char*) subP->id.c_str(), NULL) == false) && (urnCheck((char*) subP->id.c_str(), NULL) == false))
+  char* uri = (char*) subP->id.c_str();
+  char* detail;
+
+  if (pcheckUri(uri, &detail) == false)
   {
     LM_W(("Bad Input (Subscription::id is not a URI)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", subP->id.c_str());
+    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", uri);  // FIXME: Include 'detail' and name (subscription::id)
     orionldState.httpStatusCode = 400;
     return false;
   }

@@ -41,15 +41,14 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/qLex.h"                               // qLex
 #include "orionld/common/qParse.h"                             // qParse
 #include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
@@ -112,6 +111,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
+
+  LM_TMP(("GET: type == '%s'", type));
 
   //
   // FIXME: Move all this to orionldMhdConnectionInit()
@@ -304,22 +305,25 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   for (int ix = 0; ix < idVecItems; ix++)
   {
-    if ((urlCheck(idVector[ix], &detail) == false) && (urnCheck(idVector[ix], &detail) == false))
+    if (pcheckUri(idVector[ix], &detail) == false)
     {
       LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (id array item)
       return false;
     }
   }
 
   if (typeVecItems == 1)  // type needs to be modified according to @context
   {
-    char* detail;
+    // FIXME:
+    //   No expansion desired if the type is already FQN - however, this may
+    //   null out prefix expansion so, I'veremoved the call to pcheckUri() and
+    //   I always expand ...
+    //
+    type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
 
-    // No expansion desired if the type is already a FQN
-    if (urlCheck(type, &detail) == false)
-      type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
-
+    LM_TMP(("GET: context is: %s", orionldState.contextP->url));
+    LM_TMP(("GET: expanded type: %s", type));
     isTypePattern = false;  // Just in case ...
   }
 
@@ -335,7 +339,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
-      if (urlCheck(typeVector[ix], &detail) == false)
+      if (pcheckUri(typeVector[ix], &detail) == false)
         typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);
       else
         typeExpanded = typeVector[ix];

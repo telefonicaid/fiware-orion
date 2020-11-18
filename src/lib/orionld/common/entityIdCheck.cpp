@@ -28,14 +28,14 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Trace levels for logging
 
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/entityErrorPush.h"                      // entityErrorPush
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/common/entityIdCheck.h"                        // Own interface
 
 
 
@@ -63,10 +63,10 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
 
   // Entity ID must be a valid URI
   char* detail;
-  if (!urlCheck(entityIdNodeP->value.s, &detail) && !urnCheck(entityIdNodeP->value.s, &detail))
+  if (pcheckUri(entityIdNodeP->value.s, &detail) == false)
   {
     LM_W(("Bad Input (CREATE/UPSERT: entity::id is a string but not a valid URI)"));
-    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400);
+    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400);  // FIXME: Include 'detail' and name (entityId) ?
     return false;
   }
 

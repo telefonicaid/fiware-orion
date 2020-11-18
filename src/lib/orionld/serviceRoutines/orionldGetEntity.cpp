@@ -42,17 +42,16 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
 
 
@@ -417,15 +416,14 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 {
   char*    detail;
   KjNode*  regArray;
-  // bool     keyValues = orionldState.uriParamOptions.keyValues;
 
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if ((urlCheck(orionldState.wildcard[0], &detail) == false) && (urnCheck(orionldState.wildcard[0], &detail) == false))
+  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
 
@@ -481,7 +479,12 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       attrsMandatory = true;
   }
 
-  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0], attrsP, attrsMandatory, orionldState.uriParamOptions.sysAttrs, orionldState.uriParamOptions.keyValues, orionldState.uriParams.datasetId);
+  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
+                                               attrsP,
+                                               attrsMandatory,
+                                               orionldState.uriParamOptions.sysAttrs,
+                                               orionldState.uriParamOptions.keyValues,
+                                               orionldState.uriParams.datasetId);
 #endif
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
