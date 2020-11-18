@@ -24,22 +24,21 @@
 */
 extern "C"
 {
-#include "kjson/kjLookup.h"                                     // kjLookup
-#include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
 }
 
-#include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
-#include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                            // urlCheck
-#include "orionld/common/urnCheck.h"                            // urnCheck
-#include "orionld/payloadCheck/pcheckSubscription.h"            // pcheckSubscription
-#include "orionld/db/dbConfiguration.h"                         // dbSubscriptionGet
-#include "orionld/serviceRoutines/orionldPatchSubscription.h"   // Own Interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
+#include "orionld/db/dbConfiguration.h"                        // dbSubscriptionGet
+#include "orionld/serviceRoutines/orionldPatchSubscription.h"  // Own Interface
 
 
 
@@ -484,11 +483,12 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 bool orionldPatchSubscription(ConnectionInfo* ciP)
 {
   char* subscriptionId = orionldState.wildcard[0];
+  char* detail;
 
-  if ((urlCheck(subscriptionId, NULL) == false) && (urnCheck(subscriptionId, NULL) == false))
+  if (pcheckUri(subscriptionId, &detail) == false)
   {
     orionldState.httpStatusCode = 400;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);  // FIXME: Include 'detail' and name (subscriptionId)
     return false;
   }
 

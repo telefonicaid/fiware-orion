@@ -38,13 +38,12 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                            // urlCheck
-#include "orionld/common/urnCheck.h"                            // urnCheck
 #include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
+#include "orionld/payloadCheck/pcheckUri.h"                     // pcheckUri
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"   // Own Interface
 
 
@@ -555,11 +554,12 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 {
   char*    registrationId = orionldState.wildcard[0];
   KjNode*  propertyTree;
+  char*    detail;
 
-  if ((urlCheck(registrationId, NULL) == false) && (urnCheck(registrationId, NULL) == false))
+  if (pcheckUri(registrationId, &detail) == false)
   {
     orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);  // FIXME: Include 'detail' and name (registrationId)
     return false;
   }
 

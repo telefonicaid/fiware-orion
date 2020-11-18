@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,46 +22,52 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strcpy
+#include <unistd.h>                                               // NULL
 
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
-#include "orionld/common/linkCheck.h"                          // Own interface
+#include "orionld/payloadCheck/pcheckUri.h"                       // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// linkCheck -
+// pcheckUri - check that the string 's' contains a valid URI
 //
-// Example link:
-//   <https://fiware.github.io/X/Y/Z.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-//
-// NOTE
-//   The initial '<' is stepped over before clling this function, by linkHeaderCheck() in orionldMhdConnectionTreat.cpp
-//
-bool linkCheck(char* link, char** detailsP)
+bool pcheckUri(char* uri, char** detailP)
 {
-  char* cP = link;
-
-  while (*cP != '>')
+  if (uri == NULL)
   {
-    if (*cP == 0)
+    *detailP = (char*) "NULL value";
+    return false;
+  }
+
+  if (*uri == 0)
+  {
+    *detailP = (char*) "Empty value";
+    return false;
+  }
+  
+  while (*uri != 0)
+  {
+    if (*uri == ':')
+      return true;
+
+    if ((*uri >= 'A') && (*uri <= 'Z'))
     {
-      *detailsP = (char*) "missing '>' at end of URL of link";
+      // OK
+    }
+    else if ((*uri >= 'a') && (*uri <= 'z'))
+    {
+      // OK
+    }
+    else
+    {
+      *detailP = (char*) "Invalid character for the URI scheme";
       return false;
     }
 
-    ++cP;
+    ++uri;
   }
 
-  *cP = 0;  // End of string for the URL
-
-  if (pcheckUri(link, detailsP) == false)
-    return false;
-
-  //
-  // FIXME: Parse the 'rel' and 'type' as well ?
-  //
-
-  return true;
+  *detailP = (char*) "No colon found in URI";
+  return false;
 }

@@ -42,12 +42,11 @@ extern "C"
 #include "rest/HttpStatusCode.h"                                 // SccContextElementNotFound
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/httpStatusCodeToOrionldErrorType.h"     // httpStatusCodeToOrionldErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own Interface
@@ -63,13 +62,13 @@ bool orionldDeleteAttribute(ConnectionInfo* ciP)
   char*    entityId = orionldState.wildcard[0];
   char*    attrName = orionldState.wildcard[1];
   char*    attrNameP;
-  char*    details;
+  char*    detail;
 
   // Make sure the Entity ID is a valid URI
-  if ((urlCheck(entityId, &details) == false) && (urnCheck(entityId, &details) == false))
+  if (pcheckUri(entityId, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID '%s' - not a URI)", entityId));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include name (entityId) and value ($entityId)
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }

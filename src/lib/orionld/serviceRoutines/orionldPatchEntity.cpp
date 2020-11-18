@@ -28,6 +28,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -42,6 +43,8 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
@@ -194,17 +197,22 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   char* entityId   = orionldState.wildcard[0];
   char* detail;
 
+  LM_TMP(("PATCH: entity id: '%s'", entityId));
   // 1. Is the Entity ID in the URL a valid URI?
-  if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
+  if (pcheckUri(entityId, &detail) == false)
   {
     orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Entity ID must be a valid URI", entityId);  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
 
   // 2. Is the payload not a JSON object?
   OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
 
+  char buf[1024];
+  kjRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
+  LM_TMP(("PATCH: incoming payload body: %s", buf));
+  
   // 3. Get the entity from mongo
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
@@ -213,6 +221,9 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
     return false;
   }
+
+  kjRender(orionldState.kjsonP, dbEntityP, buf, sizeof(buf));
+  LM_TMP(("PATCH: entity in DB: %s", buf));
 
   // 3. Get the Entity Type, needed later in the call to the constructor of ContextElement
   KjNode* idNodeP = kjLookup(dbEntityP, "_id");
@@ -251,6 +262,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
     return false;
   }
+  kjRender(orionldState.kjsonP, inDbAttrsP, buf, sizeof(buf));
+  LM_TMP(("PATCH: inDbAttrsP: %s", buf));
 
   //
   // 5. Loop over the incoming payload data
@@ -262,6 +275,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   KjNode* next;
   KjNode* updatedP     = kjArray(orionldState.kjsonP, "updated");
   KjNode* notUpdatedP  = kjArray(orionldState.kjsonP, "notUpdated");
+  int     newAttrs     = 0;
 
   while (newAttrP != NULL)
   {
@@ -269,6 +283,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     char*    title;
     char*    detail;
 
+    LM_TMP(("PATCH: attribute name: '%s'", newAttrP->name));
     next = newAttrP->next;
 
     if ((strcmp(newAttrP->name, "location")         != 0) &&
@@ -278,7 +293,8 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     {
       newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
     }
-
+    LM_TMP(("PATCH: attribute name expanded: '%s'", newAttrP->name));
+    
     // Is the attribute in the incoming payload a valid attribute?
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
     {
@@ -290,13 +306,16 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     char* eqName = kaStrdup(&orionldState.kalloc, newAttrP->name);
     dotForEq(eqName);
+    LM_TMP(("PATCH: looking up the attribute '%s' in the db attrs array (where '.' is replaced with '=')", eqName));
     dbAttrP = kjLookup(inDbAttrsP, eqName);
     if (dbAttrP == NULL)  // Doesn't already exist - must be discarded
     {
+      LM_TMP(("PATCH: attribute '%s' doesn't exist - it's discarded", eqName));
       attributeNotUpdated(notUpdatedP, newAttrP->name, "attribute doesn't exist");
       newAttrP = next;
       continue;
     }
+    LM_TMP(("PATCH: attribute '%s' exists and will be modified (real attr name: '%s')", eqName, newAttrP->name));
 
     // Steal createdAt from dbAttrP?
 
@@ -304,47 +323,55 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     kjChildRemove(inDbAttrsP, dbAttrP);
     kjChildAdd(inDbAttrsP, newAttrP);
     attributeUpdated(updatedP, newAttrP->name);
+
+    ++newAttrs;
     newAttrP = next;
   }
 
 
-  // 6. Convert the resulting tree (dbEntityP) to a ContextElement
-  UpdateContextRequest ucRequest;
-  ContextElement*      ceP = new ContextElement(entityId, entityType, "false");
-
-  ucRequest.contextElementVector.push_back(ceP);
-
-  for (KjNode* attrP = inDbAttrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  if (newAttrs > 0)
   {
-    ContextAttribute* caP = new ContextAttribute();
+    // 6. Convert the resulting tree (dbEntityP) to a ContextElement
+    UpdateContextRequest ucRequest;
+    ContextElement*      ceP = new ContextElement(entityId, entityType, "false");
 
-    if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
+    ucRequest.contextElementVector.push_back(ceP);
+
+    for (KjNode* attrP = inDbAttrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
-      LM_E(("kjTreeToContextAttribute: %s", detail));
-      attributeNotUpdated(notUpdatedP, attrP->name, "Error");
-      delete caP;
+      ContextAttribute* caP = new ContextAttribute();
+
+      eqForDot(attrP->name);
+      LM_TMP(("PATCH: converting attribute '%s' to a ContextAttribute", attrP->name));
+    
+      if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
+      {
+        LM_E(("kjTreeToContextAttribute: %s", detail));
+        attributeNotUpdated(notUpdatedP, attrP->name, "Error");
+        delete caP;
+      }
+      else
+        ceP->contextAttributeVector.push_back(caP);
     }
-    else
-      ceP->contextAttributeVector.push_back(caP);
+    ucRequest.updateActionType = ActionTypeReplace;
+
+
+    // 8. Call mongoBackend to do the REPLACE of the entity
+    UpdateContextResponse  ucResponse;
+
+    orionldState.httpStatusCode = mongoUpdateContext(&ucRequest,
+                                                     &ucResponse,
+                                                     orionldState.tenant,
+                                                     ciP->servicePathV,
+                                                     ciP->uriParam,
+                                                     ciP->httpHeaders.xauthToken,
+                                                     ciP->httpHeaders.correlator,
+                                                     ciP->httpHeaders.ngsiv2AttrsFormat,
+                                                     ciP->apiVersion,
+                                                     NGSIV2_NO_FLAVOUR);
+
+    ucRequest.release();
   }
-  ucRequest.updateActionType = ActionTypeReplace;
-
-
-  // 8. Call mongoBackend to do the REPLACE of the entity
-  UpdateContextResponse  ucResponse;
-
-  orionldState.httpStatusCode = mongoUpdateContext(&ucRequest,
-                                                   &ucResponse,
-                                                   orionldState.tenant,
-                                                   ciP->servicePathV,
-                                                   ciP->uriParam,
-                                                   ciP->httpHeaders.xauthToken,
-                                                   ciP->httpHeaders.correlator,
-                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
-                                                   ciP->apiVersion,
-                                                   NGSIV2_NO_FLAVOUR);
-
-  ucRequest.release();
 
   // 9. Postprocess output from mongoBackend
   if (orionldState.httpStatusCode == SccOk)

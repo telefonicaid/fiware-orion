@@ -44,17 +44,16 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // *CHECK*
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/context/orionldContextItemExpand.h"            // orionldUriExpand
 #include "orionld/kjTree/kjTreeToEntity.h"                       // kjTreeToEntity
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
-#include "orionld/context/orionldContextItemExpand.h"            // orionldUriExpand
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
@@ -334,10 +333,10 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
+  if (pcheckUri(entityId, &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID '%s' - Not a URI)", entityId));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URI");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URI");  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
 
