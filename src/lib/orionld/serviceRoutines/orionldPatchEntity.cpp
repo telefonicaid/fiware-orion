@@ -212,7 +212,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   char buf[1024];
   kjRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
   LM_TMP(("PATCH: incoming payload body: %s", buf));
-  
+
   // 3. Get the entity from mongo
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
@@ -294,7 +294,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
     }
     LM_TMP(("PATCH: attribute name expanded: '%s'", newAttrP->name));
-    
+
     // Is the attribute in the incoming payload a valid attribute?
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
     {
@@ -343,7 +343,7 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
       eqForDot(attrP->name);
       LM_TMP(("PATCH: converting attribute '%s' to a ContextAttribute", attrP->name));
-    
+
       if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
       {
         LM_E(("kjTreeToContextAttribute: %s", detail));

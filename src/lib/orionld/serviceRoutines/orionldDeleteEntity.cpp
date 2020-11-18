@@ -50,7 +50,7 @@ bool orionldDeleteEntity(ConnectionInfo* ciP)
   // Make sure the Entity ID is a valid URI
   if (pcheckUri(entityId, &detail) == false)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail); // FIXME: Include value (entityId) and name ("entityId")
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include value (entityId) and name ("entityId")
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }

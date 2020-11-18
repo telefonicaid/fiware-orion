@@ -115,7 +115,7 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
 
       if (pcheckUri(datasetIdP->value.s, &pdP->detail) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId"); // FIXME: Include 'detail' and value (datasetIdP->value.s)
+        orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId");  // FIXME: Include 'detail' and value (datasetIdP->value.s)
         orionldState.httpStatusCode = SccBadRequest;
         pdP->status = 400;
         return NULL;

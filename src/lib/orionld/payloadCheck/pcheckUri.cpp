@@ -45,7 +45,7 @@ bool pcheckUri(char* uri, char** detailP)
     *detailP = (char*) "Empty value";
     return false;
   }
-  
+
   while (*uri != 0)
   {
     if (*uri == ':')
