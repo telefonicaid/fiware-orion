@@ -421,6 +421,7 @@ noCache=""
 threadpool=ON
 ngsild=OFF
 externalBroker=OFF
+mintaka=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
@@ -428,6 +429,7 @@ do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
+  elif [ "$1" == "-mintaka" ];       then mintaka=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
   elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
   elif [ "$1" == "-meld" ];          then CB_DIFF_TOOL=meld;
@@ -511,6 +513,18 @@ then
   dirOrFile=test/functionalTest/cases/0000_ngsild
 fi
 
+
+
+# -----------------------------------------------------------------------------
+#
+# Only mintaka tests?
+#
+# If set, overrides parameter
+#
+if [ "$mintaka" == "on" ]
+then
+  dirOrFile=../Mintaka/tests
+fi
 
 
 # ------------------------------------------------------------------------------
