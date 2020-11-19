@@ -38,14 +38,12 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                            // urlCheck
-#include "orionld/common/urnCheck.h"                            // urnCheck
 #include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"          // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
+#include "orionld/payloadCheck/pcheckUri.h"                     // pcheckUri
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"   // Own Interface
 
 
@@ -86,7 +84,6 @@ static void longToFloat(KjNode* nodeP)
     char*     longString  = nodeP->value.firstChildP->value.s;
     double    floatValue  = strtold(longString, NULL);
 
-    LM_TMP(("MILLIS: string '%s': %f", longString, floatValue));
     nodeP->type    = KjFloat;
     nodeP->value.f = floatValue;
   }
@@ -557,11 +554,12 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 {
   char*    registrationId = orionldState.wildcard[0];
   KjNode*  propertyTree;
+  char*    detail;
 
-  if ((urlCheck(registrationId, NULL) == false) && (urnCheck(registrationId, NULL) == false))
+  if (pcheckUri(registrationId, &detail) == false)
   {
     orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Registration ID must be a valid URI", registrationId);  // FIXME: Include 'detail' and name (registrationId)
     return false;
   }
 
@@ -610,13 +608,12 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
 
   while (propertyP != NULL)
   {
-    bool    valueMayBeExpanded;
     KjNode* dbPropertyP;
 
     next = propertyP->next;
 
     if (orionldContextItemAlreadyExpanded(propertyP->name) == false)
-      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, &valueMayBeExpanded, true, NULL);
+      propertyP->name = orionldContextItemExpand(orionldState.contextP, propertyP->name, true, NULL);
 
     if ((dbPropertyP = kjLookup(dbPropertiesP, propertyP->name)) == NULL)
     {
@@ -624,9 +621,6 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
       orionldErrorResponseCreate(OrionldBadRequestData, "non-existing registration property", propertyP->name);
       return false;
     }
-
-    if (valueMayBeExpanded)
-      orionldContextValueExpand(propertyP);
 
     //
     // Replace the registration properties
@@ -651,14 +645,13 @@ bool orionldPatchRegistration(ConnectionInfo* ciP)
   ngsildRegistrationPatch(dbRegistrationP, orionldState.requestTree);
 
   // Update modifiedAt
-  double  now         = getCurrentTime();
   KjNode* modifiedAtP = kjLookup(dbRegistrationP, "modifiedAt");
 
   if (modifiedAtP != NULL)
-    modifiedAtP->value.f = now;
+    modifiedAtP->value.f = orionldState.requestTime;
   else
   {
-    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", now);
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
     kjChildAdd(dbRegistrationP, modifiedAtP);
   }
 

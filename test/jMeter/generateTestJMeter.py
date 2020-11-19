@@ -71,6 +71,7 @@ PATH_SERVICE = ''
 HEADERS = {}
 HTTP_VERB = ""
 BODY_DATA = ""
+PERFORMANCE_METRICS = {}
 
 OUTPUT_FILE_NAME = ''
 # =============================================================
@@ -107,12 +108,16 @@ def loadParamsFromFileSelected(file):
             if readData["HEADERS"]:
                 global HEADERS
                 HEADERS = readData["HEADERS"]
-            if readData["BODY_DATA"]:
+            if "BODY_DATA" in readData:
                 global BODY_DATA
                 if "raw" in readData["BODY_DATA"] and "json" not in readData["BODY_DATA"]:
                     BODY_DATA = str(readData["BODY_DATA"]["raw"])
                 if "raw" not in readData["BODY_DATA"] and "json" in readData["BODY_DATA"]:
-                    BODY_DATA = str(readData["BODY_DATA"]["json"])
+                    BODY_DATA = str(
+                        readData["BODY_DATA"]["json"]).replace("'", "\"")
+            if "PERFORMANCE_METRICS" in readData:
+                global PERFORMANCE_METRICS
+                PERFORMANCE_METRICS = readData["PERFORMANCE_METRICS"]
 
             global OUTPUT_FILE_NAME
             OUTPUT_FILE_NAME = "{title}_{timeNow}".format(
@@ -152,6 +157,35 @@ def setHeaders(key, value):
     return header
 
 
+def addPerformanceMetricsProps(type, index, props):
+    collection = ET.Element("collectionProp")
+    collection.set("name", str(index) + "_" + type)
+
+    for key, value in props.items():
+        prop = ET.Element("stringProp")
+        prop.set("name", key)
+        prop.text = str(value)
+        collection.append(prop)
+
+    if type == 'cpu':
+        prop = ET.Element("stringProp")
+        prop.set("name", "command")
+        prop.text = 'sar -u 1 1 | awk \'/^Average:/ {print 100-$8}\''
+    elif type == 'ram':
+        prop = ET.Element("stringProp")
+        prop.set("name", "command")
+        prop.text = 'free | grep Mem | awk \'{print 100 -($4/$2 * 100.0)}\''
+
+    collection.append(prop)
+
+    prop = ET.Element("stringProp")
+    prop.set("name", "delta")
+    prop.text = 'false'
+    collection.append(prop)
+
+    return collection
+
+
 # defineParams: Create a structure of folders for HTML Report or just .csv file
 # @params : isCreateHTMLReport - Works like a switch for choose the structure
 
@@ -169,6 +203,20 @@ def defineParams(tree, op):
             for key, value in HEADERS.items():
                 header = setHeaders(key, value)
                 item.append(header)
+        if PERFORMANCE_METRICS != {} and item.attrib['name'] == 'samplers':
+            if "CPU" in PERFORMANCE_METRICS:
+                for props in PERFORMANCE_METRICS["CPU"]:
+                    index = PERFORMANCE_METRICS["CPU"].index(props)
+                    performanceProps = addPerformanceMetricsProps(
+                        'cpu', index, props)
+                    item.append(performanceProps)
+
+            if "RAM" in PERFORMANCE_METRICS:
+                for props in PERFORMANCE_METRICS["RAM"]:
+                    index = PERFORMANCE_METRICS["RAM"].index(props)
+                    performanceProps = addPerformanceMetricsProps(
+                        'ram', index, props)
+                    item.append(performanceProps)
 
     for item in root.iter('stringProp'):
         if item.attrib['name'] == "ThreadGroup.num_threads":

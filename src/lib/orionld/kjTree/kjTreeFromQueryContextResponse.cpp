@@ -137,7 +137,7 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
   //
   for (int ix = 0; ix < attrs; ix++)
   {
-    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], NULL, true, NULL);
+    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], true, NULL);
   }
 
   *attrListExpandedVecP = expandedV;
@@ -400,7 +400,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
       }
       else
       {
-        LM_TMP(("MILLIS: Treating attribute '%s'", attrName));
         //
         // NOT keyValues - create entire attribute tree
         //
@@ -509,8 +508,6 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
           Metadata* mdP                  = aP->metadataVector[ix];
           char*     mdName               = (char*) mdP->name.c_str();
           bool      valueMayBeCompacted  = false;
-
-          LM_TMP(("MILLIS: Treating sub-attribute '%s'", mdName));
 
           if ((strcmp(mdName, "observedAt") != 0) &&
               (strcmp(mdName, "createdAt")  != 0) &&

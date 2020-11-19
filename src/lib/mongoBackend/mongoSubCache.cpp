@@ -81,22 +81,47 @@ using mongo::OID;
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
   //
-  // 01. Check validity of subP parameter
+  // Check validity of 'sub' parameter
   //
-  BSONElement  idField = getFieldF(sub, "_id");
+  std::string subId;
 
-  if (idField.eoo() == true)
+  if (!sub.hasField("_id"))
+  {
+    LM_E(("Database Error (subscription without subscription-id in database)"));
+    return -1;
+  }
+
+  mongo::BSONElement _id = sub.getField("_id");
+
+  if (_id.eoo() == true)
   {
     std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    LM_E(("Database Error (%s)", details.c_str()));
     alarmMgr.dbError(details);
     return -1;
   }
+
+  if (_id.type() == mongo::String)
+    subId = _id.String().c_str();
+  else if (_id.type() == mongo::jstOID)
+    subId = _id.OID().toString().c_str();
+  else
+  {
+    LM_E(("Database Error (invalid type for _id field in a subscription)"));
+    alarmMgr.dbError("Database Error (invalid type for _id field in a subscription)");
+    return -1;
+  }
+
   alarmMgr.dbErrorReset();
 
   //
-  // 03. Create CachedSubscription
+  // Create CachedSubscription
   //
   CachedSubscription* cSubP = new CachedSubscription();
+
+  if (subId != "")
+    cSubP->subscriptionId = strdup(subId.c_str());
+
   LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   if (cSubP == NULL)
@@ -112,29 +137,26 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
+  std::string    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(sub, CSUB_LDCONTEXT) : "";
   std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
-  cSubP->tenant = (tenant[0] == 0)? strdup("") : strdup(tenant);
+  if (ldContext != "")  // NGSI-LD subscription
+  {
+    cSubP->ldContext = strdup(ldContext.c_str());
 
-#ifdef ORIONLD
-  //
-  // Make sure 'idField' is an OID before calling OID.
-  // Subs created with NGSI-LD aren't OIDs, so ...
-  // Using idField.OID() on a sub-id that isn't an OID gets an exception and the broker crashes.
-  //
-  char oid[128];
+    if (renderFormat == NGSI_V2_NORMALIZED)
+      renderFormat = NGSI_LD_V1_NORMALIZED;
+    else if (renderFormat == NGSI_V2_KEYVALUES)
+      renderFormat = NGSI_LD_V1_KEYVALUES;
+    else
+    {
+      LM_W(("No render format in DB for NGSI-LD subscription - using NGSI-LD NORMALIZED"));
+      renderFormat = NGSI_LD_V1_NORMALIZED;
+    }
+  }
 
-  strncpy(oid, idField.toString().c_str(), sizeof(oid));
-
-  if (strncmp(oid, "_id: ObjectId('", 15) == 0)
-    cSubP->subscriptionId  = strdup(idField.OID().toString().c_str());
-  else
-    cSubP->subscriptionId  = strdup(idField.toString().c_str());
-#else
-  cSubP->subscriptionId    = strdup(idField.OID().toString().c_str());
-#endif
-
+  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(sub, CSUB_SERVICE_PATH).c_str() : "/");
   cSubP->renderFormat          = renderFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;

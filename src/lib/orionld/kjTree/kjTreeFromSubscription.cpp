@@ -293,10 +293,8 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // status
-  double  now    = getCurrentTime();
-  char*   status = NULL;
-
-  if (subscriptionP->expires < now)
+  char* status = NULL;
+  if (subscriptionP->expires < orionldState.requestTime)
     status = (char*) "expired";
   else if (subscriptionP->status != "active")
     status = (char*) "paused";
@@ -400,7 +398,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // throttling
-  LM_TMP(("THROT: throttling: %f", subscriptionP->throttling));
   if (subscriptionP->throttling != 0)
   {
     nodeP = kjFloat(orionldState.kjsonP, "throttling", subscriptionP->throttling);

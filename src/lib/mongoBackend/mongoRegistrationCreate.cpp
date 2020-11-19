@@ -219,11 +219,9 @@ static void setTimeInterval(const char* name, const OrionldTimeInterval* interva
 {
   mongo::BSONObjBuilder intervalObj;
 
-  LM_TMP(("MILI: Appending start: %f", intervalP->start));
-  LM_TMP(("MILI: Appending end: %f", intervalP->end));
   intervalObj.append("start", intervalP->start);
   intervalObj.append("end",   intervalP->end);
-  // LM_TMP(("MILI: intervalObj: %s", intervalObj.obj().toString().c_str()));     // DESTRUCTIVE !!!
+
   bobP->append(name, intervalObj.obj());
 }
 
@@ -328,10 +326,8 @@ void mongoRegistrationCreate
   setFormat("JSON", &bob);   // FIXME #3068: this would be unhardwired when we implement NGSIv2-based forwarding
 
 #ifdef ORIONLD
-  double now = getCurrentTime();
-
-  setTimestamp("createdAt",  now, &bob);
-  setTimestamp("modifiedAt", now, &bob);
+  setTimestamp("createdAt",  orionldState.requestTime, &bob);
+  setTimestamp("modifiedAt", orionldState.requestTime, &bob);
 
   if (regP->observationInterval.start != 0)
     setTimeInterval("observationInterval", &regP->observationInterval, &bob);

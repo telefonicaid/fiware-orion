@@ -68,8 +68,6 @@ static bool timestampToString(KjNode* nodeP)
   char*   detail;
   double  timestamp;
 
-  LM_TMP(("MILLI: timestampToString calling numberToDate"));
-
   if (nodeP->type == KjFloat)
     timestamp = nodeP->value.f;
   else if (nodeP->type == KjInt)
@@ -271,8 +269,6 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
       // - observedAt
       // - unitCode
       //
-      LM_TMP(("MILLIS: Treating sub-attribute '%s'", metadataP->name));
-
       if (strcmp(metadataP->name, "observedAt") == 0)
       {
         if (metadataP->type == KjObject)

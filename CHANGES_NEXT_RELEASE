@@ -1,17 +1,7 @@
-* Issue #XXX  Better error handling for geo location
-* Issue #XXX  Version Info printed to stdout (and log-file) at startup
-* Issue #XXX  Fixed the "1001 bug" - a delayed free problem solved by making kjClone() not use always malloc, with an option to use KAlloc
-* Issue #280  Avoiding duplicates of entities in Batch Upsert
-* Issue #280  All env vars are now prefixed ORIONLD_
-* Issue #XXX  Crash when patching observedAt as sub-attribute
-* Issue #XXX  Subscriptions when deleted were not removed from the subscription cache - now they are
-* Issue #482  Fixed "Part C" - Notifications of big size attributes are cut off at 2049 Byte total message length
-* Issue #482  Fixed "Part B" - Size constraints on entity size for GET /entities/{entity-id}
-* Issue #480  Erroneous contexts are saved in the context cache
-* Issue #482  Error following the 482 fix, too small buffer of delayed free references - upped to 1001 slots
-* Issue #XXX  Crash in startup if a huge amount of GeoProperties in the database
-* Issue #280  @id and @type can now be used instead of id and type
-* Issue #280  milliseconds for ALL timestamps, including throttling, notifiedAt, observation and management intervals, etc, etc
-* Issue #280  Implemented createdAt and modifiedAt + options=sysAttrs for subscriptions (with milliseconds, of course)
-* Issue #280  createdAt and modifiedAt for registrations were returned as integers - now as ISO8601 strings (with milliseconds)
-* Issue #280  Returning 501 Not Implemented if timeInterval is used for subscriptions
+* Issue  #280   Made GET /entities?id=EID call the service routine for /entities/{EID}, if just one single entity id
+* Issue  #280   Unified all timestamps, with one single call to clock_gettime()
+* Issue  #550   Added a new notification format for NGSI-LD subscriptions, to notify in NGSIv2 format
+* Issue  #553   Forwarding X-Auth-Token
+* Issue  #565   Ability to start broker with traces only to stdout
+* Issue  #280   Batch Upsert with options=update didn't do what it should - it replaces instead of updates the entities
+* Issue  #573   URI Check less restrictive than before

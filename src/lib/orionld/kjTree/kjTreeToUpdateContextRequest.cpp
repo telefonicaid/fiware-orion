@@ -26,10 +26,12 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 
@@ -156,7 +158,7 @@ static bool kjTreeToContextElementAttributes
 //
 // If Content-Type is "application/ld+json", then the @context must be part of each and every item of the array
 //
-void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjNode* errorsArrayP)
+void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjNode* errorsArrayP, KjNode* idTypeAndCreDateFromDb)
 {
   KjNode* next;
   KjNode* entityP = treeP->value.firstChildP;
@@ -218,7 +220,66 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
         contextP = orionldState.contextP;
     }
 
-    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, NULL, true, NULL);
+    if (entityType == NULL)
+    {
+      //
+      // No entity type given in incoming payload - we'll have to look it up in the database
+      //
+      // If a NULL is passed as idTypeAndCreDateFromDb, then error
+      //
+      if (idTypeAndCreDateFromDb == NULL)
+      {
+        LM_E(("No entity type given and no way to find it in the DB - we should never get here"));
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "No entity type given and no way to find it in the DB", "we should never get here", 500);
+        entityP = next;
+        continue;
+      }
+
+      KjNode* dbEntityP = NULL;
+      for (KjNode* eP = idTypeAndCreDateFromDb->value.firstChildP; eP != NULL; eP = eP->next)
+      {
+        KjNode* idP = kjLookup(eP, "id");
+
+        if (idP == NULL)
+        {
+          LM_E(("Internal Error (no 'id' field found in entity taken from DB)"));
+          continue;
+        }
+
+        if (idP->type != KjString)
+        {
+          LM_E(("Internal Error ('id' field found in entity taken from DB but it's not a KjString (%s))", kjValueType(idP->type)));
+          continue;
+        }
+
+        if (strcmp(idP->value.s, entityId) == 0)
+        {
+          dbEntityP = eP;
+          break;
+        }
+      }
+
+      if (dbEntityP == NULL)
+      {
+        LM_E(("Internal Error (no entity type in payload and entity not found in DB - this should have been reported as an error in an earlier stage ...)"));
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in payload and entity not found in DB", NULL, 500);
+        entityP = next;
+        continue;
+      }
+
+      KjNode* dbEntityTypeP = kjLookup(dbEntityP, "type");
+      if (dbEntityTypeP == NULL)
+      {
+        LM_E(("Internal Error (no entity type in object extracted from the DB)"));
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in object extracted from the DB", NULL, 500);
+        entityP = next;
+        continue;
+      }
+
+      entityType = dbEntityTypeP->value.s;
+    }
+
+    entityTypeExpanded = orionldContextItemExpand(contextP, entityType, true, NULL);
     if (entityTypeExpanded == NULL)
     {
       LM_E(("orionldContextItemExpand failed for '%s': %s", entityType, detail));

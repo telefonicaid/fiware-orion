@@ -106,7 +106,6 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
       if (r != "OK")
       {
-        LM_TMP(("LEAK: Not OK from parseEntityVector: NOT releasing burP->entities at %p", burP->entities));
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         ciP->httpStatusCode = SccBadRequest;

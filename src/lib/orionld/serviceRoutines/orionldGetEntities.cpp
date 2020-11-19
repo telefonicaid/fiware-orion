@@ -41,16 +41,16 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                    // mongoQueryContext
 
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/qLex.h"                               // qLex
 #include "orionld/common/qParse.h"                             // qParse
 #include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/serviceRoutines/orionldGetEntity.h"          // orionldGetEntity - if URI param 'id' is given
 #include "orionld/serviceRoutines/orionldGetEntities.h"        // Own Interface
 
 
@@ -60,34 +60,47 @@ extern "C"
 // orionldGetEntities -
 //
 // URI params:
+// - options=keyValues
+// - limit
+// - offset
 // - id
 // - idPattern
-// - type         (can't point to NULL as its converted to a std::string)
+// - type
 // - typePattern  (not possible - ignored (need an exact type name to lookup alias))
 // - q
 // - attrs
-// - mq          - Not used in ngsi-ld. []/. is used instead of q/mq
 // - geometry
 // - coordinates
 // - georel
 // - maxDistance
-// - options=keyValues
+//
+// If "id" is given, then all other URI params are just to hint the broker on where to look for the
+// entity (except for pagination params 'offset' and 'limit', and 'attrs' that has an additional function).
+//
+// This is necessary in a federated system using for example only entity type in the registrations.
+//
+// Orion-LD doesn't support federation right now (Oct 2020) and has ALL entities in its local database and thus
+// need no help to find the entity.
+//
+// So, all URI params to help finding the entity are ignored (idPattern, type, q, geometry, coordinates, georel, maxDistance)
+// Note that the pagination params (limit, offset) make no sense when returning a single entity.
+// 'attrs' is a different deal though. 'attrs' will filter the attributes to be returned.
 //
 bool orionldGetEntities(ConnectionInfo* ciP)
 {
-  char*                 id             = (ciP->uriParam["id"].empty())?          NULL : (char*) ciP->uriParam["id"].c_str();
-  char*                 type           = (ciP->uriParam["type"].empty())?        (char*) "" : (char*) ciP->uriParam["type"].c_str();
-  char*                 idPattern      = (ciP->uriParam["idPattern"].empty())?   NULL : (char*) ciP->uriParam["idPattern"].c_str();
-  char*                 q              = (ciP->uriParam["q"].empty())?           NULL : (char*) ciP->uriParam["q"].c_str();
-  char*                 attrs          = (ciP->uriParam["attrs"].empty())?       NULL : (char*) ciP->uriParam["attrs"].c_str();
+  char*                 id             = orionldState.uriParams.id;
+  char*                 type           = orionldState.uriParams.type;
+  char*                 idPattern      = orionldState.uriParams.idPattern;
+  char*                 q              = orionldState.uriParams.q;
+  char*                 attrs          = orionldState.uriParams.attrs;
 
-  char*                 geometry       = (ciP->uriParam["geometry"].empty())?    NULL : (char*) ciP->uriParam["geometry"].c_str();
-  char*                 georel         = (ciP->uriParam["georel"].empty())?      NULL : (char*) ciP->uriParam["georel"].c_str();
-  char*                 coordinates    = (ciP->uriParam["coordinates"].empty())? NULL : (char*) ciP->uriParam["coordinates"].c_str();
+  char*                 geometry       = orionldState.uriParams.geometry;
+  char*                 georel         = orionldState.uriParams.georel;
+  char*                 coordinates    = orionldState.uriParams.coordinates;
 
   char*                 idString       = (id != NULL)? id      : idPattern;
   const char*           isIdPattern    = (id != NULL)? "false" : "true";
-  bool                  isTypePattern  = (*type != 0)? false   : true;
+  bool                  isTypePattern  = (type != NULL)? false   : true;
   EntityId*             entityIdP;
   char*                 typeExpanded   = NULL;
   char*                 detail;
@@ -95,11 +108,57 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   char*                 typeVector[32];  // Is 32 a good limit?
   int                   idVecItems     = (int) sizeof(idVector) / sizeof(idVector[0]);
   int                   typeVecItems   = (int) sizeof(typeVector) / sizeof(typeVector[0]);
-  bool                  keyValues      = ciP->uriParamOptions[OPT_KEY_VALUES];
+  bool                  keyValues      = orionldState.uriParamOptions.keyValues;
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
 
-  if ((id == NULL) && (idPattern == NULL) && (*type == 0) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
+  LM_TMP(("GET: type == '%s'", type));
+
+  //
+  // FIXME: Move all this to orionldMhdConnectionInit()
+  //
+  if ((id          != NULL) && (*id          == 0)) id          = NULL;
+  if ((coordinates != NULL) && (*coordinates == 0)) coordinates = NULL;
+
+  //
+  // If URI param 'id' is given AND only one identifier in the list, then let the service routine for
+  // GET /entities/{EID} do the work
+  //
+  if ((id != NULL) && (strchr(id, ',') == NULL))
+  {
+    //
+    // The entity 'id' is given, so we'll just pretend that `GET /entities/{EID}` was called and not `GET /entities`
+    //
+    orionldState.wildcard[0] = id;
+
+    //
+    // An array must be returned
+    //
+    KjNode* arrayP  = kjArray(orionldState.kjsonP, NULL);
+
+    // GET /entities return 200 OK and payload data [] if not found
+    // GET /entities/{EID} returns 404 not found ...
+    // Need to fix this:
+    // * return true even if orionldGetEntity returns false
+    // * change the 404 to a 200
+    //
+    // If the entity id found, it is added to the array
+    //
+    if (orionldGetEntity(ciP) == true)
+    {
+      KjNode* entityP = orionldState.responseTree;
+
+      entityP->next             = NULL;
+      arrayP->value.firstChildP = entityP;
+    }
+    else
+      orionldState.httpStatusCode = 200;  // Overwrite the 404 from orionldGetEntity
+
+    orionldState.responseTree = arrayP;
+    return true;
+  }
+
+  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL))
   {
     LM_W(("Bad Input (too broad query - need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter"));
 
@@ -220,7 +279,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     isIdPattern = (char*) "true";
   }
 
-  if (*type == 0)  // No type given - match all types
+  if (type == NULL)  // No type given - match all types
   {
     type          = (char*) ".*";
     isTypePattern = true;
@@ -246,22 +305,25 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   //
   for (int ix = 0; ix < idVecItems; ix++)
   {
-    if ((urlCheck(idVector[ix], &detail) == false) && (urnCheck(idVector[ix], &detail) == false))
+    if (pcheckUri(idVector[ix], &detail) == false)
     {
       LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (id array item)
       return false;
     }
   }
 
   if (typeVecItems == 1)  // type needs to be modified according to @context
   {
-    char* detail;
+    // FIXME:
+    //   No expansion desired if the type is already FQN - however, this may
+    //   null out prefix expansion so, I'veremoved the call to pcheckUri() and
+    //   I always expand ...
+    //
+    type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
 
-    // No expansion desired if the type is already a FQN
-    if (urlCheck(type, &detail) == false)
-      type = orionldContextItemExpand(orionldState.contextP, type, NULL, true, NULL);
-
+    LM_TMP(("GET: context is: %s", orionldState.contextP->url));
+    LM_TMP(("GET: expanded type: %s", type));
     isTypePattern = false;  // Just in case ...
   }
 
@@ -277,8 +339,8 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   {
     for (int ix = 0; ix < typeVecItems; ix++)
     {
-      if (urlCheck(typeVector[ix], &detail) == false)
-        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], NULL, true, NULL);
+      if (pcheckUri(typeVector[ix], &detail) == false)
+        typeExpanded = orionldContextItemExpand(orionldState.contextP, typeVector[ix], true, NULL);
       else
         typeExpanded = typeVector[ix];
 
@@ -301,7 +363,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
     for (int ix = 0; ix < vecItems; ix++)
     {
-      const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], NULL, true, NULL);
+      const char* longName = orionldContextItemExpand(orionldState.contextP, shortNameVector[ix], true, NULL);
 
       mongoRequest.attributeList.push_back(longName);
     }

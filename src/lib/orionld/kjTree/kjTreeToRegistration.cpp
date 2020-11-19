@@ -38,9 +38,8 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
 #include "orionld/kjTree/kjTreeToTimeInterval.h"               // kjTreeToTimeInterval
 #include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
@@ -120,7 +119,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         {
           STRING_CHECK(propP, "PropertyInfo::name");
 
-          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, NULL, true, NULL);
+          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, true, NULL);
           regP->dataProvided.propertyV.push_back(propP->value.s);
         }
       }
@@ -138,7 +137,7 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         {
           STRING_CHECK(relP, "RelationInfo::name");
 
-          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, NULL, true, NULL);
+          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, true, NULL);
           regP->dataProvided.relationshipV.push_back(relP->value.s);
         }
       }
@@ -193,10 +192,12 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   else
     regP->id = orionldState.payloadIdNode->value.s;
 
-  if ((urlCheck((char*) regP->id.c_str(), NULL) == false) && (urnCheck((char*) regP->id.c_str(), NULL) == false))
+  char* uri = (char*) regP->id.c_str();
+  char* detail;
+  if (pcheckUri(uri, &detail) == false)
   {
     LM_W(("Bad Input (Registration::id is not a URI)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str());
+    orionldErrorResponseCreate(OrionldBadRequestData, "Registration::id is not a URI", regP->id.c_str());  // FIXME: Include 'detail' and name (registration::id)
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
@@ -336,7 +337,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       //
       // Expand the name of the property
       //
-      kNodeP->name = orionldContextItemExpand(orionldState.contextP, kNodeP->name, NULL, true, NULL);
+      kNodeP->name = orionldContextItemExpand(orionldState.contextP, kNodeP->name, true, NULL);
     }
 
     kNodeP = next;

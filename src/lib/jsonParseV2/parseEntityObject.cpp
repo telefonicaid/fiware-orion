@@ -152,13 +152,9 @@ std::string parseEntityObject
       ContextAttribute* caP = new ContextAttribute();
       r = parseContextAttribute(ciP, iter, caP);
       if (r == "OK")
-      {
-        LM_TMP(("LEAK: parseContextAttribute OK"));
         eP->attributeVector.push_back(caP);
-      }
       else
       {
-        LM_TMP(("LEAK: Deleting erroneous ContextAttribute '%s' meant for for entity at %p", caP->name.c_str(), eP));
         delete caP;
         return r;
       }

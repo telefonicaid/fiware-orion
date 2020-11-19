@@ -147,7 +147,7 @@ static bool uriParamTypeToFilter(mongo::BSONObjBuilder* queryBuilderP, char* typ
     }
     else
     {
-      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, NULL, true, NULL);
+      char* typeExpanded = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
       bsonArray.append(typeExpanded);
     }
   }
@@ -195,7 +195,7 @@ static bool uriParamAttrsToFilter(mongo::BSONObjBuilder* queryBuilderP, char* at
     }
     else
     {
-      char* attrExpanded = orionldContextItemExpand(orionldState.contextP, attr, NULL, true, NULL);
+      char* attrExpanded = orionldContextItemExpand(orionldState.contextP, attr, true, NULL);
       bsonArray.append(attrExpanded);
     }
   }

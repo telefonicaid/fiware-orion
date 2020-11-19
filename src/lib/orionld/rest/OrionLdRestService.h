@@ -106,6 +106,37 @@ typedef struct OrionLdRestServiceSimplifiedVector
 
 // -----------------------------------------------------------------------------
 //
+// URI Parameters
+//
+#define ORIONLD_URIPARAM_LIMIT                (1 << 0)
+#define ORIONLD_URIPARAM_OFFSET               (1 << 1)
+#define ORIONLD_URIPARAM_IDLIST               (1 << 2)
+#define ORIONLD_URIPARAM_TYPELIST             (1 << 3)
+#define ORIONLD_URIPARAM_IDPATTERN            (1 << 4)
+#define ORIONLD_URIPARAM_ATTRS                (1 << 5)
+#define ORIONLD_URIPARAM_Q                    (1 << 6)
+#define ORIONLD_URIPARAM_GEOREL               (1 << 7)
+#define ORIONLD_URIPARAM_GEOMETRY             (1 << 8)
+#define ORIONLD_URIPARAM_COORDINATES          (1 << 9)
+#define ORIONLD_URIPARAM_GEOPROPERTY          (1 << 10)
+#define ORIONLD_URIPARAM_GEOMETRYPROPERTY     (1 << 11)
+#define ORIONLD_URIPARAM_CSF                  (1 << 12)
+#define ORIONLD_URIPARAM_OPTIONS              (1 << 13)
+#define ORIONLD_URIPARAM_COUNT                (1 << 14)
+#define ORIONLD_URIPARAM_DATASETID            (1 << 15)
+#define ORIONLD_URIPARAM_DELETEALL            (1 << 16)
+#define ORIONLD_URIPARAM_TIMEPROPERTY         (1 << 17)
+#define ORIONLD_URIPARAM_TIMEREL              (1 << 18)
+#define ORIONLD_URIPARAM_TIMEAT               (1 << 19)
+#define ORIONLD_URIPARAM_ENDTIMEAT            (1 << 20)
+#define ORIONLD_URIPARAM_DETAILS              (1 << 21)
+#define ORIONLD_URIPARAM_PRETTYPRINT          (1 << 22)
+#define ORIONLD_URIPARAM_SPACES               (1 << 23)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionLdRestService -
 //
 // NOTE
@@ -125,7 +156,8 @@ typedef struct OrionLdRestService
   int                    charsBeforeSecondWildcardSum;  // -"- 'a' + 't' + 't' + 'r' + 's' - used to find start of wildcard no 2
   char                   matchForSecondWildcard[16];    // E.g. "/attrs/" for [/ngsi-ld/v1]/entities/*/attrs/*
   int                    matchForSecondWildcardLen;     // strlen of last path to match
-  uint32_t               options;                       // Peculiarities of this type of requests
+  uint32_t               options;                       // Peculiarities of this type of requests (bitmask)
+  uint32_t               uriParams;                     // Supported URI parameters (bitmask)
 } OrionLdRestService;
 
 

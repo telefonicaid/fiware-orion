@@ -37,6 +37,7 @@
 #include "rest/ConnectionInfo.h"
 #include "cache/subCache.h"
 #include "apiTypesV2/Subscription.h"
+#include "orionld/common/orionldState.h"             // orionldState
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonSubscription.h"
 #include "mongoBackend/connectionOperations.h"
@@ -243,7 +244,7 @@ static void setStatus(Subscription* s, const BSONObj& r)
   //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
   //   value of "-1 == never expires" is used.
   //
-  if ((s->expires > getCurrentTime()) || (s->expires == -1))
+  if ((s->expires > orionldState.requestTime) || (s->expires == -1))
   {
     s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
   }

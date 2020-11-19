@@ -22,11 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                               // strcpy
+#include <string.h>                                            // strcpy
 
-#include "orionld/common/urlCheck.h"              // urlCheck
-#include "orionld/common/urnCheck.h"              // urnCheck
-#include "orionld/common/linkCheck.h"             // Own interface
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/common/linkCheck.h"                          // Own interface
 
 
 
@@ -57,12 +56,11 @@ bool linkCheck(char* link, char** detailsP)
 
   *cP = 0;  // End of string for the URL
 
-  if ((urlCheck(link, detailsP) == false) && (urnCheck(link, detailsP) == false))
+  if (pcheckUri(link, detailsP) == false)
     return false;
 
   //
   // FIXME: Parse the 'rel' and 'type' as well ?
-  //        Need to speak to Cantera about this
   //
 
   return true;

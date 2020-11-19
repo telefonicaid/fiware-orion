@@ -37,13 +37,11 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldContextValueExpand.h"           // orionldContextValueExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/payloadCheck/pcheckGeoProperty.h"              // pcheckGeoProperty
 #include "orionld/kjTree/kjTreeToMetadata.h"                     // kjTreeToMetadata
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // Own interface
@@ -317,6 +315,7 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
   KjNode*   valueNodeP      = NULL;
   KjNode*   objectNodeP     = NULL;
   KjNode*   observedAtP     = NULL;
+  KjNode*   unitCodeP       = NULL;
   bool      isProperty      = false;
   bool      isRelationship  = false;
   char*     shortName       = orionldContextItemAliasLookup(orionldState.contextP, nodeP->name, NULL, NULL);
@@ -331,6 +330,12 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
   {
     isProperty  = true;
     observedAtP = nodeP;
+    valueNodeP  = nodeP;
+  }
+  else if (SCOMPARE9(shortName, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
+  {
+    isProperty  = true;
+    unitCodeP   = nodeP;
     valueNodeP  = nodeP;
   }
   else if (nodeP->type == KjObject)
@@ -436,6 +441,26 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
         mdP->numberValue = observedAtP->value.i;
     }
   }
+  else if (unitCodeP != NULL)
+  {
+    mdP->valueType   = orion::ValueTypeString;
+    mdP->name        = "unitCode";
+
+    if (unitCodeP->type == KjObject)
+    {
+      // Lookup member "value"
+      KjNode* valueP = kjLookup(unitCodeP, "value");
+      if (valueP != NULL)
+        mdP->stringValue = valueP->value.s;
+      else
+      {
+        LM_E(("Internal Error (no value field from DB)"));
+        mdP->stringValue = "value lost in DB";
+      }
+    }
+    else
+      mdP->stringValue = unitCodeP->value.s;
+  }
   else if (isProperty == true)
   {
     if (metadataValueSet(mdP, valueNodeP) == false)
@@ -524,12 +549,8 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       (strcmp(kNodeP->name, "operationSpace")   != 0))
   {
     char*                longName;
-    bool                 valueMayBeExpanded  = false;
 
-    longName = orionldContextItemExpand(contextP, kNodeP->name, &valueMayBeExpanded, true, &contextItemP);
-
-    if (valueMayBeExpanded)
-      orionldContextValueExpand(kNodeP);
+    longName = orionldContextItemExpand(contextP, kNodeP->name, true, &contextItemP);
 
     kNodeP->name = longName;
     caP->name    = longName;
@@ -649,6 +670,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     else if (SCOMPARE9(nodeP->name, 'u', 'n', 'i', 't', 'C', 'o', 'd', 'e', 0))
     {
       DUPLICATE_CHECK(unitCodeP, "unit code", nodeP);
+      STRING_CHECK(unitCodeP, "unitCode");
       if (metadataAdd(caP, nodeP, caName) == false)
       {
         // metadataAdd calls orionldErrorResponseCreate
@@ -665,7 +687,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
     else if (SCOMPARE11(nodeP->name, 'o', 'b', 's', 'e', 'r', 'v', 'e', 'd', 'A', 't', 0))
     {
       DUPLICATE_CHECK(observedAtP, "observed at", nodeP);
-      STRING_CHECK(nodeP, "observed at");
+      STRING_CHECK(nodeP, "observedAt");
 
       //
       // This is a very special attribute.
@@ -932,7 +954,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
     if (objectP->type == KjString)
     {
-      if ((urlCheck(objectP->value.s, &details) == false) && (urnCheck(objectP->value.s, &details) == false))
+      if (pcheckUri(objectP->value.s, &details) == false)
         ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
 
       caP->valueType   = orion::ValueTypeString;
@@ -943,11 +965,11 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       for (KjNode* nodeP = objectP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
       {
         if (nodeP->type != KjString)
-          ATTRIBUTE_ERROR("relationship attribute with 'object' array item having invalid URI", objectP->value.s);
+          ATTRIBUTE_ERROR("relationship attribute with 'object' array item not being a JSON string", kjValueType(nodeP->type));
 
         char* uri = nodeP->value.s;
-        if ((urlCheck(uri, &details) == false) && (urnCheck(uri, &details) == false))
-          ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", objectP->value.s);
+        if (pcheckUri(uri, &details) == false)
+          ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", uri);
       }
       caP->valueType      = orion::ValueTypeVector;
       caP->compoundValueP = compoundCreate(objectP, NULL);

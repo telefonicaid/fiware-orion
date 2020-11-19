@@ -60,21 +60,26 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextCacheLookup(context);
 
-  // id
-  strcpy(&idBuffer[25], id);
-  nodeP = kjString(orionldState.kjsonP, "id", idBuffer);
-  kjChildAdd(rootP, nodeP);
+  LM_TMP(("V2NFY: Rendering Notification. Format: %s", renderFormatToString(renderFormat, false, false)));
 
-  // type
-  nodeP = kjString(orionldState.kjsonP, "type", "Notification");
-  kjChildAdd(rootP, nodeP);
+  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+  {
+    // id
+    strcpy(&idBuffer[25], id);
+    nodeP = kjString(orionldState.kjsonP, "id", idBuffer);
+    kjChildAdd(rootP, nodeP);
+
+    // type
+    nodeP = kjString(orionldState.kjsonP, "type", "Notification");
+    kjChildAdd(rootP, nodeP);
+  }
 
   // subscriptionId
   nodeP = kjString(orionldState.kjsonP, "subscriptionId", (char*) ncrP->subscriptionId.get().c_str());
   kjChildAdd(rootP, nodeP);
 
   // context - if JSONLD
-  if (mimeType == JSONLD)
+  if ((mimeType == JSONLD) && (renderFormat != NGSI_LD_V1_V2_NORMALIZED))
   {
     if (context == NULL)
       nodeP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
@@ -89,18 +94,19 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   }
 
   // notifiedAt
-  double  now = getCurrentTime();  // FIXME - use an already existing timestamp!
-  char    date[128];
-  char*   details;
-
-  if (numberToDate(now, date, sizeof(date), &details) == false)
+  if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
   {
-    LM_E(("Runtime Error (numberToDate: %s)", details));
-    return NULL;
-  }
-  nodeP = kjString(orionldState.kjsonP, "notifiedAt", date);
-  kjChildAdd(rootP, nodeP);
+    char    date[128];
+    char*   details;
 
+    if (numberToDate(orionldState.requestTime, date, sizeof(date), &details) == false)
+    {
+      LM_E(("Runtime Error (numberToDate: %s)", details));
+      return NULL;
+    }
+    nodeP = kjString(orionldState.kjsonP, "notifiedAt", date);
+    kjChildAdd(rootP, nodeP);
+  }
 
   //
   // data
@@ -125,8 +131,14 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // entity type - Mandatory URI
-    alias = orionldContextItemAliasLookup(contextP, ceP->entityId.type.c_str(), NULL, NULL);
-    nodeP = kjString(orionldState.kjsonP, "type", alias);
+    if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+    {
+      alias = orionldContextItemAliasLookup(contextP, ceP->entityId.type.c_str(), NULL, NULL);
+      nodeP = kjString(orionldState.kjsonP, "type", alias);
+    }
+    else
+      nodeP = kjString(orionldState.kjsonP, "type", ceP->entityId.type.c_str());
+
     kjChildAdd(objectP, nodeP);
 
     // Attributes
@@ -141,12 +153,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
       nodeP = kjTreeFromContextAttribute(aP, contextP, renderFormat, detailsP);
       kjChildAdd(objectP, nodeP);
     }
-    // location                        GeoProperty
-    // observationSpace                GeoProperty
-    // operationSpace                  GeoProperty
-    // Property 0..N
-    // Relationship 0..N
-    //
   }
 
   return rootP;

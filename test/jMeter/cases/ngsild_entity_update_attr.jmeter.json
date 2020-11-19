@@ -1,0 +1,21 @@
+{
+    "NUM_OF_THREADS": 100,
+    "LOOPS": 20,
+    "RAMP_TIME": 1,
+    "MAX_COUNT_VARIABLE_VALUE": 10,
+    "DOMAIN_IP": "localhost",
+    "PORT": 1026,
+    "PATH_SERVICE": "ngsi-ld/v1/entities/urn:entities:E${counter_value}/attrs",
+    "HTTP_VERB": "PATCH",
+    "HEADERS": {
+        "Content-Type": "application/json"
+    },
+    "BODY_DATA": {
+        "json": {
+            "value1": {
+                "type": "Property",
+                "value": "${random}"
+            }
+        }
+    }
+}

@@ -140,15 +140,9 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
     else if (SCOMPARE8(nodeP->name, 'c', 'r', 'e', 'D', 'a', 't', 'e', 0))
     {
       if (nodeP->type == KjFloat)
-      {
         *creDateP = nodeP->value.f;
-        LM_TMP(("MILLIS: credate was a float: %f", *creDateP));
-      }
       else if (nodeP->type == KjInt)
-      {
         *creDateP = (double) nodeP->value.i;
-        LM_TMP(("MILLIS: credate was an integer: %f", *creDateP));
-      }
     }
   }
 }
@@ -194,42 +188,12 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     return false;
   }
 
-
-  //
-  // if (replace)
-  // {
-  //   01. Create "idArray" from the "incomingTree", with error handling
-  //   02. Get "idTypeAndCredateFromDb" by calling dbEntityListLookupWithIdTypeCreDate(idArray);
-  //   03. Creation Date from DB entities, and type-check
-  //       - Make sure that no entity in the incomingTree contains a "type" != type in db for that entity
-  //       - Add creDate from DB to incomingTree
-  //       Foreach entity in idTypeAndCredateFromDb  (those that existed in the database)
-  //       03.1 Lookup entity-pointer in "incomingTree"
-  //       03.2 Call entityFieldsExtract
-  //       03.3 If entityFieldsExtract returns false:
-  //            03.3.1 remove entity from incomingTree
-  //            03.3.1 remove entity from idArray
-  //            03.3.2 add error by calling entityErrorPush()
-  //       03.4 Get type and creDate from entity in idTypeAndCredateFromDb
-  //       03.5 Compare types, if entity in idTypeAndCredateFromDb has one and if not the same:
-  //            03.5.1 remove entity from incomingTree
-  //            03.5.1 remove entity from idArray
-  //            03.5.2 add error by calling entityErrorPush()
-  //       03.6 Add creDate to entity-pointer in "incomingTree"
-  //       04. Make sure all entities that did not exist hav a type in the incoming payload
-  //       05. Remove the entities in "idArray" from DB
-  // }
-  //
-  // 06. Fill in UpdateContextRequest from "incomingTree"
-  // 07. Set 'modDate' as "RIGHT NOW" for all entities
-  // 08. Call mongoBackend with AppendStrict - as all already existing entities have been removed
-  //
-  KjNode*               incomingTree   = orionldState.requestTree;
-  KjNode*               idArray        = kjArray(orionldState.kjsonP, NULL);
-  KjNode*               successArrayP  = kjArray(orionldState.kjsonP, "success");
-  KjNode*               errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  KjNode*               entityP;
-  KjNode*               next;
+  KjNode* incomingTree   = orionldState.requestTree;
+  KjNode* idArray        = kjArray(orionldState.kjsonP, NULL);
+  KjNode* successArrayP  = kjArray(orionldState.kjsonP, "success");
+  KjNode* errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
+  KjNode* entityP;
+  KjNode* next;
 
   //
   // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
@@ -356,7 +320,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       //
       if (typeInPayload != NULL)
       {
-        char* typeInPayloadExpanded = orionldContextItemExpand(contextP, typeInPayload, NULL, true, NULL);
+        char* typeInPayloadExpanded = orionldContextItemExpand(contextP, typeInPayload, true, NULL);
 
         if (strcmp(typeInPayloadExpanded, typeInDb) != 0)
         {
@@ -421,8 +385,11 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   // 05. Remove the entities in "removeArray" from DB
   //
-  if ((removeArray != NULL) && (removeArray->value.firstChildP != NULL))
-    dbEntitiesDelete(removeArray);
+  if (orionldState.uriParamOptions.update == false)
+  {
+    if ((removeArray != NULL) && (removeArray->value.firstChildP != NULL))
+      dbEntitiesDelete(removeArray);
+  }
 
 
   //
@@ -430,9 +397,9 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   UpdateContextRequest  mongoRequest;
 
-  mongoRequest.updateActionType = ActionTypeAppendStrict;
+  mongoRequest.updateActionType = ActionTypeAppend;
 
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP);
+  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
 
 
   //

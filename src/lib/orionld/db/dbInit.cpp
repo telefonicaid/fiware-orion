@@ -31,6 +31,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"             // mongoCppLegacyEntityLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"    // mongoCppLegacyEntityAttributeLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"   // mongoCppLegacyEntityAttributesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"       // mongoCppLegacyEntityFieldReplace
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"        // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"          // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityDelete.h"             // mongoCppLegacyEntityDelete
@@ -77,6 +78,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntityAttributeLookup                  = mongoCppLegacyEntityAttributeLookup;
   dbEntityAttributesDelete                 = mongoCppLegacyEntityAttributesDelete;
   dbEntityUpdate                           = mongoCppLegacyEntityUpdate;
+  dbEntityFieldReplace                     = mongoCppLegacyEntityFieldReplace;
   dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityDelete                           = mongoCppLegacyEntityDelete;
@@ -115,10 +117,11 @@ void dbInit(const char* dbHost, const char* dbName)
   dbSubscriptionReplace                    = NULL;  // FIXME: Implement mongocSubscriptionReplace
   dbRegistrationGet                        = NULL;  // FIXME: Implement mongocRegistrationGet
   dbRegistrationReplace                    = NULL;  // FIXME: Implement mongocRegistrationReplace
-  dbEntitiesGet                            = NULL;  // FIXME: Implement
-  dbEntityTypesFromRegistrationsGet        = NULL;  // FIXME: Implement
-  dbGeoIndexCreate                         = NULL;  // FIXME: Implement
-  dbEntitiesQuery                          = NULL;  // FIXME: Implement
+  dbEntitiesGet                            = NULL;  // FIXME: Implement mongocEntitiesGet
+  dbEntityTypesFromRegistrationsGet        = NULL;  // FIXME: Implement mongocEntityTypesFromRegistrationsGet
+  dbGeoIndexCreate                         = NULL;  // FIXME: Implement mongocGeoIndexCreate
+  dbEntitiesQuery                          = NULL;  // FIXME: Implement mongocEntitiesQuery
+  dbEntityFieldReplace                     = NULL;  // FIXME: Implement mongocEntityFieldReplace
 
   mongocInit(dbHost, dbName);
 

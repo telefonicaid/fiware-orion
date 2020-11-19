@@ -41,7 +41,6 @@ bool numberToDate(double timestamp, char* date, int dateLen, char** detailsP)
   time_t     fromEpoch = (time_t) timestamp;
   double     millis    = timestamp - fromEpoch;
 
-  LM_TMP(("MILLIS: timestamp: %f", timestamp));
   gmtime_r(&fromEpoch, &tm);
   strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
 
@@ -52,12 +51,10 @@ bool numberToDate(double timestamp, char* date, int dateLen, char** detailsP)
     return false;
   }
 
-  LM_TMP(("MILLIS: millis: %f", millis));
   int dMicros  = (int) (millis * 1000000) + 1;
   int dMillis  = dMicros / 1000;
-  LM_TMP(("MILLIS: dMicros: %d", dMicros));
+
   snprintf(&date[sLen], dateLen - sLen, ".%03dZ", dMillis);
-  LM_TMP(("MILLIS: %f => '%s'", timestamp, date));
-  LM_TMP(("MILLIS: --------------------------"));
+
   return true;
 }

@@ -42,17 +42,16 @@ extern "C"
 #include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup, dbEntityRetrieve
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
 
 
@@ -168,7 +167,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
   if (kjTreeRegistrationInfoExtract(registrationP, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, registrationAttrV, 100, &registrationAttrs, &detail) == false)
     return NULL;
 
-  char* newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, 200 * 30);  // Assuming max 20 attrs, max 200 chars per attr ...
+  char* newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, 200 * 30);  // Assuming max 30 attrs, max 200 chars per attr ...
 
   if ((uriParamAttrs == 0) && (registrationAttrs == 0))
     newUriParamAttrsString = (char*) "";
@@ -255,12 +254,21 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
     headerV[header].value = orionldState.tenant;
     ++header;
   }
+
   if ((orionldState.servicePath != NULL) && (orionldState.servicePath[0] != 0))
   {
     headerV[header].type  = HttpHeaderPath;
     headerV[header].value = orionldState.servicePath;
     ++header;
   }
+
+  if (orionldState.xauthHeader != NULL)
+  {
+    headerV[header].type  = HttpHeaderXauth;
+    headerV[header].value = orionldState.xauthHeader;
+    ++header;
+  }
+
   headerV[header].type = HttpHeaderNone;
 
   if (orionldState.linkHttpHeaderPresent)
@@ -304,7 +312,7 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
     //
     for (int ix = 0; ix < uriParamAttrs; ix++)
     {
-      uriParamAttrsV[ix] = orionldContextItemExpand(orionldState.contextP, uriParamAttrsV[ix], NULL, true, NULL);
+      uriParamAttrsV[ix] = orionldContextItemExpand(orionldState.contextP, uriParamAttrsV[ix], true, NULL);
     }
   }
 
@@ -315,37 +323,50 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
   {
     KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, uriParamAttrsV, uriParamAttrs);
 
-    if (partTree != NULL)  // Move all attributes from 'partTree' into responseP
+    if (partTree == NULL)
     {
-      KjNode* nodeP = partTree->value.firstChildP;
-      KjNode* next;
+      LM_E(("Internal Error (forwarded request failed)"));
+      continue;
+    }
 
-      while (nodeP != NULL)
+    if (partTree->type != KjObject)
+    {
+      LM_W(("Garbage from Context Provider (the response to a forwarded GET /entities/{EID} must be a JSON object - not %s)",
+            kjValueType(partTree->type)));
+      continue;
+    }
+
+    //
+    // Move all attributes from 'partTree' into responseP
+    //
+    KjNode* nodeP = partTree->value.firstChildP;
+    KjNode* next;
+
+    while (nodeP != NULL)
+    {
+      next = nodeP->next;
+
+      if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
       {
-        next = nodeP->next;
-
-        if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
-        {
-          // Do Nothing
-        }
-        else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
-        {
-          if (needEntityType)
-          {
-            //
-            // We're taking the entity::type from the Response to the forwarded request
-            // because no local entity was found.
-            // It could also be taken from the registration.
-            //
-            kjChildAdd(responseP, nodeP);
-            needEntityType = false;
-          }
-        }
-        else
-          kjChildAdd(responseP, nodeP);
-
-        nodeP = next;
+        // Do Nothing
       }
+      else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
+      {
+        if (needEntityType)
+        {
+          //
+          // We're taking the entity::type from the Response to the forwarded request
+          // because no local entity was found.
+          // It could also be taken from the registration.
+          //
+          kjChildAdd(responseP, nodeP);
+          needEntityType = false;
+        }
+      }
+      else
+        kjChildAdd(responseP, nodeP);
+
+      nodeP = next;
     }
   }
 
@@ -362,7 +383,7 @@ static char** attrsListToArray(char* attrList, char* attrV[], int attrVecLen)
 
   for (int ix = 0; ix < items; ix++)
   {
-    attrV[ix] = orionldContextItemExpand(orionldState.contextP, attrV[ix], NULL, true, NULL);
+    attrV[ix] = orionldContextItemExpand(orionldState.contextP, attrV[ix], true, NULL);
     attrV[ix] = kaStrdup(&orionldState.kalloc, attrV[ix]);
     dotForEq(attrV[ix]);
   }
@@ -395,15 +416,14 @@ bool orionldGetEntity(ConnectionInfo* ciP)
 {
   char*    detail;
   KjNode*  regArray;
-  // bool     keyValues = orionldState.uriParamOptions.keyValues;
 
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
   //
-  if ((urlCheck(orionldState.wildcard[0], &detail) == false) && (urnCheck(orionldState.wildcard[0], &detail) == false))
+  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
   {
     LM_W(("Bad Input (Invalid Entity ID - Not a URL nor a URN)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", "Not a URL nor a URN");  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
 
@@ -459,7 +479,12 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       attrsMandatory = true;
   }
 
-  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0], attrsP, attrsMandatory, orionldState.uriParamOptions.sysAttrs, orionldState.uriParamOptions.keyValues, orionldState.uriParams.datasetId);
+  orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
+                                               attrsP,
+                                               attrsMandatory,
+                                               orionldState.uriParamOptions.sysAttrs,
+                                               orionldState.uriParamOptions.keyValues,
+                                               orionldState.uriParams.datasetId);
 #endif
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {

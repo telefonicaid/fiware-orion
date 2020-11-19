@@ -294,7 +294,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
       char number[16];
 
       snprintf(number, sizeof(number), "%d", count);
-      httpHeaderAdd(ciP, "NGSILD-Count", number);
+      httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
     }
     return true;
   }
@@ -331,7 +331,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
     char number[16];
 
     snprintf(number, sizeof(number), "%d", count);
-    httpHeaderAdd(ciP, "NGSILD-Count", number);
+    httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
   }
 
   return true;
