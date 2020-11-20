@@ -2,4 +2,4 @@
 - Add: support 'true' and 'false' literals (in addition to 'TRUE' and 'FALSE') in flag-like env vars
 - Upgrade Dockerfile base image from centos7.7.1908 to centos7.9.2009
 - FIX BUG: Create normal files as 644 permissions for assure backup tools take configuration files
-
+- Hardening: upgrade MongoDB recommendation from 3.6 to 4.2

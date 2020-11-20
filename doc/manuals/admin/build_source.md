@@ -75,7 +75,7 @@ In the case of the aarch64 architecture, install perl-Digest-MD5 and libxslt usi
 
 * (Optional but highly recommended) run unit test. Firstly, you have to install MongoDB as the unit and functional tests
 rely on mongod running in localhost. Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
-for details. Recommended version is 3.6 (although 3.2 and 3.4 should also work fine).
+for details. Recommended version is 4.2 (although 3.2, 3.4 and 3.6 should also work fine).
 
 * Install the binary. You can use INSTALL_DIR to set the installation prefix path (default is /usr), thus the broker is installed in `$INSTALL_DIR/bin` directory.
 
@@ -89,12 +89,12 @@ The Orion Context Broker comes with a suite of functional, valgrind and end-to-e
 
 * To install mongodb-org-shell using yum, create a /etc/yum.repos.d/mongodb.repo file.
 
-        [mongodb-org-3.6]
+        [mongodb-org-4.2]
         name=MongoDB Repository
-        baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
+        baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
         gpgcheck=1
         enabled=1
-        gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
+        gpgkey=https://www.mongodb.org/static/pgp/server-4.2.asc
 
 * Install the required tools:
 
@@ -149,7 +149,7 @@ You can generate the RPM for the source code (optional):
 ## Ubuntu 18.04 LTS
 
 This instruction is how to build the Orion Context Broker for the x86_64 or the aarch64 architecture on Ubuntu 18.04 LTS.
-And it includes the instruction to build MongoDB 3.6 that the Orion depends on.
+And it includes the instruction to build MongoDB 4.2 that the Orion depends on.
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.65.1
@@ -161,7 +161,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
-* MongoDB: 3.6.17 (from source)
+* MongoDB: 4.2.11 (from source)
 
 The basic procedure is as follows (assuming you don't run commands as root, we use sudo for those
 commands that require root privilege):
@@ -226,8 +226,8 @@ In the case of the aarch64 architecture, run `./configure` with `--build=arm-lin
         cd fiware-orion
         make
 
-* Build MongoDB 3.6.17 from source code and install it. To run unit test, you have to build MongoDB as the unit and functional
-tests rely on mongod running in localhost (The MongoDB 3.6 binary for Ubuntu 18.04 is not provided.). The instruction to build
+* Build MongoDB 4.2.11 from source code and install it. To run unit test, you have to build MongoDB as the unit and functional
+tests rely on mongod running in localhost (The MongoDB 4.2 binary for Ubuntu 18.04 is not provided.). The instruction to build
 MongoDB from source code is as the following. In the case of the aarch64 architecture, additionally add the `-march=armv8-a+crc`
 option to CCFLAGS. Run the `mongo` command to check that MongoDB has been successfully installed:
 
@@ -236,7 +236,7 @@ option to CCFLAGS. Run the `mongo` command to check that MongoDB has been succes
         sudo apt install python python-pip            # Not required if you installed in previous step
         pip install --upgrade pip                     # Not required if you installed in previous step
         cd /opt
-        git clone -b r3.6.17 --depth=1 https://github.com/mongodb/mongo.git
+        git clone -b r4.2.11 --depth=1 https://github.com/mongodb/mongo.git
         cd mongo
         pip install --user -r buildscripts/requirements.txt
         python buildscripts/scons.py mongo mongod mongos \
