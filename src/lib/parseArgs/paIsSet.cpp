@@ -22,27 +22,57 @@
 *
 * Author: developer
 */
+#include <string.h>               /* strcmp                                    */
+#include <stdio.h>                /* snprintf                                  */
+#include <stdlib.h>               /* getenv                                    */
 
-#include <string.h>             /* strcmp                                    */
-
-#include "parseArgs/paIsSet.h"  /* Own interface                             */
+#include "parseArgs/parseArgs.h"  /* PaArgument                                */
+#include "parseArgs/paConfig.h"   /* paPrefix                                  */
+#include "parseArgs/paIsSet.h"    /* Own interface                             */
 
 
 
 /* ****************************************************************************
 *
-* paIsSet - is an argument existing in the parse list
+* paIsSet - is an argument existing in the parse list OR defined as env-var
 */
-bool paIsSet(int argC, char* argV[], const char* option)
+bool paIsSet(int argC, char* argV[], PaArgument* paArgs, const char* option)
 {
-  int i;
+  int ix;
 
-  for (i = 1; i < argC; i++)
+  // 1. CLI argument list
+  for (ix = 1; ix < argC; ix++)
   {
-    if (strcmp(argV[i], option) == 0)
-    {
+    if (strcmp(argV[ix], option) == 0)
       return true;
+  }
+
+  // 2. env-var
+  while (paArgs[ix].type != PaLastArg)
+  {
+    if (strcmp(paArgs[ix].option, option) == 0)
+    {
+      if (paArgs[ix].envName == NULL)
+        return false;
+
+      char  expandedEnvVar[256];
+      char* envVarP = (char*) paArgs[ix].envName;
+
+      if (paPrefix != NULL)
+      {
+        snprintf(expandedEnvVar, sizeof(expandedEnvVar), "%s%s", paPrefix, paArgs[ix].envName);
+        envVarP = expandedEnvVar;
+      }
+
+      char* envVarValue = getenv(envVarP);
+
+      if ((envVarValue != NULL) && (strcmp(envVarValue, "TRUE") == 0))
+        return true;
+
+      return false;
     }
+
+    ++ix;
   }
 
   return false;
@@ -56,13 +86,13 @@ bool paIsSet(int argC, char* argV[], const char* option)
 */
 const char* paIsSetSoGet(int argC, char* argV[], const char* option)
 {
-  int i;
+  int ix;
 
-  for (i = 1; i < argC; i++)
+  for (ix = 1; ix < argC; ix++)
   {
-    if (strcmp(argV[i], option) == 0)
+    if (strcmp(argV[ix], option) == 0)
     {
-      return argV[i + 1];
+      return argV[ix + 1];
     }
   }
 

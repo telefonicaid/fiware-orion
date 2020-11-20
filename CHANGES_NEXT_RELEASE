@@ -2,3 +2,6 @@
 * Issue  #280   Unified all timestamps, with one single call to clock_gettime()
 * Issue  #550   Added a new notification format for NGSI-LD subscriptions, to notify in NGSIv2 format
 * Issue  #553   Forwarding X-Auth-Token
+* Issue  #565   Ability to start broker with traces only to stdout
+* Issue  #280   Batch Upsert with options=update didn't do what it should - it replaces instead of updates the entities
+* Issue  #573   URI Check less restrictive than before
