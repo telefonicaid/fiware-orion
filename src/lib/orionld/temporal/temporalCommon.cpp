@@ -920,7 +920,7 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
     char* unitCodeValue = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
     bzero(unitCodeValue, unitCodeValuesSize);
 
-    if (attrLocalP->unitCode == NULL)
+    if (attrLocalP->subAttributeUnitCode == NULL)
     {
         snprintf(unitCodeValue, unitCodeValuesSize, "NULL");
     }
