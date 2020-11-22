@@ -788,7 +788,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             int allValuesSizeSubAttr = 2048;
             char* allValuesSubAttr = kaAlloc(&orionldState.kalloc,allValuesSizeSubAttr);
 
-            allValuesRenderSubAttr (&dbSubAttribTable->subAttributeTableArray[dbSubAttribLoop], allValuesSubAttr, allValuesSizeSubAttr);
+            allValuesRenderSubAttr (&dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop], allValuesSubAttr, allValuesSizeSubAttr);
 
             snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
                     " attribute_id, unit_code, data_set_id, value_type, value_string, value_boolean, value_number,"
