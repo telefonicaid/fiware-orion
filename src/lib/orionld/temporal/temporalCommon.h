@@ -135,6 +135,7 @@ typedef struct OrionldTemporalDbSubAttributeTable
   char*                                     subAttributeDataSetId;
   char*                                     subAttributeValueString;
   bool                                      subAttributeValueBoolean;
+  char*                                     subAttributeValueArray;
   long long int                             subAttributeValueNumber;
   char*                                     subAttributeValueRelation;
   char*                                     subAttributeValueObject;

@@ -897,13 +897,13 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
     switch (attrLocalP->subAttributeValueType)
     {
       case EnumValueString:
-        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->subAttributeValueStringString);
+        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->subAttributeValueString);
 
         case EnumValueNumber:
           snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->subAttributeValueNumber);
 
         case EnumValueBool:
-          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->subAttributeValueBool==true)? "true" : "false");
+          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->subAttributeValueBoolean==true)? "true" : "false");
 
         case EnumValueArray:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->subAttributeValueArray);
