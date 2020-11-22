@@ -887,29 +887,29 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     //char* uuidBuffer = kaAlloc(&orionldState.kalloc, 64);
     //uuidGenerate(uuidBuffer);
 
-    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s, %s",
+    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
         unitCodeValue, dataSetIdValue, allValues, geoPropertyValue, observedAtValue);
 }
 
 
 void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize)
 {
-    switch (attrLocalP->attributeValueType)
+    switch (attrLocalP->subAttributeValueType)
     {
       case EnumValueString:
-        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->subAttributeValueStringString);
 
         case EnumValueNumber:
-          snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
+          snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->subAttributeValueNumber);
 
         case EnumValueBool:
-          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->subAttributeValueBool==true)? "true" : "false");
 
         case EnumValueArray:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->valueArray);
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->subAttributeValueArray);
 
         case EnumValueObject:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->valueObject);
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->subAttributeValueObject);
 
         default:
           LM_W(("Teamporal - Bad Input - Key values not supported"));
@@ -926,27 +926,27 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
     }
     else
     {
-        snprintf(unitCodeValue, unitCodeValuesSize, "%s", attrLocalP->unitCode);
+        snprintf(unitCodeValue, unitCodeValuesSize, "%s", attrLocalP->subAttributeUnitCode);
     }
 
     int dataSetIdSize = 128;
     char* dataSetIdValue = kaAlloc(&orionldState.kalloc, dataSetIdSize);
     bzero(dataSetIdValue, dataSetIdSize);
 
-    if (attrLocalP->dataSetId == NULL)
+    if (attrLocalP->subAttributeDataSetId == NULL)
     {
         snprintf(dataSetIdValue, dataSetIdSize, "NULL");
     }
     else
     {
-        snprintf(dataSetIdValue, dataSetIdSize, "%s", attrLocalP->dataSetId);
+        snprintf(dataSetIdValue, dataSetIdSize, "%s", attrLocalP->subAttributeDataSetId);
     }
 
     int geoPropertySize = 512;
     char* geoPropertyValue = kaAlloc(&orionldState.kalloc, geoPropertySize);
     bzero(geoPropertyValue, geoPropertySize);
 
-    if (attrLocalP->geoProperty == NULL)
+    if (attrLocalP->subAttributeGeoProperty == NULL)
     {
         snprintf(geoPropertyValue, geoPropertySize, "NULL");
     }
@@ -972,8 +972,8 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
     char* uuidBuffer = kaAlloc(&orionldState.kalloc, 64);
     uuidGenerate(uuidBuffer);
 
-    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s, %s",
-        unitCodeValue, dataSetIdValue, attrLocalP->instanceId, allValues, geoPropertyValue, observedAtValue);
+    snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
+        unitCodeValue, dataSetIdValue, allValues, geoPropertyValue, observedAtValue);
 }
 
 
