@@ -27,7 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                         // KjNode
-#include "kjson/kjBuilder.h"                                      // kjArray
+#include "kjson/kjBuilder.h"                                      // kjArray, kjObject
 #include "kjson/kjLookup.h"                                       // kjLookup
 }
 
@@ -36,6 +36,7 @@ extern "C"
 
 #include "orionld/types/OrionldProblemDetails.h"                  // OrionldProblemDetails
 #include "orionld/common/orionldState.h"                          // orionldState
+#include "orionld/common/uuidGenerate.h"                          // uuidGenerate
 #include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
 #include "orionld/db/dbConfiguration.h"                           // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
 #include "orionld/db/dbEntityTypesGet.h"                          // Own interface
@@ -150,7 +151,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   }
 
   // Sort
-  KjNode* sortedArrayP = kjArray(orionldState.kjsonP, NULL);
+  KjNode* sortedArrayP = kjArray(orionldState.kjsonP, "typeList");
 
   //
   // The very first item can be inserted directly, without caring about sorting
@@ -176,5 +177,17 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     nodeP = next;
   }
 
-  return sortedArrayP;
+  char entityTypesId[64];
+  strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
+  uuidGenerate(&entityTypesId[27]);
+
+  KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
+  KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);
+  KjNode* typeNodeP         = kjString(orionldState.kjsonP, "type", "EntityTypeList");
+
+  kjChildAdd(typeNodeResponseP, idNodeP);
+  kjChildAdd(typeNodeResponseP, typeNodeP);
+  kjChildAdd(typeNodeResponseP, sortedArrayP);
+
+  return typeNodeResponseP;
 }
