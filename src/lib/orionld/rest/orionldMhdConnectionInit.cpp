@@ -38,8 +38,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
@@ -343,9 +342,9 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     char* detail;
 
-    if (!urlCheck((char*) value, &detail) && !urnCheck((char*) value, &detail))
+    if (pcheckUri((char*) value, &detail) == false)
     {
-      orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", value);
+      orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", value);  // FIXME: Include 'detail' and name (datasetId)
       orionldState.httpStatusCode = 400;
       return false;
     }

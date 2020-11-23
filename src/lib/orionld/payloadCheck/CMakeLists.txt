@@ -40,6 +40,7 @@ SET (SOURCES
      pcheckQuery.cpp
      pcheckAttrs.cpp
      pcheckQ.cpp
+     pcheckUri.cpp
 )
 
 # Include directories

@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
+
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,46 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strcpy
-
-#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
-#include "orionld/common/linkCheck.h"                          // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// linkCheck -
+// pcheckUri -
 //
-// Example link:
-//   <https://fiware.github.io/X/Y/Z.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-//
-// NOTE
-//   The initial '<' is stepped over before clling this function, by linkHeaderCheck() in orionldMhdConnectionTreat.cpp
-//
-bool linkCheck(char* link, char** detailsP)
-{
-  char* cP = link;
+extern bool pcheckUri(char* uri, char** detailP);
 
-  while (*cP != '>')
-  {
-    if (*cP == 0)
-    {
-      *detailsP = (char*) "missing '>' at end of URL of link";
-      return false;
-    }
-
-    ++cP;
-  }
-
-  *cP = 0;  // End of string for the URL
-
-  if (pcheckUri(link, detailsP) == false)
-    return false;
-
-  //
-  // FIXME: Parse the 'rel' and 'type' as well ?
-  //
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKURI_H_
