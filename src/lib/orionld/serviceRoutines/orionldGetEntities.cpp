@@ -420,7 +420,7 @@ bool orionldGetEntities(ConnectionInfo* ciP)
 
   //
   // Special case:
-  // If count is asked for and limit == 0 - just do the cunt query
+  // If count is asked for and limit == 0 - just do the count query
   //
   if ((countP != NULL) && (orionldState.uriParams.limit == 0))
     orionldState.onlyCount = true;
