@@ -59,7 +59,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                           // orionldState
 #include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
+#include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
 #endif
 
 #include "mongoBackend/connectionOperations.h"
@@ -3092,7 +3092,7 @@ static bool createEntity
   {
     mongo::BSONObj  datasetsObj;
 
-    mongoCppLegacyKjTreeToBsonObj(orionldState.datasets, &datasetsObj);
+    dbDataFromKjTree(orionldState.datasets, &datasetsObj);
     insertedDoc.append(orionldState.datasets->name, datasetsObj);
   }
 
