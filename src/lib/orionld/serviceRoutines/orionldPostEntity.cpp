@@ -53,6 +53,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/attributeUpdated.h"                     // attributeUpdated
+#include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
 #include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
 #include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
@@ -61,37 +63,6 @@ extern "C"
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// attributeNotUpdated -
-//
-static void attributeNotUpdated(KjNode* notUpdatedP, const char* attrName, const char* reason)
-{
-  KjNode* notUpdatedDetailsP = kjObject(orionldState.kjsonP, NULL);
-  KjNode* attrNameP          = kjString(orionldState.kjsonP, "attributeName", attrName);
-  KjNode* reasonP            = kjString(orionldState.kjsonP, "reason", reason);
-
-  kjChildAdd(notUpdatedDetailsP, attrNameP);
-  kjChildAdd(notUpdatedDetailsP, reasonP);
-
-  kjChildAdd(notUpdatedP, notUpdatedDetailsP);
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// attributeUpdated -
-//
-static void attributeUpdated(KjNode* updatedP, const char* attrName)
-{
-  KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrName);
-
-  kjChildAdd(updatedP, attrNameP);
-}
 
 
 
