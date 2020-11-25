@@ -44,6 +44,8 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // DUPLICATE_CHECK, STRING_CHECK, ...
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/attributeUpdated.h"                     // attributeUpdated
+#include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
@@ -51,41 +53,6 @@ extern "C"
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// attributeNotUpdated -
-//
-// FIXME: there's a copy of this function in orionldPostEntity.cpp
-//
-static void attributeNotUpdated(KjNode* notUpdatedP, const char* attrName, const char* reason)
-{
-  KjNode* notUpdatedDetailsP = kjObject(orionldState.kjsonP, NULL);
-  KjNode* attrNameP          = kjString(orionldState.kjsonP, "attributeName", attrName);
-  KjNode* reasonP            = kjString(orionldState.kjsonP, "reason", reason);
-
-  kjChildAdd(notUpdatedDetailsP, attrNameP);
-  kjChildAdd(notUpdatedDetailsP, reasonP);
-
-  kjChildAdd(notUpdatedP, notUpdatedDetailsP);
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// attributeUpdated -
-//
-// FIXME: there's a copy of this function in orionldPostEntity.cpp
-//
-static void attributeUpdated(KjNode* updatedP, const char* attrName)
-{
-  KjNode* attrNameP = kjString(orionldState.kjsonP, NULL, attrName);
-
-  kjChildAdd(updatedP, attrNameP);
-}
 
 
 
