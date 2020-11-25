@@ -6,3 +6,7 @@
 * Issue  #280   Batch Upsert with options=update didn't do what it should - it replaces instead of updates the entities
 * Issue  #573   URI Check less restrictive than before
 * Issue  #280   Modify GET /ngsi-ld/v1/types according to the new NGSI-LD spec (1.3.1)
+* Issue  #280   Fixed Batch Update without options=noOverwrite (didn't replace attributes - now it does)
+* Issue  #280   Implemented Batch Update with options=noOverwrite
+
+
