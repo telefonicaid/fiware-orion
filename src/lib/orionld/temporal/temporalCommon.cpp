@@ -65,7 +65,7 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 }
 
 
-void temporalValidateTenant()
+bool temporalValidateTenant()
 {
   if (orionldTenantLookup(orionldState.tenant) == NULL)
   {
@@ -78,7 +78,7 @@ void temporalValidateTenant()
       LM_W(("Teamporal - Tenant database initialisation successful"));
       return true;
     }
-    else 
+    else
     {
       LM_W(("Teamporal - Tenant database initialisation failed"));
       return false;
