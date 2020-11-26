@@ -214,13 +214,15 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
 
 
 //void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex);
+//void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex);
+void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndex);
 
 void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
 
 void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
-bool temporalTenanatValidate();
+void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex);
+
 
 #endif  // TEMPORAL_COMMON_H_

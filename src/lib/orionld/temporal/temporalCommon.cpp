@@ -66,6 +66,56 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 
 
 
+void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex)
+{
+  if(arrayFlag)
+  {
+    KjNode* idP = kjLookup(entityP, "id");
+    KjNode* typeP = kjLookup(entityP, "type");
+    allTab->entityTableArray[entityIndex].entityId = idP->value.s;
+    allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
+  }
+  else
+  {
+    allTab->entityTableArray[entityIndex].entityId = orionldState.entityId;
+    allTab->entityTableArray[entityIndex].entityType = orionldState.entityType;
+  }
+
+  int attributesCount = 0;
+  int subAttrCount = 0;
+
+  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "type") == 0))
+    {
+      continue;
+    }
+    attributesCount++;
+
+    for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+    {
+      subAttrCount++;
+    }
+  }
+
+  int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
+  allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
+  bzero(allTab->attributeTableArray, attribArrayTotalSize);
+
+  int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
+  allTab->subAttributeTableArray = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+  bzero(allTab->subAttributeTableArray, subAttribArrayTotalSize);
+
+  int attrIndex=0;
+  int subAttrIndex = 0;
+  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    allTab->attributeTableArray[attrIndex].entityId = dbEntityTableLocal[entityIndex].entityId;
+    attrExtract (attrP, allTab->attributeTableArray, allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+    attrIndex++;
+  }
+}
+
 
 // -----------------------------------------------------------------------------
 //
@@ -76,61 +126,59 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
 {
     OrionldTemporalDbAllTables*          dbAllTablesLocal; // Chandra - TBI
-    OrionldTemporalDbEntityTable*        dbEntityTableLocal;
-    OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
-    OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal;
+    //  OrionldTemporalDbEntityTable*        dbEntityTableLocal;
+    //  OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
+    //  OrionldTemporalDbSubAttributeTable*  dbSubAttributeTableLocal;
+
 
     int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
     dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
     bzero(dbAllTablesLocal, dbAllTablesSize);
 
+
+    dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+    dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
+
     //  orionldState.requestTree->type == KjArray;
     if(orionldState.requestTree->type == KjArray)
     {
-      int entityNumbers = 0;
+      int entityCount = 0;
       for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
-         entityNumbers++;
+         entityCount++;
       }
 
-      dbEntityTableLocal = (OrionldTemporalDbEntityTable**) kaAlloc(&orionldState.kalloc, (entityNumbers * sizeof(OrionldTemporalDbEntityTable*)) );
-      bzero(dbSubAttributeTableLocal, (entityNumbers * sizeof(OrionldTemporalDbEntityTable*)));
+      dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
+      bzero(dbSubAttributeTableLocal, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
+
+      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
       int entityIndex=0;
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
-        dbEntityTableLocal[entityIndex].entityId = orionldState.payloadIdNode->value.s;
-        dbEntityTableLocal[entityIndex].entityType = orionldState.payloadTypeNode->value.s;
-
-        int attributesNumbers = 0;
-        for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-        {
-           attributesNumbers++;
-        }
-
-        int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
-        dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
-        bzero(dbAttributeTableLocal, attribArrayTotalSize);
-
-        dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
-        bzero(dbSubAttributeTableLocal, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
-
-        int attrIndex=0;
-        for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-        {
-           dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
-           attrExtract (attrP, &dbAttributeTableLocal[attrIndex], dbSubAttributeTableLocal, attrIndex);
-           attrIndex++;
-        }
-        entityIndex++;
+        entityExtract (&dbAllTablesLocal, entityP, true, entityIndex++);
       }
-
-      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-      dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-      dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
     }
     else
     {
+      dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbEntityTable));
+      bzero(dbSubAttributeTableLocal, sizeof(OrionldTemporalDbEntityTable));
+
+      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+
+      entityExtract (&dbAllTablesLocal, orionldState.requestTree, false, 0);
+    }
+
+#if 0
+}
+
+
+    else
+    {
+      OrionldTemporalDbEntityTable*        dbEntityTableLocal;
+      OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
+      OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal;
+
       int entityArrayTotalSize = sizeof(OrionldTemporalDbEntityTable);
       dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
       bzero(dbEntityTableLocal, entityArrayTotalSize);
@@ -169,11 +217,13 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
       dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
       dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
     }
-    return dbAllTablesLocal;
+
+#endif
+  return dbAllTablesLocal;
 }
 
 
-void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex)
+void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndex)
 {
    //int oldTemporalTreeNodeLevel = 0;
    //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -307,17 +357,18 @@ void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTab
                 subAttrs++;
         }
 
-        int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
-        dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
-        bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
+        //int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
+        //dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
+        //bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
 
         int subAttrIx=0;
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
-            dbSubAttributeTableLocal[subAttrIx]->attributeName = dbAttributeTableLocal->attributeName;
-            dbSubAttributeTableLocal[attrIndex][subAttrIx].attrInstanceId = dbAttributeTableLocal->instanceId;
-            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[attrIndex][subAttrIx]);
-            subAttrIx++;
+            dbSubAttributeTableLocal[subAttrIndex]->attributeName = dbAttributeTableLocal->attributeName;
+            dbSubAttributeTableLocal[subAttrIndex].attrInstanceId = dbAttributeTableLocal->instanceId;
+            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[subAttrIndex]);
+            //subAttrIx++;
+            subAttrIndex++;
         }
     }
 
