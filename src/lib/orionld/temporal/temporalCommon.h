@@ -197,9 +197,9 @@ extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAl
 
 // ----------------------------------------------------------------------------
 //
-// temporalInitialiseTenant -
+// temporalTenantIntialise -
 //
-extern bool temporalInitialiseTenant(char *tenantName);
+extern bool temporalTenantIntialise(char *tenantName);
 
 
 // ----------------------------------------------------------------------------
@@ -221,6 +221,6 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
 
 void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
-bool temporalValidateTenant();
+bool temporalTenanatValidate();
 
 #endif  // TEMPORAL_COMMON_H_

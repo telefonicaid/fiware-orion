@@ -65,7 +65,7 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 }
 
 
-bool temporalValidateTenant()
+bool temporalTenanatValidate()
 {
   if (orionldTenantLookup(orionldState.tenant) == NULL)
   {
@@ -73,7 +73,7 @@ bool temporalValidateTenant()
     snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
     orionldTenantCreate(prefixed);
 
-    if (temporalInitialiseTenant)
+    if (temporalTenantIntialise(prefixed))
     {
       LM_W(("Teamporal - Tenant database initialisation successful"));
       return true;
@@ -569,9 +569,9 @@ bool TemporalPgDBConnectorOpen(char *tenantName)
 
 // ----------------------------------------------------------------------------
 //
-// temporalInitialiseTenant -
+// temporalTenantIntialise -
 //
-bool temporalInitialiseTenant(char *tenantName)
+bool temporalTenantIntialise(char *tenantName)
 {
     LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
 
