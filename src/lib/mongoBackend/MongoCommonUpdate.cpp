@@ -2689,7 +2689,7 @@ static bool createEntity
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
-    oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
+    oeP->fill(SccBadRequest, *errDetail, "BadRequest");
     return false;
   }
 
