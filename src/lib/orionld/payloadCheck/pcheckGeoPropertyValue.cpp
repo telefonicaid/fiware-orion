@@ -36,15 +36,15 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/payloadCheck/pcheckGeoType.h"                  // pcheckGeoType
 #include "orionld/payloadCheck/pcheckGeoqCoordinates.h"          // pcheckGeoqCoordinates
-#include "orionld/payloadCheck/pcheckGeoProperty.h"              // Own interface
+#include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pcheckGeoProperty -
+// pcheckGeoPropertyValue -
 //
-bool pcheckGeoProperty(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP)
+bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP)
 {
   KjNode*             typeNodeP         = NULL;
   KjNode*             coordinatesNodeP  = NULL;
@@ -62,16 +62,16 @@ bool pcheckGeoProperty(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoord
   {
     if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0))
     {
-      char* details;
+      char* detail;
 
       DUPLICATE_CHECK(typeNodeP, "geo-location::type", nodeP);
       STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object must be a JSON String");
       EMPTY_STRING_CHECK(nodeP, "the 'type' field of a GeoJSON object cannot be an empty string");
 
-      if (pcheckGeoType(typeNodeP->value.s, &geoType, &details) == false)
+      if (pcheckGeoType(typeNodeP->value.s, &geoType, &detail) == false)
       {
         LM_W(("Bad Input (invalid type for geoJson: '%s')", typeNodeP->value.s));
-        orionldErrorResponseCreate(OrionldBadRequestData, details, typeNodeP->value.s);
+        orionldErrorResponseCreate(OrionldBadRequestData, detail, typeNodeP->value.s);
         return false;
       }
       geoTypeString = typeNodeP->value.s;

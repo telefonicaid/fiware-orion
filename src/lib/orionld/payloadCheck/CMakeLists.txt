@@ -27,7 +27,7 @@ SET (SOURCES
      pcheckGeoType.cpp
      pcheckGeoqCoordinates.cpp
      pcheckGeoqGeorel.cpp
-     pcheckGeoProperty.cpp
+     pcheckGeoPropertyValue.cpp
      pcheckGeoQ.cpp
      pcheckEndpoint.cpp
      pcheckNotification.cpp
