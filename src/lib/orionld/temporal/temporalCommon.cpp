@@ -80,7 +80,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     KjNode* idP = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
-    allTab->entityTableArray[entityIndex].entityType = typeP->value.s;
+    allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
   }
 
   int attributesCount = 0;
@@ -858,12 +858,11 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
         if(entityUpdateFlag)
         {
-          snprintf(dbEntityStrBuffer, dbEntityBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
-                "created_at,modified_at, observed_at) VALUES (%s, %s, NULL, %f, %f, NULL)",
-                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId,
-                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType,
+          snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table(entity_id,entity_type,geo_property,"
+                "SET created_at = %f, modified_at = %f WHERE entity_id = %s",
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
-                dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt);
+                dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
+                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
         }
         else
         {
