@@ -151,12 +151,12 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
 
-      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+      //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
       int entityIndex=0;
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
-        entityExtract (&dbAllTablesLocal, entityP, true, entityIndex++);
+        entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
       }
     }
     else
@@ -164,9 +164,9 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbEntityTable));
       bzero(dbAllTablesLocal->entityTableArray, sizeof(OrionldTemporalDbEntityTable));
 
-      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+      //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
-      entityExtract (&dbAllTablesLocal, orionldState.requestTree, false, 0);
+      entityExtract (dbAllTablesLocal, orionldState.requestTree, false, 0);
     }
 
 #if 0
