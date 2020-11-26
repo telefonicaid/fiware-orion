@@ -47,7 +47,7 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-	char tenantName[] = "orionld"; // Chandra-TBD
+	char tenantName[] = "orionld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
 		if(TemporalPgDBConnectorOpen() == true)
@@ -83,7 +83,8 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	// }
 	//else
 	//{
-	if(TemporalConstructInsertSQLStatement(dbAllTables) == true)
+
+	if(TemporalConstructInsertSQLStatement(dbAllTables, false) == true)
 	{
 		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
 		return true;
