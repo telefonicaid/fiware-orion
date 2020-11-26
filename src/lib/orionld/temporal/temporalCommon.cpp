@@ -110,7 +110,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   int subAttrIndex = 0;
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    allTab->attributeTableArray[attrIndex].entityId = dbEntityTableLocal[entityIndex].entityId;
+    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     attrExtract (attrP, allTab->attributeTableArray, allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
     attrIndex++;
   }
@@ -136,8 +136,8 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     bzero(dbAllTablesLocal, dbAllTablesSize);
 
 
-    dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-    dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
+    //dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+    //dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
 
     //  orionldState.requestTree->type == KjArray;
     if(orionldState.requestTree->type == KjArray)
@@ -148,8 +148,8 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
          entityCount++;
       }
 
-      dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
-      bzero(dbSubAttributeTableLocal, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
+      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
+      bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
 
       dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
@@ -161,8 +161,8 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     }
     else
     {
-      dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbEntityTable));
-      bzero(dbSubAttributeTableLocal, sizeof(OrionldTemporalDbEntityTable));
+      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbEntityTable));
+      bzero(dbAllTablesLocal->entityTableArray, sizeof(OrionldTemporalDbEntityTable));
 
       dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
