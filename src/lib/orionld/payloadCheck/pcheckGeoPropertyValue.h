@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTY_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTY_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_
 
 /*
 *
@@ -34,8 +34,8 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// pcheckGeoProperty -
+// pcheckGeoPropertyValue -
 //
-extern bool pcheckGeoProperty(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP);
+extern bool pcheckGeoPropertyValue(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTY_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTYVALUE_H_
