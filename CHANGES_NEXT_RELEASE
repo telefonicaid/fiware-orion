@@ -9,4 +9,5 @@
 * Issue  #280   Fixed Batch Update without options=noOverwrite (didn't replace attributes - now it does)
 * Issue  #280   Implemented Batch Update with options=noOverwrite
 * Issue  #280   Default mongo request mutex policy changed from 'all' to 'none'
+* Issue  #586   Stopped using gtime(), that is not reentrant - gtime_r() is used instead
 

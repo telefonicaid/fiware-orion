@@ -1102,16 +1102,14 @@ template <> std::string toString(double f)
 *
 * isodate2str -
 *
-* FIXME P6: change implementation to use gmtime_r
-*
 */
 std::string isodate2str(double timestamp)
 {
   // 80 bytes is enough to store any ISO8601 string safely
-  // We use gmtime() to get UTC strings, otherwise we would use localtime()
+  // We use gmtime_r() to get UTC strings, otherwise we would use localtime()
   // Date pattern: 1970-04-26T17:46:40.000Z
 
-  char    buffer[80];
+  char buffer[80];
 
   //
   // About the added microsecond in  **int millis = (micros + 1) / 1000;**
@@ -1145,12 +1143,13 @@ std::string isodate2str(double timestamp)
   // 3. Convert the decimals into microseconds, by multiplicating with one million (1000000) - in the variable 'micros'.
   // 4. Add a microsecond and then divide by one thousand - cutting all decimals
   //
-  time_t  seconds   = (time_t) timestamp;
-  double  ms        = timestamp - (double) seconds;
-  int     micros    = ms * 1000000;
-  int     millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
+  time_t     seconds   = (time_t) timestamp;
+  double     ms        = timestamp - (double) seconds;
+  int        micros    = ms * 1000000;
+  int        millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
+  struct tm  now;
 
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime(&seconds));
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime_r(&seconds, &now));
 
   char* eob = &buffer[strlen(buffer)];
   sprintf(eob, ".%03dZ", millis);
