@@ -77,10 +77,8 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   }
   else
   {
-    KjNode* idP = kjLookup(entityP, "id");
-    KjNode* typeP = kjLookup(entityP, "type");
-    allTab->entityTableArray[entityIndex].entityId = idP->value.s;
-    allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
+    allTab->entityTableArray[entityIndex].entityId = orionldState.payloadIdNode->value.s;
+    allTab->entityTableArray[entityIndex].entityType = (orionldState.payloadIdType->value.s != NULL)? orionldState.payloadIdType->value.s : NULL;
   }
 
   int attributesCount = 0;
