@@ -65,28 +65,6 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 }
 
 
-bool temporalTenanatValidate()
-{
-  if (orionldTenantLookup(orionldState.tenant) == NULL)
-  {
-    char prefixed[64];
-    snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
-    orionldTenantCreate(prefixed);
-
-    if (temporalTenantIntialise(prefixed))
-    {
-      LM_W(("Teamporal - Tenant database initialisation successful"));
-      return true;
-    }
-    else
-    {
-      LM_W(("Teamporal - Tenant database initialisation failed"));
-      return false;
-    }
-  }
-  else
-    return true;
-}
 
 
 // -----------------------------------------------------------------------------
@@ -106,12 +84,59 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
     dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
     bzero(dbAllTablesLocal, dbAllTablesSize);
 
-    int entityArrayTotalSize = sizeof(OrionldTemporalDbEntityTable);
-    dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
-    bzero(dbEntityTableLocal, entityArrayTotalSize);
+    //  orionldState.requestTree->type == KjArray;
+    if(orionldState.requestTree->type == KjArray)
+    {
+      int entityNumbers = 0;
+      for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      {
+         entityNumbers++;
+      }
 
-    dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
-    dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
+      dbEntityTableLocal = (OrionldTemporalDbEntityTable**) kaAlloc(&orionldState.kalloc, (entityNumbers * sizeof(OrionldTemporalDbEntityTable*)) );
+      bzero(dbSubAttributeTableLocal, (entityNumbers * sizeof(OrionldTemporalDbEntityTable*)));
+
+      int entityIndex=0;
+      for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      {
+        dbEntityTableLocal[entityIndex].entityId = orionldState.payloadIdNode->value.s;
+        dbEntityTableLocal[entityIndex].entityType = orionldState.payloadTypeNode->value.s;
+
+        int attributesNumbers = 0;
+        for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+        {
+           attributesNumbers++;
+        }
+
+        int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
+        dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
+        bzero(dbAttributeTableLocal, attribArrayTotalSize);
+
+        dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
+        bzero(dbSubAttributeTableLocal, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
+
+        int attrIndex=0;
+        for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+        {
+           dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
+           attrExtract (attrP, &dbAttributeTableLocal[attrIndex], dbSubAttributeTableLocal, attrIndex);
+           attrIndex++;
+        }
+        entityIndex++;
+      }
+
+      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+      dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+      dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
+    }
+    else
+    {
+      int entityArrayTotalSize = sizeof(OrionldTemporalDbEntityTable);
+      dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
+      bzero(dbEntityTableLocal, entityArrayTotalSize);
+
+      dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
+      dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
 
 /*
 #if 0
@@ -119,31 +144,31 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
 #endif
 */
 
-    int attributesNumbers = 0;
-    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-    {
-       attributesNumbers++;
+      int attributesNumbers = 0;
+      for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+         attributesNumbers++;
+      }
+
+      int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
+      dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
+      bzero(dbAttributeTableLocal, attribArrayTotalSize);
+
+      dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
+      bzero(dbSubAttributeTableLocal, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
+
+      int attrIndex=0;
+      for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+         dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
+         attrExtract (attrP, &dbAttributeTableLocal[attrIndex], dbSubAttributeTableLocal, attrIndex);
+         attrIndex++;
+      }
+
+      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+      dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+      dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
     }
-
-    int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
-    dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
-    bzero(dbAttributeTableLocal, attribArrayTotalSize);
-
-    dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
-    bzero(dbSubAttributeTableLocal, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
-
-    int attrIndex=0;
-    for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-    {
-       dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
-       attrExtract (attrP, &dbAttributeTableLocal[attrIndex], dbSubAttributeTableLocal, attrIndex);
-       attrIndex++;
-    }
-
-    dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-    dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-    dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
-
     return dbAllTablesLocal;
 }
 
@@ -569,9 +594,9 @@ bool TemporalPgDBConnectorOpen(char *tenantName)
 
 // ----------------------------------------------------------------------------
 //
-// temporalTenantIntialise -
+// temporalTenantInitialise -
 //
-bool temporalTenantIntialise(char *tenantName)
+bool temporalTenantInitialise(char *tenantName)
 {
     LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
 
@@ -659,15 +684,15 @@ bool temporalTenantIntialise(char *tenantName)
                 "modified_at TIMESTAMP, observed_at TIMESTAMP,PRIMARY KEY (entity_id)),",
 
                 "create type attribute_value_type_enum as enum ('value_string',"
-                " 'value_number', 'value_boolean', 'value_relation',"
-                " 'value_object', 'value_datetime', 'value_geo')",
+                "'value_number', 'value_boolean', 'value_relation',"
+                "'value_object', 'value_datetime', 'value_geo')",
 
                 "CREATE TABLE IF NOT EXISTS attributes_table"
-                " (entity_id TEXT NOT NULL REFERENCES entity_table(entity_id),"
+                "(entity_id TEXT NOT NULL REFERENCES entity_table(entity_id),"
                 "id TEXT NOT NULL, name TEXT, value_type attribute_value_type_enum,"
-                " sub_property BOOL, unit_code TEXT, data_set_id TEXT,"
+                "sub_property BOOL, unit_code TEXT, data_set_id TEXT,"
                 "instance_id TEXT NOT NULL, value_string TEXT,"
-                " value_boolean BOOL, value_number float8,"
+                "value_boolean BOOL, value_number float8,"
                 "value_relation TEXT,value_object TEXT, value_datetime TIMESTAMP,"
                 "geo_property GEOMETRY,created_at TIMESTAMP NOT NULL,"
                 "modified_at TIMESTAMP NOT NULL,observed_at TIMESTAMP NOT NULL,"
@@ -676,10 +701,10 @@ bool temporalTenantIntialise(char *tenantName)
                 //  "SELECT create_hypertable('attributes_table', 'modified_at')",
 
                 "CREATE TABLE IF NOT EXISTS attribute_sub_properties_table"
-                " (entity_id TEXT NOT NULL,attribute_id TEXT NOT NULL,"
+                "(entity_id TEXT NOT NULL,attribute_id TEXT NOT NULL,"
                 "attribute_instance_id TEXT NOT NULL, id TEXT NOT NULL,"
                 "value_type attribute_value_type_enum,value_string TEXT,"
-                " value_boolean BOOL, value_number float8, "
+                "value_boolean BOOL, value_number float8, "
                 "value_relation TEXT,name TEXT,geo_property GEOMETRY,"
                 "unit_code TEXT, value_object TEXT, value_datetime TIMESTAMP,"
                 "instance_id bigint GENERATED BY DEFAULT AS IDENTITY"

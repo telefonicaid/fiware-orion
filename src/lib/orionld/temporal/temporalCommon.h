@@ -197,9 +197,9 @@ extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAl
 
 // ----------------------------------------------------------------------------
 //
-// temporalTenantIntialise -
+// temporalTenantInitialise -
 //
-extern bool temporalTenantIntialise(char *tenantName);
+extern bool temporalTenantInitialise(char *tenantName);
 
 
 // ----------------------------------------------------------------------------
