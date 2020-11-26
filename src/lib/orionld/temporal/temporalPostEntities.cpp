@@ -50,6 +50,11 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 	char tenantName[] = "orionld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
+		if(!temporalValidateTenant())
+		{
+			LM_TMP(("CCSR: Tenant initialisation failed"));
+		}
+
 		if(TemporalPgDBConnectorOpen() == true)
 		{
 			LM_TMP(("CCSR: connection to postgress db is open"));

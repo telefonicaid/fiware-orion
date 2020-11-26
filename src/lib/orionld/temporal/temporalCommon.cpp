@@ -48,6 +48,7 @@ extern "C"
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/orionldTenantCreate.h"                // Own interface
 
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
 
@@ -62,6 +63,31 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 {
     return "value_string";  // Chandra - TBI
 }
+
+
+void temporalValidateTenant()
+{
+  if (orionldTenantLookup(orionldState.tenant) == NULL)
+  {
+    char prefixed[64];
+    snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
+    orionldTenantCreate(prefixed);
+
+    if (temporalInitialiseTenant)
+    {
+      LM_W(("Teamporal - Tenant database initialisation successful"));
+      return true;
+    }
+    else 
+    {
+      LM_W(("Teamporal - Tenant database initialisation failed"));
+      return false;
+    }
+  }
+  else
+    return true;
+}
+
 
 // -----------------------------------------------------------------------------
 //
