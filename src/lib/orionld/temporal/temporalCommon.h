@@ -221,4 +221,6 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
 
 void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
+bool temporalValidateTenant();
+
 #endif  // TEMPORAL_COMMON_H_
