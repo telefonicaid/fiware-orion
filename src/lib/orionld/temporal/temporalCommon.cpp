@@ -792,7 +792,7 @@ bool temporalTenantInitialise(char *tenantName)
 //
 bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 {
-        char oldTenantName[] = "orionld";
+        char oldTenantName[] = "orion_ld";
 
         TemporalPgDBConnectorOpen(oldTenantName);  //  opening Tenant Db connection
 
