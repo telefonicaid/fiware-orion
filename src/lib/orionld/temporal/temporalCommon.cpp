@@ -859,9 +859,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         if(entityUpdateFlag)
         {
           snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table(entity_id,entity_type,geo_property,"
-                "SET created_at = '%s', modified_at = %f WHERE entity_id = '%s'",
-                dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
-                dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
+                "SET created_at = '%s', modified_at = '%s' WHERE entity_id = '%s'",
+                //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
+                //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
+                "2017-02-10 05:41:00" , "2017-02-10 05:41:00",
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
         }
         else
