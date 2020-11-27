@@ -862,7 +862,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 "SET created_at = '%s', modified_at = '%s' WHERE entity_id = '%s'",
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
-                "2017-02-10 05:41:00" , "2017-02-10 05:41:00",
+                "2017-02-10T05:41:00.123Z" , "2017-02-10T05:41:00.123Z",
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
         }
         else
@@ -873,7 +873,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt
-                "2017-02-10 05:41:00" , "2017-02-10 05:41:00");
+                "2017-02-10T05:41:00.123Z" , "2017-02-10T05:41:00.123Z");
         }
         //
         // Some traces just to see how the KjNode tree works
