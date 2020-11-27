@@ -810,7 +810,8 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, oldTemporalSQLBuffer);
 	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   	{
-        	LM_E(("i%s command failed for inserting single Entity into DB %s\n",oldTemporalSQLBuffer, oldTenantName));
+        	LM_E(("%s command failed for inserting single Entity into DB %s",oldTemporalSQLBuffer, oldTenantName));
+          LM_E(("Reason %s",PQerrorMessage(oldPgDbTenantConnection));
         	PQclear(oldPgTenandDbResult);
         	TemporalPgDBConnectorClose();
         	return false;
