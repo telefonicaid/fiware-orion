@@ -64,6 +64,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"          // orionldPostBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
+#include "orionld/serviceRoutines/orionldPostBatchUpdate.h"          // orionldPostBatchUpdate
 #include "orionld/serviceRoutines/orionldPostQuery.h"                // orionldPostQuery
 #include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
@@ -278,11 +279,16 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
+  LM_TMP(("TMPF: Hello"));
+  LM_TMP(("TMPF: TD=%d", temporal));
 
   if (temporal)  // CLI Option to turn on Temporal Evolution of Entities
   {
     if (serviceP->serviceRoutine == orionldPostEntities)
+    {
       serviceP->temporalRoutine  = temporalPostEntities;
+      LM_TMP(("TMPF: TA=%p", serviceP->temporalRoutine));
+    }
     else if (serviceP->serviceRoutine == orionldPostBatchDelete)
       serviceP->temporalRoutine   = temporalPostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
@@ -299,10 +305,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
       serviceP->temporalRoutine = temporalPostBatchCreate;
     else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
       serviceP->temporalRoutine = temporalPostBatchUpsert;
-#if 0
     else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
       serviceP->temporalRoutine = temporalPostBatchUpdate;
-#endif
   }
 }
 

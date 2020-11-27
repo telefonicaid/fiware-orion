@@ -97,10 +97,11 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
       subAttrCount++;
     }
   }
-
   int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
   allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
   bzero(allTab->attributeTableArray, attribArrayTotalSize);
+  LM_TMP(("TMPF: AttrArrayTotalSize:%d", attribArrayTotalSize));
+  LM_TMP(("TMPF: attributesCount:%d", attributesCount));
 
   int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
   allTab->subAttributeTableArray = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
@@ -578,7 +579,7 @@ bool TemporalPgDBConnectorClose()
 // ----------------------------------------------------------------------------
 bool TemporalPgDBConnectorOpen()
 {
-    char oldPgDbConnCheckSql[] = "user=postgres password=orion dbname=postgres"; //Need to be changed to environment variables CHANDRA-TBD
+    char oldPgDbConnCheckSql[] = "user=postgres password=password dbname=orion_ld"; //Need to be changed to environment variables CHANDRA-TBD
     oldPgDbConnection = PQconnectdb(oldPgDbConnCheckSql);
     if (PQstatus(oldPgDbConnection) == CONNECTION_BAD)
     {
@@ -1116,7 +1117,7 @@ bool TemporalPgTenantDBConnectorOpen(char* tenantName)
     int oldPgTDbConnSQLBufferSize = 1024;
     int oldPgTDbConnSQLUsedBufferSize = 0;
     char oldPgTDbConnSQLUser[] = "postgres"; // Chandra-TBD
-    char oldPgTDbConnSQLPasswd[] = "orion"; // Chandra-TBD
+    char oldPgTDbConnSQLPasswd[] = "password"; // Chandra-TBD
     char* oldTemporalSQLBuffer = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
 
     strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);

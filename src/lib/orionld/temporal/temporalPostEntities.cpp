@@ -47,7 +47,7 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-	char tenantName[] = "orionld"; // Chandra-TBD This needs to be changed
+	char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
 		//if(!temporalTenanatValidate())
