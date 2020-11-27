@@ -843,7 +843,7 @@ static bool numberToDate(double timestamp, char* date, int dateLen)
 {
   struct tm  tm;
   time_t fromEpoch = timestamp;
-  int milliSec = (timestamp - fromEpoch) * 1000;
+  //int milliSec = (timestamp - fromEpoch) * 1000;
 
   gmtime_r(&fromEpoch, &tm);
   strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
