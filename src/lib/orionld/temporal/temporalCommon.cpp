@@ -73,13 +73,22 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   {
     KjNode* idP = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
+    //KjNode* createdAtP = kjLookup(entityP, "createdAt");
+    //KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
+
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
     allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
+    //allTab->entityTableArray[entityIndex].createdAt = createdAt->value.s;
+    //allTab->entityTableArray[entityIndex].modifiedAt = modifiedAt->value.s;
+    allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   }
   else
   {
     allTab->entityTableArray[entityIndex].entityId = orionldState.payloadIdNode->value.s;
     allTab->entityTableArray[entityIndex].entityType = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
+    allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   }
 
   int attributesCount = 0;
@@ -98,6 +107,10 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
       subAttrCount++;
     }
   }
+
+  allTab->attributeTableArrayItems = attributesCount;
+  allTab->subAttributeTableArray = subAttrCount;
+
   int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
   allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
   bzero(allTab->attributeTableArray, attribArrayTotalSize);
@@ -125,7 +138,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 // INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
 //      VALUES ("%s,%s,%s,%s");
 //
-OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
+OrionldTemporalDbAllTables*  TemporalEntityExtract()
 {
     OrionldTemporalDbAllTables*          dbAllTablesLocal; // Chandra - TBI
     //  OrionldTemporalDbEntityTable*        dbEntityTableLocal;
@@ -149,6 +162,8 @@ OrionldTemporalDbAllTables*  singleTemporalEntityExtract()
       {
          entityCount++;
       }
+
+      dbAllTables->entityTableArray.entityTableArrayItems = entityCount;
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
@@ -862,9 +877,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbEntityTable = 1;
-    int dbAttribTable = 0;
-    int dbSubAttribTable = 0;
+    int dbEntityTable = dbAllTables->entityTableArrayItems;
+    int dbAttribTable = dbAllTables->attributeTableArrayItems;
+    int dbSubAttribTable = dbAllTables->subAttributeTableArrayItems;
 
 
     int dbEntityBufferSize = 10 * 1024;
@@ -910,7 +925,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         LM_TMP(("CCSR:"));
     }
 
-    temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR
+    //  temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR
 
     for (int dbAttribLoop=0; dbAttribLoop < dbAttribTable; dbAttribLoop++)
     {
@@ -928,17 +943,25 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         char* uuidBuffer = kaAlloc(&orionldState.kalloc, 64);
         uuidGenerate(uuidBuffer);
 
-        snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,value_type,"
+        char createdAt[64];
+        char modifiedAt[64];
+
+        numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
+              createdAt, sizeof(createdAt));
+
+        numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
+              modifiedAt, sizeof(modifiedAt));
+
+        snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,type,value_type,"
             "sub_property,instance_id, unit_code, data_set_id, value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
                 dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType),  //Chandra-TBD
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
-                uuidBuffer, allValues,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt);
+                uuidBuffer, allValues, createdAt, modifiedAt);
 
         for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
         {
@@ -952,21 +975,33 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
             allValuesRenderSubAttr (&dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop], allValuesSubAttr, allValuesSizeSubAttr);
 
+            char createdAt[64];
+            char modifiedAt[64];
+
+            numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
+                  createdAt, sizeof(createdAt));
+
+            numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
+                  modifiedAt, sizeof(modifiedAt));
+
             snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
-                    " attribute_id, unit_code, data_set_id, value_type, value_string, value_boolean, value_number,"
+                    " attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
                     "value_relation,value_object, value_datetime, geo_property, observed_at, created_at, modified_at)"
                     "VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
-                    dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].entityId,
-                    dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].attributeName,
-                    dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].attributeValueType),  //Chandra-TBD
-                    (dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
-                    uuidBuffer, allValuesSubAttr,
-                    dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].createdAt,
-                    dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].modifiedAt);
+                    dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].entityId,
+                    dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].attributeName,
+                    dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeName,
+                    dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeType,
+                    dbValueEnumString(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeValueType),  //Chandra-TBD
+                    (dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
+                    uuidBuffer, allValuesSubAttr, createdAt, modifiedAt);
         }
     }
 
-    return true;
+    if(temporalExecSqlStatement (dbEntityStrBuffer))
+      return true;
+    else
+      return false;
 }
 
 void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)

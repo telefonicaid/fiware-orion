@@ -158,8 +158,11 @@ typedef struct OrionldTemporalDbSubAttributeTable
 typedef struct OrionldTemporalDbAllTables
 {
   OrionldTemporalDbEntityTable*         entityTableArray;
+  int entityTableArrayItems;
   OrionldTemporalDbAttributeTable*      attributeTableArray;
+  int attributeTableArrayItems;
   OrionldTemporalDbSubAttributeTable*   subAttributeTableArray;
+  int subAttributeTableArrayItems;
 } OrionldTemporalDbAllTables;
 
 // ----------------------------------------------------------------------------
