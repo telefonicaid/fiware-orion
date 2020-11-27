@@ -59,3 +59,5 @@ FUNC_TESTS
 VALGRIND
 test/pluginTest
 src/lib/orionld/common/branchName.h
+
+!.github/
