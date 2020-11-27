@@ -7,7 +7,7 @@ on:
       - develop
 
 env:
-  IMAGE_NAME: ghcr.io/wistefan/orion-ld:${{ GITHUB_RUN_ID }}
+  IMAGE_NAME: ghcr.io/wistefan/orion-ld:$GITHUB_RUN_ID
 
 jobs:
   unit:
@@ -35,8 +35,8 @@ jobs:
           push: true
           file: docker/Dockerfile-debian
           build-args: STAGE=deps
-          tags: ${{ IMAGE_NAME }}
+          tags: $IMAGE_NAME
 
       - name: Run unit test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ IMAGE_NAME }} build.sh -s unit -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts $IMAGE_NAME build.sh -s unit -dqt
