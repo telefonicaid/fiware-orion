@@ -176,7 +176,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
         entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
-        dbAllTablesLocal->entityTableArrayItems++
+        dbAllTablesLocal->entityTableArrayItems++;
       }
     }
     else
@@ -266,7 +266,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         //    dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
         //else
         dbAttributeTableLocal->observedAt = 49;
-        kjChildRemove (attrP,nodeP);
+        kjChildRemove (attrP,observedAtP);
         LM_TMP(("CCSR - Temporal - Found observedAt %s",observedAtP->value.s));
     }
 
@@ -386,9 +386,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     if (attrP->value.firstChildP != NULL)
     {
         dbAttributeTableLocal->subProperty = true;
-        int subAttrs = 0;
-
-        //int subAttrIx=0;
+        
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
