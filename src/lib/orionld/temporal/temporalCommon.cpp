@@ -848,13 +848,12 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     int dbAttribTable = sizeof(dbAllTablesLocal->attributeTableArray);
     int dbSubAttribTable = sizeof(dbAllTablesLocal->subAttributeTableArray);
 
+    int dbEntityBufferSize = 10 * 1024;
+    char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
+    bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
     for (int dbEntityLoop=0; dbEntityLoop < dbEntityTable; dbEntityLoop++)
     {
-        int dbEntityBufferSize = 10 * 1024;
-        char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
-        bzero(dbEntityStrBuffer, dbEntityBufferSize);
-
         if(entityUpdateFlag)
         {
           snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table(entity_id,entity_type,geo_property,"
@@ -879,7 +878,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         LM_TMP(("CCSR:"));
     }
 
-    temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR 
+    temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR
 
     for (int dbAttribLoop=0; dbAttribLoop < dbAttribTable; dbAttribLoop++)
     {
