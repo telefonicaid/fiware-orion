@@ -309,7 +309,7 @@ sudo apt-get install postgresql-12-postgis-3-scripts
 
 Add Postgres development libraries
 ```bash
-apt-get install libpq-dev
+sudo apt-get install libpq-dev
 ```
 
 Add timescale db and posgis
@@ -323,7 +323,7 @@ Command for checking postgres
 ```bash
 systemctl status postgresql.service
 ```
-The output will be something like this
+The output should be something like this:
 ```text
 postgresql.service - PostgreSQL RDBMS
     Loaded: loaded (/lib/systemd/system/postgresql.service; enabled; vendor preset: enabled)
@@ -338,7 +338,7 @@ postgresql.service - PostgreSQL RDBMS
 ```bash
 systemctl status postgresql@12-main.service 
 ```
-The output will be something like this
+The output should be something like this:
 ```text
 postgresql@12-main.service - PostgreSQL Cluster 12-main
     Loaded: loaded (/lib/systemd/system/postgresql@.service; indirect; vendor preset: enabled)
@@ -370,3 +370,9 @@ Add this line and save it
 ```bash
 shared_preload_libraries = 'timescaledb'
 ```
+
+- Where exactly?
+  - anywhere?
+  - at the end of the file?
+
+- Do I need to restart the postgres daemon after this edit? Send a singal to it?  Nothing at all?
