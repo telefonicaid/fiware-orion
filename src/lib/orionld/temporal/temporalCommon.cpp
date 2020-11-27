@@ -987,13 +987,13 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
                     " attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
                     "value_relation,value_object, value_datetime, geo_property, observed_at, created_at, modified_at)"
-                    "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+                    "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].entityId,
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].attributeName,
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeName,
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeType,
                     dbValueEnumString(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeValueType),  //Chandra-TBD
-                    (dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
+                    //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
                     uuidBuffer, allValuesSubAttr, createdAt, modifiedAt);
         }
     }
