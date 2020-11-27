@@ -251,7 +251,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
 
     std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string isPattern;
+    if (entity.hasField(CSUB_ENTITY_ISPATTERN))
+    {
+      isPattern = getStringFieldF(entity, CSUB_ENTITY_ISPATTERN);
+      if(isPattern.empty() && id.empty()) isPattern = "true";
+    }
+    else
+    {
+      isPattern = "false";
+    }
+
     std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
     bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
@@ -371,7 +381,17 @@ int mongoSubCacheItemInsert
     }
 
     std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
+    std::string isPattern;
+    if (entity.hasField(CSUB_ENTITY_ISPATTERN))
+    {
+      isPattern = getStringFieldF(entity, CSUB_ENTITY_ISPATTERN);
+      if(isPattern.empty() && id.empty()) isPattern = "true";
+    }
+    else
+    {
+      isPattern = "false";
+    }
+
     std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
     bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
