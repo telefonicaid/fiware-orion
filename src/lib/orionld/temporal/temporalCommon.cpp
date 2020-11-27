@@ -1088,7 +1088,8 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     else
     {
         // Chandra-TBI
-        // snprintf(geoPropertyValue, geoPropertySize, "%f", attrLocalP->geoProperty);
+        //snprintf(geoPropertyValue, geoPropertySize, "%f", attrLocalP->geoProperty);
+        snprintf(geoPropertyValue, geoPropertySize, "%s", "NULL");
     }
 
     int observedAtSize = 512;
@@ -1109,7 +1110,7 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
 
     snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
         unitCodeValue, dataSetIdValue, attributeValue, geoPropertyValue, observedAtValue);
-        
+
     LM_TMP (("Printing all Values in the end in attribute extract %s", allValues));
 
 }
