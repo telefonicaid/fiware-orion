@@ -1025,18 +1025,23 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     {
       case EnumValueString:
         snprintf(allValues, allValuesSize, "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        break;
 
         case EnumValueNumber:
           snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
+          break;
 
         case EnumValueBool:
           snprintf(allValues, allValuesSize, "NULL, NULL, '%s', NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+          break;
 
         case EnumValueArray:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
+          break;
 
         case EnumValueObject:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueObject);
+          break;
 
         default:
           LM_W(("Error - Invalid attribute Value type %d", attrLocalP->attributeValueType));
@@ -1110,18 +1115,23 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
     {
       case EnumValueString:
         snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->subAttributeValueString);
+        break;
 
         case EnumValueNumber:
           snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->subAttributeValueNumber);
+          break;
 
         case EnumValueBool:
           snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->subAttributeValueBoolean==true)? "true" : "false");
+          break;
 
         case EnumValueArray:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->subAttributeValueArray);
+          break;
 
         case EnumValueObject:
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->subAttributeValueObject);
+          break;
 
         default:
           LM_W(("Error - Invalid Sub attribute Value type %d", attrLocalP->subAttributeValueType));
