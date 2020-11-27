@@ -108,6 +108,8 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     }
   }
 
+  LM_K(("Number of Attributes & number of SubAttributes %i %i", attributesCount, subAttrCount));
+
   allTab->attributeTableArrayItems = attributesCount;
   allTab->subAttributeTableArrayItems = subAttrCount;
 
@@ -163,6 +165,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
          entityCount++;
       }
 
+      LM_K(("Number of Entities after count %i", entityCount));
 
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
