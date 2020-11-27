@@ -877,7 +877,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbEntityTable = dbAllTablesLocal->entityTableArrayItems;
+    int dbEntityTable = 1; // dbAllTablesLocal->entityTableArrayItems;
     int dbAttribTable = dbAllTablesLocal->attributeTableArrayItems;
     int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
 
