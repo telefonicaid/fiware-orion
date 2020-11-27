@@ -323,7 +323,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         kjChildRemove (attrP,attributeObject);
 
         // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-        dbAttributeTableLocal->attributeValueType  = EnumValueObject;
+        dbAttributeTableLocal->attributeValueType  = EnumValueString;
         dbAttributeTableLocal->valueString = attributeObject->value.s;
         LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal->valueString));
 
@@ -374,6 +374,8 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
               dbAttributeTableLocal->attributeValueType  = EnumValueString;
               dbAttributeTableLocal->valueString = valueP->value.s;
         }
+
+        LM_TMP(("CCSR:  attributeValueType : %d", dbAttributeTableLocal->attributeValueType));
     }
 
     //  adding instance id to map to sub attributes
@@ -960,7 +962,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             "value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, "
             "created_at, modified_at) "
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+                "VALUES ('%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 //dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
@@ -1016,22 +1018,24 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
 void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)
 {
+    LM_TMP(("Temporal allValuesRenderAttr - attrLocalP->attributeValueType %i",attrLocalP->attributeValueType));
+
     switch (attrLocalP->attributeValueType)
     {
       case EnumValueString:
-        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        snprintf(allValues, allValuesSize, "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
 
         case EnumValueNumber:
           snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
 
         case EnumValueBool:
-          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+          snprintf(allValues, allValuesSize, "NULL, NULL, '%s', NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
 
         case EnumValueArray:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->valueArray);
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
 
         case EnumValueObject:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->valueObject);
+          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueObject);
 
         default:
           LM_W(("Teamporal - Bad Input - Key values not supported"));
