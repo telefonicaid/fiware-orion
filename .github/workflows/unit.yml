@@ -35,7 +35,7 @@ jobs:
           push: true
           file: docker/Dockerfile-debian
           build-args: STAGE=deps
-          tags: ${{ IMAGE_NAME }}
+          tags: ${{ env.IMAGE_NAME }}
 
       - name: Run unit test
         run: |
