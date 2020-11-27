@@ -1039,7 +1039,7 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueObject);
 
         default:
-          LM_W(("Teamporal - Bad Input - Key values not supported"));
+          LM_W(("Error - Invalid attribute Value type %d", attrLocalP->attributeValueType));
           return;
     }
 
@@ -1124,7 +1124,7 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
           snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->subAttributeValueObject);
 
         default:
-          LM_W(("Teamporal - Bad Input - Key values not supported"));
+          LM_W(("Error - Invalid Sub attribute Value type %d", attrLocalP->subAttributeValueType));
           return;
     }
 
