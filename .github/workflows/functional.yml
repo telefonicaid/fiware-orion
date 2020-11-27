@@ -1,0 +1,48 @@
+name: Functional Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - name: Build and push to local registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
+          tags: localhost:5000/wistefan/orion-ld:test
+
+    functional-part1:
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts localhost:5000/wistefan/orion-ld:test build.sh -s functional_1_450 -dqt
+
+    functional-part2:
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts localhost:5000/wistefan/orion-ld:test build.sh -s functional_1_450 -dqt
+
+    functional-part3:
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts localhost:5000/wistefan/orion-ld:test build.sh -s functional_1_450 -dqt
+
+    functional-part4:
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts localhost:5000/wistefan/orion-ld:test build.sh -s functional_1_450 -dqt
