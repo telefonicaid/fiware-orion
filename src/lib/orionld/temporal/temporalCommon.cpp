@@ -373,9 +373,10 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         {
               dbAttributeTableLocal->attributeValueType  = EnumValueString;
               dbAttributeTableLocal->valueString = valueP->value.s;
+              LM_TMP(("CCSR:  attribute value string  : %s", dbAttributeTableLocal->valueString));
         }
 
-        LM_TMP(("CCSR:  attributeValueType : %d", dbAttributeTableLocal->attributeValueType));
+        LM_TMP(("CCSR:  Attribute Value type : %d", dbAttributeTableLocal->attributeValueType));
     }
 
     //  adding instance id to map to sub attributes
