@@ -109,7 +109,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   }
 
   allTab->attributeTableArrayItems = attributesCount;
-  allTab->subAttributeTableArray = subAttrCount;
+  allTab->subAttributeTableArrayItems = subAttrCount;
 
   int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
   allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
@@ -138,7 +138,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 // INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
 //      VALUES ("%s,%s,%s,%s");
 //
-OrionldTemporalDbAllTables*  TemporalEntityExtract()
+OrionldTemporalDbAllTables*  temporalEntityExtract()
 {
     OrionldTemporalDbAllTables*          dbAllTablesLocal; // Chandra - TBI
     //  OrionldTemporalDbEntityTable*        dbEntityTableLocal;
@@ -163,7 +163,7 @@ OrionldTemporalDbAllTables*  TemporalEntityExtract()
          entityCount++;
       }
 
-      dbAllTables->entityTableArray.entityTableArrayItems = entityCount;
+      dbAllTablesLocal->entityTableArray.entityTableArrayItems = entityCount;
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
@@ -877,9 +877,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbEntityTable = dbAllTables->entityTableArrayItems;
-    int dbAttribTable = dbAllTables->attributeTableArrayItems;
-    int dbSubAttribTable = dbAllTables->subAttributeTableArrayItems;
+    int dbEntityTable = dbAllTablesLocal->entityTableArrayItems;
+    int dbAttribTable = dbAllTablesLocal->attributeTableArrayItems;
+    int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
 
 
     int dbEntityBufferSize = 10 * 1024;
