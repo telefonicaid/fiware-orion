@@ -163,7 +163,8 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
          entityCount++;
       }
 
-      dbAllTablesLocal->entityTableArrayItems = entityCount;
+      //dbAllTablesLocal->entityTableArrayItems = entityCount;
+      dbAllTablesLocal.entityTableArrayItems = entityCount;
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
@@ -877,7 +878,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbEntityTable = 1; // dbAllTablesLocal->entityTableArrayItems;
+    int dbEntityTable = dbAllTablesLocal.entityTableArrayItems;
     int dbAttribTable = dbAllTablesLocal->attributeTableArrayItems;
     int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
 
