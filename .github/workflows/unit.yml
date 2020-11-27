@@ -7,7 +7,7 @@ on:
       - develop
 
 env:
-  IMAGE_NAME: ghcr.io/wistefan/orion-ld:$GITHUB_RUN_ID
+  IMAGE_NAME: ghcr.io/wistefan/orion-ld:${{ github.run_id }}
 
 jobs:
   unit:
