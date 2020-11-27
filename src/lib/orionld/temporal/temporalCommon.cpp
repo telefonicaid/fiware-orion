@@ -78,10 +78,9 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
     allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
-    //allTab->entityTableArray[entityIndex].createdAt = createdAt->value.s;
-    //allTab->entityTableArray[entityIndex].modifiedAt = modifiedAt->value.s;
-    allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-    allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    kjChildRemove (entityP, idP);
+    if (typeP != NULL)
+      kjChildRemove(entityP, typeP);
   }
   else
   {
@@ -91,15 +90,14 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   }
 
+  allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+  allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+
   int attributesCount = 0;
   int subAttrCount = 0;
 
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "type") == 0))
-    {
-      continue;
-    }
     attributesCount++;
 
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
@@ -152,6 +150,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
     dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
     bzero(dbAllTablesLocal, dbAllTablesSize);
 
+    dbAllTablesLocal->entityTableArrayItems = 0;
 
     //dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
     //dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
@@ -177,8 +176,8 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
         entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
+        dbAllTablesLocal->entityTableArrayItems++
       }
-      dbAllTablesLocal->entityTableArrayItems = entityIndex;
     }
     else
     {
@@ -247,17 +246,71 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 }
 
 
-void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndex)
+void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
+  OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndexP)
 {
-   //int oldTemporalTreeNodeLevel = 0;
-   //for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-   //{
+    int subAttrIx = *subAttrIndexP;
+
     dbAttributeTableLocal->attributeName = attrP->name;
+
     if (attrP->type != KjObject)
     {
-        LM_W(("Teamporal - Bad Input - Key values not supported"));
+        LM_W(("Temporal - Bad Input - Key values not supported"));
         return;
     }
+
+    KjNode* observedAtP = kjLookup(attrP, "observedAt");
+    if (observedAtP != NULL)
+    {
+        //if (observedAtP->type == KjString)
+        //    dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
+        //else
+        dbAttributeTableLocal->observedAt = 49;
+        kjChildRemove (attrP,nodeP);
+        LM_TMP(("CCSR - Temporal - Found observedAt %s",observedAtP->value.s));
+    }
+
+    KjNode* nodeP  = kjLookup(attrP, "unitCode");
+    if(nodeP != NULL)
+    {
+        kjChildRemove (attrP,nodeP);
+        // Chandra-TBI
+    }
+
+    nodeP  = kjLookup(attrP, "location");
+    if(nodeP != NULL)
+    {
+        kjChildRemove (attrP,nodeP);
+        // Chandra-TBI
+    }
+
+    nodeP  = kjLookup(attrP, "operationSpace");
+    if(nodeP != NULL)
+    {
+        kjChildRemove (attrP,nodeP);
+        // Chandra-TBI
+    }
+
+    nodeP  = kjLookup(attrP, "observationSpace");
+    if(nodeP != NULL)
+    {
+        kjChildRemove (attrP,nodeP);
+        // Chandra-TBI
+    }
+
+    nodeP  = kjLookup(attrP, "datasetId");
+    if(nodeP != NULL)
+    {
+        kjChildRemove (attrP,nodeP);
+        // Chandra-TBI
+    }
+
+    //nodeP  = kjLookup(attrP, "instanceid");
+    //if(nodeP != NULL)
+    //{
+    //    kjChildRemove (attrP,nodeP);
+    //    // Chandra-TBI
+    //}
 
     KjNode* attrTypeP  = kjLookup(attrP, "type");
     kjChildRemove (attrP,attrTypeP);
@@ -328,85 +381,28 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     uuidGenerate(dbAttributeTableLocal->instanceId);
 
     // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
-    KjNode* nodeP  = kjLookup(attrP, "unitCode");
-    if(nodeP != NULL)
-    {
-        kjChildRemove (attrP,nodeP);
-        // Chandra-TBI
-    }
-
-    nodeP  = kjLookup(attrP, "observationSpace");
-    if(nodeP != NULL)
-    {
-        kjChildRemove (attrP,nodeP);
-        // Chandra-TBI
-    }
-
-    nodeP  = kjLookup(attrP, "datasetId");
-    if(nodeP != NULL)
-    {
-        kjChildRemove (attrP,nodeP);
-        // Chandra-TBI
-    }
-
-    //nodeP  = kjLookup(attrP, "instanceid");
-    //if(nodeP != NULL)
-    //{
-    //    kjChildRemove (attrP,nodeP);
-    //    // Chandra-TBI
-    //}
-
-    nodeP  = kjLookup(attrP, "location");
-    if(nodeP != NULL)
-    {
-        kjChildRemove (attrP,nodeP);
-        // Chandra-TBI
-    }
-
-    nodeP  = kjLookup(attrP, "operationSpace");
-    if(nodeP != NULL)
-    {
-        kjChildRemove (attrP,nodeP);
-        // Chandra-TBI
-    }
-
 
 
     if (attrP->value.firstChildP != NULL)
     {
         dbAttributeTableLocal->subProperty = true;
         int subAttrs = 0;
-        for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
-        {
-                subAttrs++;
-        }
-
-        //int subAttribArrayTotalSize = subAttrs * sizeof(OrionldTemporalDbSubAttributeTable);
-        //dbSubAttributeTableLocal[attrIndex] = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
-        //bzero(dbSubAttributeTableLocal, subAttribArrayTotalSize);
 
         //int subAttrIx=0;
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
-            dbSubAttributeTableLocal[*subAttrIndex].attributeName = dbAttributeTableLocal->attributeName;
-            dbSubAttributeTableLocal[*subAttrIndex].attrInstanceId = dbAttributeTableLocal->instanceId;
-            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[*subAttrIndex]);
-            //subAttrIx++;
-            subAttrIndex++;
+            dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
+            dbSubAttributeTableLocal[subAttrIx].attrInstanceId = dbAttributeTableLocal->instanceId;
+            attrSubAttrExtract (subAttrP, &dbSubAttributeTableLocal[subAttrIx]);
+            subAttrIx++;
         }
+        *subAttrIndexP = subAttrIx;
     }
 
     dbAttributeTableLocal->createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
     dbAttributeTableLocal->modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
 
-    KjNode* observedAtP = kjLookup(attrP, "observedAt");
-    if (observedAtP != NULL)
-    {
-        if (observedAtP->type == KjString)
-            dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
-        else
-            dbAttributeTableLocal->observedAt = observedAtP->value.f;
-    }
+
 
      //oldTemporalTreeNodeLevel++;
      //}
@@ -559,9 +555,9 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
        KjNode* observedAtP = kjLookup(subAttrP, "observedAt");
        if (observedAtP != NULL)
        {
-          if (observedAtP->type == KjString)
-             dbSubAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
-          else
+          //if (observedAtP->type == KjString)
+          //   dbSubAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
+          //else
              dbSubAttributeTableLocal->observedAt = observedAtP->value.f;
        }
     // }
@@ -991,7 +987,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
                   modifiedAt, sizeof(modifiedAt));
 
-            snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
+            snprintf(dbSubAttribStrBuffer, dbSubAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
                     " attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
                     "value_relation,value_object, value_datetime, geo_property, observed_at, created_at, modified_at)"
                     "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
@@ -1003,6 +999,11 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
                     uuidBuffer, allValuesSubAttr, createdAt, modifiedAt);
         }
+
+        if(temporalExecSqlStatement (dbAttribStrBuffer))
+          return true;
+        else
+          return false;
     }
 
     if(temporalExecSqlStatement (dbEntityStrBuffer))
