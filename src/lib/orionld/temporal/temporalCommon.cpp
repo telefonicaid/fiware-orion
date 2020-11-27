@@ -1021,26 +1021,29 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
 {
     LM_TMP(("Temporal allValuesRenderAttr - attrLocalP->attributeValueType %i",attrLocalP->attributeValueType));
 
+    char attributeValue[512];
+
     switch (attrLocalP->attributeValueType)
     {
       case EnumValueString:
-        snprintf(allValues, allValuesSize, "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        LM_TMP (("Printing all Values in attribute extract %s", allValues));
         break;
 
         case EnumValueNumber:
-          snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
           break;
 
         case EnumValueBool:
-          snprintf(allValues, allValuesSize, "NULL, NULL, '%s', NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, '%s', NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
           break;
 
         case EnumValueArray:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
           break;
 
         case EnumValueObject:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueObject);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueObject);
           break;
 
         default:
@@ -1105,7 +1108,10 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     //uuidGenerate(uuidBuffer);
 
     snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
-        unitCodeValue, dataSetIdValue, allValues, geoPropertyValue, observedAtValue);
+        unitCodeValue, dataSetIdValue, attributeValue, geoPropertyValue, observedAtValue);
+        
+    LM_TMP (("Printing all Values in the end in attribute extract %s", allValues));
+
 }
 
 
