@@ -7,7 +7,7 @@ on:
       - develop
 
 jobs:
-  compliance:
+  unit:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
