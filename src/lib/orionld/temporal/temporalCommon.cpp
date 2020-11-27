@@ -879,6 +879,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         LM_TMP(("CCSR:"));
     }
 
+    temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR 
+
     for (int dbAttribLoop=0; dbAttribLoop < dbAttribTable; dbAttribLoop++)
     {
         int dbAttribBufferSize = 10 * 1024;
