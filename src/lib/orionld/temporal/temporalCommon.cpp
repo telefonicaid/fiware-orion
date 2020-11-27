@@ -386,7 +386,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     if (attrP->value.firstChildP != NULL)
     {
         dbAttributeTableLocal->subProperty = true;
-        
+
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
         {
             dbSubAttributeTableLocal[subAttrIx].attributeName = dbAttributeTableLocal->attributeName;
@@ -953,13 +953,17 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
               modifiedAt, sizeof(modifiedAt));
 
-        snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,type,value_type,"
-            "sub_property,instance_id, unit_code, data_set_id, value_string, value_boolean, value_number, value_relation,"
-            "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+          //"type,", Fix me - put type back Chandra TBC
+        snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,"
+            "value_type,"
+            "sub_property,instance_id, unit_code, data_set_id, value_string,"
+            "value_boolean, value_number, value_relation,"
+            "value_object, value_datetime, geo_property, observed_at, "
+            "created_at, modified_at) "
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
+                //dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
                 dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType),  //Chandra-TBD
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 uuidBuffer, allValues, createdAt, modifiedAt);
