@@ -26,6 +26,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
@@ -51,6 +53,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
@@ -76,6 +80,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
@@ -101,6 +107,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
