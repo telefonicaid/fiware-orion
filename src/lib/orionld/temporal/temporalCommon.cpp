@@ -616,7 +616,7 @@ bool TemporalPgDBConnectorOpen(char *tenantName)
         char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";
         strcat (oldPgDbSqlCreateTDbSQL, tenantName);
         strcat (oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
-        char oldPgTDbConnSQL[] = "user=postgres password=orion dbname= ";
+        char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";
         strcat (oldPgTDbConnSQL, tenantName);
 
         LM_K(("Command to create database for Tenant %s\n", tenantName));
