@@ -6,6 +6,9 @@ on:
     branches:
       - develop
 
+env:
+  IMAGE_NAME: ghcr.io/wistefan/orion-ld:${{ GITHUB_RUN_ID }}
+
 jobs:
   unit:
     runs-on: ubuntu-latest
@@ -19,14 +22,21 @@ jobs:
         with:
           driver-opts: network=host
 
+      - name: Login to ghcr
+          uses: docker/login-action@v1
+          with:
+            registry: ghcr.io
+            username: ${{ github.repository_owner }}
+            password: ${{ secrets.ghcr_TOKEN }}
+
       - name: Build and push to local registry
         uses: docker/build-push-action@v2
         with:
           push: true
           file: docker/Dockerfile-debian
           build-args: STAGE=deps
-          tags: localhost:5000/wistefan/orion-ld:test
+          tags: ${{ IMAGE_NAME }}
 
       - name: Run unit test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts localhost:5000/wistefan/orion-ld:test build.sh -s unit -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ IMAGE_NAME }} build.sh -s unit -dqt
