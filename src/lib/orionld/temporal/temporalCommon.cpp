@@ -163,7 +163,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
          entityCount++;
       }
 
-      dbAllTablesLocal->entityTableArray.entityTableArrayItems = entityCount;
+      dbAllTablesLocal->entityTableArrayItems = entityCount;
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
@@ -256,7 +256,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     kjChildRemove (attrP,attrTypeP);
     dbAttributeTableLocal->attributeType = attrTypeP->value.s;
 
-     if (strcmp (dbAttributeTableLocal->attributeType,"Relationship") == 0)
+    if (strcmp (dbAttributeTableLocal->attributeType,"Relationship") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
     {
         KjNode* attributeObject  = kjLookup(attrP, "object");
@@ -422,7 +422,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
      kjChildRemove (subAttrP,attrTypeP);
      dbSubAttributeTableLocal->subAttributeType = attrTypeP->value.s;
 
-      if (strcmp (dbSubAttributeTableLocal->subAttributeType,"Relationship") == 0)
+     if (strcmp (dbSubAttributeTableLocal->subAttributeType,"Relationship") == 0)
      // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
      {
          KjNode* attributeObject  = kjLookup(subAttrP, "object");
@@ -955,7 +955,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,type,value_type,"
             "sub_property,instance_id, unit_code, data_set_id, value_string, value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, created_at, modified_at) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
@@ -987,7 +987,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
                     " attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
                     "value_relation,value_object, value_datetime, geo_property, observed_at, created_at, modified_at)"
-                    "VALUES (%s, %s, %s, %s, %s, %s, %f, %f)",
+                    "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].entityId,
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].attributeName,
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeName,
