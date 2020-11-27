@@ -24,8 +24,7 @@ jobs:
         with:
           push: true
           file: docker/Dockerfile-debian
-          build-args:
-            - STAGE=deps
+          build-args: STAGE=deps
           tags: localhost:5000/wistefan/orion-ld:test
 
       - name: Run unit test
