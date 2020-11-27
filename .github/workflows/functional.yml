@@ -13,7 +13,6 @@ jobs:
   functional-part1:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-
     services:
       registry:
         image: registry:2
@@ -46,7 +45,11 @@ jobs:
   functional-part2:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v2
 
@@ -73,7 +76,12 @@ jobs:
   functional-part3:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+          -
     steps:
       - uses: actions/checkout@v2
 
@@ -100,7 +108,12 @@ jobs:
   functional-part4:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+          -
     steps:
       - uses: actions/checkout@v2
 
