@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/common/QNode.h"                                // QNode
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
+#include "orionld/context/orionldContextItemExpand.h"            //  orionldContextItemExpand
 
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
 
@@ -834,6 +835,22 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 }
 
 
+// -----------------------------------------------------------------------------
+//
+// numberToDate -
+//
+static bool numberToDate(double timestamp, char* date, int dateLen)
+{
+  struct tm  tm;
+  time_t fromEpoch = timestamp;
+  int milliSec = (timestamp - fromEpoch) * 1000;
+
+  gmtime_r(&fromEpoch, &tm);
+  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
+
+  return true;
+}
+
 // ----------------------------------------------------------------------------
 //
 // PGconn* TemporalConstructUpdateSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal) - function to buil update SQL statement
@@ -856,13 +873,24 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
     for (int dbEntityLoop=0; dbEntityLoop < dbEntityTable; dbEntityLoop++)
     {
+        char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
+          dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType, NULL, true, NULL);
+        char createdAt[64];
+        char modifiedAt[64];
+
+        numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
+              createdAt, sizeof(createdAt));
+
+        numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
+              modifiedAt, sizeof(modifiedAt));
+
         if(entityUpdateFlag)
         {
-          snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table(entity_id,entity_type,geo_property,"
+          snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table "
                 "SET created_at = '%s', modified_at = '%s' WHERE entity_id = '%s'",
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
-                "2017-02-10T05:41:00.123Z" , "2017-02-10T05:41:00.123Z",
+                createdAt, modifiedAt,
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
         }
         else
@@ -870,10 +898,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
           snprintf(dbEntityStrBuffer, dbEntityBufferSize, "INSERT INTO entity_table(entity_id,entity_type,geo_property,"
                 "created_at,modified_at, observed_at) VALUES ('%s', '%s', NULL, '%s', '%s', NULL)",
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId,
-                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType,
+                expandedEntityType,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt
-                "2017-02-10T05:41:00.123Z" , "2017-02-10T05:41:00.123Z");
+                createdAt, modifiedAt);
         }
         //
         // Some traces just to see how the KjNode tree works
