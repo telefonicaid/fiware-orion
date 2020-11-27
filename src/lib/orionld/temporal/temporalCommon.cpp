@@ -163,8 +163,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
          entityCount++;
       }
 
-      //dbAllTablesLocal->entityTableArrayItems = entityCount;
-      dbAllTablesLocal.entityTableArrayItems = entityCount;
+
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
@@ -176,6 +175,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       {
         entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
       }
+      dbAllTablesLocal->entityTableArrayItems = entityIndex;
     }
     else
     {
@@ -185,7 +185,10 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
       entityExtract (dbAllTablesLocal, orionldState.requestTree, false, 0);
+      dbAllTablesLocal->entityTableArrayItems++;
     }
+
+    LM_K(("Number of Entities %i", dbAllTablesLocal->entityTableArrayItems));
 
 #if 0
 }
