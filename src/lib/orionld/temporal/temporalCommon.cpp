@@ -969,7 +969,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
+                expandedAttrType,
                 dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType),  //Chandra-TBD
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 uuidBuffer, allValues, createdAt, modifiedAt);
