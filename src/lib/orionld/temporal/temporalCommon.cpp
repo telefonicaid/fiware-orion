@@ -142,6 +142,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
     {
+      LM_TMP(("CCSR: Found SubAttribute\n"));
       subAttrCount++;
     }
   }
