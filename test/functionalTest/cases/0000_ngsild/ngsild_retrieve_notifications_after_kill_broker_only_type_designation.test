@@ -33,7 +33,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT} -v
 
 #
 # 01. Create an Entity E01 with attr P1 and P2
-# 02. Create a subscription with accumulator receiving notifications for ALL attributes of E01
+# 02. Create a subscription with accumulator receiving notifications for ALL attributes of type T
 # 03. See notification in DB
 # 04. Add P3 to E01
 # 05. Dump accumulator to see one notification - NGSI-LD has no initial notifications
