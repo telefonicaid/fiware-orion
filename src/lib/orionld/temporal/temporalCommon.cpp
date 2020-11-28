@@ -96,6 +96,7 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
     default:
       LM_W(("Error - Invalid attribute Value type %d", attrLocalP->attributeValueType));
       return;
+    }
 }
 
 
