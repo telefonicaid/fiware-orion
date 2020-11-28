@@ -930,9 +930,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         LM_TMP(("CCSR:"));
     }
 
-    if(temporalExecSqlStatement (dbEntityStrBuffer))
-      return true;
-    else
+    if(!temporalExecSqlStatement (dbEntityStrBuffer))
       return false;
 
     //  temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR
@@ -1022,7 +1020,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
                     uuidBuffer, allValuesSubAttr, subAttrCreatedAt, subAttrModifiedAt, subAttrObeservedAt);
         }
-        
+
         if(temporalExecSqlStatement (dbAttribStrBuffer))
           return true;
         else
