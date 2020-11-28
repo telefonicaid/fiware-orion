@@ -956,6 +956,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
               modifiedAt, sizeof(modifiedAt));
 
+        char* expandedAttrType = orionldContextItemExpand(orionldState.contextP,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType, NULL, true, NULL);
+
           //"type,", Fix me - put type back Chandra TBC
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,"
             "value_type,"
@@ -966,7 +969,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 "VALUES ('%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
-                //dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
+                dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
                 dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType),  //Chandra-TBD
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 uuidBuffer, allValues, createdAt, modifiedAt);
@@ -1027,7 +1030,7 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     {
       case EnumValueString:
         snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
-        LM_TMP (("Printing all Values in attribute extract %s", allValues));
+        LM_TMP (("Printing all Values in attribute extract %s", attributeValue));
         break;
 
         case EnumValueNumber:
