@@ -1021,11 +1021,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     uuidBuffer, allValuesSubAttr, subAttrCreatedAt, subAttrModifiedAt, subAttrObeservedAt);
         }
 
-        if(temporalExecSqlStatement (dbAttribStrBuffer))
-          return true;
-        else
+        if(!temporalExecSqlStatement (dbAttribStrBuffer))
           return false;
     }
+    return true;
 }
 
 void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)
