@@ -364,7 +364,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         kjChildRemove (attrP,attributeObject);
 
         // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-        dbAttributeTableLocal->attributeValueType  = EnumValueString;
+        dbAttributeTableLocal->attributeValueType  = EnumValueRelation;
         dbAttributeTableLocal->valueString = attributeObject->value.s;
         LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal->valueString));
 
@@ -474,7 +474,7 @@ void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* d
          kjChildRemove (subAttrP,attributeObject);
 
          // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
-         dbSubAttributeTableLocal->subAttributeValueType  = EnumValueObject;
+         dbSubAttributeTableLocal->subAttributeValueType  = EnumValueRelation;
          dbSubAttributeTableLocal->subAttributeValueString = attributeObject->value.s;
          LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal->subAttributeValueString));
 
@@ -1077,7 +1077,7 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     switch (attrLocalP->attributeValueType)
     {
       case EnumValueString:
-        snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL, NULL",attrLocalP->valueString);
         LM_TMP (("Printing all Values in attribute extract %s", attributeValue));
         break;
 
