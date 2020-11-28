@@ -1077,32 +1077,32 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
     switch (attrLocalP->attributeValueType)
     {
       case EnumValueString:
-        snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL, NULL",attrLocalP->valueString);
+        snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
         LM_TMP (("Printing all Values in attribute extract %s", attributeValue));
         break;
 
         case EnumValueNumber:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, %lld, NULL, NULL, NULL, NULL",attrLocalP->valueNumber);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
           break;
 
         case EnumValueBool:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, '%s', NULL, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, '%s', NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
           break;
 
         case EnumValueRelation:  // same object
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL, NULL",attrLocalP->valueObject);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueObject);
           break;
 
         case EnumValueArray:  // same object
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
           break;
 
         case EnumValueObject:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s', NULL",attrLocalP->valueObject);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueObject);
           break;
 
         case EnumValueDateTime:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueObject);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueDatetime);
           break;
 
         default:
@@ -1177,26 +1177,35 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
 
 void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize)
 {
+  char subAttributeValue[512];
     switch (attrLocalP->subAttributeValueType)
     {
       case EnumValueString:
-        snprintf(allValues, allValuesSize, "%s, NULL, NULL, NULL, NULL",attrLocalP->subAttributeValueString);
+        snprintf(subAttributeValue, sizeof(subAttributeValue), "'%s', NULL, NULL, NULL, NULL",attrLocalP->subAttributeValueString);
         break;
 
         case EnumValueNumber:
-          snprintf(allValues, allValuesSize, "NULL, %lld, NULL, NULL, NULL",attrLocalP->subAttributeValueNumber);
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, %lld, NULL, NULL, NULL",attrLocalP->subAttributeValueNumber);
           break;
 
         case EnumValueBool:
-          snprintf(allValues, allValuesSize, "NULL, NULL, %s, NULL, NULL",(attrLocalP->subAttributeValueBoolean==true)? "true" : "false");
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, '%s', NULL, NULL",(attrLocalP->subAttributeValueBoolean==true)? "true" : "false");
+          break;
+
+        case EnumValueRelation:  // same object
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueObject);
           break;
 
         case EnumValueArray:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, %s, NULL",attrLocalP->subAttributeValueArray);
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueArray);
           break;
 
         case EnumValueObject:
-          snprintf(allValues, allValuesSize, "NULL, NULL, NULL, NULL, %s",attrLocalP->subAttributeValueObject);
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueObject);
+          break;
+
+        case EnumValueDateTime:
+          snprintf(subAttributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",attrLocalP->subAttributeValueDatetime);
           break;
 
         default:
