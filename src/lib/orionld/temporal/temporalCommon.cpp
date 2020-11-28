@@ -972,7 +972,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             "value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, "
             "created_at, modified_at, observed_at) "
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, %s, '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 expandedAttrType,
