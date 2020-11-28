@@ -56,8 +56,9 @@ extern "C"
 enum OrionldTemporalAttributeValueTypeEnum
 {
   EnumValueString = 0,
-  EnumValueNumber,
   EnumValueBool,
+  EnumValueNumber,
+  EnumValueRelation,
   EnumValueObject,
   EnumValueArray,
   EnumValueDateTime
