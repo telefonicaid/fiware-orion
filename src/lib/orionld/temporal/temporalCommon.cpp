@@ -830,7 +830,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, oldTemporalSQLBuffer);
 	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   	{
-        	LM_E(("%s command failed for inserting single Entity into DB %s",oldTemporalSQLBuffer, oldTenantName));
+        	LM_E(("%s command failed for inserting single Attribute into DB %s",oldTemporalSQLBuffer, oldTenantName));
           LM_E(("Reason %s",PQerrorMessage(oldPgDbTenantConnection)));
         	PQclear(oldPgTenandDbResult);
         	TemporalPgDBConnectorClose();
@@ -842,7 +842,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "COMMIT");
   	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   	{
-        	LM_E(("COMMIT command failed for inserting single Entity into DB %s\n",oldTenantName));
+        	LM_E(("COMMIT command failed for inserting single Sub Attribute into DB %s\n",oldTenantName));
         	PQclear(oldPgTenandDbResult);
         	TemporalPgDBConnectorClose();
         	return false;
@@ -929,6 +929,11 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         LM_TMP(("CCSR: dbEntityStrBuffer:     '%s'", dbEntityStrBuffer));
         LM_TMP(("CCSR:"));
     }
+
+    if(temporalExecSqlStatement (dbEntityStrBuffer))
+      return true;
+    else
+      return false;
 
     //  temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR
 
@@ -1017,14 +1022,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
                     uuidBuffer, allValuesSubAttr, subAttrCreatedAt, subAttrModifiedAt, subAttrObeservedAt);
         }
-
-        if(temporalExecSqlStatement (dbAttribStrBuffer))
-          return true;
-        else
-          return false;
     }
 
-    if(temporalExecSqlStatement (dbEntityStrBuffer))
+    if(temporalExecSqlStatement (dbAttribStrBuffer))
       return true;
     else
       return false;
