@@ -322,6 +322,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     if(nodeP != NULL)
     {
         kjChildRemove (attrP,nodeP);
+        LM_TMP(("CCSR - Found Loation "));
         // Chandra-TBI
     }
 
