@@ -1102,7 +1102,9 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
           break;
 
         case EnumValueDateTime:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",attrLocalP->valueDatetime);
+          char atrrValueDataTime[64];
+          numberToDate (attrLocalP->valueDatetime, atrrValueDataTime, sizeof(atrrValueDataTime));
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",atrrValueDataTime);
           break;
 
         default:
@@ -1205,7 +1207,9 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
           break;
 
         case EnumValueDateTime:
-          snprintf(subAttributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",attrLocalP->subAttributeValueDatetime);
+          char subAtrrValueDataTime[64];
+          numberToDate (attrLocalP->subAttributeValueDatetime, subAtrrValueDataTime, sizeof(subAtrrValueDataTime));
+          snprintf(subAtrrValueDataTime, sizeof(subAtrrValueDataTime), "NULL, NULL, NULL, NULL, '%s'",subAtrrValueDataTime);
           break;
 
         default:
