@@ -894,14 +894,15 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     {
         char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
           dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType, NULL, true, NULL);
-        char createdAt[64];
-        char modifiedAt[64];
+
+        char entCreatedAt[64];
+        char entModifiedAt[64];
 
         numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
-              createdAt, sizeof(createdAt));
+              entCreatedAt, sizeof(entCreatedAt));
 
         numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
-              modifiedAt, sizeof(modifiedAt));
+              entModifiedAt, sizeof(entModifiedAt));
 
         if(entityUpdateFlag)
         {
@@ -909,7 +910,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 "SET created_at = '%s', modified_at = '%s' WHERE entity_id = '%s'",
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
-                createdAt, modifiedAt,
+                entCreatedAt, entModifiedAt,
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
         }
         else
@@ -947,14 +948,19 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         char* uuidBuffer = kaAlloc(&orionldState.kalloc, 64);
         uuidGenerate(uuidBuffer);
 
-        char createdAt[64];
-        char modifiedAt[64];
+        char attrCreatedAt[64];
+        char attrModifiedAt[64];
+        char attrObservedAt[64];
 
         numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
-              createdAt, sizeof(createdAt));
+              attrCreatedAt, sizeof(attrCreatedAt));
 
         numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
-              modifiedAt, sizeof(modifiedAt));
+              attrModifiedAt, sizeof(attrModifiedAt));
+
+        numberToDate (dbAllTablesLocal->attributeTableArray[dbEntityLoop].observedAt,
+              attrObservedAt, sizeof(attrObservedAt));
+
 
         char* expandedAttrType = orionldContextItemExpand(orionldState.contextP,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType, NULL, true, NULL);
@@ -972,8 +978,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 expandedAttrType,
                 dbValueEnumString(dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeValueType),  //Chandra-TBD
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
-                uuidBuffer, allValues, createdAt, modifiedAt,
-                dbAllTablesLocal->attributeTableArray[dbAttribLoop].observedAt);
+                uuidBuffer, allValues, attrCreatedAt, attrModifiedAt, attrObservedAt);
 
         for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
         {
@@ -987,14 +992,18 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
             allValuesRenderSubAttr (&dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop], allValuesSubAttr, allValuesSizeSubAttr);
 
-            char createdAt[64];
-            char modifiedAt[64];
+            char subAttrCreatedAt[64];
+            char subAttrModifiedAt[64];
+            char subAttrObeservedAt[64];
 
             numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
-                  createdAt, sizeof(createdAt));
+                  subAttrCreatedAt, sizeof(subAttrCreatedAt));
 
             numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
-                  modifiedAt, sizeof(modifiedAt));
+                  subAttrModifiedAt, sizeof(subAttrModifiedAt));
+
+            numberToDate (dbAllTablesLocal->subAttributeTableArray[dbAttribLoop].observedAt,
+                  subAttrObeservedAt, sizeof(subAttrObeservedAt));
 
             snprintf(dbSubAttribStrBuffer, dbSubAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
                     " attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
@@ -1006,8 +1015,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeType,
                     dbValueEnumString(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subAttributeValueType),  //Chandra-TBD
                     //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
-                    uuidBuffer, allValuesSubAttr, createdAt, modifiedAt,
-                    dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].observedAt);
+                    uuidBuffer, allValuesSubAttr, subAttrCreatedAt, subAttrModifiedAt, subAttrObeservedAt);
         }
 
         if(temporalExecSqlStatement (dbAttribStrBuffer))
