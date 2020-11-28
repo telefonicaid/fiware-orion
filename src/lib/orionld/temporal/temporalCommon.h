@@ -116,6 +116,7 @@ typedef struct OrionldTemporalDbAttributeTable
   double                                    modifiedAt;
   double                                    observedAt;
   char*                                     instanceId;
+  char*                                     geoPropertyType;
   double                                    geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbAttributeTable;
 

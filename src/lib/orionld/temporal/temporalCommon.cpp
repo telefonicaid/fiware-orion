@@ -322,7 +322,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     if(nodeP != NULL)
     {
         kjChildRemove (attrP,nodeP);
-        LM_TMP(("CCSR - Found Loation "));
+        LM_TMP(("CCSR - Found Location "));
         // Chandra-TBI
     }
 
@@ -375,8 +375,11 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     {
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
         kjChildRemove (attrP,valueP);
-        LM_TMP(("CCSR:  Found GeoProperty : "));
+
+        dbAttributeTableLocal->geoPropertyType = valueP->type.s;
         // Chandra-TBI
+        LM_TMP(("CCSR:  Found GeoProperty : "));
+
     }
     else if (strcmp (dbAttributeTableLocal->attributeType,"Property") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
