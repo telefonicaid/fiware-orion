@@ -71,31 +71,37 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 
     case EnumValueNumber:
       LM_TMP (("It is value_number"));
+      return "value_number";
       break;
 
     case EnumValueBool:
       LM_TMP (("It is value_boolean"));
+      return "value_boolean";
       break;
 
     case EnumValueArray:
       LM_TMP (("It is value_array"));
+      return "value_array";
       break;
 
     case EnumValueRelation:
       LM_TMP (("It is value_relation"));
+      return "value_relation";
       break;
 
     case EnumValueObject:
       LM_TMP (("It is value_object"));
+      return "value_object";
       break;
 
     case EnumValueDateTime:
       LM_TMP (("It is value_datetime"));
+      return "value_datetime";
       break;
 
     default:
       LM_W(("Error - Invalid attribute Value type %d", enumValueType));
-      return;
+      return NULL;
     }
 }
 
