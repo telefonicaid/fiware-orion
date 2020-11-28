@@ -67,7 +67,7 @@ payload='{
   "id": "http://a.b.c/subs/sub01",
   "type": "Subscription",
   "name": "Sub 01",
-  "description": "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+  "description": "receiving notifications for ALL attributes of type T",
   "entities": [
     {
       "type": "T"
@@ -179,7 +179,7 @@ MongoDB server version: REGEX(.*)
 	"mimeType" : "application/json",
 	"throttling" : 0,
 	"servicePath" : "/",
-	"description" : "receiving notifications for ALL attributes of urn:ngsi-ld:E01",
+	"description" : "receiving notifications for ALL attributes of type T",
 	"status" : "active",
 	"entities" : [
 		{
