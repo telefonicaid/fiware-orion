@@ -65,7 +65,7 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
   switch (attrLocalP->attributeValueType)
   {
     case EnumValueString:
-      LM_TMP (("It is value_string));
+      LM_TMP (("It is value_string"));
       return "value_string";
       break;
 
