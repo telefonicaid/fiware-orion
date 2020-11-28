@@ -961,12 +961,12 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
           //"type,", Fix me - put type back Chandra TBC
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,"
-            "value_type,"
+            "name, value_type,"
             "sub_property,instance_id, unit_code, data_set_id, value_string,"
             "value_boolean, value_number, value_relation,"
             "value_object, value_datetime, geo_property, observed_at, "
             "created_at, modified_at) "
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
+                "VALUES ('%s', '%s', '%s','%s', '%s', '%s', '%s', %s, '%s', '%s')",
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
                 expandedAttrType,
