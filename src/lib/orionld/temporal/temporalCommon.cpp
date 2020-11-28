@@ -376,7 +376,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
         kjChildRemove (attrP,valueP);
 
-        dbAttributeTableLocal->geoPropertyType = valueP->type.s;
+      //dbAttributeTableLocal->geoPropertyType = valueP->type.s;
         // Chandra-TBI
         LM_TMP(("CCSR:  Found GeoProperty : "));
 
