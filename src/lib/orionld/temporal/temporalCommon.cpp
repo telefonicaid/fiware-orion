@@ -1022,12 +1022,12 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
                     uuidBuffer, allValuesSubAttr, subAttrCreatedAt, subAttrModifiedAt, subAttrObeservedAt);
         }
+        
+        if(temporalExecSqlStatement (dbAttribStrBuffer))
+          return true;
+        else
+          return false;
     }
-
-    if(temporalExecSqlStatement (dbAttribStrBuffer))
-      return true;
-    else
-      return false;
 }
 
 void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)
