@@ -921,7 +921,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 expandedEntityType,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt
-                createdAt, modifiedAt);
+                entCreatedAt, entModifiedAt);
         }
         //
         // Some traces just to see how the KjNode tree works
@@ -958,7 +958,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
               attrModifiedAt, sizeof(attrModifiedAt));
 
-        numberToDate (dbAllTablesLocal->attributeTableArray[dbEntityLoop].observedAt,
+        numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].observedAt,
               attrObservedAt, sizeof(attrObservedAt));
 
 
@@ -996,13 +996,13 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
             char subAttrModifiedAt[64];
             char subAttrObeservedAt[64];
 
-            numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].createdAt,
+            numberToDate (dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].createdAt,
                   subAttrCreatedAt, sizeof(subAttrCreatedAt));
 
-            numberToDate (dbAllTablesLocal->attributeTableArray[dbAttribLoop].modifiedAt,
+            numberToDate (dbAllTablesLocal->attributeTableArray[dbSubAttribLoop].modifiedAt,
                   subAttrModifiedAt, sizeof(subAttrModifiedAt));
 
-            numberToDate (dbAllTablesLocal->subAttributeTableArray[dbAttribLoop].observedAt,
+            numberToDate (dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].observedAt,
                   subAttrObeservedAt, sizeof(subAttrObeservedAt));
 
             snprintf(dbSubAttribStrBuffer, dbSubAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
