@@ -62,7 +62,7 @@ PGresult* oldPgTenandDbResult = NULL;
 
 static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumValueType)
 {
-  switch (attrLocalP->attributeValueType)
+  switch (enumValueType)
   {
     case EnumValueString:
       LM_TMP (("It is value_string"));
