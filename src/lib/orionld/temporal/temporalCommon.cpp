@@ -111,7 +111,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 {
   if(arrayFlag)
   {
-    int attrIndex = *subAttrIndexP;
+    int attrIndex = *attrIndexP;
     int subAttrIndex = *subAttrIndexP;
 
     LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
