@@ -147,7 +147,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     }
   }
 
-  LM_K(("Number of Attributes & number of SubAttributes %i %i", attributesCount, subAttrCount));
+  LM_K(("CCSR: Number of Attributes & number of SubAttributes %i %i", attributesCount, subAttrCount));
 
   allTab->attributeTableArrayItems = attributesCount;
   allTab->subAttributeTableArrayItems = subAttrCount;
@@ -155,8 +155,8 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
   allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
   bzero(allTab->attributeTableArray, attribArrayTotalSize);
-  LM_TMP(("TMPF: AttrArrayTotalSize:%d", attribArrayTotalSize));
-  LM_TMP(("TMPF: attributesCount:%d", attributesCount));
+  LM_TMP(("CCSR: AttrArrayTotalSize:%d", attribArrayTotalSize));
+  LM_TMP(("CCSR: attributesCount:%d", attributesCount));
 
   int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
   allTab->subAttributeTableArray = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
@@ -166,6 +166,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   int subAttrIndex = 0;
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
+    LM_K(("CCSR: Before callig attrExtract"));
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     attrExtract (attrP, allTab->attributeTableArray, allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
     attrIndex++;
@@ -434,6 +435,8 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
 
     if (attrP->value.firstChildP != NULL)
     {
+      LM_TMP(("CCSR:  Tring to extract subattribute "));
+
         dbAttributeTableLocal->subProperty = true;
 
         for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
@@ -448,9 +451,6 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
 
     dbAttributeTableLocal->createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
     dbAttributeTableLocal->modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-
-
-
      //oldTemporalTreeNodeLevel++;
      //}
 }
