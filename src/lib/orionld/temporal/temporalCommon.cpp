@@ -202,6 +202,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     // {
       LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
       attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+      LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %i", allTab->attributeTableArray[attrIndex].attributeValueType, allTab->attributeTableArray[attrIndex].entityId));
       allTab->attributeTableArrayItems++;
     // }
     attrIndex++;
