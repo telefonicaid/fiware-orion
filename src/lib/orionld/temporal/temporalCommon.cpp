@@ -243,6 +243,10 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
     LM_E(("CCSR: orionldState.requestTree %s",rBuf));
     //Chandra hack  -- End
 
+    int entityIndex=0;
+    int attrIndex = 0;
+    int subAttrIndex = 0;
+
     //dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
     //dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
 
@@ -268,10 +272,6 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-
-      int entityIndex=0;
-      int attrIndex = 0;
-      int subAttrIndex = 0;
 
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
