@@ -280,7 +280,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       dbAllTablesLocal->entityTableArrayItems++;
     }
 
-    LM_K(("Number of Entities %i", dbAllTablesLocal->entityTableArrayItems));
+    LM_K(("Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
 
     return dbAllTablesLocal;
 }
