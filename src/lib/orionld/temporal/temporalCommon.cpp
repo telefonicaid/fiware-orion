@@ -117,7 +117,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     //KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
 
     LM_TMP (("CCSR : entityExtract func and entityIndex %i", entityIndex));
-    LM_TMP (("CCSR : entityExtract func and entitityId %s", idP.value.s));
+    LM_TMP (("CCSR : entityExtract func and entitityId %s", idP->value.s));
 
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
     allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
@@ -220,7 +220,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       int entityIndex=0;
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
-        entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
+        entityExtract (dbAllTablesLocal, &entityP, true, entityIndex++);
         dbAllTablesLocal->entityTableArrayItems++;
       }
     }
