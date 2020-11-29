@@ -968,10 +968,11 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
     for (int dbEntityLoop=0; dbEntityLoop < dbAllTablesLocal->entityTableArrayItems; dbEntityLoop++)
     {
+        LM_TMP(("CCSR: step1.1 TemporalConstructInsertSQLStatement: %s", dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType));
         char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
           dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType, NULL, true, NULL);
 
-          LM_TMP(("CCSR: step2 TemporalConstructInsertSQLStatement: "));
+        LM_TMP(("CCSR: step2 TemporalConstructInsertSQLStatement: "));
 
         char entCreatedAt[64];
         char entModifiedAt[64];
