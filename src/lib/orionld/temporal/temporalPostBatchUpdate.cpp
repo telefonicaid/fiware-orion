@@ -48,10 +48,6 @@ extern "C"
 //
 bool temporalPostBatchUpdate(ConnectionInfo* ciP)
 {
-  char rBuf[4096];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
-  LM_E(("CCSR: orionldState.requestTree at temporalPostBatchUpdate %s",rBuf));
-
   char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
