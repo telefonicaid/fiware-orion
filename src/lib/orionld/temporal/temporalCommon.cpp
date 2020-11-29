@@ -251,8 +251,13 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", dbAllTablesLocal->entityTableArrayItems));
 
 
-      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc,(dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
+      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc,
+        (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)));
+
+      LM_K(("CCSR: at func temporalEntityExtract dbAllTables pointer %i", dbAllTablesLocal));
+      LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->entityTableArrayItems));
+
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
