@@ -985,6 +985,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
     for (int dbAttribLoop=0; dbAttribLoop < dbAttribTable; dbAttribLoop++)
     {
+        LM_TMP(("CCSR: dbAttribLoop:     '%i'", dbAttribLoop));
         int dbAttribBufferSize = 10 * 1024;
         char* dbAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbAttribBufferSize);
         bzero(dbAttribStrBuffer, dbAttribBufferSize);
