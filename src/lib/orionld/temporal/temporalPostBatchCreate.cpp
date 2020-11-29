@@ -79,7 +79,7 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
 	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
 
-  LM_TMP(("CCSR: step1 temporalPostBatchCreate")));
+  LM_TMP(("CCSR: step1 temporalPostBatchCreate"));
 
 
 	if(TemporalConstructInsertSQLStatement(dbAllTables, false) == true)
