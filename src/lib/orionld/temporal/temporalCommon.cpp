@@ -152,6 +152,10 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
     {
+      char rBuf2[4096];
+      kjRender(orionldState.kjsonP, entityP, rBuf2, sizeof(rBuf2));
+      LM_E(("CCSR: orionldState.requestTree in entityExtract func in loop %s",rBuf2));
+
       LM_TMP(("CCSR: Found SubAttribute\n"));
       subAttrCount++;
     }
@@ -177,24 +181,20 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
-
-    LM_TMP(("CCSR: Attribute orionldState.payloadIdNode in entityExtract %s", orionldState.payloadIdNode->value.s));
-
-    KjNode* attrName = kjLookup(attrP, "name");
-    if (attrName != NULL)
+    LM_TMP(("CCSR: Before callig attrExtract"));
+    if(arrayFlag)
     {
-      allTab->attributeTableArray[attrIndex].attributeName = attrP->name;
-      continue;
+      for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
+      {
+        LM_TMP(("CCSR: Before callig attrExtract - Array"));
+        attrExtract (arryAttrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+      }
     }
     else
     {
-      allTab->attributeTableArray[attrIndex].attributeName = orionldState.payloadIdNode->value.s;
-      continue;
+      LM_TMP(("CCSR: Before callig attrExtract - non-Array"));
+      attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
     }
-
-    LM_TMP(("CCSR: atrributename entityExtract :%s", allTab->attributeTableArray[attrIndex].attributeName));
-    LM_K(("CCSR: Before callig attrExtract"));
-    attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
     attrIndex++;
   }
 }
