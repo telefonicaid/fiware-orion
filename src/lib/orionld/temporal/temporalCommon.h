@@ -227,7 +227,8 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
 
 void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
-void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex);
+//void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex);
+void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndexP, int *subAttrIndexP);
 
 
 #endif  // TEMPORAL_COMMON_H_
