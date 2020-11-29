@@ -306,6 +306,8 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
   OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndexP)
 {
+  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
     char rBuf[4096];
     kjRender(orionldState.kjsonP, attrP, rBuf, sizeof(rBuf));
     LM_E(("CCSR: orionldState.requestTree in attrExtract %s",rBuf));
@@ -495,7 +497,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     dbAttributeTableLocal->createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
     dbAttributeTableLocal->modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
      //oldTemporalTreeNodeLevel++;
-     //}
+  }
 }
 
 
