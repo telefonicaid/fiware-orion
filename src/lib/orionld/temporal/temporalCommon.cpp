@@ -116,6 +116,8 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     //KjNode* createdAtP = kjLookup(entityP, "createdAt");
     //KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
 
+    LM_TMP (("CCSR : entityExtract %i", entityIndex));
+
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
     allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
     kjChildRemove (entityP, idP);
