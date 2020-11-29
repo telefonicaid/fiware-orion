@@ -177,10 +177,18 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
+
+    LM_TMP(("CCSR: Attribute orionldState.payloadIdNode in entityExtract %s", orionldState.payloadIdNode->value.s));
+
     KjNode* attrName = kjLookup(attrP, "name");
     if (attrName != NULL)
     {
       allTab->attributeTableArray[attrIndex].attributeName = attrP->name;
+      continue;
+    }
+    else
+    {
+      allTab->attributeTableArray[attrIndex].attributeName = orionldState.payloadIdNode->value.s;
       continue;
     }
 
@@ -246,7 +254,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
         char rBuf1[4096];
         kjRender(orionldState.kjsonP, entityP, rBuf1, sizeof(rBuf1));
         LM_E(("CCSR: orionldState.requestTree in temporalEntityExtract func %s",rBuf1));
-        
+
         LM_K(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
         entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
         dbAllTablesLocal->entityTableArrayItems++;
