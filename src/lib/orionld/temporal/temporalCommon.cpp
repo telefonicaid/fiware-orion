@@ -964,12 +964,14 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
     bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
-    LM_TMP(("CCSR: step1 TemporalConstructInsertSQLStatement:  entity count   '%i'", dbAllTablesLocal->entityTableArrayItems));
+    LM_TMP(("CCSR: step1 TemporalConstructInsertSQLStatement:  entity count   %i", dbAllTablesLocal->entityTableArrayItems));
 
     for (int dbEntityLoop=0; dbEntityLoop < dbAllTablesLocal->entityTableArrayItems; dbEntityLoop++)
     {
         char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
           dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType, NULL, true, NULL);
+
+          LM_TMP(("CCSR: step2 TemporalConstructInsertSQLStatement: "));
 
         char entCreatedAt[64];
         char entModifiedAt[64];
@@ -980,6 +982,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
               entModifiedAt, sizeof(entModifiedAt));
 
+        LM_TMP(("CCSR: step3 TemporalConstructInsertSQLStatement: "));
+
         if(entityUpdateFlag)
         {
           snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table "
@@ -988,6 +992,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
                 entCreatedAt, entModifiedAt,
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
+
+                LM_TMP(("CCSR: step4 TemporalConstructInsertSQLStatement: "));
+
         }
         else
         {
@@ -998,6 +1005,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt
                 entCreatedAt, entModifiedAt);
+
+                LM_TMP(("CCSR: step5 TemporalConstructInsertSQLStatement: "));
         }
         //
         // Some traces just to see how the KjNode tree works
