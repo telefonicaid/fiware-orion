@@ -266,7 +266,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
         LM_K(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
         entityExtract (dbAllTablesLocal, entityP, true, dbAllTablesLocal->entityTableArrayItems);
-        dbAllTablesLocal->entityTableArrayItems++;
+        //dbAllTablesLocal->entityTableArrayItems++;
       }
     }
     else
