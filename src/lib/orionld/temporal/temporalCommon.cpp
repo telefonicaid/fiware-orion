@@ -241,12 +241,12 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
     //  orionldState.requestTree->type == KjArray;
     if(orionldState.requestTree->type == KjArray)
     {
-      int entityCount = 0;
-      for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
-      {
-         LM_K(("CCSR : at func & first FOR loop temporalEntityExtract entityP %i", entityP));
-         dbAllTablesLocal->entityTableArrayItems++;
-      }
+      //int entityCount = 0;
+      //for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      //{
+      //   LM_K(("CCSR : at func & first FOR loop temporalEntityExtract entityP %i", entityP));
+      //   dbAllTablesLocal->entityTableArrayItems++;
+      //}
 
       LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", entityCount));
 
