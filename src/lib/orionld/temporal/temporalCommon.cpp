@@ -249,65 +249,13 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
     LM_K(("Number of Entities %i", dbAllTablesLocal->entityTableArrayItems));
 
-#if 0
-}
-
-
-    else
-    {
-      OrionldTemporalDbEntityTable*        dbEntityTableLocal;
-      OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
-      OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal;
-
-      int entityArrayTotalSize = sizeof(OrionldTemporalDbEntityTable);
-      dbEntityTableLocal = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, entityArrayTotalSize);
-      bzero(dbEntityTableLocal, entityArrayTotalSize);
-
-      dbEntityTableLocal[0].entityId = orionldState.payloadIdNode->value.s;
-      dbEntityTableLocal[0].entityType = orionldState.payloadTypeNode->value.s;
-
-/*
-#if 0
-#else
-#endif
-*/
-
-      int attributesNumbers = 0;
-      for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-      {
-         attributesNumbers++;
-      }
-
-      int attribArrayTotalSize = attributesNumbers * sizeof(OrionldTemporalDbAttributeTable);
-      dbAttributeTableLocal = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
-      bzero(dbAttributeTableLocal, attribArrayTotalSize);
-
-      dbSubAttributeTableLocal = (OrionldTemporalDbSubAttributeTable**) kaAlloc(&orionldState.kalloc, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)) );
-      bzero(dbSubAttributeTableLocal, (attributesNumbers * sizeof(OrionldTemporalDbSubAttributeTable*)));
-
-      int attrIndex=0;
-      for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-      {
-         dbAttributeTableLocal[attrIndex].entityId = dbEntityTableLocal[0].entityId;
-         attrExtract (attrP, &dbAttributeTableLocal[attrIndex], dbSubAttributeTableLocal, attrIndex);
-         attrIndex++;
-      }
-
-      dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-      dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-      dbAllTablesLocal->subAttributeTableArray = *dbSubAttributeTableLocal;
-    }
-
-#endif
-  return dbAllTablesLocal;
+    return dbAllTablesLocal;
 }
 
 
 void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
   OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndexP)
 {
-  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
     char rBuf[4096];
     kjRender(orionldState.kjsonP, attrP, rBuf, sizeof(rBuf));
     LM_E(("CCSR: orionldState.requestTree in attrExtract %s",rBuf));
@@ -497,7 +445,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     dbAttributeTableLocal->createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
     dbAttributeTableLocal->modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
      //oldTemporalTreeNodeLevel++;
-  }
+     //}
 }
 
 
