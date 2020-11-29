@@ -27,6 +27,7 @@ extern "C"
 #include "kbase/kMacros.h"                                     // K_FT
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
