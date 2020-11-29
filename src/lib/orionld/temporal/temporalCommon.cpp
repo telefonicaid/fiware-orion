@@ -293,7 +293,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     int subAttrIx = *subAttrIndexP;
 
     dbAttributeTableLocal->attributeName = attrP->name;
-    LM_TMP(("CCSR - In attrExtract function attributename %s ", attrP->name:));
+    LM_TMP(("CCSR - In attrExtract function attributename %s ", attrP->name));
 
     if (attrP->type != KjObject)
     {
