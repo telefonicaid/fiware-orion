@@ -1036,10 +1036,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         if(entityUpdateFlag)
         {
           snprintf(dbEntityStrBuffer, dbEntityBufferSize, "UPDATE entity_table "
-                "SET created_at = '%s', modified_at = '%s' WHERE entity_id = '%s'",
+                "SET modified_at = '%s' WHERE entity_id = '%s'",
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt,
                 //dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
-                entCreatedAt, entModifiedAt,
+                entModifiedAt,
                 dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
 
                 LM_TMP(("CCSR: step4 TemporalConstructInsertSQLStatement: "));
