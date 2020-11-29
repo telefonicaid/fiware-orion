@@ -193,6 +193,13 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
     //  OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
     //  OrionldTemporalDbSubAttributeTable*  dbSubAttributeTableLocal;
 
+    //Chandra hack  -- START
+    LM_E(("CCSR: orionldState.requestTree printing"));
+    char rBuf[4096];
+    kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
+    LM_E(("CCSR: orionldState.requestTree %s",rBuf));
+    //Chandra hack  -- End
+
 
     int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
     dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
@@ -317,14 +324,14 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         //    dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
         //else
         dbAttributeTableLocal->observedAt = 49;
-        LM_TMP(("CCSR - Temporal - Found observedAt %s",observedAtP->value.s));
+        LM_TMP(("CCSR - Temporal - attrP Found observedAt %s",observedAtP->value.s));
         kjChildRemove (attrP,observedAtP);
     }
 
     KjNode* nodeP  = kjLookup(attrP, "unitCode");
     if(nodeP != NULL)
     {
-        LM_TMP(("CCSR - Found unitCode "));
+        LM_TMP(("CCSR - attrP Found unitCode "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -332,7 +339,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "location");
     if(nodeP != NULL)
     {
-        LM_TMP(("CCSR - Found Location "));
+        LM_TMP(("CCSR - attrP Found Location "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -340,7 +347,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "operationSpace");
     if(nodeP != NULL)
     {
-        LM_TMP(("CCSR - Found operationSpace "));
+        LM_TMP(("CCSR - attrP Found operationSpace "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -348,7 +355,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "observationSpace");
     if(nodeP != NULL)
     {
-        LM_TMP(("CCSR - Found observationSpace "));
+        LM_TMP(("CCSR - attrP Found observationSpace "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -356,7 +363,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "datasetId");
     if(nodeP != NULL)
     {
-        LM_TMP(("CCSR - Found datasetId "));
+        LM_TMP(("CCSR - attrP ound datasetId "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -371,6 +378,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     KjNode* attrTypeP  = kjLookup(attrP, "type");
     if(attrTypeP != NULL)
     {
+      LM_TMP(("CCSR - attrTypeP Found type  "));
       kjChildRemove (attrP,attrTypeP);
     }
 
