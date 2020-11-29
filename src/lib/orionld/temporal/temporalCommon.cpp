@@ -183,22 +183,22 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     char rBuf3[4096];
     kjRender(orionldState.kjsonP, attrP, rBuf3, sizeof(rBuf3));
     LM_E(("CCSR: orionldState.requestTree Before callig attrExtract %s",rBuf3));
-    
+
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     LM_TMP(("CCSR: Before callig attrExtract"));
-    if(arrayFlag)
-    {
-      for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
-      {
-        LM_TMP(("CCSR: Before callig attrExtract - Array"));
-        attrExtract (arryAttrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-      }
-    }
-    else
-    {
+    // if(arrayFlag)
+    // {
+    //  for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
+    //  {
+    //    LM_TMP(("CCSR: Before callig attrExtract - Array"));
+    //    attrExtract (arryAttrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+    //  }
+    // }
+    // else
+    // {
       LM_TMP(("CCSR: Before callig attrExtract - non-Array"));
       attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-    }
+    // }
     attrIndex++;
   }
 }
@@ -293,6 +293,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     int subAttrIx = *subAttrIndexP;
 
     dbAttributeTableLocal->attributeName = attrP->name;
+    LM_TMP(("CCSR - In attrExtract function attributename %s ", attrP->name:));
 
     if (attrP->type != KjObject)
     {
