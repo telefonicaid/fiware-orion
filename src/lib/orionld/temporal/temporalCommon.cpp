@@ -142,6 +142,10 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   int attributesCount = 0;
   int subAttrCount = 0;
 
+  char rBuf1[4096];
+  kjRender(orionldState.kjsonP, attrTypeP, rBuf1, sizeof(rBuf1));
+  LM_E(("CCSR: orionldState.requestTree in entityExtract func %s",rBuf1));
+
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     attributesCount++;
@@ -173,6 +177,14 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
+    KjNode* attrName = kjLookup(attrP, "name");
+    if (attrName != NULL)
+    {
+      allTab->attributeTableArray[attrIndex].attributeName = attrP->name;
+      continue;
+    }
+    
+    LM_TMP(("CCSR: atrributename entityExtract :%s", allTab->attributeTableArray[attrIndex].attributeName));
     LM_K(("CCSR: Before callig attrExtract"));
     attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
     attrIndex++;
@@ -227,6 +239,9 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+      char rBuf1[4096];
+      kjRender(orionldState.kjsonP, attrTypeP, rBuf1, sizeof(rBuf1));
+      LM_E(("CCSR: orionldState.requestTree in temporalEntityExtract func %s",rBuf1));
 
       int entityIndex=0;
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
