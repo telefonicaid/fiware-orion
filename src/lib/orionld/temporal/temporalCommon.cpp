@@ -206,10 +206,11 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       int entityCount = 0;
       for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
+         LM_K(("CCSR : at func & first FOR loop temporalEntityExtract entityP %i", entityP));
          entityCount++;
       }
 
-      LM_K(("Number of Entities after count %i", entityCount));
+      LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", entityCount));
 
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (entityCount * sizeof(OrionldTemporalDbEntityTable)) );
@@ -220,7 +221,8 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       int entityIndex=0;
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
-        entityExtract (dbAllTablesLocal, &entityP, true, entityIndex++);
+        LM_K(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
+        entityExtract (dbAllTablesLocal, entityP, true, entityIndex++);
         dbAllTablesLocal->entityTableArrayItems++;
       }
     }
