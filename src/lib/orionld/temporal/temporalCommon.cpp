@@ -138,6 +138,8 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   }
 
+  LM_TMP (("CCSR : entityExtract func and allTab->entityTableArray[entityIndex].entityId %s", allTab->entityTableArray[entityIndex].entityId));
+
   allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
 
