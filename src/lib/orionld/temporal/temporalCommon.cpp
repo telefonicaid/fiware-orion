@@ -317,13 +317,14 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         //    dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
         //else
         dbAttributeTableLocal->observedAt = 49;
-        kjChildRemove (attrP,observedAtP);
         LM_TMP(("CCSR - Temporal - Found observedAt %s",observedAtP->value.s));
+        kjChildRemove (attrP,observedAtP);
     }
 
     KjNode* nodeP  = kjLookup(attrP, "unitCode");
     if(nodeP != NULL)
     {
+        LM_TMP(("CCSR - Found unitCode "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -331,14 +332,15 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "location");
     if(nodeP != NULL)
     {
-        kjChildRemove (attrP,nodeP);
         LM_TMP(("CCSR - Found Location "));
+        kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
 
     nodeP  = kjLookup(attrP, "operationSpace");
     if(nodeP != NULL)
     {
+        LM_TMP(("CCSR - Found operationSpace "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -346,6 +348,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "observationSpace");
     if(nodeP != NULL)
     {
+        LM_TMP(("CCSR - Found observationSpace "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -353,6 +356,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "datasetId");
     if(nodeP != NULL)
     {
+        LM_TMP(("CCSR - Found datasetId "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -365,15 +369,19 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     //}
 
     KjNode* attrTypeP  = kjLookup(attrP, "type");
-    kjChildRemove (attrP,attrTypeP);
-    LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
-    dbAttributeTableLocal->attributeType = attrTypeP->value.s;
+    if(attrTypeP != NULL)
+    {
+      kjChildRemove (attrP,attrTypeP);
+      LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
+      dbAttributeTableLocal->attributeType = attrTypeP->value.s;
+    }
 
     if (strcmp (dbAttributeTableLocal->attributeType,"Relationship") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
     {
         KjNode* attributeObject  = kjLookup(attrP, "object");
-        kjChildRemove (attrP,attributeObject);
+        if(attributeObject != NULL)
+          kjChildRemove (attrP,attributeObject);
 
         // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
         dbAttributeTableLocal->attributeValueType  = EnumValueRelation;
@@ -385,18 +393,19 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "GeoProperty")
     {
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
-        kjChildRemove (attrP,valueP);
+        if(valueP != NULL)
+          kjChildRemove (attrP,valueP);
 
       //dbAttributeTableLocal->geoPropertyType = valueP->type.s;
         // Chandra-TBI
         LM_TMP(("CCSR:  Found GeoProperty : "));
-
     }
     else if (strcmp (dbAttributeTableLocal->attributeType,"Property") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
     {
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
-        kjChildRemove (attrP,valueP);
+        if(valueP != NULL)
+          kjChildRemove (attrP,valueP);
 
         if (valueP->type == KjFloat)
         {
