@@ -306,6 +306,11 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
   OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndexP)
 {
+    char rBuf[4096];
+    kjRender(orionldState.kjsonP, rBuf, sizeof(rBuf));
+    LM_E(("CCSR: orionldState.requestTree in attrExtract %s",rBuf));
+    
+
     LM_TMP(("CCSR - In attrExtract function "));
     int subAttrIx = *subAttrIndexP;
 
