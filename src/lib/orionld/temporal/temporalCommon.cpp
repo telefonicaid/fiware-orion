@@ -214,6 +214,12 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 OrionldTemporalDbAllTables*  temporalEntityExtract()
 {
     OrionldTemporalDbAllTables*          dbAllTablesLocal; // Chandra - TBI
+
+    int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
+    dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
+    bzero(dbAllTablesLocal, dbAllTablesSize);
+
+
     dbAllTablesLocal->entityTableArrayItems = 0;
     dbAllTablesLocal->attributeTableArrayItems = 0;
     dbAllTablesLocal->subAttributeTableArrayItems = 0;
@@ -228,12 +234,6 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
     kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
     LM_E(("CCSR: orionldState.requestTree %s",rBuf));
     //Chandra hack  -- End
-
-
-    int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
-    dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
-    bzero(dbAllTablesLocal, dbAllTablesSize);
-
 
     //dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
     //dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
