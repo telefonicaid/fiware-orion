@@ -272,11 +272,15 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
         (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)));
       LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->entityTableArrayItems));
+      LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArray pointer %i", dbAllTablesLocal->entityTableArray));
+
 
       int attribArrayTotalSize = 1024 * sizeof(OrionldTemporalDbAttributeTable);  // Chandra - TBI
       LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.1 %i", dbAllTablesLocal->attributeTableArray));
+
       dbAllTablesLocal->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
       LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.2 %i", dbAllTablesLocal->attributeTableArray));
+
       bzero(dbAllTablesLocal->attributeTableArray, attribArrayTotalSize);
       LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->attributeTableArray));
 
