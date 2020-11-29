@@ -22,6 +22,13 @@
 *
 * Author: Ken Zangelin, Chandra Challagonda
 */
+extern "C"
+{
+#include "kbase/kMacros.h"                                     // K_FT
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -30,7 +37,8 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/temporal/temporalPostBatchCreate.h"          // Own interface
+#include "orionld/temporal/temporalPostEntities.h"             // Own interface
+#include "orionld/temporal/temporalCommon.h"                // Common function
 
 
 
