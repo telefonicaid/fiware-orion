@@ -380,6 +380,10 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     //    // Chandra-TBI
     //}
 
+    char rBuf1[4096];
+    kjRender(orionldState.kjsonP, attrP, rBuf1, sizeof(rBuf1));
+    LM_E(("CCSR: orionldState.requestTree in attrExtract %s",rBuf1));
+
     KjNode* attrTypeP  = kjLookup(attrP, "type");
     if(attrTypeP != NULL)
     {
