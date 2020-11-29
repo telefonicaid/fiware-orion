@@ -382,7 +382,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
 
     char rBuf1[4096];
     kjRender(orionldState.kjsonP, attrP, rBuf1, sizeof(rBuf1));
-    LM_E(("CCSR: orionldState.requestTree in attrExtract %s",rBuf1));
+    LM_E(("CCSR: orionldState.requestTree in attrP attrExtract %s",rBuf1));
 
     KjNode* attrTypeP  = kjLookup(attrP, "type");
     if(attrTypeP != NULL)
@@ -390,6 +390,10 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
       LM_TMP(("CCSR - attrTypeP Found type  "));
       kjChildRemove (attrP,attrTypeP);
     }
+
+    char rBuf2[4096];
+    kjRender(orionldState.kjsonP, attrTypeP, rBuf1, sizeof(rBuf2));
+    LM_E(("CCSR: orionldState.requestTree in attrTypeP attrExtract %s",rBuf2));
 
     LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
     dbAttributeTableLocal->attributeType = attrTypeP->value.s;
