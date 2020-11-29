@@ -1029,6 +1029,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 uuidBuffer, allValues, attrCreatedAt, attrModifiedAt, attrObservedAt);
 
+        LM_TMP (("CCSR - Printing SQL attribute %s", dbAttribStrBuffer));
         if(!temporalExecSqlStatement (dbAttribStrBuffer))
           return false;
 
