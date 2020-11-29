@@ -399,6 +399,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     else if (strcmp (dbAttributeTableLocal->attributeType,"Property") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Property")
     {
+        LM_TMP(("CCSR:  Found Property : "));
         KjNode* valueP  = kjLookup(attrP, "value");  //Chandra-TBD
         if(valueP != NULL)
           kjChildRemove (attrP,valueP);
@@ -990,7 +991,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         // Some traces just to see how the KjNode tree works
         //
         LM_TMP(("CCSR: dbEntityStrBuffer:     '%s'", dbEntityStrBuffer));
-        
+
         if(!temporalExecSqlStatement (dbEntityStrBuffer))
           return false;
     }
