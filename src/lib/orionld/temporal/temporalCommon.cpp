@@ -1134,7 +1134,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
 void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)
 {
-    LM_TMP(("Temporal allValuesRenderAttr - attrLocalP->attributeValueType %i",attrLocalP->attributeValueType));
+    LM_TMP(("Temporal allValuesRenderAttr - attrLocalP->attributeValueType %i , %s",attrLocalP->attributeValueType, attrLocalP->entityId));
 
     char attributeValue[512];
 
