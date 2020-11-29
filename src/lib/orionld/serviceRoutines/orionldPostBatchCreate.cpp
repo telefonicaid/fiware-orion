@@ -136,7 +136,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   KjNode*               next;
 
   //Chandra hack  -- START
-  KjNode* cloneP = kjClone(orionldState.kjsonP, orionldStste.requestTree);
+  KjNode* cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
   //Chandra hack  -- End
 
   //
