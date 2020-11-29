@@ -146,7 +146,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   kjRender(orionldState.kjsonP, entityP, rBuf1, sizeof(rBuf1));
   LM_E(("CCSR: orionldState.requestTree in entityExtract func %s",rBuf1));
 
-  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     attributesCount++;
 
@@ -342,7 +342,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     nodeP  = kjLookup(attrP, "datasetId");
     if(nodeP != NULL)
     {
-        LM_TMP(("CCSR - attrP ound datasetId "));
+        LM_TMP(("CCSR - attrP Found datasetId "));
         kjChildRemove (attrP,nodeP);
         // Chandra-TBI
     }
@@ -990,11 +990,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         // Some traces just to see how the KjNode tree works
         //
         LM_TMP(("CCSR: dbEntityStrBuffer:     '%s'", dbEntityStrBuffer));
-        LM_TMP(("CCSR:"));
+        
+        if(!temporalExecSqlStatement (dbEntityStrBuffer))
+          return false;
     }
-
-    if(!temporalExecSqlStatement (dbEntityStrBuffer))
-      return false;
 
     //  temporalExecSqlStatement (dbEntityStrBuffer);  //Chandra - hack TBR
 
