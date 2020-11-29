@@ -257,7 +257,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   orionldState.requestTree = cloneP;
   LM_E(("CCSR: orionldState.requestTree = cloneP"));
   char rBuf[4096];
-  kjRender(orionldState.requestTree, cloneP, rBuf, sizeof(rBuf));
+  kjRender(orionldState.kjsonP, cloneP, rBuf, sizeof(rBuf));
   LM_E(("CCSR: orionldState.requestTree %s",rBuf));
   //Chandra hack  -- End
 
