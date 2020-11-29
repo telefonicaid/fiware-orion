@@ -299,6 +299,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal,
   OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndexP)
 {
+    LM_TMP(("CCSR - In attrExtract function "));
     int subAttrIx = *subAttrIndexP;
 
     dbAttributeTableLocal->attributeName = attrP->name;
