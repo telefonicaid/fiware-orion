@@ -1053,6 +1053,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         int allValuesSize = 2048;
         char* allValues = kaAlloc(&orionldState.kalloc,allValuesSize);
 
+        LM_TMP(("CCSR: TemporalConstructInsertSQLStatement dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName :  %s",
+            dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
+
+
         allValuesRenderAttr (&dbAllTablesLocal->attributeTableArray[dbAttribLoop], allValues, allValuesSize);
 
             //Chandra-TBI
