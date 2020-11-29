@@ -107,10 +107,13 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 
 
 
-void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndex, int *subAttrIndex)
+void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndexP, int *subAttrIndexP)
 {
   if(arrayFlag)
   {
+    int attrIndex = *subAttrIndexP;
+    int subAttrIndex = *subAttrIndexP;
+
     LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
     KjNode* idP = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
@@ -186,7 +189,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     kjRender(orionldState.kjsonP, attrP, rBuf3, sizeof(rBuf3));
     LM_E(("CCSR: orionldState.requestTree Before callig attrExtract %s",rBuf3));
 
-    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
+    allTab->attributeTableArray[*attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     LM_TMP(("CCSR: Before callig attrExtract"));
     // if(arrayFlag)
     // {
@@ -199,11 +202,15 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     // else
     // {
       LM_TMP(("CCSR: Before callig attrExtract - non-Array"));
-      attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , *attrIndex, &subAttrIndex);
+      attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
       allTab->attributeTableArrayItems++;
     // }
-    *attrIndex++;
+    attrIndex++;
   }
+
+  *attrIndexP = attrIndex;
+  *subAttrIndexP = subAttrIndex;
+
 }
 
 
