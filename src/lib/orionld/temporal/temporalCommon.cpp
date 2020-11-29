@@ -392,11 +392,13 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
         {
               dbAttributeTableLocal->attributeValueType  = EnumValueNumber;
               dbAttributeTableLocal->valueNumber = valueP->value.f;
+              LM_TMP(("CCSR:  attribute value number  : %f", dbAttributeTableLocal->valueString));
         }
         else if (valueP->type == KjInt)
         {
               dbAttributeTableLocal->attributeValueType  = EnumValueNumber;
               dbAttributeTableLocal->valueNumber = valueP->value.i;
+              LM_TMP(("CCSR:  attribute value number  : %i", dbAttributeTableLocal->valueString));
         }
         else if (valueP->type == KjArray)
         {
