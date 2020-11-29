@@ -253,7 +253,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
       dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc,
         (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
-      bzero(dbAllTablesLocal->entityTableArray, (entityCount * sizeof(OrionldTemporalDbEntityTable)));
+      bzero(dbAllTablesLocal->entityTableArray, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)));
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
