@@ -1101,15 +1101,15 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
           break;
 
         case EnumValueRelation:  // same object
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueObject);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueString);
           break;
 
         case EnumValueArray:  // same object
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueArray);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueString);
           break;
 
         case EnumValueObject:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueObject);
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueString);
           break;
 
         case EnumValueDateTime:
@@ -1206,15 +1206,15 @@ void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, cha
           break;
 
         case EnumValueRelation:  // same object
-          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueObject);
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueString);
           break;
 
         case EnumValueArray:
-          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueArray);
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueString);
           break;
 
         case EnumValueObject:
-          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueObject);
+          snprintf(subAttributeValue, sizeof(subAttributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->subAttributeValueString);
           break;
 
         case EnumValueDateTime:
