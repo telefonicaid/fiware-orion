@@ -180,6 +180,10 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
   int subAttrIndex = 0;
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
+    char rBuf3[4096];
+    kjRender(orionldState.kjsonP, attrP, rBuf3, sizeof(rBuf3));
+    LM_E(("CCSR: orionldState.requestTree Before callig attrExtract %s",rBuf3));
+    
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     LM_TMP(("CCSR: Before callig attrExtract"));
     if(arrayFlag)
