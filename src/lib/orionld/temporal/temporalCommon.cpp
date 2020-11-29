@@ -109,11 +109,10 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 
 void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndexP, int *subAttrIndexP)
 {
+  int attrIndex = *attrIndexP;
+  int subAttrIndex = *subAttrIndexP;
   if(arrayFlag)
   {
-    int attrIndex = *attrIndexP;
-    int subAttrIndex = *subAttrIndexP;
-
     LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
     KjNode* idP = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
