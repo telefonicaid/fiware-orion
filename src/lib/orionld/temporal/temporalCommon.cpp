@@ -284,8 +284,13 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
         LM_TMP(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
         entityExtract (dbAllTablesLocal, entityP, true, entityIndex, &attrIndex, &subAttrIndex );
         //dbAllTablesLocal->entityTableArrayItems++;
+
+        LM_TMP(("CCSR: After callig entityExtract - Array and attributeValueType %i, entityId %s, attribute %s",
+            allTab->attributeTableArray[5].attributeValueType, dbAllTablesLocal->attributeTableArray[5].entityId,
+            allTab->attributeTableArray[5].attributeName));
+
         entityIndex++;
-      }
+        }
     }
     else
     {
