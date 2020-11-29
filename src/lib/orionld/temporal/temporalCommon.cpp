@@ -365,6 +365,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
 
     KjNode* attrTypeP  = kjLookup(attrP, "type");
     kjChildRemove (attrP,attrTypeP);
+    LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
     dbAttributeTableLocal->attributeType = attrTypeP->value.s;
 
     if (strcmp (dbAttributeTableLocal->attributeType,"Relationship") == 0)
