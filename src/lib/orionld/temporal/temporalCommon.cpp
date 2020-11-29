@@ -251,8 +251,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", dbAllTablesLocal->entityTableArrayItems));
 
 
-      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc,
-        (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
+      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc,(dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
       bzero(dbAllTablesLocal->entityTableArray, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)));
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
@@ -262,9 +261,9 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       {
         char rBuf1[4096];
         kjRender(orionldState.kjsonP, entityP, rBuf1, sizeof(rBuf1));
-        LM_E(("CCSR: orionldState.requestTree in temporalEntityExtract func %s",rBuf1));
+        LM_TMP(("CCSR: orionldState.requestTree in temporalEntityExtract func %s",rBuf1));
 
-        LM_K(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
+        LM_TMP(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
         entityExtract (dbAllTablesLocal, entityP, true, dbAllTablesLocal->entityTableArrayItems);
         //dbAllTablesLocal->entityTableArrayItems++;
       }
@@ -280,7 +279,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       dbAllTablesLocal->entityTableArrayItems++;
     }
 
-    LM_K(("Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
+    LM_TMP(("CCSR: Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
 
     return dbAllTablesLocal;
 }
@@ -291,7 +290,7 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
 {
     char rBuf[4096];
     kjRender(orionldState.kjsonP, attrP, rBuf, sizeof(rBuf));
-    LM_E(("CCSR: orionldState.requestTree in attrExtract %s",rBuf));
+    LM_TMP(("CCSR: orionldState.requestTree in attrExtract %s",rBuf));
 
 
     LM_TMP(("CCSR - In attrExtract function "));
