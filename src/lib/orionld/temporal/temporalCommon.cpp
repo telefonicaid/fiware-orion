@@ -964,6 +964,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
     bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
+    LM_TMP(("CCSR: step1 TemporalConstructInsertSQLStatement:  entity count   '%i'", dbAllTablesLocal->entityTableArrayItems));
+
     for (int dbEntityLoop=0; dbEntityLoop < dbAllTablesLocal->entityTableArrayItems; dbEntityLoop++)
     {
         char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
