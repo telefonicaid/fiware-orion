@@ -1029,6 +1029,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                 (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
                 uuidBuffer, allValues, attrCreatedAt, attrModifiedAt, attrObservedAt);
 
+        if(!temporalExecSqlStatement (dbAttribStrBuffer))
+          return false;
+
         for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
         {
             int dbSubAttribBufferSize = 10 * 1024;
@@ -1066,9 +1069,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                     //(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].subProperty==true)? "true" : "false",
                     uuidBuffer, allValuesSubAttr, subAttrCreatedAt, subAttrModifiedAt, subAttrObeservedAt);
         }
-
-        if(!temporalExecSqlStatement (dbAttribStrBuffer))
-          return false;
     }
     return true;
 }
@@ -1086,12 +1086,12 @@ void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* all
         LM_TMP (("Printing all Values in attribute extract %s", attributeValue));
         break;
 
-        case EnumValueNumber:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, %lld, NULL, NULL, NULL",attrLocalP->valueNumber);
+        case EnumValueBool:
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, '%s', NULL, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
           break;
 
-        case EnumValueBool:
-          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, '%s', NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+        case EnumValueNumber:
+          snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, %lld, NULL, NULL",attrLocalP->valueNumber);
           break;
 
         case EnumValueRelation:  // same object
