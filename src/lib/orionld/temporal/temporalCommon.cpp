@@ -111,6 +111,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 {
   if(arrayFlag)
   {
+    LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
     KjNode* idP = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
     //KjNode* createdAtP = kjLookup(entityP, "createdAt");
