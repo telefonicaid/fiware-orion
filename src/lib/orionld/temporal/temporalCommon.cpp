@@ -1017,6 +1017,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         char* expandedAttrType = orionldContextItemExpand(orionldState.contextP,
                 dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType, NULL, true, NULL);
 
+        LM_TMP (("CCSR - Printing attributeName %s", dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
+
           //"type,", Fix me - put type back Chandra TBC
         snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,"
             "name, value_type,"
