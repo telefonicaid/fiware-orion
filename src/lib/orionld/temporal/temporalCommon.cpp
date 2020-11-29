@@ -372,9 +372,10 @@ void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTabl
     if(attrTypeP != NULL)
     {
       kjChildRemove (attrP,attrTypeP);
-      LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
-      dbAttributeTableLocal->attributeType = attrTypeP->value.s;
     }
+
+    LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
+    dbAttributeTableLocal->attributeType = attrTypeP->value.s;
 
     if (strcmp (dbAttributeTableLocal->attributeType,"Relationship") == 0)
     // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
