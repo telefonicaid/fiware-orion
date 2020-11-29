@@ -292,7 +292,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
-      entityExtract (dbAllTablesLocal, orionldState.requestTree, false, 0);
+      entityExtract (dbAllTablesLocal, orionldState.requestTree, false, entityIndex, &attrIndex, &subAttrIndex );
       dbAllTablesLocal->entityTableArrayItems++;
     }
 
