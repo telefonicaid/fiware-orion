@@ -245,7 +245,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
       for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
          LM_K(("CCSR : at func & first FOR loop temporalEntityExtract entityP %i", entityP));
-         entityCount++;
+         dbAllTablesLocal->entityTableArrayItems++;
       }
 
       LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", entityCount));
@@ -264,7 +264,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
         LM_E(("CCSR: orionldState.requestTree in temporalEntityExtract func %s",rBuf1));
 
         LM_K(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
-        entityExtract (dbAllTablesLocal, entityP, true, dbAllTablesLocal->entityTableArrayItems++);
+        entityExtract (dbAllTablesLocal, entityP, true, dbAllTablesLocal->entityTableArrayItems);
         dbAllTablesLocal->entityTableArrayItems++;
       }
     }
