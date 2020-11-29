@@ -118,8 +118,8 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 
     LM_TMP (("CCSR : entityExtract %i", entityIndex));
 
-    allTab->entityTableArray[entityIndex].entityId = idP.payloadIdNode->value.s;
-    allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP.payloadIdNode->value.s : NULL;
+    allTab->entityTableArray[entityIndex].entityId = idP->payloadIdNode->value.s;
+    allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->payloadIdNode->value.s : NULL;
     kjChildRemove (entityP, idP);
     if (typeP != NULL)
       kjChildRemove(entityP, typeP);
