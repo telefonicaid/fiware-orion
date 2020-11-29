@@ -122,22 +122,22 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     LM_TMP (("CCSR : entityExtract func and entityIndex %i", allTab->attributeTableArrayItems));
     LM_TMP (("CCSR : entityExtract func and entitityId %s", idP->value.s));
 
-    allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].entityId = idP->value.s;
-    allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].entityType = (typeP != NULL)? typeP->value.s : NULL;
+    allTab->entityTableArray[allTab->entityTableArrayItems].entityId = idP->value.s;
+    allTab->entityTableArray[allTab->entityTableArrayItems].entityType = (typeP != NULL)? typeP->value.s : NULL;
     kjChildRemove (entityP, idP);
     if (typeP != NULL)
       kjChildRemove(entityP, typeP);
   }
   else
   {
-    allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].entityId = orionldState.payloadIdNode->value.s;
-    allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].entityType = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
-    allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-    allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    allTab->entityTableArray[allTab->entityTableArrayItems].entityId = orionldState.payloadIdNode->value.s;
+    allTab->entityTableArray[allTab->entityTableArrayItems].entityType = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
+    allTab->entityTableArray[allTab->entityTableArrayItems].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    allTab->entityTableArray[allTab->entityTableArrayItems].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   }
 
-  allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-  allTab->entityTableArray[dbAllTablesLocal->entityTableArrayItems].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+  allTab->entityTableArray[allTab->entityTableArrayItems].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+  allTab->entityTableArray[allTab->entityTableArrayItems].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
 
   int attributesCount = 0;
   int subAttrCount = 0;
@@ -256,7 +256,7 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
-      int entityIndex=0;
+      //int entityIndex=0;
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
         char rBuf1[4096];
@@ -954,9 +954,9 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     //int temporalSQLStatementLengthBuffer = sizeof(dbAllTablesLocal->dbEntityTableLocal);
     //char* updateEntityTableSQLStatement = temporalSQLStatementLengthBuffer * 1024;  // Not smart Chandra-TBI
     //int dbEntityTable = sizeof(dbAllTablesLocal.entityTableArray);
-    int dbEntityTable = dbAllTablesLocal->entityTableArrayItems;
-    int dbAttribTable = dbAllTablesLocal->attributeTableArrayItems;
-    int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
+    //int dbEntityTable = dbAllTablesLocal->entityTableArrayItems;
+    //int dbAttribTable = dbAllTablesLocal->attributeTableArrayItems;
+    //int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
 
 
     int dbEntityBufferSize = 10 * 1024;
@@ -1062,7 +1062,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
         if(!temporalExecSqlStatement (dbAttribStrBuffer))
           return false;
 
-        for (int dbSubAttribLoop=0; dbSubAttribLoop < dbSubAttribTable; dbSubAttribLoop++)
+        for (int dbSubAttribLoop=0; dbSubAttribLoop < dbAllTablesLocal->subAttributeTableArrayItems; dbSubAttribLoop++)
         {
             int dbSubAttribBufferSize = 10 * 1024;
             char* dbSubAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbSubAttribBufferSize);
