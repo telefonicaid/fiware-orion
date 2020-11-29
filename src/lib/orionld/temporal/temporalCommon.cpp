@@ -107,7 +107,7 @@ static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumV
 
 
 
-void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex)
+void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndex, int *subAttrIndex)
 {
   if(arrayFlag)
   {
@@ -122,22 +122,22 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     LM_TMP (("CCSR : entityExtract func and entityIndex %i", allTab->attributeTableArrayItems));
     LM_TMP (("CCSR : entityExtract func and entitityId %s", idP->value.s));
 
-    allTab->entityTableArray[allTab->entityTableArrayItems].entityId = idP->value.s;
-    allTab->entityTableArray[allTab->entityTableArrayItems].entityType = (typeP != NULL)? typeP->value.s : NULL;
+    allTab->entityTableArray[entityIndex].entityId = idP->value.s;
+    allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
     kjChildRemove (entityP, idP);
     if (typeP != NULL)
       kjChildRemove(entityP, typeP);
   }
   else
   {
-    allTab->entityTableArray[allTab->entityTableArrayItems].entityId = orionldState.payloadIdNode->value.s;
-    allTab->entityTableArray[allTab->entityTableArrayItems].entityType = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
-    allTab->entityTableArray[allTab->entityTableArrayItems].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-    allTab->entityTableArray[allTab->entityTableArrayItems].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    allTab->entityTableArray[entityIndex].entityId = orionldState.payloadIdNode->value.s;
+    allTab->entityTableArray[entityIndex].entityType = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
+    allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+    allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   }
 
-  allTab->entityTableArray[allTab->entityTableArrayItems].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
-  allTab->entityTableArray[allTab->entityTableArrayItems].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+  allTab->entityTableArray[entityIndex].createdAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
+  allTab->entityTableArray[entityIndex].modifiedAt = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
 
   int attributesCount = 0;
   int subAttrCount = 0;
@@ -163,28 +163,30 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
 
   LM_K(("CCSR: Number of Attributes & number of SubAttributes %i %i", attributesCount, subAttrCount));
 
-  allTab->attributeTableArrayItems = attributesCount;
-  allTab->subAttributeTableArrayItems = subAttrCount;
+  //allTab->attributeTableArrayItems = attributesCount;
+  //allTab->subAttributeTableArrayItems = subAttrCount;
 
-  int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
+  //int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
+  int attribArrayTotalSize = 10 * 1024;
   allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, attribArrayTotalSize);
   bzero(allTab->attributeTableArray, attribArrayTotalSize);
   LM_TMP(("CCSR: AttrArrayTotalSize:%d", attribArrayTotalSize));
   LM_TMP(("CCSR: attributesCount:%d", attributesCount));
 
-  int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
+  //int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
+  int subAttribArrayTotalSize = 10 * 1024;
   allTab->subAttributeTableArray = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, subAttribArrayTotalSize);
   bzero(allTab->subAttributeTableArray, subAttribArrayTotalSize);
 
-  int attrIndex=0;
-  int subAttrIndex = 0;
+  //int attrIndex=0;
+  //int subAttrIndex = 0;
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     char rBuf3[4096];
     kjRender(orionldState.kjsonP, attrP, rBuf3, sizeof(rBuf3));
     LM_E(("CCSR: orionldState.requestTree Before callig attrExtract %s",rBuf3));
 
-    allTab->attributeTableArray[allTab->attributeTableArrayItems].entityId = allTab->entityTableArray[entityIndex].entityId;
+    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     LM_TMP(("CCSR: Before callig attrExtract"));
     // if(arrayFlag)
     // {
@@ -197,10 +199,10 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     // else
     // {
       LM_TMP(("CCSR: Before callig attrExtract - non-Array"));
-      attrExtract (attrP, &allTab->attributeTableArray[allTab->attributeTableArrayItems], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+      attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , *attrIndex, &subAttrIndex);
       allTab->attributeTableArrayItems++;
     // }
-    attrIndex++;
+    *attrIndex++;
   }
 }
 
@@ -261,7 +263,10 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
 
       //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
 
-      //int entityIndex=0;
+      int entityIndex=0;
+      int attrIndex = 0;
+      int subAttrIndex = 0;
+
       for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
         char rBuf1[4096];
@@ -269,8 +274,9 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
         LM_TMP(("CCSR: orionldState.requestTree in temporalEntityExtract func %s",rBuf1));
 
         LM_TMP(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
-        entityExtract (dbAllTablesLocal, entityP, true, dbAllTablesLocal->entityTableArrayItems);
+        entityExtract (dbAllTablesLocal, entityP, true, entityIndex, &attrIndex, &subAttrIndex );
         //dbAllTablesLocal->entityTableArrayItems++;
+        entityIndex++;
       }
     }
     else
