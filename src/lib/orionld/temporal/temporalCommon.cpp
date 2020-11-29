@@ -121,7 +121,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     //KjNode* createdAtP = kjLookup(entityP, "createdAt");
     //KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
 
-    LM_TMP (("CCSR : entityExtract func and entityIndex %i", allTab->attributeTableArrayItems));
+    LM_TMP (("CCSR : entityExtract func and atrributeIndex %i", allTab->attributeTableArrayItems));
     LM_TMP (("CCSR : entityExtract func and entitityId %s", idP->value.s));
 
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
@@ -200,7 +200,7 @@ void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool ar
     // }
     // else
     // {
-      LM_TMP(("CCSR: Before callig attrExtract - non-Array"));
+      LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
       attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
       allTab->attributeTableArrayItems++;
     // }
