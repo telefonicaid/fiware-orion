@@ -47,6 +47,10 @@ extern "C"
 //
 bool temporalPostBatchUpdate(ConnectionInfo* ciP)
 {
+  char rBuf[4096];
+  kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
+  LM_E(("CCSR: orionldState.requestTree at temporalPostBatchUpdate %s",rBuf));
+
   char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
@@ -78,7 +82,7 @@ bool temporalPostBatchUpdate(ConnectionInfo* ciP)
 	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
 
-  LM_TMP(("CCSR: step1 temporalPostBatchCreate"));
+  LM_TMP(("CCSR: step1 temporalPostBatchUpdate"));
 
 
 	if(TemporalConstructInsertSQLStatement(dbAllTables, true) == true)
