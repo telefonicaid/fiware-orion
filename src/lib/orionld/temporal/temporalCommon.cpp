@@ -286,8 +286,8 @@ OrionldTemporalDbAllTables*  temporalEntityExtract()
         //dbAllTablesLocal->entityTableArrayItems++;
 
         LM_TMP(("CCSR: After callig entityExtract - Array and attributeValueType %i, entityId %s, attribute %s",
-            allTab->attributeTableArray[5].attributeValueType, dbAllTablesLocal->attributeTableArray[5].entityId,
-            allTab->attributeTableArray[5].attributeName));
+            dbAllTablesLocal->attributeTableArray[5].attributeValueType, dbAllTablesLocal->attributeTableArray[5].entityId,
+            dbAllTablesLocal->attributeTableArray[5].attributeName));
 
         entityIndex++;
         }
