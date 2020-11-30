@@ -1,0 +1,548 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Basic Test
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# There is a bug in the Batch Update operation, without options=noOverwrite. See issue #578
+# Steps 04 and 06 compensate for this bug (P1.P11 should not be there).
+# Once the issue #578 has been addressed, this functest needs a modification.
+#
+#
+# 01. Create entities E1, E2 and E3 with attributes P1 and R1
+# 02. GET the entities
+# 03. Batch-update E1 and E3, with attrs P1 and R2 (attribute overwrite is default)
+# 04. GET the entities - see new P1 (new), R1 and R2 for E1 and E3, while E2 is as before
+# 05. Batch-update E1 and E3 with noOverwrite set with attrs P2 and R2
+# 06. GET the entities - see that R2 was not touched, while P2 was appended to E1 and E3
+#
+
+echo "01. Create entities E1, E2 and E3 with attributes P1 and R1"
+echo "==========================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E1:R1:step1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E2:R1:step1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E3:R1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entities"
+echo "===================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "03. Batch-update E1 and E3, with attrs P1 and R2 (attribute overwrite is default)"
+echo "================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 03",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E1:R1:step1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 03",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E3:R1:step1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+echo "04. GET the entities - see new P1 (new), R1 and R2 for E1 and E3, while E2 is as before"
+echo "======================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "05. Batch-update E1 and E3 with noOverwrite set with attrs P2 and R2"
+echo "===================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E1:R1:step5",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E3:R1:step5",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+echo "06. GET the entities - see that R2 was not touched, while P2 was appended to E1 and E3"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1, E2 and E3 with attributes P1 and R1
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entity:E1",
+        "urn:ngsi-ld:entity:E2",
+        "urn:ngsi-ld:entity:E3"
+    ]
+}
+
+
+02. GET the entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 682
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E1:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E2:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E3:R1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "T"
+    }
+]
+
+
+03. Batch-update E1 and E3, with attrs P1 and R2 (attribute overwrite is default)
+=================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. GET the entities - see new P1 (new), R1 and R2 for E1 and E3, while E2 is as before
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 970
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E1:R1:step1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E1:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E2:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E3:R1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E3:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "T"
+    }
+]
+
+
+05. Batch-update E1 and E3 with noOverwrite set with attrs P2 and R2
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET the entities - see that R2 was not touched, while P2 was appended to E1 and E3
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1144
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "P2": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E1:R1:step1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E1:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E2:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "P2": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E3:R1",
+            "type": "Relationship"
+        },
+        "R2": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E3:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

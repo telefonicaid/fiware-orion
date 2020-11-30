@@ -536,7 +536,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static double setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  double lastFailure = getNumberFieldAsDoubleF(subOrig, CSUB_LASTFAILURE);
+  double lastFailure = subOrig.hasField(CSUB_LASTFAILURE)? getNumberFieldAsDoubleF(subOrig, CSUB_LASTFAILURE) : 0;
 
   //
   // Compare with 'lastFailure' from the sub-cache.

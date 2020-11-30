@@ -1,0 +1,618 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Basic Test
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+#
+# There is a bug in the Batch Upsert operation, with options=update. See issue #579
+# Step 06 compensates for this bug (P2.P13 should not be there).
+# Once the issue #579 has been addressed, this functest needs a modification.
+#
+# 01. Create entities E1 and E2 with attributes P1 and R1, using batch upsert
+# 02. GET entities, see E1 and E2 with attributes P1 and R1
+# 03. Upsert entities E1, E2 and E3 with attributes P2 and R2 (Entity content is replaced - default mode)
+# 04. GET entities, see E1, E2 and E3, all with attributes P2 and R2 - entities have been replaced in step 3
+# 05. Upsert entities E1, E2, E3 and E4 with attributes P2, P3 and R3, using options=update - append attrs P3 and R3, replace P2
+# 06. GET entities, see the new E4 and E1+E2+E3 with P3 and R3 new step 05, while P2 has been replaced with what's in step 05
+#
+
+echo "01. Create entities E1 and E2 with attributes P1 and R1, using batch upsert"
+echo "==========================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E1:R1:step1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "STEP 01",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:E2:R1:step1",
+      "P11": {
+        "type": "Property",
+        "value": "STEP 01"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "02. GET entities, see E1 and E2 with attributes P1 and R1"
+echo "========================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "03. Upsert entities E1, E2 and E3 with attributes P2 and R2 (Entity content is replaced - default mode)"
+echo "======================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 03",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E1:R2:step3",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 03",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E2:R2:step3",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 03",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:E3:R2:step3",
+      "P13": {
+        "type": "Property",
+        "value": "STEP 03"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "04. GET entities, see E1, E2 and E3, all with attributes P2 and R2 - entities have been replaced in step 3"
+echo "=========================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+echo "05. Upsert entities E1, E2, E3 and E4 with attributes P2, P3 and R3, using options=update - append attrs P3 and R3, replace P2"
+echo "=============================================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entity:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "P3": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P35": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:E1:R3:step5",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E2",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "P3": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P35": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:E2:R3:step5",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E3",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "P3": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P35": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:E3:R3:step5",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entity:E4",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "P3": {
+      "type": "Property",
+      "value": "STEP 05",
+      "P35": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:E4:R3:step5",
+      "P15": {
+        "type": "Property",
+        "value": "STEP 05"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
+echo
+echo
+
+
+echo "06. GET entities, see the new E4 and E1+E2+E3 with P3 and R3 new step 05, while P2 has been replaced with what's in step 05"
+echo "==========================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1 and E2 with attributes P1 and R1, using batch upsert
+===========================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. GET entities, see E1 and E2 with attributes P1 and R1
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 459
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E1:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "type": "Property",
+            "value": "STEP 01"
+        },
+        "R1": {
+            "P11": {
+                "type": "Property",
+                "value": "STEP 01"
+            },
+            "object": "urn:E2:R1:step1",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    }
+]
+
+
+03. Upsert entities E1, E2 and E3 with attributes P2 and R2 (Entity content is replaced - default mode)
+=======================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. GET entities, see E1, E2 and E3, all with attributes P2 and R2 - entities have been replaced in step 3
+==========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 688
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "R2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E1:R2:step3",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "P2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "R2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E2:R2:step3",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    },
+    {
+        "P2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "type": "Property",
+            "value": "STEP 03"
+        },
+        "R2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E3:R2:step3",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "T"
+    }
+]
+
+
+05. Upsert entities E1, E2, E3 and E4 with attributes P2, P3 and R3, using options=update - append attrs P3 and R3, replace P2
+==============================================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET entities, see the new E4 and E1+E2+E3 with P3 and R3 new step 05, while P2 has been replaced with what's in step 05
+===========================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1697
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "P3": {
+            "P35": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "R2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E1:R2:step3",
+            "type": "Relationship"
+        },
+        "R3": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "object": "urn:E1:R3:step5",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E1",
+        "type": "T"
+    },
+    {
+        "P2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "P3": {
+            "P35": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "R2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E2:R2:step3",
+            "type": "Relationship"
+        },
+        "R3": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "object": "urn:E2:R3:step5",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T"
+    },
+    {
+        "P2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "P3": {
+            "P35": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "R2": {
+            "P13": {
+                "type": "Property",
+                "value": "STEP 03"
+            },
+            "object": "urn:E3:R2:step3",
+            "type": "Relationship"
+        },
+        "R3": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "object": "urn:E3:R3:step5",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E3",
+        "type": "T"
+    },
+    {
+        "P2": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "P3": {
+            "P35": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "type": "Property",
+            "value": "STEP 05"
+        },
+        "R3": {
+            "P15": {
+                "type": "Property",
+                "value": "STEP 05"
+            },
+            "object": "urn:E4:R3:step5",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:entity:E4",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

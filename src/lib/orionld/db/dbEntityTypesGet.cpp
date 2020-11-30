@@ -151,7 +151,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   }
 
   // Sort
-  KjNode* sortedArrayP = kjArray(orionldState.kjsonP, NULL);
+  KjNode* sortedArrayP = kjArray(orionldState.kjsonP, "typeList");
 
   //
   // The very first item can be inserted directly, without caring about sorting
@@ -184,12 +184,10 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);
   KjNode* typeNodeP         = kjString(orionldState.kjsonP, "type", "EntityTypeList");
-  KjNode* typeNodeListP     = kjArray(orionldState.kjsonP,  "typeList");
 
-  kjChildAdd(typeNodeListP, sortedArrayP);
   kjChildAdd(typeNodeResponseP, idNodeP);
   kjChildAdd(typeNodeResponseP, typeNodeP);
-  kjChildAdd(typeNodeResponseP, typeNodeListP);
+  kjChildAdd(typeNodeResponseP, sortedArrayP);
 
   return typeNodeResponseP;
 }
