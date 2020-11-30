@@ -110,6 +110,10 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   KjNode*  entityP;
   KjNode*  next;
 
+  //Chandra hack  -- START
+  KjNode* cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+  //Chandra hack  -- End
+
   //
   // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
   //
@@ -322,6 +326,14 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNoContent;
     orionldState.responseTree = NULL;
   }
+
+  //Chandra hack  -- START
+  orionldState.requestTree = cloneP;
+  LM_E(("CCSR: orionldState.requestTree = cloneP"));
+  char rBuf[4096];
+  kjRender(orionldState.kjsonP, cloneP, rBuf, sizeof(rBuf));
+  LM_E(("CCSR: orionldState.requestTree %s",rBuf));
+  //Chandra hack  -- End
 
   return true;
 }
