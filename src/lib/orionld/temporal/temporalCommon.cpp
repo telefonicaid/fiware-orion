@@ -123,7 +123,7 @@ void entityExtract
 (
   OrionldTemporalDbAllTables*  allTab,
   KjNode*                      entityP,
-  bool                         arrayFlag,
+  bool                         entityInArray,
   int                          entityIndex,
   int*                         attrIndexP,
   int*                         subAttrIndexP
@@ -133,7 +133,7 @@ void entityExtract
   int    subAttrIndex = *subAttrIndexP;
   double now          = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;  // FIXME: to orionldState
   
-  if (arrayFlag)
+  if (entityInArray)
   {
     LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
     KjNode* idP = kjLookup(entityP, "id");
@@ -218,20 +218,22 @@ void entityExtract
 
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
     LM_TMP(("CCSR: Before callig attrExtract"));
-    // if(arrayFlag)
+    // if (entityInArray)
     // {
-    //  for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
-    //  {
-    //    LM_TMP(("CCSR: Before callig attrExtract - Array"));
-    //    attrExtract (arryAttrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-    //  }
+    //   for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
+    //   {
+    //     LM_TMP(("CCSR: Before callig attrExtract - Array"));
+    //     attrExtract (arryAttrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+    //   }
     // }
     // else
     // {
       LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
-      attrExtract (attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+      attrExtract(attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
       LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %s, attribute %s",
-          allTab->attributeTableArray[attrIndex].attributeValueType, allTab->attributeTableArray[attrIndex].entityId, allTab->attributeTableArray[attrIndex].attributeName));
+              allTab->attributeTableArray[attrIndex].attributeValueType,
+              allTab->attributeTableArray[attrIndex].entityId,
+              allTab->attributeTableArray[attrIndex].attributeName));
       allTab->attributeTableArrayItems++;
     // }
     attrIndex++;
@@ -239,8 +241,8 @@ void entityExtract
 
   *attrIndexP = attrIndex;
   *subAttrIndexP = subAttrIndex;
-
 }
+
 
 
 // -----------------------------------------------------------------------------
@@ -249,107 +251,103 @@ void entityExtract
 // INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
 //      VALUES ("%s,%s,%s,%s");
 //
-OrionldTemporalDbAllTables*  temporalEntityExtract()
+OrionldTemporalDbAllTables* temporalEntityExtract(void)
 {
-    OrionldTemporalDbAllTables*          dbAllTablesLocal; // Chandra - TBI
+  OrionldTemporalDbAllTables*  dbAllTablesLocal; // Chandra - TBI
 
-    int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
-    dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
-    bzero(dbAllTablesLocal, dbAllTablesSize);
+  int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
+  dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
+  bzero(dbAllTablesLocal, dbAllTablesSize);
 
-    int attribArrayTotalSize = 100;  // Chandra - TBI
-    LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.1 %i", dbAllTablesLocal->attributeTableArray));
+  int attribArrayTotalSize = 100;  // Chandra - TBI
+  LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.1 %i", dbAllTablesLocal->attributeTableArray));
 
-    dbAllTablesLocal->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc,
-      (attribArrayTotalSize * sizeof(OrionldTemporalDbAttributeTable)));
-    LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.2 %i", dbAllTablesLocal->attributeTableArray));
+  dbAllTablesLocal->attributeTableArray = (OrionldTemporalDbAttributeTable*)
+    kaAlloc(&orionldState.kalloc, (attribArrayTotalSize * sizeof(OrionldTemporalDbAttributeTable)));
+  LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.2 %i", dbAllTablesLocal->attributeTableArray));
 
-    bzero(dbAllTablesLocal->attributeTableArray, attribArrayTotalSize);
-    LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->attributeTableArray));
+  bzero(dbAllTablesLocal->attributeTableArray, attribArrayTotalSize);
+  LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->attributeTableArray));
 
-    //int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
-    int subAttribArrayTotalSize = 100; // Chandra - TBI
-    dbAllTablesLocal->subAttributeTableArray = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc,
-      (subAttribArrayTotalSize * sizeof(OrionldTemporalDbSubAttributeTable)));
-    bzero(dbAllTablesLocal->subAttributeTableArray, (subAttribArrayTotalSize * sizeof(OrionldTemporalDbSubAttributeTable)));
-    LM_K(("CCSR: at func temporalEntityExtract dbAllTables->subAttributeTableArray pointer %i", dbAllTablesLocal->subAttributeTableArray));
+  // int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
+  int subAttribArrayTotalSize = 100; // Chandra - TBI
+  dbAllTablesLocal->subAttributeTableArray =
+    (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc, (subAttribArrayTotalSize * sizeof(OrionldTemporalDbSubAttributeTable)));
+  bzero(dbAllTablesLocal->subAttributeTableArray, (subAttribArrayTotalSize * sizeof(OrionldTemporalDbSubAttributeTable)));
+  LM_K(("CCSR: at func temporalEntityExtract dbAllTables->subAttributeTableArray pointer %i", dbAllTablesLocal->subAttributeTableArray));
 
 
-    dbAllTablesLocal->entityTableArrayItems = 0;
-    dbAllTablesLocal->attributeTableArrayItems = 0;
-    dbAllTablesLocal->subAttributeTableArrayItems = 0;
+  dbAllTablesLocal->entityTableArrayItems = 0;
+  dbAllTablesLocal->attributeTableArrayItems = 0;
+  dbAllTablesLocal->subAttributeTableArrayItems = 0;
 
-    //  OrionldTemporalDbEntityTable*        dbEntityTableLocal;
-    //  OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
-    //  OrionldTemporalDbSubAttributeTable*  dbSubAttributeTableLocal;
+  //  OrionldTemporalDbEntityTable*        dbEntityTableLocal;
+  //  OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
+  //  OrionldTemporalDbSubAttributeTable*  dbSubAttributeTableLocal;
 
-    //Chandra hack  -- START
-    LM_E(("CCSR: orionldState.requestTree printing"));
-    char rBuf[4096];
-    kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
-    LM_E(("CCSR: orionldState.requestTree %s",rBuf));
-    //Chandra hack  -- End
+  // Chandra hack  -- START
+  LM_E(("CCSR: orionldState.requestTree printing"));
+  char rBuf[4096];
+  kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
+  LM_E(("CCSR: orionldState.requestTree %s",rBuf));
+  //Chandra hack  -- End
 
-    int entityIndex=0;
-    int attrIndex = 0;
-    int subAttrIndex = 0;
+  int entityIndex  = 0;
+  int attrIndex    = 0;
+  int subAttrIndex = 0;
 
-    //dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
-    //dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
+  // dbAllTablesLocal->attributeTableArray = dbAttributeTableLocal;
+  // dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
 
-    //  orionldState.requestTree->type == KjArray;
-    if(orionldState.requestTree->type == KjArray)
+  //  orionldState.requestTree->type == KjArray;
+  if(orionldState.requestTree->type == KjArray)
+  {
+    // int entityCount = 0;
+    for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      //int entityCount = 0;
-      for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
-      {
-         LM_K(("CCSR : at func & first FOR loop temporalEntityExtract entityP %i", entityP));
-         dbAllTablesLocal->entityTableArrayItems++;
-      }
-
-      LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", dbAllTablesLocal->entityTableArrayItems));
-
-
-      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc,
-        (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
-      bzero(dbAllTablesLocal->entityTableArray, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)));
-      LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->entityTableArrayItems));
-      LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArray pointer %i", dbAllTablesLocal->entityTableArray));
-
-
-
-      LM_K(("CCSR: at func temporalEntityExtract dbAllTables pointer %i", dbAllTablesLocal));
-
-      //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-
-      for(KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
-      {
-        LM_TMP(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
-        entityExtract (dbAllTablesLocal, entityP, true, entityIndex, &attrIndex, &subAttrIndex );
-        //dbAllTablesLocal->entityTableArrayItems++;
-
-        LM_TMP(("CCSR: After callig entityExtract - Array and attributeValueType %i, entityId %s, attribute %s",
-            dbAllTablesLocal->attributeTableArray[5].attributeValueType, dbAllTablesLocal->attributeTableArray[5].entityId,
-            dbAllTablesLocal->attributeTableArray[5].attributeName));
-
-        entityIndex++;
-        }
-    }
-    else
-    {
-      dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbEntityTable));
-      bzero(dbAllTablesLocal->entityTableArray, sizeof(OrionldTemporalDbEntityTable));
-
-      //dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
-
-      entityExtract (dbAllTablesLocal, orionldState.requestTree, false, entityIndex, &attrIndex, &subAttrIndex );
+      LM_K(("CCSR : at func & first FOR loop temporalEntityExtract entityP %i", entityP));
       dbAllTablesLocal->entityTableArrayItems++;
     }
 
-    LM_TMP(("CCSR: Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
-    LM_TMP(("CCSR: Number of Attributes %i %s", dbAllTablesLocal->attributeTableArrayItems, dbAllTablesLocal->attributeTableArray[0].attributeValueType ));
+    LM_K(("CCSR: at func temporalEntityExtract Number of Entities after count %i", dbAllTablesLocal->entityTableArrayItems));
 
-    return dbAllTablesLocal;
+    dbAllTablesLocal->entityTableArray =
+      (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)) );
+    bzero(dbAllTablesLocal->entityTableArray, (dbAllTablesLocal->entityTableArrayItems * sizeof(OrionldTemporalDbEntityTable)));
+    LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->entityTableArrayItems));
+    LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArray pointer %i", dbAllTablesLocal->entityTableArray));
+    LM_K(("CCSR: at func temporalEntityExtract dbAllTables pointer %i", dbAllTablesLocal));
+
+    // dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+
+    for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      LM_TMP(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
+      entityExtract (dbAllTablesLocal, entityP, true, entityIndex, &attrIndex, &subAttrIndex );
+      // dbAllTablesLocal->entityTableArrayItems++;
+
+      LM_TMP(("CCSR: After callig entityExtract - Array and attributeValueType %i, entityId %s, attribute %s",
+              dbAllTablesLocal->attributeTableArray[5].attributeValueType, dbAllTablesLocal->attributeTableArray[5].entityId,
+              dbAllTablesLocal->attributeTableArray[5].attributeName));
+
+      entityIndex++;
+    }
+  }
+  else
+  {
+    dbAllTablesLocal->entityTableArray = (OrionldTemporalDbEntityTable*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbEntityTable));
+    bzero(dbAllTablesLocal->entityTableArray, sizeof(OrionldTemporalDbEntityTable));
+
+    // dbAllTablesLocal->entityTableArray = dbEntityTableLocal;
+
+    entityExtract(dbAllTablesLocal, orionldState.requestTree, false, entityIndex, &attrIndex, &subAttrIndex );
+    dbAllTablesLocal->entityTableArrayItems++;
+  }
+
+  LM_TMP(("CCSR: Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
+  LM_TMP(("CCSR: Number of Attributes %i %s", dbAllTablesLocal->attributeTableArrayItems, dbAllTablesLocal->attributeTableArray[0].attributeValueType ));
+
+  return dbAllTablesLocal;
 }
 
 
