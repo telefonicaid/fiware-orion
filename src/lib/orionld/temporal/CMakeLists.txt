@@ -30,10 +30,8 @@ SET (SOURCES
     temporalPostBatchUpdate.cpp
     temporalPostBatchUpsert.cpp
     temporalPostEntities.cpp
-    temporalPostEntity.cpp
-    temporalInitialiseTenant.cpp
-    temporalOpenDBConnection.cpp
-    temporalOpenTenantDBConnection.cpp
+    temporalUpdateEntity.cpp
+    temporalCommon.cpp
 )
 
 SET (HEADERS
@@ -46,10 +44,8 @@ SET (HEADERS
     temporalPostBatchUpdate.h
     temporalPostBatchUpsert.h
     temporalPostEntities.h
-    temporalPostEntity.h
-    temporalInitialiseTenant.h
-    temporalOpenDBConnection.h
-    temporalOpenTenantDBConnection.h
+    temporalUpdateEntity.h
+    temporalCommon.h
 )
 
 

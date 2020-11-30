@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITIES_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITIES_H_
-
 /*
 *
 * Copyright 2019 FIWARE Foundation e.V.
@@ -25,14 +22,31 @@
 *
 * Author: Ken Zangelin, Chandra Challagonda
 */
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "orionld/temporal/temporalCommon.h"              // common include
+#include "rest/HttpStatusCode.h"                               // SccNotImplemented
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/temporal/temporalUpdateEntity.h"               // Own interface
+
+#include "orionld/temporal/temporalCommon.h"                     // Temporal common
+
 
 
 // ----------------------------------------------------------------------------
 //
-// temporalPostEntities -
+// temporalUpdateEntity -
 //
-extern bool temporalPostEntities(ConnectionInfo* ciP);
+bool temporalUpdateEntity(ConnectionInfo* ciP)
+{
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITIES_H_
+  LM_E(("Not Implemented"));
+  orionldState.httpStatusCode  = SccNotImplemented;
+  orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
+  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented temporalUpdateEntity", orionldState.serviceP->url);
+
+  return false;
+}

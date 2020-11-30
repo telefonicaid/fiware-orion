@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -109,6 +111,10 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
   KjNode*  entityP;
   KjNode*  next;
+
+  //Chandra hack  -- START
+  KjNode* cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+  //Chandra hack  -- End
 
   //
   // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
@@ -322,6 +328,14 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNoContent;
     orionldState.responseTree = NULL;
   }
+
+  //Chandra hack  -- START
+  orionldState.requestTree = cloneP;
+  LM_E(("CCSR: orionldState.requestTree = cloneP"));
+  char rBuf[4096];
+  kjRender(orionldState.kjsonP, cloneP, rBuf, sizeof(rBuf));
+  LM_E(("CCSR: orionldState.requestTree %s",rBuf));
+  //Chandra hack  -- End
 
   return true;
 }

@@ -38,7 +38,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
-
+#include "orionld/temporal/temporalCommon.h"                // Common function
 
 
 // ----------------------------------------------------------------------------
@@ -47,47 +47,56 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-  char*  entityId   = orionldState.payloadIdNode->value.s;
-  char*  entityType = orionldState.payloadTypeNode->value.s;
+	char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
+	if (oldPgDbConnection == NULL)
+	{
+		//if(!temporalTenanatValidate())
+		//{
+		//	LM_TMP(("CCSR: Tenant initialisation failed"));
+		//}
+
+		if(TemporalPgDBConnectorOpen() == true)
+		{
+			LM_TMP(("CCSR: connection to postgress db is open"));
+			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
+			{
+				LM_TMP(("CCSR: connection to tenant db is open"));
+			}
+			else
+			{
+				LM_TMP(("CCSR: connection to tenant db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
+				return false;
+			}
+		}
+		else
+		{
+			LM_TMP(("CCSR: connection to postgres db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
+			return false;
+		}
+	}
+
+	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
+	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
 
 
-  //
-  // Some traces just to see how the KjNode tree works
-  //
-  LM_TMP(("TMPF: Entity Id:   '%s'", entityId));
-  LM_TMP(("TMPF: Entity Type: '%s'", entityType));
-  LM_TMP(("TMPF: Context:     '%s'", orionldState.contextP->url));
-  LM_TMP(("TMPF:"));
+	// LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
+  //       LM_TMP(("CCSR:temporalPostEntities "));
 
-  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    KjNode* attrValueP = kjLookup(attrP, "value");
-    KjNode* attrTypeP  = kjLookup(attrP, "type");
+	// if(oldTemporalSQLFullBuffer == NULL)
+	// {
+	//	return false;
+	// }
+	//else
+	//{
 
-    if (attrValueP == NULL)
-      attrValueP = kjLookup(attrP, "object");  // Relationships have no "value" but an "object"
-
-    LM_TMP(("TMPF: Attribute:   '%s':", attrP->name));
-    LM_TMP(("TMPF:   Type:      '%s'", attrTypeP->value.s));
-
-    if (attrValueP->type == KjString)
-      LM_TMP(("TMPF:   Value:     '%s'", attrValueP->value.s));
-    else if (attrValueP->type == KjInt)
-      LM_TMP(("TMPF:   Value:     %d", attrValueP->value.i));
-    else if (attrValueP->type == KjFloat)
-      LM_TMP(("TMPF:   Value:     %f", attrValueP->value.f));
-    else if (attrValueP->type == KjBoolean)
-      LM_TMP(("TMPF:   Value:     '%s'", K_FT(attrValueP->value.b)));
-    else if (attrValueP->type == KjNull)
-      LM_TMP(("TMPF:   Value:     NULL"));
-    else if (attrValueP->type == KjArray)
-      LM_TMP(("TMPF:   Value:     ARRAY"));
-    else if (attrValueP->type == KjObject)
-      LM_TMP(("TMPF:   Value:     OBJECT"));
-    else
-      LM_TMP(("TMPF:   Value:     UNKNOWN: %d", attrValueP->type));
-    LM_TMP(("TMPF:"));
-  }
-
-  return false;
+	if(TemporalConstructInsertSQLStatement(dbAllTables, false) == true)
+	{
+		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
 }
