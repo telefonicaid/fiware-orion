@@ -155,7 +155,7 @@ void entityExtract
       kjChildRemove(entityP, typeP);
     }
     else
-      allTab->entityTableArray[entityIndex].entityType = (typeP != NULL)? typeP->value.s : NULL;
+      allTab->entityTableArray[entityIndex].entityType = NULL;
   }
   else
   {
