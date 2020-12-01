@@ -170,8 +170,8 @@ bool temporalTenantInitialise(char* tenant)
 
     int oldPgTDbConnSQLBufferSize     = 1024;
     int oldPgTDbConnSQLUsedBufferSize = 0;
-    char oldPgTDbConnSQLUser[]        = "postgres"; // Chandra-TBD
-    char oldPgTDbConnSQLPasswd[]      = "orion"; // Chandra-TBD
+    char oldPgTDbConnSQLUser[]        = TEMPORAL_DB_USER; // Chandra-TBD
+    char oldPgTDbConnSQLPasswd[]      = TEMPORAL_DB_PASSWORD; // Chandra-TBD
     char* oldTemporalSQLBuffer        = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
 
     strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
