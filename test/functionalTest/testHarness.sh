@@ -978,6 +978,8 @@ function runTest()
   $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
   exitCode=$?
   logMsg "SHELL-INIT part for $path DONE. exitCode=$exitCode"
+  grep -v "already exists" $dirname/$filename.shellInit.stderr >  $dirname/$filename.shellInit.stderr.withoutAlready_Exists
+  mv $dirname/$filename.shellInit.stderr.withoutAlready_Exists  $dirname/$filename.shellInit.stderr
   linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
