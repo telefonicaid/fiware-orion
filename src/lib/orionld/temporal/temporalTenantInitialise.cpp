@@ -216,7 +216,11 @@ bool temporalTenantInitialise(const char* tenant)
         " = 'public' AND table_name = 'entitysdfds_table'");
 
       LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 0)));
-      PQprint( stdout, res, &options );
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 1)));
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 2)));
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 3)));
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 4)));
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 5)));
       //need to create a routine - Fix me PLEEEEEASE - end
 
       const char* oldPgDbCreateTenantTables[] =
