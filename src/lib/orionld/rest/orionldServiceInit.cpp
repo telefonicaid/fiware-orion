@@ -279,18 +279,13 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  = 0;
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
-  LM_TMP(("TMPF: Hello"));
-  LM_TMP(("TMPF: TD=%d", temporal));
 
   if (temporal)  // CLI Option to turn on Temporal Evolution of Entities
   {
     if (serviceP->serviceRoutine == orionldPostEntities)
-    {
-      serviceP->temporalRoutine  = temporalPostEntities;
-      LM_TMP(("TMPF: TA=%p", serviceP->temporalRoutine));
-    }
+      serviceP->temporalRoutine = temporalPostEntities;
     else if (serviceP->serviceRoutine == orionldPostBatchDelete)
-      serviceP->temporalRoutine   = temporalPostBatchDelete;
+      serviceP->temporalRoutine = temporalPostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
       serviceP->temporalRoutine = temporalUpdateEntity;
     else if (serviceP->serviceRoutine == orionldDeleteAttribute)

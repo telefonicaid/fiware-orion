@@ -702,24 +702,20 @@ bool TemporalPgDBConnectorClose(void)
 //
 bool TemporalPgDBConnectorOpen(void)
 {
-  char oldPgDbConnCheckSql[] = "user=postgres password=password dbname=orion_ld"; //Need to be changed to environment variables CHANDRA-TBD
+  char oldPgDbConnCheckSql[512];
+
+  // FIXME: use CLI variables instead of these definitions (TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, TEMPORAL_DB)
+  snprintf(oldPgDbConnCheckSql, sizeof(oldPgDbConnCheckSql), "user=%s password=%s dbname=%s", TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, TEMPORAL_DB);
 
   oldPgDbConnection = PQconnectdb(oldPgDbConnCheckSql);
-
-  if (PQstatus(oldPgDbConnection) == CONNECTION_BAD)
+  if (PQstatus(oldPgDbConnection) != CONNECTION_OK)
   {
-    LM_E(("Connection to Postgress database is not achieved"));
-    LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbConnection)));
+    LM_E(("Database Error (error connecting to database: %s)", PQerrorMessage(oldPgDbConnection)));
     TemporalPgDBConnectorClose(); //close connection and cleanup
     return false;
   }
-  else if (PQstatus(oldPgDbConnection) == CONNECTION_OK)
-  {
-    LM_K(("Connection is ok with the Postgres database\n"));
-    return true; //Return the connection handler
-  }
 
-  return false;
+  return true;  // FIXME: return the connection handler
 }
 
 
@@ -728,39 +724,36 @@ bool TemporalPgDBConnectorOpen(void)
 //
 // TemporalPgDBConnectorOpen - function to open the Postgres database connection
 //
-bool TemporalPgDBConnectorOpen(char* tenantName)
+bool TemporalPgDBConnectorOpen(char* tenant)
 {
-  LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
-
-  if (TemporalPgDBConnectorOpen() != false)  // oldPgDbConnection set by TemporalPgDBConnectorOpen()
+  if (TemporalPgDBConnectorOpen() == true)  // oldPgDbConnection is set by TemporalPgDBConnectorOpen ...
   {
-    LM_K(("Trying to create database for Tenant %s\n", tenantName));
-
     char oldPgDbSqlSyntax[]= ";";
     char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";  // FIXME: snprintf
-    strcat(oldPgDbSqlCreateTDbSQL, tenantName);
+    strcat(oldPgDbSqlCreateTDbSQL, tenant);
     strcat(oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
-    char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";    // FIXME: snprintf
-    strcat (oldPgTDbConnSQL, tenantName);
 
-    LM_K(("Command to create database for Tenant %s\n", tenantName));
+    char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";    // FIXME: snprintf
+    strcat (oldPgTDbConnSQL, tenant);
+
+    LM_TMP(("Command to create database for Tenant %s\n", tenant));
 
     PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-    LM_K(("Opening database connection for Tenant %s\n", tenantName));
+    LM_TMP(("Opening database connection for Tenant %s\n", tenant));
 
     oldPgDbTenantConnection = PQconnectdb(oldPgTDbConnSQL);
     if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
     {
-      LM_E(("Connection to %s database is not achieved or created", tenantName));
-      LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
-      TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
+      LM_E(("Connection to %s database is not achieved or created", tenant));
+      LM_E(("Database Error (error connecting to postgres: %s)", PQerrorMessage(oldPgDbTenantConnection)));
+      TemporalPgDBConnectorClose();
       return false;
     }
     PQclear(oldPgTenandDbResult);
 	}
 	else
 	{
-    LM_E(("Connection to PostGress database is not achieved or created", tenantName));
+    LM_E(("Connection to PostGress database is not achieved or created", tenant));
     LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbConnection)));
     TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
 	}
@@ -774,14 +767,14 @@ bool TemporalPgDBConnectorOpen(char* tenantName)
 //
 // temporalTenantInitialise -
 //
-bool temporalTenantInitialise(char* tenantName)
+bool temporalTenantInitialise(char* tenant)
 {
-  LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
+  LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenant));
 
   //  oldPgDbConnection = TemporalDBConnectorOpen();
   if (TemporalPgDBConnectorOpen() != false)
   {
-    LM_K(("Trying to create database for Tenant %s\n", tenantName));
+    LM_K(("Trying to create database for Tenant %s\n", tenant));
 
     int   oldPgDbSqlCreateTDbSQLBufferSize     = 1024;
     int   oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
@@ -794,8 +787,8 @@ bool temporalTenantInitialise(char* tenantName)
 
     strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
     oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
-    strncat(oldPgDbSqlCreateTDbSQL, tenantName, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
-    oldPgDbSqlCreateTDbSQLUsedBufferSize += sizeof(tenantName);
+    strncat(oldPgDbSqlCreateTDbSQL, tenant, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+    oldPgDbSqlCreateTDbSQLUsedBufferSize += strlen(tenant);
     strncpy(oldPgDbSqlCreateTDbSQL, ";", oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
     oldPgDbSqlCreateTDbSQLUsedBufferSize += 1;
 
@@ -819,26 +812,26 @@ bool temporalTenantInitialise(char* tenantName)
     oldPgTDbConnSQLUsedBufferSize += 1;
     strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
     oldPgTDbConnSQLUsedBufferSize += 7;
-    strncat(oldTemporalSQLBuffer, tenantName, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += sizeof(tenantName);
+    strncat(oldTemporalSQLBuffer, tenant, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+    oldPgTDbConnSQLUsedBufferSize += strlen(tenant);
 
-    LM_K(("Command to create database for Tenant %s\n", tenantName));
+    LM_K(("Command to create database for Tenant %s\n", tenant));
 
     PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-    LM_K(("Opening database connection for Tenant %s\n", tenantName));
+    LM_K(("Opening database connection for Tenant %s\n", tenant));
 
     oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
     if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
     {
-      LM_E(("Connection to %s database is not achieved or created", tenantName));
+      LM_E(("Connection to %s database is not achieved or created", tenant));
       LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
       TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
       return false;
     }
     else if (PQstatus(oldPgDbTenantConnection) == CONNECTION_OK)
     {
-      LM_K(("Connection is ok with the %s database\n", tenantName));
-      LM_K(("Now crreating the tables for the teanant %s \n", tenantName));
+      LM_K(("Connection is ok with the %s database\n", tenant));
+      LM_K(("Now crreating the tables for the teanant %s \n", tenant));
       const char* oldPgDbCreateTenantTables[9][250] =
         {
           "CREATE EXTENSION IF NOT EXISTS postgis",
@@ -892,7 +885,7 @@ bool temporalTenantInitialise(char* tenantName)
 
         if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
         {
-          LM_K(("Postgres DB command failed for database for Tenant %s%s\n", tenantName,oldPgDbCreateTenantTables[oldPgDbNumObj]));
+          LM_K(("Postgres DB command failed for database for Tenant %s%s\n", tenant,oldPgDbCreateTenantTables[oldPgDbNumObj]));
           break;
         }
         PQclear(oldPgTenandDbResult);
@@ -1161,38 +1154,37 @@ void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allV
   switch (attrLocalP->attributeValueType)
   {
   case EnumValueString:
-    snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL",attrLocalP->valueString);
-    LM_TMP (("Printing all Values in attribute extract %s", attributeValue));
+    snprintf(attributeValue, sizeof(attributeValue), "'%s', NULL, NULL, NULL, NULL", attrLocalP->valueString);
     break;
 
   case EnumValueBool:
-    snprintf(attributeValue, sizeof(attributeValue), "NULL, '%s', NULL, NULL, NULL",(attrLocalP->valueBool==true)? "true" : "false");
+    snprintf(attributeValue, sizeof(attributeValue), "NULL, '%s', NULL, NULL, NULL", (attrLocalP->valueBool == true)? "true" : "false");
     break;
 
   case EnumValueNumber:
-    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, %lld, NULL, NULL",attrLocalP->valueNumber);
+    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, %lld, NULL, NULL", attrLocalP->valueNumber);
     break;
 
   case EnumValueRelation:  // same object
-    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueString);
+    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL", attrLocalP->valueString);
     break;
 
   case EnumValueArray:  // same object
-    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueString);
+    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL", attrLocalP->valueString);
     break;
 
   case EnumValueObject:
-    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL",attrLocalP->valueString);
+    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, '%s', NULL", attrLocalP->valueString);
     break;
 
   case EnumValueDateTime:
     char atrrValueDataTime[64];
     numberToDate (attrLocalP->valueDatetime, atrrValueDataTime, sizeof(atrrValueDataTime));
-    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'",atrrValueDataTime);
+    snprintf(attributeValue, sizeof(attributeValue), "NULL, NULL, NULL, NULL, '%s'", atrrValueDataTime);
     break;
 
   default:
-    LM_W(("Error - Invalid attribute Value type %d", attrLocalP->attributeValueType));
+    LM_W(("Error - Invalid attribute value type: %d", attrLocalP->attributeValueType));
     return;
   }
 
@@ -1290,6 +1282,7 @@ void allValuesRenderSubAttr(OrionldTemporalDbSubAttributeTable* attrLocalP, char
 
   int   unitCodeValuesSize = 128;
   char* unitCodeValue      = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
+
   bzero(unitCodeValue, unitCodeValuesSize);
 
   if (attrLocalP->subAttributeUnitCode == NULL)
@@ -1340,50 +1333,46 @@ void allValuesRenderSubAttr(OrionldTemporalDbSubAttributeTable* attrLocalP, char
 
 // ----------------------------------------------------------------------------
 //
-// TemporalPgTenantDBConnectorOpen - function to open the Postgres database connection
+// TemporalPgTenantDBConnectorOpen - open the Postgres database connection
 //
-bool TemporalPgTenantDBConnectorOpen(char* tenantName)
+bool TemporalPgTenantDBConnectorOpen(const char* tenant)
 {
   int   oldPgTDbConnSQLBufferSize      = 1024;
   int   oldPgTDbConnSQLUsedBufferSize  = 0;
-  char  oldPgTDbConnSQLUser[]          = "postgres"; // Chandra-TBD
-  char  oldPgTDbConnSQLPasswd[]        = "password"; // Chandra-TBD
   char* oldTemporalSQLBuffer           = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
 
   //
-  // FIXME: snprintf
+  // FIXME:
+  // - snprintf instead of this mess of strcat
+  // - user from cli option that defaults to TEMPORAL_DB_USER
+  // - password from cli option that defaults to TEMPORAL_DB_PASSWORD
   //
   strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
   oldPgTDbConnSQLUsedBufferSize += 5;
-  strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-  oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
+  strncat(oldTemporalSQLBuffer, TEMPORAL_DB_USER, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += strlen(TEMPORAL_DB_USER);
   strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
   oldPgTDbConnSQLUsedBufferSize += 1;
   strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
   oldPgTDbConnSQLUsedBufferSize += 9;
-  strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-  oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
+  strncat(oldTemporalSQLBuffer, TEMPORAL_DB_PASSWORD, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += strlen(TEMPORAL_DB_PASSWORD);
   strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
   oldPgTDbConnSQLUsedBufferSize += 1;
   strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
   oldPgTDbConnSQLUsedBufferSize += 7;
-  strncat(oldTemporalSQLBuffer, tenantName, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-  oldPgTDbConnSQLUsedBufferSize += sizeof(tenantName);
+  strncat(oldTemporalSQLBuffer, tenant, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += strlen(tenant);
   
   oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
 
-  if (PQstatus(oldPgDbTenantConnection) == CONNECTION_BAD)
+  if (PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
   {
-    LM_E(("Connection to Tenant database is not achieved"));
-    LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
-    TemporalPgDBConnectorClose(); //close connection and cleanup
+    LM_E(("Database Error (Postgres DB connection failed: %s)", PQerrorMessage(oldPgDbTenantConnection)));
+    TemporalPgDBConnectorClose();
     return false;
   }
-  else if (PQstatus(oldPgDbConnection) == CONNECTION_OK)
-  {
-    //puts("CONNECTION_OK");
-    LM_K(("Connection is ok with the Postgres database\n"));
-    return true; //Return the connection handler
-  }
-  return false;
+
+  LM_K(("Connection is ok with the Postgres database\n"));
+  return true;  // FIXME: return instead the connection handler
 }

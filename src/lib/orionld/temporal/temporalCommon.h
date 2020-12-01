@@ -1,5 +1,5 @@
-#ifndef TEMPORAL_COMMON_H_
-#define TEMPORAL_COMMON_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALCOMMON_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALCOMMON_H_
 
 /*
 *
@@ -25,17 +25,13 @@
 *
 * Author: Chandra Challagonda
 */
-
-#include "orionld/db/dbDriver.h"                                 // database driver header
-#include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
+#include <postgresql/libpq-fe.h>                                 // For Postgres
 
 extern "C"
 {
 #include "kjson/kjson.h"                                         // Kjson
 #include "kjson/KjNode.h"                                        // KjNode
 }
-
-#include <postgresql/libpq-fe.h>                                 // For Postgres
 
 #include "common/globals.h"                                      // ApiVersion
 #include "common/MimeType.h"                                     // MimeType
@@ -47,6 +43,32 @@ extern "C"
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
 #include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
+
+
+
+// -----------------------------------------------------------------------------
+//
+// TEMPORAL_DB - the name of the default database
+//
+#define TEMPORAL_DB "orion_ld"  // FIXME: change name to 'orion' - to align with mongodb
+
+
+
+// -----------------------------------------------------------------------------
+//
+// TEMPORAL_DB_USER
+//
+#define TEMPORAL_DB_USER "postgres"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// TEMPORAL_DB_PASSWORD
+//
+#define TEMPORAL_DB_PASSWORD "password"
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -65,21 +87,20 @@ enum OrionldTemporalAttributeValueTypeEnum
 };
 
 
+
 // -----------------------------------------------------------------------------
 //
 // OrionldTemporalDbConnectionState - Contains general Temporal variables
 //
-//
-//
-extern PGconn* oldPgDbConnection;
-extern PGconn* oldPgDbTenantConnection;
-extern PGresult* oldPgTenandDbResult;
+extern PGconn*    oldPgDbConnection;
+extern PGconn*    oldPgDbTenantConnection;
+extern PGresult*  oldPgTenandDbResult;
+
+
 
 // -----------------------------------------------------------------------------
 //
 // OrionldTemporalCommonStateGeneral - Contains entity contents
-//
-//
 //
 typedef struct OrionldTemporalDbEntityTable
 {
@@ -91,11 +112,11 @@ typedef struct OrionldTemporalDbEntityTable
   float           geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbEntityTable;
 
+
+
 // -----------------------------------------------------------------------------
 //
 // OrionldTemporalDbAttributeTable - Contains Attribute contents
-//
-//
 //
 typedef struct OrionldTemporalDbAttributeTable
 {
@@ -120,11 +141,11 @@ typedef struct OrionldTemporalDbAttributeTable
   double                                    geoProperty[];  // Chandra-TBD
 } OrionldTemporalDbAttributeTable;
 
+
+
 // -----------------------------------------------------------------------------
 //
 // OrionldTemporalDbSubAttributeTable - Contains sub Attribute contents
-//
-//
 //
 typedef struct OrionldTemporalDbSubAttributeTable
 {
@@ -150,48 +171,56 @@ typedef struct OrionldTemporalDbSubAttributeTable
 } OrionldTemporalDbSubAttributeTable;
 
 
+
 // -----------------------------------------------------------------------------
 //
 // OrionldTemporalDbAllTables - Contains all the PostGress Db Table contents
 //
 //
 //
-
 typedef struct OrionldTemporalDbAllTables
 {
   OrionldTemporalDbEntityTable*         entityTableArray;
-  int entityTableArrayItems;
+  int                                   entityTableArrayItems;
   OrionldTemporalDbAttributeTable*      attributeTableArray;
-  int attributeTableArrayItems;
+  int                                   attributeTableArrayItems;
   OrionldTemporalDbSubAttributeTable*   subAttributeTableArray;
-  int subAttributeTableArrayItems;
+  int                                   subAttributeTableArrayItems;
 } OrionldTemporalDbAllTables;
 
-// ----------------------------------------------------------------------------
-//
-// bool TemporalPgDBConnectorOpen() - function to open the Postgres database connection
-//
-// ----------------------------------------------------------------------------
-extern bool TemporalPgDBConnectorOpen();
+
 
 // ----------------------------------------------------------------------------
 //
-// bool TemporalPgDBConnectorOpen() - function to close the Postgres database connection gracefully
+// TemporalPgDBConnectorOpen - function to open the Postgres database connection
 //
-// ----------------------------------------------------------------------------
-extern bool TemporalPgDBConnectorClose();
+extern bool TemporalPgDBConnectorOpen(void);
 
-// -----------------------------------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
 //
-// temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
+// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
 //
-OrionldTemporalDbAllTables*  attrSubattrExtract();
+extern bool TemporalPgDBConnectorClose(void);
+
+
 
 // -----------------------------------------------------------------------------
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
-OrionldTemporalDbAllTables*  temporalEntityExtract();
+extern OrionldTemporalDbAllTables* attrSubattrExtract(void);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
+//
+extern OrionldTemporalDbAllTables* temporalEntityExtract(void);
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -200,6 +229,8 @@ OrionldTemporalDbAllTables*  temporalEntityExtract();
 //
 extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal, bool entityUpdateFlag);
 
+
+
 // ----------------------------------------------------------------------------
 //
 // temporalTenantInitialise -
@@ -207,28 +238,58 @@ extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAl
 extern bool temporalTenantInitialise(char *tenantName);
 
 
+
 // ----------------------------------------------------------------------------
 //
-// PGconn* TemporalPgTenantDBConnectorOpen(ichar* tenantName) - function to open the Postgres database connection
+// TemporalPgTenantDBConnectorOpen - open the Postgres database connection
 //
-// ----------------------------------------------------------------------------
-extern bool TemporalPgTenantDBConnectorOpen(char* tenantName);
+extern bool TemporalPgTenantDBConnectorOpen(const char* tenantName);
 
 
-void  attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal);
+
+// -----------------------------------------------------------------------------
+//
+// attrSubAttrExtract -
+//
+extern void attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal);
 
 
-//void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, int attrIndex);
-//void  attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable** dbSubAttributeTableLocal, int attrIndex);
-void attrExtract(KjNode* attrP, OrionldTemporalDbAttributeTable* dbAttributeTableLocal, OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal, int attrIndex, int* subAttrIndex);
 
-void allValuesRenderAttr (OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize);
+// -----------------------------------------------------------------------------
+//
+// attrExtract -
+//
+extern void attrExtract
+(
+  KjNode*                             attrP,
+  OrionldTemporalDbAttributeTable*    dbAttributeTableLocal,
+  OrionldTemporalDbSubAttributeTable* dbSubAttributeTableLocal,
+  int                                 attrIndex,
+  int*                                subAttrIndex
+);
 
 
-void allValuesRenderSubAttr (OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
-//void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex);
-void entityExtract (OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndexP, int *subAttrIndexP);
+// -----------------------------------------------------------------------------
+//
+// allValuesRenderAttr -
+//
+extern void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize);
 
 
-#endif  // TEMPORAL_COMMON_H_
+
+// -----------------------------------------------------------------------------
+//
+// allValuesRenderSubAttr -
+//
+extern void allValuesRenderSubAttr(OrionldTemporalDbSubAttributeTable* attrLocalP, char* allValues, int allValuesSize);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityExtract -
+//
+extern void entityExtract(OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndexP, int *subAttrIndexP);
+
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALCOMMON_H_

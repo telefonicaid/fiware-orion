@@ -366,13 +366,8 @@ Edit postgresql.conf
 ```bash
 sudo nano /etc/postgresql/12/main/postgresql.conf
 ```
-Add this line and save it
+Add this line at then end of the file and save it
 ```bash
 shared_preload_libraries = 'timescaledb'
 ```
-
-- Where exactly?
-  - anywhere?
-  - at the end of the file?
-
-- Do I need to restart the postgres daemon after this edit? Send a singal to it?  Nothing at all?
+That's it - no need to send any signals nor restart anything.

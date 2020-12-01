@@ -961,12 +961,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Calling Temporal Routine to save the temporal data (if applicable)
   // Only if the Service Routine was successful, of course
   //
-  LM_TMP(("TMPF: Calling Temporal Routine?"));
   if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
   {
-    LM_TMP(("TMPF: The HTTP Status code is GOOD"));
-    LM_TMP(("TMPF: TL=%p", orionldState.serviceP));
-    LM_TMP(("TMPF: TP=%p", orionldState.serviceP->temporalRoutine));
     if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
     {
       LM_TMP(("TMPF: Calling Temporal Routine!"));
