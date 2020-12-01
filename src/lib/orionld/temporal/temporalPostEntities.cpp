@@ -38,7 +38,8 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
-#include "orionld/temporal/temporalCommon.h"                // Common function
+#include "orionld/temporal/temporalCommon.h"                   // Common db functions for temporal
+
 
 
 // ----------------------------------------------------------------------------
@@ -47,56 +48,30 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-	char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
-		//if(!temporalTenanatValidate())
-		//{
-		//	LM_TMP(("CCSR: Tenant initialisation failed"));
-		//}
-
-		if(TemporalPgDBConnectorOpen() == true)
+		if (TemporalPgDBConnectorOpen() == true)
 		{
-			LM_TMP(("CCSR: connection to postgress db is open"));
-			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
+			if (TemporalPgTenantDBConnectorOpen(TEMPORAL_DB) == false)
 			{
-				LM_TMP(("CCSR: connection to tenant db is open"));
-			}
-			else
-			{
-				LM_TMP(("CCSR: connection to tenant db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
+				LM_E(("Database Error (connection to tenant db is not successful with error '%s')", PQerrorMessage(oldPgDbConnection)));
 				return false;
 			}
 		}
 		else
 		{
-			LM_TMP(("CCSR: connection to postgres db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
+			LM_E(("Database Error (error opening db connection: %s)", PQerrorMessage(oldPgDbConnection)));
 			return false;
 		}
 	}
 
-	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
 
-
-	// LM_TMP(("CCSR: temporalPostEntities -- oldTemporalSQLBuffer:     '%s'", oldTemporalSQLFullBuffer));
-  //       LM_TMP(("CCSR:temporalPostEntities "));
-
-	// if(oldTemporalSQLFullBuffer == NULL)
-	// {
-	//	return false;
-	// }
-	//else
-	//{
-
-	if(TemporalConstructInsertSQLStatement(dbAllTables, false) == true)
+	if (TemporalConstructInsertSQLStatement(dbAllTables, false) == false)
 	{
-		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
-		return true;
-	}
-	else
-	{
+    LM_E(("Database Error (unable to insert db tables: %s)", PQerrorMessage(oldPgDbConnection)));
 		return false;
 	}
-	return false;
+
+	return true;
 }

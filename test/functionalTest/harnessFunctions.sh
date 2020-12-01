@@ -531,12 +531,14 @@ function brokerStart()
 
   # Check for --noCache and --cache options in 'extraParams'
   xParams=""
+  temporal=OFF
   while [ "$#" != 0 ]
   do
     if   [ "$1" == "--noCache" ];            then noCache=ON;
     elif [ "$1" == "--cache" ];              then noCache=OFF;
     elif [ "$1" == "-noCache" ];             then noCache=ON;
     elif [ "$1" == "-cache" ];               then noCache=OFF;
+    elif [ "$1" == "-temporal" ];            then temporal=ON; 
     elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
     then
       notificationModeGiven=TRUE
@@ -578,6 +580,11 @@ function brokerStart()
     ipVersion=BOTH
   fi
 
+
+  if [ "$temporal" == "ON" ]
+  then
+    xParams=$xParams' -temporal'
+  fi
 
   localBrokerStop $role
   localBrokerStart $role $traceLevels $ipVersion $xParams
