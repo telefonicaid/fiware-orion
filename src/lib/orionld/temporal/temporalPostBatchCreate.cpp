@@ -48,7 +48,7 @@ extern "C"
 //
 bool temporalPostBatchCreate(ConnectionInfo* ciP)
 {
-  char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
+  /* char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
 		//if(!temporalTenanatValidate())
@@ -56,7 +56,7 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
 		//	LM_TMP(("CCSR: Tenant initialisation failed"));
 		//}
 
-		/* if(TemporalPgDBConnectorOpen() == true)
+		 if(TemporalPgDBConnectorOpen() == true)
 		{
 			LM_TMP(("CCSR: connection to postgress db is open"));
 			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
