@@ -213,8 +213,7 @@ bool temporalTenantInitialise(const char* tenant)
       PGresult *res = PQexec(oldPgDbTenantConnection,
         "SELECT entity_id FROM entity_ccsr_table");
 
-      if(PQresultStatus(res)==PGRES_FATAL_ERROR &&
-        strstr(PQresultErrorMessage(res),"Relation \"entity_ccsr_table\" does not exist"))
+      if(PQresultStatus(res)==PGRES_FATAL_ERROR)
         {
           LM_K(("CCSR - Table does not EXIST - what can we do"));
         }
