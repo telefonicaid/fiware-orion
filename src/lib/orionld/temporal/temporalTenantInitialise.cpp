@@ -213,7 +213,11 @@ bool temporalTenantInitialise(const char* tenant)
       PGresult *res = PQexec(oldPgDbTenantConnection,
         "SELECT EXISTS( SELECT * FROM information_schema.tables WHERE table_schema"
         " = 'public' AND table_name = 'entitysdfds_table'");
-      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res,0,0)));
+
+      for (int n = 0; n < PQntuples(res); n++)
+      {
+        LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, n, 0)));
+      }
       //need to create a routine - Fix me PLEEEEEASE - end
 
       const char* oldPgDbCreateTenantTables[] =
