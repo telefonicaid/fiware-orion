@@ -30,7 +30,6 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/temporal/temporalOpenDBConnection.h"         // for opening and closing DB connections
 #include "orionld/temporal/temporalTenantInitialise.h"         // Own interface
 
 
