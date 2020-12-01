@@ -51,6 +51,8 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"            //  orionldContextItemExpand
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
 #include "orionld/common/orionldTenantCreate.h"                  // Own interface
+#include "orionld/temporal/temporalTenantInitialise.h"           // Postgres db functions
+
 
 
 
