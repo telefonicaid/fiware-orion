@@ -33,6 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // tenantV, tenants
+#include "orionld/temporal/temporalCommon.h"                   // temporalTenantInitialise
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
 
 
@@ -47,4 +48,6 @@ void orionldTenantCreate(char* tenant)
     LM_X(1, ("Too many tenants in the system - increase the size of tenantV and recompile!"));
 
   tenantV[tenants++] = strdup(tenant);
+
+  temporalTenantInitialise(tenant);
 }

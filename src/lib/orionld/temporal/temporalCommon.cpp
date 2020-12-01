@@ -48,7 +48,7 @@ extern "C"
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
-#include "orionld/context/orionldContextItemExpand.h"            //  orionldContextItemExpand
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
 #include "orionld/common/orionldTenantCreate.h"                  // Own interface
 
@@ -736,10 +736,10 @@ bool TemporalPgDBConnectorOpen(char* tenant)
     char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";    // FIXME: snprintf
     strcat (oldPgTDbConnSQL, tenant);
 
-    LM_TMP(("Command to create database for Tenant %s\n", tenant));
+    LM_TMP(("Command to create database for Tenant %s", tenant));
 
     PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-    LM_TMP(("Opening database connection for Tenant %s\n", tenant));
+    LM_TMP(("Opening database connection for Tenant %s", tenant));
 
     oldPgDbTenantConnection = PQconnectdb(oldPgTDbConnSQL);
     if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
@@ -754,7 +754,7 @@ bool TemporalPgDBConnectorOpen(char* tenant)
 	else
 	{
     LM_E(("Connection to PostGress database is not achieved or created", tenant));
-    LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbConnection)));
+    LM_E(("CONNECTION_BAD %s", PQerrorMessage(oldPgDbConnection)));
     TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
 	}
 
@@ -767,14 +767,14 @@ bool TemporalPgDBConnectorOpen(char* tenant)
 //
 // temporalTenantInitialise -
 //
-bool temporalTenantInitialise(char* tenant)
+bool temporalTenantInitialise(const char* tenant)
 {
-  LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenant));
+  LM_TMP(("TEMP: Opening connection to Postgres database for new tenant database creation - tenant: '%s'", tenant));
 
   //  oldPgDbConnection = TemporalDBConnectorOpen();
   if (TemporalPgDBConnectorOpen() != false)
   {
-    LM_K(("Trying to create database for Tenant %s\n", tenant));
+    LM_TMP(("TEMP: Creating database for tenant '%s'", tenant));
 
     int   oldPgDbSqlCreateTDbSQLBufferSize     = 1024;
     int   oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
@@ -784,7 +784,6 @@ bool temporalTenantInitialise(char* tenant)
     //
     // FIXME: This entire bunch of strcpy/strcat needs to be change to use snprintf
     //
-
     strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
     oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
     strncat(oldPgDbSqlCreateTDbSQL, tenant, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
@@ -795,7 +794,7 @@ bool temporalTenantInitialise(char* tenant)
     int oldPgTDbConnSQLBufferSize     = 1024;
     int oldPgTDbConnSQLUsedBufferSize = 0;
     char oldPgTDbConnSQLUser[]        = "postgres"; // Chandra-TBD
-    char oldPgTDbConnSQLPasswd[]      = "orion"; // Chandra-TBD
+    char oldPgTDbConnSQLPasswd[]      = "password"; // Chandra-TBD
     char* oldTemporalSQLBuffer        = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
 
     strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
@@ -815,23 +814,23 @@ bool temporalTenantInitialise(char* tenant)
     strncat(oldTemporalSQLBuffer, tenant, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
     oldPgTDbConnSQLUsedBufferSize += strlen(tenant);
 
-    LM_K(("Command to create database for Tenant %s\n", tenant));
+    LM_TMP(("TEMP: Command to create database for Tenant %s", tenant));
 
     PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-    LM_K(("Opening database connection for Tenant %s\n", tenant));
+    LM_TMP(("TEMP: Opening database connection for Tenant %s", tenant));
 
     oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
     if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
     {
       LM_E(("Connection to %s database is not achieved or created", tenant));
-      LM_E(("CONNECTION_BAD %s\n", PQerrorMessage(oldPgDbTenantConnection)));
+      LM_E(("CONNECTION_BAD %s", PQerrorMessage(oldPgDbTenantConnection)));
       TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
       return false;
     }
     else if (PQstatus(oldPgDbTenantConnection) == CONNECTION_OK)
     {
-      LM_K(("Connection is ok with the %s database\n", tenant));
-      LM_K(("Now crreating the tables for the teanant %s \n", tenant));
+      LM_TMP(("TEMP: Connection is ok with the %s database", tenant));
+      LM_TMP(("TEMP: Now crreating the tables for the teanant %s ", tenant));
       const char* oldPgDbCreateTenantTables[9][250] =
         {
           "CREATE EXTENSION IF NOT EXISTS postgis",
@@ -885,7 +884,7 @@ bool temporalTenantInitialise(char* tenant)
 
         if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
         {
-          LM_K(("Postgres DB command failed for database for Tenant %s%s\n", tenant,oldPgDbCreateTenantTables[oldPgDbNumObj]));
+          LM_TMP(("TEMP: Postgres DB command failed for database for Tenant %s%s", tenant,oldPgDbCreateTenantTables[oldPgDbNumObj]));
           break;
         }
         PQclear(oldPgTenandDbResult);
@@ -915,7 +914,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
   oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "BEGIN");
   if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   {
-    LM_E(("BEGIN command failed for inserting single Entity into DB %s\n",oldTenantName));
+    LM_E(("BEGIN command failed for inserting single Entity into DB %s",oldTenantName));
     PQclear(oldPgTenandDbResult);
     TemporalPgDBConnectorClose();
     return false;
@@ -937,7 +936,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "COMMIT");
   if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
   {
-    LM_E(("COMMIT command failed for inserting single Sub Attribute into DB %s\n",oldTenantName));
+    LM_E(("COMMIT command failed for inserting single Sub Attribute into DB %s",oldTenantName));
     PQclear(oldPgTenandDbResult);
     TemporalPgDBConnectorClose();
     return false;
@@ -1080,12 +1079,25 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     LM_TMP (("CCSR - Printing attributeName %s", dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
 
     //"type,", Fix me - put type back Chandra TBC
-    snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,"
-             "name, value_type,"
-             "sub_property,instance_id, unit_code, data_set_id, value_string,"
-             "value_boolean, value_number, value_relation,"
-             "value_object, value_datetime, geo_property, "
-             "created_at, modified_at, observed_at) "
+    snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table("
+             "entity_id,"
+             "id,"
+             "name,"
+             "value_type,"
+             "sub_property,"
+             "instance_id,"
+             "unit_code,"
+             "data_set_id,"
+             "value_string,"
+             "value_boolean,"
+             "value_number,"
+             "value_relation,"
+             "value_object,"
+             "value_datetime,"
+             "geo_property,"
+             "created_at,"
+             "modified_at,"
+             "observed_at) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s')",
              dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
              dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
@@ -1373,6 +1385,21 @@ bool TemporalPgTenantDBConnectorOpen(const char* tenant)
     return false;
   }
 
-  LM_K(("Connection is ok with the Postgres database\n"));
+  LM_TMP(("TEMP: Connection is ok with the Postgres database"));
   return true;  // FIXME: return instead the connection handler
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalInit -
+//
+int temporalInit(void)
+{
+  LM_TMP(("TEMP: Calling temporalTenantInitialise"));
+  temporalTenantInitialise("orion_ld");
+  LM_TMP(("TEMP: After temporalTenantInitialise"));
+
+  return 0;
 }

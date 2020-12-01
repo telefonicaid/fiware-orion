@@ -190,6 +190,14 @@ typedef struct OrionldTemporalDbAllTables
 
 
 
+// -----------------------------------------------------------------------------
+//
+// temporalInit -
+//
+extern int temporalInit(void);
+
+
+
 // ----------------------------------------------------------------------------
 //
 // TemporalPgDBConnectorOpen - function to open the Postgres database connection
@@ -235,7 +243,7 @@ extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAl
 //
 // temporalTenantInitialise -
 //
-extern bool temporalTenantInitialise(char *tenantName);
+extern bool temporalTenantInitialise(const char *tenantName);
 
 
 

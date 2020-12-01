@@ -114,6 +114,7 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 #include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
+#include "orionld/temporal/temporalCommon.h"                // temporalInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -1132,6 +1133,8 @@ int main(int argC, char* argV[])
   }
 
   LM_K(("Initialization ready - accepting requests on port %d", port));
+
+  temporalInit();
 
   while (1)
   {
