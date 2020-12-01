@@ -48,30 +48,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// TEMPORAL_DB - the name of the default database
-//
-#define TEMPORAL_DB "orion_ld"  // FIXME: change name to 'orion' - to align with mongodb
-
-
-
-// -----------------------------------------------------------------------------
-//
-// TEMPORAL_DB_USER
-//
-#define TEMPORAL_DB_USER "postgres"
-
-
-
-// -----------------------------------------------------------------------------
-//
-// TEMPORAL_DB_PASSWORD
-//
-#define TEMPORAL_DB_PASSWORD "password"
-
-
-
-// -----------------------------------------------------------------------------
-//
 // OrionldTemporalAttributeValueTypeEnum
 //
 //
@@ -192,30 +168,6 @@ typedef struct OrionldTemporalDbAllTables
 
 // -----------------------------------------------------------------------------
 //
-// temporalInit -
-//
-extern int temporalInit(void);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// TemporalPgDBConnectorOpen - function to open the Postgres database connection
-//
-extern bool TemporalPgDBConnectorOpen(void);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
-//
-extern bool TemporalPgDBConnectorClose(void);
-
-
-
-// -----------------------------------------------------------------------------
-//
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
 //
 extern OrionldTemporalDbAllTables* attrSubattrExtract(void);
@@ -236,14 +188,6 @@ extern OrionldTemporalDbAllTables* temporalEntityExtract(void);
 //
 //
 extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal, bool entityUpdateFlag);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// temporalTenantInitialise -
-//
-extern bool temporalTenantInitialise(const char *tenantName);
 
 
 

@@ -48,7 +48,7 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-	if (oldPgDbConnection == NULL)
+	/* if (oldPgDbConnection == NULL)
 	{
 		if (TemporalPgDBConnectorOpen() == true)
 		{
@@ -63,7 +63,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
 			LM_E(("Database Error (error opening db connection: %s)", PQerrorMessage(oldPgDbConnection)));
 			return false;
 		}
-	}
+	} */
 
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
 
