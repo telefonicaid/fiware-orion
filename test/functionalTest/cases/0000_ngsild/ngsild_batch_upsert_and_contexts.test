@@ -717,7 +717,7 @@ Date: REGEX(.*)
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1000
+Content-Length: 1010
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -741,10 +741,10 @@ Date: REGEX(.*)
     "type": "hash-table",
     "hash-table": {
       "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
       "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-      "areaServed": "https://schema.org/areaServed"
+      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing"
     }
   }
 ]
@@ -956,7 +956,7 @@ Date: REGEX(.*)
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1000
+Content-Length: 1010
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -980,10 +980,10 @@ Date: REGEX(.*)
     "type": "hash-table",
     "hash-table": {
       "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
       "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
       "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-      "areaServed": "https://schema.org/areaServed"
+      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing"
     }
   }
 ]
