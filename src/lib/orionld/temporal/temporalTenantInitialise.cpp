@@ -210,14 +210,13 @@ bool temporalTenantInitialise(const char* tenant)
       LM_K(("Now crreating the tables for the teanant %s \n", tenant));
 
       //need to create a routine - Fix me PLEEEEEASE - start
+      PQprintOpt        options = {0};
       PGresult *res = PQexec(oldPgDbTenantConnection,
         "SELECT EXISTS( SELECT * FROM information_schema.tables WHERE table_schema"
         " = 'public' AND table_name = 'entitysdfds_table'");
 
-      for (int n = 0; n < PQntuples(res); n++)
-      {
-        LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, n, 0)));
-      }
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, n, 0)));
+      PQprint( stdout, res, &options );
       //need to create a routine - Fix me PLEEEEEASE - end
 
       const char* oldPgDbCreateTenantTables[] =
