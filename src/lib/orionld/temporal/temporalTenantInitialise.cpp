@@ -209,10 +209,9 @@ bool temporalTenantInitialise(const char* tenant)
       LM_K(("Connection is ok with the %s database\n", tenant));
       LM_K(("Now crreating the tables for the teanant %s \n", tenant));
 
-      LM_K(("CCSR : database - checking if the entity table exists %d",
-        PQexec(oldPgDbTenantConnection, 
+      LM_K(("CCSR : database - checking if the entity table exists %d",(PQexec(oldPgDbTenantConnection,
         "SELECT EXISTS( SELECT * FROM information_schema.tables WHERE table_schema"
-        " = 'public' AND table_name = 'entity_table'"));
+        " = 'public' AND table_name = 'entity_table'"))));
 
       const char* oldPgDbCreateTenantTables[] =
         {
