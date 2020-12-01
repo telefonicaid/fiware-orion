@@ -275,3 +275,50 @@ bool temporalTenantInitialise(char* tenant)
   }
   return true;
 }
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalExecSqlStatement -
+//
+bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
+{
+  char oldTenantName[] = "orion_ld";
+
+  temporalTenantInitialise(oldTenantName);  //  opening Tenant Db connection
+
+  oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "BEGIN");
+  if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+  {
+    LM_E(("BEGIN command failed for inserting single Entity into DB %s\n",oldTenantName));
+    PQclear(oldPgTenandDbResult);
+    TemporalPgDBConnectorClose();
+    return false;
+  }
+  PQclear(oldPgTenandDbResult);
+
+	//  char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
+	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, oldTemporalSQLBuffer);
+	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+  {
+    LM_E(("%s command failed for inserting single Attribute into DB %s",oldTemporalSQLBuffer, oldTenantName));
+    LM_E(("Reason %s",PQerrorMessage(oldPgDbTenantConnection)));
+    PQclear(oldPgTenandDbResult);
+    TemporalPgDBConnectorClose();
+    return false;
+  }
+  PQclear(oldPgTenandDbResult);
+
+	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "COMMIT");
+  if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+  {
+    LM_E(("COMMIT command failed for inserting single Sub Attribute into DB %s\n",oldTenantName));
+    PQclear(oldPgTenandDbResult);
+    TemporalPgDBConnectorClose();
+    return false;
+  }
+
+  PQclear(oldPgTenandDbResult);
+  TemporalPgDBConnectorClose();
+  return true;
+}

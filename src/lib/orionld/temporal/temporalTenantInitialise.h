@@ -78,5 +78,13 @@ extern bool temporalTenantInitialise(char *tenantName);
 
 
 
+// -----------------------------------------------------------------------------
+//
+// temporalExecSqlStatement -
+//
+extern bool temporalExecSqlStatement(char* oldTemporalSQLBuffer);
+
+
+
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_

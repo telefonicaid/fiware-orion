@@ -166,22 +166,6 @@ typedef struct OrionldTemporalDbAllTables
 
 
 
-// ----------------------------------------------------------------------------
-//
-// TemporalPgDBConnectorOpen - function to open the Postgres database connection
-//
-extern bool TemporalPgDBConnectorOpen(void);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
-//
-extern bool TemporalPgDBConnectorClose(void);
-
-
-
 // -----------------------------------------------------------------------------
 //
 // temporalOrionldCommonBuildInsertEntity - initialize the thread-local variables of temporalOrionldCommonState
@@ -204,14 +188,6 @@ extern OrionldTemporalDbAllTables* temporalEntityExtract(void);
 //
 //
 extern bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTablesLocal, bool entityUpdateFlag);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// temporalTenantInitialise -
-//
-extern bool temporalTenantInitialise(char *tenantName);
 
 
 
