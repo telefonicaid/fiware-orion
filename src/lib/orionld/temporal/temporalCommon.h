@@ -244,4 +244,12 @@ extern void allValuesRenderSubAttr(OrionldTemporalDbSubAttributeTable* attrLocal
 //
 extern void entityExtract(OrionldTemporalDbAllTables* allTab, KjNode* entityP, bool arrayFlag, int entityIndex, int *attrIndexP, int *subAttrIndexP);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalInit -
+//
+extern int temporalInit(void);
+
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALCOMMON_H_

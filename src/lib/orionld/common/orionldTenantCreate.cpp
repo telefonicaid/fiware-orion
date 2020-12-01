@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // tenantV, tenants
-#include "orionld/temporal/temporalCommon.h"                   // temporalTenantInitialise
+#include "orionld/temporal/temporalTenantInitialise.h"         // temporalTenantInitialise
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
 
 

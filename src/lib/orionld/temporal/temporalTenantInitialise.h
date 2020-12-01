@@ -74,7 +74,7 @@ extern bool TemporalPgDBConnectorClose(void);
 //
 // temporalTenantInitialise -
 //
-extern bool temporalTenantInitialise(char *tenantName);
+extern bool temporalTenantInitialise(const char* tenantName);
 
 
 

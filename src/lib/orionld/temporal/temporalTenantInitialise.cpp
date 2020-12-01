@@ -144,7 +144,7 @@ bool TemporalPgDBConnectorOpen(char* tenant)
 //
 // temporalTenantInitialise -
 //
-bool temporalTenantInitialise(char* tenant)
+bool temporalTenantInitialise(const char* tenant)
 {
   LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenant));
 
