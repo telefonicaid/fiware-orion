@@ -56,23 +56,25 @@
 
 // ----------------------------------------------------------------------------
 //
-// TemporalPgDBConnectorClose -
-//
-extern bool TemporalPgDBConnectorClose(void);
-
-
-// ----------------------------------------------------------------------------
-//
-// TemporalPgDBConnectorOpen - For opening the data base connection
+// TemporalPgDBConnectorOpen - function to open the Postgres database connection
 //
 extern bool TemporalPgDBConnectorOpen(void);
 
 
+
 // ----------------------------------------------------------------------------
 //
-// temporalInitialiseTenant -
+// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
 //
-extern bool temporalTenantInitialise(char* tenant);
+extern bool TemporalPgDBConnectorClose(void);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// temporalTenantInitialise -
+//
+extern bool temporalTenantInitialise(char *tenantName);
 
 
 

@@ -675,7 +675,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 {
   char oldTenantName[] = "orion_ld";
 
-  TemporalPgDBConnectorOpen(oldTenantName);  //  opening Tenant Db connection
+  temporalTenantInitialise(oldTenantName);  //  opening Tenant Db connection
 
   oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "BEGIN");
   if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
