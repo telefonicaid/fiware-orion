@@ -30,10 +30,61 @@
 
 
 
+// -----------------------------------------------------------------------------
+//
+// TEMPORAL_DB - the name of the default database
+//
+#define TEMPORAL_DB "orion_ld"  // FIXME: change name to 'orion' - to align with mongodb
+
+
+
+// -----------------------------------------------------------------------------
+//
+// TEMPORAL_DB_USER
+//
+#define TEMPORAL_DB_USER "postgres"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// TEMPORAL_DB_PASSWORD
+//
+#define TEMPORAL_DB_PASSWORD "password"
+
+
+
 // ----------------------------------------------------------------------------
 //
-// temporalInitialiseTenant -
+// TemporalPgDBConnectorOpen - function to open the Postgres database connection
 //
-extern PGconn* temporalInitialiseTenant(char *tenantName);
+extern bool TemporalPgDBConnectorOpen(void);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
+//
+extern bool TemporalPgDBConnectorClose(void);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// temporalTenantInitialise -
+//
+extern bool temporalTenantInitialise(char *tenantName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalExecSqlStatement -
+//
+extern bool temporalExecSqlStatement(char* oldTemporalSQLBuffer);
+
+
+
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_

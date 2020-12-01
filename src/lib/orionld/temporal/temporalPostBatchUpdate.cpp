@@ -52,7 +52,7 @@ bool temporalPostBatchUpdate(ConnectionInfo* ciP)
   kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
   LM_E(("CCSR: orionldState.requestTree at temporalPostBatchUpdate %s",rBuf));
 
-  char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
+  /* char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
 	if (oldPgDbConnection == NULL)
 	{
 		//if(!temporalTenanatValidate())
@@ -78,7 +78,7 @@ bool temporalPostBatchUpdate(ConnectionInfo* ciP)
 			LM_TMP(("CCSR: connection to postgres db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
 			return false;
 		}
-	}
+	}*/
 
 	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
