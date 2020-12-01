@@ -37,21 +37,20 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
-#include "orionld/common/uuidGenerate.h"                                 // for uuidGenerate
+#include "orionld/common/uuidGenerate.h"                         // for uuidGenerate
 
-#include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccNotImplemented
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "rest/HttpStatusCode.h"                                 // SccNotImplemented
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/QNode.h"                                // QNode
+#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
-#include "orionld/common/QNode.h"                                // QNode
-#include "orionld/common/orionldTenantCreate.h"                // Own interface
 #include "orionld/context/orionldContextItemExpand.h"            //  orionldContextItemExpand
-
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
+#include "orionld/common/orionldTenantCreate.h"                  // Own interface
 
 
 
@@ -67,52 +66,36 @@ PGresult*  oldPgTenandDbResult      = NULL;
 
 // -----------------------------------------------------------------------------
 //
+// lmLogTree - FIXME: move to logMsg.h/cpp
+//
+void lmLogTree(const char* prefix, const char* what, KjNode* tree)
+{
+  char buf[4096];
+  kjRender(orionldState.kjsonP, tree, buf, sizeof(buf));
+  LM_TMP(("%s: %s: %s", prefix, what, buf));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbValueEnumString -
 //
-static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum enumValueType)
+static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum valueType)
 {
-  switch (enumValueType)
+  switch (valueType)
   {
-  case EnumValueString:
-    LM_TMP (("It is value_string"));
-    return "value_string";
-    break;
-
-  case EnumValueNumber:
-    LM_TMP (("It is value_number"));
-    return "value_number";
-    break;
-
-  case EnumValueBool:
-    LM_TMP (("It is value_boolean"));
-    return "value_boolean";
-    break;
-
-  case EnumValueArray:
-    LM_TMP (("It is value_array"));
-    return "value_array";
-    break;
-
-  case EnumValueRelation:
-    LM_TMP (("It is value_relation"));
-    return "value_relation";
-    break;
-
-  case EnumValueObject:
-    LM_TMP (("It is value_object"));
-    return "value_object";
-    break;
-
-  case EnumValueDateTime:
-    LM_TMP (("It is value_datetime"));
-    return "value_datetime";
-    break;
-
-  default:
-    LM_W(("Error - Invalid attribute Value type %d", enumValueType));
-    return NULL;
+  case EnumValueString:    return "value_string";
+  case EnumValueNumber:    return "value_number";
+  case EnumValueBool:      return "value_boolean";
+  case EnumValueArray:     return "value_array";
+  case EnumValueRelation:  return "value_relation";
+  case EnumValueObject:    return "value_object";
+  case EnumValueDateTime:  return "value_datetime";
+  default:                 return "Invalid attribute value type";
   }
 }
+
 
 
 // -----------------------------------------------------------------------------
@@ -135,13 +118,13 @@ void entityExtract
   
   if (entityInArray)
   {
-    LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
-    KjNode* idP = kjLookup(entityP, "id");
+    KjNode* idP   = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
 
+    LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
     LM_K(("CCSR : at func EntityExtract id %i", idP));
-    //KjNode* createdAtP = kjLookup(entityP, "createdAt");
-    //KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
+    // KjNode* createdAtP  = kjLookup(entityP, "createdAt");
+    // KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
 
     LM_TMP (("CCSR : entityExtract func and atrributeIndex %i", allTab->attributeTableArrayItems));
     LM_TMP (("CCSR : entityExtract func and entitityId %s", idP->value.s));
@@ -179,11 +162,7 @@ void entityExtract
 
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
     {
-      char rBuf2[4096];
-      kjRender(orionldState.kjsonP, entityP, rBuf2, sizeof(rBuf2));
-      LM_E(("CCSR: orionldState.requestTree in entityExtract func in loop %s",rBuf2));
-
-      LM_TMP(("CCSR: Found SubAttribute\n"));
+      lmLogTree("CCSR", "sub attribute", subAttrP);
       subAttrCount++;
     }
   }
@@ -212,12 +191,9 @@ void entityExtract
   //int subAttrIndex = 0;
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    char rBuf3[4096];
-    kjRender(orionldState.kjsonP, attrP, rBuf3, sizeof(rBuf3));
-    LM_E(("CCSR: orionldState.requestTree Before callig attrExtract %s",rBuf3));
-
+    lmLogTree("CCSR", "attrP before attrExtract", attrP);
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
-    LM_TMP(("CCSR: Before callig attrExtract"));
+
     // if (entityInArray)
     // {
     //   for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
@@ -248,6 +224,7 @@ void entityExtract
 // -----------------------------------------------------------------------------
 //
 // temporalOrionldCommonExtractTree - initialize the thread-local variables of temporalOrionldCommonState
+//
 // INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
 //      VALUES ("%s,%s,%s,%s");
 //
@@ -285,12 +262,7 @@ OrionldTemporalDbAllTables* temporalEntityExtract(void)
   //  OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
   //  OrionldTemporalDbSubAttributeTable*  dbSubAttributeTableLocal;
 
-  // Chandra hack  -- START
-  LM_E(("CCSR: orionldState.requestTree printing"));
-  char rBuf[4096];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
-  LM_E(("CCSR: orionldState.requestTree %s",rBuf));
-  //Chandra hack  -- End
+  lmLogTree("CCSR", "orionldState.requestTree", orionldState.requestTree);
 
   int entityIndex  = 0;
   int attrIndex    = 0;
@@ -300,7 +272,7 @@ OrionldTemporalDbAllTables* temporalEntityExtract(void)
   // dbAllTablesLocal->subAttributeTableArray = dbSubAttributeTableLocal;
 
   //  orionldState.requestTree->type == KjArray;
-  if(orionldState.requestTree->type == KjArray)
+  if (orionldState.requestTree->type == KjArray)
   {
     // int entityCount = 0;
     for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
@@ -391,7 +363,7 @@ void attrExtract
   }
 
   KjNode* nodeP  = kjLookup(attrP, "unitCode");
-  if(nodeP != NULL)
+  if (nodeP != NULL)
   {
     LM_TMP(("CCSR - attrP Found unitCode "));
     kjChildRemove (attrP,nodeP);
@@ -399,7 +371,7 @@ void attrExtract
   }
 
   nodeP  = kjLookup(attrP, "location");
-  if(nodeP != NULL)
+  if (nodeP != NULL)
   {
     LM_TMP(("CCSR - attrP Found Location "));
     kjChildRemove (attrP,nodeP);
@@ -407,7 +379,7 @@ void attrExtract
   }
 
   nodeP  = kjLookup(attrP, "operationSpace");
-  if(nodeP != NULL)
+  if (nodeP != NULL)
   {
     LM_TMP(("CCSR - attrP Found operationSpace "));
     kjChildRemove (attrP,nodeP);
@@ -415,7 +387,7 @@ void attrExtract
   }
 
   nodeP  = kjLookup(attrP, "observationSpace");
-  if(nodeP != NULL)
+  if (nodeP != NULL)
   {
     LM_TMP(("CCSR - attrP Found observationSpace "));
     kjChildRemove (attrP,nodeP);
@@ -423,7 +395,7 @@ void attrExtract
   }
 
   nodeP  = kjLookup(attrP, "datasetId");
-  if(nodeP != NULL)
+  if (nodeP != NULL)
   {
     LM_TMP(("CCSR - attrP Found datasetId "));
     kjChildRemove (attrP,nodeP);
@@ -431,7 +403,7 @@ void attrExtract
   }
 
   // nodeP  = kjLookup(attrP, "instanceid");
-  // if(nodeP != NULL)
+  // if (nodeP != NULL)
   // {
   //    kjChildRemove (attrP,nodeP);
   //    // Chandra-TBI
@@ -448,10 +420,10 @@ void attrExtract
   dbAttributeTableLocal->attributeType = attrTypeP->value.s;
 
   if (strcmp(dbAttributeTableLocal->attributeType,"Relationship") == 0)
-    // if (dbAttributeTableLocal[oldTemporalTreeNodeLevel].attributeType == "Relationship")
   {
-    KjNode* attributeObject  = kjLookup(attrP, "object");
-    if(attributeObject != NULL)
+    KjNode* attributeObject = kjLookup(attrP, "object");
+
+    if (attributeObject != NULL)
       kjChildRemove (attrP,attributeObject);
 
     // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
@@ -627,36 +599,36 @@ void attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* db
     // Chandra-TBI
   }
 
-  nodeP  = kjLookup(subAttrP, "observationSpace");
+  nodeP = kjLookup(subAttrP, "observationSpace");
   if (nodeP != NULL)
   {
     kjChildRemove (subAttrP,nodeP);
     // Chandra-TBI
   }
 
-  nodeP  = kjLookup(subAttrP, "datasetId");
-  if(nodeP != NULL)
+  nodeP = kjLookup(subAttrP, "datasetId");
+  if (nodeP != NULL)
   {
     kjChildRemove (subAttrP,nodeP);
     // Chandra-TBI
   }
 
-  nodeP  = kjLookup(subAttrP, "instanceid");
-  if(nodeP != NULL)
+  nodeP = kjLookup(subAttrP, "instanceid");
+  if (nodeP != NULL)
   {
     kjChildRemove (subAttrP,nodeP);
     // Chandra-TBI
   }
 
-  nodeP  = kjLookup(subAttrP, "location");
-  if(nodeP != NULL)
+  nodeP = kjLookup(subAttrP, "location");
+  if (nodeP != NULL)
   {
     kjChildRemove (subAttrP,nodeP);
     // Chandra-TBI
   }
 
-  nodeP  = kjLookup(subAttrP, "operationSpace");
-  if(nodeP != NULL)
+  nodeP = kjLookup(subAttrP, "operationSpace");
+  if (nodeP != NULL)
   {
     kjChildRemove (subAttrP,nodeP);
     // Chandra-TBI
@@ -690,30 +662,35 @@ void attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* db
   KjNode* observedAtP = kjLookup(subAttrP, "observedAt");
   if (observedAtP != NULL)
     dbSubAttributeTableLocal->observedAt = observedAtP->value.f;
+  else
+    dbSubAttributeTableLocal->observedAt = 0;
 }
-
 
 
 
 // ----------------------------------------------------------------------------
 //
-// TemporalPgDBConnectorOpen(PGconn* conn) - function to close the Postgres database connection gracefully
+// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
 //
-bool TemporalPgDBConnectorClose()
+// FIXME: protect the connection with a semaphore
+//
+bool TemporalPgDBConnectorClose(void)
 {
   if (oldPgDbTenantConnection != NULL)
   {
     PQfinish(oldPgDbTenantConnection); // Closes the TenantDB connection
+    oldPgDbTenantConnection = NULL;
   }
-
 
   if (oldPgDbConnection == NULL)
   {
-    LM_E(("Error"));
+    LM_E(("Error ... oldPgDbConnection == NULL"));
     return false;
   }
 
   PQfinish(oldPgDbConnection); //Closes connection and and also frees memory used by the PGconn* conn variable
+  oldPgDbConnection = NULL;
+
   return true;
 }
 
@@ -723,7 +700,7 @@ bool TemporalPgDBConnectorClose()
 //
 // TemporalPgDBConnectorOpen - function to open the Postgres database connection
 //
-bool TemporalPgDBConnectorOpen()
+bool TemporalPgDBConnectorOpen(void)
 {
   char oldPgDbConnCheckSql[] = "user=postgres password=password dbname=orion_ld"; //Need to be changed to environment variables CHANDRA-TBD
 
@@ -749,22 +726,21 @@ bool TemporalPgDBConnectorOpen()
 
 // ----------------------------------------------------------------------------
 //
-// TemporalPgDBConnectorOpen(char *tenantName) - function to open the Postgres database connection
+// TemporalPgDBConnectorOpen - function to open the Postgres database connection
 //
-bool TemporalPgDBConnectorOpen(char *tenantName)
+bool TemporalPgDBConnectorOpen(char* tenantName)
 {
   LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
 
-  //  oldPgDbConnection = TemporalDBConnectorOpen();
-  if (TemporalPgDBConnectorOpen() != false)
+  if (TemporalPgDBConnectorOpen() != false)  // oldPgDbConnection set by TemporalPgDBConnectorOpen()
   {
     LM_K(("Trying to create database for Tenant %s\n", tenantName));
 
     char oldPgDbSqlSyntax[]= ";";
-    char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";
-    strcat (oldPgDbSqlCreateTDbSQL, tenantName);
-    strcat (oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
-    char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";
+    char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";  // FIXME: snprintf
+    strcat(oldPgDbSqlCreateTDbSQL, tenantName);
+    strcat(oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
+    char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";    // FIXME: snprintf
     strcat (oldPgTDbConnSQL, tenantName);
 
     LM_K(("Command to create database for Tenant %s\n", tenantName));
@@ -798,7 +774,7 @@ bool TemporalPgDBConnectorOpen(char *tenantName)
 //
 // temporalTenantInitialise -
 //
-bool temporalTenantInitialise(char *tenantName)
+bool temporalTenantInitialise(char* tenantName)
 {
   LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenantName));
 
@@ -863,7 +839,7 @@ bool temporalTenantInitialise(char *tenantName)
     {
       LM_K(("Connection is ok with the %s database\n", tenantName));
       LM_K(("Now crreating the tables for the teanant %s \n", tenantName));
-      const char *oldPgDbCreateTenantTables[9][250] =
+      const char* oldPgDbCreateTenantTables[9][250] =
         {
           "CREATE EXTENSION IF NOT EXISTS postgis",
 
@@ -935,7 +911,7 @@ bool temporalTenantInitialise(char *tenantName)
 
 // -----------------------------------------------------------------------------
 //
-// temporalExecSqlStatement
+// temporalExecSqlStatement -
 //
 bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 {
@@ -1364,7 +1340,7 @@ void allValuesRenderSubAttr(OrionldTemporalDbSubAttributeTable* attrLocalP, char
 
 // ----------------------------------------------------------------------------
 //
-// PGconn* TemporalPgTenantDBConnectorOpen(char* tenantName) - function to open the Postgres database connection
+// TemporalPgTenantDBConnectorOpen - function to open the Postgres database connection
 //
 bool TemporalPgTenantDBConnectorOpen(char* tenantName)
 {
