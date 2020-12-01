@@ -74,7 +74,7 @@ extern bool TemporalPgDBConnectorClose(void);
 //
 // temporalTenantInitialise -
 //
-extern bool temporalTenantInitialise(char *tenantName);
+extern bool temporalTenantInitialise(const char* tenantName);
 
 
 
@@ -83,8 +83,5 @@ extern bool temporalTenantInitialise(char *tenantName);
 // temporalExecSqlStatement -
 //
 extern bool temporalExecSqlStatement(char* oldTemporalSQLBuffer);
-
-
-
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_

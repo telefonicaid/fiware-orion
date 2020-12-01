@@ -43,6 +43,7 @@ PGconn*    oldPgDbTenantConnection  = NULL;
 PGresult*  oldPgTenandDbResult      = NULL;
 
 
+
 // ----------------------------------------------------------------------------
 //
 // TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
@@ -143,7 +144,7 @@ bool TemporalPgDBConnectorOpen(char* tenant)
 //
 // temporalTenantInitialise -
 //
-bool temporalTenantInitialise(char* tenant)
+bool temporalTenantInitialise(const char* tenant)
 {
   LM_K(("Trying to open connection to Postgres database for new tenat database creation %s\n", tenant));
 
@@ -275,6 +276,7 @@ bool temporalTenantInitialise(char* tenant)
   }
   return true;
 }
+
 
 
 // -----------------------------------------------------------------------------

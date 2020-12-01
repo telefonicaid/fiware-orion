@@ -48,7 +48,7 @@ extern "C"
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
-#include "orionld/context/orionldContextItemExpand.h"            //  orionldContextItemExpand
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
 #include "orionld/common/orionldTenantCreate.h"                  // Own interface
 #include "orionld/temporal/temporalTenantInitialise.h"           // Postgres db functions
@@ -791,12 +791,25 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     LM_TMP (("CCSR - Printing attributeName %s", dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
 
     //"type,", Fix me - put type back Chandra TBC
-    snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table(entity_id,id,"
-             "name, value_type,"
-             "sub_property,instance_id, unit_code, data_set_id, value_string,"
-             "value_boolean, value_number, value_relation,"
-             "value_object, value_datetime, geo_property, "
-             "created_at, modified_at, observed_at) "
+    snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table("
+             "entity_id,"
+             "id,"
+             "name,"
+             "value_type,"
+             "sub_property,"
+             "instance_id,"
+             "unit_code,"
+             "data_set_id,"
+             "value_string,"
+             "value_boolean,"
+             "value_number,"
+             "value_relation,"
+             "value_object,"
+             "value_datetime,"
+             "geo_property,"
+             "created_at,"
+             "modified_at,"
+             "observed_at) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s')",
              dbAllTablesLocal->attributeTableArray[dbAttribLoop].entityId,
              dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName,
@@ -1084,6 +1097,21 @@ bool TemporalPgTenantDBConnectorOpen(const char* tenant)
     return false;
   }
 
-  LM_K(("Connection is ok with the Postgres database\n"));
+  LM_TMP(("TEMP: Connection is ok with the Postgres database"));
   return true;  // FIXME: return instead the connection handler
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalInit -
+//
+int temporalInit(void)
+{
+  LM_TMP(("TEMP: Calling temporalTenantInitialise"));
+  temporalTenantInitialise("orion_ld");
+  LM_TMP(("TEMP: After temporalTenantInitialise"));
+
+  return 0;
 }
