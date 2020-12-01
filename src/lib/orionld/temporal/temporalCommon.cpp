@@ -54,15 +54,6 @@ extern "C"
 
 
 
-// -----------------------------------------------------------------------------
-//
-// Global vars - FIXME: need a connection pool, or for now at least a semaphore for the connection?
-//
-PGconn*    oldPgDbConnection        = NULL;
-PGconn*    oldPgDbTenantConnection  = NULL;
-PGresult*  oldPgTenandDbResult      = NULL;
-
-
 
 // -----------------------------------------------------------------------------
 //

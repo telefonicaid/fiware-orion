@@ -34,6 +34,15 @@
 
 
 
+// -----------------------------------------------------------------------------
+//
+// Global vars - FIXME: need a connection pool, or for now at least a semaphore for the connection?
+//
+PGconn*    oldPgDbConnection        = NULL;
+PGconn*    oldPgDbTenantConnection  = NULL;
+PGresult*  oldPgTenandDbResult      = NULL;
+
+
 // ----------------------------------------------------------------------------
 //
 // TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
