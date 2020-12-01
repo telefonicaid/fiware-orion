@@ -56,7 +56,7 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
 		//	LM_TMP(("CCSR: Tenant initialisation failed"));
 		//}
 
-		if(TemporalPgDBConnectorOpen() == true)
+		/* if(TemporalPgDBConnectorOpen() == true)
 		{
 			LM_TMP(("CCSR: connection to postgress db is open"));
 			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
@@ -74,7 +74,7 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
 			LM_TMP(("CCSR: connection to postgres db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
 			return false;
 		}
-	}
+	} */
 
 	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
