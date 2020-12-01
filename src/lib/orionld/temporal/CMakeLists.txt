@@ -31,6 +31,7 @@ SET (SOURCES
     temporalPostBatchUpsert.cpp
     temporalPostEntities.cpp
     temporalUpdateEntity.cpp
+    temporalTenantInitialise.cpp
     temporalCommon.cpp
 )
 
@@ -45,6 +46,7 @@ SET (HEADERS
     temporalPostBatchUpsert.h
     temporalPostEntities.h
     temporalUpdateEntity.h
+    temporalTenantInitialise.cpp
     temporalCommon.h
 )
 
