@@ -252,7 +252,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
     std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
     std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
-    if (isPattern.empty() && id.empty()) 
+    if (isPattern.empty() && id.empty())
     {
       id = ".*";
       isPattern = "true";
@@ -378,7 +378,7 @@ int mongoSubCacheItemInsert
 
     std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
     std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
-    if (isPattern.empty() && id.empty()) 
+    if (isPattern.empty() && id.empty())
     {
       id = ".*";
       isPattern = "true";
