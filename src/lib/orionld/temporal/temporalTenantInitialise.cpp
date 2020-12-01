@@ -215,7 +215,7 @@ bool temporalTenantInitialise(const char* tenant)
         "SELECT EXISTS( SELECT * FROM information_schema.tables WHERE table_schema"
         " = 'public' AND table_name = 'entitysdfds_table'");
 
-      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, n, 0)));
+      LM_K(("CCSR : database - checking if the entity table exists %d",PQgetvalue(res, 0, 0)));
       PQprint( stdout, res, &options );
       //need to create a routine - Fix me PLEEEEEASE - end
 
