@@ -380,7 +380,7 @@ bool temporalDbExists(const char* dbName)
   // need to create a routine - Fix me PLEEEEEASE - start
   PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
 
-  if( PQstatus(conn) == CONNECTION_OK )
+  if( PQstatus(res) == CONNECTION_OK )
     {
       PQclear(res);
       return true;
