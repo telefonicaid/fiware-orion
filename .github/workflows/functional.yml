@@ -8,6 +8,7 @@ on:
 
 env:
   IMAGE_NAME: localhost:5000/orion-ld-test:latest
+  IGNORE_TEST: '0706_direct_https_notifications/direct_https_notifications.test 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test 2015_notification_templates/notification_templates_cache_refresh.test'
 
 jobs:
   functional-part1:
@@ -38,9 +39,15 @@ jobs:
           build-args: STAGE=deps
           tags: ${{ env.IMAGE_NAME }}
 
+      - name: Enable IPV6
+        run: |
+          echo "0" | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6;
+          echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}'| sudo tee /etc/docker/daemon.json;
+          sudo service docker restart;
+
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_1_450 -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS=${{ env.IGNORE_TEST}}  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_1_450 -dqt
 
   functional-part2:
     runs-on: ubuntu-latest
@@ -72,7 +79,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_451_700 -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS=${{ env.IGNORE_TEST}} -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_451_700 -dqt
 
   functional-part3:
     runs-on: ubuntu-latest
@@ -104,7 +111,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_701_1000 -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS=${{ env.IGNORE_TEST}} -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_701_1000 -dqt
 
   functional-part4:
     runs-on: ubuntu-latest
@@ -136,4 +143,4 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_1001_1400 -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS=${{ env.IGNORE_TEST}} -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_1001_1400 -dqt
