@@ -381,7 +381,7 @@ bool temporalDbExists(const char* dbName)
   // need to create a routine - Fix me PLEEEEEASE - start
   PGconn *conn = PQconnectdb(sqlStm);
 
-  if( PQstatus(res) != CONNECTION_OK )
+  if( PQstatus(conn) != CONNECTION_OK )
   {
     LM_K(("CCSR - DATABASE does not EXIST - what can we do"));
     return false;
