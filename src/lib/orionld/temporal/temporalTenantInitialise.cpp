@@ -209,18 +209,6 @@ bool temporalTenantInitialise(const char* tenant)
       LM_K(("Connection is ok with the %s database\n", tenant));
       LM_K(("Now crreating the tables for the teanant %s \n", tenant));
 
-      // need to create a routine - Fix me PLEEEEEASE - start
-      PGresult *res = PQexec(oldPgDbTenantConnection,
-        "SELECT entity_id FROM entity_table");
-
-      if( PQresultStatus(res)==PGRES_FATAL_ERROR )
-        {
-          LM_K(("CCSR - Table does not EXIST - what can we do"));
-        }
-
-      PQclear(res);
-      // need to create a routine - Fix me PLEEEEEASE - end
-
       const char* oldPgDbCreateTenantTables[] =
         {
           // "CREATE EXTENSION IF NOT EXISTS postgis",
@@ -346,4 +334,67 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
   PQclear(oldPgTenandDbResult);
   TemporalPgDBConnectorClose();
   return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalDbTableExists -
+//
+bool temporalDbTableExists(const char dbName, const char tableName)
+{
+  char*  sqlStm;
+  sqlStm = kaAlloc(&orionldState.kalloc, 512);
+  bzero(sqlStm, 512);
+  snprintf(sqlStm, 512, "SELECT entity_id FROM %s", tableName);
+
+  PGconn*    tempralPgDbConnector  = NULL;
+
+  // need to create a routine - Fix me PLEEEEEASE - start
+  PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
+
+  if( PQresultStatus(res)==PGRES_FATAL_ERROR )
+    {
+      LM_K(("CCSR - Table does not EXIST - what can we do"));
+      PQclear(res);
+      return fasle;
+    }
+
+  PQclear(res);
+  return true;
+  // need to create a routine - Fix me PLEEEEEASE - end
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalDbExists -
+//
+bool bool temporalDbExists(const char* dbName)
+{
+  char*  sqlStm;
+  sqlStm = kaAlloc(&orionldState.kalloc, 512);
+  bzero(sqlStm, 512);
+  snprintf(sqlStm, 512, "dbname = %s", dbName);
+
+  // need to create a routine - Fix me PLEEEEEASE - start
+  PGconn*    tempralPgDbConnector  = NULL;
+
+  // need to create a routine - Fix me PLEEEEEASE - start
+  PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
+
+  if( PQresultStatus(res)==CONNECTION_OK )
+    {
+      PQclear(res);
+      return true;
+    }
+    else
+    {
+      LM_K(("CCSR - DATABASE does not EXIST - what can we do"));
+      PQclear(res);
+      return false;
+    }
+  // need to create a routine - Fix me PLEEEEEASE - end
 }
