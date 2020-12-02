@@ -19,11 +19,11 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
-        mosquitto:
-          image: eclipse-mosquitto:1.6
-          ports:
-            - 1883:1883
-            - 9001:9001
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        ports:
+          - 1883:1883
+          - 9001:9001
 
     steps:
       - uses: actions/checkout@v2
