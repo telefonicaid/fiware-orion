@@ -1347,6 +1347,42 @@ function dateDiff()
 }
 
 
+
+export PGPASSWORD='password'
+# -----------------------------------------------------------------------------
+#
+# postgresCmd [-t <tenant>] [-sql <SQL command as a string>]
+#
+function postgresCmd()
+{
+  #
+  # Parsing parameters
+  #
+  tenant="orion_ld"
+  sqlCommand=""
+
+  while [ "$#" != 0 ]
+  do
+    if   [ "$1" == "-t" ];   then  dbName=$2;     shift;
+    elif [ "$1" == "-sql" ]; then  sqlCommand=$2; shift;
+    else
+      echo "Invalid option/parameter for postgresCmd: $1"
+      exit 1
+    fi
+    shift;
+  done
+
+  if [ "$sqlCommand" == "" ]
+  then
+    echo "SQL command missing ... (-sql <SQL command as a string>)"
+    exit 1
+  fi
+
+  echo "$sqlCommand" | psql -U postgres -d "$tenant" --csv
+}
+
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1375,3 +1411,4 @@ export -f dateDiff
 export -f mqttTestClientStart
 export -f mqttTestClientStop
 export -f mqttTestClientDump
+export -f postgresCmd

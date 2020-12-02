@@ -1027,7 +1027,8 @@ function runTest()
     $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
     exitCode=$?
     logMsg "SHELL-INIT (again) part for $path DONE. exitCode=$exitCode"
-
+    grep -v "^NOTICE: " $dirname/$filename.shellInit.stderr > $dirname/$filename.shellInit.stderr2
+    mv $dirname/$filename.shellInit.stderr2 $dirname/$filename.shellInit.stderr
     linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]

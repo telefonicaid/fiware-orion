@@ -27,6 +27,9 @@ Simple test of creation of an Entity with all types of Attributes
 export BROKER=orionld
 dbInit CB
 brokerStart CB 100 IPv4 -temporal
+postgresCmd -sql "DELETE FROM entity_table"
+postgresCmd -sql "DELETE FROM attributes_table"
+postgresCmd -sql "DELETE FROM attribute_sub_properties_table"
 
 --SHELL--
 
@@ -53,14 +56,14 @@ echo
 
 echo "02. See the entity E in the temporal database"
 echo "============================================="
-#postgresCmd orionld "SELECT * FROM entity_table"
+postgresCmd -sql "SELECT entity_id,entity_type FROM entity_table"
 echo
 echo
 
 
 echo "03. See the attribute A as a string in the temporal database"
 echo "============================================================"
-#postgresCmd orionld "SELECT * FROM attribute_table"
+postgresCmd -sql "SELECT id,entity_id,value_type,value_string FROM attributes_table"
 echo
 echo
 
@@ -70,17 +73,21 @@ echo
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E
 Date: REGEX(.*)
 
 
 
 02. See the entity E in the temporal database
 =============================================
+entity_id,entity_type
+urn:ngsi-ld:entities:E,https://uri.etsi.org/ngsi-ld/default-context/T
 
 
 03. See the attribute A as a string in the temporal database
 ============================================================
+id,entity_id,value_type,value_string
+https://uri.etsi.org/ngsi-ld/default-context/A,urn:ngsi-ld:entities:E,value_string,A String
 
 
 --TEARDOWN--
