@@ -345,7 +345,7 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 bool temporalDbTableExists(const char* dbName, const char* tableName)
 {
   char*     sqlStm;
-  PGconn*   conn;
+  PGconn*   conn = NULL;
   sqlStm = kaAlloc(&orionldState.kalloc, 512);
   bzero(sqlStm, 512);
   snprintf(sqlStm, 512, "SELECT entity_id FROM %s", tableName);
