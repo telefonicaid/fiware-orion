@@ -352,7 +352,7 @@ bool temporalDbTableExists(const char* dbName, const char* tableName)
   // need to create a routine - Fix me PLEEEEEASE - start
   PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
 
-  if( PQresultStatus(res)==PGRES_FATAL_ERROR )
+  if( PQresultStatus(res) == PGRES_FATAL_ERROR )
     {
       LM_K(("CCSR - Table does not EXIST - what can we do"));
       PQclear(res);
@@ -380,7 +380,7 @@ bool temporalDbExists(const char* dbName)
   // need to create a routine - Fix me PLEEEEEASE - start
   PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
 
-  if( PQresultStatus(res)==CONNECTION_OK )
+  if( PQstatus(conn) == CONNECTION_OK )
     {
       PQclear(res);
       return true;
