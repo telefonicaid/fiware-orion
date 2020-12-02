@@ -344,15 +344,16 @@ bool temporalExecSqlStatement(char* oldTemporalSQLBuffer)
 //
 bool temporalDbTableExists(const char* dbName, const char* tableName)
 {
-  char*  sqlStm;
+  char*     sqlStm;
+  PGconn*   conn = NULL;
   sqlStm = kaAlloc(&orionldState.kalloc, 512);
   bzero(sqlStm, 512);
   snprintf(sqlStm, 512, "SELECT entity_id FROM %s", tableName);
 
   // need to create a routine - Fix me PLEEEEEASE - start
-  PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
+  PGresult *res = PQexec(conn, dbName);
 
-  if( PQresultStatus(res)==PGRES_FATAL_ERROR )
+  if( PQresultStatus(res) == PGRES_FATAL_ERROR )
     {
       LM_K(("CCSR - Table does not EXIST - what can we do"));
       PQclear(res);
@@ -372,24 +373,19 @@ bool temporalDbTableExists(const char* dbName, const char* tableName)
 //
 bool temporalDbExists(const char* dbName)
 {
-  char*  sqlStm;
+  char*    sqlStm;
   sqlStm = kaAlloc(&orionldState.kalloc, 512);
   bzero(sqlStm, 512);
   snprintf(sqlStm, 512, "dbname = %s", dbName);
 
   // need to create a routine - Fix me PLEEEEEASE - start
-  PGresult *res = PQexec(oldPgDbTenantConnection, dbName);
+  PGconn *conn = PQconnectdb(sqlStm);
 
-  if( PQresultStatus(res)==CONNECTION_OK )
-    {
-      PQclear(res);
-      return true;
-    }
-    else
-    {
-      LM_K(("CCSR - DATABASE does not EXIST - what can we do"));
-      PQclear(res);
-      return false;
-    }
+  if( PQstatus(conn) != CONNECTION_OK )
+  {
+    LM_K(("CCSR - DATABASE does not EXIST - what can we do"));
+    return false;
+  }
+  return true;
   // need to create a routine - Fix me PLEEEEEASE - end
 }
