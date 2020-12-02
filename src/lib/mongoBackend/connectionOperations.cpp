@@ -763,7 +763,6 @@ bool setWriteConcern
   try
   {
     connection->setWriteConcern(wc);
-    LM_I(("Database Operation Successful (setWriteConcern: %d)", wc.nodes()));
   }
   catch (const std::exception &e)
   {
@@ -810,7 +809,6 @@ bool getWriteConcern
   try
   {
     *wc = connection->getWriteConcern();
-    LM_I(("Database Operation Successful (getWriteConcern)"));
   }
   catch (const std::exception &e)
   {

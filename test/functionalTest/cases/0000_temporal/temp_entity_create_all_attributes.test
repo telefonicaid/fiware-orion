@@ -26,7 +26,7 @@ Simple test of creation of an Entity with all types of Attributes
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -temporal
+brokerStart CB 100 IPv4 -temporal
 
 --SHELL--
 

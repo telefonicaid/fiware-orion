@@ -1048,14 +1048,6 @@ int main(int argC, char* argV[])
   }
 
   //
-  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
-  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
-  // Otherwise, we have empirically checked that CB may randomly crash
-  //
-  contextBrokerInit(dbName, multitenancy);
-
-
-  //
   // If the Env Var ORIONLD_CACHED_CONTEXT_DIRECTORY is set, then at startup, the broker will read all context files
   // inside that directory and add them to the linked list of "downloaded" contexts.
   //
@@ -1072,6 +1064,21 @@ int main(int argC, char* argV[])
   //
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
   dbInit(dbHost, dbName);
+
+  //
+  // The database for Temporal Representation of Entities must be initialized before mongodb
+  // as callbacks to create tenants (== postgres databases) and their tables are called from the
+  // initialization routines of mongodb - if postgres is not initialized, this will fail.
+  //
+  if (temporal)
+    temporalInit();
+
+  //
+  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
+  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
+  // Otherwise, we have empirically checked that CB may randomly crash
+  //
+  contextBrokerInit(dbName, multitenancy);
 
   if (https)
   {
@@ -1133,8 +1140,6 @@ int main(int argC, char* argV[])
   }
 
   LM_K(("Initialization ready - accepting requests on port %d", port));
-
-  temporalInit();
 
   while (1)
   {
