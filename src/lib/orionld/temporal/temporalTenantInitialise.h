@@ -84,4 +84,20 @@ extern bool temporalTenantInitialise(const char* tenantName);
 //
 extern bool temporalExecSqlStatement(char* oldTemporalSQLBuffer);
 
+
+// -----------------------------------------------------------------------------
+//
+// temporalDbExists -
+//
+extern bool temporalDbExists(const char* dbName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalDbTableExists -
+//
+extern bool temporalDbTableExists(const char* dbName, const char* tableName);
+
+
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_
