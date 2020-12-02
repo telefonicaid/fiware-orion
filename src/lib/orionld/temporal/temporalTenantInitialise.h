@@ -89,7 +89,7 @@ extern bool temporalExecSqlStatement(char* oldTemporalSQLBuffer);
 //
 // temporalDbExists -
 //
-bool temporalDbExists(const char* dbName);
+extern bool temporalDbExists(const char* dbName);
 
 
 
@@ -97,7 +97,7 @@ bool temporalDbExists(const char* dbName);
 //
 // temporalDbTableExists -
 //
-bool temporalDbTableExists(const char* dbName, const char* tableName);
+extern bool temporalDbTableExists(const char* dbName, const char* tableName);
 
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALINTIALISETENANT_H_
