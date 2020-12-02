@@ -370,7 +370,7 @@ bool temporalDbTableExists(const char* dbName, const char* tableName)
 //
 // temporalDbExists -
 //
-bool bool temporalDbExists(const char* dbName)
+bool temporalDbExists(const char* dbName)
 {
   char*  sqlStm;
   sqlStm = kaAlloc(&orionldState.kalloc, 512);
