@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
+#include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kalloc/kaBufferInit.h"                                 // kaBufferInit
@@ -44,13 +45,14 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/orionldTenantCreate.h"                  // Own interface
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
-#include "orionld/common/orionldTenantCreate.h"                  // Own interface
+#include "orionld/temporal/geoPropertyExtract.h"                 // geoPropertyExtract
 #include "orionld/temporal/temporalTenantInitialise.h"           // Postgres db functions
 
 
@@ -185,7 +187,6 @@ void entityExtract
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     lmLogTree("CCSR", "attrP before attrExtract", attrP);
-    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
 
     // if (entityInArray)
     // {
@@ -197,13 +198,14 @@ void entityExtract
     // }
     // else
     // {
-      LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
-      attrExtract(attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-      LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %s, attribute %s",
-              allTab->attributeTableArray[attrIndex].attributeValueType,
-              allTab->attributeTableArray[attrIndex].entityId,
-              allTab->attributeTableArray[attrIndex].attributeName));
-      allTab->attributeTableArrayItems++;
+    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
+    LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
+    attrExtract(attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+    LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %s, attribute %s",
+            allTab->attributeTableArray[attrIndex].attributeValueType,
+            allTab->attributeTableArray[attrIndex].entityId,
+            allTab->attributeTableArray[attrIndex].attributeName));
+    allTab->attributeTableArrayItems++;
     // }
     attrIndex++;
   }
@@ -344,6 +346,10 @@ void attrExtract
     return;
   }
 
+  //  adding instance id to map to sub attributes
+  dbAttributeTableLocal->instanceId = kaAlloc(&orionldState.kalloc, 64);
+  uuidGenerate(dbAttributeTableLocal->instanceId);
+
   KjNode* observedAtP = kjLookup(attrP, "observedAt");
   if (observedAtP != NULL)
   {
@@ -352,7 +358,7 @@ void attrExtract
     // else
     dbAttributeTableLocal->observedAt = 49;
     LM_TMP(("CCSR - Temporal - attrP Found observedAt %s",observedAtP->value.s));
-    kjChildRemove (attrP,observedAtP);
+    kjChildRemove(attrP,observedAtP);
   }
 
   KjNode* nodeP  = kjLookup(attrP, "unitCode");
@@ -368,7 +374,7 @@ void attrExtract
   {
     LM_TMP(("CCSR - attrP Found Location "));
     kjChildRemove (attrP,nodeP);
-    // Chandra-TBI
+    geoPropertyExtract(nodeP, attrP->name, dbAttributeTableLocal->instanceId, dbAttributeTableLocal->entityId);
   }
 
   nodeP  = kjLookup(attrP, "operationSpace");
@@ -479,11 +485,6 @@ void attrExtract
 
     LM_TMP(("CCSR:  Attribute Value type : %d", dbAttributeTableLocal->attributeValueType));
   }
-
-
-  //  adding instance id to map to sub attributes
-  dbAttributeTableLocal->instanceId = kaAlloc(&orionldState.kalloc, 64);
-  uuidGenerate(dbAttributeTableLocal->instanceId);
 
   // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
 
