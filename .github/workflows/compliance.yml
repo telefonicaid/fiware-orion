@@ -1,0 +1,19 @@
+name: Compliance Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Test
+        run: |
+          $(pwd)/docker/build.sh -s compliance -t -p  $(pwd)

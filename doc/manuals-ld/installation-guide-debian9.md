@@ -48,11 +48,11 @@ Some libraries are built from source code and those sources must be downloaded a
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.48
 * rapidjson:      1.0.2
-* kbase:          0.3
-* klog:           0.3
-* kalloc:         0.3
-* kjson:          0.3
-* khash:          0.3
+* kbase:          0.5
+* klog:           0.5
+* kalloc:         0.5
+* kjson:          0.5
+* khash:          0.5
 * gtest:          1.5 (needed for unit testing only)
 * gmock:          1.5 (needed for unit testing only)
 
@@ -222,7 +222,13 @@ make html
 make
 sudo make install
 
+
 # Python library
+
+# If you don't have pip installed:
+sudo aptitude update
+sudo aptitude install python-pip
+
 pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
@@ -275,7 +281,7 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/).
+For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
 This is what the MongoDB documentation tells us to do to install MongoDB server 4.2 under Debian 9.

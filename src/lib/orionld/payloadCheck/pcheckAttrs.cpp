@@ -60,7 +60,7 @@ bool pcheckAttrs(KjNode* tree)
       return false;
     }
 
-    attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, NULL, true, NULL);
+    attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
   }
 
   return true;

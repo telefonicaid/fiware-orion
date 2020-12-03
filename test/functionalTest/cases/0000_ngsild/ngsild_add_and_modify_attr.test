@@ -33,9 +33,10 @@ brokerStart CB
 #
 # 01. Create an entity with an attribute P1
 # 02. GET the entity - see P1
-# 03. ADD the attribute P2 and modify P1
-# 04. GET the entity, see P2 and new P1
-# 05. See mongo content
+# 03. See mongo content
+# 04. ADD the attribute P2 and modify P1
+# 05. GET the entity, see P2 and new P1
+# 06. See mongo content
 #
 
 echo "01. Create an entity with an attribute P1"
@@ -62,7 +63,14 @@ echo
 echo
 
 
-echo "03. ADD the attribute P2 and modify P1"
+echo "03. See mongo content"
+echo "====================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "04. ADD the attribute P2 and modify P1"
 echo "======================================"
 payload='{
   "P1": {
@@ -80,14 +88,14 @@ echo
 echo
 
 
-echo "04. GET the entity, see P2 and new P1"
+echo "05. GET the entity, see P2 and new P1"
 echo "====================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2' --noPayloadCheck -H "application/ld+json"
 echo
 echo
 
 
-echo "05. See mongo content"
+echo "06. See mongo content"
 echo "====================="
 mongoCmd2 ftest "db.entities.findOne()"
 echo
@@ -123,7 +131,37 @@ Date: REGEX(.*)
 
 
 
-03. ADD the attribute P2 and modify P1
+03. See mongo content
+=====================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:2018-11-22T10:00:00",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*)
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+04. ADD the attribute P2 and modify P1
 ======================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -131,7 +169,7 @@ Date: REGEX(.*)
 
 
 
-04. GET the entity, see P2 and new P1
+05. GET the entity, see P2 and new P1
 =====================================
 HTTP/1.1 200 OK
 Content-Length: 178
@@ -154,7 +192,7 @@ Date: REGEX(.*)
 
 
 
-05. See mongo content
+06. See mongo content
 =====================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb:REGEX(.*)

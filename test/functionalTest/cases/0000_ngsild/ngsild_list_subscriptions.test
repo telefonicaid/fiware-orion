@@ -382,7 +382,7 @@ Date: REGEX(.*)
 02. GET subscriptions - see the first 20
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 12041
+Content-Length: 12121
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -404,7 +404,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -449,7 +449,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -494,7 +494,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -539,7 +539,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -584,7 +584,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -629,7 +629,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -674,7 +674,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -719,7 +719,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -764,7 +764,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -809,7 +809,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -854,7 +854,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -899,7 +899,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -944,7 +944,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -989,7 +989,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1034,7 +1034,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1079,7 +1079,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1124,7 +1124,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1169,7 +1169,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1214,7 +1214,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1259,7 +1259,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1294,7 +1294,7 @@ Date: REGEX(.*)
 03. GET subscriptions with limit 5 - see the first 5
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 3011
+Content-Length: 3031
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1316,7 +1316,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1361,7 +1361,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1406,7 +1406,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1451,7 +1451,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1496,7 +1496,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1531,7 +1531,7 @@ Date: REGEX(.*)
 04. GET subscriptions with limit 5 and offset 25, see subs 25-29
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 3011
+Content-Length: 3031
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -1553,7 +1553,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1598,7 +1598,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1643,7 +1643,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1688,7 +1688,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",
@@ -1733,7 +1733,7 @@ Date: REGEX(.*)
                 "type": "T3"
             }
         ],
-        "expires": "2028-12-31T10:00:00Z",
+        "expires": "2028-12-31T10:00:00.000Z",
         "geoQ": {
             "coordinates": "1,2",
             "geometry": "circle",

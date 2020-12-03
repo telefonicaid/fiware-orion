@@ -50,11 +50,11 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
@@ -66,7 +66,7 @@ extern "C"
 //
 // pcheckAttribute -
 //
-// FIXME: Implement and move to orionld/payloadCheck/pcheckAttribute.cpp
+// FIXME: Use instead the one from src/lib/payloadCheck/pcheckAttribute.cpp
 //
 static bool pcheckAttribute(KjNode* attributeP, OrionldProblemDetails* pdP)
 {
@@ -88,9 +88,8 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
   KjNode*          modifiedAt;
   KjNode*          createdAt;
   char*            longName = NULL;
-  bool             valueMayBeExpanded;
 
-  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, &valueMayBeExpanded, true, NULL);
+  longName      = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
   attributeName = kaStrdup(&orionldState.kalloc, longName);
   dotForEq(attributeName);
 
@@ -114,9 +113,9 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
         return NULL;
       }
 
-      if (!urlCheck(datasetIdP->value.s, &pdP->detail) && !urnCheck(datasetIdP->value.s, &pdP->detail))
+      if (pcheckUri(datasetIdP->value.s, &pdP->detail) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId");
+        orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", "datasetId");  // FIXME: Include 'detail' and value (datasetIdP->value.s)
         orionldState.httpStatusCode = SccBadRequest;
         pdP->status = 400;
         return NULL;
@@ -179,7 +178,7 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
 
 // -----------------------------------------------------------------------------
 //
-// pcheckAttributeType -
+// pcheckAttributeType - move to payloadCheck library
 //
 bool pcheckAttributeType(KjNode* attrTypeP, const char* attrName)
 {
@@ -190,6 +189,7 @@ bool pcheckAttributeType(KjNode* attrTypeP, const char* attrName)
     orionldState.httpStatusCode = SccBadRequest;
     return false;
   }
+
   if (attrTypeP->type != KjString)
   {
     LM_W(("Bad Input (attribute type must be a JSON string)"));
@@ -228,9 +228,9 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   // Entity ID
   //
-  if ((urlCheck(entityId, &detail) == false) && (urnCheck(entityId, &detail) == false))
+  if (pcheckUri(entityId, &detail) == false)
   {
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity id", "The id specified cannot be resolved to a URL or URN");  // FIXME: Include 'detail' and name (entityId)
     return false;
   }
 
@@ -258,10 +258,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
   entityIdP->id            = entityId;
   entityIdP->isPattern     = "false";
-  entityIdP->creDate       = getCurrentTime();
-  entityIdP->modDate       = getCurrentTime();
+  entityIdP->creDate       = orionldState.requestTime;
+  entityIdP->modDate       = orionldState.requestTime;
   entityIdP->isTypePattern = false;
-  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, NULL, true, NULL);
+  entityIdP->type          = orionldContextItemExpand(orionldState.contextP, entityType, true, NULL);
 
 
   //
@@ -313,8 +313,6 @@ bool orionldPostEntities(ConnectionInfo* ciP)
 
     KjNode* attrType = kjLookup(kNodeP, "type");
 
-    LM_T(LmtUriExpansion, ("treating attribute '%s'", kNodeP->name));
-
     if ((kNodeP == createdAtP) || (kNodeP == modifiedAtP))
     {
       kNodeP = next;
@@ -349,8 +347,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
       kjChildAdd(kNodeP, modifiedAt);
 
       // Change to longName
-      bool   valueMayBeExpanded;
-      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, &valueMayBeExpanded, true, NULL);
+      char*  longName = orionldContextItemExpand(orionldState.contextP, kNodeP->name, true, NULL);
 
       longName = kaStrdup(&orionldState.kalloc, longName);
       dotForEq(longName);
@@ -365,6 +362,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     KjNode*           attrTypeNodeP  = NULL;
     char*             detail         = (char*) "none";
 
+    eqForDot(kNodeP->name);
     if (kjTreeToContextAttribute(orionldState.contextP, kNodeP, caP, &attrTypeNodeP, &detail) == false)
     {
       // kjTreeToContextAttribute calls orionldErrorResponseCreate

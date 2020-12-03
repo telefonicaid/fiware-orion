@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
 #include "orionld/payloadCheck/pcheckInformation.h"             // pcheckInformation
 #include "orionld/payloadCheck/pcheckTimeInterval.h"            // pcheckTimeInterval
-#include "orionld/payloadCheck/pcheckGeoProperty.h"             // pcheckGeoProperty
+#include "orionld/payloadCheck/pcheckGeoPropertyValue.h"        // pcheckGeoPropertyValue
 #include "orionld/payloadCheck/pcheckRegistration.h"            // Own interface
 
 
@@ -105,7 +105,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
   {
     next = nodeP->next;
 
-    if (strcmp(nodeP->name, "id") == 0)
+    if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
     {
       if (idCanBePresent == false)
       {
@@ -119,7 +119,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
       EMPTY_STRING_CHECK(nodeP, "id");
       URI_CHECK(nodeP, "id");
     }
-    else if (strcmp(nodeP->name, "type") == 0)
+    else if (strcmp(nodeP->name, "type") == 0 || strcmp(nodeP->name, "@type") == 0)
     {
       DUPLICATE_CHECK(typeP, "type", nodeP);
       STRING_CHECK(nodeP, "type");
@@ -174,7 +174,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
       OBJECT_CHECK(nodeP, "location");
       EMPTY_OBJECT_CHECK(nodeP, "location");
 
-      if (pcheckGeoProperty(locationP, NULL, NULL) == false)
+      if (pcheckGeoPropertyValue(locationP, NULL, NULL) == false)
       {
         orionldState.httpStatusCode = SccBadRequest;
         return false;
@@ -185,7 +185,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
       DUPLICATE_CHECK(observationSpaceP, "observationSpace", nodeP);
       OBJECT_CHECK(nodeP, "observationSpace");
       EMPTY_OBJECT_CHECK(nodeP, "observationSpace");
-      if (pcheckGeoProperty(observationSpaceP, NULL, NULL) == false)
+      if (pcheckGeoPropertyValue(observationSpaceP, NULL, NULL) == false)
       {
         orionldState.httpStatusCode = SccBadRequest;
         return false;
@@ -196,7 +196,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  pr
       DUPLICATE_CHECK(operationSpaceP, "operationSpace", nodeP);
       OBJECT_CHECK(nodeP, "operationSpace");
       EMPTY_OBJECT_CHECK(nodeP, "operationSpace");
-      if (pcheckGeoProperty(operationSpaceP, NULL, NULL) == false)
+      if (pcheckGeoPropertyValue(operationSpaceP, NULL, NULL) == false)
       {
         orionldState.httpStatusCode = SccBadRequest;
         return false;

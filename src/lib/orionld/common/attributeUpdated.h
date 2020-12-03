@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTY_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTY_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ATTRIBUTEUPDATED_H_
+#define SRC_LIB_ORIONLD_COMMON_ATTRIBUTEUPDATED_H_
 
 /*
 *
@@ -25,17 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
 
 
 
 // ----------------------------------------------------------------------------
 //
-// pcheckGeoProperty -
+// attributeUpdated -
 //
-extern bool pcheckGeoProperty(KjNode* geoPropertyP, char** geoTypePP, KjNode** geoCoordsPP);
+extern void attributeUpdated(KjNode* updatedP, const char* attrName);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOPROPERTY_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ATTRIBUTEUPDATED_H_

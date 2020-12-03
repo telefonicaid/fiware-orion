@@ -23,10 +23,14 @@
 * Author: Fermin Galan
 */
 #include <stdint.h>
+#include <errno.h>                   // errno
+#include <string.h>                  // strerror
 
-#include "common/Timer.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "orionld/common/orionldState.h"  // orionldState
+#include "common/Timer.h"
 
 
 
@@ -50,7 +54,7 @@ Timer::~Timer(void)
 *
 * Timer::getCurrentTime -
 */
-int Timer::getCurrentTime(void)
+double Timer::getCurrentTime(void)
 {
-  return (int) time(NULL);
+  return orionldState.requestTime;
 }

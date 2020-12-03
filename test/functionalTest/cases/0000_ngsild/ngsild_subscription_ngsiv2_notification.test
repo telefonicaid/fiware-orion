@@ -1,0 +1,777 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI-LD Subscription for NGSIv2 notifications
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# What to test:
+# 1. Subscribed entity-type as long-name
+# 2. Subscribed attribute-name as long-name (in watchedAttributes)
+# 3. Subscribed attribute-name as long-name (in notificationParams:attrs)
+# 4. Special attr for entity: 
+#    - location
+#    - observationSpace
+#    - operationSpace
+# 5. Special sub-attrs for attributes:
+#    - observedAt
+#    - unitCode
+#    - datasetId
+#
+# 01. Create an LD subscription for NGSIv2, for all entities of type https://uri.etsi.org/ngsi-ld/default-context/T1
+# 02. Create an entity of type T, expanded to https://uri.etsi.org/ngsi-ld/default-context/T1
+# 03. Dump accumulator to see the notification (and reset the accumulator afterwards)
+# 04. Remove the subscription
+#
+# 05. Create an LD subscription for NGSIv2, for all entities with updates on attribute https://uri.etsi.org/ngsi-ld/default-context/P1
+# 06. Create an entity with an attribute named https://uri.etsi.org/ngsi-ld/default-context/P1
+# 07. Dump accumulator to see the notification (and reset the accumulator afterwards)
+# 08. Remove the subscription
+#
+# 09. Create an LD subscription for NGSIv2, for all entities and notifications with with https://uri.etsi.org/ngsi-ld/default-context/P3 only
+# 10. Create an entity with an attribute named https://uri.etsi.org/ngsi-ld/default-context/P3 and one more attribute
+# 11. Dump accumulator to see the notification with P1 only (and reset the accumulator afterwards)
+# 12. Remove the subscription
+
+# 13. Create an LD subscription for NGSIv2, for all entities of type https://uri.etsi.org/ngsi-ld/default-context/T4
+# 14. Create an entity with a location attribute
+# 15. Dump accumulator to see location in the notification (and reset the accumulator afterwards)
+# 16. See the entity in the DB
+# 17. Add observationSpace to the entity
+# 18. Dump accumulator to see observationSpace in the notification (and reset the accumulator afterwards)
+# 19. Add operationSpace to the entity
+# 20. Dump accumulator to see operationSpace in the notification (and reset the accumulator afterwards)
+# 21. Remove the subscription
+#
+
+echo "01. Create an LD subscription for NGSIv2, for all entities of type https://uri.etsi.org/ngsi-ld/default-context/T1"
+echo "=================================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+    }
+  ],
+  "notification": {
+    "format": "NGSIv2-Normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity of type T, expanded to https://uri.etsi.org/ngsi-ld/default-context/T1"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T1",
+  "P": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see the notification"
+echo "============================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Remove the subscription"
+echo "==========================="
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01 -X DELETE
+echo
+echo
+
+
+echo "05. Create an LD subscription for NGSIv2, for all entities with updates on attribute https://uri.etsi.org/ngsi-ld/default-context/P1"
+echo "=================================================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub02",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T2"
+    }
+  ],
+  "watchedAttributes": [ "https://uri.etsi.org/ngsi-ld/default-context/P1" ],
+  "notification": {
+    "format": "NGSIv2-Normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create an entity with an attribute named https://uri.etsi.org/ngsi-ld/default-context/P1"
+echo "============================================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T2",
+  "P1": {
+    "type": "Property",
+    "value": 5
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump accumulator to see the notification (and reset the accumulator afterwards)"
+echo "==================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Remove the subscription"
+echo "==========================="
+SUB_ID='http://a.b.c/subs/sub02'
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub02 -X DELETE
+echo
+echo
+
+
+echo "09. Create an LD subscription for NGSIv2, for all entities and notifications with with https://uri.etsi.org/ngsi-ld/default-context/P3 only"
+echo "========================================================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub03",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T3"
+    }
+  ],
+  "watchedAttributes": [ "https://uri.etsi.org/ngsi-ld/default-context/P3" ],
+  "notification": {
+    "attributes": [ "https://uri.etsi.org/ngsi-ld/default-context/P3" ],
+    "format": "NGSIv2-Normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. Create an entity with an attribute named https://uri.etsi.org/ngsi-ld/default-context/P3 and one more attribute"
+echo "==================================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E3",
+  "type": "T3",
+  "P3": {
+    "type": "Property",
+    "value": 10
+  },
+  "P4": {
+    "type": "Property",
+    "value": 11
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. Dump accumulator to see the notification with P3 only (and reset the accumulator afterwards)"
+echo "================================================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "12. Remove the subscription"
+echo "==========================="
+SUB_ID='http://a.b.c/subs/sub03'
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub03 -X DELETE
+echo
+echo
+
+sleep 1
+
+echo "13. Create an LD subscription for NGSIv2, for all entities of type https://uri.etsi.org/ngsi-ld/default-context/T4"
+echo "=================================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub04",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+    }
+  ],
+  "notification": {
+    "format": "NGSIv2-Normalized",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+accumulatorReset  # NGSIv2 supports initial notifications
+echo
+echo
+
+
+echo "14. Create an entity with a location attribute"
+echo "=============================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E4",
+  "type": "T4",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 2, 3 ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "15. Dump accumulator to see location in the notification (and reset the accumulator afterwards)"
+echo "==============================================================================================="
+sleep 1
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "16. See the entity in the DB"
+echo "============================"
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:ngsi-ld:entities:E4"})'
+echo
+echo
+
+
+echo "17. Add observationSpace to the entity"
+echo "======================================"
+payload='{
+  "observationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 1, 3 , 1 ]
+    },
+    "r1": {
+      "type": "Relationship",
+      "object": "urn:r:r1"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E4/attrs --payload "$payload"
+echo
+echo
+
+
+echo "18. Dump accumulator to see observationSpace in the notification (and reset the accumulator afterwards)"
+echo "======================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "19. Add operationSpace to the entity"
+echo "===================================="
+payload='{
+  "operationSpace": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [ 2, 4 , 2 ]
+    },
+    "r2": {
+      "type": "Relationship",
+      "object": "urn:r:r2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E4/attrs --payload "$payload"
+echo
+echo
+
+
+echo "20. Dump accumulator to see operationSpace in the notification (and reset the accumulator afterwards)"
+echo "====================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "21. Remove the subscription"
+echo "==========================="
+orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub04 -X DELETE
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an LD subscription for NGSIv2, for all entities of type https://uri.etsi.org/ngsi-ld/default-context/T1
+==================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+02. Create an entity of type T, expanded to https://uri.etsi.org/ngsi-ld/default-context/T1
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see the notification
+============================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 236
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: V2-Normalized-For-LD
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "https://uri.etsi.org/ngsi-ld/default-context/P": {
+                "metadata": {}, 
+                "type": "Property", 
+                "value": 2
+            }, 
+            "id": "urn:ngsi-ld:entities:E1", 
+            "type": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+        }
+    ], 
+    "subscriptionId": "REGEX(.*)"
+}
+=======================================
+
+
+04. Remove the subscription
+===========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Create an LD subscription for NGSIv2, for all entities with updates on attribute https://uri.etsi.org/ngsi-ld/default-context/P1
+==================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+06. Create an entity with an attribute named https://uri.etsi.org/ngsi-ld/default-context/P1
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+07. Dump accumulator to see the notification (and reset the accumulator afterwards)
+===================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 237
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: V2-Normalized-For-LD
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "https://uri.etsi.org/ngsi-ld/default-context/P1": {
+                "metadata": {}, 
+                "type": "Property", 
+                "value": 5
+            }, 
+            "id": "urn:ngsi-ld:entities:E2", 
+            "type": "https://uri.etsi.org/ngsi-ld/default-context/T2"
+        }
+    ], 
+    "subscriptionId": "REGEX(.*)"
+}
+=======================================
+
+
+08. Remove the subscription
+===========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. Create an LD subscription for NGSIv2, for all entities and notifications with with https://uri.etsi.org/ngsi-ld/default-context/P3 only
+=========================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+10. Create an entity with an attribute named https://uri.etsi.org/ngsi-ld/default-context/P3 and one more attribute
+===================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E3
+Date: REGEX(.*)
+
+
+
+11. Dump accumulator to see the notification with P3 only (and reset the accumulator afterwards)
+================================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 238
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: V2-Normalized-For-LD
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "https://uri.etsi.org/ngsi-ld/default-context/P3": {
+                "metadata": {}, 
+                "type": "Property", 
+                "value": 10
+            }, 
+            "id": "urn:ngsi-ld:entities:E3", 
+            "type": "https://uri.etsi.org/ngsi-ld/default-context/T3"
+        }
+    ], 
+    "subscriptionId": "REGEX(.*)"
+}
+=======================================
+
+
+12. Remove the subscription
+===========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+13. Create an LD subscription for NGSIv2, for all entities of type https://uri.etsi.org/ngsi-ld/default-context/T4
+==================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+Date: REGEX(.*)
+
+
+
+14. Create an entity with a location attribute
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E4
+Date: REGEX(.*)
+
+
+
+15. Dump accumulator to see location in the notification (and reset the accumulator afterwards)
+===============================================================================================
+POST http://localhost:9997/notify
+Fiware-Servicepath: /
+Content-Length: 238
+User-Agent: REGEX(.*)
+Ngsiv2-Attrsformat: V2-Normalized-For-LD
+Host: localhost:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+        }
+    ], 
+    "subscriptionId": "REGEX(.*)"
+}
+=======================================
+
+
+16. See the entity in the DB
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entities:E4",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T4",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"location"
+	],
+	"attrs" : {
+		"location" : {
+			"type" : "GeoProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"type" : "Point",
+				"coordinates" : [
+					1,
+					2,
+					3
+				]
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+17. Add observationSpace to the entity
+======================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+18. Dump accumulator to see observationSpace in the notification (and reset the accumulator afterwards)
+=======================================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 417
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: V2-Normalized-For-LD
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "https://uri.etsi.org/ngsi-ld/observationSpace": {
+                "metadata": {
+                    "r1": {
+                        "type": "Relationship", 
+                        "value": "urn:r:r1"
+                    }
+                }, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        3, 
+                        1
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+        }
+    ], 
+    "subscriptionId": "http://a.b.c/subs/sub04"
+}
+=======================================
+
+
+19. Add operationSpace to the entity
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+20. Dump accumulator to see operationSpace in the notification (and reset the accumulator afterwards)
+=====================================================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 594
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: V2-Normalized-For-LD
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "https://uri.etsi.org/ngsi-ld/observationSpace": {
+                "metadata": {
+                    "r1": {
+                        "type": "Relationship", 
+                        "value": "urn:r:r1"
+                    }
+                }, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        3, 
+                        1
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "https://uri.etsi.org/ngsi-ld/operationSpace": {
+                "metadata": {
+                    "r2": {
+                        "type": "Relationship", 
+                        "value": "urn:r:r2"
+                    }
+                }, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        2, 
+                        4, 
+                        2
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+        }
+    ], 
+    "subscriptionId": "http://a.b.c/subs/sub04"
+}
+=======================================
+
+
+21. Remove the subscription
+===========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

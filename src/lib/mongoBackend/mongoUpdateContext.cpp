@@ -69,9 +69,9 @@ HttpStatusCode mongoUpdateContext
   /* Check that the service path vector has only one element, returning error otherwise */
   if (servicePathV.size() > 1)
   {
-    char lenV[STRING_SIZE_FOR_INT];
+    char lenV[STRING_SIZE_FOR_LONG + 3];
 
-    snprintf(lenV, sizeof(lenV), "%lu", (unsigned long) servicePathV.size());
+    snprintf(lenV, sizeof(lenV) - 1, "%lu", (unsigned long) servicePathV.size());
 
     std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
     alarmMgr.badInput(clientIp, details);

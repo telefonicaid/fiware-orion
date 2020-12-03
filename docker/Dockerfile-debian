@@ -4,15 +4,18 @@ ARG TOKEN
 ARG STAGE=release
 ARG OS=debian
 ARG REV=develop
+ARG HOME=/opt/orion
 
 ENV BROKER='orionld'
 
+
+COPY ./docker/ /usr/local/bin/
+COPY . ${HOME}
+
+WORKDIR /opt/orion/docker/
+RUN build.sh -T ${TOKEN} -o ${OS} -s ${STAGE}
+
 WORKDIR /opt
-
-COPY . /usr/local/bin/
-
-RUN build.sh -T ${TOKEN} -o ${OS} -s ${STAGE} -r ${REV} -c
-
 ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
 EXPOSE 1026

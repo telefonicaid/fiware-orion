@@ -1,0 +1,367 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Modification of entity attributes with datasetId
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# FIXME: Once datasetId is implemented for GET /entities, this test needs to be modified
+#        The RHS of 'furniture' and 'rtest' will be arrays and not strings in steps 5 and 6
+#
+# 01. Create an entity urn:ngsi-ld:Building:store001
+# 02. Update the entity with a few datasetId instances for the attr 'furniture'
+# 03. GET the entity - see the datasets added in step 2
+# 04. GET the entity using key-values
+# 05. Query entities
+# 06. Query entities using key-values
+#
+
+echo "01. Create an entity urn:ngsi-ld:Building:store001"
+echo "=================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:store001",
+  "type": "Building",
+  "category": {"type": "Property", "value": ["commercial"]},
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Bornholmer Straße 65",
+      "addressRegion": "Berlin",
+      "addressLocality": "Prenzlauer Berg",
+      "postalCode": "10439"
+    },
+    "verified": {"type": "Property", "value": true }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {"type": "Point", "coordinates": [13.3986, 52.5547]}
+  },
+  "name": { "type": "Property", "value": "Bosebrucke Enikauf" },
+  "rtest": [
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:r:001"
+    },
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:11",
+      "object": "urn:ngsi-ld:r:002"
+    },
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:12",
+      "object": "urn:ngsi-ld:r:003"
+    }
+  ],
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "02. Update the entity with a few datasetId instances for the attr 'furniture'"
+echo "============================================================================="
+payload='{
+  "furniture": [
+    {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Shelf:001"
+    },
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:1",
+      "object": "urn:ngsi-ld:Shelf:002"
+    },
+    {
+      "type": "Relationship",
+      "datasetId": "urn:ngsi-ld:Relationship:2",
+      "object": "urn:ngsi-ld:Shelf:003"
+    }
+  ],
+  "@context": "https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001/attrs --payload "$payload" -H "Content-Type: application/ld+json"
+echo
+echo
+
+
+echo "03. GET the entity - see the datasets added in step 2"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001 -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "04. GET the entity using key-values"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001?options=keyValues -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "05. Query entities"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities?type=Building -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "06. Query entities using key-values"
+echo "==================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=Building&options=keyValues' -H 'Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:Building:store001
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001
+Date: REGEX(.*)
+
+
+
+02. Update the entity with a few datasetId instances for the attr 'furniture'
+=============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. GET the entity - see the datasets added in step 2
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 981
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "address": {
+        "type": "Property",
+        "value": {
+            "addressLocality": "Prenzlauer Berg",
+            "addressRegion": "Berlin",
+            "postalCode": "10439",
+            "streetAddress": "Bornholmer Stra\u00dfe 65"
+        },
+        "verified": {
+            "type": "Property",
+            "value": true
+        }
+    },
+    "category": {
+        "type": "Property",
+        "value": "commercial"
+    },
+    "furniture": [
+        {
+            "object": "urn:ngsi-ld:Shelf:001",
+            "type": "Relationship"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:Relationship:1",
+            "object": "urn:ngsi-ld:Shelf:002",
+            "type": "Relationship"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:Relationship:2",
+            "object": "urn:ngsi-ld:Shelf:003",
+            "type": "Relationship"
+        }
+    ],
+    "id": "urn:ngsi-ld:Building:store001",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.3986,
+                52.5547
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Bosebrucke Enikauf"
+    },
+    "rtest": [
+        {
+            "object": "urn:ngsi-ld:r:001",
+            "type": "Relationship"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:Relationship:11",
+            "object": "urn:ngsi-ld:r:002",
+            "type": "Relationship"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:Relationship:12",
+            "object": "urn:ngsi-ld:r:003",
+            "type": "Relationship"
+        }
+    ],
+    "type": "Building"
+}
+
+
+04. GET the entity using key-values
+===================================
+HTTP/1.1 200 OK
+Content-Length: 458
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "address": {
+        "addressLocality": "Prenzlauer Berg",
+        "addressRegion": "Berlin",
+        "postalCode": "10439",
+        "streetAddress": "Bornholmer Stra\u00dfe 65"
+    },
+    "category": "commercial",
+    "furniture": [
+        "urn:ngsi-ld:Shelf:001",
+        "urn:ngsi-ld:Shelf:002",
+        "urn:ngsi-ld:Shelf:003"
+    ],
+    "id": "urn:ngsi-ld:Building:store001",
+    "location": {
+        "coordinates": [
+            13.3986,
+            52.5547
+        ],
+        "type": "Point"
+    },
+    "name": "Bosebrucke Enikauf",
+    "rtest": [
+        "urn:ngsi-ld:r:001",
+        "urn:ngsi-ld:r:002",
+        "urn:ngsi-ld:r:003"
+    ],
+    "type": "Building"
+}
+
+
+05. Query entities
+==================
+HTTP/1.1 200 OK
+Content-Length: 593
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "address": {
+            "type": "Property",
+            "value": {
+                "addressLocality": "Prenzlauer Berg",
+                "addressRegion": "Berlin",
+                "postalCode": "10439",
+                "streetAddress": "Bornholmer Stra\u00dfe 65"
+            },
+            "verified": {
+                "type": "Property",
+                "value": true
+            }
+        },
+        "category": {
+            "type": "Property",
+            "value": "commercial"
+        },
+        "furniture": {
+            "object": "urn:ngsi-ld:Shelf:001",
+            "type": "Relationship"
+        },
+        "id": "urn:ngsi-ld:Building:store001",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    13.3986,
+                    52.5547
+                ],
+                "type": "Point"
+            }
+        },
+        "name": {
+            "type": "Property",
+            "value": "Bosebrucke Enikauf"
+        },
+        "rtest": {
+            "object": "urn:ngsi-ld:r:001",
+            "type": "Relationship"
+        },
+        "type": "Building"
+    }
+]
+
+
+06. Query entities using key-values
+===================================
+HTTP/1.1 200 OK
+Content-Length: 368
+Content-Type: application/json
+Link: <https://fiware.github.io/tutorials.Step-by-Step/data-models-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "address": {
+            "addressLocality": "Prenzlauer Berg",
+            "addressRegion": "Berlin",
+            "postalCode": "10439",
+            "streetAddress": "Bornholmer Stra\u00dfe 65"
+        },
+        "category": "commercial",
+        "furniture": "urn:ngsi-ld:Shelf:001",
+        "id": "urn:ngsi-ld:Building:store001",
+        "location": {
+            "coordinates": [
+                13.3986,
+                52.5547
+            ],
+            "type": "Point"
+        },
+        "name": "Bosebrucke Enikauf",
+        "rtest": "urn:ngsi-ld:r:001",
+        "type": "Building"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

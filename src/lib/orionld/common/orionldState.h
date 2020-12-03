@@ -61,7 +61,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v0.4"
+#define ORIONLD_VERSION "post-v0.5"
 
 
 
@@ -103,18 +103,30 @@ typedef struct OrionldUriParamOptions
 //
 typedef struct OrionldUriParams
 {
-  char* id;
-  char* type;
-  char* idPattern;
-  char* attrs;
-  char* options;
-  int   offset;
-  int   limit;
-  bool  count;
-  char* geometry;
-  char* geoloc;
-  char* geoproperty;
-  char* datasetId;
+  char*     id;
+  char*     type;
+  char*     idPattern;
+  char*     attrs;
+  char*     options;
+  int       offset;
+  int       limit;
+  bool      count;
+  char*     q;
+  char*     geometry;
+  char*     coordinates;
+  char*     georel;
+  char*     geoloc;
+  char*     geoproperty;
+  char*     datasetId;
+  bool      deleteAll;
+  char*     timeproperty;
+  char*     timerel;
+  char*     timeAt;
+  char*     endTimeAt;
+  bool      details;
+  uint32_t  mask;
+  bool      prettyPrint;
+  int       spaces;
 } OrionldUriParams;
 
 
@@ -135,6 +147,13 @@ typedef struct OrionldNotificationInfo
 } OrionldNotificationInfo;
 
 
+typedef enum OrionldPhase
+{
+  OrionldPhaseStartup = 1,
+  OrionldPhaseServing
+} OrionldPhase;
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -149,8 +168,10 @@ typedef struct OrionldNotificationInfo
 //
 typedef struct OrionldConnectionState
 {
+  OrionldPhase            phase;
   ConnectionInfo*         ciP;
-  struct timespec         timestamp;  // the time when the request entered
+  struct timespec         timestamp;    // The time when the request entered
+  double                  requestTime;  // Same same, but at a floating point
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
@@ -167,6 +188,7 @@ typedef struct OrionldConnectionState
   char*                   link;
   bool                    linkHeaderAdded;
   bool                    noLinkHeader;
+  char*                   xauthHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
   int                     requestNo;
@@ -212,10 +234,9 @@ typedef struct OrionldConnectionState
 #endif
 
   //
-  // Array of allocated buffers that are to freed when the request thread ends
+  // Array of allocated buffers that are to be freed when the request thread ends
   //
-  //
-  void*                   delayedFreeVec[50];
+  void*                   delayedFreeVec[1001];
   int                     delayedFreeVecIndex;
   int                     delayedFreeVecSize;
 
@@ -287,6 +308,7 @@ extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
+extern OrionldPhase      orionldPhase;
 
 
 

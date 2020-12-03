@@ -28,10 +28,10 @@
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "common/globals.h"                                      // noCache
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup, ...
+
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/urlCheck.h"                             // urlCheck
-#include "orionld/common/urnCheck.h"                             // urnCheck
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
 
@@ -43,13 +43,13 @@
 //
 bool orionldDeleteSubscription(ConnectionInfo* ciP)
 {
-  char* details;
+  char* detail;
 
-  if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
+  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
   {
-    LM_E(("uriCheck: %s", details));
+    LM_E(("uriCheck: %s", detail));
     orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Identifier", orionldState.wildcard[0]);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Identifier", orionldState.wildcard[0]);  // FIXME: Include 'detail' and name (subscriptionId)
     return false;
   }
 

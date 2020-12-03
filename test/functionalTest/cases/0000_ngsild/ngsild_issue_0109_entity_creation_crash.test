@@ -99,7 +99,7 @@ Date: REGEX(.*)
 02. GET the entity, just to make sure all is A-OK
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 458
 Content-Type: application/json
 Link: <https://fiware.github.io/data-models/full-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -129,7 +129,7 @@ Date: REGEX(.*)
         "type": "Relationship"
     },
     "status": {
-        "observedAt": "2018-09-21T12:00:00Z",
+        "observedAt": "2018-09-21T12:00:00.000Z",
         "type": "Property",
         "value": "free"
     },

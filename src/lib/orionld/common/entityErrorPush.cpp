@@ -28,6 +28,9 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
+
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
 

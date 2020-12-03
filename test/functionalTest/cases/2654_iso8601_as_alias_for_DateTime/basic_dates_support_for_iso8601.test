@@ -166,7 +166,7 @@ Date: REGEX(.*)
 04. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -175,7 +175,7 @@ Date: REGEX(.*)
     "birthdate": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2050-04-05T14:00:00.00Z"
+        "value": "2050-04-05T14:00:00.000Z"
     },
     "id": "E1",
     "type": "T1"
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 06. Check entity hasn't been modified
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -208,7 +208,7 @@ Date: REGEX(.*)
     "birthdate": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2050-04-05T14:00:00.00Z"
+        "value": "2050-04-05T14:00:00.000Z"
     },
     "id": "E1",
     "type": "T1"
@@ -227,7 +227,7 @@ Date: REGEX(.*)
 08. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 103
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -236,7 +236,7 @@ Date: REGEX(.*)
     "birthdate": {
         "metadata": {},
         "type": "ISO8601",
-        "value": "2018-12-03T13:21:42.00Z"
+        "value": "2018-12-03T13:21:42.000Z"
     },
     "id": "E1",
     "type": "T1"

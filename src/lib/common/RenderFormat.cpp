@@ -49,6 +49,8 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
   case NGSI_V2_CUSTOM:              return "custom";
   case NGSI_LD_V1_NORMALIZED:       return "normalized";
   case NGSI_LD_V1_KEYVALUES:        return "keyValues";
+  case NGSI_LD_V1_V2_NORMALIZED:    return "V2-Normalized-For-LD";
+  case NGSI_LD_V1_V2_KEYVALUES:     return "V2-KeyValues-For-LD";
   case NO_FORMAT:
     if (noDefault == true)
     {

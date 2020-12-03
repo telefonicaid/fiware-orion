@@ -194,6 +194,7 @@ bool            ngsiv1Autocast;
 int             contextDownloadAttempts;
 int             contextDownloadTimeout;
 bool            temporal;
+bool            disableFileLog;
 
 
 
@@ -256,7 +257,7 @@ bool            temporal;
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define TEMPORAL_DESC          "enable temporal evolution of entities"
-
+#define DISABLE_FILE_LOG       "disable logging into file"
 
 
 /* ****************************************************************************
@@ -292,7 +293,7 @@ PaArgument paArgs[] =
   { "-multiservice",          &multitenancy,            "MULTI_SERVICE",             PaBool,    PaOpt,  false,           false,  true,             MULTISERVICE_DESC      },
   { "-httpTimeout",           &httpTimeout,             "HTTP_TIMEOUT",              PaLong,    PaOpt,  -1,              -1,     MAX_L,            HTTP_TMO_DESC          },
   { "-reqTimeout",            &reqTimeout,              "REQ_TIMEOUT",               PaLong,    PaOpt,   0,              0,      PaNL,             REQ_TMO_DESC           },
-  { "-reqMutexPolicy",        reqMutexPolicy,           "MUTEX_POLICY",              PaString,  PaOpt,  _i "all",        PaNL,   PaNL,             MUTEX_POLICY_DESC      },
+  { "-reqMutexPolicy",        reqMutexPolicy,           "MUTEX_POLICY",              PaString,  PaOpt,  _i "none",       PaNL,   PaNL,             MUTEX_POLICY_DESC      },
   { "-corsOrigin",            allowedOrigin,            "CORS_ALLOWED_ORIGIN",       PaString,  PaOpt,  _i "",           PaNL,   PaNL,             ALLOWED_ORIGIN_DESC    },
   { "-corsMaxAge",            &maxAge,                  "CORS_MAX_AGE",              PaInt,     PaOpt,  86400,           -1,     86400,            CORS_MAX_AGE_DESC      },
   { "-cprForwardLimit",       &cprForwardLimit,         "CPR_FORWARD_LIMIT",         PaUInt,    PaOpt,  1000,            0,      UINT_MAX,         CPR_FORWARD_LIMIT_DESC },
@@ -312,6 +313,7 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",       &strictIdv1,              "CHECK_ID_V1",               PaBool,    PaOpt,  false,           false,  true,             CHECK_v1_ID_DESC       },
   { "-disableCustomNotifications",  &disableCusNotif,   "DISABLE_CUSTOM_NOTIF",      PaBool,    PaOpt,  false,           false,  true,             DISABLE_CUSTOM_NOTIF   },
   { "-logForHumans",          &logForHumans,            "LOG_FOR_HUMANS",            PaBool,    PaOpt,  false,           false,  true,             LOG_FOR_HUMANS_DESC    },
+  { "-disableFileLog",        &disableFileLog,          "DISABLE_FILE_LOG",          PaBool,    PaOpt,  false,           false,  true,             DISABLE_FILE_LOG       },
   { "-disableMetrics",        &disableMetrics,          "DISABLE_METRICS",           PaBool,    PaOpt,  false,           false,  true,             METRICS_DESC           },
   { "-insecureNotif",         &insecureNotif,           "INSECURE_NOTIF",            PaBool,    PaOpt,  false,           false,  true,             INSECURE_NOTIF         },
   { "-ngsiv1Autocast",        &ngsiv1Autocast,          "NGSIV1_AUTOCAST",           PaBool,    PaOpt,  false,           false,  true,             NGSIV1_AUTOCAST        },
@@ -868,7 +870,6 @@ int main(int argC, char* argV[])
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D and FIWARE Foundation");
   paConfig("man version",                   (void*) versionString.c_str());
-  paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("builtin prefix",                (void*) "ORIONLD_");
@@ -880,26 +881,46 @@ int main(int argC, char* argV[])
 
 
   //
-  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
+  // If option '-disableFileLog' is set, no log to file
+  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file (unless -disableFileLog is set)
+  // A combination of the two makes the broker run in foreground (not as a daemon) and printing traces to stdout only
   //
-  if (paIsSet(argC, argV, "-fg"))
-  {
-    paConfig("log to screen",                 (void*) true);
+  fg             = paIsSet(argC, argV, paArgs, "-fg");
+  disableFileLog = paIsSet(argC, argV, paArgs, "-disableFileLog");
 
-    if (paIsSet(argC, argV, "-logForHumans"))
-    {
-      paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
-    }
-    else
-    {
-      paConfig("screen line format", LOG_FILE_LINE_FORMAT);
-    }
+  if (disableFileLog && fg)
+  {
+    paConfig("log to screen", (void*) true);
+    paConfig("log to file",   (void*) false);
+  }
+  else if (fg)
+  {
+    paConfig("log to screen", (void*) true);
+    paConfig("log to file",   (void*) true);
+  }
+  else if (disableFileLog)
+  {
+    paConfig("log to screen", (void*) false);
+    paConfig("log to file",   (void*) false);
+  }
+  else
+  {
+    paConfig("log to file",   (void*) true);
+  }
+
+  if (paIsSet(argC, argV, paArgs, "-logForHumans"))
+  {
+    paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  }
+  else
+  {
+    paConfig("screen line format", LOG_FILE_LINE_FORMAT);
   }
 
   //
   // If trace levels are set, turn set logLevel to DEBUG, so that the trace messages will actually pass through
   //
-  if (paIsSet(argC, argV, "-t"))
+  if (paIsSet(argC, argV, paArgs, "-t"))
     strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel));
 
   paParse(paArgs, argC, (char**) argV, 1, false);
@@ -1134,6 +1155,8 @@ int main(int argC, char* argV[])
   }
 
   LM_I(("Startup completed"));
+  orionldPhase = OrionldPhaseServing;
+
   if (simulatedNotification)
   {
     LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));

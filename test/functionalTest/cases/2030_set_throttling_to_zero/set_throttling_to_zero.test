@@ -101,13 +101,13 @@ Date: REGEX(.*)
 02. Get the subscription, see throttling=5
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 292
+Content-Length: 293
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -148,13 +148,13 @@ Date: REGEX(.*)
 04. Get the subscription, see throttling=0 (throttling is not rendered in the response if it is zero)
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 277
+Content-Length: 278
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [

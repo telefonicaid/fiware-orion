@@ -289,7 +289,7 @@ bye
 03. GET /ngsi-ld/v1/entities?type=Vehicle - See 4 Entities
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 1643
+Content-Length: 1659
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -378,7 +378,7 @@ Date: REGEX(.*)
 05. GET /ngsi-ld/v1/entities?type=Vehicle - See changes of 2 Entities
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1975
+Content-Length: 1995
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -398,7 +398,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": "2017-07-29T12:00:04.000Z"
     }
   },
   {
@@ -419,7 +419,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": "2017-07-29T12:00:04.000Z"
     }
   },
   {
@@ -436,7 +436,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": "2017-07-29T12:00:04.000Z"
     },
     "isParked": {
       "type": "Relationship",
@@ -445,7 +445,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": "2017-07-29T12:00:04.000Z"
     }
   },
   {
@@ -462,7 +462,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:Person:Bob"
       },
-      "observedAt": "2017-07-29T12:00:04Z"
+      "observedAt": "2017-07-29T12:00:04.000Z"
     }
   }
 ]

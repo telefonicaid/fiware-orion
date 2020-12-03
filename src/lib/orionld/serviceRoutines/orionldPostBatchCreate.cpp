@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/CHECK.h"                              // ARRAY_CHECK
 #include "orionld/common/urlCheck.h"                           // urlCheck
 #include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -61,7 +62,6 @@ extern "C"
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/removeArrayEntityLookup.h"            // removeArrayEntityLookup
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
-#include "orionld/payloadCheck/pcheckEntityInfoArray.h"        // pcheckEntityInfoArray
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -84,6 +84,7 @@ static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 }
 
 
+
 // ----------------------------------------------------------------------------
 //
 // entityIdPush - add ID to array
@@ -96,6 +97,7 @@ static void entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
 }
 
 
+
 // -----------------------------------------------------------------------------
 //
 // entityIdGet -
@@ -104,10 +106,11 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 {
   for (KjNode* nodeP = dbEntityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (SCOMPARE3(nodeP->name, 'i', 'd', 0))
+    if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
       *idP = nodeP->value.s;
   }
 }
+
 
 
 // ----------------------------------------------------------------------------
@@ -128,7 +131,8 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   // * all entities must contain an entity::id (one level down)
   // * no entity can contain an entity::type (one level down)
   //
-  pcheckEntityInfoArray(orionldState.requestTree, true);  // FIXME: This is not the correct check!
+  ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
+  EMPTY_ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
 
   KjNode*               incomingTree   = orionldState.requestTree;
   KjNode*               idArray        = kjArray(orionldState.kjsonP, NULL);
@@ -160,7 +164,6 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
     entityP = next;
   }
-
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
   //     whose Entity::Id is part of the array "idArray".
@@ -191,7 +194,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
   mongoRequest.updateActionType = ActionTypeAppendStrict;
 
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP);
+  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, NULL);
 
   UpdateContextResponse mongoResponse;
 

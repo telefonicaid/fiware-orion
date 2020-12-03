@@ -65,6 +65,7 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
+#include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
@@ -334,6 +335,16 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   }
 
   //
+  // All requests are either arrays or objects
+  //
+  if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
+  {
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object");
+    orionldState.httpStatusCode = 400;
+    return false;
+  }
+
+  //
   // Empty payload object?  ("{}" resulting in a tree with one Object that has no children)
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
@@ -348,7 +359,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldErrorResponseCreate(OrionldInvalidRequest, "Empty Array", "[]");
+    orionldErrorResponseCreate(OrionldInvalidRequest, "Invalid Payload Body", "Empty Array");
     orionldState.httpStatusCode = 400;
     return false;
   }
@@ -392,7 +403,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = orionldState.payloadContextNode->next;
         kjNodeDecouple(orionldState.payloadContextNode, prev, orionldState.requestTree);
       }
-      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0))
+      else if (SCOMPARE3(attrNodeP->name, 'i', 'd', 0) || SCOMPARE4(attrNodeP->name, '@', 'i', 'd', 0))
       {
         if (orionldState.payloadIdNode != NULL)
         {
@@ -409,7 +420,7 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
         attrNodeP = orionldState.payloadIdNode->next;
         kjNodeDecouple(orionldState.payloadIdNode, prev, orionldState.requestTree);
       }
-      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0))
+      else if (SCOMPARE5(attrNodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(attrNodeP->name, '@', 't', 'y', 'p', 'e', 0))
       {
         if (orionldState.payloadTypeNode != NULL)
         {
@@ -648,6 +659,34 @@ static void dbGeoIndexes(void)
 
 // -----------------------------------------------------------------------------
 //
+// uriParamSupport - are all given URI parameters supported by the service?
+//
+bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
+{
+  int shifts = 0;
+
+  while (given != 0)
+  {
+    if ((given & 1) != 0)
+    {
+      if ((supported & (1 << shifts)) == 0)
+      {
+        *detailP = (char*) uriParamName(1 << shifts);
+        return false;
+      }
+    }
+
+    given = given >> 1;
+    ++shifts;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
@@ -714,6 +753,18 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if ((orionldState.serviceP = serviceLookup(ciP)) == NULL)
     goto respond;
+
+  //
+  // Any URI param given but not supported?
+  //
+  char* detail;
+  if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
+  {
+    LM_W(("Bad Input (unsupported URI parameter: %s)", detail));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Unsupported URI parameter", detail);
+    orionldState.httpStatusCode = 400;
+    goto respond;
+  }
 
   //
   // If a tenant is used (HTTP Header NGSILD-Tenant) and it's not any of:
@@ -958,7 +1009,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     restReply(ciP, "");
 
   //
-  // Calling Temporal Routine to save the temporal data (if applicable)
+  // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
+  //
+  // Call Temporal Routine (if there is one) to save the temporal data.
   // Only if the Service Routine was successful, of course
   //
   if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))

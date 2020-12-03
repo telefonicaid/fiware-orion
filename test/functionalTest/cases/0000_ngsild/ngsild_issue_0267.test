@@ -58,7 +58,7 @@ echo
 
 echo "02. GET the entity, no @context, no Accept header (=> */*) - see @context in payload and correct Content-Len"
 echo "============================================================================================================"
-curl "localhost:$CB_PORT/ngsi-ld/v1/entities?type=T&prettyPrint=yes&space=2" -s -S --dump-header /tmp/httpHeaders.out > /tmp/payloadData.out
+curl "localhost:$CB_PORT/ngsi-ld/v1/entities?type=T&prettyPrint=yes&spaces=2" -s -S --dump-header /tmp/httpHeaders.out > /tmp/payloadData.out
 cat /tmp/httpHeaders.out | grep -v 'Keep-Alive'
 cat /tmp/payloadData.out
 rm -f /tmp/httpHeaders.out

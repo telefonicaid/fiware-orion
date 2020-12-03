@@ -24,22 +24,21 @@
 */
 extern "C"
 {
-#include "kjson/kjLookup.h"                                     // kjLookup
-#include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildAdd, ...
 }
 
-#include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                                // ConnectionInfo
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
-#include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldErrorResponse.h"                // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                            // urlCheck
-#include "orionld/common/urnCheck.h"                            // urnCheck
-#include "orionld/payloadCheck/pcheckSubscription.h"            // pcheckSubscription
-#include "orionld/db/dbConfiguration.h"                         // dbSubscriptionGet
-#include "orionld/serviceRoutines/orionldPatchSubscription.h"   // Own Interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
+#include "orionld/db/dbConfiguration.h"                        // dbSubscriptionGet
+#include "orionld/serviceRoutines/orionldPatchSubscription.h"  // Own Interface
 
 
 
@@ -71,7 +70,7 @@ void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replac
 //
 static bool okToRemove(const char* fieldName)
 {
-  if (strcmp(fieldName, "id") == 0)
+  if ((strcmp(fieldName, "id") == 0) || (strcmp(fieldName, "@id") == 0))
     return false;
   else if (strcmp(fieldName, "notification") == 0)
     return false;
@@ -112,10 +111,6 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-//
-//
-//
-//
 static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
@@ -134,7 +129,7 @@ static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP
         if (okToRemove(fragmentP->name) == false)
         {
           orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Fragment - attempt to remove a mandatory field", fragmentP->name);
-          orionldState.httpStatusCode = SccBadRequest;
+          orionldState.httpStatusCode = 400;
           return false;
         }
 
@@ -240,11 +235,11 @@ static bool ngsildSubscriptionPatch(ConnectionInfo* ciP, KjNode* dbSubscriptionP
 //
 // {
 //   "_id" : "urn:ngsi-ld:subscriptions:01",
-//   "expiration" : NumberLong(1861869600),
+//   "expiration" : 1861869600,
 //   "reference" : "http://valid.url/url",
 //   "custom" : false,
 //   "mimeType" : "application/ld+json",
-//   "throttling" : NumberLong(5),
+//   "throttling" : 5,
 //   "servicePath" : "/",
 //   "status" : "inactive",
 //   "entities" : [
@@ -288,18 +283,22 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
   //
   for (KjNode* fragmentP = patchTree->value.firstChildP; fragmentP != NULL; fragmentP = fragmentP->next)
   {
-    if (strcmp(fragmentP->name, "type") == 0)
+    if (strcmp(fragmentP->name, "type") == 0 || strcmp(fragmentP->name, "@type") == 0)
     {
       // Just skip it - don't want "type: Subscription" in the DB. Not needed
+      continue;
     }
     else if (strcmp(fragmentP->name, "entities") == 0)
     {
-      // Make sure there is an "id" and an "isPattern"
+      // Make sure there is an "id" and an "isPattern" in the output
       for (KjNode* entityNodeP = fragmentP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
       {
-        KjNode* isTypePatternP = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
-        KjNode* idP            = kjLookup(entityNodeP, "id");
-        KjNode* idPatternP     = kjLookup(entityNodeP, "idPattern");
+        KjNode* isTypePatternP  = kjBoolean(orionldState.kjsonP, "isTypePattern", false);
+        KjNode* idP             = kjLookup(entityNodeP, "id");
+        KjNode* idPatternP      = kjLookup(entityNodeP, "idPattern");
+
+        if (idP == NULL)
+          idP = kjLookup(entityNodeP, "@id");
 
         if ((idP == NULL) && (idPatternP == NULL))
         {
@@ -345,8 +344,8 @@ static bool ngsildSubscriptionToAPIv1Datamodel(KjNode* patchTree)
     else if (strcmp(fragmentP->name, "expires") == 0)
     {
       fragmentP->name    = (char*) "expiration";
-      fragmentP->type    = KjInt;
-      fragmentP->value.i = parse8601Time(fragmentP->value.s);  // FIXME: Already done in pcheckSubscription() ...
+      fragmentP->type    = KjFloat;
+      fragmentP->value.f = parse8601Time(fragmentP->value.s);  // FIXME: Already done in pcheckSubscription() ...
     }
   }
 
@@ -429,32 +428,32 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
   KjNode* nodeP;
 
   //
-  // If 'expiration' is an Object, it means it's a NumberLong and it is then changed to a 32 bit integer
+  // If 'expiration' is an Object, it means it's a NumberLong and it is then changed to a double
   //
   if ((nodeP = kjLookup(dbSubscriptionP, "expiration")) != NULL)
   {
     if (nodeP->type == KjObject)
     {
       char*      expirationString = nodeP->value.firstChildP->value.s;
-      long long  expiration       = strtol(expirationString, NULL, 10);
+      double     expiration       = strtold(expirationString, NULL);
 
-      nodeP->type    = KjInt;
-      nodeP->value.i = expiration;
+      nodeP->type    = KjFloat;
+      nodeP->value.f = expiration;
     }
   }
 
   //
-  // If 'throttling' is an Object, it means it's a NumberLong and it is then changed to a 32 bit integer
+  // If 'throttling' is an Object, it means it's a NumberLong and it is then changed to a double
   //
   if ((nodeP = kjLookup(dbSubscriptionP, "throttling")) != NULL)
   {
     if (nodeP->type == KjObject)
     {
       char*      throttlingString = nodeP->value.firstChildP->value.s;
-      long long  throttling       = strtol(throttlingString, NULL, 10);
+      long long  throttling       = strtold(throttlingString, NULL);
 
-      nodeP->type    = KjInt;
-      nodeP->value.i = throttling;
+      nodeP->type    = KjFloat;
+      nodeP->value.f = throttling;
     }
   }
 }
@@ -484,11 +483,12 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 bool orionldPatchSubscription(ConnectionInfo* ciP)
 {
   char* subscriptionId = orionldState.wildcard[0];
+  char* detail;
 
-  if ((urlCheck(subscriptionId, NULL) == false) && (urnCheck(subscriptionId, NULL) == false))
+  if (pcheckUri(subscriptionId, &detail) == false)
   {
-    orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);
+    orionldState.httpStatusCode = 400;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription ID must be a valid URI", subscriptionId);  // FIXME: Include 'detail' and name (subscriptionId)
     return false;
   }
 
@@ -507,19 +507,28 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
 
   if (dbSubscriptionP == NULL)
   {
-    orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Subscription not found", subscriptionId);
+    orionldState.httpStatusCode = 404;
     return false;
   }
+
 
   //
   // Make sure we don't get both watchedAttributed AND timeInterval
   // If so, the PATCH is invalid
+  // Right now, timeInterval id not supported, but once it is, if ever, this code will come in handy
   //
+  if (timeIntervalNodeP != NULL)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented");
+    orionldState.httpStatusCode = 501;
+    return false;
+  }
+
   if ((watchedAttributesNodeP != NULL) && (timeIntervalNodeP != NULL))
   {
     LM_W(("Bad Input (Both 'watchedAttributes' and 'timeInterval' given in Subscription Payload Data)"));
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Both 'watchedAttributes' and 'timeInterval' given");
     return false;
   }
@@ -530,7 +539,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     if ((dbTimeIntervalNodeP != NULL) && (dbTimeIntervalNodeP->value.i != -1))
     {
       LM_W(("Bad Input (Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'"));
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'");
       return false;
     }
@@ -542,7 +551,7 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
     if ((dbConditionsNodeP != NULL) && (dbConditionsNodeP->value.firstChildP != NULL))
     {
       LM_W(("Bad Input (Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes')"));
-      orionldState.httpStatusCode = SccBadRequest;
+      orionldState.httpStatusCode = 400;
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'");
       return false;
     }
@@ -555,8 +564,6 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   // FIXME: This is BAD ... shouldn't change the type of these fields
   //
   fixDbSubscription(dbSubscriptionP);
-
-
   ngsildSubscriptionToAPIv1Datamodel(orionldState.requestTree);
 
   //
@@ -568,13 +575,24 @@ bool orionldPatchSubscription(ConnectionInfo* ciP)
   if (ngsildSubscriptionPatch(ciP, dbSubscriptionP, orionldState.requestTree, qP, geoqP) == false)
     return false;
 
+  // Update modifiedAt
+  KjNode* modifiedAtP = kjLookup(dbSubscriptionP, "modifiedAt");
+
+  if (modifiedAtP != NULL)
+    modifiedAtP->value.f = orionldState.requestTime;
+  else
+  {
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
+    kjChildAdd(dbSubscriptionP, modifiedAtP);
+  }
+
   //
   // Overwrite the current Subscription in the database
   //
   dbSubscriptionReplace(subscriptionId, dbSubscriptionP);
 
-  // All OK? 204
-  orionldState.httpStatusCode = SccNoContent;
+  // All OK? 204 No Content
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

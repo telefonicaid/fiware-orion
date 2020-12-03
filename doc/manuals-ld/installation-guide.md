@@ -1,11 +1,7 @@
 # Installing Orion-LD
 
 ## Introduction
-Orion-LD is an NGSI-LD publish/subscribe broker (or: Context Broker).
-
-For installation of Orion-LD, alpha version 0.0.1, you can:
-* use a prebuilt docker image, or
-* compile the broker from source code
+Orion-LD is an NGSI-LD publish/subscribe broker (a.k.a. a context broker).
 
 For now, Orion-LD only runs under Linux.
 No effort has been made so far to make Orion-LD run under any other platform.
@@ -13,71 +9,21 @@ The obvious choice would be MacOS, and if anybody volunteers to investigate on t
 
 ## Supported Linux Distributions
 Orion-LD NGSI-LD Context Broker reference distribution is Ubuntu 18.04.
-While Orion-LD works just fine also in CentOS, Debian, etc, or, other versions of Ubuntu, the inly officially supported distribution is Ubuntu 18.04.
+While Orion-LD works just fine also in CentOS, Debian, etc, or, other versions of Ubuntu, including 20.04,
+the inly officially supported distribution is Ubuntu 18.04.
 
 ## Installation
-
-### Docker Images
-Docker images for Ubuntu and CentOS are produced for each Pull Request merged into the `develop` branch.
-To create and run the Orion-LD Docker image, it is necessary to have [Docker](https://www.docker.com/).
-and [Docker Compose](https://docs.docker.com/compose) installed. A sample `docker-compose.yml` can be found below:
-
-```yaml
-version: "3.5"
-services:
-  # Orion is the context broker
-  orion:
-    image: fiware/orion-ld
-    hostname: orion
-    container_name: fiware-orion
-    depends_on:
-      - mongo-db
-     expose:
-      - "1026"
-    ports:
-      - "1026:1026" 
-    command: -dbhost mongo-db -logLevel DEBUG
-    healthcheck:
-      test: curl --fail -s http://orion:1026/version || exit 1
-
-  # Databases
-  mongo-db:
-    image: mongo:3.6
-    hostname: mongo-db
-    container_name: db-mongo
-    expose:
-      - "27017"
-    ports:
-      - "27017:27017" 
-    command: --nojournal
-    volumes:
-      - mongo-db:/data
-      
-volumes:
-  mongo-db: ~
-```
-
-We also provide Centos and Debian based Dockerfiles to facilitate the building of your own images. 
-They can be found in the following [location](https://github.com/FIWARE/context.Orion-LD/tree/develop/docker) 
-along  with the documentation describing how to use it.
-
-A public image is also available on [Docker Hub](https://hub.docker.com/r/fiware/orion-ld/) 
-
-### Building from source code
-First thing to do is to install the operating system.
-As mentioned, Orion-LD runs on a variety of Linux platforms.
-Ubuntu 18.04 LTS is the officially supported distribution, but Orion-LD potentially works on any modern Linux distribution.
-
-To install Orion-LD from source code, please follow the instructions for your selected distribution.
-
-Installation guides for different distributions:
-* [Ubuntu 18.04.3 LTS](installation-guide-ubuntu-18.04.3.md) - the Official Distribution
-* [CentOS 7](installation-guide-centos7.md)
-* [Debian 9](installation-guide-debian9.md)
+For installation of Orion-LD, alpha version 0.x, you can:
+* use a [prebuilt docker image](installation-guide-docker.md), or
+* build Orion-LD from source code:
+  * [Ubuntu 18.04.3 LTS](installation-guide-ubuntu-18.04.3.md) - the Official Distribution
+  * [Ubuntu 20.04.1 LTS](installation-guide-ubuntu-20.04.1.md)
+  * [CentOS 7](installation-guide-centos7.md)
+  * [Debian 9](installation-guide-debian9.md)
+  * [Debian 10](installation-guide-debian10.md)
 
 
 ### Sanity check
-
 Now that you have Orion-LD compiled and installed, and the MongoDB server running, the broker should work.
 To make sure all is OK, let's start it and run a few simple commands against it.
 
@@ -298,9 +244,11 @@ Now please continue to learn about Orion-LD with the (Getting Started Guide)[get
 
 If you feel like running tests, to **really** make sure your Orion-LD Context Broker is working correctly,
 please follow the instructions in your respective Installation Guide for Functional Tests:
-* [Ubuntu 18.04.3](installation-guide-functional-tests-ubuntu18.04.3.md)
+* [Ubuntu 18.04](installation-guide-functional-tests-ubuntu18.04.3.md)
+* [Ubuntu 20.04](installation-guide-functional-tests-ubuntu20.04.1.md)
 * [CentOS 7](installation-guide-functional-tests-centos7.md)
 * [Debian 9](installation-guide-functional-tests-debian9.md)
+* [Debian 10](installation-guide-functional-tests-debian10.md)
 
 
 And/Or: run the Unit Tests (there are no specific Unit Tests for the NGSi-LD part, only older orion stuff), how to do it is described [here](installation-guide-for-unit-tests.md).

@@ -2625,7 +2625,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
               "- update(): <{ _id: ObjectId('", s1);
     EXPECT_EQ("') },{ _id: ObjectId('", s2);
 
-    EXPECT_EQ("'), expiration: 1360232760, "
+    EXPECT_EQ("'), expiration: 1360232760.0, "
               "servicePath: \"/\", "
               "format: \"JSON\", "
               "contextRegistration: [ "

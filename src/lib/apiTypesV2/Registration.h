@@ -141,7 +141,7 @@ struct Registration
   std::string            description;
   bool                   descriptionProvided;
   DataProvided           dataProvided;
-  long long              expires;
+  double                 expires;
   std::string            status;
   Provider               provider;
   ForwardingInformation  forwardingInformation;
@@ -149,8 +149,8 @@ struct Registration
 #ifdef ORIONLD
   std::string           name;
   std::string           ldContext;
-  long long             createdAt;
-  long long             modifiedAt;
+  double                createdAt;
+  double                modifiedAt;
   OrionldTimeInterval   observationInterval;
   OrionldTimeInterval   managementInterval;
   OrionldGeoLocation    location;

@@ -219,12 +219,12 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
     "type": "GtfsStation",
-    "name": "Rangsdorf, Bahnhof",
     "hasStop": [
       "urn:ngsi-ld:GtfsStop:000008012713:MS",
       "urn:ngsi-ld:GtfsStop:300000005271:MS",
       "urn:ngsi-ld:GtfsStop:300000005273:MS"
     ],
+    "name": "Rangsdorf, Bahnhof",
     "location": {
       "type": "Point",
       "coordinates": [
@@ -236,11 +236,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
     "type": "GtfsStation",
-    "name": "Leipzig, Hauptbahnhof",
     "hasStop": [
       "urn:ngsi-ld:GtfsStop:000008010205:MS",
       "urn:ngsi-ld:GtfsStop:000008098205:MS"
     ],
+    "name": "Leipzig, Hauptbahnhof",
     "location": {
       "type": "Point",
       "coordinates": [
@@ -273,11 +273,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:GtfsStation:900000550090:MS",
     "type": "GtfsStation",
-    "name": "Leipzig, Hauptbahnhof",
     "hasStop": [
       "urn:ngsi-ld:GtfsStop:000008010205:MS",
       "urn:ngsi-ld:GtfsStop:000008098205:MS"
     ],
+    "name": "Leipzig, Hauptbahnhof",
     "location": {
       "type": "Point",
       "coordinates": [
@@ -289,12 +289,12 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:GtfsStation:900000245025:MS",
     "type": "GtfsStation",
-    "name": "Rangsdorf, Bahnhof II",
     "hasStop": [
       "urn:ngsi-ld:GtfsStop:000008012713:MS",
       "urn:ngsi-ld:GtfsStop:300000005271:MS",
       "urn:ngsi-ld:GtfsStop:300000005273:MS"
     ],
+    "name": "Rangsdorf, Bahnhof II",
     "location": {
       "type": "Point",
       "coordinates": [
@@ -306,11 +306,11 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:GtfsStation:900000550091:MS",
     "type": "GtfsStation",
-    "name": "Leipzig, Hauptbahnhof",
     "hasStop": [
       "urn:ngsi-ld:GtfsStop:000008010205:MS",
       "urn:ngsi-ld:GtfsStop:000008098205:MS"
     ],
+    "name": "Leipzig, Hauptbahnhof",
     "location": {
       "type": "Point",
       "coordinates": [

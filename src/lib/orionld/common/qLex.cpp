@@ -442,7 +442,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       //
       // Must be part of a Number, a Variable, or a DateTime
       // Valid characters for:
-      // - Number:   a-zA-Z0-9_.
+      // - Number:   0-9.
       // - Variable: a-zA-Z0-9_.
       // - DateTime: Z0-9_:.
       //
@@ -464,7 +464,7 @@ QNode* qLex(char* s, char** titleP, char** detailsP)
       {}
       else
       {
-        LM_W(("Bad Input (invalid character '%s')", *sP));
+        LM_W(("Bad Input (invalid character 0x%x)", *sP & 0xFF));
         *titleP = (char*) "ngsi-ld query language: invalid character";
         *detailsP = sP;
         sP[1] = 0;

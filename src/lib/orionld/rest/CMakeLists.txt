@@ -28,6 +28,7 @@ SET (SOURCES
     orionldServiceLookup.cpp
     orionldServiceInitPresent.cpp
     temporaryErrorPayloads.cpp
+    uriParamName.cpp
 )
 
 # Include directories

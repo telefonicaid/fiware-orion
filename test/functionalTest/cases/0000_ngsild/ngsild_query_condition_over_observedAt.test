@@ -224,7 +224,7 @@ Date: REGEX(.*)
 04. Query the property P100 over 'observedAt' after 2018-12-03 - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 807
+Content-Length: 811
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -244,7 +244,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
       },
-      "observedAt": "2018-12-04T12:00:00Z"
+      "observedAt": "2018-12-04T12:00:00.000Z"
     },
     "R100": {
       "type": "Relationship",
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 05. Query the property P100 over 'observedAt' of EXACT 2018-12-04T12:00:00.00Z - see entity urn:ngsi-ld:T_Query:EntityForQuery2345
 ==================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 807
+Content-Length: 811
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -296,7 +296,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
       },
-      "observedAt": "2018-12-04T12:00:00Z"
+      "observedAt": "2018-12-04T12:00:00.000Z"
     },
     "R100": {
       "type": "Relationship",
