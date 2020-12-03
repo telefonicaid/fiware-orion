@@ -841,6 +841,7 @@ function partExecute()
   then
     if [ $__tryNo == $MAX_TRIES ]
     then
+      echo "Test failed. Output: $linesInStderr"
       exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
     else
       logMsg "$what: output on stderr"
