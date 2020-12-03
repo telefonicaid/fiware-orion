@@ -58,6 +58,9 @@ def diff_files(input_file, ref_file):
 
     input_lines = input.readlines()
 
+    print "++++++++++++++++ Input:"
+    print input_lines
+
     for ref_line in ref.readlines():
         # Get line from input file
         try:
