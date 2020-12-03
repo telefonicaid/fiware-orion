@@ -994,6 +994,10 @@ function runTest()
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
+    echo "+++++++++++++++++++ STDERR +++++++++++++++++++++"
+    cat $dirname/$filename.shellInit.stderr
+    echo "+++++++++++++++++++ STDOUT +++++++++++++++++++++"
+    cat $dirname/$filename.shellInit.stdout
     exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
     runTestStatus="shell-init-error"
     return
