@@ -249,112 +249,112 @@ function exitFunction()
   echo -n "(FAILURE $exitCode - $errorText) "
 
   if [ "$TRAVIS" != "" ] || [ "$loud" == "on" ]
-    #
-    # Error 9 - output not as expected
-    #
-    if [ $exitCode == 9 ]
-    then
-        echo
-        echo "Error 9 - output not as expected"
-        echo
-        echo $diffFile:
-        echo  "---------------------------------------"
-        cat $diffFile
-        echo  "---------------------------------------"
-        echo
+  then
+      #
+      # Error 9 - output not as expected
+      #
+      if [ $exitCode == 9 ]
+      then
+          echo
+          echo "Error 9 - output not as expected"
+          echo
+          echo $diffFile:
+          echo  "---------------------------------------"
+          cat $diffFile
+          echo  "---------------------------------------"
+          echo
 
-        cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-        if [ "$ORIONLD_SUPPRESS_LOG_FILE_OUTPUT" != "YES" ] && [ -s /tmp/orionld.err-warn.log ]
-        then
-            echo "Errors and warnings from the orionld log file"
-            echo "-------------------------------------------------"
-            cat /tmp/orionld.err-warn.log
-            echo "-------------------------------------------------"
-            echo
-            echo
-        fi
+          cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
+          if [ "$ORIONLD_SUPPRESS_LOG_FILE_OUTPUT" != "YES" ] && [ -s /tmp/orionld.err-warn.log ]
+          then
+              echo "Errors and warnings from the orionld log file"
+              echo "-------------------------------------------------"
+              cat /tmp/orionld.err-warn.log
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
 
-        if [ -s /tmp/accumulator_9997_stderr ]
-        then
-            echo "/tmp/accumulator_9997_stderr:"
-            echo "-------------------------------------------------"
-            cat /tmp/accumulator_9997_stderr
-            echo "-------------------------------------------------"
-            echo
-            echo
-        fi
+          if [ -s /tmp/accumulator_9997_stderr ]
+          then
+              echo "/tmp/accumulator_9997_stderr:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stderr
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
 
-        if [ -s /tmp/accumulator_9997_stdout ]
-        then
-            echo "/tmp/accumulator_9997_stdout:"
-            echo "-------------------------------------------------"
-            cat /tmp/accumulator_9997_stdout
-            echo "-------------------------------------------------"
-            echo
-            echo
-        fi
-    elif [ $exitCode == 7 ] || [ $exitCode == 8 ] || [ $exitCode == 10 ] || [ $exitCode == 20 ] || [ $exitCode == 11 ]
-    then
-        echo
-        echo "Error $exitCode: $errorText"
-        echo
-        echo "$stderrFile:"
-        echo "-------------------------------------------------"
-        cat $stderrFile
-        echo "-------------------------------------------------"
-        echo
-        echo
+          if [ -s /tmp/accumulator_9997_stdout ]
+          then
+              echo "/tmp/accumulator_9997_stdout:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stdout
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+      elif [ $exitCode == 7 ] || [ $exitCode == 8 ] || [ $exitCode == 10 ] || [ $exitCode == 20 ] || [ $exitCode == 11 ]
+      then
+          echo
+          echo "Error $exitCode: $errorText"
+          echo
+          echo "$stderrFile:"
+          echo "-------------------------------------------------"
+          cat $stderrFile
+          echo "-------------------------------------------------"
+          echo
+          echo
 
-        if [ "$verbose" == "on" ]
-        then
-            echo "$stdoutFile:"
-            echo "-------------------------------------------------"
-            cat $stdoutFile
-            echo "-------------------------------------------------"
-        else
-            echo "Run in verbose mode to see also the stdout-file $stdoutFile"
-        fi
-        echo
-        echo
+          if [ "$verbose" == "on" ]
+          then
+              echo "$stdoutFile:"
+              echo "-------------------------------------------------"
+              cat $stdoutFile
+              echo "-------------------------------------------------"
+          else
+              echo "Run in verbose mode to see also the stdout-file $stdoutFile"
+          fi
+          echo
+          echo
 
-        cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
-        if [ -s /tmp/orionld.err-warn.log ]
-        then
-            echo "Errors and warnings from the orionld log file"
-            echo "-------------------------------------------------"
-            cat /tmp/orionld.err-warn.log
-            echo "-------------------------------------------------"
-            echo
-            echo
-        fi
+          cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
+          if [ -s /tmp/orionld.err-warn.log ]
+          then
+              echo "Errors and warnings from the orionld log file"
+              echo "-------------------------------------------------"
+              cat /tmp/orionld.err-warn.log
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
 
-        if [ -s /tmp/accumulator_9997_stderr ]
-        then
-            echo "/tmp/accumulator_9997_stderr:"
-            echo "-------------------------------------------------"
-            cat /tmp/accumulator_9997_stderr
-            echo "-------------------------------------------------"
-            echo
-            echo
-        fi
+          if [ -s /tmp/accumulator_9997_stderr ]
+          then
+              echo "/tmp/accumulator_9997_stderr:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stderr
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
 
-        if [ -s /tmp/accumulator_9997_stdout ]
-        then
-            echo "/tmp/accumulator_9997_stdout:"
-            echo "-------------------------------------------------"
-            cat /tmp/accumulator_9997_stdout
-            echo "-------------------------------------------------"
-            echo
-            echo
-        fi
-    elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
-    then
-        echo
-        echo "Error $exitCode (error in test-case-segments): $errorText"
-        echo
-    fi
+          if [ -s /tmp/accumulator_9997_stdout ]
+          then
+              echo "/tmp/accumulator_9997_stdout:"
+              echo "-------------------------------------------------"
+              cat /tmp/accumulator_9997_stdout
+              echo "-------------------------------------------------"
+              echo
+              echo
+          fi
+      elif [ $exitCode == 1 ] || [ $exitCode == 2 ] || [ $exitCode == 3 ] || [ $exitCode == 4 ] || [ $exitCode == 5 ] || [ $exitCode == 6 ]
+      then
+          echo
+          echo "Error $exitCode (error in test-case-segments): $errorText"
+          echo
+      fi
   fi
-
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
