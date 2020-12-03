@@ -637,7 +637,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
   // int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
 
 
-  int dbEntityBufferSize = 10 * 1024;
+  int dbEntityBufferSize  = 10 * 1024;
   char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
   bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
