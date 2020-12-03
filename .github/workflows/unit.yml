@@ -12,7 +12,7 @@ env:
 jobs:
   unit:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
     services:
       registry:
         image: registry:2

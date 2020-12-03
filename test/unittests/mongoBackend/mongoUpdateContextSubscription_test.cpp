@@ -4437,7 +4437,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
 * MongoDbUpdateFail -
 *
 */
-TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
+TEST(DISABLED_mongoUpdateContextSubscription, MongoDbUpdateFail)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
