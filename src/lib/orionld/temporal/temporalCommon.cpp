@@ -28,6 +28,7 @@ extern "C"
 {
 #include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
+#include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kalloc/kaBufferInit.h"                                 // kaBufferInit
@@ -44,13 +45,14 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/orionldTenantCreate.h"                  // Own interface
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
-#include "orionld/common/orionldTenantCreate.h"                  // Own interface
+#include "orionld/temporal/geoPropertyExtract.h"                 // geoPropertyExtract
 #include "orionld/temporal/temporalTenantInitialise.h"           // Postgres db functions
 
 
@@ -185,7 +187,6 @@ void entityExtract
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     lmLogTree("CCSR", "attrP before attrExtract", attrP);
-    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
 
     // if (entityInArray)
     // {
@@ -197,13 +198,14 @@ void entityExtract
     // }
     // else
     // {
-      LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
-      attrExtract(attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-      LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %s, attribute %s",
-              allTab->attributeTableArray[attrIndex].attributeValueType,
-              allTab->attributeTableArray[attrIndex].entityId,
-              allTab->attributeTableArray[attrIndex].attributeName));
-      allTab->attributeTableArrayItems++;
+    allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
+    LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
+    attrExtract(attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
+    LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %s, attribute %s",
+            allTab->attributeTableArray[attrIndex].attributeValueType,
+            allTab->attributeTableArray[attrIndex].entityId,
+            allTab->attributeTableArray[attrIndex].attributeName));
+    allTab->attributeTableArrayItems++;
     // }
     attrIndex++;
   }
@@ -309,9 +311,6 @@ OrionldTemporalDbAllTables* temporalEntityExtract(void)
     dbAllTablesLocal->entityTableArrayItems++;
   }
 
-  LM_TMP(("CCSR: Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
-  LM_TMP(("CCSR: Number of Attributes %i %s", dbAllTablesLocal->attributeTableArrayItems, dbAllTablesLocal->attributeTableArray[0].attributeValueType ));
-
   return dbAllTablesLocal;
 }
 
@@ -344,6 +343,10 @@ void attrExtract
     return;
   }
 
+  //  adding instance id to map to sub attributes
+  dbAttributeTableLocal->instanceId = kaAlloc(&orionldState.kalloc, 64);
+  uuidGenerate(dbAttributeTableLocal->instanceId);
+
   KjNode* observedAtP = kjLookup(attrP, "observedAt");
   if (observedAtP != NULL)
   {
@@ -352,7 +355,7 @@ void attrExtract
     // else
     dbAttributeTableLocal->observedAt = 49;
     LM_TMP(("CCSR - Temporal - attrP Found observedAt %s",observedAtP->value.s));
-    kjChildRemove (attrP,observedAtP);
+    kjChildRemove(attrP,observedAtP);
   }
 
   KjNode* nodeP  = kjLookup(attrP, "unitCode");
@@ -368,7 +371,7 @@ void attrExtract
   {
     LM_TMP(("CCSR - attrP Found Location "));
     kjChildRemove (attrP,nodeP);
-    // Chandra-TBI
+    geoPropertyExtract(nodeP, attrP->name, dbAttributeTableLocal->instanceId, dbAttributeTableLocal->entityId);
   }
 
   nodeP  = kjLookup(attrP, "operationSpace");
@@ -479,11 +482,6 @@ void attrExtract
 
     LM_TMP(("CCSR:  Attribute Value type : %d", dbAttributeTableLocal->attributeValueType));
   }
-
-
-  //  adding instance id to map to sub attributes
-  dbAttributeTableLocal->instanceId = kaAlloc(&orionldState.kalloc, 64);
-  uuidGenerate(dbAttributeTableLocal->instanceId);
 
   // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
 
@@ -713,9 +711,8 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     char entCreatedAt[64];
     char entModifiedAt[64];
 
-    numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt, entCreatedAt, sizeof(entCreatedAt));
-
-    numberToDate (dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt, entModifiedAt, sizeof(entModifiedAt));
+    numberToDate(dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt, entCreatedAt, sizeof(entCreatedAt));
+    numberToDate(dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt, entModifiedAt, sizeof(entModifiedAt));
 
     LM_TMP(("CCSR: step3 TemporalConstructInsertSQLStatement: "));
 
@@ -743,12 +740,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
       LM_TMP(("CCSR: step5 TemporalConstructInsertSQLStatement: "));
     }
-    //
-    // Some traces just to see how the KjNode tree works
-    //
-    LM_TMP(("CCSR: dbEntityStrBuffer:     '%s'", dbEntityStrBuffer));
 
-    if (!temporalExecSqlStatement (dbEntityStrBuffer))
+    LM_TMP(("CCSR: dbEntityStrBuffer: '%s'", dbEntityStrBuffer));
+
+    if (!temporalExecSqlStatement(dbEntityStrBuffer))
       return false;
   }
 
@@ -756,18 +751,17 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
   for (int dbAttribLoop = 0; dbAttribLoop < dbAllTablesLocal->attributeTableArrayItems; dbAttribLoop++)
   {
-    LM_TMP(("CCSR: dbAttribLoop:     '%i'", dbAttribLoop));
-    int dbAttribBufferSize = 10 * 1024;
-    char* dbAttribStrBuffer = kaAlloc(&orionldState.kalloc, dbAttribBufferSize);
+    int   dbAttribBufferSize = 10 * 1024;
+    char* dbAttribStrBuffer  = kaAlloc(&orionldState.kalloc, dbAttribBufferSize);
     bzero(dbAttribStrBuffer, dbAttribBufferSize);
 
-    int allValuesSize = 2048;
-    char* allValues = kaAlloc(&orionldState.kalloc,allValuesSize);
+    int   allValuesSize = 2048;
+    char* allValues     = kaAlloc(&orionldState.kalloc,allValuesSize);
 
     LM_TMP(("CCSR: TemporalConstructInsertSQLStatement dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName :  %s",
             dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
 
-    allValuesRenderAttr (&dbAllTablesLocal->attributeTableArray[dbAttribLoop], allValues, allValuesSize);
+    allValuesRenderAttr(&dbAllTablesLocal->attributeTableArray[dbAttribLoop], allValues, allValuesSize);
 
     // Chandra-TBI
 
@@ -822,7 +816,10 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     if (!temporalExecSqlStatement (dbAttribStrBuffer))
       return false;
 
-    for (int dbSubAttribLoop=0; dbSubAttribLoop < dbAllTablesLocal->subAttributeTableArrayItems; dbSubAttribLoop++)
+    // FIXME: The attribute loop should end here, right?
+    //        Cause otherwise, we are doing the sub-attr loop once per attribute 
+    
+    for (int dbSubAttribLoop = 0; dbSubAttribLoop < dbAllTablesLocal->subAttributeTableArrayItems; dbSubAttribLoop++)
     {
       int   dbSubAttribBufferSize  = 10 * 1024;
       char* dbSubAttribStrBuffer   = kaAlloc(&orionldState.kalloc, dbSubAttribBufferSize);
@@ -843,7 +840,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
       numberToDate(dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].observedAt, subAttrObeservedAt, sizeof(subAttrObeservedAt));
 
       snprintf(dbSubAttribStrBuffer, dbSubAttribBufferSize, "INSERT INTO attribute_sub_properties_table(entity_id,"
-               " attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
+               "attribute_id, id, type, value_type, unit_code, data_set_id, value_string, value_boolean, value_number,"
                "value_relation,value_object, value_datetime, geo_property, observed_at, created_at, modified_at)"
                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
                dbAllTablesLocal->subAttributeTableArray[dbSubAttribLoop].entityId,
@@ -912,8 +909,8 @@ void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allV
     return;
   }
 
-  int unitCodeValuesSize = 128;
-  char* unitCodeValue = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
+  int   unitCodeValuesSize = 128;
+  char* unitCodeValue      = kaAlloc(&orionldState.kalloc, unitCodeValuesSize);
   bzero(unitCodeValue, unitCodeValuesSize);
 
   if (attrLocalP->unitCode == NULL)
@@ -921,7 +918,7 @@ void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allV
   else
     snprintf(unitCodeValue, unitCodeValuesSize, "%s", attrLocalP->unitCode);
 
-  int dataSetIdSize = 128;
+  int   dataSetIdSize  = 128;
   char* dataSetIdValue = kaAlloc(&orionldState.kalloc, dataSetIdSize);
   bzero(dataSetIdValue, dataSetIdSize);
 
@@ -930,7 +927,7 @@ void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allV
   else
     snprintf(dataSetIdValue, dataSetIdSize, "%s", attrLocalP->dataSetId);
 
-  int geoPropertySize = 512;
+  int   geoPropertySize  = 512;
   char* geoPropertyValue = kaAlloc(&orionldState.kalloc, geoPropertySize);
   bzero(geoPropertyValue, geoPropertySize);
 

@@ -33,6 +33,7 @@ SET (SOURCES
     temporalUpdateEntity.cpp
     temporalTenantInitialise.cpp
     temporalCommon.cpp
+    geoPropertyExtract.cpp
 )
 
 SET (HEADERS

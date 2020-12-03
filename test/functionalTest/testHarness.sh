@@ -145,6 +145,7 @@ function usage()
   echo "$empty [-v (verbose)]"
   echo "$empty [--loud (loud - see travis extra info)]"
   echo "$empty [-ld (only ngsild tests)]"
+  echo "$empty [-tmp (only ngsild temporal tests)]"
   echo "$empty [-eb (external broker)]"
   echo "$empty [-tk (on error, show the diff ising tkdiff)]"
   echo "$empty [--filter <test filter>]"
@@ -410,6 +411,7 @@ noCache=""
 threadpool=ON
 ngsild=OFF
 externalBroker=OFF
+temporal=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
@@ -417,6 +419,7 @@ do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
+  elif [ "$1" == "-tmp" ];           then temporal=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
   elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
   elif [ "$1" == "--loud" ];         then loud=on;
@@ -496,6 +499,19 @@ fi
 if [ "$ngsild" == "on" ]
 then
   dirOrFile=test/functionalTest/cases/0000_ngsild
+fi
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Only temporal tests?
+#
+# If set, overrides parameter AND -ld option
+#
+if [ "$temporal" == "on" ]
+then
+  dirOrFile=test/functionalTest/cases/0000_temporal
 fi
 
 
@@ -1011,7 +1027,8 @@ function runTest()
     $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
     exitCode=$?
     logMsg "SHELL-INIT (again) part for $path DONE. exitCode=$exitCode"
-
+    grep -v "^NOTICE: " $dirname/$filename.shellInit.stderr > $dirname/$filename.shellInit.stderr2
+    mv $dirname/$filename.shellInit.stderr2 $dirname/$filename.shellInit.stderr
     linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
