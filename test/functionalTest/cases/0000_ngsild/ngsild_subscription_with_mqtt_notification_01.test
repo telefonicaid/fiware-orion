@@ -27,7 +27,7 @@ Subscription with Q-filter
 export BROKER=orionld
 dbInit CB
 brokerStart CB 0-255
-mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities -v
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities
 
 --SHELL--
 
@@ -61,7 +61,6 @@ payload='{
   },
   "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
 }'
-echo "Payload: $payload"
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
