@@ -46,7 +46,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e MQTT_BROKER_HOST=localhost -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_441_441 -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_441_441 -dqt
 
   functional-part2:
     runs-on: ubuntu-latest
