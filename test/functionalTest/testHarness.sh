@@ -48,6 +48,7 @@ echo $testStartTime > $LOG_FILE
 function logMsg()
 {
   now=$(date)
+  echo $now: $*
   echo $now: $* >> $LOG_FILE
 }
 export -f logMsg
@@ -841,7 +842,6 @@ function partExecute()
   then
     if [ $__tryNo == $MAX_TRIES ]
     then
-      echo "Test failed. Output: $linesInStderr"
       exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
     else
       logMsg "$what: output on stderr"
@@ -996,6 +996,9 @@ function runTest()
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
+    echo "Error: $linesInStderr"
+    cat $dirname/$filename.shellInit.stderr
+    cat $dirname/$filename.shellInit.stdout
     exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr $dirname/$filename.shellInit.stdout "Continue"
     runTestStatus="shell-init-error"
     return
