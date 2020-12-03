@@ -13,7 +13,7 @@ env:
 jobs:
   functional-part1:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
     services:
       registry:
         image: registry:2
@@ -50,7 +50,7 @@ jobs:
 
   functional-part2:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
     services:
       registry:
         image: registry:2
@@ -82,7 +82,7 @@ jobs:
 
   functional-part3:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
     services:
       registry:
         image: registry:2
@@ -114,7 +114,7 @@ jobs:
 
   functional-part4:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
     services:
       registry:
         image: registry:2
