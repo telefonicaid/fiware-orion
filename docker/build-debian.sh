@@ -216,6 +216,7 @@ if [[ "${STAGE}" == 'deps' ]]; then
     echo -e "\e[1;32m Builder: installing python dependencies \e[0m"
     pip install --upgrade setuptools wheel
     pip install Flask==1.0.2 pyOpenSSL==19.0.0 # paho-mqtt
+    pip install paho-mqtt
     yes | pip uninstall setuptools wheel
 fi
 
