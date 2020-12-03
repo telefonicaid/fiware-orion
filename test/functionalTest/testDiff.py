@@ -57,11 +57,15 @@ def diff_files(input_file, ref_file):
     ref = open(ref_file, 'r')
 
     input_lines = input.readlines()
+    ref_lines = ref.readlines()
 
     print "++++++++++++++++ Input:"
     print input_lines
 
-    for ref_line in ref.readlines():
+    print "++++++++++++++++ Ref:"
+    print ref_lines
+
+    for ref_line in ref_lines:
         # Get line from input file
         try:
             input_line = input_lines.pop(0)
