@@ -55,12 +55,13 @@ payload='{
     "attributes": [ "temperature" ],
     "format": "normalized",
     "endpoint": {
-      "uri": "mqtt://'$MQTT_BROKER_HOST':'$MQTT_BROKER_PORT'/entities",
+      "uri": "mqtt://$MQTT_BROKER_HOST:'$MQTT_BROKER_PORT'/entities",
       "accept": "application/json"
     }
   },
   "@context": ["https://fiware.github.io/data-models/context.jsonld", "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
 }'
+echo "Payload: $payload"
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
 echo
 echo
