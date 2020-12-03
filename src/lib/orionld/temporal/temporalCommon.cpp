@@ -311,9 +311,6 @@ OrionldTemporalDbAllTables* temporalEntityExtract(void)
     dbAllTablesLocal->entityTableArrayItems++;
   }
 
-  LM_TMP(("CCSR: Number of Entities %i %s", dbAllTablesLocal->entityTableArrayItems, dbAllTablesLocal->entityTableArray[0].entityType ));
-  LM_TMP(("CCSR: Number of Attributes %i %s", dbAllTablesLocal->attributeTableArrayItems, dbAllTablesLocal->attributeTableArray[0].attributeValueType ));
-
   return dbAllTablesLocal;
 }
 
