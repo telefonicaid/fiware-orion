@@ -27,7 +27,7 @@ Subscription with Q-filter
 export BROKER=orionld
 dbInit CB
 brokerStart CB 0-255
-mqttTestClientStart --mqttBrokerIp $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities -v
+mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities -v
 
 --SHELL--
 
