@@ -121,11 +121,11 @@ def main():
         print "VALIDATION ERROR: reference file is EMPTY"
         exit(1)
 
+    diff_files(options.input_file, options.ref_file)
     if not ilines == rlines:
         print "VALIDATION ERROR: input file and reference file have different line count"
         exit(1)
 
-    diff_files(options.input_file, options.ref_file)
 
 
 if __name__ == "__main__":
