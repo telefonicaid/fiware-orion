@@ -59,12 +59,6 @@ def diff_files(input_file, ref_file):
     input_lines = input.readlines()
     ref_lines = ref.readlines()
 
-    print "++++++++++++++++ Input:"
-    print input_lines
-
-    print "++++++++++++++++ Ref:"
-    print ref_lines
-
     for ref_line in ref_lines:
         # Get line from input file
         try:
@@ -125,11 +119,11 @@ def main():
         print "VALIDATION ERROR: reference file is EMPTY"
         exit(1)
 
-    diff_files(options.input_file, options.ref_file)
     if not ilines == rlines:
         print "VALIDATION ERROR: input file and reference file have different line count"
         exit(1)
 
+    diff_files(options.input_file, options.ref_file)
 
 
 if __name__ == "__main__":
