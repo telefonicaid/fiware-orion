@@ -77,7 +77,6 @@ extern "C"
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"       // orionldDeleteRegistration
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"        // orionldPatchSubscription
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"       // orionldDeleteSubscription
-#include "orionld/serviceRoutines/orionldPostBatchUpdate.h"          // orionldPostBatchUpdate
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"           // orionldGetEntityTypes
 #include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
 #include "orionld/temporal/temporalPostBatchDelete.h"                // temporalPostBatchDelete
@@ -88,7 +87,7 @@ extern "C"
 #include "orionld/temporal/temporalPostBatchCreate.h"                // temporalPostBatchCreate
 #include "orionld/temporal/temporalPostBatchUpsert.h"                // temporalPostBatchUpsert
 #include "orionld/temporal/temporalPostBatchUpdate.h"                // temporalPostBatchUpdate
-#include "orionld/temporal/temporalUpdateEntity.h"                     // temporalPostEntity
+#include "orionld/temporal/temporalPostEntity.h"                     // temporalPostEntity
 #include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
 #include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
@@ -405,7 +404,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     else if (serviceP->serviceRoutine == orionldPostBatchDelete)
       serviceP->temporalRoutine = temporalPostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
-      serviceP->temporalRoutine = temporalUpdateEntity;
+      serviceP->temporalRoutine = temporalPostEntity;
     else if (serviceP->serviceRoutine == orionldDeleteAttribute)
       serviceP->temporalRoutine = temporalDeleteAttribute;
     else if (serviceP->serviceRoutine == orionldDeleteEntity)
