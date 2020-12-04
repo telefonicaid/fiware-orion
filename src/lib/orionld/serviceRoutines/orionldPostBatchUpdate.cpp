@@ -111,10 +111,14 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
   KjNode*  entityP;
   KjNode*  next;
+  KjNode*  cloneP;
 
-  //Chandra hack  -- START
-  KjNode* cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
-  //Chandra hack  -- End
+  //
+  // FIXME: Entity ID and TYPE are removed from the objects - need thim for temporal
+  //        Rather than cloning the entire tree, just put them back again after processing
+  //
+  if (temporal)
+    cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   //
   // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
@@ -354,13 +358,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     orionldState.responseTree = NULL;
   }
 
-  //Chandra hack  -- START
-  orionldState.requestTree = cloneP;
-  LM_E(("CCSR: orionldState.requestTree = cloneP"));
-  char rBuf[4096];
-  kjRender(orionldState.kjsonP, cloneP, rBuf, sizeof(rBuf));
-  LM_E(("CCSR: orionldState.requestTree %s",rBuf));
-  //Chandra hack  -- End
+  if (temporal)
+    orionldState.requestTree = cloneP;
 
   return true;
 }
