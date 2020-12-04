@@ -46,6 +46,8 @@ brokerStart CB
 # 07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error
 # 08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error
 # 09. Attempt to create a registration with an empty array for 'entities' inside 'information' - see error
+# 10. Attempt to create a registration with 'id' and '@id' fields - see error
+# 11. Attempt to create a registration with 'type' and '@type' fields - see error
 #
 
 echo "01. Create a registration with ALL fields"
@@ -71,12 +73,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "start": "2018-12-31T10:00:00.123Z",
+    "end": "2028-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "start": "2017-12-31T10:00:00.798",
+    "end": "2027-12-31T10:00:00.120"
   },
   "location": {
     "type": "Polygon",
@@ -114,7 +116,7 @@ payload='{
       ]
     ]
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
   "P2": "2",
@@ -308,6 +310,172 @@ echo
 echo
 
 
+echo "10. Attempt to create a registration with 'id' and '@id' fields - see error"
+echo "==========================================================================="
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+  "type": "ContextSourceRegistration",
+  "name": "reg_csr1a342",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "11. Attempt to create a registration with 'type' and '@type' fields - see error"
+echo "==============================================================================="
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+  "type": "ContextSourceRegistration",
+  "@type": "ContextSourceRegistration",
+  "name": "reg_csr1a342",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "start": "2018-12-31T10:00:00",
+    "end": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "start": "2017-12-31T10:00:00",
+    "end": "2027-12-31T10:00:00"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 100.0, 0.0 ],
+        [ 101.0, 0.0 ],
+        [ 101.0, 1.0 ],
+        [ 100.0, 1.0 ],
+        [ 100.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 200.0, 0.0 ],
+        [ 201.0, 0.0 ],
+        [ 201.0, 1.0 ],
+        [ 200.0, 1.0 ],
+        [ 200.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 300.0, 0.0 ],
+        [ 301.0, 0.0 ],
+        [ 301.0, 1.0 ],
+        [ 300.0, 1.0 ],
+        [ 300.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:00",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
 --REGEXPECT--
 01. Create a registration with ALL fields
 =========================================
@@ -327,7 +495,7 @@ MongoDB server version: REGEX(.*)
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
 	"description" : "description of reg 1",
 	"name" : "reg_csr1a341",
-	"expiration" : NumberLong(1861869600),
+	"expiration" : 1861869601.234,
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
@@ -361,12 +529,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : NumberLong(1546250400),
-		"end" : NumberLong(1861869600)
+		"start" : 1546250400.123,
+		"end" : 1861869600.456
 	},
 	"managementInterval" : {
-		"start" : NumberLong(1514714400),
-		"end" : NumberLong(1830247200)
+		"start" : 1514714400.79REGEX(.*),
+		"end" : 1830247200.12
 	},
 	"location" : {
 		"type" : "Polygon",
@@ -469,7 +637,7 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1964
+Content-Length: 2016
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -481,7 +649,7 @@ Date: REGEX(.*)
   "description": "description of reg 1",
   "createdAt": REGEX(.*),
   "modifiedAt": REGEX(.*),
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -501,12 +669,12 @@ Date: REGEX(.*)
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00Z",
-    "end": "2028-12-31T10:00:00Z"
+    "start": "2018-12-31T10:00:00.123Z",
+    "end": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00Z",
-    "end": "2027-12-31T10:00:00Z"
+    "start": "2017-12-31T10:00:00.798Z",
+    "end": "2027-12-31T10:00:00.120Z"
   },
   "location": {
     "type": "Polygon",
@@ -791,6 +959,34 @@ Date: REGEX(.*)
 {
     "detail": "information::entities",
     "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Attempt to create a registration with 'id' and '@id' fields - see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity:id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Attempt to create a registration with 'type' and '@type' fields - see error
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity:type",
+    "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

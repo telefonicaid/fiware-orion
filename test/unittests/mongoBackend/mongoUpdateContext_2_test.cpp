@@ -4755,7 +4755,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
               "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", "
               "_id.servicePath: { $in: [ /^/.*/, null ] } },"
               "{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", mdNames: [], "
-              "modDate: 1360232700 }, modDate: 1360232700, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
+              "modDate: 1360232700.0 }, modDate: 1360232700.0, lastCorrelator: \"\" }, $unset: { location: 1, expDate: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */

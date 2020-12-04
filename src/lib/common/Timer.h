@@ -36,7 +36,7 @@ class Timer
 {
  public:
   virtual ~Timer(void);
-  virtual int getCurrentTime(void);
+  virtual double getCurrentTime(void);
 };
 
 #endif  // SRC_LIB_COMMON_TIMER_H_

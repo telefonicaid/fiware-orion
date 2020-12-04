@@ -97,11 +97,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subscription:S1",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(0),
+	"throttling" : 0,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "active",
@@ -122,7 +122,8 @@ MongoDB server version: REGEX(.*)
 	"blacklist" : false,
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
-	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/numberOfItems"
 	],

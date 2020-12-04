@@ -273,7 +273,6 @@ int httpRequestSendWithCurl
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
-
   metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
   ++callNo;

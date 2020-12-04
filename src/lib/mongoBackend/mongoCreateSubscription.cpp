@@ -34,6 +34,7 @@
 #include "apiTypesV2/Subscription.h"
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
+#include "orionld/common/orionldState.h"             // orionldState
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -53,6 +54,17 @@ using ngsiv2::Subscription;
 
 
 
+// -----------------------------------------------------------------------------
+//
+// setTimestamp -
+//
+static void setTimestamp(const char* name, double ts, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(name, ts);
+}
+
+
+
 /* ****************************************************************************
 *
 * insertInCache - insert in csub cache
@@ -64,9 +76,9 @@ static void insertInCache
   const std::string&   tenant,
   const std::string&   servicePath,
   bool                 notificationDone,
-  long long            lastNotification,
-  long long            lastFailure,
-  long long            lastSuccess
+  double               lastNotification,
+  double               lastFailure,
+  double               lastSuccess
 )
 {
   //
@@ -176,10 +188,25 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
 
 #ifdef ORIONLD
+  double now = orionldState.requestTime;
   setName(sub, &b);
   setContext(sub, &b);
   setCsf(sub, &b);
-  setTimeInterval(sub, &b);
+  setTimestamp("createdAt",  now, &b);
+  setTimestamp("modifiedAt", now, &b);
+
+  // ---------------------------------------------------------------------------
+  //
+  // setTimeInterval
+  //
+  // setTimeInterval is not called as this tiny little call causes thousands of errors in valgrind.
+  //
+  // Orion-LD doesn't support periodic notifications anyway, so the value is not used.
+  // Once (if) we decide that Orion-LD is to implement periodic notifications, the problems will have to be fixed.
+  // The field "timeInterval" in Subscription is to be changed from 'int' to 'double' and wherever the field is used we
+  // need to adapt the code to 'timeInterval' now being a 'double' and not an 'int'
+  //
+  // setTimeInterval(sub, &b);
 #endif
 
   std::string status = sub.status == ""?  STATUS_ACTIVE : sub.status;
@@ -209,7 +236,7 @@ std::string mongoCreateSubscription
 
   if (notificationDone)
   {
-    long long  lastNotification = (long long) getCurrentTime();
+    double lastNotification = orionldState.requestTime;
 
     setLastNotification(lastNotification, &b);
     setCount(1, &b);

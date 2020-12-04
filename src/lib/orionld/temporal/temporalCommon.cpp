@@ -116,14 +116,6 @@ void entityExtract
     KjNode* idP   = kjLookup(entityP, "id");
     KjNode* typeP = kjLookup(entityP, "type");
 
-    LM_K(("CCSR : at func EntityExtract entityP %i", entityP));
-    LM_K(("CCSR : at func EntityExtract id %i", idP));
-    // KjNode* createdAtP  = kjLookup(entityP, "createdAt");
-    // KjNode* modifiedAtP = kjLookup(entityP, "modifiedAt");
-
-    LM_TMP (("CCSR : entityExtract func and atrributeIndex %i", allTab->attributeTableArrayItems));
-    LM_TMP (("CCSR : entityExtract func and entitityId %s", idP->value.s));
-
     allTab->entityTableArray[entityIndex].entityId = idP->value.s;
     kjChildRemove(entityP, idP);
 
@@ -148,69 +140,30 @@ void entityExtract
   allTab->entityTableArray[entityIndex].createdAt  = now;
   allTab->entityTableArray[entityIndex].modifiedAt = now;
 
+  //
+  // Count the total number of attributes and sub-attributes
+  //
   int  attributesCount = 0;
   int  subAttrCount    = 0;
-
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     attributesCount++;
 
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
     {
-      lmLogTree("CCSR", "sub attribute", subAttrP);
       subAttrCount++;
     }
   }
 
-  LM_K(("CCSR: Number of Attributes & number of SubAttributes %i %i", attributesCount, subAttrCount));
-
-  //allTab->attributeTableArrayItems = attributesCount;
-  //allTab->subAttributeTableArrayItems = subAttrCount;
-
-  //int attribArrayTotalSize = attributesCount * sizeof(OrionldTemporalDbAttributeTable);
-  //int attribArrayTotalSize = 1024;  // Chandra - TBI
-  //allTab->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc,
-  //  (attribArrayTotalSize * sizeof(OrionldTemporalDbAttributeTable)));
-  //bzero(allTab->attributeTableArray, (attribArrayTotalSize * sizeof(OrionldTemporalDbAttributeTable)));
-
-  //LM_TMP(("CCSR: AttrArrayTotalSize:%d", attribArrayTotalSize));
-  //LM_TMP(("CCSR: attributesCount:%d", attributesCount));
-
-  //int subAttribArrayTotalSize = subAttrCount * sizeof(OrionldTemporalDbSubAttributeTable);
-  //int subAttribArrayTotalSize = 1024; // Chandra - TBI
-  //allTab->subAttributeTableArray = (OrionldTemporalDbSubAttributeTable*) kaAlloc(&orionldState.kalloc,
-  //  (subAttribArrayTotalSize * sizeof(OrionldTemporalDbSubAttributeTable)));
-  //bzero(allTab->subAttributeTableArray, (subAttribArrayTotalSize * sizeof(OrionldTemporalDbSubAttributeTable)));
-
-  //int attrIndex=0;
-  //int subAttrIndex = 0;
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    lmLogTree("CCSR", "attrP before attrExtract", attrP);
-
-    // if (entityInArray)
-    // {
-    //   for (KjNode* arryAttrP = attrP->value.firstChildP; arryAttrP != NULL; arryAttrP = arryAttrP->next)
-    //   {
-    //     LM_TMP(("CCSR: Before callig attrExtract - Array"));
-    //     attrExtract (arryAttrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-    //   }
-    // }
-    // else
-    // {
     allTab->attributeTableArray[attrIndex].entityId = allTab->entityTableArray[entityIndex].entityId;
-    LM_TMP(("CCSR: Before callig attrExtract - non-Array and attrIndex-Items %i, attrIndex %i", allTab->attributeTableArrayItems, attrIndex));
     attrExtract(attrP, &allTab->attributeTableArray[attrIndex], allTab->subAttributeTableArray , attrIndex, &subAttrIndex);
-    LM_TMP(("CCSR: After callig attrExtract - non-Array and attributeValueType %i, entityId %s, attribute %s",
-            allTab->attributeTableArray[attrIndex].attributeValueType,
-            allTab->attributeTableArray[attrIndex].entityId,
-            allTab->attributeTableArray[attrIndex].attributeName));
     allTab->attributeTableArrayItems++;
-    // }
     attrIndex++;
   }
 
-  *attrIndexP = attrIndex;
+  *attrIndexP    = attrIndex;
   *subAttrIndexP = subAttrIndex;
 }
 
@@ -218,25 +171,18 @@ void entityExtract
 
 // -----------------------------------------------------------------------------
 //
-// temporalOrionldCommonExtractTree - initialize the thread-local variables of temporalOrionldCommonState
-//
-// INSERT INTO entity_table(entity_id,entity_type,geo_property,created_at,modified_at, observed_at)
-//      VALUES ("%s,%s,%s,%s");
+// temporalEntityExtract -
 //
 OrionldTemporalDbAllTables* temporalEntityExtract(void)
 {
   OrionldTemporalDbAllTables*  dbAllTablesLocal; // Chandra - TBI
 
-  int dbAllTablesSize = sizeof(OrionldTemporalDbAllTables);
-  dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, dbAllTablesSize);
-  bzero(dbAllTablesLocal, dbAllTablesSize);
+  dbAllTablesLocal = (OrionldTemporalDbAllTables*) kaAlloc(&orionldState.kalloc, sizeof(OrionldTemporalDbAllTables));
+  bzero(dbAllTablesLocal, sizeof(OrionldTemporalDbAllTables));
 
   int attribArrayTotalSize = 100;  // Chandra - TBI
-  LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.1 %i", dbAllTablesLocal->attributeTableArray));
 
-  dbAllTablesLocal->attributeTableArray = (OrionldTemporalDbAttributeTable*)
-    kaAlloc(&orionldState.kalloc, (attribArrayTotalSize * sizeof(OrionldTemporalDbAttributeTable)));
-  LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer - 000.2 %i", dbAllTablesLocal->attributeTableArray));
+  dbAllTablesLocal->attributeTableArray = (OrionldTemporalDbAttributeTable*) kaAlloc(&orionldState.kalloc, (attribArrayTotalSize * sizeof(OrionldTemporalDbAttributeTable)));
 
   bzero(dbAllTablesLocal->attributeTableArray, attribArrayTotalSize);
   LM_K(("CCSR: at func temporalEntityExtract dbAllTables->entityTableArrayItems pointer %i", dbAllTablesLocal->attributeTableArray));
@@ -691,7 +637,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
   // int dbSubAttribTable = dbAllTablesLocal->subAttributeTableArrayItems;
 
 
-  int dbEntityBufferSize = 10 * 1024;
+  int dbEntityBufferSize  = 10 * 1024;
   char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
   bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
@@ -702,7 +648,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
     LM_TMP(("CCSR: step1.1 TemporalConstructInsertSQLStatement: %s", dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType));
     char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
                                                         dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType,
-                                                        NULL,
                                                         true,
                                                         NULL);
 
@@ -778,7 +723,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
     char* expandedAttrType = orionldContextItemExpand(orionldState.contextP,
                                                       dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
-                                                      NULL,
                                                       true,
                                                       NULL);
 

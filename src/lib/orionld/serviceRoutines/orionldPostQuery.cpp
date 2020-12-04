@@ -171,9 +171,9 @@ KjNode* dmodelEntity(KjNode* dbEntityP, bool sysAttrs, OrionldProblemDetails* pd
 
   for (KjNode* nodeP = _idP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
-    if (strcmp(nodeP->name, "id") == 0)
+    if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
       idP = nodeP;
-    else if (strcmp(nodeP->name, "type") == 0)
+    else if ((strcmp(nodeP->name, "type") == 0) || (strcmp(nodeP->name, "@type") == 0))
       typeP = nodeP;
   }
 
@@ -294,7 +294,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
       char number[16];
 
       snprintf(number, sizeof(number), "%d", count);
-      httpHeaderAdd(ciP, "NGSILD-Count", number);
+      httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
     }
     return true;
   }
@@ -331,7 +331,7 @@ bool orionldPostQuery(ConnectionInfo* ciP)
     char number[16];
 
     snprintf(number, sizeof(number), "%d", count);
-    httpHeaderAdd(ciP, "NGSILD-Count", number);
+    httpHeaderAdd(ciP, "NGSILD-Results-Count", number);
   }
 
   return true;

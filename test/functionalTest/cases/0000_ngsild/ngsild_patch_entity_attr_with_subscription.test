@@ -1,0 +1,378 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity attribute using PATCH
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+#
+# FIXME: There is a bug in the notifications triggered by PATCH /ngsi-ld/v1/entities/{EID}/attrs
+#        and the step 06 compensates for this bug.
+#        Once the issue #559 is fixed, this functest will start failing and must be modified
+#
+# 01. Create an entity E1 with properties A1 and A2
+# 02. Create a subscription matching E1
+# 03. Update the E1 property A1
+# 04. See the entity in the DB
+# 05. GET the entity E1, make sure that A1 value was changed - and that PP1 has disappeared
+# 06. Dump the accumulator - see one notification - then reset the accumulator
+# 07. Attempt to add a property 
+# 08. GET E1, make sure A3 is not there
+# 09. See the entity in the DB
+# 10. Dump the accumulator - see NO notification
+#
+
+echo "01. Create an entity E1 with properties A1 and A2"
+echo "================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "value": "A1 Step 1",
+    "PP1": {
+      "type": "Property",
+      "value": "A1::PP1 Step 1"
+    }
+  },
+  "A2": {
+    "type": "Property",
+    "value": "A2 Step 1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription matching E1"
+echo "====================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+	"notification": {
+		"endpoint": {
+			"uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+			"accept": "application/json"
+		}
+	}  
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Update the E1 property A1"
+echo "============================="
+payload='{
+  "A1": {
+    "value": "A1 Step 3",
+    "type": "Property"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. See the entity in the DB"
+echo "============================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "05. GET the entity E1, make sure that A1 value was changed - and that PP1 has disappeared"
+echo "========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1?prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "06. Dump the accumulator - see one notification - then reset the accumulator"
+echo "============================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Attempt to add a property A3 - should be ignored"
+echo "===================================================="
+payload='{
+  "A3": {
+    "value": "A3 Step 6",
+    "type": "Property"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. GET E1, make sure A3 is not there"
+echo "====================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1?prettyPrint=yes' --noPayloadCheck
+echo
+echo
+
+
+echo "09. See the entity in the DB"
+echo "============================"
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "10. Dump the accumulator - see NO notification"
+echo "=============================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with properties A1 and A2
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+Date: REGEX(.*)
+
+
+
+02. Create a subscription matching E1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+Date: REGEX(.*)
+
+
+
+03. Update the E1 property A1
+=============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. See the entity in the DB
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "A2 Step 1",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "A1 Step 3",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+05. GET the entity E1, make sure that A1 value was changed - and that PP1 has disappeared
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 179
+Content-Type: application/json
+Link: REGEX(.*)
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "A2": {
+    "type": "Property",
+    "value": "A2 Step 1"
+  },
+  "A1": {
+    "type": "Property",
+    "value": "A1 Step 3"
+  }
+}
+
+
+
+06. Dump the accumulator - see one notification - then reset the accumulator
+============================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 360
+User-Agent: REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "A1": {
+                "PP1": {
+                    "type": "Property", 
+                    "value": "A1::PP1 Step 1"
+                }, 
+                "type": "Property", 
+                "value": "A1 Step 3"
+            }, 
+            "A2": {
+                "type": "Property", 
+                "value": "A2 Step 1"
+            }, 
+            "id": "urn:ngsi-ld:entity:E1", 
+            "type": "T"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1", 
+    "type": "Notification"
+}
+=======================================
+
+
+07. Attempt to add a property A3 - should be ignored
+====================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 132
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "notUpdated": [
+        {
+            "attributeName": "https://uri.etsi.org/ngsi-ld/default-context/A3",
+            "reason": "attribute doesn't exist"
+        }
+    ],
+    "updated": []
+}
+
+
+08. GET E1, make sure A3 is not there
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 179
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T",
+  "A2": {
+    "type": "Property",
+    "value": "A2 Step 1"
+  },
+  "A1": {
+    "type": "Property",
+    "value": "A1 Step 3"
+  }
+}
+
+
+
+09. See the entity in the DB
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:entity:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/A2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/A2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "A2 Step 1",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/A1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "A1 Step 3",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+10. Dump the accumulator - see NO notification
+==============================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

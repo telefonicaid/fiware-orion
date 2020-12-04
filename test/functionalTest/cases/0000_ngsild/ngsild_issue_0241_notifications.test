@@ -154,7 +154,7 @@ Date: REGEX(.*)
 ================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 858
+Content-Length: 866
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -172,7 +172,7 @@ Content-Type: application/ld+json
             "id": "urn:ngsi-ld:Vehicle:A4501", 
             "isParked": {
                 "object": "urn:ngsi-ld:OffStreetParking:Downtown1", 
-                "observedAt": "2018-12-04T12:00:00Z", 
+                "observedAt": "2018-12-04T12:00:00.000Z", 
                 "providedBy": {
                     "object": "urn:ngsi-ld:Person:Bob", 
                     "type": "Relationship"

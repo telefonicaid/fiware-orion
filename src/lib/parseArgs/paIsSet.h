@@ -27,12 +27,19 @@
 */
 
 
+/* ****************************************************************************
+*
+* PaArgument - defined in parseArgs.h and needed in paIsSet
+*/
+struct PaArgument;
+
+
 
 /* ****************************************************************************
 *
 * paIsSet - is an argument existing in the parse list
 */
-extern bool paIsSet(int argC, char* argV[], const char* option);
+extern bool paIsSet(int argC, char* argV[], PaArgument* paArgs, const char* option);
 
 
 

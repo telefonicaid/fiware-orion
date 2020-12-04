@@ -370,7 +370,8 @@ bool collectionInsert
     return false;
   }
 
-  LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", col.c_str(), doc.toString().c_str()));
+  LM_T(LmtMongo, ("insert() in collection '%s'", col.c_str()));
+  LM_T(LmtMongo, ("insert() document '%s'", doc.toString().c_str()));
 
   try
   {

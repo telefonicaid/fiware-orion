@@ -36,19 +36,16 @@
 
 // -----------------------------------------------------------------------------
 //
-// Global vars - FIXME: need a connection pool, or for now at least a semaphore for the connection?
+// Global vars - FIXME: need a connection pool
 //
 PGconn*    oldPgDbConnection        = NULL;
 PGconn*    oldPgDbTenantConnection  = NULL;
-PGresult*  oldPgTenandDbResult      = NULL;
 
 
 
 // ----------------------------------------------------------------------------
 //
-// TemporalPgDBConnectorOpen - function to close the Postgres database connection gracefully
-//
-// FIXME: protect the connection with a semaphore
+// TemporalPgDBConnectorClose -
 //
 bool TemporalPgDBConnectorClose(void)
 {
@@ -95,50 +92,89 @@ bool TemporalPgDBConnectorOpen(void)
 }
 
 
-/*
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// TemporalPgDBConnectorOpen - function to open the Postgres database connection
+// pgTablesCreate -
 //
-bool TemporalPgDBConnectorOpen(char* tenant)
+bool pgTablesCreate(PGconn* pgConnectionP)
 {
-  if (TemporalPgDBConnectorOpen() == true)  // oldPgDbConnection is set by TemporalPgDBConnectorOpen ...
-  {
-    char oldPgDbSqlSyntax[]= ";";
-    char oldPgDbSqlCreateTDbSQL[] = "CREATE DATABASE ";  // FIXME: snprintf
-    strcat(oldPgDbSqlCreateTDbSQL, tenant);
-    strcat(oldPgDbSqlCreateTDbSQL, oldPgDbSqlSyntax);
-
-    char oldPgTDbConnSQL[] = "user=postgres password=password dbname= ";    // FIXME: snprintf
-    strcat (oldPgTDbConnSQL, tenant);
-
-    LM_TMP(("Command to create database for Tenant %s", tenant));
-
-    PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-    LM_TMP(("Opening database connection for Tenant %s", tenant));
-
-    oldPgDbTenantConnection = PQconnectdb(oldPgTDbConnSQL);
-    if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
+  const char* sqlV[] =
     {
-      LM_E(("Connection to %s database is not achieved or created", tenant));
-      LM_E(("Database Error (error connecting to postgres: %s)", PQerrorMessage(oldPgDbTenantConnection)));
-      TemporalPgDBConnectorClose();
-      return false;
-    }
-    PQclear(oldPgTenandDbResult);
-	}
-	else
-	{
-    LM_E(("Connection to PostGress database is not achieved or created", tenant));
-    LM_E(("CONNECTION_BAD %s", PQerrorMessage(oldPgDbConnection)));
-    TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
-	}
+      // "CREATE EXTENSION IF NOT EXISTS postgis",
+      // "CREATE EXTENSION IF NOT EXISTS timescaledb",
+      // "DROP TABLE attribute_sub_properties_table",      // For testing only
+      // "DROP TABLE attributes_table",                    // For testing only
+      // "DROP TABLE entity_table",                        // For testing only
 
-	return true;
+      "CREATE TABLE IF NOT EXISTS entity_table ("
+        "entity_id TEXT NOT NULL,"
+        "entity_type TEXT,"
+        "geo_property GEOMETRY,"
+        "created_at TIMESTAMP,"
+        "modified_at TIMESTAMP,"
+        "observed_at TIMESTAMP,"
+        "PRIMARY KEY (entity_id, modified_at))",
+
+      // FIXME: The type 'attribute_value_type_enum' needs to be added at startup but only if it doesn't already exists
+      // "CREATE TYPE IF NOT EXISTS attribute_value_type_enum as enum ('value_string'," "'value_number', 'value_boolean', 'value_relation'," "'value_object', 'value_datetime', 'value_geo')",
+
+      "CREATE TABLE IF NOT EXISTS attributes_table("
+        "entity_id TEXT NOT NULL,"
+        "id TEXT NOT NULL,"
+        "name TEXT,"
+        "value_type attribute_value_type_enum,"
+        "sub_property BOOL,"
+        "unit_code TEXT,"
+        "data_set_id TEXT,"
+        "instance_id TEXT NOT NULL,"
+        "value_string TEXT,"
+        "value_boolean BOOL,"
+        "value_number float8,"
+        "value_relation TEXT,"
+        "value_object TEXT,"
+        "value_datetime TIMESTAMP,"
+        "geo_property GEOMETRY,"
+        "created_at TIMESTAMP NOT NULL,"
+        "modified_at TIMESTAMP NOT NULL,"
+        "observed_at TIMESTAMP NOT NULL,"
+        "PRIMARY KEY (entity_id, id, modified_at))",
+
+      //  "SELECT create_hypertable('attributes_table', 'modified_at')",
+
+      "CREATE TABLE IF NOT EXISTS attribute_sub_properties_table("
+        "entity_id TEXT NOT NULL,"
+        "attribute_id TEXT NOT NULL,"
+        "attribute_instance_id TEXT NOT NULL,"
+        "id TEXT NOT NULL,"
+        "value_type attribute_value_type_enum,"
+        "value_string TEXT,"
+        "value_boolean BOOL,"
+        "value_number float8, "
+        "value_relation TEXT,"
+        "name TEXT,geo_property GEOMETRY,"
+        "unit_code TEXT,"
+        "value_object TEXT,"
+        "value_datetime TIMESTAMP)"
+    };
+  
+  for (unsigned int ix = 0; ix < sizeof(sqlV) / sizeof(sqlV[0]); ix++)
+  {
+    PGresult* pgResult = PQexec(pgConnectionP, sqlV[ix]);
+
+    LM_TMP(("SQL: %s", sqlV[ix]));
+    if (PQresultStatus(pgResult) != PGRES_COMMAND_OK)
+    {
+      LM_E(("Database Error (Postgres DB command '%s': %s)", sqlV[ix], PQerrorMessage(pgConnectionP)));
+      // No break here - let's continue to detect more errors ...
+    }
+    PQclear(pgResult);
+  }
+
+  return true;
 }
 
-*/
+
 
 // ----------------------------------------------------------------------------
 //
@@ -146,147 +182,63 @@ bool TemporalPgDBConnectorOpen(char* tenant)
 //
 bool temporalTenantInitialise(const char* tenant)
 {
-  LM_K(("Trying to open connection to Postgres database for new tenat database creation %s", tenant));
-
-  //  oldPgDbConnection = TemporalDBConnectorOpen();
-  if (TemporalPgDBConnectorOpen() != false)
+  if (TemporalPgDBConnectorOpen() == false)
   {
-    LM_K(("Trying to create database for Tenant %s", tenant));
-
-    int   oldPgDbSqlCreateTDbSQLBufferSize     = 1024;
-    int   oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
-    char* oldPgDbSqlCreateTDbSQL               = kaAlloc(&orionldState.kalloc, oldPgDbSqlCreateTDbSQLBufferSize);
-
-
-    //
-    // FIXME: This entire bunch of strcpy/strcat needs to be change to use snprintf
-    //
-
-    strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
-    oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
-    strncat(oldPgDbSqlCreateTDbSQL, tenant, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
-    oldPgDbSqlCreateTDbSQLUsedBufferSize += strlen(tenant);
-    strncpy(oldPgDbSqlCreateTDbSQL, ";", oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
-    oldPgDbSqlCreateTDbSQLUsedBufferSize += 1;
-
-    int oldPgTDbConnSQLBufferSize     = 1024;
-    int oldPgTDbConnSQLUsedBufferSize = 0;
-    char oldPgTDbConnSQLUser[]        = TEMPORAL_DB_USER; // Chandra-TBD
-    char oldPgTDbConnSQLPasswd[]      = TEMPORAL_DB_PASSWORD; // Chandra-TBD
-    char* oldTemporalSQLBuffer        = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
-
-    strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += 5;
-    strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
-    strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += 1;
-    strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += 9;
-    strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
-    strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += 1;
-    strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += 7;
-    strncat(oldTemporalSQLBuffer, tenant, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
-    oldPgTDbConnSQLUsedBufferSize += strlen(tenant);
-
-    LM_K(("Command to create database for Tenant %s", tenant));
-
-    PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
-    LM_K(("Opening database connection for Tenant %s", tenant));
-
-    oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
-    if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
-    {
-      LM_E(("Database Error (unable  to connect to tenant '%s': %s", tenant, PQerrorMessage(oldPgDbTenantConnection)));
-      TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
-      return false;
-    }
-    else if (PQstatus(oldPgDbTenantConnection) == CONNECTION_OK)
-    {
-      LM_K(("Connection is ok with the '%s' database", tenant));
-      LM_K(("Now creating the tables for the tenant '%s'", tenant));
-      const char* oldPgDbCreateTenantTables[] =
-        {
-          // "CREATE EXTENSION IF NOT EXISTS postgis",
-          // "CREATE EXTENSION IF NOT EXISTS timescaledb",
-          // "DROP TABLE attribute_sub_properties_table",      // For testing only
-          // "DROP TABLE attributes_table",                    // For testing only
-          // "DROP TABLE entity_table",                        // For testing only
-
-          "CREATE TABLE IF NOT EXISTS entity_table ("
-            "entity_id TEXT NOT NULL,"
-            "entity_type TEXT,"
-            "geo_property GEOMETRY,"
-            "created_at TIMESTAMP,"
-            "modified_at TIMESTAMP,"
-            "observed_at TIMESTAMP,"
-            "PRIMARY KEY (entity_id, modified_at))",
-
-          // FIXME: The type 'attribute_value_type_enum' needs to be added at startup but only if it doesn't already exists
-          // "CREATE TYPE IF NOT EXISTS attribute_value_type_enum as enum ('value_string'," "'value_number', 'value_boolean', 'value_relation'," "'value_object', 'value_datetime', 'value_geo')",
-
-          "CREATE TABLE IF NOT EXISTS attributes_table("
-            "entity_id TEXT NOT NULL,"
-            "id TEXT NOT NULL,"
-            "name TEXT,"
-            "value_type attribute_value_type_enum,"
-            "sub_property BOOL,"
-            "unit_code TEXT,"
-            "data_set_id TEXT,"
-            "instance_id TEXT NOT NULL,"
-            "value_string TEXT,"
-            "value_boolean BOOL,"
-            "value_number float8,"
-            "value_relation TEXT,"
-            "value_object TEXT,"
-            "value_datetime TIMESTAMP,"
-            "geo_property GEOMETRY,"
-            "created_at TIMESTAMP NOT NULL,"
-            "modified_at TIMESTAMP NOT NULL,"
-            "observed_at TIMESTAMP NOT NULL,"
-            "PRIMARY KEY (entity_id, id, modified_at))",
-
-          //  "SELECT create_hypertable('attributes_table', 'modified_at')",
-
-          "CREATE TABLE IF NOT EXISTS attribute_sub_properties_table("
-            "entity_id TEXT NOT NULL,"
-            "attribute_id TEXT NOT NULL,"
-            "attribute_instance_id TEXT NOT NULL,"
-            "id TEXT NOT NULL,"
-            "value_type attribute_value_type_enum,"
-            "value_string TEXT,"
-            "value_boolean BOOL,"
-            "value_number float8, "
-            "value_relation TEXT,"
-            "name TEXT,geo_property GEOMETRY,"
-            "unit_code TEXT,"
-            "value_object TEXT,"
-            "value_datetime TIMESTAMP)"
-        };
-      PQclear(oldPgTenandDbResult);
-
-      for (unsigned int ix = 0; ix < sizeof(oldPgDbCreateTenantTables) / sizeof(oldPgDbCreateTenantTables[0]); ix++)
-      {
-        oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, oldPgDbCreateTenantTables[ix]);
-
-        LM_TMP(("SQL: %s", oldPgDbCreateTenantTables[ix]));
-        if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
-        {
-          LM_E(("Database Error (Postgres DB command failed for database for Tenant '%s'  (%s): %s)", tenant, oldPgDbCreateTenantTables[ix], PQerrorMessage(oldPgDbTenantConnection)));
-          // break;
-        }
-        PQclear(oldPgTenandDbResult);
-      }
-    }
-  }
-  else
-  {
-    TemporalPgDBConnectorClose(); //close Postgres DB connection and cleanup
+    TemporalPgDBConnectorClose();  // close Postgres DB connection and cleanup
     return false;
   }
+
+  LM_K(("Trying to create database for Tenant %s", tenant));
+
+  int   oldPgDbSqlCreateTDbSQLBufferSize     = 1024;
+  int   oldPgDbSqlCreateTDbSQLUsedBufferSize = 0;
+  char* oldPgDbSqlCreateTDbSQL               = kaAlloc(&orionldState.kalloc, oldPgDbSqlCreateTDbSQLBufferSize);
+
+  //
+  // FIXME: This entire bunch of strcpy/strcat needs to be change to use snprintf
+  //
+  strncpy(oldPgDbSqlCreateTDbSQL, "CREATE DATABASE ", oldPgDbSqlCreateTDbSQLBufferSize);
+  oldPgDbSqlCreateTDbSQLUsedBufferSize += 16;
+  strncat(oldPgDbSqlCreateTDbSQL, tenant, oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+  oldPgDbSqlCreateTDbSQLUsedBufferSize += strlen(tenant);
+  strncpy(oldPgDbSqlCreateTDbSQL, ";", oldPgDbSqlCreateTDbSQLBufferSize - oldPgDbSqlCreateTDbSQLUsedBufferSize);
+  oldPgDbSqlCreateTDbSQLUsedBufferSize += 1;
+
+  int oldPgTDbConnSQLBufferSize     = 1024;
+  int oldPgTDbConnSQLUsedBufferSize = 0;
+  char oldPgTDbConnSQLUser[]        = TEMPORAL_DB_USER; // Chandra-TBD
+  char oldPgTDbConnSQLPasswd[]      = TEMPORAL_DB_PASSWORD; // Chandra-TBD
+  char* oldTemporalSQLBuffer        = kaAlloc(&orionldState.kalloc, oldPgTDbConnSQLBufferSize);
+
+  strncpy(oldTemporalSQLBuffer, "user=", oldPgTDbConnSQLBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += 5;
+  strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLUser, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLUser);
+  strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += 1;
+  strncat(oldTemporalSQLBuffer, "password=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += 9;
+  strncat(oldTemporalSQLBuffer, oldPgTDbConnSQLPasswd, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += sizeof(oldPgTDbConnSQLPasswd);
+  strncat(oldTemporalSQLBuffer, " ", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += 1;
+  strncat(oldTemporalSQLBuffer, "dbname=", oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += 7;
+  strncat(oldTemporalSQLBuffer, tenant, oldPgTDbConnSQLBufferSize - oldPgTDbConnSQLUsedBufferSize);
+  oldPgTDbConnSQLUsedBufferSize += strlen(tenant);
+
+  PGresult* oldPgTenandDbResult = PQexec(oldPgDbConnection, oldPgDbSqlCreateTDbSQL);
+
+  oldPgDbTenantConnection = PQconnectdb(oldTemporalSQLBuffer);
+  if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK && PQstatus(oldPgDbTenantConnection) != CONNECTION_OK)
+  {
+    LM_E(("Database Error (unable to connect to tenant '%s': %s", tenant, PQerrorMessage(oldPgDbTenantConnection)));
+    TemporalPgDBConnectorClose(); //close Tenant DB connection and cleanup
+    return false;
+  }
+  else if (PQstatus(oldPgDbTenantConnection) == CONNECTION_OK)
+    pgTablesCreate(oldPgDbTenantConnection);
+
   return true;
 }
 
@@ -302,39 +254,40 @@ bool temporalExecSqlStatement(char* sql)
 
   temporalTenantInitialise(oldTenantName);  //  opening Tenant Db connection
 
-  oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "BEGIN");
-  if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+  PGresult* pgResult = PQexec(oldPgDbTenantConnection, "BEGIN");
+  if (PQresultStatus(pgResult) != PGRES_COMMAND_OK)
   {
     LM_E(("BEGIN command failed for inserting single Entity into DB %s", oldTenantName));
-    PQclear(oldPgTenandDbResult);
+    PQclear(pgResult);
     TemporalPgDBConnectorClose();
     return false;
   }
-  PQclear(oldPgTenandDbResult);
+  PQclear(pgResult);
 
 	//  char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
-	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, sql);
-	if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+	pgResult = PQexec(oldPgDbTenantConnection, sql);
+	if (PQresultStatus(pgResult) != PGRES_COMMAND_OK)
   {
     LM_E(("command failed for inserting single Attribute into DB %s: '%s'", oldTenantName, sql));
     LM_E(("Reason %s", PQerrorMessage(oldPgDbTenantConnection)));
-    PQclear(oldPgTenandDbResult);
+    PQclear(pgResult);
     TemporalPgDBConnectorClose();
     return false;
   }
-  PQclear(oldPgTenandDbResult);
+  PQclear(pgResult);
 
-	oldPgTenandDbResult = PQexec(oldPgDbTenantConnection, "COMMIT");
-  if (PQresultStatus(oldPgTenandDbResult) != PGRES_COMMAND_OK)
+	pgResult = PQexec(oldPgDbTenantConnection, "COMMIT");
+  if (PQresultStatus(pgResult) != PGRES_COMMAND_OK)
   {
     LM_E(("COMMIT command failed for inserting single Sub Attribute into DB %s", oldTenantName));
-    PQclear(oldPgTenandDbResult);
+    PQclear(pgResult);
     TemporalPgDBConnectorClose();
     return false;
   }
 
-  PQclear(oldPgTenandDbResult);
+  PQclear(pgResult);
   TemporalPgDBConnectorClose();
+
   return true;
 }
 

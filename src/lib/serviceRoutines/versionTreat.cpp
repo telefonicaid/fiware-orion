@@ -57,7 +57,7 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 */
 void versionSet(const char* version)
 {
-  strncpy(versionString, version, sizeof(versionString));
+  strncpy(versionString, version, sizeof(versionString) - 1);
 }
 
 
@@ -107,7 +107,7 @@ std::string versionTreat
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";
 #else
-  std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
+  std::string uptime = parsedUptime(orionldState.requestTime - startTime);
 #endif
 
   out += "{\n";

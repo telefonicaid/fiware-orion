@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -38,8 +38,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/temporal/temporalCommon.h"                   // temporalEntityExtract, TemporalConstructInsertSQLStatement
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
-#include "orionld/temporal/temporalCommon.h"                // Common function
+
 
 
 // ----------------------------------------------------------------------------
@@ -48,52 +49,7 @@ extern "C"
 //
 bool temporalPostBatchUpdate(ConnectionInfo* ciP)
 {
-  char rBuf[4096];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, rBuf, sizeof(rBuf));
-  LM_E(("CCSR: orionldState.requestTree at temporalPostBatchUpdate %s",rBuf));
-
-  /* char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
-	if (oldPgDbConnection == NULL)
-	{
-		//if(!temporalTenanatValidate())
-		//{
-		//	LM_TMP(("CCSR: Tenant initialisation failed"));
-		//}
-
-		if(TemporalPgDBConnectorOpen() == true)
-		{
-			LM_TMP(("CCSR: connection to postgress db is open"));
-			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
-			{
-				LM_TMP(("CCSR: connection to tenant db is open"));
-			}
-			else
-			{
-				LM_TMP(("CCSR: connection to tenant db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
-				return false;
-			}
-		}
-		else
-		{
-			LM_TMP(("CCSR: connection to postgres db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
-			return false;
-		}
-	}*/
-
-	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
 	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
 
-  LM_TMP(("CCSR: step1 temporalPostBatchUpdate"));
-
-
-	if(TemporalConstructInsertSQLStatement(dbAllTables, true) == true)
-	{
-		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	return false;
+	return TemporalConstructInsertSQLStatement(dbAllTables, true);  // FIXME: wish it was this easy ...
 }

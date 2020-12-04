@@ -30,7 +30,7 @@ SET (SOURCES
     temporalPostBatchUpdate.cpp
     temporalPostBatchUpsert.cpp
     temporalPostEntities.cpp
-    temporalUpdateEntity.cpp
+    temporalPostEntity.cpp
     temporalTenantInitialise.cpp
     temporalCommon.cpp
     geoPropertyExtract.cpp
@@ -46,7 +46,7 @@ SET (HEADERS
     temporalPostBatchUpdate.h
     temporalPostBatchUpsert.h
     temporalPostEntities.h
-    temporalUpdateEntity.h
+    temporalPostEntity.h
     temporalTenantInitialise.cpp
     temporalCommon.h
 )

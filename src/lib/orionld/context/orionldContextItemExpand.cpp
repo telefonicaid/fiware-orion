@@ -44,7 +44,6 @@
 // PARAMETERS
 //   contextP                the context
 //   shortName               the name to expand
-//   valueMayBeExpandedP     pointer to a bool that is set to true if @type == @vocab
 //   contextItemPP           to give the caller the complete result of the lookup
 //
 // RETURN VALUE
@@ -62,16 +61,12 @@ char* orionldContextItemExpand
 (
   OrionldContext*       contextP,
   const char*           shortName,
-  bool*                 valueMayBeExpandedP,
   bool                  useDefaultUrlIfNotFound,
   OrionldContextItem**  contextItemPP
 )
 {
   OrionldContextItem* contextItemP;
   char*               colonP;
-
-  if (valueMayBeExpandedP != NULL)
-    *valueMayBeExpandedP = false;
 
   if (contextP == NULL)
     contextP = orionldCoreContextP;
@@ -109,13 +104,6 @@ char* orionldContextItemExpand
   // 4. Save the pointer to the context item
   if (contextItemPP != NULL)
     *contextItemPP = contextItemP;
-
-  // 5. May the value be expanded?
-  if ((valueMayBeExpandedP != NULL) && (contextItemP->type != NULL))
-  {
-    if (strcmp(contextItemP->type, "@vocab") == 0)
-      *valueMayBeExpandedP = true;
-  }
 
   return contextItemP->id;
 }

@@ -64,11 +64,11 @@ static void entityInfoArrayFilter(mongo::BSONObjBuilder* queryBuilderP, KjNode* 
 
     for (KjNode* nodeP = entityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
-      if (strcmp(nodeP->name, "id") == 0)
+      if ((strcmp(nodeP->name, "id") == 0) || (strcmp(nodeP->name, "@id") == 0))
         idP = nodeP;
       else if (strcmp(nodeP->name, "idPattern") == 0)
         idPatternP = nodeP;
-      else if (strcmp(nodeP->name, "type") == 0)
+      else if ((strcmp(nodeP->name, "type") == 0) || (strcmp(nodeP->name, "@type") == 0))
         typeP = nodeP;
     }
 
@@ -265,7 +265,6 @@ static bool geoqWithinFilter(mongo::BSONObjBuilder* queryBuilderP, char* geometr
   char geoPropertyPath[256] = { 'a', 't', 't', 'r', 's', '.', 0 };
   snprintf(geoPropertyPath, sizeof(geoPropertyPath), "attrs.%s.value", geopropName);
 
-  // LM_TMP(("GEO: Query: { %s: %s }", geoPropertyPath, withinBuilder.obj().toString().c_str()));  // DESTRUCTIVE !!!
   queryBuilderP->append(geoPropertyPath, withinBuilder.obj());
 
   return true;
@@ -304,7 +303,6 @@ static bool geoqIntersectsFilter(mongo::BSONObjBuilder* queryBuilderP, char* geo
   char geoPropertyPath[256] = { 'a', 't', 't', 'r', 's', '.', 0 };
   snprintf(geoPropertyPath, sizeof(geoPropertyPath), "attrs.%s.value", geopropName);
 
-  // LM_TMP(("GEO: Query: { %s: %s }", geoPropertyPath, intersectsBuilder.obj().toString().c_str()));  // DESTRUCTIVE !!!
   queryBuilderP->append(geoPropertyPath, intersectsBuilder.obj());
 
   return true;
@@ -332,7 +330,6 @@ static bool geoqEqualsFilter(mongo::BSONObjBuilder* queryBuilderP, KjNode* geome
   char geoPropertyPath[256] = { 'a', 't', 't', 'r', 's', '.', 0 };
   snprintf(geoPropertyPath, sizeof(geoPropertyPath), "attrs.%s.value", geopropName);
 
-  // LM_TMP(("GEO: Query: { %s: %s }", geoPropertyPath, valueObj.toString().c_str()));  // DESTRUCTIVE !!!
   queryBuilderP->append(geoPropertyPath, valueObj);
 
   return true;
@@ -375,7 +372,6 @@ static bool geoqDisjointFilter(mongo::BSONObjBuilder* queryBuilderP, char* geome
   char geoPropertyPath[256] = { 'a', 't', 't', 'r', 's', '.', 0 };
   snprintf(geoPropertyPath, sizeof(geoPropertyPath), "attrs.%s.value", geopropName);
 
-  // LM_TMP(("GEO: Query: { %s: %s }", geoPropertyPath, intersectsBuilder.obj().toString().c_str()));  // DESTRUCTIVE !!!
   queryBuilderP->append(geoPropertyPath, notBuilder.obj());
 
   return true;
@@ -420,8 +416,6 @@ static bool geoqOverlapsFilter(mongo::BSONObjBuilder* queryBuilderP, char* geome
   int   size;
 
   size = snprintf(geoPropertyPath, sizeof(geoPropertyPath), "attrs.%s.value", geopropName);
-
-  // LM_TMP(("GEO: Query: { %s: %s }", geoPropertyPath, intersectsBuilder.obj().toString().c_str()));  // DESTRUCTIVE !!!
 
   queryBuilderP->append(geoPropertyPath, intersectsBuilder.obj());
 
@@ -550,7 +544,6 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
     // Sort according to creDate
     query.sort("creDate", 1);
 
-    // LM_TMP(("GEO: query: %s", query.toString().c_str()));  // Not Destructive
     cursorP = connectionP->query(collectionPath, query, limit, offset);
 
     try

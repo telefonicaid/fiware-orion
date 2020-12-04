@@ -133,7 +133,7 @@ extern void setCondsAndInitialNotify
 *
 * setLastNotification -
 */
-extern void setLastNotification(long long lastNotification, mongo::BSONObjBuilder* b);
+extern void setLastNotification(double lastNotification, mongo::BSONObjBuilder* b);
 
 
 
@@ -149,7 +149,7 @@ extern void setCount(long long count, mongo::BSONObjBuilder* b);
 *
 * setLastFailure -
 */
-extern void setLastFailure(long long lastFailure, mongo::BSONObjBuilder* b);
+extern void setLastFailure(double lastFailure, mongo::BSONObjBuilder* b);
 
 
 
@@ -157,7 +157,7 @@ extern void setLastFailure(long long lastFailure, mongo::BSONObjBuilder* b);
 *
 * setLastSuccess -
 */
-extern void setLastSuccess(long long lastSuccess, mongo::BSONObjBuilder* b);
+extern void setLastSuccess(double lastSuccess, mongo::BSONObjBuilder* b);
 
 
 

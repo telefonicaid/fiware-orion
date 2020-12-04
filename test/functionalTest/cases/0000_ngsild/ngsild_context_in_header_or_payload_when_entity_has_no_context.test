@@ -46,7 +46,7 @@ payload='{
   "P1": {
     "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00",
+    "observedAt": "2018-12-04T12:01:01.678Z",
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
@@ -99,7 +99,7 @@ Date: REGEX(.*)
 02. GET all entities using application/json - see context in Link HTTP Header
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 280
+Content-Length: 284
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -115,7 +115,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
       },
-      "observedAt": "2018-12-04T12:00:00Z"
+      "observedAt": "2018-12-04T12:01:01.678Z"
     }
   }
 ]
@@ -125,7 +125,7 @@ Date: REGEX(.*)
 03. GET all entities using application/ld+json - see context in payload
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 359
+Content-Length: 363
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -141,7 +141,7 @@ Date: REGEX(.*)
         "type": "Relationship",
         "object": "urn:ngsi-ld:T2:6789"
       },
-      "observedAt": "2018-12-04T12:00:00Z"
+      "observedAt": "2018-12-04T12:01:01.678Z"
     }
   }
 ]
@@ -151,7 +151,7 @@ Date: REGEX(.*)
 04. GET the entity using application/json - see context in Link HTTP Header
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 250
+Content-Length: 254
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -162,7 +162,7 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00Z",
+    "observedAt": "2018-12-04T12:01:01.678Z",
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 05. GET the entity using application/ld+json - see context in payload
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 327
+Content-Length: 331
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -186,7 +186,7 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00Z",
+    "observedAt": "2018-12-04T12:01:01.678Z",
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"

@@ -134,7 +134,7 @@ Date: REGEX(.*)
 02. Retrieve entities with an attribute named P100
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 244
+Content-Length: 248
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -150,7 +150,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:00:00Z",
+            "observedAt": "2018-12-04T12:00:00.000Z",
             "type": "Property",
             "value": 12
         },
@@ -163,7 +163,7 @@ Date: REGEX(.*)
 03. Retrieve entities with condition over object
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 536
+Content-Length: 540
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -183,7 +183,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:00:00Z",
+            "observedAt": "2018-12-04T12:00:00.000Z",
             "type": "Property",
             "value": 12
         },
@@ -228,7 +228,7 @@ Date: REGEX(.*)
 05. Retrieve entities with query by condition over values
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 536
+Content-Length: 540
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -248,7 +248,7 @@ Date: REGEX(.*)
                 "object": "urn:ngsi-ld:T2:6789",
                 "type": "Relationship"
             },
-            "observedAt": "2018-12-04T12:00:00Z",
+            "observedAt": "2018-12-04T12:00:00.000Z",
             "type": "Property",
             "value": 12
         },

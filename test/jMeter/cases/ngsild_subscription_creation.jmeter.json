@@ -1,0 +1,37 @@
+{
+    "NUM_OF_THREADS": 1,
+    "LOOPS": 3,
+    "RAMP_TIME": 1,
+    "DOMAIN_IP": "localhost",
+    "PORT": 1026,
+    "PATH_SERVICE": "ngsi-ld/v1/subscriptions",
+    "HTTP_VERB": "POST",
+    "HEADERS": {
+        "Content-Type": "application/ld+json"
+    },
+    "BODY_DATA": {
+        "json": {
+            "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "id": "http://a.b.c/subs/${__UUID()}",
+            "type": "Subscription",
+            "name": "Test subscription 09",
+            "description": "Description of Test subscription 09",
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:E01",
+                    "type": "T1"
+                }
+            ],
+            "notification": {
+                "attributes": [
+                    "P1"
+                ],
+                "format": "keyValues",
+                "endpoint": {
+                    "uri": "http://valid.url/url",
+                    "accept": "application/ld+json"
+                }
+            }
+        }
+    }
+}

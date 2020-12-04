@@ -1,0 +1,18 @@
+{
+    "NUM_OF_THREADS": 1,
+    "LOOPS": 1,
+    "RAMP_TIME": 1,
+    "DOMAIN_IP": "localhost",
+    "PORT": 1026,
+    "PATH_SERVICE": "ngsi-ld/v1/entities?type=Vehicle&options=sysAttrs",
+    "HTTP_VERB": "GET",
+    "HEADERS": {
+        "Content-Type": "application/json"
+    },
+    "BODY_DATA": {
+        "json": {
+            "name": "tester",
+            "age": "36"
+        }
+    }
+}

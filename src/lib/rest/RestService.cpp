@@ -584,9 +584,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       restReply(ciP, response);
 
       if (jsonReqP != NULL)
-      {
         jsonReqP->release(&parseData);
-      }
 
       if (ciP->apiVersion == V2)
       {

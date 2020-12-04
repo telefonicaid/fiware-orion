@@ -246,7 +246,7 @@ static void prepareDatabase(bool useSubCache = true)
 
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
                       "expiration" << 1500000000 <<
-                      "lastNotification" << 20000000 <<
+                      "lastNotification" << (double) 20000000.0 <<
                       "reference" << "http://notify1.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
@@ -255,7 +255,7 @@ static void prepareDatabase(bool useSubCache = true)
   // After the changes to simplify "condition" field (issue #1851) sub2 has become equal to sub1 and sub3
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
                       "expiration" << 2000000000 <<
-                      "lastNotification" << 30000000 <<
+                      "lastNotification" << (double) 30000000.0 <<
                       "reference" << "http://notify2.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
@@ -263,7 +263,7 @@ static void prepareDatabase(bool useSubCache = true)
 
   BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
                       "expiration" << 1500000000 <<
-                      "lastNotification" << 20000000 <<
+                      "lastNotification" << (double) 20000000.0 <<
                       "reference" << "http://notify3.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "type" << "T" << "isPattern" << "true")) <<
                       "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
@@ -338,7 +338,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
                         "expiration" << 1500000000 <<
-                        "lastNotification" << 20000000 <<
+                        "lastNotification" << (double) 20000000.0 <<
                         "reference" << "http://notify4.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
@@ -346,7 +346,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
                         "expiration" << 1500000000 <<
-                        "lastNotification" << 20000000 <<
+                        "lastNotification" << (double) 20000000.0 <<
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[2-3]" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A3" << "A4") <<
@@ -1621,7 +1621,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(20000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;
@@ -1678,7 +1678,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(20000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;
@@ -1735,7 +1735,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(20000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;
@@ -2684,7 +2684,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(30000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;
@@ -2741,7 +2741,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(30000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;
@@ -2798,7 +2798,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(30000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;
@@ -2855,7 +2855,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(30000000, sub.getField("lastNotification").Double());
 
     /* Release mock */
     delete notifierMock;

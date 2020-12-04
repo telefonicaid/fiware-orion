@@ -51,6 +51,8 @@ static bool formatExtract(char* format, ngsiv2::Subscription* subP)
     subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
   else if (SCOMPARE11(format, 'n', 'o', 'r', 'm', 'a', 'l', 'i', 'z', 'e', 'd', 0))
     subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
+  else if (SCOMPARE18(format, 'N', 'G', 'S', 'I', 'v', '2', '-', 'N', 'o', 'r', 'm', 'a', 'l', 'i', 'z', 'e', 'd', 0))
+    subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED;
   else
   {
     LM_E(("Invalid value for Notification::format: '%s'", format));

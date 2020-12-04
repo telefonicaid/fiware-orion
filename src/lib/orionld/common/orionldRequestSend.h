@@ -40,7 +40,8 @@ typedef enum OrionldHttpHeaderType
   HttpHeaderAccept,
   HttpHeaderLink,
   HttpHeaderTenant,
-  HttpHeaderPath
+  HttpHeaderPath,
+  HttpHeaderXauth
 } OrionldHttpHeaderType;
 
 

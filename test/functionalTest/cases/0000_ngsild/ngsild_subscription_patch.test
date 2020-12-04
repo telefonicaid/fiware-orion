@@ -66,7 +66,7 @@ payload='{
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00",
+  "expires": "2028-12-31T11:12:13.14",
   "throttling": 5
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
@@ -100,7 +100,7 @@ echo
 
 echo "05. GET the subscription - see the modification"
 echo "==============================================="
-orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01?prettyPrint=yes&spaces=2' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01?prettyPrint=yes&spaces=2&options=sysAttrs' --noPayloadCheck
 echo
 echo
 
@@ -151,11 +151,11 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:01",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://localhost:9997/notify",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(5),
+	"throttling" : 5,
 	"servicePath" : "/",
 	"status" : "active",
 	"entities" : [
@@ -176,7 +176,8 @@ MongoDB server version: REGEX(.*)
 	"name" : "Test subscription S01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
-	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -196,7 +197,7 @@ bye
 03. GET the subscription - see its initial state
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 547
+Content-Length: 551
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -228,7 +229,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T11:12:13.140Z",
   "throttling": 5
 }
 
@@ -245,7 +246,7 @@ Date: REGEX(.*)
 05. GET the subscription - see the modification
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 625
+Content-Length: 716
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -255,6 +256,8 @@ Date: REGEX(.*)
   "type": "Subscription",
   "name": "Changed Name for Test subscription S01",
   "description": "New Description of Test subscription S01",
+  "createdAt": "REGEX(.*)",
+  "modifiedAt": "REGEX(.*)",
   "entities": [
     {
       "id": "urn:ngsi-ld:E01",
@@ -278,7 +281,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T11:12:13.140Z",
   "throttling": 5
 }
 
@@ -316,7 +319,8 @@ MongoDB server version: REGEX(.*)
 	"name" : "Changed Name for Test subscription S01",
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"csf" : "not implemented",
-	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P2"
 	],
@@ -347,7 +351,7 @@ Date: REGEX(.*)
 ================================================
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
-Content-Length: 291
+Content-Length: 295
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:9997

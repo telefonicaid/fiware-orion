@@ -22,24 +22,25 @@
 *
 * Author: Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                                // MongoDB C++ Client Legacy Driver
+#include "mongo/client/dbclient.h"                                   // MongoDB C++ Client Legacy Driver
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                         // KjNode
-#include "kjson/kjLookup.h"                                       // kjLookup
+#include "kjson/KjNode.h"                                            // KjNode
+#include "kjson/kjLookup.h"                                          // kjLookup
 }
 
-#include "logMsg/logMsg.h"                                        // LM_*
-#include "logMsg/traceLevels.h"                                   // Lmt*
+#include "logMsg/logMsg.h"                                           // LM_*
+#include "logMsg/traceLevels.h"                                      // Lmt*
 
-#include "mongoBackend/MongoGlobal.h"                             // getMongoConnection, releaseMongoConnection, ...
+#include "mongoBackend/MongoGlobal.h"                                // getMongoConnection, releaseMongoConnection, ...
 
-#include "orionld/common/orionldState.h"                          // tenants, tenantV
-#include "orionld/db/dbCollectionPathGet.h"                       // dbCollectionPathGetWithTenant
-#include "orionld/db/dbGeoIndexLookup.h"                          // dbGeoIndexLookup
-#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"  // mongoCppLegacyGeoIndexCreate
-#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexInit.h"    // Own interface
+#include "orionld/common/orionldState.h"                             // tenants, tenantV
+#include "orionld/db/dbCollectionPathGet.h"                          // dbCollectionPathGetWithTenant
+#include "orionld/db/dbGeoIndexLookup.h"                             // dbGeoIndexLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"     // mongoCppLegacyGeoIndexCreate
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
+#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexInit.h"       // Own interface
 
 
 
@@ -72,13 +73,21 @@ void mongoCppLegacyGeoIndexInit(void)
     mongo::DBClientBase*                  connectionP    = getMongoConnection();
     std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
 
+    orionldState.jsonBuf = NULL;
     while (cursorP->more())
     {
+      if (orionldState.jsonBuf != NULL)
+      {
+        // mongoCppLegacyKjTreeFromBsonObj uses orionldState.jsonBuf for its output tree
+        free(orionldState.jsonBuf);
+        orionldState.jsonBuf = NULL;
+      }
+
       mongo::BSONObj  bsonObj = cursorP->nextSafe();
 
       char*           title;
       char*           detail;
-      KjNode*         kjTree  = dbDataToKjTree(&bsonObj, &title, &detail);
+      KjNode*         kjTree  = mongoCppLegacyKjTreeFromBsonObj(&bsonObj, &title, &detail);
       KjNode*         attrsP = kjTree->value.firstChildP;
 
       if (attrsP == NULL)  //  Entity without attributes ?

@@ -50,8 +50,11 @@ extern "C"
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/rest/temporaryErrorPayloads.h"                     // Temporary Error Payloads
+#include "orionld/rest/uriParamName.h"                               // uriParamName
 #include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
 #include "orionld/serviceRoutines/orionldPostEntity.h"               // orionldPostEntity
+#include "orionld/serviceRoutines/orionldGetEntities.h"              // orionldGetEntities
+#include "orionld/serviceRoutines/orionldGetEntity.h"                // orionldGetEntity
 #include "orionld/serviceRoutines/orionldPatchEntity.h"              // orionldPatchEntity
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"             // orionldDeleteEntity
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"           // orionldPatchAttribute
@@ -68,6 +71,13 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostQuery.h"                // orionldPostQuery
 #include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
+#include "orionld/serviceRoutines/orionldGetRegistrations.h"         // orionldGetRegistrations
+#include "orionld/serviceRoutines/orionldGetRegistration.h"          // orionldGetRegistration
+#include "orionld/serviceRoutines/orionldPatchRegistration.h"        // orionldPatchRegistration
+#include "orionld/serviceRoutines/orionldDeleteRegistration.h"       // orionldDeleteRegistration
+#include "orionld/serviceRoutines/orionldPatchSubscription.h"        // orionldPatchSubscription
+#include "orionld/serviceRoutines/orionldDeleteSubscription.h"       // orionldDeleteSubscription
+#include "orionld/serviceRoutines/orionldGetEntityTypes.h"           // orionldGetEntityTypes
 #include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
 #include "orionld/temporal/temporalPostBatchDelete.h"                // temporalPostBatchDelete
 #include "orionld/temporal/temporalDeleteAttribute.h"                // temporalDeleteAttribute
@@ -77,7 +87,7 @@ extern "C"
 #include "orionld/temporal/temporalPostBatchCreate.h"                // temporalPostBatchCreate
 #include "orionld/temporal/temporalPostBatchUpsert.h"                // temporalPostBatchUpsert
 #include "orionld/temporal/temporalPostBatchUpdate.h"                // temporalPostBatchUpdate
-#include "orionld/temporal/temporalUpdateEntity.h"                     // temporalPostEntity
+#include "orionld/temporal/temporalPostEntity.h"                     // temporalPostEntity
 #include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
 #include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
@@ -215,19 +225,106 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   //
   //
 
+  // Valid for almost ALL services - zeroed out by those services that do not support this feature
   serviceP->options = ORIONLD_SERVICE_OPTION_MAKE_SURE_TENANT_EXISTS;
 
+  //
+  // URI parameters - set it to NONE - NO URI Parameter supported
+  // Later, each service is set to support whatever URI parameters the service supports
+  //
+  serviceP->uriParams = 0;
+
+  // But first, ALL services support 'prettyPrint' and 'spaces'
+  serviceP->uriParams |= ORIONLD_URIPARAM_PRETTYPRINT;
+  serviceP->uriParams |= ORIONLD_URIPARAM_SPACES;
 
   if (serviceP->serviceRoutine == orionldPostEntities)
   {
-    serviceP->options  = 0;
+    serviceP->options  = 0;  // Tenant will be created if necessary
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
   }
+  else if (serviceP->serviceRoutine == orionldGetEntities)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_IDLIST;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
+    serviceP->uriParams |= ORIONLD_URIPARAM_IDPATTERN;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_Q;
+    serviceP->uriParams |= ORIONLD_URIPARAM_CSF;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOREL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COORDINATES;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
+  }
+  else if (serviceP->serviceRoutine == orionldGetEntity)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
+  }
+  else if (serviceP->serviceRoutine == orionldDeleteEntity)
+  {
+  }
+  else if (serviceP->serviceRoutine == orionldPostEntity)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+  }
+  else if (serviceP->serviceRoutine == orionldPatchAttribute)
+  {
+  }
+  else if (serviceP->serviceRoutine == orionldDeleteAttribute)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_DATASETID;
+    serviceP->uriParams |= ORIONLD_URIPARAM_DELETEALL;
+  }
+  else if (serviceP->serviceRoutine == orionldPostRegistrations)
+  {
+    serviceP->options  = 0;  // Tenant will be created if necessary
+
+    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
+  }
+  else if (serviceP->serviceRoutine == orionldGetRegistrations)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_IDLIST;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
+    serviceP->uriParams |= ORIONLD_URIPARAM_IDPATTERN;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_Q;
+    serviceP->uriParams |= ORIONLD_URIPARAM_CSF;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOREL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COORDINATES;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TIMEPROPERTY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TIMEREL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TIMEAT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ENDTIMEAT;
+  }
+  else if (serviceP->serviceRoutine == orionldGetRegistration)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+  }
+  else if (serviceP->serviceRoutine == orionldPatchRegistration)
+  {
+  }
+  else if (serviceP->serviceRoutine == orionldDeleteRegistration)
+  {
+  }
   else if (serviceP->serviceRoutine == orionldPostSubscriptions)
   {
-    serviceP->options  = 0;
+    serviceP->options  = 0;  // Tenant will be created if necessary
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
@@ -235,48 +332,68 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldGetSubscriptions)
   {
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
   }
   else if (serviceP->serviceRoutine == orionldGetSubscription)
   {
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+  }
+  else if (serviceP->serviceRoutine == orionldPatchSubscription)
+  {
+  }
+  else if (serviceP->serviceRoutine == orionldDeleteSubscription)
+  {
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchCreate)
+  {
+    serviceP->options  = 0;  // Tenant will be created if necessary
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+  }
+  else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
+  {
+    serviceP->options  = 0;  // Tenant will be created if necessary
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchDelete)
   {
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
-  else if (serviceP->serviceRoutine == orionldPostBatchCreate)
-  {
-    serviceP->options  = 0;
-  }
-  else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
-  {
-    serviceP->options  = 0;
-  }
   else if (serviceP->serviceRoutine == orionldPostQuery)
   {
-    serviceP->options  = 0;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
+  }
+  else if (serviceP->serviceRoutine == orionldGetEntityTypes)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
   }
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
-    serviceP->options  = 0;
+    serviceP->options  = 0;  // Tenant is Ignored
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
-  else if (serviceP->serviceRoutine == orionldPostRegistrations)
-  {
-    serviceP->options  = 0;
-
-    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
-  }
   else if (serviceP->serviceRoutine == orionldGetTenants)
   {
-    serviceP->options  = 0;
+    serviceP->options  = 0;  // Tenant is Ignored
+
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldGetDbIndexes)
   {
-    serviceP->options  = 0;
+    serviceP->options  = 0;  // Tenant is Ignored
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
 
@@ -287,7 +404,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     else if (serviceP->serviceRoutine == orionldPostBatchDelete)
       serviceP->temporalRoutine = temporalPostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
-      serviceP->temporalRoutine = temporalUpdateEntity;
+      serviceP->temporalRoutine = temporalPostEntity;
     else if (serviceP->serviceRoutine == orionldDeleteAttribute)
       serviceP->temporalRoutine = temporalDeleteAttribute;
     else if (serviceP->serviceRoutine == orionldDeleteEntity)

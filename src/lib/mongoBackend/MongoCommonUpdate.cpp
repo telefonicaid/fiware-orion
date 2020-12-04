@@ -59,7 +59,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                           // orionldState
 #include "orionld/common/geoJsonCreate.h"                          // geoJsonCreate
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
+#include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
 #endif
 
 #include "mongoBackend/connectionOperations.h"
@@ -578,7 +578,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getIntFieldF(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldAsDoubleF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -611,7 +611,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 5. Add modification date (actual change only if actual update) */
   if (actualUpdate)
   {
-    ab.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
+    ab.append(ENT_ATTRS_MODIFICATION_DATE, orionldState.requestTime);
   }
   else
   {
@@ -619,7 +619,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldAsDoubleF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -718,7 +718,6 @@ static bool updateAttribute
   if (isReplace)
   {
     BSONObjBuilder newAttr;
-    int            now = getCurrentTime();
 
     *actualUpdate = true;
 
@@ -740,8 +739,8 @@ static bool updateAttribute
     }
 
     newAttr.append(ENT_ATTRS_TYPE, attrType);
-    newAttr.append(ENT_ATTRS_CREATION_DATE, now);
-    newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
+    newAttr.append(ENT_ATTRS_CREATION_DATE, orionldState.requestTime);
+    newAttr.append(ENT_ATTRS_MODIFICATION_DATE, orionldState.requestTime);
 
     caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
@@ -868,10 +867,8 @@ static bool appendAttribute
   ab.append(ENT_ATTRS_MDNAMES, mdNames);
 
   /* 4. Dates */
-  int now = getCurrentTime();
-
-  ab.append(ENT_ATTRS_CREATION_DATE, now);
-  ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
+  ab.append(ENT_ATTRS_CREATION_DATE, orionldState.requestTime);
+  ab.append(ENT_ATTRS_MODIFICATION_DATE, orionldState.requestTime);
 
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
   toSet->append(composedName, ab.obj());
@@ -1113,16 +1110,15 @@ static bool addTriggeredSubscriptions_withCache
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
-  int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     CachedSubscription* cSubP = subVec[ix];
 
     // Outdated subscriptions are skipped
-    if (cSubP->expirationTime < now)
+    if (cSubP->expirationTime < orionldState.requestTime)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)",
-                         cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%f, NOW:%f, DIFF: %f)",
+                         cSubP->subscriptionId, cSubP->expirationTime, orionldState.requestTime, orionldState.requestTime - cSubP->expirationTime));
       continue;
     }
 
@@ -1150,50 +1146,50 @@ static bool addTriggeredSubscriptions_withCache
 
     // Throttling
     LM_T(LmtSubCache, ("---------------- Throttling check ------------------"));
-    LM_T(LmtSubCache, ("cSubP->throttling:           %d", cSubP->throttling));
-    LM_T(LmtSubCache, ("cSubP->lastNotificationTime: %d", cSubP->lastNotificationTime));
-    LM_T(LmtSubCache, ("Now:                         %d", now));
+    LM_T(LmtSubCache, ("cSubP->throttling:           %f", cSubP->throttling));
+    LM_T(LmtSubCache, ("cSubP->lastNotificationTime: %f", cSubP->lastNotificationTime));
+    LM_T(LmtSubCache, ("Now:                         %f", orionldState.requestTime));
 
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
-      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
+      if ((orionldState.requestTime - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
-                           now,
-                           now - cSubP->lastNotificationTime,
+                           orionldState.requestTime,
+                           orionldState.requestTime - cSubP->lastNotificationTime,
                            cSubP->throttling));
         continue;
       }
       else
       {
         LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
                            cSubP->subscriptionId,
                            cSubP->throttling,
                            cSubP->lastNotificationTime,
-                           now,
-                           now - cSubP->lastNotificationTime,
+                           orionldState.requestTime,
+                           orionldState.requestTime - cSubP->lastNotificationTime,
                            cSubP->throttling));
       }
     }
     else
     {
       LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
-                         "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                         "(T: %f, LNT: %f, NOW: %f, NOW-LNT: %f, T: %f)",
                          cSubP->subscriptionId,
                          cSubP->throttling,
                          cSubP->lastNotificationTime,
-                         now,
-                         now - cSubP->lastNotificationTime,
+                         orionldState.requestTime,
+                         orionldState.requestTime - cSubP->lastNotificationTime,
                          cSubP->throttling));
     }
 
-    TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
-                                                           (long long) cSubP->lastNotificationTime,
+    TriggeredSubscription* subP = new TriggeredSubscription(cSubP->throttling,
+                                                           cSubP->lastNotificationTime,
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
                                                            aList,
@@ -1277,7 +1273,7 @@ static void fill_idNPtypeNP
                                              BSON(entTypeQ << BSON("$exists" << false))) <<
                          entPatternQ << "false" <<
                          typePatternQ << BSON("$ne" << true) <<
-                         CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                         CSUB_EXPIRATION   << BSON("$gt" << orionldState.requestTime) <<
                          CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
                          CSUB_SERVICE_PATH << spBson);
 }
@@ -1316,7 +1312,7 @@ static void fill_idPtypeNP
 
   bgP->boPNP.append(entPatternQ, "true");
   bgP->boPNP.append(typePatternQ, BSON("$ne" << true));
-  bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boPNP.append(CSUB_EXPIRATION, BSON("$gt" << orionldState.requestTime));
   bgP->boPNP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   bgP->boPNP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
@@ -1356,7 +1352,7 @@ static void fill_idNPtypeP
 
   bgP->boNPP.append(entPatternQ, "false");
   bgP->boNPP.append(typePatternQ, true);
-  bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boNPP.append(CSUB_EXPIRATION, BSON("$gt" << orionldState.requestTime));
   bgP->boNPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   bgP->boNPP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
@@ -1398,7 +1394,7 @@ static void fill_idPtypeP
 
   bgP->boPP.append(entPatternQ, "true");
   bgP->boPP.append(typePatternQ, true);
-  bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  bgP->boPP.append(CSUB_EXPIRATION, BSON("$gt" << orionldState.requestTime));
   bgP->boPP.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   bgP->boPP.append(CSUB_SERVICE_PATH, spBson);
   bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
@@ -1472,7 +1468,7 @@ static bool addTriggeredSubscriptions_noCache
   //
   // Allocating buffer to hold all these BIG variables, necessary for the population of
   // the four parts of the final query.
-  // The necessary variables are too big for the stack and thus moved to the head, inside BsonGroup.
+  // The necessary variables are too big for the stack and thus moved to the heap, inside CSubQueryGroup.
   //
   CSubQueryGroup* bgP = new CSubQueryGroup();
 
@@ -1556,8 +1552,8 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-      long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+      double            throttling         = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(sub, CSUB_THROTTLING)       : -1;
+      double            lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(sub, CSUB_LASTNOTIFICATION) : -1;
       std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
@@ -2047,13 +2043,13 @@ static bool processSubscriptions
     /* Check 1: timing (not expired and ok from throttling point of view) */
     if (tSubP->throttling != 1 && tSubP->lastNotification != 1)
     {
-      long long  current               = getCurrentTime();
-      long long  sinceLastNotification = current - tSubP->lastNotification;
+      double  current                = orionldState.requestTime;
+      double  sinceLastNotification  = current - tSubP->lastNotification;
 
       if (tSubP->throttling > sinceLastNotification)
       {
-        LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", tSubP->cacheSubId.c_str(), current));
+        LM_T(LmtMongo, ("blocked due to throttling, current time is: %f", current));
+        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %f", tSubP->cacheSubId.c_str(), current));
         continue;
       }
     }
@@ -2173,8 +2169,6 @@ static bool processSubscriptions
 
     if (notificationSent)
     {
-      long long rightNow = getCurrentTime();
-
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
@@ -2182,7 +2176,7 @@ static bool processSubscriptions
       {
         BSONObj query  = BSON("_id" << OID(mapSubId));
         BSONObj update = BSON("$set" <<
-                              BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                              BSON(CSUB_LASTNOTIFICATION << orionldState.requestTime) <<
                               "$inc" << BSON(CSUB_COUNT << (long long) 1));
 
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
@@ -2200,10 +2194,10 @@ static bool processSubscriptions
 
         if (cSubP != NULL)
         {
-          cSubP->lastNotificationTime = rightNow;
+          cSubP->lastNotificationTime = orionldState.requestTime;
           cSubP->count               += 1;
 
-          LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'",
+          LM_T(LmtSubCache, ("set lastNotificationTime to %f and count to %lld for '%s'",
                              cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
         }
         else
@@ -2397,8 +2391,7 @@ static void updateAttrInNotifyCer
       caP->actionType = actionType;
 
       /* Set modification date */
-      int now = getCurrentTime();
-      caP->modDate = now;
+      caP->modDate = orionldState.requestTime;
 
       /* Metadata */
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
@@ -2454,10 +2447,8 @@ static void updateAttrInNotifyCer
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
-  int now = getCurrentTime();
-
-  caP->creDate = now;
-  caP->modDate = now;
+  caP->creDate = orionldState.requestTime;
+  caP->modDate = orionldState.requestTime;
 
   if (caP->compoundValueP)
   {
@@ -2929,7 +2920,7 @@ static bool createEntity
 (
   EntityId*                        eP,
   const ContextAttributeVector&    attrsV,
-  int                              now,
+  double                           now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -3067,12 +3058,13 @@ static bool createEntity
 
   if ((orionldState.creDatesP != NULL) && ((savedCreDateP = kjLookup(orionldState.creDatesP, eP->id.c_str())) != NULL))
   {
-    eP->creDate = (double) savedCreDateP->value.i;
-    // LM_W(("Inserting creDate as DOUBLE: %f (URL: %s)", eP->creDate, orionldState.urlPath));
-    insertedDoc.append(ENT_CREATION_DATE, (int) savedCreDateP->value.i);
+    eP->creDate = (double) savedCreDateP->value.f;
+    insertedDoc.append(ENT_CREATION_DATE, savedCreDateP->value.f);
   }
   else
+  {
     insertedDoc.append(ENT_CREATION_DATE, now);
+  }
 #else
   insertedDoc.append(ENT_CREATION_DATE, now);
 #endif
@@ -3100,7 +3092,7 @@ static bool createEntity
   {
     mongo::BSONObj  datasetsObj;
 
-    mongoCppLegacyKjTreeToBsonObj(orionldState.datasets, &datasetsObj);
+    dbDataFromKjTree(orionldState.datasets, &datasetsObj);
     insertedDoc.append(orionldState.datasets->name, datasetsObj);
   }
 
@@ -3394,8 +3386,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.entityId.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldAsDoubleF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.entityId.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldAsDoubleF(r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
@@ -3426,6 +3418,9 @@ static void updateEntity
                                      &(responseP->oe)))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
+
+    if (orionldState.apiVersion == NGSI_LD_V1)
+      return;
 
     //
     // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
@@ -3458,9 +3453,8 @@ static void updateEntity
 
   if (action != ActionTypeReplace)
   {
-    int now = getCurrentTime();
-    toSet.append(ENT_MODIFICATION_DATE, now);
-    notifyCerP->contextElement.entityId.modDate = now;
+    toSet.append(ENT_MODIFICATION_DATE, orionldState.requestTime);
+    notifyCerP->contextElement.entityId.modDate = orionldState.requestTime;
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
@@ -3511,7 +3505,6 @@ static void updateEntity
   {
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
-    int            now = getCurrentTime();
 
     // This avoids strange behavior like as for the location, as reported in the #1142 issue
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
@@ -3520,7 +3513,7 @@ static void updateEntity
     {
       updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
                                         ENT_ATTRNAMES               << toPushArr <<
-                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_MODIFICATION_DATE       << orionldState.requestTime <<
                                         ENT_EXPIRATION              << currentDateExpiration <<
                                         ENT_LAST_CORRELATOR         << fiwareCorrelator));
     }
@@ -3528,12 +3521,12 @@ static void updateEntity
     {
       updatedEntity.append("$set", BSON(ENT_ATTRS                   << toSetObj <<
                                         ENT_ATTRNAMES               << toPushArr <<
-                                        ENT_MODIFICATION_DATE       << now <<
+                                        ENT_MODIFICATION_DATE       << orionldState.requestTime <<
                                         ENT_LAST_CORRELATOR         << fiwareCorrelator));
       updatedEntity.append("$unset", toUnsetObj);
     }
 
-    notifyCerP->contextElement.entityId.modDate = now;
+    notifyCerP->contextElement.entityId.modDate = orionldState.requestTime;
   }
   else
   {
@@ -3614,18 +3607,15 @@ static void updateEntity
 
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
-   * add the corresponding ContextElementResponse to the global response */
-  if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
-  {
+   * add the corresponding ContextElementResponse to the global response
+   */
+  if ((orionldState.apiVersion != NGSI_LD_V1) && ((action == ActionTypeUpdate) || (action == ActionTypeReplace)))
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-  }
 
   // StatusCode may be set already (if so, we keep the existing value)
 
   if (cerP->statusCode.code == SccNone)
-  {
     cerP->statusCode.fill(SccOk);
-  }
 
   responseP->contextElementResponseVector.push_back(cerP);
 }
@@ -3946,15 +3936,18 @@ void processContextElement
 
     if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
-      /* In the case of UPDATE or REPLACE we look for context providers */
-      searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-      cerP->statusCode.fill(SccOk);
-      responseP->contextElementResponseVector.push_back(cerP);
+      if (orionldState.apiVersion != NGSI_LD_V1)
+      {
+        /* In the case of UPDATE or REPLACE we look for context providers */
+        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+        cerP->statusCode.fill(SccOk);
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
 
       //
       // If no context providers found, then the UPDATE was simply for a non-found entity and an error should be returned
       //
-      if (forwardsPending(responseP) == false)
+      if ((orionldState.apiVersion == NGSI_LD_V1) || (forwardsPending(responseP) == false))
       {
         cerP->statusCode.fill(SccContextElementNotFound);
 
@@ -3979,9 +3972,8 @@ void processContextElement
     {
       std::string  errReason;
       std::string  errDetail;
-      int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
+      if (!createEntity(enP, ceP->contextAttributeVector, orionldState.requestTime, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
         LM_E(("Internal Error (createEntity failed)"));
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
@@ -4026,14 +4018,14 @@ void processContextElement
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);
 
         // Set creDate and modDate times
-        notifyCerP->contextElement.entityId.creDate = now;
-        notifyCerP->contextElement.entityId.modDate = now;
+        notifyCerP->contextElement.entityId.creDate = orionldState.requestTime;
+        notifyCerP->contextElement.entityId.modDate = orionldState.requestTime;
 
         for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
         {
           ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
-          caP->creDate = now;
-          caP->modDate = now;
+          caP->creDate = orionldState.requestTime;
+          caP->modDate = orionldState.requestTime;
         }
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";

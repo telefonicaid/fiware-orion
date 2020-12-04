@@ -75,7 +75,7 @@ bool pcheckInformationItem(KjNode* informationP)
         STRING_CHECK(propP, "information[X]::properties[X]");
         EMPTY_STRING_CHECK(propP, "information[X]::properties[X]");
         if (orionldContextItemAlreadyExpanded(propP->value.s) == false)
-          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, NULL, true, NULL);
+          propP->value.s = orionldContextItemExpand(orionldState.contextP, propP->value.s, true, NULL);
       }
     }
     else if (strcmp(infoItemP->name, "relationships") == 0)
@@ -88,7 +88,7 @@ bool pcheckInformationItem(KjNode* informationP)
         STRING_CHECK(relP, "information[X]::relationships[X]");
         EMPTY_STRING_CHECK(relP, "information[X]::relationships[X]");
         if (orionldContextItemAlreadyExpanded(relP->value.s) == false)
-          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, NULL, true, NULL);
+          relP->value.s = orionldContextItemExpand(orionldState.contextP, relP->value.s, true, NULL);
       }
     }
     else
