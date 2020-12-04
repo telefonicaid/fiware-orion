@@ -1,0 +1,21 @@
+name: Functional Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+env:
+   TEST_IMAGE_NAME: fiware/orion-ci:rpm7
+
+jobs:
+  functional:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -idqts functional
