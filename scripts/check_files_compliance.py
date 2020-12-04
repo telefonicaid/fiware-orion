@@ -48,7 +48,7 @@ header.append('\s*For those usages not covered by this license please contact wi
 header.append('\s*iot_support at tid dot es$')
 
 header2 = []
-header2.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0] FIWARE Foundation e.V.$')
+header2.append('\s*Copyright( \(c\))? 20[1|2][0|1|2|3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
 header2.append('\s*$')
 header2.append('\s*This file is part of Orion-LD Context Broker.$')
 header2.append('\s*$')
