@@ -111,7 +111,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
   KjNode*  entityP;
   KjNode*  next;
-  KjNode*  cloneP;
+  KjNode*  cloneP         = NULL;  // Only for temporal
 
   //
   // FIXME: Entity ID and TYPE are removed from the objects - need thim for temporal
@@ -358,7 +358,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     orionldState.responseTree = NULL;
   }
 
-  if (temporal)
+  if ((temporal == true) && (cloneP != NULL))
     orionldState.requestTree = cloneP;
 
   return true;
