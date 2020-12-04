@@ -188,7 +188,20 @@ echo -e "\e[1;32m Builder: installing MQTT - not! \e[0m"
 # apt-get -y install mosquitto
 # sudo service mosquitto start
 #
+# For github actions, mosquitto runs in a separate docker container
+#
 
+#
+# postgres
+#
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
+sudo apt update
+
+sudo apt -y install postgresql-12 postgresql-client-12
+sudo apt install postgis postgresql-12-postgis-3
+sudo apt-get install postgresql-12-postgis-3-scripts
+sudo apt-get install libpq-dev
 
 ldconfig
 
