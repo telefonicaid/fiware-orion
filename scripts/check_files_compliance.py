@@ -115,7 +115,7 @@ def check_file_orionld(file):
                     i = 1
             else:
                 if not re.search(header2[i], line):
-                    return 'mismatch: header <' + header2[i] + '> : line <' + line + '>'
+                    return 'mismatch: HEADER <' + header2[i] + '> : line <' + line + '>'
                 i += 1
                 if i == len(header2):
                     # We have reach the end of the header, so the complete check passes
@@ -269,6 +269,8 @@ for root, dirs, files in os.walk(dir):
         elif 'src/lib/orionld/' in filename:
             is_orionld = True
         elif 'test/functionalTest/cases/0000_ngsild' in filename:
+            is_orionld = True
+        elif 'test/functionalTest/cases/0000_temporal' in filename:
             is_orionld = True
         elif 'test/unittests/orionld' in filename:
             is_orionld = True
