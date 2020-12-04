@@ -1,4 +1,4 @@
-name: Compliance Test
+name: Compliance Tests
 
 on:
   push:
