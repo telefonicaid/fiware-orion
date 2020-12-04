@@ -194,7 +194,7 @@ echo -e "\e[1;32m Builder: installing MQTT - not! \e[0m"
 #
 # postgres
 #
-sudo apt-get install libpq-dev
+apt-get install libpq-dev
 
 ldconfig
 
