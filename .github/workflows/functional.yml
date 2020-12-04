@@ -19,4 +19,3 @@ jobs:
       - name: Run functional test
         run: |
           echo "Current folder is: ${pwd}"
-          docker run -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -idqts functional
