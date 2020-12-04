@@ -18,4 +18,4 @@ jobs:
 
       - name: Run functional test
         run: |
-          echo "Current folder is: ${pwd}"
+          ls
