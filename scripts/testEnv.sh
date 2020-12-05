@@ -52,7 +52,8 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o LISTENER3_PORT   - port where a third listening (test) application listens for connections
 #
 # o MQTT_BROKER_PORT - port of the MQTT Broker
-#
+# o MQTT_BROKER_HOST - host of the MQTT Broker
+
 export CB_PORT=${CB_PORT:-9999}
 export CP1_PORT=${CP1_PORT:-9801}
 export CP2_PORT=${CP2_PORT:-9802}
@@ -63,6 +64,7 @@ export LISTENER_PORT=${LISTENER_PORT:-9997}
 export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 export MQTT_BROKER_PORT=${MQTT_BROKER_PORT:-1883}
+export MQTT_BROKER_HOST=${MQTT_BROKER_HOST:-localhost}
 
 
 

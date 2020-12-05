@@ -146,7 +146,7 @@ static bool isFatherProcess = false;
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[64];
+char            dbHost[1024];
 char            rplSet[64];
 char            dbName[64];
 char            dbUser[64];
