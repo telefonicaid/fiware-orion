@@ -10,5 +10,6 @@
 * Issue  #280   Implemented Batch Update with options=noOverwrite
 * Issue  #280   Default mongo request mutex policy changed from 'all' to 'none'
 * Issue  #586   Stopped using gtime(), that is not reentrant - gtime_r() is used instead
-* Issue   XXX   A Korean contributor "@manaty226" fixed an important bug about subscriptions after broker restart - Thanks!
+* Issue   XXX   External contributor "@manaty226" fixed an important bug about subscriptions after broker restart - Thanks!
+* Issue  #605   ORIONLD_MONGO_HOST env var is not parsed correctly - made the buffer for the CLI '-dbHost' bigger (64 -> 1024)
 * Issue  #559   External contributor "@manaty226" ixed notification on PATCH Entity, updating attributes
