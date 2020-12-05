@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin, Chandra Challagonda
 */
+#include <postgresql/libpq-fe.h>                               // PGconn
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
@@ -37,8 +39,13 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
+#include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
+#include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
+#include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
+#include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
-#include "orionld/temporal/temporalCommon.h"                // Common function
 
 
 
@@ -48,49 +55,37 @@ extern "C"
 //
 bool temporalPostBatchCreate(ConnectionInfo* ciP)
 {
-  /* char tenantName[] = "orion_ld"; // Chandra-TBD This needs to be changed
-	if (oldPgDbConnection == NULL)
-	{
-		//if(!temporalTenanatValidate())
-		//{
-		//	LM_TMP(("CCSR: Tenant initialisation failed"));
-		//}
+  PGconn* connectionP;
 
-		 if(TemporalPgDBConnectorOpen() == true)
-		{
-			LM_TMP(("CCSR: connection to postgress db is open"));
-			if(TemporalPgTenantDBConnectorOpen(tenantName) == true)
-			{
-				LM_TMP(("CCSR: connection to tenant db is open"));
-			}
-			else
-			{
-				LM_TMP(("CCSR: connection to tenant db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
-				return false;
-			}
-		}
-		else
-		{
-			LM_TMP(("CCSR: connection to postgres db is not successful with error '%s'", PQerrorMessage(oldPgDbConnection)));
-			return false;
-		}
-	} */
+  if (orionldState.tenant == NULL)
+    connectionP = pgConnectionGet(dbName);
+  else
+    LM_X(1, ("Tenants not supported for the temporal layer (for now)"));
 
-	//char* oldTemporalSQLFullBuffer = temporalCommonExtractTree();
-	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
 
-  LM_TMP(("CCSR: step1 temporalPostBatchCreate"));
+  pgTransactionBegin(connectionP);
 
+  bool ok = true;
+  for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    if (pgEntityTreat(connectionP, NULL, NULL, entityP) == false)
+    {
+      ok = false;
+      break;
+    }
+  }
 
-	if(TemporalConstructInsertSQLStatement(dbAllTables, false) == true)
-	{
-		LM_TMP(("CCSR: temporalPostEntities -- Post Entities success to database:"));
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	return false;
+  if (ok == false)
+  {
+    LM_E(("Database Error (batch create temporal layer failed)"));
+    pgTransactionRollback(connectionP);
+  }
+  else
+    pgTransactionCommit(connectionP);
 
+  pgConnectionRelease(connectionP);
+
+  return true;
 }

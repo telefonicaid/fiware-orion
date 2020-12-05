@@ -34,6 +34,16 @@ SET (SOURCES
     temporalTenantInitialise.cpp
     temporalCommon.cpp
     geoPropertyExtract.cpp
+    pgConnectionGet.cpp
+    pgConnectionRelease.cpp
+    pgTransactionBegin.cpp
+    pgTransactionCommit.cpp
+    pgTransactionRollback.cpp
+    pgEntityTreat.cpp
+    pgEntityPush.cpp
+    pgAttributeTreat.cpp
+    pgAttributePush.cpp
+    pgSubAttributePush.cpp
 )
 
 SET (HEADERS
@@ -47,8 +57,19 @@ SET (HEADERS
     temporalPostBatchUpsert.h
     temporalPostEntities.h
     temporalUpdateEntity.h
-    temporalTenantInitialise.cpp
+    temporalTenantInitialise.h
     temporalCommon.h
+    geoPropertyExtract.h
+    pgConnectionGet.h
+    pgConnectionRelease.h
+    pgTransactionBegin.h
+    pgTransactionCommit.h
+    pgTransactionRollback.h
+    pgEntityTreat.h
+    pgEntityPush.h
+    pgAttributeTreat.h
+    pgAttributePush.h
+    pgSubAttributePush.h
 )
 
 
