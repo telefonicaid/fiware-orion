@@ -2393,51 +2393,63 @@ static void updateAttrInNotifyCer
       /* Set modification date */
       caP->modDate = orionldState.requestTime;
 
-      /* Metadata */
-      for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
+      /* Replace Metadata if actionType is UPDATE, append if actionType is APPEND*/
+      if (actionType == NGSI_MD_ACTIONTYPE_UPDATE)
       {
-        Metadata* targetMdP = targetAttr->metadataVector[jx];
-
-        /* Search for matching metadata in the CER attribute */
-        bool matchMd = false;
-        for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
+        caP->metadataVector.release();
+        caP->metadataVector.fill(&(targetAttr->metadataVector));
+      }
+      else if (actionType == NGSI_MD_ACTIONTYPE_APPEND)
+      {
+        for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
         {
-          Metadata* mdP = caP->metadataVector[kx];
+          Metadata *targetMdP = targetAttr->metadataVector[jx];
 
-          if (mdP->name == targetMdP->name)
+          /* Search for matching metadata in the CER attribute */
+          bool matchMd = false;
+          for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
           {
-            mdP->valueType   = targetMdP->valueType;
-            mdP->stringValue = targetMdP->stringValue;
-            mdP->boolValue   = targetMdP->boolValue;
-            mdP->numberValue = targetMdP->numberValue;
+            Metadata *mdP = caP->metadataVector[kx];
 
-            // Free old value of compound, if any
-            if (mdP->compoundValueP != NULL)
+            if (mdP->name == targetMdP->name)
             {
-              delete mdP->compoundValueP;
-              mdP->compoundValueP = NULL;
+              mdP->valueType = targetMdP->valueType;
+              mdP->stringValue = targetMdP->stringValue;
+              mdP->boolValue = targetMdP->boolValue;
+              mdP->numberValue = targetMdP->numberValue;
+
+              // Free old value of compound, if any
+              if (mdP->compoundValueP != NULL)
+              {
+                delete mdP->compoundValueP;
+                mdP->compoundValueP = NULL;
+              }
+
+              // Steal compound value from targetMdP
+              mdP->compoundValueP = targetMdP->compoundValueP;
+              targetMdP->compoundValueP = NULL;
+
+              if (targetMdP->type != "")
+              {
+                mdP->type = targetMdP->type;
+              }
+
+              matchMd = true;
+              break; /* kx  loop */
             }
+          }
 
-            // Steal compound value from targetMdP
-            mdP->compoundValueP       = targetMdP->compoundValueP;
-            targetMdP->compoundValueP = NULL;
-
-            if (targetMdP->type != "")
-            {
-              mdP->type = targetMdP->type;
-            }
-
-            matchMd = true;
-            break;   /* kx  loop */
+          /* If the attribute in target attr was not found, then it has to be added */
+          if (!matchMd)
+          {
+            Metadata *newMdP = new Metadata(targetMdP, useDefaultType);
+            caP->metadataVector.push_back(newMdP);
           }
         }
-
-        /* If the attribute in target attr was not found, then it has to be added */
-        if (!matchMd)
-        {
-          Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
-          caP->metadataVector.push_back(newMdP);
-        }
+      }
+      else
+      {
+        LM_W(("Unexpected actionType %s", actionType.c_str()));
       }
 
       return;
