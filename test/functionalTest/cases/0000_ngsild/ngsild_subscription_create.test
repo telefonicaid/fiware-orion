@@ -31,6 +31,17 @@ brokerStart CB 0-255
 --SHELL--
 
 #
+# As of today (July 2020), Orion-LD doesn't support periodical notifications.
+# We implemented it in Orion but as nobody was using it, we removed the functionality.
+# For NGSi-LD we'll have to decide whether we want it or not.
+# My personal vote would be not to implement it as I see it as a useless feature that eats CPU resources unnecessarily.
+# That said, a few tests are implemented inside the broker code, to check for incompatible requests, e.g. creation of a subscription
+# with both throttling and timeInterval.
+# I recently implemented a response of 501 for whenever a timeInterval is used with subscriptions, and this response shadows this error handling
+# about throttling and timeInterval and the test case 07 show just that.
+# I've decided to keep the test case though as, perhaps, some day, Orion-LD will support this feature about periodic notifications.
+#
+#
 # 01. POST /ngsi-ld/v1/subscriptions, with sub-id http://a.b.c/subs/sub01
 # 02. Check mongo
 # 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
@@ -40,7 +51,7 @@ brokerStart CB 0-255
 # 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 # 08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK
 # 09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
-# 10. GET sub09 and make sure no 'expires' nor 'throttling' is returned
+# 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 #
 
 
@@ -350,9 +361,9 @@ echo
 echo
 
 
-echo "10. GET sub09 and make sure no 'expires' nor 'throttling' is returned"
-echo "====================================================================="
-orionCurl --url /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09 -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo "10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned"
+echo "==================================================================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09?options=sysAttrs' -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -374,11 +385,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "http://a.b.c/subs/sub01",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(5),
+	"throttling" : 5,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "paused",
@@ -412,7 +423,8 @@ MongoDB server version: REGEX(.*)
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"csf" : "not implemented",
-	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"http://example.org/P2"
 	],
@@ -432,7 +444,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 884
+Content-Length: 888
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -481,7 +493,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
@@ -490,7 +502,7 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 973
+Content-Length: 977
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -538,7 +550,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
@@ -575,14 +587,14 @@ Date: REGEX(.*)
 
 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 ===================================================================================================
-HTTP/1.1 400 Bad Request
+HTTP/1.1 501 Not Implemented
 Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "no detail",
-    "title": "Both 'timeInterval' and 'watchedAttributes' present",
+    "detail": "Subscription::timeInterval is not implemented",
+    "title": "Not Implemented",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -605,15 +617,16 @@ Date: REGEX(.*)
 
 
 
-10. GET sub09 and make sure no 'expires' nor 'throttling' is returned
-=====================================================================
+10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
+===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 317
+Content-Length: 396
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
+    "createdAt": REGEX(.*),
     "description": "Description of Test subscription 09",
     "entities": [
         {
@@ -622,6 +635,7 @@ Date: REGEX(.*)
         }
     ],
     "id": "http://a.b.c/subs/sub09",
+    "modifiedAt": REGEX(.*),
     "name": "Test subscription 09",
     "notification": {
         "attributes": [

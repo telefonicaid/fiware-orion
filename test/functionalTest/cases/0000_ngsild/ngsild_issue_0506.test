@@ -1,0 +1,151 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 506 - patching the attributes of an entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+#
+# 01. Create an Entity with four attributes
+# 02. Update two of the attributes, using PATCH on .../{EID}/attrs
+# 03. GET the entity and see that two attrs have changed and the other two are intact
+#
+
+echo "01. Create an Entity with four attributes"
+echo "========================================="
+payload='{
+  "id": "urn:ngsi-ld:TemperatureSensor:001",
+  "type": "TemperatureSensor",
+  "category": {
+    "type": "Property",
+    "value": "sensor"
+  },
+  "temperature": {
+    "type": "Property",
+    "value": 25,
+    "unitCode": "CEL"
+  },
+  "batteryLevel": {
+    "value": 0.9,
+    "type": "Property",
+    "unitCode": "C62"
+  },
+  "controlledAsset": {
+    "object": "urn:ngsi-ld:Building:barn002",
+    "type": "Relationship"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Update two of the attributes, using PATCH on .../{EID}/attrs"
+echo "================================================================"
+payload='{
+  "category": {
+    "value": [
+      "sensor",
+      "actuator"
+    ],
+    "type": "Property"
+  },
+  "controlledAsset": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Building:barn001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001/attrs -X PATCH  --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity and see that two attrs have changed and the other two are intact"
+echo "==================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Entity with four attributes
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
+Date: REGEX(.*)
+
+
+
+02. Update two of the attributes, using PATCH on .../{EID}/attrs
+================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. GET the entity and see that two attrs have changed and the other two are intact
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 338
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "batteryLevel": {
+        "type": "Property",
+        "unitCode": "C62",
+        "value": 0.9
+    },
+    "category": {
+        "type": "Property",
+        "value": [
+            "sensor",
+            "actuator"
+        ]
+    },
+    "controlledAsset": {
+        "object": "urn:ngsi-ld:Building:barn001",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:TemperatureSensor:001",
+    "temperature": {
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 25
+    },
+    "type": "TemperatureSensor"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

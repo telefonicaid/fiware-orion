@@ -74,12 +74,12 @@ payload='[
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
     "temperature": {
-      "observedAt": "2020-04-09T14:33:38Z",
+      "observedAt": "2020-04-09T14:33:38.123Z",
       "type": "Property",
       "value": 21.9
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:38Z",
+      "observedAt": "2020-04-09T14:33:38.007Z",
       "type": "Property",
       "value": 1014.96
     }
@@ -239,7 +239,7 @@ payload='[
       "value": 22.8
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:29Z",
+      "observedAt": "2020-04-09T14:33:29.556Z",
       "type": "Property",
       "value": 1015.64
     }
@@ -313,12 +313,12 @@ payload='[
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
     "temperature": {
-      "observedAt": "2020-04-09T14:33:38Z",
+      "observedAt": "2020-04-09T14:33:38.460Z",
       "type": "Property",
       "value": 21.9
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:38Z",
+      "observedAt": "2020-04-09T14:33:38.999Z",
       "type": "Property",
       "value": 1014.96
     }
@@ -353,12 +353,12 @@ payload='[
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
     "temperature": {
-      "observedAt": "2020-04-09T14:33:36Z",
+      "observedAt": "2020-04-09T14:33:36.499Z",
       "type": "Property",
       "value": 29.55
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:36Z",
+      "observedAt": "2020-04-09T14:33:36.001Z",
       "type": "Property",
       "value": 1018.0255999999999
     }
@@ -393,12 +393,12 @@ payload='[
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
     "temperature": {
-      "observedAt": "2020-04-09T14:33:34Z",
+      "observedAt": "2020-04-09T14:33:34.501Z",
       "type": "Property",
       "value": 14.3
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:34Z",
+      "observedAt": "2020-04-09T14:33:34.199Z",
       "type": "Property",
       "value": 1020.87
     }
@@ -433,12 +433,12 @@ payload='[
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
     "temperature": {
-      "observedAt": "2020-04-09T14:33:30Z",
+      "observedAt": "2020-04-09T14:33:30.0Z",
       "type": "Property",
       "value": 33.9
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:30Z",
+      "observedAt": "2020-04-09T14:33:30.7Z",
       "type": "Property",
       "value": 980.56
     }
@@ -478,7 +478,7 @@ payload='[
       "value": 22.8
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:29Z",
+      "observedAt": "2020-04-09T14:33:29.000Z",
       "type": "Property",
       "value": 1015.64
     }
@@ -524,7 +524,7 @@ Good - the creation of the 5 entities took less than 5 seconds
 03. Get the entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 4121
+Content-Length: 4161
 Content-Type: application/json
 Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -533,14 +533,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:22828"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1014.96,
-      "observedAt": "2020-04-09T14:33:38Z"
+      "observedAt": "2020-04-09T14:33:38.007Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -553,7 +549,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 21.9,
-      "observedAt": "2020-04-09T14:33:38Z"
+      "observedAt": "2020-04-09T14:33:38.123Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:22828"
     },
     "location": {
       "type": "GeoProperty",
@@ -569,14 +569,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:15333"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1018.0256,
-      "observedAt": "2020-04-09T14:33:36Z"
+      "observedAt": "2020-04-09T14:33:36.000Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -589,7 +585,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 29.55,
-      "observedAt": "2020-04-09T14:33:36Z"
+      "observedAt": "2020-04-09T14:33:36.000Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:15333"
     },
     "location": {
       "type": "GeoProperty",
@@ -605,14 +605,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:25514"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1020.87,
-      "observedAt": "2020-04-09T14:33:34Z"
+      "observedAt": "2020-04-09T14:33:34.000Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -625,7 +621,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 14.3,
-      "observedAt": "2020-04-09T14:33:34Z"
+      "observedAt": "2020-04-09T14:33:34.000Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:25514"
     },
     "location": {
       "type": "GeoProperty",
@@ -641,14 +641,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:18219"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 980.56,
-      "observedAt": "2020-04-09T14:33:30Z"
+      "observedAt": "2020-04-09T14:33:30.000Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -661,7 +657,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 33.9,
-      "observedAt": "2020-04-09T14:33:30Z"
+      "observedAt": "2020-04-09T14:33:30.000Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:18219"
     },
     "location": {
       "type": "GeoProperty",
@@ -677,14 +677,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:16956"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1015.64,
-      "observedAt": "2020-04-09T14:33:29Z"
+      "observedAt": "2020-04-09T14:33:29.556Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -697,7 +693,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 22.8,
-      "observedAt": "2020-04-09T14:33:29Z"
+      "observedAt": "2020-04-09T14:33:29.000Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:16956"
     },
     "location": {
       "type": "GeoProperty",
@@ -717,7 +717,7 @@ Date: REGEX(.*)
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1158
+Content-Length: 1010
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -736,24 +736,16 @@ Date: REGEX(.*)
     }
   },
   {
-    "url": "https://fiware.github.io/data-models/context.jsonld",
+    "url": "https://schema.lab.fiware.org/ld/context",
     "id": "None",
     "type": "hash-table",
     "hash-table": {
       "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+      "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
       "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-      "areaServed": "https://schema.org/areaServed",
-      "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
+      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing"
     }
-  },
-  {
-    "url": "https://schema.lab.fiware.org/ld/context",
-    "id": "None",
-    "type": "array",
-    "URLs": [
-      "https://fiware.github.io/data-models/context.jsonld"
-    ]
   }
 ]
 
@@ -771,7 +763,7 @@ Date: REGEX(.*)
 06. Get the entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 4121
+Content-Length: 4161
 Content-Type: application/json
 Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -780,14 +772,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:22828"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1014.96,
-      "observedAt": "2020-04-09T14:33:38Z"
+      "observedAt": "2020-04-09T14:33:38.999Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -800,7 +788,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 21.9,
-      "observedAt": "2020-04-09T14:33:38Z"
+      "observedAt": "2020-04-09T14:33:38.460Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:22828"
     },
     "location": {
       "type": "GeoProperty",
@@ -816,14 +808,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:15333"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1018.0256,
-      "observedAt": "2020-04-09T14:33:36Z"
+      "observedAt": "2020-04-09T14:33:36.001Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -836,7 +824,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 29.55,
-      "observedAt": "2020-04-09T14:33:36Z"
+      "observedAt": "2020-04-09T14:33:36.499Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:15333"
     },
     "location": {
       "type": "GeoProperty",
@@ -852,14 +844,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:25514"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1020.87,
-      "observedAt": "2020-04-09T14:33:34Z"
+      "observedAt": "2020-04-09T14:33:34.199Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -872,7 +860,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 14.3,
-      "observedAt": "2020-04-09T14:33:34Z"
+      "observedAt": "2020-04-09T14:33:34.501Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:25514"
     },
     "location": {
       "type": "GeoProperty",
@@ -888,14 +880,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:18219"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 980.56,
-      "observedAt": "2020-04-09T14:33:30Z"
+      "observedAt": "2020-04-09T14:33:30.700Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -908,7 +896,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 33.9,
-      "observedAt": "2020-04-09T14:33:30Z"
+      "observedAt": "2020-04-09T14:33:30.000Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:18219"
     },
     "location": {
       "type": "GeoProperty",
@@ -924,14 +916,10 @@ Date: REGEX(.*)
   {
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
     "type": "WeatherObserved",
-    "stationName": {
-      "type": "Property",
-      "value": "BMP180:16956"
-    },
     "atmosphericPressure": {
       "type": "Property",
       "value": 1015.64,
-      "observedAt": "2020-04-09T14:33:29Z"
+      "observedAt": "2020-04-09T14:33:29.000Z"
     },
     "dataProvider": {
       "type": "Property",
@@ -944,7 +932,11 @@ Date: REGEX(.*)
     "temperature": {
       "type": "Property",
       "value": 22.8,
-      "observedAt": "2020-04-09T14:33:29Z"
+      "observedAt": "2020-04-09T14:33:29.000Z"
+    },
+    "stationName": {
+      "type": "Property",
+      "value": "BMP180:16956"
     },
     "location": {
       "type": "GeoProperty",
@@ -964,7 +956,7 @@ Date: REGEX(.*)
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1158
+Content-Length: 1010
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -983,24 +975,16 @@ Date: REGEX(.*)
     }
   },
   {
-    "url": "https://fiware.github.io/data-models/context.jsonld",
+    "url": "https://schema.lab.fiware.org/ld/context",
     "id": "None",
     "type": "hash-table",
     "hash-table": {
       "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+      "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
       "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-      "areaServed": "https://schema.org/areaServed",
-      "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
+      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing"
     }
-  },
-  {
-    "url": "https://schema.lab.fiware.org/ld/context",
-    "id": "None",
-    "type": "array",
-    "URLs": [
-      "https://fiware.github.io/data-models/context.jsonld"
-    ]
   }
 ]
 

@@ -959,7 +959,7 @@ int paConfigActions(bool preTreat)
       }
       else
       {
-        char w[256];
+        char w[300];
 
         snprintf(w, sizeof(w), "invalid log level string: %s", (char*) paLogLevel);
         PA_WARNING(PasBadValue, w);

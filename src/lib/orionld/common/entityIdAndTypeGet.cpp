@@ -54,14 +54,14 @@ bool entityIdAndTypeGet(KjNode* entityNodeP, char** idP, char** typeP, KjNode* e
 
   for (KjNode* itemP = entityNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
-    if (SCOMPARE3(itemP->name, 'i', 'd', 0))
+    if (SCOMPARE3(itemP->name, 'i', 'd', 0) || SCOMPARE4(itemP->name, '@', 'i', 'd', 0))
     {
       if (idNodeP != NULL)
         idDuplicated = true;
       else
         idNodeP = itemP;
     }
-    else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
+    else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(itemP->name, '@', 't', 'y', 'p', 'e', 0))
     {
       if (typeNodeP != NULL)
         typeDuplicated = true;

@@ -64,10 +64,21 @@ static void kjChildPrepend(KjNode* container, KjNode* child)
 //
 static bool timestampToString(KjNode* nodeP)
 {
-  char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-  char* detail;
+  char*   dateBuf = kaAlloc(&orionldState.kalloc, 64);
+  char*   detail;
+  double  timestamp;
 
-  if (numberToDate(nodeP->value.i, dateBuf, 64, &detail) == false)
+  if (nodeP->type == KjFloat)
+    timestamp = nodeP->value.f;
+  else if (nodeP->type == KjInt)
+    timestamp = nodeP->value.i;
+  else
+  {
+    LM_E(("Internal Error (not a number: %s)", kjValueType(nodeP->type)));
+    return false;
+  }
+
+  if (numberToDate(timestamp, dateBuf, 64, &detail) == false)
   {
     LM_E(("Database Error (numberToDate: %s)", detail));
     return false;
@@ -266,7 +277,7 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
           metadataP->value = metadataP->value.firstChildP->value;
         }
 
-        if (metadataP->type == KjInt)
+        if ((metadataP->type == KjInt) || (metadataP->type == KjFloat))
           timestampToString(metadataP);
 
         continue;

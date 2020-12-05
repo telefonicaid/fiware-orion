@@ -126,6 +126,29 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
     kjChildAdd(topP, nodeP);
   }
 
+  // sysAttrs - createdAt and modifiedAt
+  if (orionldState.uriParamOptions.sysAttrs == true)
+  {
+    char    dateTime[64];
+    char*   detail;
+    KjNode* nodeP;
+
+    if (subscriptionP->createdAt != -1)
+    {
+      numberToDate(subscriptionP->createdAt, dateTime, sizeof(dateTime), &detail);
+      nodeP = kjString(orionldState.kjsonP, "createdAt", dateTime);
+      kjChildAdd(topP, nodeP);
+    }
+
+    if (subscriptionP->modifiedAt != -1)
+    {
+      numberToDate(subscriptionP->modifiedAt, dateTime, sizeof(dateTime), &detail);
+      nodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
+      kjChildAdd(topP, nodeP);
+    }
+  }
+
+
   // entities
   size = subscriptionP->subject.entities.size();
   if (size != 0)
@@ -270,10 +293,8 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   }
 
   // status
-  time_t now    = time(NULL);
-  char*  status = NULL;
-
-  if (subscriptionP->expires < now)
+  char* status = NULL;
+  if (subscriptionP->expires < orionldState.requestTime)
     status = (char*) "expired";
   else if (subscriptionP->status != "active")
     status = (char*) "paused";
@@ -317,6 +338,8 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   kjChildAdd(endpointP, nodeP);
 
   const char* mimeType = (subscriptionP->notification.httpInfo.mimeType == JSON)? "application/json" : "application/ld+json";
+  char        dateTime[128];
+  char*       detail;
 
   nodeP = kjString(orionldState.kjsonP, "accept", mimeType);
   kjChildAdd(endpointP, nodeP);
@@ -325,7 +348,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
 
 
   // notification::timesSent
-#if 0
   if (subscriptionP->notification.timesSent > 0)
   {
     nodeP = kjInteger(orionldState.kjsonP, "timesSent", subscriptionP->notification.timesSent);
@@ -335,24 +357,26 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // notification::lastNotification
   if (subscriptionP->notification.lastNotification > 0)
   {
-    nodeP = kjInteger(orionldState.kjsonP, "lastNotification", subscriptionP->notification.lastNotification);
+    numberToDate(subscriptionP->notification.lastNotification, dateTime, sizeof(dateTime), &detail);
+    nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
     kjChildAdd(objectP, nodeP);
   }
 
   // notification::lastFailure
   if (subscriptionP->notification.lastFailure > 0)
   {
-    nodeP = kjInteger(orionldState.kjsonP, "lastFailure", subscriptionP->notification.lastFailure);
+    numberToDate(subscriptionP->notification.lastFailure, dateTime, sizeof(dateTime), &detail);
+    nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
     kjChildAdd(objectP, nodeP);
   }
 
   // notification::lastSuccess
   if (subscriptionP->notification.lastSuccess > 0)
   {
-    nodeP = kjInteger(orionldState.kjsonP, "lastSuccess", subscriptionP->notification.lastSuccess);
+    numberToDate(subscriptionP->notification.lastSuccess, dateTime, sizeof(dateTime), &detail);
+    nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);
     kjChildAdd(objectP, nodeP);
   }
-#endif
 
   kjChildAdd(topP, objectP);
 
@@ -363,7 +387,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
     char*            details;
     char             date[64];
 
-    if (numberToDate((time_t) subscriptionP->expires, date, sizeof(date), &details) == false)
+    if (numberToDate(subscriptionP->expires, date, sizeof(date), &details) == false)
     {
       LM_E(("Error creating a stringified date for 'expires'"));
       orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", details);
@@ -376,7 +400,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // throttling
   if (subscriptionP->throttling != 0)
   {
-    nodeP = kjInteger(orionldState.kjsonP, "throttling", subscriptionP->throttling);
+    nodeP = kjFloat(orionldState.kjsonP, "throttling", subscriptionP->throttling);
     kjChildAdd(topP, nodeP);
   }
 

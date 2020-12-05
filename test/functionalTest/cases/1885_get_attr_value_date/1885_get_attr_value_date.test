@@ -72,12 +72,12 @@ Date: REGEX(.*)
 02. GET /v2/entities/room/attrs/temperature/value as text/plain
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 23
+Content-Length: 24
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-2035-06-15T07:21:24.00Z
+2035-06-15T07:21:24.238Z
 
 
 --TEARDOWN--

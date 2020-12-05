@@ -46,6 +46,9 @@ brokerStart CB 212-249
 # 12. POST /ngsi-ld/v1/entities, with a Relationship without an 'object'
 # 13. POST /ngsi-ld/v1/entities, with a GeoProperty without a 'value'
 #
+# 14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
+# 15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
+#
 
 echo "01. POST /ngsi-ld/v1/entities, with a non-object payload - see error"
 echo "===================================================================="
@@ -235,6 +238,46 @@ echo
 echo
 
 
+echo "14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error"
+echo "================================================================================================"
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "@id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 6"
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error"
+echo "===================================================================================================="
+payload='{
+  "id": "http://a.b.c/entity/E7",
+  "type": "A",
+  "@type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 6"
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /ngsi-ld/v1/entities, with a non-object payload - see error
 ====================================================================
@@ -395,6 +438,34 @@ Date: REGEX(.*)
 {
     "detail": "name",
     "title": "Attribute with type GeoProperty found, but the associated value field is missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity:id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Entity:type",
+    "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

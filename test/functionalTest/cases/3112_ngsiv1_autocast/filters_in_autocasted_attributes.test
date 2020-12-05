@@ -254,7 +254,7 @@ Date: REGEX(.*)
 04. Query level<85, get E1 and E2
 =================================
 HTTP/1.1 200 OK
-Content-Length: 297
+Content-Length: 299
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -264,7 +264,7 @@ Date: REGEX(.*)
         "date": {
             "metadata": {},
             "type": "ISO8601",
-            "value": "2016-01-12T15:25:00.00Z"
+            "value": "2016-01-12T15:25:00.000Z"
         },
         "id": "E1",
         "level": {
@@ -278,7 +278,7 @@ Date: REGEX(.*)
         "date": {
             "metadata": {},
             "type": "ISO8601",
-            "value": "2016-01-12T14:25:00.00Z"
+            "value": "2016-01-12T14:25:00.000Z"
         },
         "id": "E2",
         "level": {
@@ -294,7 +294,7 @@ Date: REGEX(.*)
 05. Query date<2016-01-12T15:00:00.00Z, get E2 and E3
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 297
+Content-Length: 299
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -304,7 +304,7 @@ Date: REGEX(.*)
         "date": {
             "metadata": {},
             "type": "ISO8601",
-            "value": "2016-01-12T14:25:00.00Z"
+            "value": "2016-01-12T14:25:00.000Z"
         },
         "id": "E2",
         "level": {
@@ -318,7 +318,7 @@ Date: REGEX(.*)
         "date": {
             "metadata": {},
             "type": "ISO8601",
-            "value": "2016-01-12T13:25:00.00Z"
+            "value": "2016-01-12T13:25:00.000Z"
         },
         "id": "E3",
         "level": {

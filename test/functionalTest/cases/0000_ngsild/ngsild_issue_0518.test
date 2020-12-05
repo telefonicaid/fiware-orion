@@ -1,0 +1,214 @@
+# Copyright 2019 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+HTTP Headers included in notifications
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Creation of subscription, including two HTTP headers as receiverInfo
+# 02. Creation of entity
+# 03. See the subscription in the DB
+# 04. Dump the accumulator - see one notification - make sure the two extra HTTP headers are present
+#
+
+echo "01. Creation of subscription, including two HTTP headers as receiverInfo"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:Subscription:S01",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "Vehicle"
+    }
+  ],
+  "watchedAttributes": ["speed"],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json",
+      "receiverInfo": [
+        {
+          "key": "H1",
+          "value": "123"
+        },
+        {
+          "key": "H2",
+          "value": "456"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Creation of entity"
+echo "======================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:V1234",
+  "type": "Vehicle",
+  "speed": {
+    "type": "Property",
+    "value": 34
+  },
+  "brandName": {
+    "type": "Property",
+    "value": "Mercedes"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. See the subscription in the DB"
+echo "=================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "04. Dump the accumulator - see one notification - make sure the two extra HTTP headers are present"
+echo "=================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Creation of subscription, including two HTTP headers as receiverInfo
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S01
+Date: REGEX(.*)
+
+
+
+02. Creation of entity
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V1234
+Date: REGEX(.*)
+
+
+
+03. See the subscription in the DB
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:S01",
+	"expiration" : REGEX(.*),
+	"reference" : "http://localhost:9997/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"headers" : {
+		"H1" : "123",
+		"H2" : "456"
+	},
+	"throttling" : 0,
+	"servicePath" : "/",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/speed"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+04. Dump the accumulator - see one notification - make sure the two extra HTTP headers are present
+==================================================================================================
+POST http://REGEX(.*)
+Fiware-Servicepath: /
+Content-Length: 319
+User-Agent: REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+H1: 123
+H2: 456
+Host: localhost:REGEX(.*)
+Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "brandName": {
+                "type": "Property", 
+                "value": "Mercedes"
+            }, 
+            "id": "urn:ngsi-ld:Vehicle:V1234", 
+            "speed": {
+                "type": "Property", 
+                "value": 34
+            }, 
+            "type": "Vehicle"
+        }
+    ], 
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "urn:ngsi-ld:Subscription:S01", 
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

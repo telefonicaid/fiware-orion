@@ -127,7 +127,7 @@ Date: REGEX(.*)
 04. GET all entities with observedAt==2018-01-13 - see E1
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 114
+Content-Length: 118
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -135,7 +135,7 @@ Date: REGEX(.*)
 [
     {
         "A": {
-            "observedAt": "2018-01-13T00:00:00Z",
+            "observedAt": "2018-01-13T00:00:00.000Z",
             "type": "Property",
             "value": 1
         },

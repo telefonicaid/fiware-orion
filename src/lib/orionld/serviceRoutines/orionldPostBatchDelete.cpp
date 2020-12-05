@@ -24,25 +24,24 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                               // KjNode
-#include "kjson/kjBuilder.h"                                            // kjString, kjObject, ...
-#include "kjson/kjLookup.h"                                             // kjLookup
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
-#include "logMsg/logMsg.h"                                              // LM_*
-#include "logMsg/traceLevels.h"                                         // Lmt*
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/ConnectionInfo.h"                                         // ConnectionInfo
-#include "ngsi10/UpdateContextRequest.h"                                 // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                                // UpdateContextResponse
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
+#include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 
-#include "orionld/common/SCOMPARE.h"                                     // SCOMPAREx
-#include "orionld/common/urlCheck.h"                                     // urlCheck
-#include "orionld/common/urnCheck.h"                                     // urnCheck
-#include "orionld/common/orionldState.h"                                 // orionldState
-#include "orionld/common/orionldErrorResponse.h"                         // orionldErrorResponseCreate
-#include "orionld/db/dbConfiguration.h"                                  // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
-#include "orionld/serviceRoutines/orionldPostBatchDelete.h"              // Own interface
+#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/db/dbConfiguration.h"                        // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
+#include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
+#include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
 
 
 
@@ -83,25 +82,15 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
       return false;
     }
 
-    if (!urlCheck(idNodeP->value.s, &detail) && !urnCheck(idNodeP->value.s, &detail))
+    if (pcheckUri(idNodeP->value.s, &detail) == false)
     {
       LM_W(("Bad Input (Invalid payload - Array items must be valid URIs)"));
-      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs");
+      orionldErrorResponseCreate(OrionldBadRequestData, "Invalid payload", "Array items must be valid URIs");  // FIXME: Include 'detail' and name ("id") and its value (idNodeP->value.s)
       orionldState.httpStatusCode = SccBadRequest;
       return false;
     }
   }
 
-  #if 0
-    if (mongoCppLegacyEntityListLookupWithIdTypeCreDate(orionldState.requestTree) == NULL)
-    {
-      LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
-      orionldState.httpStatusCode = SccBadRequest;
-      if (orionldState.responseTree == NULL)
-        orionldErrorResponseCreate(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL");
-      return false;
-    }
-  #endif
 
   //
   // First get the entities from database to check if they exist
@@ -126,9 +115,13 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
 
     for (KjNode* dbEntity = dbEntities->value.firstChildP; dbEntity != NULL; dbEntity = dbEntity->next)
     {
-      KjNode* dbEntityId  = kjLookup(dbEntity, "id");
+      KjNode* dbEntityId  = kjLookup(dbEntity, "id");  // Coming from DB - '@id' not necessary
 
-      if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
+      if (dbEntityId == NULL)
+      {
+        // This can't happen ... however, let's make sure the broker never crashes ...
+      }
+      else if (strcmp(reqEntityId->value.s, dbEntityId->value.s) == 0)
       {
         idExists = true;
         break;  // Found - no need to keep searching.

@@ -2,6 +2,11 @@
 
 In order to write this guide, CentOS 7 (Desktop image) was downloaded from [here](http://isoredirect.centos.org/centos/8/isos/x86_64/CentOS-8-x86_64-1905-dvd1.iso), and installed as a virtual machine under VMWare.
 
+*Obs.: If you don't have internet access execute this command:*
+```bash
+dhclient
+```
+
 ## Installation of dependency packages
 
 To be installed via package manager:
@@ -16,8 +21,14 @@ To be installed via package manager:
 
 Tools needed for compilation and testing:
 
+Install OKay repository that offers an alternate to complement missing packages from CENTOS and EPEL. Source (https://okay.network/blog-news/rpm-repositories-for-centos-6-and-7.html)
+
 ```bash
-sudo yum install make cmake gcc-c++ scons
+sudo yum install http://repo.okay.com.mx/centos/7/x86_64/release/okay-release-1-1.noarch.rpm
+```
+
+```bash
+sudo yum install make cmake gcc-c++ scons curl wget
 ```
 
 Libraries that aren't built from source code:
@@ -33,11 +44,11 @@ Some libraries are built from source code and those sources must be downloaded a
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.48
 * rapidjson:      1.0.2
-* kbase:          0.2
-* klog:           0.2
-* kalloc:         0.2
-* kjson:          0.2
-* khash:          0.2
+* kbase:          0.5
+* klog:           0.5
+* kalloc:         0.5
+* kjson:          0.5
+* khash:          0.5
 * gtest:          1.5 (needed for unit testing only)
 * gmock:          1.5 (needed for unit testing only)
 
@@ -198,9 +209,9 @@ To download, build and install:
 The *Eclipse Paho* project provides open-source client implementations of MQTT and MQTT-SN messaging protocols aimed at new, existing, and emerging applications for the Internet of Things (IoT). Source: https://www.eclipse.org/paho
 
 ```bash
-yum -y install doxygen
-yum -y install graphviz
-rm -f /usr/local/lib/libpaho*
+sudo yum -y install doxygen
+sudo yum -y install graphviz
+sudo rm -f /usr/local/lib/libpaho*
 cd ~/git
 git clone https://github.com/eclipse/paho.mqtt.c.git
 cd paho.mqtt.c
@@ -211,7 +222,12 @@ make
 sudo make install
 
 # Python library
-pip install paho-mqtt
+
+# If you don't have pip installed:
+sudo yum update
+sudo yum install python-pip
+
+sudo pip install paho-mqtt
 ```
 #### Eclipse Mosquitto
 
@@ -264,7 +280,7 @@ So far, we have only installed the mongo client library, so that *orionld* can s
 
 ## Install the MongoDB server
 If using a docker image, the MongoDB server comes as part of the docker, but if docker is not used, then the MongoDB server must be installed.
-For this, preser refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/).
+For this, please refer to the [MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/).
 The version 4.0 is recommended, but both older and newer should work just fine.
 
 This is what the MongoDB documentation tells us to do to install MongoDB server 4.0 under CentOS 7:

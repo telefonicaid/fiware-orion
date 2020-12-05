@@ -52,7 +52,7 @@ bool kjTreeToStringList(KjNode* kNodeP, std::vector<std::string>* stringListP)
     char*   expanded;
 
     STRING_CHECK(attributeP, "String-List item");
-    expanded = orionldContextItemExpand(orionldState.contextP, attributeP->value.s, NULL, true, NULL);
+    expanded = orionldContextItemExpand(orionldState.contextP, attributeP->value.s, true, NULL);
     stringListP->push_back(expanded);
   }
 

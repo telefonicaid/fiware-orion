@@ -277,8 +277,8 @@ function brokerStartAwait
       break;
     fi
 
-    logMsg Awaiting valgrind to fully start the orion context broker '('$loopNo')' ...
-    sleep .2
+    logMsg Awaiting orion context to fully start '(loop '$loopNo')' ...
+    sleep .1
     loopNo=$loopNo+1
   done
 
@@ -693,6 +693,7 @@ function accumulatorStart()
   # FIXME P6: note that due to the way argument processing work, the arguments have to be
   # in a fixed order in the .test, i.e.: --pretty-print, --https, --key, --cert
 
+  echo accumulatorStart $* > /tmp/accumulatorStart
   if [ "$1" = "--pretty-print" ]
   then
     pretty="$1"
@@ -719,6 +720,17 @@ function accumulatorStart()
     shift
   fi
 
+  URL=/notify
+  if [ "$1" = "--url" ]
+  then
+    echo "accumulatorStart: --url: $1 $2" >> /tmp/accumulatorStart
+    URL="$2"
+    shift
+    shift
+    echo "accumulatorStart: rest: $*" >> /tmp/accumulatorStart
+  fi
+
+  echo accumulatorStart after shifts: $* >> /tmp/accumulatorStart
   bindIp=$1
   port=$2
 
@@ -735,7 +747,8 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  $REPO_HOME/scripts/accumulator-server.py --port $port --url /notify --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  echo $REPO_HOME/scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr >> /tmp/accumulatorStart
+  $REPO_HOME/scripts/accumulator-server.py --port $port --url "$URL" --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -1348,6 +1361,44 @@ function dateDiff()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# eqTimestamp - make sure two timestamps are equal
+#
+function eqTimestamp()
+{
+  name=$1
+  ts1="$2"
+  ts2="$3"
+  if [ "$ts1" != "$ts2" ]
+  then
+    echo ERROR: Timestamp $name has changed: \"$ts1\", \"$ts2\"
+  else
+    echo OK: Timestamp $name has not changed
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# neqTimestamp - make sure two timestamps differ
+#
+function neqTimestamp()
+{
+  name=$1
+  ts1="$2"
+  ts2="$3"
+  if [ "$ts1" == "$ts2" ]
+  then
+    echo ERROR: Timestamp $name has not changed: \"$ts1\"
+  else
+    echo OK: Timestamp $name has changed
+  fi
+}
+
+
+
 export PGPASSWORD='password'
 # -----------------------------------------------------------------------------
 #
@@ -1411,4 +1462,6 @@ export -f dateDiff
 export -f mqttTestClientStart
 export -f mqttTestClientStop
 export -f mqttTestClientDump
+export -f eqTimestamp
+export -f neqTimestamp
 export -f postgresCmd

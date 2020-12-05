@@ -44,17 +44,17 @@ extern "C"
 //
 bool kjTreeRegistrationInfoExtract
 (
-  KjNode*          registrationP,
-  char*            protocol,
-  int              protocolSize,
-  char*            host,
-  int              hostSize,
-  unsigned short*  portP,
-  char**           uriDirP,
-  char*            registrationAttrV[],
-  int              registrationAttrSize,
-  int*             registrationAttrsP,
-  char**           detailP
+  KjNode*    registrationP,
+  char*      protocol,
+  int        protocolSize,
+  char*      host,
+  int        hostSize,
+  uint16_t*  portP,
+  char**     uriDirP,
+  char*      registrationAttrV[],
+  int        registrationAttrSize,
+  int*       registrationAttrsP,
+  char**     detailP
 )
 {
   *registrationAttrsP = 0;

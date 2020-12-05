@@ -137,7 +137,7 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
   //
   for (int ix = 0; ix < attrs; ix++)
   {
-    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], NULL, true, NULL);
+    expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], true, NULL);
   }
 
   *attrListExpandedVecP = expandedV;
@@ -159,7 +159,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
   // FIXME: Always "keyValues" for 'createdAt' and 'modifiedAt' ?
 
   // createdAt
-  if (numberToDate((time_t) creDate, date, sizeof(date), &details) == false)
+  if (numberToDate(creDate, date, sizeof(date), &details) == false)
   {
     LM_E(("Error creating a stringified date for 'createdAt'"));
     orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified createdAt date", details);
@@ -170,7 +170,7 @@ bool orionldSysAttrs(double creDate, double modDate, KjNode* containerP)
   kjChildAdd(containerP, nodeP);
 
   // modifiedAt
-  if (numberToDate((time_t) modDate, date, sizeof(date), &details) == false)
+  if (numberToDate(modDate, date, sizeof(date), &details) == false)
   {
     LM_E(("Error creating a stringified date for 'modifiedAt'"));
     orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified modifiedAt date", details);
@@ -436,7 +436,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
             char   date[128];
             char*  details;
 
-            if (numberToDate((time_t) aP->numberValue, date, sizeof(date), &details) == false)
+            if (numberToDate(aP->numberValue, date, sizeof(date), &details) == false)
             {
               LM_E(("Error creating a stringified date"));
               orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified observedAt date", details);
@@ -539,7 +539,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
                 char   date[128];
                 char*  details;
 
-                if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
+                if (numberToDate(mdP->numberValue, date, sizeof(date), &details) == false)
                 {
                   LM_E(("Error creating a stringified date"));
                   orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified observedAt date", details);
@@ -587,7 +587,7 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, char* attrList, bool keyValu
                 char   date[128];
                 char*  details;
 
-                if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
+                if (numberToDate(mdP->numberValue, date, sizeof(date), &details) == false)
                 {
                   LM_E(("Error creating a stringified date"));
                   orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified date", details);

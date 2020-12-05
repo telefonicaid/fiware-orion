@@ -219,13 +219,13 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -274,13 +274,13 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 455
+Content-Length: 456
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "1991-04-05T14:00:00.00Z",
+    "expires": "1991-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -331,13 +331,13 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 447
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "1991-04-05T14:00:00.00Z",
+    "expires": "1991-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -388,13 +388,13 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 372
+Content-Length: 373
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "1991-04-05T14:00:00.00Z",
+    "expires": "1991-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [

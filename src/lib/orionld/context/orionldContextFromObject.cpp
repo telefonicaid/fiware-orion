@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjFree.h"                                        // kjFree
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -101,24 +102,48 @@ static int valueCompareFunction(const char* longname, void* itemP)
 //
 OrionldContext* orionldContextFromObject(char* url, bool toBeCloned, KjNode* contextObjectP, OrionldProblemDetails* pdP)
 {
-  char*           id = NULL;
-  OrionldContext* contextP;
+  OrionldContext*  contextP;
+  char*            id = NULL;
+  bool             ok = true;
 
   if (url == NULL)
     url  = orionldContextUrlGenerate(&id);
 
   contextP = orionldContextCreate(url, id, contextObjectP, true, toBeCloned);
-  orionldContextCacheInsert(contextP);
-
-  contextP->context.hash.nameHashTable  = khashTableCreate(&kalloc, hashCode, nameCompareFunction,  ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);
-  contextP->context.hash.valueHashTable = khashTableCreate(&kalloc, hashCode, valueCompareFunction, ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);
-
-  if (orionldContextHashTablesFill(contextP, contextObjectP, pdP) == false)
+  if (contextP == NULL)
   {
-    // orionldContextHashTablesFill fills in pdP
+    LM_E(("orionldContextCreate failed"));
     return NULL;
   }
 
+  contextP->context.hash.nameHashTable  = khashTableCreate(&kalloc, hashCode, nameCompareFunction,  ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);
+  if (contextP->context.hash.nameHashTable == NULL)
+  {
+    LM_E(("khashTableCreate failed"));
+    ok = false;
+  }
+
+  contextP->context.hash.valueHashTable = khashTableCreate(&kalloc, hashCode, valueCompareFunction, ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE);
+  if (contextP->context.hash.valueHashTable == NULL)
+  {
+    LM_E(("khashTableCreate failed"));
+    ok = false;
+  }
+
+  if ((ok == true) && (orionldContextHashTablesFill(contextP, contextObjectP, pdP) == false))
+  {
+    // orionldContextHashTablesFill fills in pdP
+    LM_E(("orionldContextHashTablesFill failed"));
+    ok = false;
+  }
+
+  if (ok == false)
+  {
+    if (toBeCloned == true)
+      kjFree(contextP->tree);
+    return NULL;
+  }
+
+  orionldContextCacheInsert(contextP);
   return contextP;
 }
-

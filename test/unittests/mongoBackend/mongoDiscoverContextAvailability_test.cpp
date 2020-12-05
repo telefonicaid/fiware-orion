@@ -26,6 +26,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+#include "orionld/common/orionldState.h"  // orionldState
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
@@ -947,6 +948,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1007,6 +1009,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A1");
@@ -1082,6 +1085,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1141,6 +1145,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1219,6 +1224,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1296,6 +1302,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1337,6 +1344,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A5");
@@ -1385,6 +1393,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1485,6 +1494,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1560,6 +1570,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1652,6 +1663,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1754,6 +1766,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1836,6 +1849,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1893,6 +1907,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -1969,6 +1984,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -2058,6 +2074,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -2107,6 +2124,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -2212,6 +2230,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Invoke the function in mongoBackend library */
     ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathVector);
@@ -2311,6 +2330,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     ON_CALL(*timerMock, getCurrentTime())
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
+    orionldState.requestTime = 1360232700.0;
 
     /* Set MongoDB connection */
     DBClientBase* connectionDb = getMongoConnection();
@@ -2333,7 +2353,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
               "- query(): { query: { $or: [ { contextRegistration.entities: "
               "{ $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
               "{ contextRegistration.entities.id: { $in: [] } } ], "
-              "expiration: { $gt: 1360232700 }"
+              "expiration: { $gt: 1360232700.0 }"
               ", servicePath: { $in: [ /^/.*/, null ] } }"
               ", orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
     EXPECT_EQ(0, res.responseVector.size());

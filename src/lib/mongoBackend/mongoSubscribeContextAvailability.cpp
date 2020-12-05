@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "orionld/common/orionldState.h"             // orionldState
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "mongoBackend/connectionOperations.h"
@@ -74,7 +75,7 @@ HttpStatusCode mongoSubscribeContextAvailability
   }
 
   /* Calculate expiration (using the current time and the duration field in the request) */
-  long long expiration = getCurrentTime() + requestP->duration.parse();
+  long long expiration = orionldState.requestTime + requestP->duration.parse();
   LM_T(LmtMongo, ("Subscription expiration: %d", expiration));
 
   /* Create the mongoDB subscription document */

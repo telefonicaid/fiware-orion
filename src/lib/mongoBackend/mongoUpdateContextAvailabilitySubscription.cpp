@@ -32,6 +32,7 @@
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "orionld/common/orionldState.h"             // orionldState
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -155,7 +156,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
   else
   {
-    int64_t expiration = getCurrentTime() + requestP->duration.parse();
+    int64_t expiration = orionldState.requestTime + requestP->duration.parse();
 
     newSub.append(CASUB_EXPIRATION, (long long) expiration);
     LM_T(LmtMongo, ("New subscription expiration: %l", expiration));

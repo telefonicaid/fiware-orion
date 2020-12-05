@@ -155,22 +155,22 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.fiware.org/ns/data-models#dataProvider",
-		"https://uri.fiware.org/ns/data-models#source",
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dataProvider",
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/source",
 		"https://uri.etsi.org/ngsi-ld/default-context/stationName",
 		"location",
-		"https://uri.fiware.org/ns/data-models#temperature",
-		"https://uri.fiware.org/ns/data-models#atmosphericPressure"
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/temperature",
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/atmosphericPressure"
 	],
 	"attrs" : {
-		"https://uri=fiware=org/ns/data-models#dataProvider" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/dataProvider" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "sensor.community",
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/data-models#source" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/source" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -197,7 +197,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/data-models#temperature" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/temperature" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -211,7 +211,7 @@ MongoDB server version: REGEX(.*)
 				"observedAt"
 			]
 		},
-		"https://uri=fiware=org/ns/data-models#atmosphericPressure" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/atmosphericPressure" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -241,22 +241,22 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.fiware.org/ns/data-models#dataProvider",
-		"https://uri.fiware.org/ns/data-models#source",
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dataProvider",
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/source",
 		"https://uri.etsi.org/ngsi-ld/default-context/stationName",
 		"location",
-		"https://uri.fiware.org/ns/data-models#temperature",
-		"https://uri.fiware.org/ns/data-models#atmosphericPressure"
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/temperature",
+		"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/atmosphericPressure"
 	],
 	"attrs" : {
-		"https://uri=fiware=org/ns/data-models#dataProvider" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/dataProvider" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "sensor.community",
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/data-models#source" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/source" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -283,7 +283,7 @@ MongoDB server version: REGEX(.*)
 			},
 			"mdNames" : [ ]
 		},
-		"https://uri=fiware=org/ns/data-models#temperature" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/temperature" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -297,7 +297,7 @@ MongoDB server version: REGEX(.*)
 				"observedAt"
 			]
 		},
-		"https://uri=fiware=org/ns/data-models#atmosphericPressure" : {
+		"https://smart-data-models=github=io/data-models/terms=jsonld#/definitions/atmosphericPressure" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

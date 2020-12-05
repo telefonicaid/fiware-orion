@@ -57,7 +57,7 @@ echo
 
 echo "02. Query the property P100 giving an empty coords URI param, make sure the broker doesn't crash - see error"
 echo "============================================================================================================"
-orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=&geometry=Point&coords=&georel=near;maxDistance==10&type=Building&options=keyValues'
+orionCurl --url '/ngsi-ld/v1/entities?geometry=Point&coordinates=&geometry=Point&georel=near;maxDistance==10&type=Building&options=keyValues'
 echo
 echo
 

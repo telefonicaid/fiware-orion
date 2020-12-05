@@ -88,7 +88,7 @@ Date: REGEX(.*)
 02. GET the entity with options=sysAttrs, see 'createdAt' and 'modifiedAt' as text strings
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 295
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -111,7 +111,7 @@ Date: REGEX(.*)
 03. GET the entity with options=sysAttrs AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 295
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 04. GET the entity with options=sysAttrs,keyValues AND attrs=P1, see 'createdAt' and 'modifiedAt' as text strings but only for the entity, not for P1
 =====================================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 153
+Content-Length: 161
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)

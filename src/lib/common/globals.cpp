@@ -132,7 +132,7 @@ void transactionIdSet(void)
 */
 void correlatorIdSet(const char* corrId)
 {
-  strncpy(correlatorId, corrId, sizeof(correlatorId));
+  strncpy(correlatorId, corrId, sizeof(correlatorId) - 1);
 }
 
 
@@ -246,7 +246,7 @@ void setTimer(Timer* t)
 *
 * getCurrentTime - 
 */ 
-int getCurrentTime(void)
+double getCurrentTime(void)
 {
   if (getTimer() == NULL)
   {
@@ -497,14 +497,14 @@ static int timezoneOffset(const char* tz)
 * Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */
-int64_t parse8601Time(const std::string& ss)
+double parse8601Time(const std::string& ss)
 {
   int    y = 0;
   int    M = 0;
   int    d = 0;
   int    h = 0;
   int    m = 0;
-  float  s = 0;
+  double s = 0;
   char   tz[10];
 
   // Length check, to avoid buffer overflow in tz[]. Calculation is as follows:
@@ -528,14 +528,15 @@ int64_t parse8601Time(const std::string& ss)
   // which states that "There is no limit on the number of decimal places for the decimal fraction".
 
   // Default timezone is Z, sscanf will override it if an explicit timezone is provided
-  snprintf(tz, sizeof(tz), "%s", "Z");
+  tz[0] = 'Z';
+  tz[1] = 0;
 
-  bool validDate = ((sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d:%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  ||  // Trying hh:mm:ss.sss or hh:mm:ss
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%f%s", &y, &M, &d, &h, &m, &s, tz) >= 6)    ||  // Trying hhmmss.sss or hhmmss
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)         ||  // Trying hh:mm
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)          ||  // Trying hhmm
-                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)                 ||  // Trying hh
-                    (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3));                           // Trying just date (in this case tz is not allowed)
+  bool validDate = ((sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d:%lf%s", &y, &M, &d, &h, &m, &s, tz) >= 6)  ||  // Trying hh:mm:ss.sss or hh:mm:ss
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%lf%s", &y, &M, &d, &h, &m, &s, tz) >= 6)    ||  // Trying hhmmss.sss or hhmmss
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d:%2d%s", &y, &M, &d, &h, &m, tz) >= 5)          ||  // Trying hh:mm
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%2d%s", &y, &M, &d, &h, &m, tz) >= 5)           ||  // Trying hhmm
+                    (sscanf(ss.c_str(), "%4d-%2d-%2dT%2d%s", &y, &M, &d, &h, tz) >= 4)                  ||  // Trying hh
+                    (sscanf(ss.c_str(), "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3));                            // Trying just date (in this case tz is not allowed)
 
   if (!validDate)
   {
@@ -548,19 +549,21 @@ int64_t parse8601Time(const std::string& ss)
     return -1;
   }
 
-  // Note that at the present moment we are not doing anything with milliseconds, but
-  // in the future we could use that to increase time resolution (however, not as part
-  // of the tm struct)
-
   struct tm time;
   time.tm_year = y - 1900; // Year since 1900
   time.tm_mon  = M - 1;    // 0-11
   time.tm_mday = d;        // 1-31
   time.tm_hour = h;        // 0-23
   time.tm_min  = m;        // 0-59
-  time.tm_sec  = (int)s;   // 0-61 (0-60 in C++11)
+  time.tm_sec  = (int) s;  // 0-61 (0-60 in C++11)
 
-  return (int64_t) (timegm(&time) - offset);
+  int64_t  totalSecs  = timegm(&time) - offset;
+  float    millis     = s - (int) s;
+  double   timestamp  = totalSecs;
+
+  timestamp += millis;  // Must be done in two lines:  timestamp = totalSecs + millis fails ...
+
+  return timestamp;
 }
 
 

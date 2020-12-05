@@ -53,9 +53,10 @@ function logMsg()
 export -f logMsg
 
 
+
 # -----------------------------------------------------------------------------
 #
-# DISABLED - funct tests that are disabled, for some reason
+# DISABLED - functests that are disabled, for some reason
 #
 DISABLED=('test/functionalTest/cases/1156_qfilters_and_compounds/qfilters_and_compounds_equals_null.test' \
           'test/functionalTest/cases/0000_bad_requests/exit.test' \
@@ -82,6 +83,14 @@ export REPO_HOME=$PWD
 cd $dirname
 export SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
+
+
+
+# ------------------------------------------------------------------------------
+#
+# Func test cases may need kjson
+#
+export PATH=$PATH:${REPO_HOME}/../kjson
 
 
 
@@ -147,7 +156,9 @@ function usage()
   echo "$empty [-ld (only ngsild tests)]"
   echo "$empty [-tmp (only ngsild temporal tests)]"
   echo "$empty [-eb (external broker)]"
-  echo "$empty [-tk (on error, show the diff ising tkdiff)]"
+  echo "$empty [-tk (on error, show the diff using tkdiff)]"
+  echo "$empty [-meld (on error, show the diff using meld)]"
+  echo "$empty [-meld (on error, show the diff using diff)]"
   echo "$empty [--filter <test filter>]"
   echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
@@ -422,6 +433,8 @@ do
   elif [ "$1" == "-tmp" ];           then temporal=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
   elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
+  elif [ "$1" == "-meld" ];          then CB_DIFF_TOOL=meld;
+  elif [ "$1" == "-diff" ];          then CB_DIFF_TOOL=diff;
   elif [ "$1" == "--loud" ];         then loud=on;
   elif [ "$1" == "--dryrun" ];       then dryrun=on;
   elif [ "$1" == "--keep" ];         then keep=on;
@@ -915,9 +928,9 @@ function partExecute()
         endDate=$(date)
         if [ $blockDiff == 'yes' ]
         then
-          $CB_DIFF_TOOL $dirname/$filename.regexpect.sorted $dirname/$filename.out.sorted
+          $CB_DIFF_TOOL $dirname/$filename.out.sorted $dirname/$filename.regexpect.sorted
         else
-          $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
+          $CB_DIFF_TOOL $dirname/$filename.out $dirname/$filename.regexpect
         fi
         logMsg "diff tool $CB_DIFF_TOOL finished"
       fi

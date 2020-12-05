@@ -39,8 +39,8 @@
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  long long                _throttling,
-  long long                _lastNotification,
+  double                   _throttling,
+  double                   _lastNotification,
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
   const StringList&        _attrL,

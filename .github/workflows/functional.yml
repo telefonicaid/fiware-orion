@@ -1,0 +1,145 @@
+name: Functional Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+
+env:
+  IMAGE_NAME: localhost:5000/orion-ld-test:latest
+  IGNORE_TEST: '0706_direct_https_notifications/direct_https_notifications.test 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test 2015_notification_templates/notification_templates_cache_refresh.test 0000_ipv6_support/ipv4_ipv6_both.test'
+
+jobs:
+  functional-part1:
+    runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        ports:
+          - 1883:1883
+          - 9001:9001
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - name: Build and push to local registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_0_450 -dqt
+
+  functional-part2:
+    runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - name: Build and push to local registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_451_700 -dqt
+
+  functional-part3:
+    runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - name: Build and push to local registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_701_1000 -dqt
+
+  functional-part4:
+    runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - name: Build and push to local registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/Dockerfile-debian
+          build-args: STAGE=deps
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Run functional test
+        run: |
+          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_1001_1400 -dqt

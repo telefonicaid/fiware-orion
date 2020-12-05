@@ -164,14 +164,14 @@ void orionldNotify(void)
   int           contentLength;
   struct iovec  ioVec[6]        = { { requestHeader, 0 }, { contentLenHeader, 0 }, { contentTypeHeaderJson, 32 }, { userAgentHeader, 23 }, { payload, 0 } };
   int           ioVecLen        = 5;
-  int           now             = time(NULL);
-  char          nowString[64];
+  char          requestTimeV[64];
   char*         detail;
 
-  if (numberToDate(now, nowString, sizeof(nowString), &detail) == false)
+
+  if (numberToDate(orionldState.requestTime, requestTimeV, sizeof(requestTimeV), &detail) == false)
   {
     LM_E(("Internal Error (converting timestamp to DateTime string: %s)", detail));
-    snprintf(nowString, sizeof(nowString), "1970-01-01T00:00:00Z");
+    snprintf(requestTimeV, sizeof(requestTimeV), "1970-01-01T00:00:00Z");
   }
 
   for (int ix = 0; ix < orionldState.notificationRecords; ix++)
@@ -252,7 +252,7 @@ void orionldNotify(void)
     KjNode* idNodeP              = kjString(orionldState.kjsonP, "id", notificationId);
     KjNode* typeNodeP            = kjString(orionldState.kjsonP, "type", "Notification");
     KjNode* subscriptionIdNodeP  = kjString(orionldState.kjsonP, "subscriptionId", niP->subscriptionId);
-    KjNode* notifiedAtNodeP      = kjString(orionldState.kjsonP, "notifiedAt", nowString);
+    KjNode* notifiedAtNodeP      = kjString(orionldState.kjsonP, "notifiedAt", requestTimeV);
     KjNode* dataNodeP            = kjArray(orionldState.kjsonP,  "data");
 
     kjChildAdd(notificationTree, idNodeP);

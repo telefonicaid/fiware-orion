@@ -22,27 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                              // std::string
+#include <string>                                                // std::string
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "apiTypesV2/Subscription.h"                           // Subscription
-#include "mongoBackend/MongoGlobal.h"                          // mongoIdentifier
+#include "apiTypesV2/Subscription.h"                             // Subscription
+#include "mongoBackend/MongoGlobal.h"                            // mongoIdentifier
 
-#include "orionld/common/CHECK.h"                              // CHECKx()
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/kjTree/kjTreeToEntIdVector.h"                // kjTreeToEntIdVector
-#include "orionld/kjTree/kjTreeToStringList.h"                 // kjTreeToStringList
-#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"     // kjTreeToSubscriptionExpression
-#include "orionld/kjTree/kjTreeToNotification.h"               // kjTreeToNotification
-#include "orionld/kjTree/kjTreeToSubscription.h"               // Own interface
+#include "orionld/common/CHECK.h"                                // CHECKx()
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
+#include "orionld/kjTree/kjTreeToStringList.h"                   // kjTreeToStringList
+#include "orionld/kjTree/kjTreeToSubscriptionExpression.h"       // kjTreeToSubscriptionExpression
+#include "orionld/kjTree/kjTreeToNotification.h"                 // kjTreeToNotification
+#include "orionld/kjTree/kjTreeToSubscription.h"                 // Own interface
 
 
 
@@ -69,7 +69,6 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   KjNode*                   notificationP             = NULL;
   bool                      notificationPresent       = false;
   char*                     expiresP                  = NULL;
-  uint64_t                  throttling                = -1;
   bool                      throttlingPresent         = false;
 
   //
@@ -97,24 +96,24 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   // o id
   // o type
   //
-
   if (orionldState.payloadIdNode == NULL)
   {
     char randomId[32];
-
     mongoIdentifier(randomId);
-
     subP->id  = "urn:ngsi-ld:Subscription:";
     subP->id += randomId;
   }
   else
     subP->id = orionldState.payloadIdNode->value.s;
 
-  if ((urlCheck((char*) subP->id.c_str(), NULL) == false) && (urnCheck((char*) subP->id.c_str(), NULL) == false))
+  char* uri = (char*) subP->id.c_str();
+  char* detail;
+
+  if (pcheckUri(uri, &detail) == false)
   {
     LM_W(("Bad Input (Subscription::id is not a URI)"));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", subP->id.c_str());
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldErrorResponseCreate(OrionldBadRequestData, "Subscription::id is not a URI", uri);  // FIXME: Include 'detail' and name (subscription::id)
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -136,7 +135,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   {
     LM_W(("Bad Input (Mandatory field missing: Subscription::type)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Mandatory field missing", "Subscription::type");
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -144,7 +143,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   {
     LM_W(("Bad Input (subscription type must have the value /Subscription/)"));
     orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for Subscription::type", orionldState.payloadTypeNode->value.s);
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 
@@ -194,6 +193,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (SCOMPARE13(kNodeP->name, 't', 'i', 'm', 'e', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 0))
     {
+#if TIMEINTERVAL_SUPPORTED
       DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP);
       INTEGER_CHECK(kNodeP, "Subscription::timeInterval");
 
@@ -201,11 +201,16 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       {
         LM_W(("Bad Input (Subscription::timeInterval has a negative value)"));
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value in payload data", "Subscription::timeInterval has a negative value");
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
 
       subP->timeInterval = timeIntervalP->value.i;
+#else
+      orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented");
+      orionldState.httpStatusCode = 501;
+      return false;
+#endif
     }
     else if (SCOMPARE2(kNodeP->name, 'q', 0))
     {
@@ -284,10 +289,24 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (SCOMPARE11(kNodeP->name, 't', 'h', 'r', 'o', 't', 't', 'l', 'i', 'n', 'g', 0))
     {
-      DUPLICATE_CHECK_WITH_PRESENCE(throttlingPresent, throttling, "Subscription::throttling", kNodeP->value.i);
-      INTEGER_CHECK(kNodeP, "Subscription::throttling");
+      if (throttlingPresent == true)
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Duplicated field", kNodeP->name);
+        orionldState.httpStatusCode = 400;
+        return false;
+      }
+      throttlingPresent = true;
 
-      subP->throttling = throttling;
+      if (kNodeP->type == KjFloat)
+        subP->throttling = kNodeP->value.f;
+      else if (kNodeP->type == KjInt)
+        subP->throttling = kNodeP->value.i;
+      else
+      {
+        orionldErrorResponseCreate(OrionldBadRequestData, "Not a JSON Number", "Subscription::throttling");
+        orionldState.httpStatusCode = 400;
+        return false;
+      }
     }
     else if (SCOMPARE7(kNodeP->name, 's', 't', 'a', 't', 'u', 's', 0))
     {

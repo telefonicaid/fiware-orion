@@ -161,7 +161,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions for 1 servicepath
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 321
+Content-Length: 322
 Content-Type: application/json
 Fiware-Total-Count: 1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -169,7 +169,7 @@ Date: REGEX(.*)
 
 [
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -206,7 +206,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions for /#
 ================================
 HTTP/1.1 200 OK
-Content-Length: 707
+Content-Length: 709
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 
 [
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
@@ -249,7 +249,7 @@ Date: REGEX(.*)
         "throttling": 5
     },
     {
-        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [

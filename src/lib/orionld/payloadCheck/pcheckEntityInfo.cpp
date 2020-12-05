@@ -54,7 +54,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
 
   for (KjNode* entityItemP = entityInfoP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
   {
-    if (strcmp(entityItemP->name, "id") == 0)
+    if ((strcmp(entityItemP->name, "id") == 0) || (strcmp(entityItemP->name, "@id") == 0))
     {
       DUPLICATE_CHECK(idP, "entities[X]::id", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::id");
@@ -68,7 +68,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       EMPTY_STRING_CHECK(entityItemP, "entities[X]::idPattern");
       // FIXME: How check for valid REGEX???
     }
-    else if (strcmp(entityItemP->name, "type") == 0)
+    else if ((strcmp(entityItemP->name, "type") == 0) || (strcmp(entityItemP->name, "@type") == 0))
     {
       DUPLICATE_CHECK(typeP, "entities[X]::type", entityItemP);
       STRING_CHECK(entityItemP, "entities[X]::type");
@@ -79,7 +79,7 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory)
       // If a ':' is found inside the first 10 chars, the value is assumed to be expanded ...
       //
       if (orionldContextItemAlreadyExpanded(entityItemP->value.s) == false)
-        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, NULL, true, NULL);
+        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);
     }
     else
     {

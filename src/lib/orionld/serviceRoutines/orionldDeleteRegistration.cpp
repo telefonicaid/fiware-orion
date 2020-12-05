@@ -22,16 +22,15 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                        // LM_*
-#include "logMsg/traceLevels.h"                                   // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "rest/ConnectionInfo.h"                                  // ConnectionInfo
-#include "orionld/common/orionldState.h"                          // orionldState
-#include "orionld/common/urlCheck.h"                              // urlCheck
-#include "orionld/common/urnCheck.h"                              // urnCheck
-#include "orionld/common/orionldErrorResponse.h"                  // orionldErrorResponseCreate
-#include "orionld/db/dbConfiguration.h"                           // dbRegistrationDelete
-#include "orionld/serviceRoutines/orionldDeleteRegistration.h"    // Own Interface
+#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/serviceRoutines/orionldDeleteRegistration.h"   // Own Interface
 
 
 
@@ -43,11 +42,11 @@ bool orionldDeleteRegistration(ConnectionInfo* ciP)
 {
   char* detail;
 
-  if ((urlCheck(orionldState.wildcard[0], &detail) == false) && (urnCheck(orionldState.wildcard[0], &detail) == false))
+  if (pcheckUri(orionldState.wildcard[0], &detail) == false)
   {
     LM_E(("uriCheck: %s", detail));
     orionldState.httpStatusCode = SccBadRequest;
-    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0]);
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Context Source Registration Identifier", orionldState.wildcard[0]);  // FIXME: Include 'detail' and name (registrationId)
     return false;
   }
 

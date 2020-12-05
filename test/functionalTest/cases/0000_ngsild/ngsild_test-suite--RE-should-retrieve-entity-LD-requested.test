@@ -92,7 +92,7 @@ Date: REGEX(.*)
 02. GET entity, accepting application/ld+json, and with same context as the entity creation
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 639
+Content-Length: 643
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -103,7 +103,7 @@ Date: REGEX(.*)
   "P1": {
     "type": "Property",
     "value": 12,
-    "observedAt": "2018-12-04T12:00:00Z",
+    "observedAt": "2018-12-04T12:00:00.000Z",
     "P1_R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"

@@ -55,6 +55,9 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
     //
     KjNode* inEntityIdNodeP = kjLookup(inNodeP, "id");
 
+    if (inEntityIdNodeP == NULL)
+      inEntityIdNodeP = kjLookup(inNodeP, "@id");
+
     if (inEntityIdNodeP == NULL)  // Entity ID is mandatory
     {
       LM_E(("KZ: Invalid Entity: Mandatory field entity::id is missing"));
@@ -74,6 +77,9 @@ bool typeCheckForNonExistingEntities(KjNode* incomingTree, KjNode* idTypeAndCreD
     if (dbEntityId == NULL)  // This Entity is to be created - "type" is mandatory!
     {
       KjNode* inEntityTypeNodeP = kjLookup(inNodeP, "type");
+
+      if (inEntityTypeNodeP == NULL)
+        inEntityTypeNodeP = kjLookup(inNodeP, "@type");
 
       if (inEntityTypeNodeP == NULL)
       {

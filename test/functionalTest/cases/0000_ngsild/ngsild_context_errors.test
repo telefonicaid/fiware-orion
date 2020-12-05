@@ -33,22 +33,33 @@ brokerStart CB 212-249
 #
 # So, what can go wrong ...
 # 01. @context is a Boolean
-# 02. @context is a Number
-# 03. @context is an object and a value is NOT a string
-# 04. @context is an empty string
-# 05. URL in context is an invalid URL
-# 06. URL in context is a valid URL but it doesn't exist
-# 07. Ugly Parse Error: @context: { 'https://...' ]
+# 02. GET Contexts - see only Core Context
+# 03. @context is a Number
+# 04. GET Contexts - see only Core Context
+# 05. @context is an object and a value is NOT a string
+# 06. GET Contexts - see only Core Context
+# 07. @context is an empty string
+# 08. GET Contexts - see only Core Context
+# 09. URL in context is an invalid URL
+# 10. GET Contexts - see only Core Context
+# 11. URL in context is a valid URL but it doesn't exist
+# 12. GET Contexts - see only Core Context
+# 13. Ugly Parse Error: @context: { 'https://...' ]
+# 14. GET Contexts - see only Core Context
+# 15. Parse Error in an external context (https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld)
+# 16. GET Contexts - see only Core Context
+# 17. Exact same request again - make sure it gives the same error
+# 18. GET Contexts - see only Core Context 
+# 19. Inline context that is an array of three and the middle member is a context that gives parse error
+# 20. GET Contexts - see only Core Context
 #
-# Need Cantera for the rest (no longer true - have inline contexts now ...):
-# 08. Parse Error in the resulting context
-# 09. resulting payload not a JSON object?
-# 10. resulting payload is an empty object
-# 11. Not a single member
-# 12. Single member not called '@context
-# 13. Single member not object or array
-# 14. Array with member that is not a string
-# 15. Array with member that is not a valid URL
+# xx. resulting payload not a JSON object?
+# xx. resulting payload is an empty object
+# xx. Not a single member
+# xx. Single member not called '@context
+# xx. Single member not object or array
+# xx. Array with member that is not a string
+# xx. Array with member that is not a valid URL
 # 
 
 echo "01. @context is a Boolean"
@@ -67,7 +78,14 @@ echo
 echo
 
 
-echo "02. @context is a Number"
+echo "02. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "03. @context is a Number"
 echo "======================="
 payload='{
   "id": "urn:E1",
@@ -83,7 +101,14 @@ echo
 echo
 
 
-echo "03. @context is an object and a value is NOT a string"
+echo "04. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "05. @context is an object and a value is NOT a string"
 echo "====================================================="
 payload='{
   "id": "urn:E1",
@@ -99,7 +124,14 @@ echo
 echo
 
 
-echo "04. @context is an empty string"
+echo "06. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "07. @context is an empty string"
 echo "==============================="
 payload='{
   "id": "urn:E1",
@@ -115,7 +147,14 @@ echo
 echo
 
 
-echo "05. URL in context is an invalid URL"
+echo "08. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "09. URL in context is an invalid URL"
 echo "===================================="
 payload='{
   "id": "urn:E1",
@@ -131,7 +170,14 @@ echo
 echo
 
 
-echo "06. URL in context is a valid URL but it doesn't exist"
+echo "10. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "11. URL in context is a valid URL but it doesn't exist"
 echo "======================================================"
 payload='{
   "id": "urn:E1",
@@ -147,7 +193,14 @@ echo
 echo
 
 
-echo "07. Ugly Parse Error: @context: { 'https://...' ]"
+echo "12. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "13. Ugly Parse Error: @context: { 'https://...' ]"
 echo "================================================="
 payload='{
   "id": "urn:E1",
@@ -161,6 +214,86 @@ payload='{
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
 echo
 echo
+
+
+echo "14. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "15. Parse Error in an external context (https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld)"
+echo "=========================================================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "16. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "17. Exact same request again - make sure it gives the same error"
+echo "================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "18. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
+
+echo "19. Inline context that is an array of three and the middle member is a context that gives parse error"
+echo "======================================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "John 2"
+  },
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" -H "Accept: application/ld+json"
+echo
+echo
+
+
+echo "20. GET Contexts - see only Core Context"
+echo "========================================"
+orionCurl --url /ngsi-ld/ex/v1/contexts?prettyPrint=yes
+echo
+echo
+
 
 --REGEXPECT--
 01. @context is a Boolean
@@ -177,7 +310,31 @@ Date: REGEX(.*)
 }
 
 
-02. @context is a Number
+02. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+03. @context is a Number
 =======================
 HTTP/1.1 400 Bad Request
 Content-Length: 132
@@ -191,7 +348,31 @@ Date: REGEX(.*)
 }
 
 
-03. @context is an object and a value is NOT a string
+04. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+05. @context is an object and a value is NOT a string
 =====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 114
@@ -205,7 +386,31 @@ Date: REGEX(.*)
 }
 
 
-04. @context is an empty string
+06. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+07. @context is an empty string
 ===============================
 HTTP/1.1 400 Bad Request
 Content-Length: 128
@@ -220,7 +425,31 @@ Date: REGEX(.*)
 
 
 
-05. URL in context is an invalid URL
+08. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+09. URL in context is an invalid URL
 ====================================
 HTTP/1.1 400 Bad Request
 Content-Length: 109
@@ -234,7 +463,31 @@ Date: REGEX(.*)
 }
 
 
-06. URL in context is a valid URL but it doesn't exist
+10. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+11. URL in context is a valid URL but it doesn't exist
 ======================================================
 HTTP/1.1 503 Service Unavailable
 Content-Length: 140
@@ -248,7 +501,31 @@ Date: REGEX(.*)
 }
 
 
-07. Ugly Parse Error: @context: { 'https://...' ]
+12. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+13. Ugly Parse Error: @context: { 'https://...' ]
 =================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 153
@@ -260,6 +537,144 @@ Date: REGEX(.*)
     "title": "JSON Parse Error",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
+
+
+14. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+15. Parse Error in an external context (https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld)
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 193
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld",
+    "title": "JSON Parse Error in @context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+17. Exact same request again - make sure it gives the same error
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 193
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld",
+    "title": "JSON Parse Error in @context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+18. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
+
+
+19. Inline context that is an array of three and the middle member is a context that gives parse error
+======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 149
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "JSON Parse Error: expecting comma or end of array",
+    "title": "JSON Parse Error",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+}
+
+
+20. GET Contexts - see only Core Context
+========================================
+HTTP/1.1 200 OK
+Content-Length: 470
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "hash-table": {
+            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        },
+        "id": "None",
+        "type": "hash-table",
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    }
+]
 
 
 --TEARDOWN--

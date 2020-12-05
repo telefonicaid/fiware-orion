@@ -156,14 +156,14 @@ Date: REGEX(.*)
 05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 68
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "birthdate": "2016-02-22T10:00:00.00Z",
+        "birthdate": "2016-02-22T10:00:00.000Z",
         "id": "E22",
         "type": "Thing"
     }
@@ -173,19 +173,19 @@ Date: REGEX(.*)
 06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 133
+Content-Length: 135
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "birthdate": "2016-02-24T10:00:00.00Z",
+        "birthdate": "2016-02-24T10:00:00.000Z",
         "id": "E24",
         "type": "Thing"
     },
     {
-        "birthdate": "2016-02-23T10:00:00.00Z",
+        "birthdate": "2016-02-23T10:00:00.000Z",
         "id": "E23",
         "type": "Thing"
     }
@@ -195,24 +195,24 @@ Date: REGEX(.*)
 07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 199
+Content-Length: 202
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
     {
-        "birthdate": "2016-02-24T10:00:00.00Z",
+        "birthdate": "2016-02-24T10:00:00.000Z",
         "id": "E24",
         "type": "Thing"
     },
     {
-        "birthdate": "2016-02-23T10:00:00.00Z",
+        "birthdate": "2016-02-23T10:00:00.000Z",
         "id": "E23",
         "type": "Thing"
     },
     {
-        "birthdate": "2016-02-22T10:00:00.00Z",
+        "birthdate": "2016-02-22T10:00:00.000Z",
         "id": "E22",
         "type": "Thing"
     }

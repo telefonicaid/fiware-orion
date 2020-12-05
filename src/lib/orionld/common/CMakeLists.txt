@@ -52,6 +52,10 @@ SET (SOURCES
     qAliasCompact.cpp
     orionldTenantLookup.cpp
     orionldTenantCreate.cpp
+    attributeUpdated.cpp
+    attributeNotUpdated.cpp
+    isSpecialAttribute.cpp
+    isSpecialSubAttribute.cpp
     # qTreeToBson.cpp
 )
 

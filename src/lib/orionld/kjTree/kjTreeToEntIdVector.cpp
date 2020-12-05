@@ -32,15 +32,16 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "apiTypesV2/EntID.h"                                  // EntID
-#include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/CHECK.h"                              // CHECKx(U)
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
-#include "orionld/kjTree/kjTreeToEntIdVector.h"                // Own interface
+#include "apiTypesV2/EntID.h"                                    // EntID
+#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
+#include "orionld/common/CHECK.h"                                // CHECKx(U)
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/common/urlCheck.h"                             // urlCheck
+#include "orionld/common/urnCheck.h"                             // urnCheck
+#include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/kjTree/kjTreeToEntIdVector.h"                  // Own interface
 
 
 
@@ -72,7 +73,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
 
     for (itemP = entityP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
-      if (SCOMPARE3(itemP->name, 'i', 'd', 0))
+      if (SCOMPARE3(itemP->name, 'i', 'd', 0) || SCOMPARE4(itemP->name, '@', 'i', 'd', 0))
       {
         DUPLICATE_CHECK(idP, "EntityInfo::id", itemP->value.s);
         STRING_CHECK(itemP, "EntityInfo::id");
@@ -82,7 +83,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
         DUPLICATE_CHECK(idPatternP, "EntityInfo::idPattern", itemP->value.s);
         STRING_CHECK(itemP, "EntityInfo::idPattern");
       }
-      else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0))
+      else if (SCOMPARE5(itemP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(itemP->name, '@', 't', 'y', 'p', 'e', 0))
       {
         DUPLICATE_CHECK(typeP, "EntityInfo::type", itemP->value.s);
         STRING_CHECK(itemP, "EntityInfo::type");
@@ -109,11 +110,11 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
     if (idP != NULL)
     {
       // The entity id must be a URI
-      char* details;
+      char* detail;
 
-      if ((urlCheck(idP, &details) == false) && (urnCheck(idP, &details) == false))
+      if (pcheckUri(idP, &detail) == false)
       {
-        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", details);
+        orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Entity ID", detail);  // FIXME: Include 'detail' and name (id)
         orionldState.httpStatusCode = SccBadRequest;
         return false;
       }
@@ -130,7 +131,7 @@ bool kjTreeToEntIdVector(KjNode* kNodeP, std::vector<ngsiv2::EntID>* entitiesP)
     if (idP)        entityInfo.id        = idP;
     if (idPatternP) entityInfo.idPattern = idPatternP;
 
-    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, NULL, true, NULL);
+    entityInfo.type      = orionldContextItemExpand(orionldState.contextP, typeP, true, NULL);
     entitiesP->push_back(entityInfo);
   }
 

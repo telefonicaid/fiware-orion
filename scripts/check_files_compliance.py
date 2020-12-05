@@ -48,7 +48,7 @@ header.append('\s*For those usages not covered by this license please contact wi
 header.append('\s*iot_support at tid dot es$')
 
 header2 = []
-header2.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
+header2.append('\s*Copyright( \(c\))? 20[1|2][0|1|2|3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
 header2.append('\s*$')
 header2.append('\s*This file is part of Orion-LD Context Broker.$')
 header2.append('\s*$')
@@ -115,7 +115,7 @@ def check_file_orionld(file):
                     i = 1
             else:
                 if not re.search(header2[i], line):
-                    return 'mismatch: header <' + header2[i] + '> : line <' + line + '>'
+                    return 'mismatch: HEADER <' + header2[i] + '> : line <' + line + '>'
                 i += 1
                 if i == len(header2):
                     # We have reach the end of the header, so the complete check passes
@@ -142,7 +142,7 @@ def ignore(root, file):
     if 'SRPMS' in root or 'SOURCES' in root or 'RPMS' in root:
         return True
 
-    # Files in the test/valdring directory ending with .out are not processed
+    # Files in the test/valgrind directory ending with .out are not processed
     if 'valgrind' in root and file.endswith('.out'):
         return True
 
@@ -180,12 +180,20 @@ def ignore(root, file):
     if os.path.splitext(file)[1][1:] in extensions_to_ignore:
         return True
 
+    # JMX files in test/jMeter are ignored
+    if 'jMeter' in root and (file.endswith('.jmx') or file.endswith('.jmeter.json')):
+        return True
+
+    # JSON files in test/jMeter/cases are ignored
+    if 'cases' in root and file.endswith('.json'):
+        return True
+
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu', 'orionld.ubuntu',
                    'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml',
-                   '.dockerignore']
+                   '.dockerignore', '.jmeter.json']
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
@@ -261,6 +269,8 @@ for root, dirs, files in os.walk(dir):
         elif 'src/lib/orionld/' in filename:
             is_orionld = True
         elif 'test/functionalTest/cases/0000_ngsild' in filename:
+            is_orionld = True
+        elif 'test/functionalTest/cases/0000_temporal' in filename:
             is_orionld = True
         elif 'test/unittests/orionld' in filename:
             is_orionld = True

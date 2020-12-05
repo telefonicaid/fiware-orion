@@ -171,8 +171,8 @@ static int dirFind(char* dir, int dirLen)
 */
 int paRcFileParse(void)
 {
-  char   dir[1024];
-  char   path[1024];
+  char   dir[128];
+  char   path[256];
   char   line[512];
   int    lineNo = 0;
   FILE*  fP;
@@ -229,7 +229,7 @@ int paRcFileParse(void)
     delim = strchr(line, '=');
     if (delim == NULL)
     {
-      char w[512];
+      char w[600];
 
       snprintf(w, sizeof(w), "%s[%d]: no delimiter found", path, lineNo);
       PA_WARNING(PasParseError, w);
@@ -272,9 +272,9 @@ int paRcFileParse(void)
 
     if (varFound == false)
     {
-      char w[512];
+      char w[1024];
 
-      snprintf(w, sizeof(w), "%s[%d]: variable '%s' not recognized", path, lineNo, var);
+      snprintf(w, sizeof(w) - 1, "%s[%d]: variable '%s' not recognized", path, lineNo, var);
       PA_WARNING(PasNoSuchVariable, w);
       continue;
     }

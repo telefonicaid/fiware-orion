@@ -125,7 +125,7 @@ char* orionldContextPrefixExpand(OrionldContext* contextP, const char* str, char
   // If not, look it up in the context and add it to the cache
   if (prefixExpansion == NULL)
   {
-    prefixExpansion = (char*) orionldContextItemExpand(contextP, prefix, NULL, false, NULL);
+    prefixExpansion = (char*) orionldContextItemExpand(contextP, prefix, false, NULL);
     if (prefixExpansion != NULL)
       prefixCacheInsert(prefix, prefixExpansion);
     else

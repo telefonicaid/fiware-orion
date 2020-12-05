@@ -80,11 +80,12 @@ bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldNa
       ++coords;
     }
 
-    buf = kaAlloc(&orionldState.kalloc, 128);
+    int bufSize = 128;
+    buf = kaAlloc(&orionldState.kalloc, bufSize);
     if (coords == 2)
-      snprintf(buf, 128, "%f,%f", coordV[0], coordV[1]);
+      snprintf(buf, bufSize, "%f,%f", coordV[0], coordV[1]);
     else
-      snprintf(buf, 128, "%f,%f,%f", coordV[0], coordV[1], coordV[2]);
+      snprintf(buf, bufSize, "%f,%f,%f", coordV[0], coordV[1], coordV[2]);
   }
   else
   {
@@ -203,7 +204,7 @@ bool pcheckGeoQ(KjNode* geoqNodeP, bool coordsToString)
 
     if (strcmp(pName, "location") != 0)
     {
-      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, NULL, true, NULL);
+      geopropertyP->value.s = orionldContextItemExpand(orionldState.contextP, pName, true, NULL);
       dotForEq(geopropertyP->value.s);
     }
   }

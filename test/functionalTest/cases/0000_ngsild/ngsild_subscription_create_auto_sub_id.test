@@ -124,11 +124,11 @@ connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:Subscription:REGEX([0-9a-f\-]{24})",
-	"expiration" : NumberLong(REGEX(.*)),
+	"expiration" : REGEX(.*),
 	"reference" : "http://valid.url/url",
 	"custom" : false,
 	"mimeType" : "application/ld+json",
-	"throttling" : NumberLong(5),
+	"throttling" : 5,
 	"servicePath" : "/",
 	"description" : "Description of Test subscription 01",
 	"status" : "paused",
@@ -162,7 +162,8 @@ MongoDB server version: REGEX(.*)
 	"name" : "Test subscription 01",
 	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"csf" : "not implemented",
-	"timeInterval" : -1,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"http://example.org/P2"
 	],
@@ -182,7 +183,7 @@ bye
 03. Grep mongo content for subscription id and do a GET /ngsi-ld/v1/subscription/$SUB_ID
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 910
+Content-Length: 914
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -231,7 +232,7 @@ Date: REGEX(.*)
       "accept": "application/ld+json"
     }
   },
-  "expires": "2028-12-31T10:00:00Z",
+  "expires": "2028-12-31T10:00:00.000Z",
   "throttling": 5
 }
 
