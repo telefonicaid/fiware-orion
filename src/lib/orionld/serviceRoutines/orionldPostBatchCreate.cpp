@@ -125,6 +125,14 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 bool orionldPostBatchCreate(ConnectionInfo* ciP)
 {
   //
+  // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
+  //        Rather than cloning the entire tree, just put them back again after processing
+  //
+  KjNode* cloneP = NULL;  // Only for temporal
+  if (temporal)
+    cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
+  //
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array
   // * cannot be empty
@@ -251,6 +259,9 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccReceiverInternalError;
     return false;
   }
+
+  if ((temporal == true) && (cloneP != NULL))
+    orionldState.requestTree = cloneP;
 
   return true;
 }

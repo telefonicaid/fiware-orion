@@ -35,7 +35,15 @@
 //
 // pgTransactionBegin - start a transaction
 //
+// FIXME: Use PQexecPrepared - prepared statements
+//
 bool pgTransactionBegin(PGconn* connectionP)
 {
-  return false;
+  PGresult* res;
+
+  res = PQexec(connectionP, "BEGIN");
+  if (res == NULL)
+    LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
+
+  return true;
 }

@@ -170,8 +170,9 @@ typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
   ConnectionInfo*         ciP;
-  struct timespec         timestamp;    // The time when the request entered
-  double                  requestTime;  // Same same, but at a floating point
+  struct timespec         timestamp;             // The time when the request entered
+  double                  requestTime;           // Same same, but at a floating point
+  char                    requestTimeString[64]; // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;

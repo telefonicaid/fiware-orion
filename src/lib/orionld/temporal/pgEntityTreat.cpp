@@ -29,11 +29,13 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildRemove
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 
 #include "orionld/temporal/pgEntityPush.h"                     // pgEntityPush
@@ -46,8 +48,14 @@ extern "C"
 //
 // pgEntityTreat -
 //
-bool pgEntityTreat(PGconn* connectionP, char* id, char* type, KjNode* entityP)
+bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt)
 {
+  // <DEBUG>
+  char buf[1024];
+  kjRender(orionldState.kjsonP, entityP, buf, sizeof(buf));
+  LM_TMP(("TEMP: entityP: %s", buf));
+  // </DEBUG>
+
   if (id == NULL)  // Find the entity id in the entity tree
   {
     KjNode* nodeP = kjLookup(entityP, "id");
@@ -71,19 +79,19 @@ bool pgEntityTreat(PGconn* connectionP, char* id, char* type, KjNode* entityP)
     kjChildRemove(entityP, nodeP);
   }
 
-
+#if 0  // Attributes later!
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (pgAttributeTreat(connectionP, attrP) == false)
       LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
   }
-
+#endif
 
   char instanceId[64];
   uuidGenerate(instanceId);
 
-
-  if (pgEntityPush(connectionP, id, type, instanceId) == false)
+  LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, instanceId, id, type, createdAt, modifiedAt));
+  if (pgEntityPush(connectionP, instanceId, id, type, createdAt, modifiedAt) == false)
     LM_RE(false, ("pgEntityPush failed"));
 
   return true;

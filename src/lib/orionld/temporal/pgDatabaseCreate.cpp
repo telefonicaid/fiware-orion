@@ -27,21 +27,29 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/temporal/pgTransactionCommit.h"              // Own interface
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgDatabaseCreate.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionCommit - commit a transaction
+// pgDatabaseCreate - create a postgres database
 //
-bool pgTransactionCommit(PGconn* connectionP)
+bool pgDatabaseCreate(PGconn* connection, const char* dbName)
 {
-  PGresult* res;
+  PGconn*    connectionP;
+  char       sql[512];
+  PGresult*  res;
 
-  res = PQexec(connectionP, "COMMIT");
+  connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
+  
+  snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
+  res = PQexec(connectionP, sql);
   if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
+    LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
 
   return true;
 }

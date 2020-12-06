@@ -1045,15 +1045,3 @@ bool TemporalPgTenantDBConnectorOpen(const char* tenant)
 
 
 
-// -----------------------------------------------------------------------------
-//
-// temporalInit -
-//
-int temporalInit(void)
-{
-  LM_TMP(("TEMP: Calling temporalTenantInitialise"));
-  temporalTenantInitialise("orion_ld");
-  LM_TMP(("TEMP: After temporalTenantInitialise"));
-
-  return 0;
-}

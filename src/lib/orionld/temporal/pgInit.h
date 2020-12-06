@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGINIT_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGINIT_H_
+
 /*
 *
 * Copyright 2020 FIWARE Foundation e.V.
@@ -22,26 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/temporal/pgTransactionCommit.h"              // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionCommit - commit a transaction
+// pgInit -
 //
-bool pgTransactionCommit(PGconn* connectionP)
-{
-  PGresult* res;
+extern bool pgInit(const char* dbPrefix);
 
-  res = PQexec(connectionP, "COMMIT");
-  if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGINIT_H_

@@ -27,21 +27,15 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/temporal/pgTransactionCommit.h"              // Own interface
+#include "orionld/temporal/pgDatabaseTableExists.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionCommit - commit a transaction
+// pgDatabaseTableExists
 //
-bool pgTransactionCommit(PGconn* connectionP)
+bool pgDatabaseTableExists(PGconn* connectionP, const char* dbName)
 {
-  PGresult* res;
-
-  res = PQexec(connectionP, "COMMIT");
-  if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
-
-  return true;
+  return false;
 }

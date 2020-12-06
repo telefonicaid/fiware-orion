@@ -38,6 +38,6 @@ extern "C"
 //
 // pgEntityTreat -
 //
-extern bool pgEntityTreat(PGconn* connectionP, char* id, char* type, KjNode* entityP);
+extern bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt);
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGENTITYTREAT_H_

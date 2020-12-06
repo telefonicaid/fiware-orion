@@ -31,6 +31,21 @@
 #include "orionld/temporal/pgConnectionGet.h"                  // Own interface
 
 
+//
+// FIXME:
+//   typedef struct PgConnection
+//   {
+//     sem_t    sem;
+//     bool     taken;
+//     PGconn*  connectionP;
+//     char*    dbName;
+//   } PgConnection;
+//
+// The connection pool will be simply a linked list of PgConnection.
+// If none is free (for the dbName in question), another connection is opened.
+//
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -42,10 +57,11 @@
 //
 PGconn* pgConnectionGet(const char* dbName)
 {
-  const char* keywords[] = { "host",      "port", "user",            "password",           "dbname" };
-  const char* values[]   = { "localhost", "5432",  TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, dbName   };
+  // FIXME: connection pool: lookup a free connection to 'dbName' ...
 
-  PGconn* connectionP = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname: https://www.postgresql.org/docs/12/libpq-connect.html
+  const char*  keywords[]   = { "host",      "port", "user",            "password",           "dbname", NULL };
+  const char*  values[]     = { "localhost", "5432",  TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, dbName, NULL   };
+  PGconn*      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname: https://www.postgresql.org/docs/12/libpq-connect.html
 
   if (connectionP == NULL)
     LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", "localhost", 5432, TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, dbName));

@@ -1402,6 +1402,60 @@ function neqTimestamp()
 export PGPASSWORD='password'
 # -----------------------------------------------------------------------------
 #
+# pgDrop [dbName]
+#
+function pgDrop()
+{
+  dbName="$1"
+  echo "DROP DATABASE IF EXISTS $dbName" | psql -U postgres 2> /tmp/pg-stderr-01
+  egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
+  egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
+
+  lines=$(wc -l /tmp/pg-stderr-03 | awk '{print $1}')
+  if [ $lines != 0 ]
+  then
+    echo unable to drop DB $dbName 1>&2
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# pgCreate [dbName]
+#
+function pgCreate()
+{
+  dbName="$1"
+  echo "Creating postgres DB $dbName"
+  creation="CREATE DATABASE $dbName"
+  postgis="CREATE EXTENSION IF NOT EXISTS postgis"
+  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'DateTime', 'Geo', 'LanguageMap')"
+  entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
+
+  echo $creation  | psql -U postgres
+  echo $postgis   | psql -U postgres
+  echo $valuetype | psql -U postgres -d "$dbName"
+  echo $entities  | psql -U postgres -d "$dbName"
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# pgInit [dbName]
+#
+function pgInit()
+{
+  dbName="$1"
+  pgDrop $dbName
+  pgCreate $dbName
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
 # postgresCmd [-t <tenant>] [-sql <SQL command as a string>]
 #
 function postgresCmd()
@@ -1409,7 +1463,7 @@ function postgresCmd()
   #
   # Parsing parameters
   #
-  tenant="orion_ld"
+  tenant=$CB_DB_NAME
   sqlCommand=""
 
   while [ "$#" != 0 ]
@@ -1465,3 +1519,6 @@ export -f mqttTestClientDump
 export -f eqTimestamp
 export -f neqTimestamp
 export -f postgresCmd
+export -f pgDrop
+export -f pgInit
+export -f pgCreate

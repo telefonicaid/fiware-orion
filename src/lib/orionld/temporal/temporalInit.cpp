@@ -20,28 +20,29 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin
+* Author: Chandra Challagonda & Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/temporal/pgTransactionCommit.h"              // Own interface
+#include "orionld/common/orionldState.h"                       // dbName
+#include "orionld/temporal/temporalTenantInitialise.h"         // temporalTenantInitialise
+#include "orionld/temporal/pgInit.h"                           // pgInit
+#include "orionld/temporal/temporalInit.h"                     // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionCommit - commit a transaction
+// temporalInit -
 //
-bool pgTransactionCommit(PGconn* connectionP)
+bool temporalInit(void)
 {
-  PGresult* res;
+  //  temporalTenantInitialise("orion_ld");  // FIXME: Remove
 
-  res = PQexec(connectionP, "COMMIT");
-  if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
+  LM_TMP(("PGINIT: Calling pgInit(%s)", dbName));
+  if (pgInit(dbName) == false)
+    LM_RE(false, ("Database Error (pgInit(%s) failed)", dbName));
 
   return true;
 }

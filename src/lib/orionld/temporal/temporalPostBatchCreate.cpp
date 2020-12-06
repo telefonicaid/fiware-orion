@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Chandra Challagonda
+* Author: Ken Zangelin
 */
 #include <postgresql/libpq-fe.h>                               // PGconn
 
@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
 #include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
 #include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
@@ -46,6 +47,28 @@ extern "C"
 #include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
 #include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalEntityArrayExpand -
+//
+void temporalEntityArrayExpand(KjNode* tree)
+{
+  for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    for (KjNode* nodeP = entityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      if (strcmp(nodeP->name, "type") == 0)
+        nodeP->value.s = orionldContextItemExpand(orionldState.contextP, nodeP->value.s, true, NULL);
+      else if (strcmp(nodeP->name, "id")       == 0) {}
+      else if (strcmp(nodeP->name, "location") == 0) {}
+      else
+        nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, true, NULL);
+    }
+  }
+}
 
 
 
@@ -57,20 +80,31 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
 {
   PGconn* connectionP;
 
-  if (orionldState.tenant == NULL)
-    connectionP = pgConnectionGet(dbName);
-  else
-    LM_X(1, ("Tenants not supported for the temporal layer (for now)"));
+  // Expanding entity types and attribute names
+  // FIXME: the tree should be served expanded
+  temporalEntityArrayExpand(orionldState.requestTree);
+
+  LM_TMP(("TEMP: In temporalPostBatchCreate"));
+  // FIXME: Implement orionldState.dbName
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
+
+  LM_TMP(("TEMP: Calling pgConnectionGet(%s)", dbName));
+  connectionP = pgConnectionGet(dbName);
+  LM_TMP(("TEMP:  pgConnectionGet returned %p", connectionP));
 
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
-  pgTransactionBegin(connectionP);
+  LM_TMP(("TEMP: Calling pgTransactionBegin"));
+  if (pgTransactionBegin(connectionP) != true)
+    LM_RE(false, ("pgTransactionBegin failed"));
 
   bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    if (pgEntityTreat(connectionP, NULL, NULL, entityP) == false)
+    LM_TMP(("TEMP: Calling pgEntityTreat"));
+    if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString) == false)
     {
       ok = false;
       break;
@@ -80,12 +114,18 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
   if (ok == false)
   {
     LM_E(("Database Error (batch create temporal layer failed)"));
-    pgTransactionRollback(connectionP);
+    if (pgTransactionRollback(connectionP) == false)
+      LM_RE(false, ("pgTransactionRollback failed"));
   }
   else
-    pgTransactionCommit(connectionP);
+  {
+    LM_TMP(("TEMP: Calling pgTransactionCommit"));
+    if (pgTransactionCommit(connectionP) != true)
+      LM_RE(false, ("pgTransactionCommit failed"));
+  }
 
+  LM_TMP(("TEMP: Calling pgConnectionRelease"));
   pgConnectionRelease(connectionP);
-
+  LM_TMP(("TEMP: All OK"));
   return true;
 }

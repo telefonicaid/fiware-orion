@@ -186,6 +186,7 @@ SET (ORION_LIBS
     orionld_mongoCppLegacy
     orionld_db
     orionld_mongoBackend
+    orionld_temporal
 
     serviceRoutines
     serviceRoutinesV2

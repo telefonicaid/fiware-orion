@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGDATABASETABLECREATEALL_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGDATABASETABLECREATEALL_H_
+
 /*
 *
 * Copyright 2020 FIWARE Foundation e.V.
@@ -24,24 +27,12 @@
 */
 #include <postgresql/libpq-fe.h>                               // PGconn
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/temporal/pgTransactionCommit.h"              // Own interface
-
 
 
 // -----------------------------------------------------------------------------
 //
-// pgTransactionCommit - commit a transaction
+// pgDatabaseTableCreateAll -
 //
-bool pgTransactionCommit(PGconn* connectionP)
-{
-  PGresult* res;
+extern bool pgDatabaseTableCreateAll(PGconn* connectionP);
 
-  res = PQexec(connectionP, "COMMIT");
-  if (res == NULL)
-    LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGDATABASETABLECREATEALL_H_
