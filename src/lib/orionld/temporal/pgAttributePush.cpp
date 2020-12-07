@@ -35,6 +35,9 @@
 //
 // pgAttributePush - push an attribute for db insertion
 //
+// Not sure this function will be needed after all.
+// There are separate push functions for every type of attribute.
+//
 bool pgAttributePush(PGconn* connectionP, char* id, char* instanceId)
 {
   return false;

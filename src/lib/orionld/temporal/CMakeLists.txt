@@ -50,6 +50,7 @@ SET (SOURCES
     pgAttributeTreat.cpp
     pgAttributePush.cpp
     pgSubAttributePush.cpp
+    pgRelationshipPush.cpp
 )
 
 SET (HEADERS
@@ -82,6 +83,7 @@ SET (HEADERS
     pgAttributeTreat.h
     pgAttributePush.h
     pgSubAttributePush.h
+    pgRelationshipPush.h
 )
 
 

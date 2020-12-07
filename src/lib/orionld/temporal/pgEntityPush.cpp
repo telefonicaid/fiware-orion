@@ -41,7 +41,7 @@ bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, c
   PGresult*  res;
 
   snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s', NULL)", instanceId, id, type, createdAt, modifiedAt);
-  LM_TMP(("TEMP: sql: %s", sql));
+  LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));

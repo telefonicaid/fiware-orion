@@ -44,6 +44,10 @@ payload='[
     "SP": {
       "type": "Property",
       "value": "SP of E1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:R1"
     }
   },
   {
@@ -52,6 +56,10 @@ payload='[
     "SP": {
       "type": "Property",
       "value": "SP of E2"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:R1"
     }
   },
   {
@@ -60,6 +68,10 @@ payload='[
     "SP": {
       "type": "Property",
       "value": "SP of E3"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:R1"
     }
   }
 ]'
@@ -77,7 +89,7 @@ echo
 
 echo "03. See the three AP attributes in the temporal database"
 echo "========================================================"
-echo LATER
+postgresCmd -sql "SELECT id,valueType,entityId,subProperty,unitcode,datasetid,text FROM attributes"
 echo
 echo
 
@@ -111,7 +123,10 @@ urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the three AP attributes in the temporal database
 ========================================================
-LATER
+id,valuetype,entityid,subproperty,unitcode,datasetid,text
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:relationships:R1
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:relationships:R1
 
 
 --TEARDOWN--

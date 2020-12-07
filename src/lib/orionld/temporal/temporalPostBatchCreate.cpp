@@ -71,7 +71,7 @@ void temporalEntityArrayExpand(KjNode* tree)
 }
 
 
-
+#define TEMP_TRANSACTIONS 1
 // ----------------------------------------------------------------------------
 //
 // temporalPostBatchCreate -
@@ -84,26 +84,23 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
   // FIXME: the tree should be served expanded
   temporalEntityArrayExpand(orionldState.requestTree);
 
-  LM_TMP(("TEMP: In temporalPostBatchCreate"));
   // FIXME: Implement orionldState.dbName
   if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
     LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
 
-  LM_TMP(("TEMP: Calling pgConnectionGet(%s)", dbName));
   connectionP = pgConnectionGet(dbName);
-  LM_TMP(("TEMP:  pgConnectionGet returned %p", connectionP));
-
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
-  LM_TMP(("TEMP: Calling pgTransactionBegin"));
+#ifdef TEMP_TRANSACTIONS
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));
+#endif
 
   bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    LM_TMP(("TEMP: Calling pgEntityTreat"));
+    LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
     if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString) == false)
     {
       ok = false;
@@ -120,8 +117,10 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
   else
   {
     LM_TMP(("TEMP: Calling pgTransactionCommit"));
+#ifdef TEMP_TRANSACTIONS
     if (pgTransactionCommit(connectionP) != true)
       LM_RE(false, ("pgTransactionCommit failed"));
+#endif
   }
 
   LM_TMP(("TEMP: Calling pgConnectionRelease"));

@@ -22,9 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+#include <postgresql/libpq-fe.h>                               // PGconn
 
-#include "orionld/temporal/pgTransactionRollback.h"              // Own interface
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/temporal/pgTransactionRollback.h"            // Own interface
 
 
 
@@ -34,5 +37,13 @@
 //
 bool pgTransactionRollback(PGconn* connectionP)
 {
+  PGresult* res;
+
+  LM_TMP(("SQL[%p]: ROLLBACK", connectionP));
+
+  res = PQexec(connectionP, "ROLLBACK");
+  if (res == NULL)
+    LM_RE(false, ("Database Error (PQexec(ROLLBACK): %s)", PQresStatus(PQresultStatus(res))));
+
   return false;
 }

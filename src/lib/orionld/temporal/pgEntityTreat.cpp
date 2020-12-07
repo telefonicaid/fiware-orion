@@ -79,20 +79,19 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
     kjChildRemove(entityP, nodeP);
   }
 
-#if 0  // Attributes later!
-  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-  {
-    if (pgAttributeTreat(connectionP, attrP) == false)
-      LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
-  }
-#endif
-
   char instanceId[64];
   uuidGenerate(instanceId);
 
   LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, instanceId, id, type, createdAt, modifiedAt));
   if (pgEntityPush(connectionP, instanceId, id, type, createdAt, modifiedAt) == false)
     LM_RE(false, ("pgEntityPush failed"));
+
+  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    // FIXME: createdAt ... I need to know that the Attribute did not exist for this to be OK ...
+    if (pgAttributeTreat(connectionP, attrP, instanceId, id, createdAt, modifiedAt) == false)
+      LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
+  }
 
   return true;
 }

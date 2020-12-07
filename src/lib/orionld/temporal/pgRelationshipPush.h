@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTETREAT_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTETREAT_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGRELATIONSHIPPUSH_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGRELATIONSHIPPUSH_H_
 
 /*
 *
@@ -25,28 +25,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
+#include <postgresql/libpq-fe.h>                                 // PGconn
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgAttributeTreat - treat an attribute for db insertion
+// pgRelationshipPush - push an relationship to its DB table
 //
-extern bool pgAttributeTreat
+extern bool pgRelationshipPush
 (
   PGconn*      connectionP,
-  KjNode*      attrP,
+  const char*  object,
   const char*  entityRef,
   const char*  entityId,
+  const char*  attributeName,
+  const char*  attributeInstance,
+  const char*  datasetId,
+  const char*  observedAt,
   const char*  createdAt,
-  const char*  modifiedAt
+  const char*  modifiedAt,
+  bool         subProperties
 );
 
-
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTETREAT_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGRELATIONSHIPPUSH_H_
