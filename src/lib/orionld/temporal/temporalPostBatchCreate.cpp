@@ -71,7 +71,7 @@ void temporalEntityArrayExpand(KjNode* tree)
 }
 
 
-#define TEMP_TRANSACTIONS 1
+
 // ----------------------------------------------------------------------------
 //
 // temporalPostBatchCreate -
@@ -80,8 +80,12 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
 {
   PGconn* connectionP;
 
-  // Expanding entity types and attribute names
-  // FIXME: the tree should be served expanded
+  //
+  // FIXME: the tree should be served expanded + with erroneous entities removed
+  //
+
+
+  // Expanding entity types and attribute names - FIXME: Remove ...
   temporalEntityArrayExpand(orionldState.requestTree);
 
   // FIXME: Implement orionldState.dbName
@@ -92,10 +96,8 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
 
-#ifdef TEMP_TRANSACTIONS
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));
-#endif
 
   bool ok = true;
   for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
@@ -116,15 +118,11 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
   }
   else
   {
-    LM_TMP(("TEMP: Calling pgTransactionCommit"));
-#ifdef TEMP_TRANSACTIONS
     if (pgTransactionCommit(connectionP) != true)
       LM_RE(false, ("pgTransactionCommit failed"));
-#endif
   }
 
-  LM_TMP(("TEMP: Calling pgConnectionRelease"));
   pgConnectionRelease(connectionP);
-  LM_TMP(("TEMP: All OK"));
+
   return true;
 }
