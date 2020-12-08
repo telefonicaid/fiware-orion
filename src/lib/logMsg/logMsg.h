@@ -532,16 +532,19 @@ do                                                                        \
 *
 * LM_K - log message
 */
-#define LM_K(s)                                                            \
-do                                                                         \
-{                                                                          \
-  char* text;                                                              \
-                                                                           \
-  if ((text = lmTextGet s) != NULL)                                        \
-  {                                                                        \
-    lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);   \
-    ::free(text);                                                          \
-  }                                                                        \
+#define LM_K(s)                                                              \
+do                                                                           \
+{                                                                            \
+  char* text;                                                                \
+                                                                             \
+  if (lmtmp == true)                                                         \
+  {                                                                          \
+    if ((text = lmTextGet s) != NULL)                                        \
+    {                                                                        \
+      lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);   \
+      ::free(text);                                                          \
+    }                                                                        \
+  }                                                                          \
 } while (0)
 #endif
 
@@ -556,16 +559,20 @@ do                                                                         \
 * LM_TMP is meant *only* for temporal logging and all occurrencies of LM_TMP
 * should be removed before creating pull requests for review.
 */
-#define LM_TMP(s)                                                        \
-do                                                                       \
-{                                                                        \
-  char* text;                                                            \
-                                                                         \
-  if ((text = lmTextGet s) != NULL)                                      \
-  {                                                                      \
-    lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-    ::free(text);                                                        \
-  }                                                                      \
+extern bool lmtmp;
+#define LM_TMP(s)                                                          \
+do                                                                         \
+{                                                                          \
+  char* text;                                                              \
+                                                                           \
+  if (lmtmp == true)                                                       \
+  {                                                                        \
+    if ((text = lmTextGet s) != NULL)                                      \
+    {                                                                      \
+      lmOut(text, 'K', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+      ::free(text);                                                        \
+    }                                                                      \
+  }                                                                        \
 } while (0)
 #endif
 
