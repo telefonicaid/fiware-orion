@@ -176,11 +176,9 @@ echo -e "\e[1;32m Paho Installed ... \e[0m"
 echo "============== PAHO INSTALLATION TRACES START ============================="
 cat /tmp/paho-install
 echo "============== PAHO INSTALLATION TRACES END ==============================="
-
 echo
-echo -e "\e[1;32m Builder: installing MQTT - not! \e[0m"
+
 #
-# FIXME
 #   For unknown reasons, 'mosquitto' can't be installed in this repo
 #   As workaround, all MQTT functests are disabled for travis. 
 #
@@ -194,7 +192,9 @@ echo -e "\e[1;32m Builder: installing MQTT - not! \e[0m"
 #
 # postgres
 #
-apt-get install libpq-dev
+echo -e "\e[1;32m Builder: installing postgres dev library \e[0m"
+
+apt-get install -y libpq-dev
 
 ldconfig
 
