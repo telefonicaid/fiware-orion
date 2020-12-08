@@ -7,7 +7,7 @@ on:
       - develop
 
 env:
-  IMAGE_NAME: ghcr.io/wistefan/orion-ld-test:${{ github.run_id }}
+  IMAGE_NAME: localhost:5000/orion-ld-test:latest
 
 jobs:
   unit:
@@ -18,6 +18,10 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
@@ -34,10 +38,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: docker/Dockerfile-debian
-          build-args: STAGE=deps
+          file: docker/Dockerfile-test
           tags: localhost:5000/orion-ld-test:latest
 
       - name: Run unit test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts localhost:5000/orion-ld-test:latest build.sh -s unit -dqt
+          docker run --rm -v $(pwd):/opt/orion --network host -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s unit -dqt
