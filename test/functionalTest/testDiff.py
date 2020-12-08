@@ -125,5 +125,6 @@ def main():
     diff_files(options.input_file, options.ref_file)
 
 
+
 if __name__ == "__main__":
     main()

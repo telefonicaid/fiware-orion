@@ -513,7 +513,7 @@ Date: REGEX(.*)
 ============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 194
+Content-Length: 161
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -527,10 +527,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
             "A1": {
                 "metadata": {
                     "M1": {
-                        "type": "Number", 
-                        "value": 3
-                    }, 
-                    "M2": {
                         "type": "Number", 
                         "value": 3
                     }
