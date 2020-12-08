@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // tenantV, tenants
 #include "orionld/temporal/temporalTenantInitialise.h"         // temporalTenantInitialise
+#include "orionld/temporal/pgDatabasePrepare.h"                // pgDatabasePrepare
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
 
 
@@ -49,5 +50,7 @@ void orionldTenantCreate(char* tenant)
 
   tenantV[tenants++] = strdup(tenant);
 
-  temporalTenantInitialise(tenant);
+  temporalTenantInitialise(tenant);  // FIXME: to be removed
+
+  pgDatabasePrepare(tenant);
 }

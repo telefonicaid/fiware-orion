@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin, Chandra Challagonda
 */
+#include <postgresql/libpq-fe.h>                               // Postgres
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -30,6 +32,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/temporal/temporal.h"                         // TEMPORAL_DB, TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD
 #include "orionld/temporal/temporalTenantInitialise.h"         // Own interface
 
 

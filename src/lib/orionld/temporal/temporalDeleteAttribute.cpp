@@ -20,13 +20,12 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Chandra Challagonda
+* Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccNotImplemented
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
@@ -41,7 +40,7 @@
 bool temporalDeleteAttribute(ConnectionInfo* ciP)
 {
   LM_E(("Not Implemented"));
-  orionldState.httpStatusCode  = SccNotImplemented;
+  orionldState.httpStatusCode  = 501;
   orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
   orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
 

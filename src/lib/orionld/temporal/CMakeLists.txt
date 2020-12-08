@@ -21,6 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    temporalInit.cpp
     temporalDeleteAttribute.cpp
     temporalDeleteEntity.cpp
     temporalPatchAttribute.cpp
@@ -34,9 +35,26 @@ SET (SOURCES
     temporalTenantInitialise.cpp
     temporalCommon.cpp
     geoPropertyExtract.cpp
+    pgInit.cpp
+    pgConnectionGet.cpp
+    pgConnectionRelease.cpp
+    pgDatabaseCreate.cpp
+    pgDatabasePrepare.cpp
+    pgDatabaseTableExists.cpp
+    pgDatabaseTableCreateAll.cpp
+    pgTransactionBegin.cpp
+    pgTransactionCommit.cpp
+    pgTransactionRollback.cpp
+    pgEntityTreat.cpp
+    pgEntityPush.cpp
+    pgAttributeTreat.cpp
+    pgAttributePush.cpp
+    pgSubAttributePush.cpp
+    pgRelationshipPush.cpp
 )
 
 SET (HEADERS
+    temporalInit.h
     temporalDeleteAttribute.h
     temporalDeleteEntity.h
     temporalPatchAttribute.h
@@ -47,8 +65,25 @@ SET (HEADERS
     temporalPostBatchUpsert.h
     temporalPostEntities.h
     temporalPostEntity.h
-    temporalTenantInitialise.cpp
+    temporalTenantInitialise.h
     temporalCommon.h
+    geoPropertyExtract.h
+    pgInit.h
+    pgConnectionGet.h
+    pgConnectionRelease.h
+    pgDatabaseCreate.h
+    pgDatabasePrepare.h
+    pgDatabaseTableExists.h
+    pgDatabaseTableCreateAll.h
+    pgTransactionBegin.h
+    pgTransactionCommit.h
+    pgTransactionRollback.h
+    pgEntityTreat.h
+    pgEntityPush.h
+    pgAttributeTreat.h
+    pgAttributePush.h
+    pgSubAttributePush.h
+    pgRelationshipPush.h
 )
 
 

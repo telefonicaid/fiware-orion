@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/temporal/temporal.h"                           // Defines
 #include "orionld/temporal/temporalCommon.h"                     // Temporal common
 #include "orionld/temporal/geoPropertyExtract.h"                 // geoPropertyExtract
 #include "orionld/temporal/temporalTenantInitialise.h"           // Postgres db functions
@@ -1044,15 +1045,3 @@ bool TemporalPgTenantDBConnectorOpen(const char* tenant)
 
 
 
-// -----------------------------------------------------------------------------
-//
-// temporalInit -
-//
-int temporalInit(void)
-{
-  LM_TMP(("TEMP: Calling temporalTenantInitialise"));
-  temporalTenantInitialise("orion_ld");
-  LM_TMP(("TEMP: After temporalTenantInitialise"));
-
-  return 0;
-}

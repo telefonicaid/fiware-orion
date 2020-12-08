@@ -114,7 +114,7 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 #include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
-#include "orionld/temporal/temporalCommon.h"                // temporalInit
+#include "orionld/temporal/temporalInit.h"                  // temporalInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -1096,7 +1096,10 @@ int main(int argC, char* argV[])
   // initialization routines of mongodb - if postgres is not initialized, this will fail.
   //
   if (temporal)
-    temporalInit();
+  {
+    if (temporalInit() == false)
+      LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
+  }
 
   //
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,

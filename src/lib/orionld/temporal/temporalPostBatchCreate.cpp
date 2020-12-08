@@ -20,8 +20,10 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Chandra Challagonda
+* Author: Ken Zangelin
 */
+#include <postgresql/libpq-fe.h>                               // PGconn
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
@@ -37,8 +39,36 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
-#include "orionld/temporal/temporalCommon.h"                   // temporalEntityExtract, TemporalConstructInsertSQLStatement
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
+#include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
+#include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
+#include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
+#include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalEntityArrayExpand -
+//
+void temporalEntityArrayExpand(KjNode* tree)
+{
+  for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    for (KjNode* nodeP = entityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      if (strcmp(nodeP->name, "type") == 0)
+        nodeP->value.s = orionldContextItemExpand(orionldState.contextP, nodeP->value.s, true, NULL);
+      else if (strcmp(nodeP->name, "id")       == 0) {}
+      else if (strcmp(nodeP->name, "location") == 0) {}
+      else
+        nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, true, NULL);
+    }
+  }
+}
 
 
 
@@ -48,7 +78,51 @@ extern "C"
 //
 bool temporalPostBatchCreate(ConnectionInfo* ciP)
 {
-	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
+  PGconn* connectionP;
 
-	return TemporalConstructInsertSQLStatement(dbAllTables, false);  // FIXME: wish it was this easy ...
+  //
+  // FIXME: the tree should be served expanded + with erroneous entities removed
+  //
+
+
+  // Expanding entity types and attribute names - FIXME: Remove ...
+  temporalEntityArrayExpand(orionldState.requestTree);
+
+  // FIXME: Implement orionldState.dbName
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
+
+  connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
+
+  if (pgTransactionBegin(connectionP) != true)
+    LM_RE(false, ("pgTransactionBegin failed"));
+
+  bool ok = true;
+  for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
+    if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString) == false)
+    {
+      ok = false;
+      break;
+    }
+  }
+
+  if (ok == false)
+  {
+    LM_E(("Database Error (batch create temporal layer failed)"));
+    if (pgTransactionRollback(connectionP) == false)
+      LM_RE(false, ("pgTransactionRollback failed"));
+  }
+  else
+  {
+    if (pgTransactionCommit(connectionP) != true)
+      LM_RE(false, ("pgTransactionCommit failed"));
+  }
+
+  pgConnectionRelease(connectionP);
+
+  return true;
 }

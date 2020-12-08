@@ -114,7 +114,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   KjNode*  cloneP         = NULL;  // Only for temporal
 
   //
-  // FIXME: Entity ID and TYPE are removed from the objects - need thim for temporal
+  // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
   //        Rather than cloning the entire tree, just put them back again after processing
   //
   if (temporal)

@@ -38,7 +38,6 @@ extern "C"
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
 #include "common/string.h"                                       // FT
@@ -687,6 +686,23 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 
 // -----------------------------------------------------------------------------
 //
+// numberToDate - FIXME: move to orionld/common
+//
+static bool numberToDate(double timestamp, char* date, int dateLen)
+{
+  struct tm  tm;
+  time_t     fromEpoch = timestamp;
+
+  gmtime_r(&fromEpoch, &tm);
+  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
@@ -1018,6 +1034,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
     {
+      numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
+
       LM_TMP(("TMPF: Calling Temporal Routine!"));
       orionldState.serviceP->temporalRoutine(ciP);
       LM_TMP(("TMPF: After Temporal Routine!"));
