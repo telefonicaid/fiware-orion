@@ -195,6 +195,7 @@ int             contextDownloadAttempts;
 int             contextDownloadTimeout;
 bool            temporal;
 bool            disableFileLog;
+bool            lmtmp;
 
 
 
@@ -258,6 +259,8 @@ bool            disableFileLog;
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define TEMPORAL_DESC          "enable temporal evolution of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
+#define TMPTRACES_DESC         "disable LM_TMP traces"
+
 
 
 /* ****************************************************************************
@@ -320,6 +323,7 @@ PaArgument paArgs[] =
   { "-ctxTimeout",            &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,     PaOpt,  5000,            0,      20000,            CTX_TMO_DESC           },
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC           },
   { "-temporal",              &temporal,                "TEMPORAL",                  PaBool,    PaOpt,  false,           false,  true,             TEMPORAL_DESC          },
+  { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC         },
 
   PA_END_OF_ARGS
 };
