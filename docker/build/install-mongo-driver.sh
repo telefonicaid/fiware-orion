@@ -30,3 +30,16 @@ cd ${ROOT_FOLDER}/mongo-cxx-driver
 scons --disable-warnings-as-errors --use-sasl-client --ssl
 scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
 cd ${ROOT_FOLDER} && rm -Rf mongo-cxx-driver
+
+echo
+echo -e "\e[1;32m Debian Builder: check systemd \e[0m"
+apt-get -y install --reinstall systemd  # force reinstall systemd
+service dbus start
+
+echo
+echo -e "\e[1;32m Builder: installing mongo \e[0m"
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+
+echo 'deb [ arch=amd64 ] https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main' > /etc/apt/sources.list.d/mongodb.list
+apt-get -y update
+apt-get -y install mongodb-org mongodb-org-shell

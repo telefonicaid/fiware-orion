@@ -22,32 +22,8 @@
 
 set -e
 
-BUILD_DEPS=(
- 'libboost-all-dev' \
- 'libcurl4-openssl-dev' \
- 'libgcrypt-dev' \
- 'libgnutls28-dev' \
- 'libsasl2-dev' \
- 'libssl-dev' \
- 'uuid-dev' \
-)
-
-BUILD_TOOLS=(
- 'apt-transport-https' \
- 'bzip2' \
- 'ca-certificates' \
- 'cmake' \
- 'curl' \
- 'wget' \
- 'dirmngr' \
- 'g++' \
- 'gcc' \
- 'git' \
- 'gnupg' \
- 'make' \
- 'scons' \
-)
-
-apt-get -y install -f --no-install-recommends \
-    ${BUILD_TOOLS[@]} \
-    ${BUILD_DEPS[@]}
+apt-get update && apt-get install -y lsb-release && apt-get clean all
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
+apt-get update
+apt-get -y install postgresql-12 postgresql-client-12
