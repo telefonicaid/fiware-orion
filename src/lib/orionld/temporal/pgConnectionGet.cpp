@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/temporal/temporal.h"                         // TEMPORAL_DB, TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD
+#include "orionld/common/orionldState.h"                       // troeHost, troePort, troeUser, troePwd
 #include "orionld/temporal/pgConnectionGet.h"                  // Own interface
 
 
@@ -58,13 +58,16 @@
 PGconn* pgConnectionGet(const char* dbName)
 {
   // FIXME: connection pool: lookup a free connection to 'dbName' ...
+  char port[16];
 
-  const char*  keywords[]   = { "host",      "port", "user",            "password",           "dbname", NULL };
-  const char*  values[]     = { "localhost", "5432",  TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, dbName, NULL   };
-  PGconn*      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname: https://www.postgresql.org/docs/12/libpq-connect.html
+  snprintf(port, sizeof(port), "%d", troePort);
+
+  const char*  keywords[]   = { "host",   "port",   "user",   "password",  "dbname", NULL };
+  const char*  values[]     = { troeHost, port,     troeUser, troePwd,     dbName,   NULL };
+  PGconn*      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
 
   if (connectionP == NULL)
-    LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", "localhost", 5432, TEMPORAL_DB_USER, TEMPORAL_DB_PASSWORD, dbName));
+    LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, dbName));
 
   return connectionP;
 }
