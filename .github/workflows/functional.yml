@@ -50,7 +50,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_0_450 -dqt
+          docker run --network host -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_0_450 -dqt
 
   functional-part2:
     runs-on: ubuntu-latest
@@ -60,6 +60,10 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+      postgres:
+        image: postgres:12
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v2
@@ -82,7 +86,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_451_700 -dqt
+          docker run --network host -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_451_700 -dqt
 
   functional-part3:
     runs-on: ubuntu-latest
