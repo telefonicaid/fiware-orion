@@ -50,7 +50,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --network host -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_0_450 -dqt
+          docker run -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_0_450 -dqt
 
   functional-part2:
     runs-on: ubuntu-latest
