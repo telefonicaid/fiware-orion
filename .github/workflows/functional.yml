@@ -24,6 +24,10 @@ jobs:
         ports:
           - 1883:1883
           - 9001:9001
+      postgres:
+        image: postgres:12
+        ports:
+          - 5432-5432
 
     steps:
       - uses: actions/checkout@v2
