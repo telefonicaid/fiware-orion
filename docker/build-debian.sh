@@ -193,7 +193,6 @@ echo
 # postgres
 #
 echo -e "\e[1;32m Builder: installing postgres dev library \e[0m"
-
 apt-get install -y libpq-dev
 
 ldconfig
