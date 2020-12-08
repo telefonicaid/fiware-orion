@@ -30,11 +30,6 @@ brokerStart CB 0-255
 accumulatorStart --pretty-print
 
 --SHELL--
-#
-# FIXME: There is a bug in the notifications triggered by PATCH /ngsi-ld/v1/entities/{EID}/attrs
-#        and the step 06 compensates for this bug.
-#        Once the issue #559 is fixed, this functest will start failing and must be modified
-#
 # 01. Create an entity E1 with properties A1 and A2
 # 02. Create a subscription matching E1
 # 03. Update the E1 property A1
@@ -254,7 +249,7 @@ Date: REGEX(.*)
 ============================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 360
+Content-Length: 309
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -266,10 +261,6 @@ Content-Type: application/json; charset=utf-8
     "data": [
         {
             "A1": {
-                "PP1": {
-                    "type": "Property", 
-                    "value": "A1::PP1 Step 1"
-                }, 
                 "type": "Property", 
                 "value": "A1 Step 3"
             }, 
