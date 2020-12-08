@@ -193,8 +193,11 @@ echo
 # postgres
 #
 echo -e "\e[1;32m Builder: installing postgres dev library \e[0m"
-apt-get install -y libpq-dev
-apt install -y postgresql postgresql-contrib
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+apt-get update
+apt-get -y install postgresql-12 libpq-dev postgresql-client-12
+
 
 ldconfig
 
