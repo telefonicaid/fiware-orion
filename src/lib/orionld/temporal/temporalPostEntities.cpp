@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Chandra Challagonda
+* Author: Ken Zangelin
 */
 extern "C"
 {
@@ -33,12 +33,10 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccNotImplemented
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
-#include "orionld/temporal/temporalCommon.h"                   // Common db functions for temporal
 
 
 
@@ -48,30 +46,11 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-	/* if (oldPgDbConnection == NULL)
-	{
-		if (TemporalPgDBConnectorOpen() == true)
-		{
-			if (TemporalPgTenantDBConnectorOpen(TEMPORAL_DB) == false)
-			{
-				LM_E(("Database Error (connection to tenant db is not successful with error '%s')", PQerrorMessage(oldPgDbConnection)));
-				return false;
-			}
-		}
-		else
-		{
-			LM_E(("Database Error (error opening db connection: %s)", PQerrorMessage(oldPgDbConnection)));
-			return false;
-		}
-	} */
+  LM_E(("Not Implemented"));
 
-	OrionldTemporalDbAllTables* dbAllTables = temporalEntityExtract();
+  orionldState.httpStatusCode = 501;
+  orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
+  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
 
-	if (TemporalConstructInsertSQLStatement(dbAllTables, false) == false)
-	{
-    LM_E(("Database Error (unable to insert db tables: %s)", PQerrorMessage(oldPgDbConnection)));
-		return false;
-	}
-
-	return true;
+	return false;
 }

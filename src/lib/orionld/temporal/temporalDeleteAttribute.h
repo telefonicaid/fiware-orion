@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin, Chandra Challagonda
+* Author: Ken Zangelin
 */
 #include <postgresql/libpq-fe.h>                               // For Postgres
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo

@@ -20,13 +20,12 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Chandra Challagonda & Ken Zangelin
+* Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // dbName
-#include "orionld/temporal/temporalTenantInitialise.h"         // temporalTenantInitialise
 #include "orionld/temporal/pgInit.h"                           // pgInit
 #include "orionld/temporal/temporalInit.h"                     // Own interface
 
@@ -38,9 +37,6 @@
 //
 bool temporalInit(void)
 {
-  //  temporalTenantInitialise("orion_ld");  // FIXME: Remove
-
-  LM_TMP(("PGINIT: Calling pgInit(%s)", dbName));
   if (pgInit(dbName) == false)
     LM_RE(false, ("Database Error (pgInit(%s) failed)", dbName));
 
