@@ -196,6 +196,10 @@ int             contextDownloadTimeout;
 bool            temporal;
 bool            disableFileLog;
 bool            lmtmp;
+char            troeHost[64];
+unsigned short  troePort;
+char            troeUser[64];
+char            troePwd[64];
 
 
 
@@ -260,6 +264,10 @@ bool            lmtmp;
 #define TEMPORAL_DESC          "enable temporal evolution of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define TMPTRACES_DESC         "disable LM_TMP traces"
+#define TROE_HOST_DESC         "host for temporal database db server"
+#define TROE_PORT_DESC         "port for temporal database db server"
+#define TROE_HOST_USER         "username for temporal database db server"
+#define TROE_HOST_PWD          "password for temporal database db server"
 
 
 
@@ -324,6 +332,10 @@ PaArgument paArgs[] =
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC           },
   { "-temporal",              &temporal,                "TEMPORAL",                  PaBool,    PaOpt,  false,           false,  true,             TEMPORAL_DESC          },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC         },
+  { "-troeHost",              troeHost,                 "TROE_HOST",                 PaString,  PaOpt,  _i "localhost",  PaNL,   PaNL,             TROE_HOST_DESC         },
+  { "-troePort",              &troePort,                "TROE_PORT",                 PaInt,     PaOpt,  5432,            PaNL,   PaNL,             TROE_PORT_DESC         },
+  { "-troeUser",              troeUser,                 "TROE_USER",                 PaString,  PaOpt,  _i "postgres",   PaNL,   PaNL,             TROE_HOST_USER         },
+  { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD          },
 
   PA_END_OF_ARGS
 };

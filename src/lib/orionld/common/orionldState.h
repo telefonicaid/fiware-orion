@@ -305,6 +305,10 @@ extern char*             tenant;                   // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
 extern bool              temporal;                 // From orionld.cpp
+extern char              troeHost[64];             // From orionld.cpp
+extern unsigned short    troePort;                 // From orionld.cpp
+extern char              troeUser[64];             // From orionld.cpp
+extern char              troePwd[64];              // From orionld.cpp
 extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;
