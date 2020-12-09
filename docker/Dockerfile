@@ -10,7 +10,7 @@ COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
 
-RUN  if [ "$DEBUG" = 'true' ] ; then make debug install ; else make release install ; fi
+RUN  if [ "$DEBUG" = "true" ] ; then make debug install ; else make release install ; fi
 
 RUN strip /usr/bin/orionld
 
