@@ -17,3 +17,5 @@
 * Issue  #599   Entities are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Relationship attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   String Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Integer Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Float Property attributes are correctly inserted into the postgres table for temporal representation of entities
