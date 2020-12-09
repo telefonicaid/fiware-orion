@@ -18,6 +18,7 @@ FROM debian:stretch-slim
 
 RUN mkdir -p /var/{log,run}/orionld
 
+COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
 COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/bin/orionld /usr/bin/orionld
