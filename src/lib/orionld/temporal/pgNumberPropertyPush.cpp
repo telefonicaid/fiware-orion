@@ -28,19 +28,18 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/temporal/pgStringPropertyPush.h"             // Own interface
+#include "orionld/temporal/pgNumberPropertyPush.h"             // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgStringPropertyPush - push a String Property to its DB table
+// pgNumberPropertyPush - push a Number Property to its DB table
 //
-bool pgStringPropertyPush
+bool pgNumberPropertyPush
 (
   PGconn*      connectionP,
-  const char*  valueType,
-  const char*  value,
+  double       numberValue,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
@@ -67,37 +66,36 @@ bool pgStringPropertyPush
     unitCodeString = unitCodeStringV;
   }
 
-  LM_TMP(("PUSH: valueType: %s", valueType));
   //
   // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
   //
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, text, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subPropertiesString, datasetId, value, unitCodeString);
+             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, text, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, valueType, subPropertiesString, value, unitCodeString);
+             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, numberValue, unitCodeString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, text, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, valueType, subPropertiesString, datasetId, value, unitCodeString);
+             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, text, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subPropertiesString, value, unitCodeString);
+             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, numberValue, unitCodeString);
   }
 
 
@@ -109,7 +107,7 @@ bool pgStringPropertyPush
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
   else
-    LM_TMP(("SQL: DB operation to insert a String Property seems to have worked"));
+    LM_TMP(("SQL: DB operation to insert a Number Property seems to have worked"));
 
   return true;
 }

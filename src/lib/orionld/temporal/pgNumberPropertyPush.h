@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGPROPERTYPUSH_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGPROPERTYPUSH_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGNUMBERPROPERTYPUSH_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGNUMBERPROPERTYPUSH_H_
 
 /*
 *
@@ -31,13 +31,12 @@
 
 // -----------------------------------------------------------------------------
 //
-// pgStringPropertyPush - push a string property to its DB table
+// pgNumberPropertyPush - push a Number Property to its DB table
 //
-extern bool pgStringPropertyPush
+extern bool pgNumberPropertyPush
 (
   PGconn*      connectionP,
-  const char*  valueType,    // "Relationship", "String", "Array", "Object", "DateTime"
-  const char*  value,
+  double       numberValue,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
@@ -50,4 +49,4 @@ extern bool pgStringPropertyPush
   const char*  unitCode
 );
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGPROPERTYPUSH_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGNUMBERPROPERTYPUSH_H_
