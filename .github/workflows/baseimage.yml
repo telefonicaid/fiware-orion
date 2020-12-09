@@ -6,8 +6,6 @@ name: Deploy Baseimage
 
 on:
   push:
-    branches:
-      - develop
     paths:
       - docker/**
 
@@ -17,7 +15,7 @@ env:
 jobs:
   deploy:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: github.event_name == 'push'
 
     steps:
