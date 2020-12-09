@@ -64,6 +64,6 @@ jobs:
         with:
           push: true
           build-args: |
-            DEBUG='true'
+            DEBUG=true
           tags: ${{ env.DEBUG_IMAGE_NAME }}
           file: docker/Dockerfile
