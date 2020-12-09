@@ -43,4 +43,4 @@ jobs:
 
       - name: Run unit test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s unit -dqt
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s unit -dqt
