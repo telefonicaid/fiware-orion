@@ -12,7 +12,7 @@ env:
 jobs:
   deploy-release:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: github.event_name == 'push'
 
     steps:
@@ -40,7 +40,7 @@ jobs:
 
   deploy-debug:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: github.event_name == 'push'
 
     steps:

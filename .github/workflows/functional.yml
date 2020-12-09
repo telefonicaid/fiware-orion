@@ -12,7 +12,7 @@ env:
 
 jobs:
   functional-part1:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -56,7 +56,7 @@ jobs:
           docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_450 -dqt
 
   functional-part2:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -91,7 +91,7 @@ jobs:
           docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_451_700 -dqt
 
   functional-part3:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -122,7 +122,7 @@ jobs:
           docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_701_1000 -dqt
 
   functional-part4:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
