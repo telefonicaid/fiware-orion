@@ -94,5 +94,9 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-ctxTimeout' <Timeout in milliseconds for downloading of contexts>]
                 [option '-ctxAttempts' <Number of attempts for downloading of contexts>]
                 [option '-temporal' (enable temporal evolution of entities)]
+                [option '-troeHost' <host for temporal database db server>]
+                [option '-troePort' <port for temporal database db server>]
+                [option '-troeUser' <username for temporal database db server>]
+                [option '-troePwd' <password for temporal database db server>]
 
 --TEARDOWN--
