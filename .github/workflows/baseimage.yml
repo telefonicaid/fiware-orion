@@ -6,8 +6,6 @@ name: Deploy Baseimage
 
 on:
   push:
-    branches:
-      - develop
     paths:
       - docker/**
 
