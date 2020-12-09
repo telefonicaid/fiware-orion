@@ -90,6 +90,11 @@ int           contextDownloadTimeout  = 10000;
 bool          temporal                = false;
 bool          multitenancy            = false;
 bool          lmtmp                   = false;
+char            troeHost[64];
+unsigned short  troePort;
+char            troeUser[64];
+char            troePwd[64];
+
 
 
 /* ****************************************************************************
