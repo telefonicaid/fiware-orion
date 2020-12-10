@@ -1,7 +1,7 @@
 FROM fiware/orion-ld-base AS build-stage
 
 ARG PATH_TO_SRC='opt/orion/'
-ARG DEBUG='false'
+ARG DEBUG=false
 
 RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
 RUN rm -r /usr/local/lib/
@@ -18,10 +18,11 @@ FROM debian:stretch-slim
 
 RUN mkdir -p /var/{log,run}/orionld
 
+COPY --from=build-stage /etc/ssl/ /etc/ssl/
 COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
 COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
 COPY --from=build-stage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
-COPY --from=build-stage /usr/bin/orionld /usr/bin/orionld
+COPY --from=build-stage /usr/bin/ /usr/bin/
 
 ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
