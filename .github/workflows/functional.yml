@@ -87,7 +87,11 @@ jobs:
           push: true
           file: docker/Dockerfile-test
           tags: ${{ env.IMAGE_NAME }}
-
+      
+      - name: Run test
+        run: |
+          docker run --rm -t --entrypoint bash ${{ env.IMAGE_NAME }} ls /usr/share/postgresql/12/extension/
+      
       - name: Run functional test
         run: |
           docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_469_469 -dqt
