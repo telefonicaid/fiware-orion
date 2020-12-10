@@ -65,6 +65,8 @@ jobs:
           - 5000:5000
       postgres:
         image: postgres:12
+        env:
+          POSTGRES_PASSWORD: password 
         ports:
           - 5432:5432
 
