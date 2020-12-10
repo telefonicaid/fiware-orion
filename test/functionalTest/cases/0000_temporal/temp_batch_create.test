@@ -53,6 +53,17 @@ payload='[
       "type": "Property",
       "value": 3.14
     },
+    "Object": {
+      "type": "Property",
+      "value": {
+        "A": 1,
+        "vec": [ 1, 2, 3 ]
+      }
+    },
+    "Array": {
+      "type": "Property",
+      "value": [ "S1", "S2", "S3" ]
+    },
     "R1": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:relationships:R1"
@@ -135,6 +146,8 @@ id,valuetype,entityid,subproperty,unitcode,datasetid,text,number
 https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,f,,,SP of E1,
 https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,,,,1
 https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14
+https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,"{""A"":1,""vec"":[1,2,3]}",
+https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,"[""S1"",""S2"",""S3""]",
 https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,
 https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E2,f,,,SP of E2,
 https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:relationships:R1,

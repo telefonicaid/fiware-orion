@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildRemove
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -38,7 +39,8 @@ extern "C"
 #include "orionld/temporal/pgRelationshipPush.h"               // pgRelationshipPush
 #include "orionld/temporal/pgStringPropertyPush.h"             // pgStringPropertyPush
 #include "orionld/temporal/pgNumberPropertyPush.h"             // pgNumberPropertyPush
-#include "orionld/temporal/pgEntityPush.h"                     // Own interface
+#include "orionld/temporal/pgCompoundPropertyPush.h"           // pgCompoundPropertyPush
+#include "orionld/temporal/pgAttributeTreat.h"                 // Own interface
 
 
 
@@ -121,11 +123,14 @@ bool pgAttributeTreat
     if (pgNumberPropertyPush(connectionP, valueNodeP->value.f, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
       LM_RE(false, ("pgIntPropertyPush failed"));
   }
+  else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
+  {
+     if (pgCompoundPropertyPush(connectionP, valueNodeP, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+      LM_RE(false, ("pgCompoundPropertyPush failed"));
+  }
 #if 0
   else if (strcmp(type, "GeoProperty") == 0)
     pgGeoPropertyTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
-  else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
-    pgCompoundPropertyPush(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
   else if (valueNodeP->type == KjFloat)
     pgFloatPropertyPush(connectionP, valueNodeP->value.f, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
   else if (valueNodeP->type == KjBool)
