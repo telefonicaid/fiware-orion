@@ -208,19 +208,6 @@ echo -n "Builder: status:
     USER=${ORION_USER}
 "
 
-if [[ "${STAGE}" == 'release' || "${STAGE}" == 'deps' ]]; then
-    echo "Builder: checking token"
-    if [[ -z "${TOKEN}" ]]; then
-        echo "Builder: failed, TOKEN is not set"
-        exit 1
-    fi
-
-    echo "Builder: building starts for OS $OS"
-    build-${OS}.sh
-    echo "Builder: building ended"
-    exit 0
-fi
-
 # ===================================== MONGO ==========================================================================
 if [[ -n "${DATABASE}" && ! "$(pidof mongod)" ]]; then
 

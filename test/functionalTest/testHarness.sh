@@ -205,31 +205,6 @@ function vMsg()
 }
 
 
-
-# -----------------------------------------------------------------------------
-#
-# If in TRAVIS, a few functests must be disabled
-#
-if [ "$TRAVIS" != "" ]
-then
-    echo "==========================================================================================="
-    echo "==                                                                                       =="
-    echo "==    RUNNING INSIDE TRAVIS                                                              =="
-    echo "==                                                                                       =="
-    echo "==========================================================================================="
-    CB_SKIP_FUNC_TESTS="0000_large_requests/notification_different_sizes.test"
-    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0000_ipv6_support/ipv4_ipv6_both.test"
-    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0706_direct_https_notifications/direct_https_notifications.test"
-    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test"
-    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 2015_notification_templates/notification_templates_cache_refresh.test"
-    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 2015_notification_templates/notification_templates_many_notifications.test"
-    CB_SKIP_FUNC_TESTS=$CB_SKIP_FUNC_TESTS" 0000_ngsild/ngsild_subscription_with_mqtt_notification_01.test"
-    echo TRAVIS: $TRAVIS
-    echo TRAVIS run skips tests $CB_SKIP_FUNC_TESTS
-fi
-
-
-
 # -----------------------------------------------------------------------------
 #
 # exitFunction
@@ -248,7 +223,7 @@ function exitFunction()
   logMsg "FAILURE $exitCode for test $testFile: $errorText"
   echo -n "(FAILURE $exitCode - $errorText) "
 
-  if [ "$TRAVIS" != "" ] || [ "$loud" == "on" ]
+  if [ "$CB_FT_VERBOSE" != "" ] || [ "$loud" == "on" ]
   then
       #
       # Error 9 - output not as expected

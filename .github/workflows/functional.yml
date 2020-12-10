@@ -12,7 +12,7 @@ env:
 
 jobs:
   functional-part1:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -24,6 +24,10 @@ jobs:
         ports:
           - 1883:1883
           - 9001:9001
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
@@ -40,16 +44,15 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: docker/Dockerfile-debian
-          build-args: STAGE=deps
+          file: docker/Dockerfile-test
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --network host --entrypoint bash -e loud=on -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}'  -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_0_450 -dqt
+          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_0_450 -dqt
 
   functional-part2:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -72,16 +75,15 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: docker/Dockerfile-debian
-          build-args: STAGE=deps
+          file: docker/Dockerfile-test
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_451_700 -dqt
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_451_700 -dqt
 
   functional-part3:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -104,16 +106,15 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: docker/Dockerfile-debian
-          build-args: STAGE=deps
+          file: docker/Dockerfile-test
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_701_1000 -dqt
+          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_701_1000 -dqt
 
   functional-part4:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       registry:
@@ -136,10 +137,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: docker/Dockerfile-debian
-          build-args: STAGE=deps
+          file: docker/Dockerfile-test
           tags: ${{ env.IMAGE_NAME }}
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/orion --entrypoint bash -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} build.sh -s functional_1001_1400 -dqt
+          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_1001_1400 -dqt
