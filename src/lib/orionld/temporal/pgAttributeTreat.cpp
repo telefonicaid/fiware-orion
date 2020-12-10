@@ -36,6 +36,8 @@ extern "C"
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/temporal/pgRelationshipPush.h"               // pgRelationshipPush
+#include "orionld/temporal/pgStringPropertyPush.h"             // pgStringPropertyPush
+#include "orionld/temporal/pgNumberPropertyPush.h"             // pgNumberPropertyPush
 #include "orionld/temporal/pgEntityPush.h"                     // Own interface
 
 
@@ -68,7 +70,7 @@ bool pgAttributeTreat
 
   char     instanceId[64];
   char*    id         = attrP->name;
-//  char*    unitCode   = NULL;
+  char*    unitCode   = NULL;
   char*    datasetId  = NULL;
   char*    observedAt = NULL;
   KjNode*  valueNodeP = NULL;
@@ -89,8 +91,8 @@ bool pgAttributeTreat
       valueNodeP = subAttrP;
     else if (strcmp(subAttrP->name, "object") == 0)
       valueNodeP = subAttrP;
-//    else if (strcmp(subAttrP->name, "unitCode") == 0)
-//      unitCode = subAttrP->value.s;
+    else if (strcmp(subAttrP->name, "unitCode") == 0)
+      unitCode = subAttrP->value.s;
     else
     {
       subAttrs = true;
@@ -98,24 +100,36 @@ bool pgAttributeTreat
     }
   }
 
+
   if (strcmp(type, "Relationship") == 0)
   {
     if (pgRelationshipPush(connectionP, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
       LM_RE(false, ("pgRelationshipPush failed"));
   }
+  else if (valueNodeP->type == KjString)
+  {
+    if (pgStringPropertyPush(connectionP, "String", valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+      LM_RE(false, ("pgStringPropertyPush failed"));
+  }
+  else if (valueNodeP->type == KjInt)
+  {
+    if (pgNumberPropertyPush(connectionP, valueNodeP->value.i, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+      LM_RE(false, ("pgIntPropertyPush failed"));
+  }
+  else if (valueNodeP->type == KjFloat)
+  {
+    if (pgNumberPropertyPush(connectionP, valueNodeP->value.f, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+      LM_RE(false, ("pgIntPropertyPush failed"));
+  }
 #if 0
   else if (strcmp(type, "GeoProperty") == 0)
-    pgGeoPropertyValueTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt);
-  else if (valueNodeP->type == KjString)
-    pgStringPropertyValueTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt);
+    pgGeoPropertyTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
   else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
-    pgCompoundPropertyValueTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt);
+    pgCompoundPropertyPush(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
   else if (valueNodeP->type == KjFloat)
-    pgFloatPropertyValueTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt);
-  else if (valueNodeP->type == KjInt)
-    pgIntPropertyValueTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt);
+    pgFloatPropertyPush(connectionP, valueNodeP->value.f, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
   else if (valueNodeP->type == KjBool)
-    pgBoolPropertyValueTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt);
+    pgBoolPropertyPush(connectionP, valueNodeP->value.b, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
 #endif
   else
     return true;

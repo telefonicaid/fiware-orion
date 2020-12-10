@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2020 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -51,6 +51,8 @@ SET (SOURCES
     pgAttributePush.cpp
     pgSubAttributePush.cpp
     pgRelationshipPush.cpp
+    pgStringPropertyPush.cpp
+    pgNumberPropertyPush.cpp
 )
 
 SET (HEADERS
@@ -84,6 +86,7 @@ SET (HEADERS
     pgAttributePush.h
     pgSubAttributePush.h
     pgRelationshipPush.h
+    pgNumberPropertyPush.h
 )
 
 
