@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/temporal/pgStringPropertyPush.h"             // pgStringPropertyPush
 #include "orionld/temporal/pgNumberPropertyPush.h"             // pgNumberPropertyPush
 #include "orionld/temporal/pgCompoundPropertyPush.h"           // pgCompoundPropertyPush
+#include "orionld/temporal/pgBoolPropertyPush.h"               // pgBoolPropertyPush
 #include "orionld/temporal/pgAttributeTreat.h"                 // Own interface
 
 
@@ -110,7 +111,7 @@ bool pgAttributeTreat
   }
   else if (valueNodeP->type == KjString)
   {
-    if (pgStringPropertyPush(connectionP, "String", valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+    if (pgStringPropertyPush(connectionP, "String", valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
       LM_RE(false, ("pgStringPropertyPush failed"));
   }
   else if (valueNodeP->type == KjInt)
@@ -125,16 +126,17 @@ bool pgAttributeTreat
   }
   else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
   {
-     if (pgCompoundPropertyPush(connectionP, valueNodeP, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+     if (pgCompoundPropertyPush(connectionP, valueNodeP, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
       LM_RE(false, ("pgCompoundPropertyPush failed"));
+  }
+  else if (valueNodeP->type == KjBoolean)
+  {
+    if (pgBoolPropertyPush(connectionP, valueNodeP->value.b, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+      LM_RE(false, ("pgBoolPropertyPush failed"));
   }
 #if 0
   else if (strcmp(type, "GeoProperty") == 0)
     pgGeoPropertyTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
-  else if (valueNodeP->type == KjFloat)
-    pgFloatPropertyPush(connectionP, valueNodeP->value.f, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
-  else if (valueNodeP->type == KjBool)
-    pgBoolPropertyPush(connectionP, valueNodeP->value.b, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
 #endif
   else
     return true;

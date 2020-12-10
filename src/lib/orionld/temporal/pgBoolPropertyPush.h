@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGCOMPOUNDPROPERTYPUSH_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_PGCOMPOUNDPROPERTYPUSH_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGBOOLPROPERTYPUSH_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGBOOLPROPERTYPUSH_H_
 
 /*
 *
@@ -27,21 +27,16 @@
 */
 #include <postgresql/libpq-fe.h>                                 // PGconn
 
-extern "C"
-{
-#include "kjson/KjNode.h"                                      // KjNode
-}
-
 
 
 // -----------------------------------------------------------------------------
 //
-// pgCompoundPropertyPush - push a Compound Property to its DB table
+// pgBoolPropertyPush - push a bool property to its DB table
 //
-extern bool pgCompoundPropertyPush
+extern bool pgBoolPropertyPush
 (
   PGconn*      connectionP,
-  KjNode*      compoundValueNodeP,
+  bool         value,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
@@ -53,4 +48,4 @@ extern bool pgCompoundPropertyPush
   bool         subProperties
 );
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGCOMPOUNDPROPERTYPUSH_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGBOOLPROPERTYPUSH_H_

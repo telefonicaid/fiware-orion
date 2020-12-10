@@ -56,8 +56,7 @@ bool pgCompoundPropertyPush
   const char*  observedAt,
   const char*  createdAt,
   const char*  modifiedAt,
-  bool         subProperties,
-  const char*  unitCode
+  bool         subProperties
 )
 {
   int          renderedValueSize   = 4 * 1024;
