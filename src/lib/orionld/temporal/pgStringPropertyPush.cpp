@@ -67,7 +67,6 @@ bool pgStringPropertyPush
     unitCodeString = unitCodeStringV;
   }
 
-  LM_TMP(("PUSH: valueType: %s", valueType));
   //
   // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
   //
