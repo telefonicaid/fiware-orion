@@ -52,5 +52,5 @@ bool temporalPostEntities(ConnectionInfo* ciP)
   orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
   orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
 
-	return false;
+  return false;
 }

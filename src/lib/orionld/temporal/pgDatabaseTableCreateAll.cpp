@@ -85,7 +85,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "datetime        TIMESTAMP,"
     "geo             GEOMETRY,"
     "unitCode        TEXT)";
-    
+
   const char* valueTypeSql = "CREATE TYPE ValueType AS ENUM("
     "'String',"
     "'Number',"

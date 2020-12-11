@@ -34,4 +34,3 @@ void pgConnectionRelease(PGconn* connectionP)
 {
   PQfinish(connectionP);
 }
-  

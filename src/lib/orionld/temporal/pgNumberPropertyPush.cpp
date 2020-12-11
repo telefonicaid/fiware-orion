@@ -49,7 +49,7 @@ bool pgNumberPropertyPush
   const char*  createdAt,
   const char*  modifiedAt,
   bool         subProperties,
-  const	char*  unitCode
+  const char*  unitCode
 )
 {
   char         sql[1024];
