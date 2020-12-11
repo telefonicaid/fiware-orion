@@ -43,34 +43,42 @@ payload='[
     "type": "T",
     "SP": {
       "type": "Property",
-      "value": "SP of E1"
+      "value": "SP of E1",
+      "observedAt": "2020-12-10T07:11:00.123Z"
     },
     "I": {
       "type": "Property",
-      "value": 1
+      "value": 1,
+      "observedAt": "2020-12-10T07:11:00.124Z",
+      "unitCode": "cm"
     },
     "F": {
       "type": "Property",
-      "value": 3.14
+      "value": 3.14,
+      "observedAt": "2020-12-10T07:11:00.125Z"
     },
     "Object": {
       "type": "Property",
       "value": {
         "A": 1,
         "vec": [ 1, 2, 3 ]
-      }
+      },
+      "observedAt": "2020-12-10T07:11:00.126Z"
     },
     "Array": {
       "type": "Property",
-      "value": [ "S1", "S2", "S3" ]
+      "value": [ "S1", "S2", "S3" ],
+      "observedAt": "2020-12-10T07:11:00.127Z"
     },
     "B": {
       "type": "Property",
-      "value": true
+      "value": true,
+      "observedAt": "2020-12-10T07:11:00.128Z"
     },
     "R1": {
       "type": "Relationship",
-      "object": "urn:ngsi-ld:relationships:R1"
+      "object": "urn:ngsi-ld:relationships:R1",
+      "observedAt": "2020-12-10T07:11:00.129Z"
     }
   },
   {
@@ -112,7 +120,7 @@ echo
 
 echo "03. See the three AP attributes in the temporal database"
 echo "========================================================"
-postgresCmd -sql "SELECT id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt FROM attributes"
 echo
 echo
 
@@ -146,18 +154,18 @@ urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the three AP attributes in the temporal database
 ========================================================
-id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,f,,,SP of E1,,
-https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,,,,1,
-https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14,
-https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,"{""A"":1,""vec"":[1,2,3]}",,
-https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,"[""S1"",""S2"",""S3""]",,
-https://uri.etsi.org/ngsi-ld/default-context/B,Boolean,urn:ngsi-ld:entities:E1,f,,,,,t
-https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,,
-https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E2,f,,,SP of E2,,
-https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:relationships:R1,,
-https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E3,f,,,SP of E3,,
-https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:relationships:R1,,
+id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat
+https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,f,,,SP of E1,,,2020-12-10 07:11:00.123
+https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,cm,,,1,,2020-12-10 07:11:00.124
+https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14,,2020-12-10 07:11:00.125
+https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,"{""A"":1,""vec"":[1,2,3]}",,,2020-12-10 07:11:00.126
+https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,"[""S1"",""S2"",""S3""]",,,2020-12-10 07:11:00.127
+https://uri.etsi.org/ngsi-ld/default-context/B,Boolean,urn:ngsi-ld:entities:E1,f,,,,,t,2020-12-10 07:11:00.128
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,,,2020-12-10 07:11:00.129
+https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E2,f,,,SP of E2,,,
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:relationships:R1,,,
+https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E3,f,,,SP of E3,,,
+https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:relationships:R1,,,
 
 
 --TEARDOWN--
