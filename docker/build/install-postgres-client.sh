@@ -26,4 +26,4 @@ apt-get update && apt-get install -y lsb-release && apt-get clean all
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
 apt-get update
-apt-get -y install libpq-dev postgresql-12 postgresql-client-12
+apt-get -y install libpq-dev postgresql-12 postgresql-client-12 postgis postgresql-12-postgis-2.5

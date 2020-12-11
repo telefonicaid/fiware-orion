@@ -26,6 +26,11 @@ date
 export BROKER=${BROKER:-orionld}
 export ORIONLD_SUPPRESS_LOG_FILE_OUTPUT=${ORIONLD_SUPPRESS_LOG_FILE_OUTPUT:-NO}
 
+export PGHOST=${PGHOST:-localhost} # /var/run/postgresql
+export PGPORT=${PGPORT:-5432}
+export PGUSER=${PGUSER:-postgres}
+export PGPASSWORD=${PGPASSWORD:-password}
+
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 
