@@ -220,8 +220,11 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     }
 
     //
-    // Special case: observedAt - stored as Number but must be served as a string ...
-    //                            also, not expanded
+    // Special cases:
+    //
+    // * observedAt - stored as Number but must be served as a string ...
+    //                also, not expanded
+    // * unitCode - presented as key-value
     //
     if (strcmp(mdName, "observedAt") == 0)
     {
@@ -236,6 +239,8 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 
       nodeP = kjString(orionldState.kjsonP, mdName, date);
     }
+    else if (strcmp(mdName, "unitCode") == 0)
+      nodeP = kjString(orionldState.kjsonP, mdName, mdP->stringValue.c_str());
     else
     {
       char*   mdLongName     = orionldContextItemAliasLookup(contextP, mdName, NULL, NULL);
