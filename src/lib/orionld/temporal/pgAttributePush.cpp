@@ -27,18 +27,93 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/temporal/pgRelationshipPush.h"               // pgRelationshipPush
+#include "orionld/temporal/pgStringPropertyPush.h"             // pgStringPropertyPush
+#include "orionld/temporal/pgNumberPropertyPush.h"             // pgNumberPropertyPush
+#include "orionld/temporal/pgCompoundPropertyPush.h"           // pgCompoundPropertyPush
+#include "orionld/temporal/pgBoolPropertyPush.h"               // pgBoolPropertyPush
 #include "orionld/temporal/pgAttributePush.h"                  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgAttributePush - push an attribute for db insertion
+// pgAttributePush - add an attribute to the DB
 //
-// Not sure this function will be needed after all.
-// There are separate push functions for every type of attribute.
-//
-bool pgAttributePush(PGconn* connectionP, char* id, char* instanceId)
+bool pgAttributePush
+(
+  PGconn*      connectionP,
+  KjNode*      valueNodeP,
+  const char*  attributeType,
+  const char*  entityRef,
+  const char*  entityId,
+  const char*  id,
+  const char*  instanceId,
+  const char*  datasetId,
+  const char*  observedAt,
+  const char*  createdAt,
+  const char*  modifiedAt,
+  bool         subAttrs,
+  const char*  unitCode
+)
 {
-  return false;
+  //
+  // Relationship
+  //
+  if (strcmp(attributeType, "Relationship") == 0)
+  {
+    if (pgRelationshipPush(connectionP, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+      LM_RE(false, ("pgRelationshipPush failed"));
+  }
+  //
+  // Property
+  //
+  else if (strcmp(attributeType, "Property") == 0)
+  {
+    if (valueNodeP->type == KjString)
+    {
+      if (pgStringPropertyPush(connectionP, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+        LM_RE(false, ("pgStringPropertyPush failed"));
+    }
+    else if (valueNodeP->type == KjInt)
+    {
+      if (pgNumberPropertyPush(connectionP, valueNodeP->value.i, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+        LM_RE(false, ("pgIntPropertyPush failed"));
+    }
+    else if (valueNodeP->type == KjFloat)
+    {
+      if (pgNumberPropertyPush(connectionP, valueNodeP->value.f, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+        LM_RE(false, ("pgIntPropertyPush failed"));
+    }
+    else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
+    {
+      if (pgCompoundPropertyPush(connectionP, valueNodeP, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+        LM_RE(false, ("pgCompoundPropertyPush failed"));
+    }
+    else if (valueNodeP->type == KjBoolean)
+    {
+      if (pgBoolPropertyPush(connectionP, valueNodeP->value.b, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+        LM_RE(false, ("pgBoolPropertyPush failed"));
+    }
+    else
+    {
+      LM_E(("Internal Error (invalid value type for the Property '%s')", id));;
+      return false;
+    }
+  }
+  //
+  // GeoProperty
+  //
+  else if (strcmp(attributeType, "GeoProperty") == 0)
+  {
+    LM_W(("GeoProperty ... not implemented"));
+    // pgGeoPropertyTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
+  }
+  else
+  {
+    LM_E(("Internal Error (invalid type (%s) for the attribute '%s')", attributeType, id));
+    return false;
+  }
+
+  return true;
 }

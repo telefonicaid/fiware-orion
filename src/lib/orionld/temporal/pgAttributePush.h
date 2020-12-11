@@ -31,8 +31,23 @@
 
 // -----------------------------------------------------------------------------
 //
-// pgAttributePush - push an attribute to its DB table
+// pgAttributePush - add an attribute to the DB
 //
-extern bool pgAttributePush(PGconn* connectionP, char* id, char* instanceId);
+extern bool pgAttributePush
+(
+  PGconn*      connectionP,
+  KjNode*      valueNodeP,
+  const char*  attributeType,
+  const char*  entityRef,
+  const char*  entityId,
+  const char*  id,
+  const char*  instanceId,
+  const char*  datasetId,
+  const char*  observedAt,
+  const char*  createdAt,
+  const char*  modifiedAt,
+  bool         subAttrs,
+  const char*  unitCode
+);
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTEPUSH_H_
