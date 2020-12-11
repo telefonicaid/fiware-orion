@@ -1279,7 +1279,8 @@ function orionCurl()
   then
     echo "Broker seems to have died ..."
   else
-    cat /tmp/httpHeaders.out  | sed 's///g' > /tmp/httpHeaders.noCtrlM
+    cat /tmp/httpHeaders.out  | sed 's/
+//g' > /tmp/httpHeaders.noCtrlM
     mv /tmp/httpHeaders.noCtrlM /tmp/httpHeaders.out
 
     _responseHeaders=$(cat /tmp/httpHeaders.out)
@@ -1438,7 +1439,7 @@ function pgCreate()
   attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT NOT NULL REFERENCES entities(instanceId), entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
   echo $creation    | psql --host $PGHOST --port $PGPORT --username $PGUSER
   echo $postgis     | psql --host $PGHOST --port $PGPORT --username $PGUSER
-  echo $valuetype   | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+#  echo $valuetype   | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo $entities    | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo $attributes  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
 
