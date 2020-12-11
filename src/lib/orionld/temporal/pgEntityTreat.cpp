@@ -88,9 +88,16 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    // FIXME: createdAt ... I need to know that the Attribute did not exist for this to be OK ...
-    if (pgAttributeTreat(connectionP, attrP, instanceId, id, createdAt, modifiedAt) == false)
-      LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
+    if (attrP->type == KjObject)
+    {
+      // FIXME: createdAt ... I need to know that the Attribute did not exist for this to be OK ...
+      if (pgAttributeTreat(connectionP, attrP, instanceId, id, createdAt, modifiedAt) == false)
+        LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
+    }
+    else if (attrP->type == KjArray)
+    {
+      LM_W(("The attribute '%s' is an array ... datasetId is not supported for TRoE", attrP->name));
+    }
   }
 
   return true;
