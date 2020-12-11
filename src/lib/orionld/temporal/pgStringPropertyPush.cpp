@@ -39,7 +39,6 @@
 bool pgStringPropertyPush
 (
   PGconn*      connectionP,
-  const char*  valueType,
   const char*  value,
   const char*  entityRef,
   const char*  entityId,
@@ -64,29 +63,29 @@ bool pgStringPropertyPush
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subPropertiesString, datasetId, value);
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, value);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, valueType, subPropertiesString, value);
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, value);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, valueType, subPropertiesString, datasetId, value);
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, value);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subPropertiesString, value);
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
+             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, value);
   }
 
 

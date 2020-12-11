@@ -127,7 +127,7 @@ bool pgAttributeTreat
   }
   else if (valueNodeP->type == KjString)
   {
-    if (pgStringPropertyPush(connectionP, "String", valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+    if (pgStringPropertyPush(connectionP, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
       LM_RE(false, ("pgStringPropertyPush failed"));
   }
   else if (valueNodeP->type == KjInt)
