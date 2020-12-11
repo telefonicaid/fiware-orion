@@ -41,16 +41,18 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
 {
   switch (format)
   {
-  case NGSI_V1_LEGACY:              return useLegacyWord ? "legacy" : "JSON";
-  case NGSI_V2_NORMALIZED:          return "normalized";
-  case NGSI_V2_KEYVALUES:           return "keyValues";
-  case NGSI_V2_VALUES:              return "values";
-  case NGSI_V2_UNIQUE_VALUES:       return "uniqueValues";
-  case NGSI_V2_CUSTOM:              return "custom";
-  case NGSI_LD_V1_NORMALIZED:       return "normalized";
-  case NGSI_LD_V1_KEYVALUES:        return "keyValues";
-  case NGSI_LD_V1_V2_NORMALIZED:    return "V2-Normalized-For-LD";
-  case NGSI_LD_V1_V2_KEYVALUES:     return "V2-KeyValues-For-LD";
+  case NGSI_V1_LEGACY:                    return useLegacyWord ? "legacy" : "JSON";
+  case NGSI_V2_NORMALIZED:                return "normalized";
+  case NGSI_V2_KEYVALUES:                 return "keyValues";
+  case NGSI_V2_VALUES:                    return "values";
+  case NGSI_V2_UNIQUE_VALUES:             return "uniqueValues";
+  case NGSI_V2_CUSTOM:                    return "custom";
+  case NGSI_LD_V1_NORMALIZED:             return "normalized";
+  case NGSI_LD_V1_KEYVALUES:              return "keyValues";
+  case NGSI_LD_V1_V2_NORMALIZED:          return "x-ngsiv2-normalized";
+  case NGSI_LD_V1_V2_KEYVALUES:           return "x-nsgiv2-keyValues";
+  case NGSI_LD_V1_V2_NORMALIZED_COMPACT:  return "x-ngsiv2-normalized-compacted";
+  case NGSI_LD_V1_V2_KEYVALUES_COMPACT:   return "x-nsgiv2-keyValues-compacted";
   case NO_FORMAT:
     if (noDefault == true)
     {
@@ -80,6 +82,12 @@ RenderFormat stringToRenderFormat(const std::string& s, bool noDefault)
   if (s == "values")       { return NGSI_V2_VALUES;        }
   if (s == "uniqueValues") { return NGSI_V2_UNIQUE_VALUES; }
   if (s == "custom")       { return NGSI_V2_CUSTOM;        }
+
+  if (s == "x-ngsiv2")                      { return NGSI_LD_V1_V2_NORMALIZED_COMPACT; }
+  if (s == "x-ngsiv2-normalized")           { return NGSI_LD_V1_V2_NORMALIZED;         }
+  if (s == "x-ngsiv2-keyValues")            { return NGSI_LD_V1_V2_KEYVALUES;          }
+  if (s == "x-ngsiv2-normalized-compacted") { return NGSI_LD_V1_V2_NORMALIZED_COMPACT; }
+  if (s == "x-ngsiv2-keyValues-compacted")  { return NGSI_LD_V1_V2_KEYVALUES_COMPACT;  }
   
   return (noDefault == false)? DEFAULT_RENDER_FORMAT : NO_FORMAT;
 }
