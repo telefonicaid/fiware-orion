@@ -21,3 +21,4 @@
 * Issue  #599   Float Property attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Array Property attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Object Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Bool Property attributes are correctly inserted into the postgres table for temporal representation of entities

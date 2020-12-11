@@ -46,8 +46,7 @@ extern bool pgStringPropertyPush
   const char*  observedAt,
   const char*  createdAt,
   const char*  modifiedAt,
-  bool         subProperties,
-  const char*  unitCode
+  bool         subProperties
 );
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGPROPERTYPUSH_H_
