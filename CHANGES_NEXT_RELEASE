@@ -13,3 +13,4 @@
 * Issue   XXX   External contributor "@manaty226" fixed an important bug about subscriptions after broker restart - Thanks!
 * Issue  #605   ORIONLD_MONGO_HOST env var is not parsed correctly - made the buffer for the CLI '-dbHost' bigger (64 -> 1024)
 * Issue  #559   External contributor "@manaty226" fixed notification on PATCH Entity, updating attributes - Big Thanks!
+* Issue  #622   unitCode not correctly rendered in NGSI-LD notifications
