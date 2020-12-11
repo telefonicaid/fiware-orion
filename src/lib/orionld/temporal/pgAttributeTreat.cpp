@@ -82,10 +82,20 @@ bool pgAttributeTreat
   uuidGenerate(instanceId);
 
   //
-  // Gather special sub-attrs and call pgSubAttributeTreat for normal sub-attrs
+  // Get all special sub-attributes and remove them from the tree
+  // Only normal sub attributes left in the tree after this loop
+  // The sub-attributes must be added to the DB after the attribute, as the InstanceID of the attribute is
+  // needed (and referenced => the DB gices error if the referenced attribute doesn't exist already).
   //
-  for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+  // I wonder if this "REFERENCED BY" slows the DB down when inserting ... If so, do we really need it?
+  //
+  KjNode* subAttrP = attrP->value.firstChildP;
+  KjNode* next;
+
+  while (subAttrP != NULL)
   {
+    next = subAttrP->next;
+
     if (strcmp(subAttrP->name, "observedAt") == 0)
       observedAt = subAttrP->value.s;
     else if (strcmp(subAttrP->name, "datasetId") == 0)
@@ -99,11 +109,17 @@ bool pgAttributeTreat
     else
     {
       subAttrs = true;
-      // pgSubAttributeTreat()
+      subAttrP = next;
+      continue;   // pgSubAttributeTreat()  later - after creating the attribute
     }
+
+    kjChildRemove(attrP, subAttrP);
+    subAttrP = next;
   }
 
-
+  //
+  // Now add the attribute to the DB - FIXME: this entire IF could be pgAttributePush()
+  //
   if (strcmp(type, "Relationship") == 0)
   {
     if (pgRelationshipPush(connectionP, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
@@ -139,7 +155,17 @@ bool pgAttributeTreat
     pgGeoPropertyTreat(connectionP, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
 #endif
   else
-    return true;
+  {
+    LM_E(("Internal Error (invalid value type for the attribute '%s')", id));
+    return false;
+  }
+
+
+  // FIXME: This entire loop could be pgSubAttributePush()
+  for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+  {
+    LM_TMP(("TEMP: Got a sub-attr: '%s'", subAttrP->name));
+  }
 
   return true;
 }

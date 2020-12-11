@@ -1,3 +1,4 @@
+
 * Issue  #280   Made GET /entities?id=EID call the service routine for /entities/{EID}, if just one single entity id
 * Issue  #280   Unified all timestamps, with one single call to clock_gettime()
 * Issue  #550   Added a new notification format for NGSI-LD subscriptions, to notify in NGSIv2 format
@@ -22,3 +23,4 @@
 * Issue  #599   Array Property attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Object Property attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Bool Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   observedAt sub-attributes are correctly inserted into the postgres table for temporal representation of entities

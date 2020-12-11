@@ -59,6 +59,7 @@ bool pgStringPropertyPush
   //
   // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
   //
+  LM_TMP(("OBS: observedAt for attr '%s': %p (%s)", attributeName, observedAt, (observedAt != NULL)? observedAt : "not present"));
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
