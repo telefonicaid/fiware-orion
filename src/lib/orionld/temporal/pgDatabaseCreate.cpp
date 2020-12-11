@@ -45,7 +45,7 @@ bool pgDatabaseCreate(PGconn* connection, const char* dbName)
   connectionP = pgConnectionGet(dbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));
-  
+
   snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
   res = PQexec(connectionP, sql);
   if (res == NULL)

@@ -32,9 +32,6 @@ SET (SOURCES
     temporalPostBatchUpsert.cpp
     temporalPostEntities.cpp
     temporalPostEntity.cpp
-    temporalTenantInitialise.cpp
-    temporalCommon.cpp
-    geoPropertyExtract.cpp
     pgInit.cpp
     pgConnectionGet.cpp
     pgConnectionRelease.cpp
@@ -69,9 +66,6 @@ SET (HEADERS
     temporalPostBatchUpsert.h
     temporalPostEntities.h
     temporalPostEntity.h
-    temporalTenantInitialise.h
-    temporalCommon.h
-    geoPropertyExtract.h
     pgInit.h
     pgConnectionGet.h
     pgConnectionRelease.h
