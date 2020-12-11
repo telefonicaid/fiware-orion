@@ -1279,8 +1279,7 @@ function orionCurl()
   then
     echo "Broker seems to have died ..."
   else
-    cat /tmp/httpHeaders.out  | sed 's/
-//g' > /tmp/httpHeaders.noCtrlM
+    cat /tmp/httpHeaders.out  | sed 's/^M//g' > /tmp/httpHeaders.noCtrlM
     mv /tmp/httpHeaders.noCtrlM /tmp/httpHeaders.out
 
     _responseHeaders=$(cat /tmp/httpHeaders.out)
