@@ -6,8 +6,10 @@ on:
       - develop
 
 env:
-  RELEASE_IMAGE_NAME: fiware/orion-ld:latest
-  DEBUG_IMAGE_NAME: fiware/orion-ld:debug
+  IMAGE_NAME: fiware/orion-ld
+  IMAGE_TAG_LATEST:  latest
+  IMAGE_TAG_DEBUG: debug
+  IMAGE_TAG_PRE: 0.6-PRE-${{ github.run_number }}
 
 jobs:
   deploy-release:
@@ -35,7 +37,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ env.RELEASE_IMAGE_NAME }}
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile
 
   deploy-debug:
@@ -65,5 +69,5 @@ jobs:
           push: true
           build-args: |
             DEBUG=true
-          tags: ${{ env.DEBUG_IMAGE_NAME }}
+          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_DEBUG }}
           file: docker/Dockerfile
