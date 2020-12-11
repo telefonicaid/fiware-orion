@@ -131,7 +131,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // entity type - Mandatory URI
-    if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
+    if ((renderFormat != NGSI_LD_V1_V2_NORMALIZED) && (renderFormat != NGSI_LD_V1_V2_KEYVALUES))
     {
       alias = orionldContextItemAliasLookup(contextP, ceP->entityId.type.c_str(), NULL, NULL);
       nodeP = kjString(orionldState.kjsonP, "type", alias);

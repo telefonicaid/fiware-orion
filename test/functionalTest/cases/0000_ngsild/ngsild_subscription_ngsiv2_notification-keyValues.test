@@ -1,0 +1,164 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI-LD Subscription for NGSIv2 notifications with key-values (not supported)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Attempt to create an LD subscription for NGSIv2, with key-values - see 501 error
+# 02. Attempt to create an LD subscription for NGSIv2, with key-values AND compacted - see 501 error
+# 03. Attempt to create an LD subscription with invalid format - see 400 error
+#
+
+echo "01. Attempt to create an LD subscription for NGSIv2, with key-values - see 501 error"
+echo "===================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+    }
+  ],
+  "notification": {
+    "format": "x-ngsiv2-keyValues",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create an LD subscription for NGSIv2, with key-values AND compacted - see 501 error"
+echo "=================================================================================================="
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+    }
+  ],
+  "notification": {
+    "format": "x-ngsiv2-keyValues-compacted",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create an LD subscription with invalid format - see 400 error"
+echo "============================================================================"
+payload='{
+  "id": "http://a.b.c/subs/sub01",
+  "type": "Subscription",
+  "name": "NGSIv2 Notifications",
+  "description": "NGSI-LD Subscription for NGSIv2 Notifications",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+    }
+  ],
+  "notification": {
+    "format": "x-ngsiv3",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an LD subscription for NGSIv2, with key-values - see 501 error
+====================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "x-ngsiv2-keyValues",
+    "title": "Non-supported notification format",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an LD subscription for NGSIv2, with key-values AND compacted - see 501 error
+==================================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "x-ngsiv2-keyValues-compacted",
+    "title": "Non-supported notification format",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create an LD subscription with invalid format - see 400 error
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "x-ngsiv3",
+    "title": "Invalid value for Notification::format",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
