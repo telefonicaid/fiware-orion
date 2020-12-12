@@ -28,4 +28,4 @@
 * Issue  #599   Relationship sub-attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   String sub-attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Boolean sub-attributes are correctly inserted into the postgres table for temporal representation of entities
-* Issue  #599   Comkpound sub-attributes (Array, Object) are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Compound sub-attributes (Array, Object) are correctly inserted into the postgres table for temporal representation of entities
