@@ -48,4 +48,4 @@ extern bool pgSubRelationshipPush
   const char*  modifiedAt
 );
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGRELATIONSHIPPUSH_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGSUBRELATIONSHIPPUSH_H_

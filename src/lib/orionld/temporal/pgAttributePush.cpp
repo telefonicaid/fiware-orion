@@ -97,7 +97,7 @@ bool pgAttributePush
     }
     else
     {
-      LM_E(("Internal Error (invalid value type for the Property '%s')", id));;
+      LM_E(("Internal Error (invalid value type for the Property '%s')", id));
       return false;
     }
   }
