@@ -34,73 +34,56 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/temporal/pgCompoundPropertyPush.h"           // Own interface
+#include "orionld/temporal/pgCompoundSubPropertyPush.h"        // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgCompoundPropertyPush - push a Compound Property to its DB table
+// pgCompoundPropertyPush - push a Compound Sub-Property to its DB table
 //
-// If the value is Compound - the need for unitCode seems ... ZERO - so, not supporting it !
-//
-bool pgCompoundPropertyPush
+bool pgCompoundSubPropertyPush
 (
   PGconn*      connectionP,
+  const char*  subAttributeName,
+  const char*  instanceId,
   KjNode*      compoundValueNodeP,
   const char*  entityRef,
   const char*  entityId,
-  const char*  attributeName,
-  const char*  attributeInstance,
-  const char*  datasetId,
+  const char*  attributeRef,
+  const char*  attributeId,
   const char*  observedAt,
   const char*  createdAt,
-  const char*  modifiedAt,
-  bool         subProperties
+  const char*  modifiedAt
 )
 {
   int          renderedValueSize   = 4 * 1024;
   char*        renderedValue       = kaAlloc(&orionldState.kalloc, renderedValueSize);
   int          sqlSize             = 5 * 1024;
   char*        sql                 = kaAlloc(&orionldState.kalloc, sqlSize);  // FIXME - one single call to kaAlloc, por favor !!!
-  const char*  subPropertiesString = (subProperties == false)? "false" : "true";
   PGresult*    res;
 
   if ((renderedValue == NULL) || (sql == NULL))
-    LM_RE(false, ("Internal Error (unable to allocate room for compound value"));
+    LM_RE(false, ("Internal Error (unable to allocate room for compound value of sub-attribute"));
 
   kjRender(orionldState.kjsonP, compoundValueNodeP, renderedValue, renderedValueSize);
 
   //
-  // Four combinations for NULL/non-NULL 'datasetId' and 'observedAt'
+  // Two combinations for NULL/non-NULL 'observedAt'
   //
-  if ((datasetId != NULL) && (observedAt != NULL))
+  if (observedAt != NULL)
   {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, renderedValue);
+    snprintf(sql, sqlSize, "INSERT INTO subAttributes("
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, renderedValue);
   }
-  else if ((datasetId == NULL) && (observedAt == NULL))
+  else
   {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, renderedValue);
-  }
-  else if (datasetId != NULL)  // observedAt == NULL
-  {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, renderedValue);
-  }
-  else  // observedAt != NULL, datasetId == NULL
-  {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, renderedValue);
+    snprintf(sql, sqlSize, "INSERT INTO subAttributes("
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, renderedValue);
   }
 
   // <DEBUG>
@@ -128,7 +111,7 @@ bool pgCompoundPropertyPush
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
   else
-    LM_TMP(("SQL: DB operation to insert a Compound Property seems to have worked"));
+    LM_TMP(("SQL: DB operation to insert a Compound Sub-Property seems to have worked"));
 
   return true;
 }
