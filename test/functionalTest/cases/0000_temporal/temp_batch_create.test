@@ -55,6 +55,11 @@ payload='[
         "type": "Property",
         "value": "string sub-property",
         "observedAt": "2020-12-10T07:12:00.124Z"
+      },
+      "Sub-Bool": {
+        "type": "Property",
+        "value": true,
+        "observedAt": "2020-12-10T07:12:00.125Z"
       }
     },
     "I": {
@@ -191,6 +196,7 @@ https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entitie
 id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
 Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R1,,,2020-12-10 07:12:00.123
 Sub-String,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,string sub-property,,,2020-12-10 07:12:00.124
+Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,t,2020-12-10 07:12:00.125
 
 
 --TEARDOWN--
