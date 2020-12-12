@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGSUBATTRIBUTEPUSH_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_PGSUBATTRIBUTEPUSH_H_
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGSUBPROPERTYPUSH_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGSUBPROPERTYPUSH_H_
 
 /*
 *
@@ -27,32 +27,25 @@
 */
 #include <postgresql/libpq-fe.h>                                 // PGconn
 
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
 
 
 // -----------------------------------------------------------------------------
 //
-// pgSubAttributePush - push a sub attribute to its DB table
+// pgStringSubPropertyPush - push a String Sub-Attribute to its DB table
 //
-extern bool pgSubAttributePush
+extern bool pgStringSubPropertyPush
 (
   PGconn*      connectionP,
-  KjNode*      valueNodeP,
   const char*  instanceId,
-  const char*  subAttributeType,
+  const char*  object,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
-  const char*  attributeId,
-  const char*  id,
+  const char*  attrbiteId,
+  const char*  subAttributeName,
   const char*  observedAt,
   const char*  createdAt,
-  const char*  modifiedAt,
-  const char*  unitCode
+  const char*  modifiedAt
 );
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGSUBATTRIBUTEPUSH_H_
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGSTRINGSUBPROPERTYPUSH_H_

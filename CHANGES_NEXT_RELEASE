@@ -24,3 +24,6 @@
 * Issue  #599   Object Property attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Bool Property attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   observedAt sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   sub-attributes are supproed for temporal representation of entities
+* Issue  #599   Relationship sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   String sub-attributes are correctly inserted into the postgres table for temporal representation of entities

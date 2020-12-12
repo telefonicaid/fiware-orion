@@ -1436,18 +1436,21 @@ function pgCreate()
   valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'DateTime', 'Geo', 'LanguageMap')"
   entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
   attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT NOT NULL REFERENCES entities(instanceId), entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
-  echo $creation    | psql --host $PGHOST --port $PGPORT --username $PGUSER
-  #echo $postgis     | psql --host $PGHOST --port $PGPORT --username $PGUSER
-  echo $valuetype   | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo $entities    | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo $attributes  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT NOT NULL REFERENCES entities(instanceId), entityId TEXT NOT NULL, attributeRef TEXT NOT NULL REFERENCES attributes(instanceId), attributeId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
+
+  echo $creation       | psql --host $PGHOST --port $PGPORT --username $PGUSER
+  #echo $postgis       | psql --host $PGHOST --port $PGPORT --username $PGUSER
+  echo $valuetype      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo $entities       | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo $attributes     | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo $subAttributes  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
 
   #
   # Not sure why, but the tables seem to survive the deletion of the database ... done by pgDrop
   # This is pretty strange.
   # To fix the problem, the tables are emptied here:
   #
-#  echo "DELETE FROM subAttributes" | psql --host $PGHOST --port $PGPORT --username $PGUSER
+  echo "DELETE FROM subattributes" | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo "DELETE FROM attributes"    | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo "DELETE FROM entities"      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
 }

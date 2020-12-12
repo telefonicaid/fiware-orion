@@ -37,6 +37,7 @@ extern "C"
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/temporal/pgAttributePush.h"                  // pgAttributePush
+#include "orionld/temporal/pgSubAttributeTreat.h"              // pgSubAttributeTreat
 #include "orionld/temporal/pgAttributeTreat.h"                 // Own interface
 
 
@@ -123,7 +124,11 @@ bool pgAttributeTreat
   for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
     LM_TMP(("TEMP: Got a sub-attr: '%s'", subAttrP->name));
-    // pgSubAttributeTreat(subAttrP);
+    if (pgSubAttributeTreat(connectionP, subAttrP, entityRef, entityId, instanceId, id, createdAt, modifiedAt) == false)
+    {
+      LM_E(("Internal Error (pgSubAttributeTreat failed)"));
+      return false;
+    }
   }
 
   return true;
