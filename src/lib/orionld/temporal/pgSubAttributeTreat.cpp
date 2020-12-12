@@ -59,8 +59,14 @@ bool pgSubAttributeTreat
 {
   LM_TMP(("TEMP: treating sub-attr '%s'", subAttrP->name));
 
+  //
+  // This can't happen - Orion-LD would have flagged an error and we wouldn't have gotten this far ...
+  // Cause, sub-attrs cannot have datasetIds.
+  // However, THIS CHECK avoids possible crashes due to bugs and it's beyond fast, so ...
+  //
   if (subAttrP->type != KjObject)
     LM_RE(false, ("Sub Attribute '%s' is not an Object", subAttrP->name));
+
 
   KjNode* typeP = kjLookup(subAttrP, "type");
   char*   subAttributeType;
