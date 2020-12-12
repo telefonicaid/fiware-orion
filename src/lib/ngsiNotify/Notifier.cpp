@@ -240,6 +240,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     if (httpInfo.includePayload)
     {
+    if (httpInfo.payload.empty())
+    {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
 
@@ -276,7 +278,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
       curl_free(pload);
     }
-
+    }
 
     //
     // 4. URI Params (Query Strings)

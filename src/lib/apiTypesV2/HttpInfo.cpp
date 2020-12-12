@@ -78,9 +78,17 @@ std::string HttpInfo::toJson()
 
   if (custom)
   {
-    if (!this->includePayload)
+    if (!this->payload.empty())
     {
       jh.addString("payload", this->payload);
+    }
+    else if (this->includePayload)
+    {
+      jh.addBool("includePayload", false);
+    }
+    else
+    {
+      jh.addBool("includePayload", true);
     }
 
     if (this->verb != NOVERB)

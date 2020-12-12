@@ -23,7 +23,7 @@
 * [Registrations](#registrations)
 * [`keyValues` not supported in `POST /v2/op/notify`](#keyvalues-not-supported-in-post-v2opnotify)
 * [Deprecated features](#deprecated-features)
-* [Additional fields in `httpInfo` for custom notifications](#additional-fields-in-`httpInfo`-for-custom-notifications)
+* [Additional fields in `httpInfo` for custom notifications](#additional-fields-in-httpInfo-for-custom-notifications)
 
 This document describes some considerations to take into account
 regarding the specific implementation done by Orion Context Broker
@@ -459,7 +459,7 @@ which attributes to include in the response to the query) and unary attribute fi
 
 ## Additional fields in `httpInfo` for custom notifications
 
-Orion supports a boolean field `includePayload` in `httpInfo` for custom notifications that can be used to avoid payload in the outgoing notification. If `includePayload` is set to `true` then no payload is included in the notification (and `payload` field, if used, is ignored).
-Default value if `includePayload` if omitted is `true`.
+Orion supports a boolean field `includePayload` in `httpCustom` for custom notifications that can be used to avoid payload in the outgoing notification. If `includePayload` is set to `false` then no payload is included in the notification (and `payload` field, if used, is ignored).
+Default value if `includePayload` if omitted is `true` (that is, payload is included by default).
 
 [Top](#top)

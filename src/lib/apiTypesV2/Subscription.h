@@ -48,7 +48,6 @@ struct Notification
   std::vector<std::string> metadata;
   bool                     blacklist;
   bool                     onlyChanged;
-  bool                     includePayload;
   long long                timesSent;
   long long                lastNotification;
   HttpInfo                 httpInfo;
@@ -63,7 +62,6 @@ struct Notification
     attributes(),
     blacklist(false),
     onlyChanged(false),
-    includePayload(true),
     timesSent(0),
     lastNotification(-1),
     httpInfo(),
