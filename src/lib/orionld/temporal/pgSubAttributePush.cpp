@@ -30,6 +30,7 @@
 #include "orionld/temporal/pgSubRelationshipPush.h"            // pgSubRelationshipPush
 #include "orionld/temporal/pgStringSubPropertyPush.h"          // pgStringSubPropertyPush
 #include "orionld/temporal/pgBoolSubPropertyPush.h"            // pgBoolSubPropertyPush
+#include "orionld/temporal/pgCompoundSubPropertyPush.h"        // pgCompoundSubPropertyPush
 #include "orionld/temporal/pgSubAttributePush.h"               // Own interface
 
 
@@ -76,6 +77,11 @@ bool pgSubAttributePush
     else if (valueNodeP->type == KjBoolean)
     {
       if (pgBoolSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.b, entityRef, entityId, attributeRef, attributeId, observedAt, createdAt, modifiedAt) == false)
+      LM_RE(false, ("pgStringSubPropertyPush failed"));
+    }
+    else if ((valueNodeP->type == KjObject) || (valueNodeP->type == KjArray))
+    {
+      if (pgCompoundSubPropertyPush(connectionP, id, instanceId, valueNodeP, entityRef, entityId, attributeRef, attributeId, observedAt, createdAt, modifiedAt) == false)
       LM_RE(false, ("pgStringSubPropertyPush failed"));
     }
   }
