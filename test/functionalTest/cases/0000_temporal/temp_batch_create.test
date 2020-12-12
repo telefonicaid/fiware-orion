@@ -70,6 +70,18 @@ payload='[
         "type": "Property",
         "value": { "pi": 3.14, "bTrue": true, "c3": "3" },
         "observedAt": "2020-12-10T07:12:00.127Z"
+      },
+      "Sub-Int": {
+        "type": "Property",
+        "value": 33,
+        "observedAt": "2020-12-10T07:12:00.128Z",
+        "unitCode": "pi-i"
+      },
+      "Sub-Float": {
+        "type": "Property",
+        "value": 3.1415927,
+        "observedAt": "2020-12-10T07:12:00.129Z",
+        "unitCode": "pi-f"
       }
     },
     "I": {
@@ -209,6 +221,8 @@ Sub-String,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-c
 Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,t,2020-12-10 07:12:00.125
 Sub-Array,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,"[1,2,3]",,,2020-12-10 07:12:00.126
 Sub-Object,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,"{""pi"":3.14,""bTrue"":true,""c3"":""3""}",,,2020-12-10 07:12:00.127
+Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,2020-12-10 07:12:00.128
+Sub-Float,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-f,,3.141593,,2020-12-10 07:12:00.129
 
 
 --TEARDOWN--

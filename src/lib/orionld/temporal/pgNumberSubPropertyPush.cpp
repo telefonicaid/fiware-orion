@@ -28,30 +28,41 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/temporal/pgBoolSubPropertyPush.h"            // Own interface
+#include "orionld/temporal/pgNumberSubPropertyPush.h"          // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgBoolSubPropertyPush - push a Boolean Sub-Property to its DB table
+// pgNumberSubPropertyPush - push a Numberean Sub-Property to its DB table
 //
-bool pgBoolSubPropertyPush
+bool pgNumberSubPropertyPush
 (
   PGconn*      connectionP,
   const char*  subAttributeName,
   const char*  instanceId,
-  bool         boolValue,
+  double       numberValue,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
   const char*  attributeId,
   const char*  observedAt,
   const char*  createdAt,
-  const char*  modifiedAt
+  const char*  modifiedAt,
+  const char*  unitCode
 )
 {
-  char sql[1024];
+  char   sql[1024];
+  char   unitCodeStringV[128];
+  char*  unitCodeString;
+
+  if (unitCode == NULL)
+    unitCodeString = (char*) "NULL";
+  else
+  {
+    snprintf(unitCodeStringV, sizeof(unitCodeStringV), "'%s'", unitCode);
+    unitCodeString = unitCodeStringV;
+  }
 
   //
   // Two combinations for NULL/non-NULL 'observedAt' (sub-attributes have no datasetId)
@@ -59,16 +70,16 @@ bool pgBoolSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, numberValue, unitCodeString);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %f, %s)",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, numberValue, unitCodeString);
   }
   LM_TMP(("SQL[%p]: %s", connectionP, sql));
 
@@ -81,7 +92,7 @@ bool pgBoolSubPropertyPush
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
   else
-    LM_TMP(("SQL: DB operation to insert a Boolean Sub-Property seems to have worked"));
+    LM_TMP(("SQL: DB operation to insert a Number Sub-Property seems to have worked"));
 
   return true;
 }

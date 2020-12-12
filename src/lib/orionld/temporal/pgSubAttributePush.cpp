@@ -31,6 +31,7 @@
 #include "orionld/temporal/pgStringSubPropertyPush.h"          // pgStringSubPropertyPush
 #include "orionld/temporal/pgBoolSubPropertyPush.h"            // pgBoolSubPropertyPush
 #include "orionld/temporal/pgCompoundSubPropertyPush.h"        // pgCompoundSubPropertyPush
+#include "orionld/temporal/pgNumberSubPropertyPush.h"          // pgNumberSubPropertyPush
 #include "orionld/temporal/pgSubAttributePush.h"               // Own interface
 
 
@@ -84,10 +85,20 @@ bool pgSubAttributePush
       if (pgCompoundSubPropertyPush(connectionP, id, instanceId, valueNodeP, entityRef, entityId, attributeRef, attributeId, observedAt, createdAt, modifiedAt) == false)
       LM_RE(false, ("pgStringSubPropertyPush failed"));
     }
+    else if (valueNodeP->type == KjInt)
+    {
+      if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.i, entityRef, entityId, attributeRef, attributeId, observedAt, createdAt, modifiedAt, unitCode) == false)
+      LM_RE(false, ("pgNumberSubPropertyPush[Integer] failed"));
+    }
+    else if (valueNodeP->type == KjFloat)
+    {
+      if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.f, entityRef, entityId, attributeRef, attributeId, observedAt, createdAt, modifiedAt, unitCode) == false)
+      LM_RE(false, ("pgNumberSubPropertyPush[Float] failed"));
+    }
   }
   else
   {
-    LM_E(("Unsupported type of sub-arttribute to push to DB"));
+    LM_E(("Unsupported type of sub-attribute to push to DB"));
     return false;
   }
 

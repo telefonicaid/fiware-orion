@@ -57,6 +57,7 @@ SET (SOURCES
     pgStringSubPropertyPush.cpp
     pgBoolSubPropertyPush.cpp
     pgCompoundSubPropertyPush.cpp
+    pgNumberSubPropertyPush.cpp
 )
 
 SET (HEADERS
@@ -93,6 +94,7 @@ SET (HEADERS
     pgStringSubPropertyPush.h
     pgBoolSubPropertyPush.h
     pgCompoundSubPropertyPush.h
+    pgNumberSubPropertyPush.h
 )
 
 
