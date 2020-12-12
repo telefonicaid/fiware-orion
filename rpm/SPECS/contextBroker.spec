@@ -92,6 +92,12 @@ has been renamed to /etc/sysconfig/%{name}.orig-$DATE.
 After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
 EOMSG
+chmod 644 /etc/cron.d/cron-logrotate-contextBroker-size || true
+chmod 644 /etc/logrotate.d/logrotate-contextBroker-daily || true
+chmod 644 /etc/prelink.conf.d/contextBroker.conf || true
+chmod 644 /etc/sysconfig/contextBroker || true
+chmod 644 /etc/sysconfig/logrotate-contextBroker-size || true
+chmod 644 /etc/tmpfiles.d/contextBroker.conf || true
 
 %clean
 rm -rf $RPM_BUILD_ROOT

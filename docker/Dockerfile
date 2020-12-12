@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=centos7.7.1908
+ARG  IMAGE_TAG=centos7.9.2009
 FROM centos:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid

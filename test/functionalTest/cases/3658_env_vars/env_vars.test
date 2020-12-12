@@ -123,6 +123,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-relogAlarms' (log messages for existing alarms beyond the raising alar]   ORION_RELOG_ALARMS                FALSE /FALSE/
                                [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]     ORION_CHECK_ID_V1                 FALSE /FALSE/
                                [option '-disableCustomNotifications' (disable NGSIv2 custom notifications)]        ORION_DISABLE_CUSTOM_NOTIF        FALSE /FALSE/
+                               [option '-disableFileLog' (disable logging into file)]                              ORION_DISABLE_FILE_LOG            FALSE /FALSE/
                                [option '-logForHumans' (human readible log to screen)]                             ORION_LOG_FOR_HUMANS              FALSE /FALSE/
                                [option '-logLineMaxSize' <log line maximum size (in bytes)>]                       ORION_LOG_LINE_MAX_SIZE           32768 /32768/ >= 100
                                [option '-logInfoPayloadMaxSize' <maximum length for request or response payload]   ORION_LOG_INFO_PAYLOAD_MAX_SIZE   5120 /5120/ >= 0

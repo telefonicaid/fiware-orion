@@ -23,17 +23,60 @@
 * Author: developer
 */
 
-#include <string.h>             /* strcmp                                    */
+#include <string.h>               /* strcmp                                    */
+#include <stdio.h>                /* snprintf                                  */
+#include <stdlib.h>               /* getenv                                    */
 
-#include "parseArgs/paIsSet.h"  /* Own interface                             */
+#include "parseArgs/parseArgs.h"  /* PaArgument, ...                           */
+#include "parseArgs/paConfig.h"   /* paPrefix                                  */
+#include "parseArgs/paIsSet.h"    /* Own interface                             */
+
+
+
+/* *****************************************************************************
+*
+* getEnvVarValue - get value of the env var with prefix taken into account
+*/
+static const char* getEnvVarValue(const char* envVarName)
+{
+  char prefixedEnvVarName[256];
+
+  snprintf(prefixedEnvVarName, sizeof(prefixedEnvVarName), "%s%s", paPrefix, envVarName);
+
+  return getenv(prefixedEnvVarName);
+}
+
+
+
+/* *****************************************************************************
+*
+* getCorrespondingEnvVar - get the name of the env var that corresponds with
+* the given option or null if there is none
+*/
+static const char* getCorrespondingEnvVar(PaArgument* pArguments, const char* option)
+{
+  int count = 0;
+
+  while (pArguments[count].type != PaLastArg)
+  {
+    if (strncmp(pArguments[count].option, option, strlen(option)) == 0)
+    {
+      return pArguments[count].envName;
+    }
+    ++count;
+  }
+
+  return NULL;
+}
 
 
 
 /* ****************************************************************************
 *
-* paIsSet - is an argument existing in the parse list
+* paIsSet - is an argument existing in the parse list or is it set to true as
+* an env var
 */
-bool paIsSet(int argC, char* argV[], const char* option)
+bool paIsSet(int argC, char* argV[], PaArgument* pArguments, const char* option)
 {
   int i;
 
@@ -45,7 +88,25 @@ bool paIsSet(int argC, char* argV[], const char* option)
     }
   }
 
-  return false;
+  const char* envVar = getCorrespondingEnvVar(pArguments, option);
+
+  if (envVar == NULL)
+  {
+    return false;
+  }
+  else
+  {
+    const char* envVarValue = getEnvVarValue(envVar);
+
+    if (envVarValue == NULL)
+      return false;
+
+    //
+    // Equivalent to a command-line option being set is, that the var is set to
+    // "TRUE" or "true" therefore we only return true in that cases.
+    //
+    return ((strcmp(envVarValue, "TRUE") == 0) || (strcmp(envVarValue, "true") == 0));
+  }
 }
 
 
@@ -54,7 +115,7 @@ bool paIsSet(int argC, char* argV[], const char* option)
 *
 * paIsSetSoGet - return value of option 'option'
 */
-const char* paIsSetSoGet(int argC, char* argV[], const char* option)
+const char* paIsSetSoGet(int argC, char* argV[], PaArgument* pArguments, const char* option)
 {
   int i;
 
@@ -66,5 +127,12 @@ const char* paIsSetSoGet(int argC, char* argV[], const char* option)
     }
   }
 
-  return NULL;
+  const char* envVar = getCorrespondingEnvVar(pArguments, option);
+
+  if (envVar == NULL)
+  {
+    return NULL;
+  }
+
+  return getEnvVarValue(envVar);
 }
