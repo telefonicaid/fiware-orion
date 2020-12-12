@@ -29,30 +29,25 @@
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgSubAttributePush - push a sub attribute to its DB table
+// pgSubAttributeTreat - treat a sub-attribute for db insertion
 //
-extern bool pgSubAttributePush
+extern bool pgSubAttributeTreat
 (
   PGconn*      connectionP,
-  KjNode*      valueNodeP,
-  const char*  instanceId,
-  const char*  subAttributeType,
+  KjNode*      subAttrP,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
   const char*  attributeId,
-  const char*  id,
-  const char*  observedAt,
   const char*  createdAt,
-  const char*  modifiedAt,
-  const char*  unitCode
+  const char*  modifiedAt
 );
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGSUBATTRIBUTEPUSH_H_

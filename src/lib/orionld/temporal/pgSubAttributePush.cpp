@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/temporal/pgSubRelationshipPush.h"            // pgSubRelationshipPush
+#include "orionld/temporal/pgStringSubPropertyPush.h"          // pgStringSubPropertyPush
 #include "orionld/temporal/pgSubAttributePush.h"               // Own interface
 
 
@@ -35,7 +37,47 @@
 //
 // pgSubAttributePush - push a sub attribute for db insertion
 //
-bool pgSubAttributePush(PGconn* connectionP, char* id, char* instanceId)
+bool pgSubAttributePush
+(
+  PGconn*      connectionP,
+  KjNode*      valueNodeP,
+  const char*  instanceId,
+  const char*  subAttributeType,
+  const char*  entityRef,
+  const char*  entityId,
+  const char*  attributeRef,
+  const char*  attributeId,
+  const char*  id,
+  const char*  observedAt,
+  const char*  createdAt,
+  const char*  modifiedAt,
+  const char*  unitCode
+)
 {
-  return false;
+  //
+  // Relationship
+  //
+  if (strcmp(subAttributeType, "Relationship") == 0)
+  {
+    if (pgSubRelationshipPush(connectionP, instanceId, valueNodeP->value.s, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
+      LM_RE(false, ("pgRelationshipPush failed"));
+  }
+  //
+  // Property
+  //
+  else if (strcmp(subAttributeType, "Property") == 0)
+  {
+    if (valueNodeP->type == KjString)
+    {
+      if (pgStringSubPropertyPush(connectionP, instanceId, valueNodeP->value.s, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
+      LM_RE(false, ("pgStringSubPropertyPush failed"));
+    }
+  }
+  else
+  {
+    LM_E(("Unsupported type of sub-arttribute to push to DB"));
+    return false;
+  }
+
+  return true;
 }
