@@ -57,6 +57,7 @@ bool pgAttributePush
   const char*  unitCode
 )
 {
+  LM_TMP(("OBS: In pgAttributePush with observedAt: %s", observedAt));
   //
   // Relationship
   //
@@ -72,6 +73,7 @@ bool pgAttributePush
   {
     if (valueNodeP->type == KjString)
     {
+      LM_TMP(("OBS: Calling pgStringPropertyPush with observedAt: %s", observedAt));
       if (pgStringPropertyPush(connectionP, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
         LM_RE(false, ("pgStringPropertyPush failed"));
     }
