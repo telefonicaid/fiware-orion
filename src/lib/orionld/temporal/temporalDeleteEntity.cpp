@@ -22,13 +22,21 @@
 *
 * Author: Ken Zangelin
 */
+#include <postgresql/libpq-fe.h>                               // PGconn
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/common/uuidGenerate.h"                       // uuidGenerate
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
+#include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
+#include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
+#include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
+#include "orionld/temporal/pgEntityDelete.h"                   // pgEntityDelete
 #include "orionld/temporal/temporalDeleteEntity.h"             // Own interface
 
 
@@ -39,10 +47,35 @@
 //
 bool temporalDeleteEntity(ConnectionInfo* ciP)
 {
-  LM_E(("Not Implemented"));
-  orionldState.httpStatusCode  = 501;
-  orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
+  // FIXME: Implement orionldState.dbName
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
 
-  return false;
+  PGconn* connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
+
+  if (pgTransactionBegin(connectionP) != true)
+    LM_RE(false, ("pgTransactionBegin failed"));
+
+  char* entityId = orionldState.wildcard[0];
+
+  char  instanceId[64];
+  uuidGenerate(instanceId);
+
+  if (pgEntityDelete(connectionP, instanceId, entityId, orionldState.requestTimeString) == false)
+  {
+    LM_E(("Database Error (delete entities temporal layer failed)"));
+    if (pgTransactionRollback(connectionP) == false)
+      LM_RE(false, ("pgTransactionRollback failed"));
+  }
+  else
+  {
+    if (pgTransactionCommit(connectionP) != true)
+      LM_RE(false, ("pgTransactionCommit failed"));
+  }
+
+  pgConnectionRelease(connectionP);
+
+  return true;
 }
