@@ -27,6 +27,7 @@ extern "C"
 #include "kbase/kMacros.h"                                     // K_FT
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -35,9 +36,60 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
+#include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
+#include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
+#include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
+#include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
 #include "orionld/temporal/temporalPostEntities.h"             // Own interface
 
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalEntityExpand -
+//
+void temporalEntityExpand(KjNode* entityP)
+{
+  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (strcmp(attrP->name, "type") == 0)
+    {
+      LM_TMP(("EXPAND: FROM '%s' (entity type value)", attrP->value.s));
+      attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
+      LM_TMP(("EXPAND: TO '%s' (entity type value)", attrP->value.s));
+    }
+    else if (strcmp(attrP->name, "id")       == 0) {}
+    else if (strcmp(attrP->name, "location") == 0) {}
+    else
+    {
+      attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+
+      if (attrP->type == KjObject)
+      {
+        for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+        {
+          if      (strcmp(subAttrP->name, "type")        == 0) {}
+          else if (strcmp(subAttrP->name, "id")          == 0) {}
+          else if (strcmp(subAttrP->name, "value")       == 0) {}
+          else if (strcmp(subAttrP->name, "object")      == 0) {}
+          else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
+          else if (strcmp(subAttrP->name, "location")    == 0) {}
+          else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
+          else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
+          else
+          {
+            LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
+            subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name,  true, NULL);
+            LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
+          }
+        }
+      }
+    }
+  }
+}
 
 
 // ----------------------------------------------------------------------------
@@ -46,11 +98,44 @@ extern "C"
 //
 bool temporalPostEntities(ConnectionInfo* ciP)
 {
-  LM_E(("Not Implemented"));
+  PGconn* connectionP;
+  KjNode* entityP = orionldState.requestTree;
 
-  orionldState.httpStatusCode = 501;
-  orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
+  //
+  // FIXME: the tree should be served expanded by orionldPostEntities()
+  //
 
-  return false;
+
+  // Expand entity type and attribute names - FIXME: Remove once orionldPostEntities() has been fixed to do that
+  temporalEntityExpand(entityP);
+
+  // FIXME: Implement orionldState.dbName
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
+
+  connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
+
+  if (pgTransactionBegin(connectionP) != true)
+    LM_RE(false, ("pgTransactionBegin failed"));
+
+  LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
+  char* entityId   = orionldState.payloadIdNode->value.s;
+  char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
+  if (pgEntityTreat(connectionP, entityP, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString) == false)
+  {
+    LM_E(("Database Error (post entities temporal layer failed)"));
+    if (pgTransactionRollback(connectionP) == false)
+      LM_RE(false, ("pgTransactionRollback failed"));
+  }
+  else
+  {
+    if (pgTransactionCommit(connectionP) != true)
+      LM_RE(false, ("pgTransactionCommit failed"));
+  }
+
+  pgConnectionRelease(connectionP);
+
+  return true;
 }

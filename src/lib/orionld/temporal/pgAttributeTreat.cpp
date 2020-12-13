@@ -36,9 +36,41 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/temporal/pgAttributePush.h"                  // pgAttributePush
 #include "orionld/temporal/pgSubAttributeTreat.h"              // pgSubAttributeTreat
 #include "orionld/temporal/pgAttributeTreat.h"                 // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// numberToDate -
+//
+static bool numberToDate(double timestamp, char* date, int dateLen)
+{
+  struct tm  tm;
+  time_t     fromEpoch = timestamp;
+  double     fraction  = timestamp - fromEpoch + 0.0005;
+  int        millis    = fraction * 1000;
+
+  gmtime_r(&fromEpoch, &tm);
+  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
+
+  //
+  // To add the milliseconds:
+  //   - make 'milliP' pint to the end of the time string (date)
+  //   - add a dot at the end
+  //   - printf the milliseconds after the dot
+  //
+  int   sLen   = strlen(date);
+  char* milliP = &date[sLen];
+
+  *milliP = '.';
+  snprintf(&milliP[1], dateLen - sLen - 1, "%3d", millis);
+
+  return true;
+}
 
 
 
@@ -94,7 +126,21 @@ bool pgAttributeTreat
     next = subAttrP->next;
 
     if (strcmp(subAttrP->name, "observedAt") == 0)
-      observedAt = subAttrP->value.s;
+    {
+      LM_TMP(("OBS: subAttr is observedAt. JSON type: %s", kjValueType(subAttrP->type)));
+      if (subAttrP->type == KjString)
+      {
+        LM_TMP(("OBS: observedAt: %s", subAttrP->value.s));
+        observedAt = subAttrP->value.s;
+      }
+      else if (subAttrP->type == KjFloat)  // Transformed to double before sent to TEMP layer - convert back!
+      {
+        LM_TMP(("OBS: observedAt is a FLOAT - converting"));
+
+        observedAt = kaAlloc(&orionldState.kalloc, 64);
+        numberToDate(subAttrP->value.f, observedAt, 64);
+      }
+    }
     else if (strcmp(subAttrP->name, "datasetId") == 0)
       datasetId = subAttrP->value.s;
     else if (strcmp(subAttrP->name, "value") == 0)
@@ -115,6 +161,8 @@ bool pgAttributeTreat
   }
 
   // Push the attribute to DB
+
+  LM_TMP(("OBS: Calling pgAttributePush with observedAt: %s", observedAt));
   if (pgAttributePush(connectionP, valueNodeP, attributeType, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
   {
     LM_E(("Internal Error (pgAttributePush failed)"));

@@ -35,10 +35,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
-#include "rest/HttpStatusCode.h"                               // SccNotImplemented
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
 #include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
@@ -58,14 +56,37 @@ void temporalEntityArrayExpand(KjNode* tree)
 {
   for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    for (KjNode* nodeP = entityP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
-      if (strcmp(nodeP->name, "type") == 0)
-        nodeP->value.s = orionldContextItemExpand(orionldState.contextP, nodeP->value.s, true, NULL);
-      else if (strcmp(nodeP->name, "id")       == 0) {}
-      else if (strcmp(nodeP->name, "location") == 0) {}
+      if (strcmp(attrP->name, "type") == 0)
+        attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
+      else if (strcmp(attrP->name, "id")       == 0) {}
+      else if (strcmp(attrP->name, "location") == 0) {}
       else
-        nodeP->name = orionldContextItemExpand(orionldState.contextP, nodeP->name, true, NULL);
+      {
+        attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+
+        if (attrP->type == KjObject)
+        {
+          for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+          {
+            if      (strcmp(subAttrP->name, "type")        == 0) {}
+            else if (strcmp(subAttrP->name, "id")          == 0) {}
+            else if (strcmp(subAttrP->name, "value")       == 0) {}
+            else if (strcmp(subAttrP->name, "object")      == 0) {}
+            else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
+            else if (strcmp(subAttrP->name, "location")    == 0) {}
+            else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
+            else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
+            else
+            {
+              LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
+              subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
+              LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -85,7 +106,7 @@ bool temporalPostBatchCreate(ConnectionInfo* ciP)
   //
 
 
-  // Expanding entity types and attribute names - FIXME: Remove ...
+  // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchCreate.cpp has been fixed to do that
   temporalEntityArrayExpand(orionldState.requestTree);
 
   // FIXME: Implement orionldState.dbName
