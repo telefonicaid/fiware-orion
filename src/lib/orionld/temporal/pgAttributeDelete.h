@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTEDELETE_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTEDELETE_H_
+
 /*
 *
 * Copyright 2020 FIWARE Foundation e.V.
@@ -22,30 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
-
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/temporal/pgEntityDelete.h"                   // Own interface
+#include <postgresql/libpq-fe.h>                                 // PGconn
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgEntityDelete - mark an entity as deleted in the database
+// pgAttributeDelete - mark an attribute as deleted in the database
 //
-bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id, char* deletedAt)
-{
-  char       sql[512];
-  PGresult*  res;
+extern bool pgAttributeDelete(PGconn* connectionP, char* entityId, char* instanceId, char* attributeName, char* deletedAt);
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', 'DELETED', '%s', '%s', '%s')", instanceId, id, deletedAt, deletedAt, deletedAt);
-  LM_TMP(("SQL[%p]: %s", connectionP, sql));
-  res = PQexec(connectionP, sql);
-  if (res == NULL)
-    LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
-
-  LM_TMP(("TEMP: DB operation to mark an entity as deleted seems to have worked"));
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTEDELETE_H_

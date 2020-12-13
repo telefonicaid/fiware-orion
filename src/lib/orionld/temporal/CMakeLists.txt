@@ -59,6 +59,7 @@ SET (SOURCES
     pgCompoundSubPropertyPush.cpp
     pgNumberSubPropertyPush.cpp
     pgEntityDelete.cpp
+    pgAttributeDelete.cpp
 )
 
 SET (HEADERS
@@ -97,6 +98,7 @@ SET (HEADERS
     pgCompoundSubPropertyPush.h
     pgNumberSubPropertyPush.h
     pgEntityDelete.h
+    pgAttributeDelete.h
 )
 
 
