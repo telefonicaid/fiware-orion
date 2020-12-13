@@ -1,0 +1,141 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+--NAME--
+Simple test of creation of an Entity followded by a DELETE of the entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -temporal
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attributes and sub-attributes
+# 02. Delete E1
+# 03. See E1 in the temporal database
+# 04. See the attributes in the temporal database
+# 05. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity with all possible combinations"
+echo "==================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "SP": {
+    "type": "Property",
+    "value": "SP of E1",
+    "observedAt": "2020-12-10T07:11:00.123Z",
+    "Sub-R": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:rel:R",
+      "observedAt": "2020-12-10T07:12:00.123Z"
+    },
+    "Sub-Int": {
+      "type": "Property",
+      "value": 33,
+      "observedAt": "2020-12-10T07:12:00.128Z",
+      "unitCode": "pi-i"
+    }
+  },
+  "R": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:relationships:R",
+    "observedAt": "2020-12-10T07:11:00.129Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Delete E1"
+echo "============="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1 -X DELETE
+echo
+echo
+
+
+echo "03. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT id,type,deletedAt FROM entities"
+echo
+echo
+
+
+echo "04. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt FROM attributes"
+echo
+echo
+
+
+echo "05. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with all possible combinations
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Delete E1
+=============
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. See E1 in the temporal database
+===================================
+id,type,deletedat
+urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+urn:ngsi-ld:entities:E1,DELETED,REGEX(202.*)
+
+
+04. See the attributes in the temporal database
+===============================================
+id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat
+https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123
+https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129
+
+
+05. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R,,,2020-12-10 07:12:00.123
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,2020-12-10 07:12:00.128
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
