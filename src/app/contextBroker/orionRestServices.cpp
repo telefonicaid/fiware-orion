@@ -203,6 +203,7 @@ static RestService getServiceV[] =
   { StatisticsRequest,                             2, { "cache", "statistics"                                                          },  statisticsCacheTreat                             },
   { StatisticsRequest,                             4, { "v1", "admin", "cache", "statistics"                                           },  statisticsCacheTreat                             },
   { VersionRequest,                                1, { "version"                                                                      },  versionTreat                                     },
+  { VersionRequest,                                2, { "admin", "dependencies"                                                        },  versionTreat                                     },
   { LogLevelRequest,                               2, { "admin", "log"                                                                 },  getLogLevel                                      },
   { SemStateRequest,                               2, { "admin", "sem"                                                                 },  semStateTreat                                    },
   { MetricsRequest,                                2, { "admin", "metrics"                                                             },  getMetrics                                       },
