@@ -31,6 +31,8 @@
 * Issue  #599   Compound sub-attributes (Array, Object) are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Integer sub-attributes are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Float sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entityOperations/create
 * Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entities
 * Issue  #599   Implemented TRoE for DELETE /ngsi-ld/v1/entities/{entity-id}
 * Issue  #599   Implemented TRoE for DELETE /ngsi-ld/v1/entities/{entity-id}/attrs/{attributeName}
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entityOperations/delete
