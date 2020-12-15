@@ -1434,7 +1434,7 @@ function pgCreate()
   creation="CREATE DATABASE $dbName"
   postgis="CREATE EXTENSION IF NOT EXISTS postgis"
   valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'DateTime', 'Geo', 'LanguageMap')"
-  operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Update', 'Replace', 'Delete')"
+  operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
   entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
   attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
   subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT, entityId TEXT NOT NULL, attributeRef TEXT NOT NULL REFERENCES attributes(instanceId), attributeId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"

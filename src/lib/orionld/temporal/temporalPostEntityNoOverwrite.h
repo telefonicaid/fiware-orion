@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITYNOOVERWRITE_H_
+#define SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITYNOOVERWRITE_H_
+
 /*
 *
 * Copyright 2020 FIWARE Foundation e.V.
@@ -22,31 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/temporal/temporal.h"                         // Own interface
+#include "rest/ConnectionInfo.h"                               // ConnectionInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// temporalMode -
+// temporalPostEntityNoOverwrite -
 //
-const char* temporalMode(TemporalMode opMode)
-{
-  switch (opMode)
-  {
-  case TEMPORAL_ENTITY_CREATE:      return "Create";
-  case TEMPORAL_ENTITY_UPDATE:      return "Update";
-  case TEMPORAL_ENTITY_REPLACE:     return "Replace";
-  case TEMPORAL_ENTITY_DELETE:      return "Delete";
-  case TEMPORAL_ATTRIBUTE_APPEND:   return "Append";
-  case TEMPORAL_ATTRIBUTE_UPDATE:   return "Update";
-  case TEMPORAL_ATTRIBUTE_REPLACE:  return "Replace";
-  case TEMPORAL_ATTRIBUTE_DELETE:   return "Delete";
-  }
+extern bool temporalPostEntityNoOverwrite(ConnectionInfo* ciP);
 
-  LM_E(("Invalid TemporalMode: %d", opMode));
-  return "INVALID";
-}
+#endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORALPOSTENTITYNOOVERWRITE_H_
