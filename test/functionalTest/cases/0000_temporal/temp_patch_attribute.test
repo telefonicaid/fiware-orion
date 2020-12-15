@@ -19,7 +19,7 @@
 # orionld at fiware dot org
 
 --NAME--
-Simple test of creation of an Entity followed by a DELETE of one of the attributes of the entity
+Simple test of creation of an Entity followed by a PATCH of one of the attributes of the entity
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -30,21 +30,21 @@ brokerStart CB 100 IPv4 -temporal
 --SHELL--
 
 #
-# 01. Create an entity E1 with attributes and sub-attributes
-# 02. Delete E1:SP
+# 01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int
+# 02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44
 # 03. See E1 in the temporal database
 # 04. See the attributes in the temporal database
 # 05. See the sub-attributes in the temporal database
 #
 
-echo "01. Create an entity with all possible combinations"
-echo "==================================================="
+echo "01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int"
+echo "===================================================================================="
 payload='{
   "id": "urn:ngsi-ld:entities:E1",
   "type": "T",
-  "SP": {
+  "P": {
     "type": "Property",
-    "value": "SP of E1",
+    "value": "P of E1",
     "observedAt": "2020-12-10T07:11:00.123Z",
     "Sub-R": {
       "type": "Relationship",
@@ -69,9 +69,21 @@ echo
 echo
 
 
-echo "02. Delete E1:SP"
-echo "================"
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/SP -X DELETE
+echo "02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44"
+echo "=============================================================================="
+payload='{
+  "value": 44,
+  "Sub-R": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:rel:R2",
+    "observedAt": "2020-12-10T07:12:00.124Z"
+  },
+  "Sub-P": {
+    "type": "Property",
+    "value": "Sub-P"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs/P -X PATCH --payload "$payload"
 echo
 echo
 
@@ -98,8 +110,8 @@ echo
 
 
 --REGEXPECT--
-01. Create an entity with all possible combinations
-===================================================
+01. Create an entity E1 with attributes P and R - P with sub-attrs Sub-R and Sub-Int
+====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
@@ -107,8 +119,8 @@ Date: REGEX(.*)
 
 
 
-02. Delete E1:SP
-================
+02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44
+==============================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -124,16 +136,18 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
 04. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat,deletedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,t,,,P of E1,,,2020-12-10 07:11:00.123,
 Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,
-Delete,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:entities:E1,,,,,,,,REGEX(202.*)
+Update,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,44,,,
 
 
 05. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R,,,2020-12-10 07:12:00.123
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,2020-12-10 07:12:00.128
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:rel:R,,,2020-12-10 07:12:00.123
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,pi-i,,33,,2020-12-10 07:12:00.128
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:rel:R2,,,2020-12-10 07:12:00.124
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,Sub-P,,,
 
 
 --TEARDOWN--

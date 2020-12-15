@@ -272,6 +272,7 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    forwardAttrsCompacted;
+  bool                    temporalError;
 } OrionldConnectionState;
 
 
