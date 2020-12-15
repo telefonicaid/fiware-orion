@@ -34,6 +34,7 @@ SET (SOURCES
     temporalPostEntities.cpp
     temporalPostEntity.cpp
     temporalPostEntityNoOverwrite.cpp
+    temporalPatchAttribute.cpp
     pgInit.cpp
     pgConnectionGet.cpp
     pgConnectionRelease.cpp
@@ -78,6 +79,7 @@ SET (HEADERS
     temporalPostEntities.h
     temporalPostEntity.h
     temporalPostEntityNoOverwrite.h
+    temporalPatchAttribute.h
     pgInit.h
     pgConnectionGet.h
     pgConnectionRelease.h

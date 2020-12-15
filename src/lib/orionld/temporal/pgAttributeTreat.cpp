@@ -93,8 +93,8 @@ bool pgAttributeTreat
   if (attrP->type == KjArray)
     LM_RE(false, ("Attribute is an array ... datasetId? Sorry - not yet implemented"));
 
-  KjNode* typeP = kjLookup(attrP, "type");
-  char*   attributeType;
+  char*   attributeType = NULL;
+  KjNode* typeP         = kjLookup(attrP, "type");
 
   if (typeP == NULL)
     LM_RE(false, ("Attribute '%s' has no type", attrP->name));

@@ -1034,11 +1034,19 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   {
     if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
     {
-      numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
+      //
+      // Also, if something went wrong during processing, the SR can flag this by setting the requestTree to NULL
+      //
+      if (orionldState.temporalError == true)
+        LM_E(("TRoE Error - something went wrong during processing for TRoE"));
+      else
+      {
+        numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
 
-      LM_TMP(("TMPF: Calling Temporal Routine!"));
-      orionldState.serviceP->temporalRoutine(ciP);
-      LM_TMP(("TMPF: After Temporal Routine!"));
+        LM_TMP(("TMPF: Calling Temporal Routine!"));
+        orionldState.serviceP->temporalRoutine(ciP);
+        LM_TMP(("TMPF: After Temporal Routine!"));
+      }
     }
     else
       LM_TMP(("TMPF: No temporal routine for this request"));

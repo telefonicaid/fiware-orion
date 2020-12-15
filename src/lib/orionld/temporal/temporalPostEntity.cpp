@@ -62,7 +62,6 @@ bool temporalPostEntity(ConnectionInfo* ciP)
   if (orionldState.uriParamOptions.noOverwrite == true)
     return temporalPostEntityNoOverwrite(ciP);
 
-  LM_TMP(("APPA: incoming tree for Attribute Append|Replace: %s", debugBuf));
   // FIXME: Implement orionldState.dbName
   if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
     LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
