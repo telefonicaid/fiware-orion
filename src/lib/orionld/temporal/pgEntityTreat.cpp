@@ -96,6 +96,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
   {
     if (attrP->type == KjObject)
     {
+      LM_TMP(("APPA: Calling pgAttributeTreat with opMode %s", temporalMode(opMode)));
       if (pgAttributeTreat(connectionP, attrP, entityInstanceP, id, createdAt, modifiedAt, opMode) == false)
         LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
     }

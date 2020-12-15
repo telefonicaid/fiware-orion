@@ -42,27 +42,16 @@ extern "C"
 #include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
 #include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
 #include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
-#include "orionld/temporal/temporalPostEntityNoOverwrite.h"    // temporalPostEntityNoOverwrite
-#include "orionld/temporal/temporalPostEntity.h"               // Own interface
+#include "orionld/temporal/temporalPostEntityNoOverwrite.h"    // Own interface
 
 
 
 // ----------------------------------------------------------------------------
 //
-// temporalPostEntity -
+// temporalPostEntityNoOverwrite -
 //
-bool temporalPostEntity(ConnectionInfo* ciP)
+bool temporalPostEntityNoOverwrite(ConnectionInfo* ciP)
 {
-  // <DEBUG>
-  char debugBuf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, debugBuf, sizeof(debugBuf));
-  LM_TMP(("APPA: incoming tree: %s", debugBuf));
-  // </DEBUG>
-
-  if (orionldState.uriParamOptions.noOverwrite == true)
-    return temporalPostEntityNoOverwrite(ciP);
-
-  LM_TMP(("APPA: incoming tree for Attribute Append|Replace: %s", debugBuf));
   // FIXME: Implement orionldState.dbName
   if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
     LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
@@ -75,9 +64,9 @@ bool temporalPostEntity(ConnectionInfo* ciP)
     LM_RE(false, ("pgTransactionBegin failed"));
 
   char* entityId   = orionldState.wildcard[0];
-  char* entityType = (char*) "REPLACE";
-  LM_TMP(("TEMP: Calling pgEntityTreat for entity '%s'", entityId));
-  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ATTRIBUTE_REPLACE) == false)
+  char* entityType = (char*) "APPEND";
+  LM_TMP(("APPA: Calling pgEntityTreat for entity '%s'", entityId));
+  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ATTRIBUTE_APPEND) == false)
   {
     LM_E(("Database Error (post entities temporal layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
