@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TEMPORAL_PGENTITYPUSH_H_
-#define SRC_LIB_ORIONLD_TEMPORAL_PGENTITYPUSH_H_
-
 /*
 *
 * Copyright 2020 FIWARE Foundation e.V.
@@ -25,14 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/temporal/temporal.h"                         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgEntityPush - push an entity to the database
+// temporalMode -
 //
-extern bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, char* createdAt, char* modifiedAt, const char* opMode);
+const char* temporalMode(TemporalMode opMode)
+{
+  switch (opMode)
+  {
+  case TEMPORAL_ENTITY_CREATE:      return "Create";
+  case TEMPORAL_ENTITY_UPDATE:      return "Update";
+  case TEMPORAL_ENTITY_REPLACE:     return "Replace";
+  case TEMPORAL_ENTITY_DELETE:      return "Delete";
+  case TEMPORAL_ATTRIBUTE_APPEND:   return "Create";
+  case TEMPORAL_ATTRIBUTE_UPDATE:   return "Update";
+  case TEMPORAL_ATTRIBUTE_REPLACE:  return "Replace";
+  case TEMPORAL_ATTRIBUTE_DELETE:   return "Delete";
+  }
 
-#endif  // SRC_LIB_ORIONLD_TEMPORAL_PGENTITYPUSH_H_
+  LM_E(("Invalid TemporalMode: %d", opMode));
+  return "INVALID";
+}

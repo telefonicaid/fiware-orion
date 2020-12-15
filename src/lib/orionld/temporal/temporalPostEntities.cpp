@@ -24,10 +24,7 @@
 */
 extern "C"
 {
-#include "kbase/kMacros.h"                                     // K_FT
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -123,7 +120,7 @@ bool temporalPostEntities(ConnectionInfo* ciP)
   LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
   char* entityId   = orionldState.payloadIdNode->value.s;
   char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
-  if (pgEntityTreat(connectionP, entityP, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString) == false)
+  if (pgEntityTreat(connectionP, entityP, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ENTITY_CREATE) == false)
   {
     LM_E(("Database Error (post entities temporal layer failed)"));
     if (pgTransactionRollback(connectionP) == false)

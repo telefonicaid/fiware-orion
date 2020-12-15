@@ -32,6 +32,8 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "orionld/temporal/temporal.h"                         // TemporalMode
+
 
 
 // -----------------------------------------------------------------------------
@@ -45,7 +47,8 @@ extern bool pgAttributeTreat
   const char*  entityRef,
   const char*  entityId,
   const char*  createdAt,
-  const char*  modifiedAt
+  const char*  modifiedAt,
+  TemporalMode opMode
 );
 
 

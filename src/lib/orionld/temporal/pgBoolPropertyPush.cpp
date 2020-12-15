@@ -39,6 +39,7 @@
 bool pgBoolPropertyPush
 (
   PGconn*      connectionP,
+  const char*  opMode,
   bool         value,
   const char*  entityRef,
   const char*  entityId,
@@ -62,30 +63,30 @@ bool pgBoolPropertyPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, boolValueAsString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, boolValueAsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, boolValueAsString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, boolValueAsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, boolValueAsString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, boolValueAsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, boolValueAsString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, boolValueAsString);
   }
 
 
@@ -96,8 +97,6 @@ bool pgBoolPropertyPush
 
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
-  else
-    LM_TMP(("SQL: DB operation to insert a Boolean Property seems to have worked"));
 
   return true;
 }

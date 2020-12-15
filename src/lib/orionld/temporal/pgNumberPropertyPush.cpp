@@ -39,6 +39,7 @@
 bool pgNumberPropertyPush
 (
   PGconn*      connectionP,
+  const char*  opMode,
   double       numberValue,
   const char*  entityRef,
   const char*  entityId,
@@ -72,30 +73,30 @@ bool pgNumberPropertyPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, numberValue, unitCodeString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
-             attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, numberValue, unitCodeString);
   }
 
 
@@ -106,8 +107,6 @@ bool pgNumberPropertyPush
 
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
-  else
-    LM_TMP(("SQL: DB operation to insert a Number Property seems to have worked"));
 
   return true;
 }

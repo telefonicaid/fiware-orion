@@ -22,13 +22,26 @@
 *
 * Author: Ken Zangelin
 */
+#include <postgresql/libpq-fe.h>                               // PGconn
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjRender.h"                                    // kjRender
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
+#include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
+#include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
+#include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
+#include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
 #include "orionld/temporal/temporalPostEntity.h"               // Own interface
 
 
@@ -39,11 +52,46 @@
 //
 bool temporalPostEntity(ConnectionInfo* ciP)
 {
-  LM_E(("Not Implemented"));
+  // <DEBUG>
+  char debugBuf[1024];
+  kjRender(orionldState.kjsonP, orionldState.requestTree, debugBuf, sizeof(debugBuf));
+  LM_TMP(("APPA: incoming tree: %s", debugBuf));
+  // </DEBUG>
 
-  orionldState.httpStatusCode  = 501;
-  orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
+#if 0
+  LM_TMP(("APPA: incoming tree for Attribute Append|Ignore: %s", debugBuf));
+  if (orionldState.uriParamOptions.noOverwrite == true)
+    return temporalPostEntityNoOverwrite(ciP);
+#endif
 
-  return false;
+  LM_TMP(("APPA: incoming tree for Attribute Append|Replace: %s", debugBuf));
+  // FIXME: Implement orionldState.dbName
+  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
+    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
+
+  PGconn* connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
+
+  if (pgTransactionBegin(connectionP) != true)
+    LM_RE(false, ("pgTransactionBegin failed"));
+
+  char* entityId   = orionldState.wildcard[0];
+  char* entityType = (char*) "REPLACE";
+  LM_TMP(("TEMP: Calling pgEntityTreat for entity '%s'", entityId));
+  if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ATTRIBUTE_REPLACE) == false)
+  {
+    LM_E(("Database Error (post entities temporal layer failed)"));
+    if (pgTransactionRollback(connectionP) == false)
+      LM_RE(false, ("pgTransactionRollback failed"));
+  }
+  else
+  {
+    if (pgTransactionCommit(connectionP) != true)
+      LM_RE(false, ("pgTransactionCommit failed"));
+  }
+
+  pgConnectionRelease(connectionP);
+
+  return true;
 }

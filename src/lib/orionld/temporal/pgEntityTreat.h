@@ -32,12 +32,14 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "orionld/temporal/temporal.h"                         // TemporalMode
+
 
 
 // -----------------------------------------------------------------------------
 //
 // pgEntityTreat -
 //
-extern bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt);
+extern bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt, TemporalMode mode);
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGENTITYTREAT_H_

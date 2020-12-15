@@ -1,0 +1,244 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+--NAME--
+Attribute append with overwrite allowed
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -temporal
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attrs P1 and R1
+# 02. Append P2 and R2 (pure append - P2 and R2 did not previously exist)
+# 03. See E1 in the temporal database
+# 04. See the attributes in the temporal database
+# 05. See the sub-attributes in the temporal database
+#
+# 06. Append P1 and R3 (P1 will overwrite the previous P1)
+# 07. See E1 in the temporal database
+# 08. See the attributes in the temporal database - especially the new overwritten P1
+# 09. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity E1 with attrs P1 and R1"
+echo "============================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": "P1",
+    "Sub-P": {
+      "type": "Property",
+      "value": "Sub-P"
+    }
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:relationships:R1",
+    "Sub-R": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:Sub-R"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Append P2 and R2 (pure append - P2 and R2 did not previously exist)"
+echo "======================================================================="
+payload='{
+  "P2": {
+    "type": "Property",
+    "value": "P2",
+    "Sub-P2": {
+      "type": "Property",
+      "value": "Sub-P2"
+    }
+  },
+  "R2": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:relationships:R2",
+    "Sub-R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:Sub-R2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "03. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type,deletedAt FROM entities"
+echo
+echo
+
+
+echo "04. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+echo
+echo
+
+
+echo "05. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+echo "06. Append P1 and R3 (P1 will overwrite the previous P1)"
+echo "========================================================"
+payload='{
+  "P1": {
+    "type": "Property",
+    "value": "NEW P1",
+    "Sub-P": {
+      "type": "Property",
+      "value": "New Sub-P"
+    }
+  },
+  "R3": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:relationships:R3",
+    "Sub-R3": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:Sub-R3"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type,deletedAt FROM entities"
+echo
+echo
+
+
+echo "08. See the attributes in the temporal database - especially the new overwritten P1"
+echo "==================================================================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+echo
+echo
+
+
+echo "09. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attrs P1 and R1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Append P2 and R2 (pure append - P2 and R2 did not previously exist)
+=======================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. See E1 in the temporal database
+===================================
+opmode,id,type,deletedat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+
+
+04. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,,P2,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R2,,
+
+
+05. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P2,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P2,,Sub-P2,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R2,,urn:ngsi-ld:relationships:Sub-R2,,
+
+
+06. Append P1 and R3 (P1 will overwrite the previous P1)
+========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. See E1 in the temporal database
+===================================
+opmode,id,type,deletedat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+
+
+08. See the attributes in the temporal database - especially the new overwritten P1
+===================================================================================
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,t,,,P2,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R2,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,NEW P1,,
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R3,,
+
+
+09. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P2,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P2,,Sub-P2,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R2,,urn:ngsi-ld:relationships:Sub-R2,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,New Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R3,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R3,,urn:ngsi-ld:relationships:Sub-R3,,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

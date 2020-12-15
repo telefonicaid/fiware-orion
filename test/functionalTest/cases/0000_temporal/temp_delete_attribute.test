@@ -78,14 +78,14 @@ echo
 
 echo "03. See E1 in the temporal database"
 echo "==================================="
-postgresCmd -sql "SELECT id,type,deletedAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,deletedAt FROM entities"
 echo
 echo
 
 
 echo "04. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt,deletedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt,deletedAt FROM attributes"
 echo
 echo
 
@@ -117,16 +117,16 @@ Date: REGEX(.*)
 
 03. See E1 in the temporal database
 ===================================
-id,type,deletedat
-urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+opmode,id,type,deletedat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
 
 
 04. See the attributes in the temporal database
 ===============================================
-id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat,deletedat
-https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123,
-https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,
-https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:entities:E1,,,,,,,,REGEX(202.*)
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat,deletedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123,
+Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,
+Delete,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:entities:E1,,,,,,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database

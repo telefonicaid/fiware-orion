@@ -110,8 +110,6 @@ bool pgCompoundSubPropertyPush
 
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
-  else
-    LM_TMP(("SQL: DB operation to insert a Compound Sub-Property seems to have worked"));
 
   return true;
 }

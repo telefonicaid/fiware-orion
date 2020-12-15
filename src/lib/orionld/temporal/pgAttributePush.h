@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+#include <postgresql/libpq-fe.h>                               // PGconn
 
 
 
@@ -47,7 +47,8 @@ extern bool pgAttributePush
   const char*  createdAt,
   const char*  modifiedAt,
   bool         subAttrs,
-  const char*  unitCode
+  const char*  unitCode,
+  const char*  opMode
 );
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGATTRIBUTEPUSH_H_

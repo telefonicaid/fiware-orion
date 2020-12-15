@@ -32,7 +32,7 @@
 //
 // TEMPORAL_DB - the name of the default database
 //
-#define TEMPORAL_DB "orion_ld"  // FIXME: change name to 'orion' - to align with mongodb
+#define TEMPORAL_DB "orion"
 
 
 
@@ -49,5 +49,31 @@
 // TEMPORAL_DB_PASSWORD
 //
 #define TEMPORAL_DB_PASSWORD "password"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// TemporalMode -
+//
+typedef enum TemporalMode
+{
+  TEMPORAL_ENTITY_CREATE,
+  TEMPORAL_ENTITY_UPDATE,
+  TEMPORAL_ENTITY_REPLACE,
+  TEMPORAL_ENTITY_DELETE,
+  TEMPORAL_ATTRIBUTE_APPEND,
+  TEMPORAL_ATTRIBUTE_UPDATE,
+  TEMPORAL_ATTRIBUTE_REPLACE,
+  TEMPORAL_ATTRIBUTE_DELETE
+} TemporalMode;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// temporalMode -
+//
+extern const char* temporalMode(TemporalMode opMode);
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_TEMPORAL_H_
