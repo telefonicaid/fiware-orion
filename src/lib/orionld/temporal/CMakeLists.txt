@@ -21,6 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    temporal.cpp
     temporalInit.cpp
     temporalDeleteAttribute.cpp
     temporalDeleteEntity.cpp
@@ -63,6 +64,7 @@ SET (SOURCES
 )
 
 SET (HEADERS
+    temporal.h
     temporalInit.h
     temporalDeleteAttribute.h
     temporalDeleteEntity.h

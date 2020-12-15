@@ -36,3 +36,5 @@
 * Issue  #599   Implemented TRoE for DELETE /ngsi-ld/v1/entities/{entity-id}
 * Issue  #599   Implemented TRoE for DELETE /ngsi-ld/v1/entities/{entity-id}/attrs/{attributeName}
 * Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entityOperations/delete
+* Issue  #599   Added a TRoE table item 'opMode' for the tables 'entities' and 'attributes'
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entities/{entityId} without options=noOverwrite

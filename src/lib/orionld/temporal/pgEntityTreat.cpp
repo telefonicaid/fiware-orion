@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 
+#include "orionld/temporal/temporal.h"                         // TemporalMode
 #include "orionld/temporal/pgEntityPush.h"                     // pgEntityPush
 #include "orionld/temporal/pgAttributeTreat.h"                 // pgAttributeTreat
 #include "orionld/temporal/pgEntityTreat.h"                    // Own interface
@@ -48,8 +49,11 @@ extern "C"
 //
 // pgEntityTreat -
 //
-bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt)
+bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt, TemporalMode opMode)
 {
+  char  entityInstance[64];
+  char* entityInstanceP = NULL;
+
   // <DEBUG>
   char buf[1024];
   kjRender(orionldState.kjsonP, entityP, buf, sizeof(buf));
@@ -79,19 +83,20 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
     kjChildRemove(entityP, nodeP);
   }
 
-  char instanceId[64];
-  uuidGenerate(instanceId);
-
-  LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, instanceId, id, type, createdAt, modifiedAt));
-  if (pgEntityPush(connectionP, instanceId, id, type, createdAt, modifiedAt) == false)
-    LM_RE(false, ("pgEntityPush failed"));
+  if (opMode == TEMPORAL_ENTITY_CREATE)
+  {
+    uuidGenerate(entityInstance);
+    entityInstanceP = entityInstance;
+    LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, entityInstanceP, id, type, createdAt, modifiedAt));
+    if (pgEntityPush(connectionP, entityInstanceP, id, type, createdAt, modifiedAt, "Create") == false)
+      LM_RE(false, ("pgEntityPush failed"));
+  }
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
     if (attrP->type == KjObject)
     {
-      // FIXME: createdAt ... I need to know that the Attribute did not exist for this to be OK ...
-      if (pgAttributeTreat(connectionP, attrP, instanceId, id, createdAt, modifiedAt) == false)
+      if (pgAttributeTreat(connectionP, attrP, entityInstanceP, id, createdAt, modifiedAt, opMode) == false)
         LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
     }
     else if (attrP->type == KjArray)

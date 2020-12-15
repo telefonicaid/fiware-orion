@@ -37,6 +37,7 @@ extern "C"
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/temporal/temporal.h"                         // TemporalMode
 #include "orionld/temporal/pgAttributePush.h"                  // pgAttributePush
 #include "orionld/temporal/pgSubAttributeTreat.h"              // pgSubAttributeTreat
 #include "orionld/temporal/pgAttributeTreat.h"                 // Own interface
@@ -85,7 +86,8 @@ bool pgAttributeTreat
   const char*  entityRef,
   const char*  entityId,
   const char*  createdAt,
-  const char*  modifiedAt
+  const char*  modifiedAt,
+  TemporalMode opMode
 )
 {
   if (attrP->type == KjArray)
@@ -163,7 +165,8 @@ bool pgAttributeTreat
   // Push the attribute to DB
 
   LM_TMP(("OBS: Calling pgAttributePush with observedAt: %s", observedAt));
-  if (pgAttributePush(connectionP, valueNodeP, attributeType, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode) == false)
+  const char* opModeString = temporalMode(opMode);
+  if (pgAttributePush(connectionP, valueNodeP, attributeType, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode, opModeString) == false)
   {
     LM_E(("Internal Error (pgAttributePush failed)"));
     return false;

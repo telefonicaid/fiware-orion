@@ -1408,7 +1408,7 @@ function neqTimestamp()
 function pgDrop()
 {
   dbName="$1"
-  echo "DROP DATABASE IF EXISTS $dbName" | psql --host $PGHOST --port $PGPORT --username $PGUSER - 2> /tmp/pg-stderr-01
+  echo "DROP DATABASE IF EXISTS $dbName" | psql --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01
   egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
   egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
 
@@ -1434,12 +1434,14 @@ function pgCreate()
   creation="CREATE DATABASE $dbName"
   postgis="CREATE EXTENSION IF NOT EXISTS postgis"
   valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'DateTime', 'Geo', 'LanguageMap')"
-  entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
-  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
-  subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT NOT NULL REFERENCES entities(instanceId), entityId TEXT NOT NULL, attributeRef TEXT NOT NULL REFERENCES attributes(instanceId), attributeId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
+  operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Update', 'Replace', 'Delete')"
+  entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
+  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
+  subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT, entityId TEXT NOT NULL, attributeRef TEXT NOT NULL REFERENCES attributes(instanceId), attributeId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
 
-  echo $creation       | psql --host $PGHOST --port $PGPORT --username $PGUSER
   #echo $postgis       | psql --host $PGHOST --port $PGPORT --username $PGUSER
+  echo $creation       | psql --host $PGHOST --port $PGPORT --username $PGUSER
+  echo $operationMode  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo $valuetype      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo $entities       | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
   echo $attributes     | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"

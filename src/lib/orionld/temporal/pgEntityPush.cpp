@@ -35,17 +35,16 @@
 //
 // pgEntityPush - push an entity to the database
 //
-bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, char* createdAt, char* modifiedAt)
+bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, char* createdAt, char* modifiedAt, const char* opMode)
 {
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s', NULL)", instanceId, id, type, createdAt, modifiedAt);
+  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s', '%s', NULL)", instanceId, id, opMode, type, createdAt, modifiedAt);
   LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
 
-  LM_TMP(("TEMP: DB operation to insert an entity seems to have worked"));
   return true;
 }

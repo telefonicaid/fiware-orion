@@ -40,12 +40,11 @@ bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id, char* delet
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', 'DELETED', '%s', '%s', '%s')", instanceId, id, deletedAt, deletedAt, deletedAt);
+  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', 'Delete', 'NULL', '%s', '%s', '%s')", instanceId, id, deletedAt, deletedAt, deletedAt);
   LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
 
-  LM_TMP(("TEMP: DB operation to mark an entity as deleted seems to have worked"));
   return true;
 }

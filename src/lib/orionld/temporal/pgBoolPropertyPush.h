@@ -36,6 +36,7 @@
 extern bool pgBoolPropertyPush
 (
   PGconn*      connectionP,
+  const char*  opMode,
   bool         value,
   const char*  entityRef,
   const char*  entityId,
