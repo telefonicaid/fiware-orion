@@ -560,11 +560,7 @@ static void requestCompleted
   void**                      con_cls,
   MHD_RequestTerminationCode  toe
 )
-{
-  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
-
-  *con_cls = NULL;
-
+{  
   lmTransactionEnd();  // Incoming REST request ends
 
   //
@@ -574,11 +570,17 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
-  // It's unsual, but ciP can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
-  if (ciP == NULL)
+  // It's unsual, but *con_cls can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
+  // In addition, we add a similar check for con_cls (we haven't found any case in which this happens, but
+  // let's be conservative... otherwise CB will crash)
+  if ((con_cls == NULL) || (*con_cls == NULL))
   {
     return;
   }
+
+  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+
+  *con_cls = NULL;
 
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
