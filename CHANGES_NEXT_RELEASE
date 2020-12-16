@@ -1,0 +1,1 @@
+- Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
