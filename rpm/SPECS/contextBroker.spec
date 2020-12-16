@@ -176,6 +176,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Dec 16 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.1-1
+- Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
+
 * Fri Oct 30 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.0-1
 - Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
 - ADD: re-worked INFO log level, simplifying traces and making them much more useful (#3694)
