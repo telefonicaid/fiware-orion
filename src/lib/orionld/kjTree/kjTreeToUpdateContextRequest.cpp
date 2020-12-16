@@ -305,6 +305,10 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
     }
 
     ucrP->contextElementVector.push_back(ceP);
+
+    //
+    // FIXME: This is where the id and type would be put back for TRoE
+    //
     entityP = next;
   }
 }

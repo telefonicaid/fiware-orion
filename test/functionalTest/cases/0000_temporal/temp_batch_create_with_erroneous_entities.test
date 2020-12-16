@@ -1,0 +1,239 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+--NAME--
+Batch Create with some erroneous entities
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -temporal
+
+--SHELL--
+
+#
+# 01. Issue a Batch Create with two correct entities and one erroneous (entity id missing)
+# 02. See two, not three entities in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+#
+# 05. Issue a Batch Create attempting to create an entity that already exists, plus one new entity
+# 06. See three entities in the temporal database
+# 07. See the attributes in the temporal database
+# 08. See the sub-attributes in the temporal database
+#
+
+echo "01. Issue a Batch Create with two correct entities and one erroneous (entity id missing)"
+echo "========================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E1"
+    }
+  },
+  {
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of erroneous entity"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E3"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. See two, not three entities in the temporal database"
+echo "========================================================"
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+echo "05. Issue a Batch Create attempting to create an entity that already exists, plus one new entity"
+echo "================================================================================================"
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "E1 already existed"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E4",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E4"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+
+echo "06. See three entities in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "07. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt FROM attributes"
+echo
+echo
+
+
+echo "08. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Issue a Batch Create with two correct entities and one erroneous (entity id missing)
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 244
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E3"
+    ]
+}
+
+
+02. See two, not three entities in the temporal database
+========================================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,f,,,SP of E1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E3,f,,,SP of E3,,,
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+
+
+05. Issue a Batch Create attempting to create an entity that already exists, plus one new entity
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "status": 400,
+                "title": "entity already exists",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E4"
+    ]
+}
+
+
+06. See three entities in the temporal database
+===============================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T
+Create,urn:ngsi-ld:entities:E4,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+07. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,f,,,SP of E1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E3,f,,,SP of E3,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E4,f,,,SP of E4,,,
+
+
+08. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
