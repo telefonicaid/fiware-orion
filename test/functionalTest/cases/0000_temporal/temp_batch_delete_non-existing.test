@@ -1,0 +1,141 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+--NAME--
+Batch Deletion of entities that do not exist
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -temporal
+
+--SHELL--
+
+#
+# 01. Create three entities, E1, E2, and E3
+# 02. Delete E1 and E4 using Batch Delete
+# 03. See the entities in the temporal database - make sure E4 is not in TRoE
+#
+
+echo "01. Create three entities, E1, E2, and E3"
+echo "========================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E1",
+      "observedAt": "2020-12-10T07:11:00.123Z"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "SP": {
+      "type": "Property",
+      "value": "SP of E2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:R1"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. Delete E1 and E4 using Batch Delete"
+echo "======================================="
+payload='[
+  "urn:ngsi-ld:entities:E1",
+  "urn:ngsi-ld:entities:E4"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete --payload "$payload"
+echo
+echo
+
+
+echo "03. See the entities in the temporal database - make sure E4 is not in TRoE"
+echo "==========================================================================="
+postgresCmd -sql "SELECT opMode,id,type,deletedat FROM entities"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create three entities, E1, E2, and E3
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E2",
+        "urn:ngsi-ld:entities:E3"
+    ]
+}
+
+
+02. Delete E1 and E4 using Batch Delete
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E4",
+            "error": "Entity not found in database."
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E1"
+    ]
+}
+
+
+03. See the entities in the temporal database - make sure E4 is not in TRoE
+===========================================================================
+opmode,id,type,deletedat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,
+Delete,urn:ngsi-ld:entities:E1,NULL,REGEX(202.*)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
