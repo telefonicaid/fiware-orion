@@ -567,100 +567,102 @@ static void requestCompleted
 
   lmTransactionEnd();  // Incoming REST request ends
 
-  // It's unsual, but ciP can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
-  if (ciP != NULL)
-  {
-    std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
-    struct timespec  reqEndTime;
-
-    if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
-    {
-      // Variant with payload
-      logInfoRequestWithPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->payload, ciP->httpStatusCode);
-    }
-    else
-    {
-      // Variant without payload
-      logInfoRequestWithoutPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->httpStatusCode);
-    }
-
-    if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
-    {
-      free(ciP->payload);
-    }
-
-    if (timingStatistics)
-    {
-      clock_gettime(CLOCK_REALTIME, &reqEndTime);
-      clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
-
-      //
-      // Statistics
-      //
-      // Flush this requests timing measures onto a global var to be read by "GET /statistics".
-      // Also, increment the accumulated measures.
-      //
-      timeStatSemTake(__FUNCTION__, "updating statistics");
-
-      memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
-
-      //
-      // "Fix" mongoBackendTime
-      //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
-      //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
-      //
-      clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
-      clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
-      clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
-
-      clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
-      clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
-      clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
-      clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
-      clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
-      clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
-      clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
-      clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
-
-      timeStatSemGive(__FUNCTION__, "updating statistics");
-    }
-
-    //
-    // Metrics
-    //
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
-
-    //
-    // If the httpStatusCode is above the set of 200s, an error has occurred
-    //
-    if (ciP->httpStatusCode >= SccBadRequest)
-    {
-      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
-    }
-
-    if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
-    {
-      struct timeval  end;
-
-      if (gettimeofday(&end, NULL) == 0)
-      {
-        unsigned long long elapsed =
-          (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
-          (end.tv_usec - ciP->transactionStart.tv_usec);
-
-        metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
-      }
-    }
-
-    delete(ciP);
-  }
-
   //
   // delayed release of ContextElementResponseVector must be effectuated now.
   // See github issue #2994
   //
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
+
+  // It's unsual, but ciP can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
+  if (ciP == NULL)
+  {
+    return;
+  }
+
+  std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
+  struct timespec  reqEndTime;
+
+  if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
+  {
+    // Variant with payload
+    logInfoRequestWithPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->payload, ciP->httpStatusCode);
+  }
+  else
+  {
+    // Variant without payload
+    logInfoRequestWithoutPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->httpStatusCode);
+  }
+
+  if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
+  {
+    free(ciP->payload);
+  }
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+
+    //
+    // Statistics
+    //
+    // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+    // Also, increment the accumulated measures.
+    //
+    timeStatSemTake(__FUNCTION__, "updating statistics");
+
+    memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
+
+    //
+    // "Fix" mongoBackendTime
+    //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
+    //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
+    //
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
+
+    clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
+    clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
+    clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
+    clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
+    clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
+    clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
+    clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
+
+    timeStatSemGive(__FUNCTION__, "updating statistics");
+  }
+
+  //
+  // Metrics
+  //
+  metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
+
+  //
+  // If the httpStatusCode is above the set of 200s, an error has occurred
+  //
+  if (ciP->httpStatusCode >= SccBadRequest)
+  {
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+  }
+
+  if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
+  {
+    struct timeval  end;
+
+    if (gettimeofday(&end, NULL) == 0)
+    {
+      unsigned long long elapsed =
+          (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
+          (end.tv_usec - ciP->transactionStart.tv_usec);
+
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
+    }
+  }
+
+  delete(ciP);
 }
 
 
