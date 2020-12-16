@@ -41,3 +41,4 @@
 * Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entities/{entityId} with options=noOverwrite
 * Issue  #599   Implemented TRoE for PATCH /ngsi-ld/v1/entities/{entityId}/attrs/{attributeName}
 * Issue  #599   Implemented TRoE for PATCH /ngsi-ld/v1/entities/{entityId}/attrs
+* Issue  #652   BATCH Delete with more than one item for the same entity id
