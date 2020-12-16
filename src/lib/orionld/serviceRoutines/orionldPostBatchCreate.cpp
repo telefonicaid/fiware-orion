@@ -125,14 +125,6 @@ static void entityIdGet(KjNode* dbEntityP, char** idP)
 bool orionldPostBatchCreate(ConnectionInfo* ciP)
 {
   //
-  // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
-  //        Rather than cloning the entire tree, just put them back again after processing
-  //
-  KjNode* cloneP = NULL;  // Only for temporal
-  if (temporal)
-    cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
-
-  //
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array
   // * cannot be empty
@@ -168,6 +160,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
     entityP = next;
   }
+
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
   //     whose Entity::Id is part of the array "idArray".
@@ -193,6 +186,20 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   }
 
   typeCheckForNonExistingEntities(incomingTree, idTypeAndCreDateFromDb, errorsArrayP, NULL);
+
+  //
+  // Now that:
+  //   - the erroneous entities have been removed from the incoming tree,
+  //   - entities that already existed have been removed from the incoming tree,
+  // let's clone the tree for TRoE !!!
+  //
+  //
+  // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
+  //        Rather than CLONING the entire tree, just put them back again after processing
+  //
+  KjNode* cloneP = NULL;  // Only for temporal
+  if (temporal)
+    cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   UpdateContextRequest  mongoRequest;
 
