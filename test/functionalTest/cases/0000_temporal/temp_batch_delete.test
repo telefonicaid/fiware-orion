@@ -33,6 +33,8 @@ brokerStart CB 100 IPv4 -temporal
 # 01. Create three entities, E1, E2, and E3
 # 02. Delete E1 and E3 using Batch Delete
 # 03. See the entities in the temporal database
+# 04. Attempt to delete E2 twice
+# 05. See the entities in the temporal database - E2 should be deleted only once in TRoE
 #
 
 echo "01. Create three entities, E1, E2, and E3"
@@ -87,6 +89,24 @@ echo
 echo
 
 
+echo "04. Attempt to delete E2 twice"
+echo "=============================="
+payload='[
+  "urn:ngsi-ld:entities:E2",
+  "urn:ngsi-ld:entities:E2"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete --payload "$payload"
+echo
+echo
+
+
+echo "05. See the entities in the temporal database - E2 should be deleted only once in TRoE"
+echo "======================================================================================"
+postgresCmd -sql "SELECT opMode,id,type,deletedat FROM entities"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create three entities, E1, E2, and E3
 =========================================
@@ -131,6 +151,33 @@ Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,
 Delete,urn:ngsi-ld:entities:E1,NULL,REGEX(202.*)
 Delete,urn:ngsi-ld:entities:E3,NULL,REGEX(202.*)
+
+
+04. Attempt to delete E2 twice
+==============================
+HTTP/1.1 200 OK
+Content-Length: 51
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entities:E2"
+    ]
+}
+
+
+05. See the entities in the temporal database - E2 should be deleted only once in TRoE
+======================================================================================
+opmode,id,type,deletedat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,
+Delete,urn:ngsi-ld:entities:E1,NULL,REGEX(202.*)
+Delete,urn:ngsi-ld:entities:E3,NULL,REGEX(202.*)
+Delete,urn:ngsi-ld:entities:E2,NULL,REGEX(202.*)
 
 
 --TEARDOWN--
