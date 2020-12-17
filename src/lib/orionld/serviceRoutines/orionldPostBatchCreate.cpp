@@ -187,6 +187,58 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
   typeCheckForNonExistingEntities(incomingTree, idTypeAndCreDateFromDb, errorsArrayP, NULL);
 
+
+  //
+  // Attempts to create an entity more than once (more than one instance with the same Entity ID in the entity array)
+  // shall result in an error message (part of 207 response) for the all but the first instance
+  //
+  KjNode* eidP = orionldState.requestTree->value.firstChildP;
+  while (eidP != NULL)
+  {
+    next = eidP->next;
+
+    //
+    // Get the 'id' field
+    //
+    KjNode* idP = kjLookup(eidP, "id");
+    if (idP == NULL)
+    {
+      LM_E(("Internal Error (no 'id' for entity in batch create entity array - how did this get all the way here?)"));
+      eidP = next;
+      continue;
+    }
+
+    //
+    // Compare the 'id' field of current (eidP) with all nextcoming EIDs is the array
+    // If match, remove the latter
+    //
+    KjNode* copyP = eidP->next;
+    KjNode* copyNext;
+
+    while (copyP != NULL)
+    {
+      copyNext = copyP->next;
+
+      // Lookup the 'id' field
+      KjNode* copyIdP = kjLookup(copyP, "id");
+      if (copyIdP == NULL)
+      {
+        LM_E(("Internal Error (no 'id' for entity in batch create entity array - how did this get all the way here?)"));
+        copyP = copyNext;
+        continue;
+      }
+
+      if (strcmp(idP->value.s, copyIdP->value.s) == 0)
+      {
+        entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400);
+        kjChildRemove(orionldState.requestTree, copyP);
+      }
+      copyP = copyNext;
+    }
+
+    eidP = next;
+  }
+
   //
   // Now that:
   //   - the erroneous entities have been removed from the incoming tree,
