@@ -565,8 +565,6 @@ static void requestCompleted
 
   *con_cls = NULL;
 
-  lmTransactionEnd();  // Incoming REST request ends
-
   // It's unsual, but ciP can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
   if (ciP != NULL)
   {
@@ -654,6 +652,8 @@ static void requestCompleted
 
     delete(ciP);
   }
+
+  lmTransactionEnd();  // Incoming REST request ends
 
   //
   // delayed release of ContextElementResponseVector must be effectuated now.
