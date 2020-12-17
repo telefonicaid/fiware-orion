@@ -163,7 +163,7 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
 
     //
     // Compare current (eidP) string value with all nextcoming EIDs is the array
-    // If match, remove the nextcoming
+    // If match, remove the latter
     //
     KjNode* copyP = eidP->next;
     KjNode* copyNext;

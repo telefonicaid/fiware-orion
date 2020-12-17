@@ -1,0 +1,141 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+--NAME--
+Batch Create with more than one entry for the same entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -temporal
+
+--SHELL--
+
+#
+# 01. Batch Create request with more than one entry for the same entity: E1,E1,E2 - SR supposed to clean up the array before calling TRoE
+# 02. See E1 and E2 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+#
+
+echo "01. Batch Create request with more than one entry for the same entity: E1,E1,E2 - SR supposed to clean up the array before calling TRoE"
+echo "======================================================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "P of E1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "P of E2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "P of second E1"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 and E2 in the temporal database"
+echo "=========================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Create request with more than one entry for the same entity: E1,E1,E2 - SR supposed to clean up the array before calling TRoE
+=======================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 229
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "status": 400,
+                "title": "Entity ID repetition",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E2"
+    ]
+}
+
+
+02. See E1 and E2 in the temporal database
+==========================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,f,,,P of E1,,,
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E2,f,,,P of E2,,,
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
