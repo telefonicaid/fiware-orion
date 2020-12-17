@@ -176,6 +176,9 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Thu Dec 17 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.2-1
+- Fix: missing log fields (trans=, corr=, serv=, subserv=, from=) in some traces
+
 * Wed Dec 16 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.1-1
 - Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
 
