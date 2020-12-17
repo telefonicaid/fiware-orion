@@ -560,9 +560,7 @@ static void requestCompleted
   void**                      con_cls,
   MHD_RequestTerminationCode  toe
 )
-{  
-  lmTransactionEnd();  // Incoming REST request ends
-
+{
   //
   // delayed release of ContextElementResponseVector must be effectuated now.
   // See github issue #2994
@@ -575,6 +573,7 @@ static void requestCompleted
   // let's be conservative... otherwise CB will crash)
   if ((con_cls == NULL) || (*con_cls == NULL))
   {
+    lmTransactionEnd();  // Incoming REST request ends (maybe unneeded as the transaction hasn't start, but doesn't hurt)
     return;
   }
 
@@ -600,6 +599,8 @@ static void requestCompleted
   {
     free(ciP->payload);
   }
+
+  lmTransactionEnd();  // Incoming REST request ends
 
   if (timingStatistics)
   {
