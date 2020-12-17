@@ -1,1 +1,0 @@
-- Fix: missing log fields (trans=, corr=, serv=, subserv=, from=) in some traces
