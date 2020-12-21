@@ -1,7 +1,7 @@
 Name: Publish Snapshot Image from master
 #
-#on:
-#  push:
+on:
+  push:
 #    branches:
 #      - master
 
