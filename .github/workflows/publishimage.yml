@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.event_name == 'push'
 
+    steps:
     - id: timeseries
       uses: pozetroninc/github-action-get-latest-release@master
       with:
