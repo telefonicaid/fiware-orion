@@ -26,9 +26,11 @@ jobs:
         echo "Version ${{ steps.latest_version.outputs.latest_tag }}"
 
     - name: Increment version
-      uses: Benbentwo/increment-semver@master
-      with:
-        version-level: '-m'
+      id: increment-semver-minor
+      env:
+        - LATEST_RELEASE=${{ steps.latest_version.outputs.latest_tag }}
+      run: |
+        .github/incrementVersion.sh
 
     - name: Get the output version
       run: |
