@@ -26,7 +26,7 @@ jobs:
 
     - name: Increment version
       id: increment-semver-minor
-      env: |
+      env:
         LATEST_RELEASE=${{ steps.latest_version.outputs.latest_tag }}
       run: |
         .github/incrementVersion.sh
