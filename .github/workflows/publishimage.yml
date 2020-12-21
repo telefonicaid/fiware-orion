@@ -20,7 +20,5 @@ jobs:
         repo: fiware-orion
 
     - name: Echo version
-      env: |
-        LATEST: ${{ steps.latest_version.outputs.latest_tag }}
       run: |
-        echo "Version $LATEST"
+        echo "Version ${{ steps.latest_version.outputs.latest_tag }}"
