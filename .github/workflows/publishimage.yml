@@ -22,3 +22,12 @@ jobs:
     - name: Echo version
       run: |
         echo "Version ${{ steps.latest_version.outputs.latest_tag }}"
+
+    - name: Increment version
+      uses: Benbentwo/increment-semver@master
+      with:
+        version-level: '-m'
+
+    - name: Get the output version
+      run: |
+        echo "The new minor version was ${{ steps.increment-semver-minor.outputs.version }}"
