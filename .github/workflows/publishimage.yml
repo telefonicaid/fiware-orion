@@ -29,7 +29,14 @@ jobs:
       env:
         LATEST_RELEASE: ${{ steps.latest_version.outputs.latest_tag }}
       run: |
-        ./.github/incrementVersion.sh
+        version=$LATEST_RELEASE
+        a=( ${version//./ } )
+        ((a[1]++))
+        a[2]=0
+        echo "${a[0]}.${a[1]}.${a[2]}"
+        version=$(echo "${a[0]}.${a[1]}.${a[2]}")
+        echo "::set-output name=version::${version}"
+
 
     - name: Get the output version
       run: |
