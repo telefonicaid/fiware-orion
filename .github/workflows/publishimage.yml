@@ -1,5 +1,5 @@
-Name: Publish Snapshot Image from master
-#
+name: Publish Snapshot Image from master
+
 on:
   push:
 #    branches:
