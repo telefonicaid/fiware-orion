@@ -12,7 +12,15 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-    - id: timeseries
-      uses: pozetroninc/github-action-get-latest-release@master
+    - name: Get Latest Release
+      id: latest_version
+      uses: abatilo/release-info-action@v1.3.0
       with:
-        repository: telefonica/fiware-orion
+        owner: telefonica
+        repo: fiware-orion
+
+    - name: Echo version
+      env: |
+        LATEST: ${{ steps.latest_version.outputs.latest_tag }}
+      run: |
+        echo "Version $LATEST"
