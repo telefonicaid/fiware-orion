@@ -16,7 +16,7 @@ jobs:
       id: latest_version
       uses: abatilo/release-info-action@v1.3.0
       with:
-        owner: telefonica
+        owner: telefonicaid
         repo: fiware-orion
 
     - name: Echo version
