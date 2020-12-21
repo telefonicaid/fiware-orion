@@ -6,8 +6,8 @@ name: Publish Snapshot Image from master
 
 on:
   push:
-#    branches:
-#      - master
+    branches:
+      - master
 
 # will produce tags in format fiware/orion:<SEMVER>-PRE-<INCREASING-NUMBER>, f.e. fiware/orion:2.6.0-PRE-12
 env:
