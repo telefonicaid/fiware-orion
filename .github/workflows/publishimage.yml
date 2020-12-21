@@ -1,0 +1,17 @@
+Name: Publish Snapshot Image from master
+#
+#on:
+#  push:
+#    branches:
+#      - master
+
+jobs:
+  deploy-release:
+
+    runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
+
+    - id: timeseries
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: telefonica/fiware-orion
