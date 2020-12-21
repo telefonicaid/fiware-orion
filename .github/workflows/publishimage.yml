@@ -1,4 +1,4 @@
-name: Publish Snapshot Image from master
+name: Publish pre Image from master
 
 # The workflow will push PRE images from master on every merge. The images will be tagged with PRE and the next minor increase on the
 # semver(based on the github releases)
