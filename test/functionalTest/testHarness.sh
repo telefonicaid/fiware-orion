@@ -292,8 +292,6 @@ done
 
 vMsg "options parsed"
 
-
-
 # -----------------------------------------------------------------------------
 #
 # The function brokerStart looks at the env var CB_NO_CACHE to decide
@@ -320,7 +318,7 @@ fi
 # Check if fromIx is set through an env var and use if nothing
 # else is set through commandline parameter
 #
-if [ "$FT_FROM_IX" != "" ] && [ fromIx == 0 ]
+if [ "$FT_FROM_IX" != "" ] && [ $fromIx == 0 ]
 then
   fromIx=$FT_FROM_IX
 fi
@@ -330,10 +328,12 @@ fi
 # Check if toIx is set through an env var and use if nothing
 # else is set through commandline parameter
 #
-if [ "$FT_TO_IX" != "" ] && [ toIx == 0 ]
+if [ "$FT_TO_IX" != "" ] && [ $toIx == 0 ]
 then
   toIx=$FT_TO_IX
 fi
+
+echo "Run tests $fromIx to $toIx"
 
 # ------------------------------------------------------------------------------
 #
