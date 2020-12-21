@@ -13,9 +13,15 @@ jobs:
   unit:
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
+
     steps:
       - uses: actions/checkout@v2
 
       - name: Run functional test
         run: |
-          docker run -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -midqts unit
+          docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit
