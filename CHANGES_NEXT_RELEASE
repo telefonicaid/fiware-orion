@@ -43,3 +43,4 @@
 * Issue  #599   Implemented TRoE for PATCH /ngsi-ld/v1/entities/{entityId}/attrs
 * Issue  #652   BATCH Delete with more than one item for the same entity id
 * Issue  #655   BATCH Create with more than one item for the same entity id
+* Issue  #599   New TRoe databases created when new tenants are used

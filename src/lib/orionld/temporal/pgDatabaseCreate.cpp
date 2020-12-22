@@ -36,15 +36,10 @@
 //
 // pgDatabaseCreate - create a postgres database
 //
-bool pgDatabaseCreate(PGconn* connection, const char* dbName)
+bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
 {
-  PGconn*    connectionP;
   char       sql[512];
   PGresult*  res;
-
-  connectionP = pgConnectionGet(dbName);
-  if (connectionP == NULL)
-    LM_RE(false, ("no connection to postgres"));
 
   snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
   res = PQexec(connectionP, sql);

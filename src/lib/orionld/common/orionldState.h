@@ -272,7 +272,12 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    forwardAttrsCompacted;
+
+  //
+  // TRoE
+  //
   bool                    temporalError;
+  char                    troeDbName[128];
 } OrionldConnectionState;
 
 
@@ -310,6 +315,7 @@ extern char              troeHost[64];             // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
 extern char              troeUser[64];             // From orionld.cpp
 extern char              troePwd[64];              // From orionld.cpp
+extern int               troePoolSize;             // From orionld.cpp
 extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;

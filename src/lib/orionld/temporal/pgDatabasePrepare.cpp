@@ -30,9 +30,8 @@
 #include "orionld/common/orionldState.h"                       // dbName
 #include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
 #include "orionld/temporal/pgDatabaseCreate.h"                 // pgDatabaseCreate
-#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
-#include "orionld/temporal/pgDatabaseTableExists.h"            // pgDatabaseTableExists
 #include "orionld/temporal/pgDatabaseTableCreateAll.h"         // pgDatabaseTableCreateAll
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
 #include "orionld/temporal/pgDatabasePrepare.h"                // Own interface
 
 
@@ -41,41 +40,47 @@
 //
 // pgDatabasePrepare - prepare a postgres database (incl. creation if necessary)
 //
-// Create a postgres database named 'tenant', if it doesn't already exist
-// 1. Try to connect to the db 'tenant'
-// 2. If connection error AND error code == XXX, create the db 'tenant'
-// 3. Make sure the three tables are there (test if 'tenant' already existed)
-// 4. If tables not present, create them
-//
-bool pgDatabasePrepare(const char* db)
+bool pgDatabasePrepare(const char* dbName)
 {
-  LM_TMP(("PGINIT: Try-Connecting to '%s', and if that works, the DB already exists", db));
-  bool    dbCreated   = false;
-  PGconn* connectionP = pgConnectionGet(db);
+  LM_TMP(("PGPOOL: new tenant '%s'", dbName));
 
-  LM_TMP(("PGINIT: connectionP at %p", connectionP));
-  if (connectionP == NULL)
+  // Connect to the "NULL" database
+  PGconn*         connectionP      = pgConnectionGet(NULL);
+  ConnStatusType  status           = (connectionP != NULL)? PQstatus(connectionP) : CONNECTION_BAD;
+
+  if (status != CONNECTION_OK)
+    LM_RE(false, ("Database Error (unable to connect to postgres - connection / status: %p / %d)", connectionP, status));
+
+  LM_TMP(("PGPOOL: creating db '%s'", dbName));
+
+  //
+  // For now, we just create the Postgres database for the default tenant
+  // This will fail if the database already exists - that's OK
+  LM_TMP(("PGPOOL: creating db '%s'", dbName));
+  if (pgDatabaseCreate(connectionP, dbName) == false)
   {
-    LM_TMP(("PGINIT: Connection failed so, the db '%s' seems not to exist - creating it", db));
-
-    connectionP = pgConnectionGet(dbName);  // FIXME: better name for the dbPrefix !!!
-
-    if (connectionP == NULL)
-      LM_RE(false, ("Database Error (error connecting to postgres db '%s')", dbName));
-
-    if (pgDatabaseCreate(connectionP, db) == false)
-      LM_RE(false, ("Database Error (error creating postgres db '%s')", db));
-
+    LM_TMP(("PGPOOL: database '%s' seems to exist already", dbName));
     pgConnectionRelease(connectionP);
-    connectionP = pgConnectionGet(db);
-    dbCreated = true;
+    return true;
   }
+  LM_TMP(("PGPOOL: db '%s' has been created", dbName));
 
-  if ((dbCreated == true) || (pgDatabaseTableExists(connectionP, "entities") == false))
-  {
-    if (pgDatabaseTableCreateAll(connectionP) == false)
-      LM_RE(false, ("Database Error (error creating postgres database tables)"));
-  }
+  // Disconnect from the NULL connection
+  pgConnectionRelease(connectionP);
 
-  return true;
+  // Connect to the newly created database
+  LM_TMP(("PGPOOL: connecting to db '%s' to create the tables", dbName));
+
+  connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("unable to connect to newly created postgres db '%s'", dbName));
+
+  bool r;
+  if ((r = pgDatabaseTableCreateAll(connectionP)) == false)
+    LM_E(("Database Error (error creating postgres database tables)"));
+  LM_TMP(("PGPOOL: created tables for db '%s'", dbName));
+
+  pgConnectionRelease(connectionP);
+
+  return r;
 }

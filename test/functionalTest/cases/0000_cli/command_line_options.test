@@ -87,5 +87,6 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-troePort' <port for temporal database db server>]
                 [option '-troeUser' <username for temporal database db server>]
                 [option '-troePwd' <password for temporal database db server>]
+                [option '-troePoolSize' <size of the connection pool for Postgres database connections>]
 
 --TEARDOWN--

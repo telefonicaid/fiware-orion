@@ -53,16 +53,6 @@ extern "C"
 //
 bool temporalPatchEntity(ConnectionInfo* ciP)
 {
-  // <DEBUG>
-  char debugBuf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, debugBuf, sizeof(debugBuf));
-  LM_TMP(("APPA: incoming tree: %s", debugBuf));
-  // </DEBUG>
-
-  // FIXME: Implement orionldState.dbName
-  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
-    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
-
   PGconn* connectionP = pgConnectionGet(dbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));

@@ -49,5 +49,10 @@ void orionldTenantCreate(char* tenant)
 
   tenantV[tenants++] = strdup(tenant);
 
-  pgDatabasePrepare(tenant);
+  if (temporal)
+  {
+    LM_TMP(("PGPOOL: calling pgDatabasePrepare for tenant '%s')", orionldState.troeDbName));
+    if (pgDatabasePrepare(orionldState.troeDbName) != true)
+      LM_E(("Database Error (unable to prepare a new TRoE database for tenant '%s')", orionldState.troeDbName));
+  }
 }

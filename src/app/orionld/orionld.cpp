@@ -200,6 +200,7 @@ char            troeHost[64];
 unsigned short  troePort;
 char            troeUser[64];
 char            troePwd[64];
+int             troePoolSize;
 
 
 
@@ -268,6 +269,7 @@ char            troePwd[64];
 #define TROE_PORT_DESC         "port for temporal database db server"
 #define TROE_HOST_USER         "username for temporal database db server"
 #define TROE_HOST_PWD          "password for temporal database db server"
+#define TROE_POOL_DESC         "size of the connection pool for Postgres database connections"
 
 
 
@@ -336,6 +338,7 @@ PaArgument paArgs[] =
   { "-troePort",              &troePort,                "TROE_PORT",                 PaInt,     PaOpt,  5432,            PaNL,   PaNL,             TROE_PORT_DESC         },
   { "-troeUser",              troeUser,                 "TROE_USER",                 PaString,  PaOpt,  _i "postgres",   PaNL,   PaNL,             TROE_HOST_USER         },
   { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD          },
+  { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC         },
 
   PA_END_OF_ARGS
 };

@@ -1408,14 +1408,15 @@ function neqTimestamp()
 function pgDrop()
 {
   dbName="$1"
-  echo "DROP DATABASE IF EXISTS $dbName" | psql --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01
+  echo "DROP DATABASE IF EXISTS $dbName" | psql --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01 > /tmp/pg-stdout
   egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
   egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
 
   lines=$(wc -l /tmp/pg-stderr-03 | awk '{print $1}')
-  if [ $lines != 0 ]
+  if [ "$lines" != 0 ]
   then
-    echo unable to drop DB $dbName 1>&2
+    cat /tmp/pg-stderr-01
+    echo FT unable to drop DB $dbName 1>&2
   else
     echo Postgres DB $dbName has been dropped
   fi
@@ -1486,7 +1487,7 @@ function postgresCmd()
 
   while [ "$#" != 0 ]
   do
-    if   [ "$1" == "-t" ];   then  dbName=$2;     shift;
+    if   [ "$1" == "-t" ];   then  tenant=$2;     shift;
     elif [ "$1" == "-sql" ]; then  sqlCommand=$2; shift;
     else
       echo "Invalid option/parameter for postgresCmd: $1"
