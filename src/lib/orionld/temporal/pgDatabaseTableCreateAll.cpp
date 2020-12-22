@@ -124,6 +124,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
       pgTransactionRollback(connectionP);
       LM_RE(false, ("Database Error (PQexec(%s): %s)", sqlV[ix], PQresStatus(PQresultStatus(res))));
     }
+    PQclear(res);
   }
 
   pgTransactionCommit(connectionP);

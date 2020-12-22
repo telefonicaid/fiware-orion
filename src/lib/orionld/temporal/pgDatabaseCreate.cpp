@@ -45,6 +45,7 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
 
   return true;
 }

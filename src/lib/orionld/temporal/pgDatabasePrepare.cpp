@@ -45,8 +45,8 @@ bool pgDatabasePrepare(const char* dbName)
   LM_TMP(("PGPOOL: new tenant '%s'", dbName));
 
   // Connect to the "NULL" database
-  PGconn*         connectionP      = pgConnectionGet(NULL);
-  ConnStatusType  status           = (connectionP != NULL)? PQstatus(connectionP) : CONNECTION_BAD;
+  PGconn*         connectionP = pgConnectionGet(NULL);
+  ConnStatusType  status      = (connectionP != NULL)? PQstatus(connectionP) : CONNECTION_BAD;
 
   if (status != CONNECTION_OK)
     LM_RE(false, ("Database Error (unable to connect to postgres - connection / status: %p / %d)", connectionP, status));

@@ -43,6 +43,7 @@ bool pgTransactionCommit(PGconn* connectionP)
   res = PQexec(connectionP, "COMMIT");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(COMMIT): %s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
 
   if (PQstatus(connectionP) != CONNECTION_OK)
     LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)

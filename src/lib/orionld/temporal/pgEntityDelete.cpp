@@ -45,6 +45,7 @@ bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id, char* delet
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
 
   return true;
 }

@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # orionld at fiware dot org
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Batch Deletion of entities that do not exist
 

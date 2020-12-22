@@ -46,6 +46,7 @@ bool pgDatabaseTableExists(PGconn* connectionP, const char* dbName, const char* 
   status = PQresultStatus(res);
   if ((res == NULL) || (status != PGRES_TUPLES_OK))
     LM_RE(false, ("Database Error (unable to query Postgres db '%s' for the existence of the table '%s': %s)", dbName, tableName, PQresStatus(status)));
+  PQclear(res);
 
   //
   // Get the response, parse it and make sure the table exists!

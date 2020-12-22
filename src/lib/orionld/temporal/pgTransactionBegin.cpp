@@ -45,6 +45,7 @@ bool pgTransactionBegin(PGconn* connectionP)
   res = PQexec(connectionP, "BEGIN");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
 
   return true;
 }
