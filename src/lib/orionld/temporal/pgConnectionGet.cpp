@@ -46,28 +46,56 @@
 //
 
 
-
 // -----------------------------------------------------------------------------
 //
 // pgConnectionGet - get a connection to a postgres database
 //
 // FIXME: use a connection pool
 //
-// For now we open and close the connection every time - this is not very gopod for performance, of course ...
+// For now we open and close the connection every time - this is not very good for performance, of course ...
 //
-PGconn* pgConnectionGet(const char* dbName)
+PGconn* pgConnectionGet(const char* db)
 {
-  // FIXME: connection pool: lookup a free connection to 'dbName' ...
-  char port[16];
+  LM_TMP(("PGPOOL: connect to db '%s'", db));
 
+  // Empty tenant => use default db name
+  if ((db != NULL) && (*db == 0))
+    db = dbName;
+
+  //
+  // FIXME: connection pool: lookup a free connection to 'db' ...
+  //
+  // 1. PgDb* pgDbP = pgDatabaseLookup(db)
+  // 2. if (pgDbP == NULL)
+  //    {
+  // 3.   pgDbSemTake();
+  // 4.   pgDbP = pgDatabaseLookup(db);
+  // 5.   if (pgDbP == NULL)
+  // 6.     pgDbP = pgDatabaseAdd(db);
+  //    }
+  // 7.
+
+  char     port[16];
+  PGconn*  connectionP;
   snprintf(port, sizeof(port), "%d", troePort);
 
-  const char*  keywords[]   = { "host",   "port",   "user",   "password",  "dbname", NULL };
-  const char*  values[]     = { troeHost, port,     troeUser, troePwd,     dbName,   NULL };
-  PGconn*      connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+  if (db != NULL)
+  {
+    const char*  keywords[]   = { "host",   "port",   "user",   "password",  "dbname", NULL };
+    const char*  values[]     = { troeHost, port,     troeUser, troePwd,     db,       NULL };
+
+    connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+  }
+  else
+  {
+    const char*  keywords[]   = { "host",   "port",   "user",   "password",  NULL };
+    const char*  values[]     = { troeHost, port,     troeUser, troePwd,     NULL };
+
+    connectionP  = PQconnectdbParams(keywords, values, 0);  // 0: no expansion of dbname - see https://www.postgresql.org/docs/12/libpq-connect.html
+  }
 
   if (connectionP == NULL)
-    LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, dbName));
+    LM_RE(NULL, ("Database Error (unable  to connect to postgres('%s', %d, '%s', '%s', '%s')", troeHost, troePort, troeUser, troePwd, db));
 
   return connectionP;
 }

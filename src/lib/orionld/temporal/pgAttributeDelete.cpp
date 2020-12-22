@@ -47,6 +47,7 @@ bool pgAttributeDelete(PGconn* connectionP, char* entityId, char* instanceId, ch
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
 
   return true;
 }

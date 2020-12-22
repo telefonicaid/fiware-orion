@@ -33,6 +33,6 @@
 //
 // pgDatabaseTableExists
 //
-extern bool pgDatabaseTableExists(PGconn* connectionP, const char* dbName);
+extern bool pgDatabaseTableExists(PGconn* connectionP, const char* dbName, const char* tableName);
 
 #endif  // SRC_LIB_ORIONLD_TEMPORAL_PGDATABASETABLEEXISTS_H_

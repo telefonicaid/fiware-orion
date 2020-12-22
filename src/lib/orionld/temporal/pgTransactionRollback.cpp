@@ -44,6 +44,7 @@ bool pgTransactionRollback(PGconn* connectionP)
   res = PQexec(connectionP, "ROLLBACK");
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(ROLLBACK): %s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
 
-  return false;
+  return true;
 }

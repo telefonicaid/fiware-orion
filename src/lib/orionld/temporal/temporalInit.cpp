@@ -38,7 +38,7 @@
 bool temporalInit(void)
 {
   if (pgInit(dbName) == false)
-    LM_RE(false, ("Database Error (pgInit(%s) failed)", dbName));
+    LM_RE(false, ("Basic Postgres Problem - Temporal Representation of Entities is not possible"));
 
   return true;
 }

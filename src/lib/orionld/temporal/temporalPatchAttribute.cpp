@@ -93,10 +93,6 @@ bool temporalPatchAttribute(ConnectionInfo* ciP)
   // Expand names of sub-attributes - FIXME - let the Service Routine do this for us!
   temporalSubAttrsExpand(orionldState.requestTree);
 
-  // FIXME: Implement orionldState.dbName
-  if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
-    LM_X(1, ("Tenants (%s) not supported for the temporal layer (to be fixed asap)", orionldState.tenant));
-
   PGconn* connectionP = pgConnectionGet(dbName);
   if (connectionP == NULL)
     LM_RE(false, ("no connection to postgres"));

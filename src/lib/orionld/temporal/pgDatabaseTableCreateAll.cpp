@@ -38,11 +38,34 @@
 //
 // pgDatabaseTableCreateAll -
 //
+// FIXME: The types ValueType+OperationMode needs some investigation
+//        It seems like they should be created ONCE for all DBs.
+//        If this is true, the creation of the types must be part of the postgres installation.
+//        OR: pgInit() creates the types being prepared for failures of type "already exists"
+//
 bool pgDatabaseTableCreateAll(PGconn* connectionP)
 {
+  const char* valueTypeSql = "CREATE TYPE ValueType AS ENUM("
+    "'String',"
+    "'Number',"
+    "'Boolean',"
+    "'Relationship',"
+    "'Compound',"
+    "'DateTime',"
+    "'Geo',"
+    "'LanguageMap')";
+
+  const char* opModeSql = "CREATE TYPE OperationMode AS ENUM("
+    "'Create',"
+    "'Append',"
+    "'Update',"
+    "'Replace',"
+    "'Delete')";
+
   const char* entitiesSql = "CREATE TABLE IF NOT EXISTS entities ("
     "instanceId   TEXT PRIMARY KEY,"
     "id           TEXT NOT NULL,"
+    "opMode       OperationMode,"
     "type         TEXT NOT NULL,"
     "createdAt    TIMESTAMP NOT NULL,"
     "modifiedAt   TIMESTAMP NOT NULL,"
@@ -51,7 +74,8 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
   const char* attributesSql = "CREATE TABLE IF NOT EXISTS attributes ("
     "instanceId      TEXT PRIMARY KEY,"
     "id              TEXT NOT NULL,"
-    "entityRef       TEXT NOT NULL REFERENCES entities(instanceId),"
+    "opMode          OperationMode,"
+    "entityRef       TEXT,"
     "entityId        TEXT NOT NULL,"
     "createdAt       TIMESTAMP NOT NULL,"
     "modifiedAt      TIMESTAMP NOT NULL,"
@@ -64,50 +88,43 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "text            TEXT,"
     "boolean         BOOL,"
     "number          FLOAT8,"
-    "datetime        TIMESTAMP,"
-    "geo             GEOMETRY)";
+    "datetime        TIMESTAMP)";
+  // "geo             GEOMETRY"
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
     "instanceId      TEXT PRIMARY KEY,"
     "id              TEXT NOT NULL,"
+    "entityRef       TEXT,"
     "entityId        TEXT NOT NULL,"
-    "entityRef       TEXT NOT NULL REFERENCES entities(instanceId),"
-    "attributeId     TEXT NOT NULL,"
     "attributeRef    TEXT NOT NULL REFERENCES attributes(instanceId),"
+    "attributeId     TEXT NOT NULL,"
     "createdAt       TIMESTAMP NOT NULL,"
     "modifiedAt      TIMESTAMP NOT NULL,"
     "deletedAt       TIMESTAMP,"
     "observedAt      TIMESTAMP,"
     "valueType       ValueType,"
+    "unitCode        TEXT,"
     "text            TEXT,"
     "boolean         BOOL,"
     "number          FLOAT8,"
-    "datetime        TIMESTAMP,"
-    "geo             GEOMETRY,"
-    "unitCode        TEXT)";
+    "datetime        TIMESTAMP)";
+  // "geo             GEOMETRY"
 
-  const char* valueTypeSql = "CREATE TYPE ValueType AS ENUM("
-    "'String',"
-    "'Number',"
-    "'Boolean',"
-    "'Relationship',"
-    "'Compound',"
-    "'DateTime',"
-    "'Geo',"
-    "'LanguageMap')";
+  const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
 
-  const char* sqlV[] = { valueTypeSql, entitiesSql, attributesSql, subAttributesSql };
-
-  pgTransactionBegin(connectionP);
+  if (pgTransactionBegin(connectionP) == false)
+    LM_RE(false, ("pgTransactionBegin failed"));
 
   for (unsigned int ix = 0; ix < sizeof(sqlV) / sizeof(sqlV[0]); ix++)
   {
+    LM_TMP(("SQL[%p]: %s", connectionP, sqlV[ix]));
     PGresult*  res = PQexec(connectionP, sqlV[ix]);
     if (res == NULL)
     {
       pgTransactionRollback(connectionP);
       LM_RE(false, ("Database Error (PQexec(%s): %s)", sqlV[ix], PQresStatus(PQresultStatus(res))));
     }
+    PQclear(res);
   }
 
   pgTransactionCommit(connectionP);

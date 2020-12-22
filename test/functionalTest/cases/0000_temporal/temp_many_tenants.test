@@ -1,0 +1,312 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Make sure the broker creates the DBs for 10 tenants
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t0
+dbInit CB t1
+dbInit CB t2
+dbInit CB t3
+dbInit CB t4
+dbInit CB t5
+dbInit CB t6
+dbInit CB t7
+dbInit CB t8
+dbInit CB t9
+pgDrop ftest
+pgDrop ftest_t0
+pgDrop ftest_t1
+pgDrop ftest_t2
+pgDrop ftest_t3
+pgDrop ftest_t4
+pgDrop ftest_t5
+pgDrop ftest_t6
+pgDrop ftest_t7
+pgDrop ftest_t8
+pgDrop ftest_t9
+brokerStart CB 100 IPv4 -temporal -multiservice
+
+--SHELL--
+
+#
+# Before starting the broker, the postgres databases ftest_t0 - ftest_t9' are dropped.
+# This test is to make sure that Orion-LD creates the databases, its types and tables and
+# correctly fills in the three DB tables.
+#
+# 01. Create an entity E1 on tenant t0-t9 - making the broker create 10 postgres dbs
+# 02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
+#
+
+echo "01. Create an entity E1 on tenant t0-t9 - making the broker create 10 postgres dbs"
+echo "=================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P": {
+    "type": "Property",
+    "value": 1,
+    "observedAt": "2020-12-19T09:54:00.123Z",
+    "PR": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:PR"
+    }
+  }
+}'
+for t in t0 t1 t2 t3 t4 t5 t6 t7 t8 t9
+do
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "NGSILD-Tenant: $t"
+done
+echo
+echo
+
+
+echo "02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present"
+echo "==============================================================================================="
+for t in t0 t1 t2 t3 t4 t5 t6 t7 t8 t9
+do
+  dbName=ftest_$t
+  echo "ENTITIES in DB $dbName:"
+  postgresCmd -t $dbName -sql "SELECT opMode,id,type,createdAt FROM entities"
+  echo
+  echo "ATTRIBUTES in DB $dbName:"
+  postgresCmd -t $dbName -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+  echo
+  echo "SUB-ATTRIBUTES in DB $dbName:"
+  postgresCmd -t $dbName -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+  echo
+  echo
+done
+
+
+--REGEXPECT--
+01. Create an entity E1 on tenant t0-t9 - making the broker create 10 postgres dbs
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
+===============================================================================================
+ENTITIES in DB ftest_t0:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t0:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t0:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t1:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t1:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t1:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t2:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t2:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t2:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t3:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t3:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t3:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t4:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t4:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t4:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t5:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t5:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t5:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t6:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t6:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t6:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t7:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t7:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t7:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t8:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t8:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t8:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+ENTITIES in DB ftest_t9:
+opmode,id,type,createdat
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES in DB ftest_t9:
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES in DB ftest_t9:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB t0
+dbDrop CB t1
+dbDrop CB t2
+dbDrop CB t3
+dbDrop CB t4
+dbDrop CB t5
+dbDrop CB t6
+dbDrop CB t7
+dbDrop CB t8
+dbDrop CB t9
+pgDrop ftest_t0
+pgDrop ftest_t1
+pgDrop ftest_t2
+pgDrop ftest_t3
+pgDrop ftest_t4
+pgDrop ftest_t5
+pgDrop ftest_t6
+pgDrop ftest_t7
+pgDrop ftest_t8
+pgDrop ftest_t9

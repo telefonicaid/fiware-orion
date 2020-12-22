@@ -591,8 +591,9 @@ void setSubscribeContextAvailabilityCollectionName(const std::string& name)
 *
 * Common helper function for composing collection names
 */
-static std::string composeCollectionName(std::string tenant, std::string colName)
+static std::string composeCollectionName(const std::string& tenant, const std::string& colName)
 {
+  LM_TMP(("In composeCollectionName for tenant '%s'", tenant));
   return composeDatabaseName(tenant) + "." + colName;
 }
 
