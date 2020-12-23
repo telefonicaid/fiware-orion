@@ -28,7 +28,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -149,6 +149,89 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 
 
 
+// -----------------------------------------------------------------------------
+//
+// idArrayExtract -
+//
+static KjNode* idArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode* errorArray)
+{
+  KjNode* entityP = entityArray->value.firstChildP;
+  KjNode* next;
+  KjNode* idArray = kjArray(orionldState.kjsonP, NULL);
+
+  while (entityP)
+  {
+    next = entityP->next;
+
+    char*   entityId;
+    char*   entityType;
+
+    // entityIdAndTypeGet calls entityIdCheck/entityTypeCheck that adds the entity in errorArray if needed
+    if (entityIdAndTypeGet(entityP, &entityId, &entityType, errorArray) == false)
+    {
+      kjChildRemove(entityArray, entityP);
+      entityP = next;
+      continue;
+    }
+
+    //
+    // Check Content-Type and @context in payload
+    //
+    KjNode* contextNodeP  = kjLookup(entityP, "@context");
+
+    if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
+    {
+      LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
+      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400);
+      kjChildRemove(entityArray, entityP);
+    }
+    else if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
+    {
+      LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
+      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400);
+      kjChildRemove(entityArray, entityP);
+    }
+    else if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
+    {
+      LM_W(("Bad Input (@context present both in Link header and in payload data)"));
+      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400);
+      kjChildRemove(entityArray, entityP);
+    }
+    else
+    {
+      if (entityIdPush(idArray, entityId) == NULL)  // NULL means the Entity ID was a duplicate
+      {
+        // Look up the previous entity and remove it from the tree
+        KjNode* eP = kjEntityIdLookupInEntityArray(entityArray, entityId);
+
+        if (eP != NULL)
+        {
+          entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instance removed", 400);
+
+          kjChildRemove(entityArray, eP);
+
+          if (temporal)
+          {
+            //
+            // Save the entity in a KjNode array in orionldState
+            // TRoE processing will take care of pushing these entities to the TRoE DB
+            //
+            if (orionldState.duplicateArray == NULL)
+              orionldState.duplicateArray = kjArray(orionldState.kjsonP, NULL);
+            kjChildAdd(orionldState.duplicateArray, eP);
+          }
+        }
+      }
+    }
+
+    entityP = next;
+  }
+
+  return idArray;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpsert -
@@ -168,16 +251,6 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 {
   //
-  // Prerequisites for the payload in orionldState.requestTree:
-  // * must be an array
-  // * cannot be empty
-  // * all entities must contain a entity::id (one level down)
-  // * no entity can contain an entity::type (one level down)
-  //
-  ARRAY_CHECK(orionldState.requestTree, "toplevel");
-  EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
-
-  //
   // Prerequisites for URI params:
   // * both 'update' and 'replace' cannot be set in options (replace is default)
   //
@@ -188,78 +261,29 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     return false;
   }
 
+  //
+  // Prerequisites for the payload in orionldState.requestTree:
+  // * must be an array with objects
+  // * cannot be empty
+  // * all entities must contain an entity::id (one level down)
+  // * no entity can contain an entity::type (one level down)
+  //
+  ARRAY_CHECK(orionldState.requestTree, "toplevel");
+  EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
+
+
   KjNode* incomingTree   = orionldState.requestTree;
-  KjNode* idArray        = kjArray(orionldState.kjsonP, NULL);
   KjNode* successArrayP  = kjArray(orionldState.kjsonP, "success");
   KjNode* errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  KjNode* entityP;
-  KjNode* next;
 
   //
-  // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  // Entities that already exist in the DB cannot have a type != type-in-db
+  // To assure this, we need to extract all existing entities from the database
+  // Also, those entities that do not exist MUST have an entity type present.
   //
-  entityP = incomingTree->value.firstChildP;
-  while (entityP)
-  {
-    next = entityP->next;
-
-    char*   entityId;
-    char*   entityType;
-
-    // entityIdAndTypeGet calls entityIdCheck/entityTypeCheck that adds the entity in errorsArrayP if needed
-    if (entityIdAndTypeGet(entityP, &entityId, &entityType, errorsArrayP) == false)
-    {
-      kjChildRemove(incomingTree, entityP);
-      entityP = next;
-      continue;
-    }
-
-    //
-    // Check Content-Type and @context in payload
-    //
-    KjNode* contextNodeP  = kjLookup(entityP, "@context");
-
-    if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
-    {
-      LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400);
-      kjChildRemove(incomingTree, entityP);
-    }
-    else if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
-    {
-      LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400);
-      kjChildRemove(incomingTree, entityP);
-    }
-    else if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
-    {
-      LM_W(("Bad Input (@context present both in Link header and in payload data)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400);
-      kjChildRemove(incomingTree, entityP);
-    }
-    else
-    {
-      if (entityIdPush(idArray, entityId) == NULL)  // NULL means the Entity ID was a duplicate
-      {
-        // Look up the previous entity and remove it from the tree
-        KjNode* eP = kjEntityIdLookupInEntityArray(incomingTree, entityId);
-
-        if (eP != NULL)
-        {
-          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instance removed", 400);
-
-          //
-          // Save the entity in a KjNode array in orionldState: orionldState.batchEntityArray
-          // Pass the array to temporal module before passing the batch request
-          //
-          kjChildRemove(incomingTree, eP);
-        }
-      }
-    }
-
-    entityP = next;
-  }
-
+  // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  //
+  KjNode* idArray = idArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
 
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
@@ -332,7 +356,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
           LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayloadExpanded));
           entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400);
           kjChildRemove(incomingTree, entityP);
-          entityP = next;
           continue;
         }
       }
@@ -360,9 +383,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       KjNode* idNodeP = kjString(orionldState.kjsonP, NULL, idInDb);
       kjChildAdd(removeArray, idNodeP);
       ++entitiesToRemove;
-
-      // Point to the next entity and continue
-      entityP = next;
     }
   }
 
@@ -396,11 +416,17 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 06. Fill in UpdateContextRequest from "incomingTree"
   //
   UpdateContextRequest  mongoRequest;
+  KjNode*               cloneP = NULL;
+
+  if (temporal)
+    cloneP = kjClone(orionldState.kjsonP, incomingTree);
 
   mongoRequest.updateActionType = ActionTypeAppend;
 
   kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
 
+  if (temporal)
+    orionldState.requestTree = cloneP;
 
   //
   // 07. Set 'modDate' to "RIGHT NOW"

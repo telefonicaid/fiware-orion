@@ -1,0 +1,297 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Errors
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create the entity E1, with type T - for later tests for incompatible entity types
+# 02. Attempt to upsert/create an entity with a duplicated entity id
+# 03. Attempt to upsert/create an entity with a duplicated entity type
+# 04. Attempt to upsert/create an entity with a missing entity id
+# 05. Attempt to upsert/create an entity with a missing entity type
+# 06. Attempt to upsert/update an entity with a non-matching entity type (E1/TT)
+# 07. Upsert/Update an entity with a matching entity type (E1/T)
+#
+# To Be Continued ...
+#
+
+echo "01. Create the entity E1, with type T - for later tests for incompatible entity types"
+echo "====================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P": {
+    "type": "Property",
+    "value": "01: E1/P"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to upsert/create an entity with a duplicated entity id"
+echo "=================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "02: E1/P"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to upsert/create an entity with a duplicated entity type"
+echo "===================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "03: E1/P"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to upsert/create an entity with a missing entity id"
+echo "==============================================================="
+payload='[
+  {
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "04: E1/P"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to upsert/create an entity with a missing entity type"
+echo "================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "P": {
+      "type": "Property",
+      "value": "05: E1/P"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to upsert/update an entity with a non-matching entity type (E1/TT)"
+echo "=============================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "TT",
+    "P": {
+      "type": "Property",
+      "value": "06: E1/P"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+echo "07. Upsert/Update an entity with a matching entity type (E1/T)"
+echo "=============================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P": {
+      "type": "Property",
+      "value": "07: E1/P"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create the entity E1, with type T - for later tests for incompatible entity types
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Attempt to upsert/create an entity with a duplicated entity id
+==================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 196
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E3",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "Duplicated field",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+03. Attempt to upsert/create an entity with a duplicated entity type
+====================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 198
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E3",
+            "error": {
+                "detail": "entity::type",
+                "status": 400,
+                "title": "Duplicated field",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+04. Attempt to upsert/create an entity with a missing entity id
+===============================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 193
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "no entity::id",
+            "error": {
+                "detail": "entity::id",
+                "status": 400,
+                "title": "mandatory field missing",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+05. Attempt to upsert/create an entity with a missing entity type
+=================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 223
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E3",
+            "error": {
+                "detail": "Mandatory field entity::type is missing",
+                "status": 400,
+                "title": "Invalid Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+06. Attempt to upsert/update an entity with a non-matching entity type (E1/TT)
+==============================================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 196
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "detail": "TT",
+                "status": 400,
+                "title": "non-matching entity type",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": []
+}
+
+
+07. Upsert/Update an entity with a matching entity type (E1/T)
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

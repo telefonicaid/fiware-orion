@@ -77,11 +77,7 @@ void temporalEntityArrayExpand(KjNode* tree)
             else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
             else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
             else
-            {
-              LM_TMP(("EXPAND: FROM '%s'", subAttrP->name));
               subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
-              LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
-            }
           }
         }
       }

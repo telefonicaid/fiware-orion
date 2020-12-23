@@ -22,27 +22,92 @@
 *
 * Author: Ken Zangelin
 */
+#include <postgresql/libpq-fe.h>                               // PGconn
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/temporal/pgConnectionGet.h"                  // pgConnectionGet
+#include "orionld/temporal/pgConnectionRelease.h"              // pgConnectionRelease
+#include "orionld/temporal/pgTransactionBegin.h"               // pgTransactionBegin
+#include "orionld/temporal/pgTransactionRollback.h"            // pgTransactionRollback
+#include "orionld/temporal/pgTransactionCommit.h"              // pgTransactionCommit
+#include "orionld/temporal/pgEntityTreat.h"                    // pgEntityTreat
 #include "orionld/temporal/temporalPostBatchUpsert.h"          // Own interface
 
 
 
+extern void temporalEntityArrayExpand(KjNode* tree);
 // ----------------------------------------------------------------------------
 //
 // temporalPostBatchUpsert -
 //
 bool temporalPostBatchUpsert(ConnectionInfo* ciP)
 {
-  LM_E(("Not Implemented"));
-  orionldState.httpStatusCode  = 501;
-  orionldState.noLinkHeader    = true;  // We don't want the Link header for non-implemented requests
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not Implemented", orionldState.serviceP->url);
+  PGconn* connectionP;
 
-  return false;
+  connectionP = pgConnectionGet(dbName);
+  if (connectionP == NULL)
+    LM_RE(false, ("no connection to postgres"));
+
+  if (pgTransactionBegin(connectionP) != true)
+    LM_RE(false, ("pgTransactionBegin failed"));
+
+  bool ok = true;
+
+  if (orionldState.duplicateArray != NULL)
+  {
+    temporalEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do this
+    for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ENTITY_REPLACE) == false)
+      {
+        LM_E(("Database Error (pgEntityTreat failed)"));
+        ok = false;
+        break;
+      }
+    }
+  }
+
+  if (ok == true)
+  {
+    // Expanding entity types and attribute names - FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do that
+    temporalEntityArrayExpand(orionldState.requestTree);
+
+    for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ENTITY_REPLACE) == false)
+      {
+        LM_E(("Database Error (pgEntityTreat failed)"));
+        ok = false;
+        break;
+      }
+    }
+  }
+
+  if (ok == false)
+  {
+    LM_E(("Database Error (batch create temporal layer failed)"));
+    if (pgTransactionRollback(connectionP) == false)
+      LM_RE(false, ("pgTransactionRollback failed"));
+  }
+  else
+  {
+    if (pgTransactionCommit(connectionP) != true)
+      LM_RE(false, ("pgTransactionCommit failed"));
+  }
+
+  pgConnectionRelease(connectionP);
+
+  return true;
 }
