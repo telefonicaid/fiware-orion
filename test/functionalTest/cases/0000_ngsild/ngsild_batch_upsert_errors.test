@@ -26,7 +26,6 @@ Entity Batch Upsert Errors
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-pgInit $CB_DB_NAME
 brokerStart CB 0-255
 
 --SHELL--
