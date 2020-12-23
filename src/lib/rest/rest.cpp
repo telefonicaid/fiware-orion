@@ -561,7 +561,26 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
+  //
+  // delayed release of ContextElementResponseVector must be effectuated now.
+  // See github issue #2994
+  //
+  extern void delayedReleaseExecute(void);
+  delayedReleaseExecute();
+
+  // It's unsual, but *con_cls can be NULL under some circustances, e.g. toe=MHD_REQUEST_TERMINATED_CLIENT_ABORT
+  // In addition, we add a similar check for con_cls (we haven't found any case in which this happens, but
+  // let's be conservative... otherwise CB will crash)
+  if ((con_cls == NULL) || (*con_cls == NULL))
+  {
+    lmTransactionEnd();  // Incoming REST request ends (maybe unneeded as the transaction hasn't start, but doesn't hurt)
+    return;
+  }
+
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+
+  *con_cls = NULL;
+
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
@@ -581,24 +600,19 @@ static void requestCompleted
     free(ciP->payload);
   }
 
-  *con_cls = NULL;
-
   lmTransactionEnd();  // Incoming REST request ends
 
   if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
-  }
 
-  //
-  // Statistics
-  //
-  // Flush this requests timing measures onto a global var to be read by "GET /statistics".
-  // Also, increment the accumulated measures.
-  //
-  if (timingStatistics)
-  {
+    //
+    // Statistics
+    //
+    // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+    // Also, increment the accumulated measures.
+    //
     timeStatSemTake(__FUNCTION__, "updating statistics");
 
     memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
@@ -629,7 +643,6 @@ static void requestCompleted
   //
   metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
 
-
   //
   // If the httpStatusCode is above the set of 200s, an error has occurred
   //
@@ -645,20 +658,12 @@ static void requestCompleted
     if (gettimeofday(&end, NULL) == 0)
     {
       unsigned long long elapsed =
-        (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
-        (end.tv_usec - ciP->transactionStart.tv_usec);
+          (end.tv_sec  - ciP->transactionStart.tv_sec) * 1000000 +
+          (end.tv_usec - ciP->transactionStart.tv_usec);
 
       metricsMgr.add(ciP->httpHeaders.tenant, spath, _METRIC_TOTAL_SERVICE_TIME, elapsed);
     }
   }
-
-
-  //
-  // delayed release of ContextElementResponseVector must be effectuated now.
-  // See github issue #2994
-  //
-  extern void delayedReleaseExecute(void);
-  delayedReleaseExecute();
 
   delete(ciP);
 }
