@@ -83,12 +83,14 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
     kjChildRemove(entityP, nodeP);
   }
 
-  if (opMode == TEMPORAL_ENTITY_CREATE)
+  if ((opMode == TEMPORAL_ENTITY_CREATE) || (opMode == TEMPORAL_ENTITY_REPLACE))
   {
     uuidGenerate(entityInstance);
     entityInstanceP = entityInstance;
     LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, entityInstanceP, id, type, createdAt, modifiedAt));
-    if (pgEntityPush(connectionP, entityInstanceP, id, type, createdAt, modifiedAt, "Create") == false)
+
+    const char* opModeString = (opMode == TEMPORAL_ENTITY_CREATE)? "Create" : "Replace";
+    if (pgEntityPush(connectionP, entityInstanceP, id, type, createdAt, modifiedAt, opModeString) == false)
       LM_RE(false, ("pgEntityPush failed"));
   }
 
@@ -104,6 +106,8 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
     {
       LM_W(("The attribute '%s' is an array ... datasetId is not supported for TRoE", attrP->name));
     }
+    else
+      LM_E(("Internal Error (The attribute '%s' is neither an Object nor an Array)", attrP->name));
   }
 
   return true;

@@ -28,7 +28,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -208,11 +208,18 @@ static KjNode* idArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode*
         {
           entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instance removed", 400);
 
-          //
-          // Save the entity in a KjNode array in orionldState: orionldState.batchEntityArray
-          // Pass the array to temporal module before passing the batch request
-          //
           kjChildRemove(entityArray, eP);
+
+          if (temporal)
+          {
+            //
+            // Save the entity in a KjNode array in orionldState
+            // TRoE processing will take care of pushing these entities to the TRoE DB
+            //
+            if (orionldState.duplicateArray == NULL)
+              orionldState.duplicateArray = kjArray(orionldState.kjsonP, NULL);
+            kjChildAdd(orionldState.duplicateArray, eP);
+          }
         }
       }
     }
@@ -409,11 +416,17 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 06. Fill in UpdateContextRequest from "incomingTree"
   //
   UpdateContextRequest  mongoRequest;
+  KjNode*               cloneP = NULL;
+
+  if (temporal)
+    cloneP = kjClone(orionldState.kjsonP, incomingTree);
 
   mongoRequest.updateActionType = ActionTypeAppend;
 
   kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
 
+  if (temporal)
+    orionldState.requestTree = cloneP;
 
   //
   // 07. Set 'modDate' to "RIGHT NOW"
