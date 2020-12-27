@@ -154,7 +154,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     // Nothing found in the DB - all entities marked as erroneous
     for (KjNode* idEntity = idArray->value.firstChildP; idEntity != NULL; idEntity = idEntity->next)
     {
-      entityErrorPush(errorsArrayP, idEntity->value.s, OrionldBadRequestData, "entity does not exist", NULL, 400);
+      entityErrorPush(errorsArrayP, idEntity->value.s, OrionldBadRequestData, "entity does not exist", NULL, 400, true);
       entityP = entityLookupById(incomingTree, idEntity->value.s);
       kjChildRemove(incomingTree, entityP);
     }
@@ -170,7 +170,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
       {
         // This should never happen ...
         LM_E(("Internal Error (Unable to find entity '%s')", entityId));
-        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity seems to have disappeared from the incomingTree ... ???", NULL, 500);
+        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity seems to have disappeared from the incomingTree ... ???", NULL, 500, false);
         continue;
       }
 
@@ -184,7 +184,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "Invalid payload",
                         "Content-Type is 'application/ld+json', but no @context in payload data array item",
-                        400);
+                        400,
+                        false);
         kjChildRemove(incomingTree, entityP);
         continue;
       }
@@ -196,7 +197,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "Invalid payload",
                         "Content-Type is 'application/json', and an @context is present in the payload data array item",
-                        400);
+                        400,
+                        false);
         kjChildRemove(incomingTree, entityP);
         continue;
       }
@@ -207,7 +209,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
                         entityId,
                         OrionldBadRequestData,
                         "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data",
-                        400);
+                        400,
+                        false);
         kjChildRemove(incomingTree, entityP);
         continue;
       }
@@ -226,7 +229,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
       if (dbEntityP == NULL)
       {
-        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "entity does not exist", NULL, 400);
+        entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "entity does not exist", NULL, 400, true);
         kjChildRemove(incomingTree, entityP);
         continue;
       }
@@ -238,7 +241,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         if (inTypeP->type != KjString)
         {
           LM_W(("Bad Inout (Entity type is not a JSON string)"));
-          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity type is not a JSON string", kjValueType(inTypeP->type), 400);
+          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity type is not a JSON string", kjValueType(inTypeP->type), 400, false);
           kjChildRemove(incomingTree, entityP);
           continue;
         }
@@ -251,7 +254,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         if (dbTypeP == NULL)
         {
           LM_E(("Internal Error (no entity type in DB)"));
-          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in DB", NULL, 500);
+          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "no entity type in DB", NULL, 500, true);
           kjChildRemove(incomingTree, entityP);
           continue;
         }
@@ -260,7 +263,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         if (strcmp(expandedType, dbTypeP->value.s) != 0)
         {
           LM_W(("Bad Input (non-matching entity type: '%s' vs '%s')", expandedType, dbTypeP->value.s));
-          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", inTypeP->value.s, 400);
+          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "non-matching entity type", inTypeP->value.s, 400, false);
           kjChildRemove(incomingTree, entityP);
           continue;
         }
@@ -317,7 +320,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400);
+                        400,
+                        false);
       }
     }
 

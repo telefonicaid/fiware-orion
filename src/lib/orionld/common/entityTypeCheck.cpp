@@ -47,7 +47,7 @@ bool entityTypeCheck(KjNode* entityTypeNodeP, bool duplicatedType, char* entityI
   if ((typeMandatory == true) && (entityTypeNodeP == NULL))
   {
     LM_W(("Bad Input (UPSERT: mandatory field missing: entity::type)"));
-    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "mandatory field missing", "entity::type", 400);
+    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "mandatory field missing", "entity::type", 400, false);
     return false;
   }
 
@@ -55,7 +55,7 @@ bool entityTypeCheck(KjNode* entityTypeNodeP, bool duplicatedType, char* entityI
   if (duplicatedType == true)
   {
     LM_W(("KZ: Bad Input (UPSERT: Duplicated entity::type)"));
-    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated field", "entity::type", 400);
+    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated field", "entity::type", 400, false);
     return false;
   }
 
@@ -63,7 +63,7 @@ bool entityTypeCheck(KjNode* entityTypeNodeP, bool duplicatedType, char* entityI
   if ((entityTypeNodeP != NULL) && (entityTypeNodeP->type != KjString))
   {
     LM_W(("Bad Input (UPSERT: entity::type not a string)"));
-    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "field with invalid type", "entity::type", 400);
+    entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "field with invalid type", "entity::type", 400, false);
     return false;
   }
 

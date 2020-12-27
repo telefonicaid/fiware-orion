@@ -177,7 +177,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
       // Get entity id, type and creDate from the DB
       entityIdGet(dbEntityP, &idInDb);
-      entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "entity already exists", NULL, 400);
+      entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "entity already exists", NULL, 400, true);
 
       entityP = entityLookupById(incomingTree, idInDb);
 
@@ -230,7 +230,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
       if (strcmp(idP->value.s, copyIdP->value.s) == 0)
       {
-        entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400);
+        entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400, true);
         kjChildRemove(orionldState.requestTree, copyP);
       }
       copyP = copyNext;
@@ -288,7 +288,8 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400);
+                        400,
+                        false);
     }
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)

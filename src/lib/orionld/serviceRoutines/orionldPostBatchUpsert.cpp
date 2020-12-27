@@ -182,52 +182,231 @@ static KjNode* idArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode*
     if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
     {
       LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
-      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400);
+      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400, false);
       kjChildRemove(entityArray, entityP);
+      entityP = next;
+      continue;
     }
-    else if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
+
+    if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
     {
       LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
-      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400);
+      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400, false);
       kjChildRemove(entityArray, entityP);
+      entityP = next;
+      continue;
     }
-    else if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
+
+    if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
     {
       LM_W(("Bad Input (@context present both in Link header and in payload data)"));
-      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400);
+      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400, false);
       kjChildRemove(entityArray, entityP);
+      entityP = next;
+      continue;
     }
-    else
-    {
-      if (entityIdPush(idArray, entityId) == NULL)  // NULL means the Entity ID was a duplicate
-      {
-        // Look up the previous entity and remove it from the tree
-        KjNode* eP = kjEntityIdLookupInEntityArray(entityArray, entityId);
 
-        if (eP != NULL)
-        {
-          entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instance removed", 400);
-
-          kjChildRemove(entityArray, eP);
-
-          if (temporal)
-          {
-            //
-            // Save the entity in a KjNode array in orionldState
-            // TRoE processing will take care of pushing these entities to the TRoE DB
-            //
-            if (orionldState.duplicateArray == NULL)
-              orionldState.duplicateArray = kjArray(orionldState.kjsonP, NULL);
-            kjChildAdd(orionldState.duplicateArray, eP);
-          }
-        }
-      }
-    }
+    entityIdPush(idArray, entityId);
 
     entityP = next;
   }
 
   return idArray;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// entityInstanceLookup -
+//
+KjNode* entityInstanceLookup(KjNode* array, const char* entityId, KjNode* entityP)
+{
+  LM_TMP(("IN"));
+  for (KjNode* nodeP = array->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    if (nodeP == entityP)
+      continue;
+
+    KjNode* idP = kjLookup(nodeP, "id");
+    if (idP == NULL)
+      continue;  // It's an error, but it should never happen
+
+    if (strcmp(idP->value.s, entityId) == 0)
+      return nodeP;
+  }
+
+  return NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityIdLookup -
+//
+KjNode* entityIdLookup(KjNode* array, const char* entityId)
+{
+  for (KjNode* nodeP = array->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+  {
+    KjNode* idP = kjLookup(nodeP, "id");
+    if (idP == NULL)
+      continue;  // It's an error, but it should never happen
+
+    if (strcmp(idP->value.s, entityId) == 0)
+      return nodeP;
+  }
+
+  return NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjEntityMergeReplacingAttributes - merge 'copyP' into 'entityP', replacing attributes
+//
+static void kjEntityMergeReplacingAttributes(KjNode* entityP, KjNode* copyP)
+{
+  KjNode* next;
+  KjNode* attrP = copyP->value.firstChildP;
+
+  while (attrP != NULL)
+  {
+    if (attrP->type != KjObject)
+    {
+      attrP = attrP->next;
+      continue;
+    }
+
+    next = copyP->next;
+
+    //
+    // Got an attribute - if found in 'entityP' then remove it from there
+    // then move the attribute from 'copyP' to 'entityP'
+    //
+    // => REPLACE the attr in 'entityP' with the one from 'copyP'
+    //
+    KjNode* toRemove = kjLookup(entityP, attrP->name);
+
+    if (toRemove != NULL)
+      kjChildRemove(entityP, toRemove);
+
+    kjChildRemove(copyP, attrP);
+    kjChildAdd(entityP, attrP);
+    attrP = next;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// duplicatedInstances - remove (save in array for temporal) duplicated entities from the array
+//
+// If more than ONE instance of an entity:
+//   - For REPLACE - remove all entity instances but the last
+//   - For UPDATE  - remove all instances and add a new one - merged from all of them
+//
+//
+// REPLACE
+//   If entities are replaced, then only the last one is relevant for the current state
+//   All instances but the last are removed from the incoming tree
+//   All removed instances are added to the array for TRoE
+//
+// UPDATE
+//   If entities are updated, then none of the individual instances are relevant for the "current state"
+//   All instances are removed and instead added to the array for TRoE - orionldState.duplicateArray
+//   After that, all TRoE instances are merged into a resulting instance that is then added to the tree for "current state"
+//
+// So, for both cases we'll remove all instances that has a duplicate
+// Then, for REPLACE, we'll put back the last, and
+// for UPDATE, we merge them all into a new entity that is added to the original array
+//
+void duplicatedInstances(KjNode* incomingTree, bool replace, KjNode* errorsArray)
+{
+  KjNode* entityP  = incomingTree->value.firstChildP;
+  KjNode* next     = NULL;
+
+  //
+  // Remove all entities that have more than one instance
+  //
+  while (entityP)
+  {
+    next = entityP->next;
+    KjNode* idP = kjLookup(entityP, "id");
+
+    if (idP == NULL)
+    {
+      LM_E(("Internal Error (no id field found for entity)"));
+      entityP = next;
+      continue;
+    }
+
+    char*   entityId = idP->value.s;
+    KjNode* sameIdP  = entityInstanceLookup(incomingTree, entityId, entityP);
+
+    if (replace == false)  // For Updates - ALL instances must go
+    {
+      if (orionldState.duplicateArray != NULL)
+        sameIdP = entityIdLookup(orionldState.duplicateArray, entityId);
+    }
+
+    if (sameIdP == NULL)
+    {
+      entityP = next;
+      continue;
+    }
+
+    if (orionldState.duplicateArray == NULL)
+      orionldState.duplicateArray = kjArray(orionldState.kjsonP, NULL);
+
+    entityErrorPush(errorsArray, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instances merged into one", 400, true);
+    kjChildRemove(incomingTree, entityP);
+    kjChildAdd(orionldState.duplicateArray, entityP);
+    entityP = next;
+  }
+
+  if (replace == true)  // For REPLACE, we're done
+    return;
+
+  if (orionldState.duplicateArray == NULL)  // If no duplicates, we're done
+    return;
+
+  // For UPDATE, we need to merge all instances in order into one new entity instance and put the merged result back into incomingTree
+  entityP = orionldState.duplicateArray->value.firstChildP;
+  while (entityP)
+  {
+    LM_TMP(("Here: entityP == %p", entityP));
+    // Decouple the first entity and use it as base for the merge
+    next = entityP->next;
+    kjChildRemove(orionldState.duplicateArray, entityP);
+
+    KjNode* idP      = kjLookup(entityP, "id");
+    char*   entityId = idP->value.s;
+
+    // Find all other instances of the same entity and merge them all into entityP
+    KjNode* copyP = next;
+    KjNode* copyNext;
+    KjNode* copyIdP;
+
+    while (copyP != NULL)
+    {
+      copyNext = copyP->next;
+      copyIdP  = kjLookup(copyP, "id");
+
+      if (strcmp(copyIdP->value.s, entityId) == 0)
+      {
+        if (copyP == next)
+          next = next->next;
+        kjChildRemove(orionldState.duplicateArray, copyP);
+        kjEntityMergeReplacingAttributes(entityP, copyP);
+      }
+
+      copyP = copyNext;
+    }
+    kjChildAdd(incomingTree, entityP);
+    entityP = next;
+  }
 }
 
 
@@ -354,7 +533,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
           // - not added to "removeArray"
           //
           LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayloadExpanded));
-          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400);
+          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400, false);
           kjChildRemove(incomingTree, entityP);
           continue;
         }
@@ -418,6 +597,17 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   UpdateContextRequest  mongoRequest;
   KjNode*               cloneP = NULL;
 
+
+  //
+  // Before the tree is destroyed by kjTreeToUpdateContextRequest(),
+  // remove+merge any duplicated entities from the array and save the array for temporal.
+  //
+  // If more than ONE instance of an entity:
+  //   - For REPLACE - remove all entity instances but the last
+  //   - For UPDATE  - remove all instances and add a new one - merged from all of them
+  //
+  duplicatedInstances(incomingTree, orionldState.uriParamOptions.update == false, errorsArrayP);
+
   if (temporal)
     cloneP = kjClone(orionldState.kjsonP, incomingTree);
 
@@ -477,7 +667,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400);
+                        400,
+                        false);
     }
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
