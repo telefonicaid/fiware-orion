@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Batch Upsert with instances of the same entity
+Entity Batch Upsert-Update with instances of the same entity
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,11 +31,11 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Upsert/Create the entity E1, with four different instances of E1 in the array
-# 02. GET all entities and see only the last instance of E1 from step 01
+# 01. Upsert+Update the entity E1, with four different instances of E1 in the array
+# 02. GET all entities and see the merged E1
 #
 
-echo "01. Upsert/Create the entity E1, with four different instances of E1 in the array"
+echo "01. Upsert+Update the entity E1, with four different instances of E1 in the array"
 echo "================================================================================="
 payload='[
   {
@@ -71,23 +71,23 @@ payload='[
     }
   }
 ]'
-orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
 echo
 echo
 
 
-echo "02. GET all entities and see only the last instance of E1 from step 01"
-echo "======================================================================"
+echo "02. GET all entities and see the merged E1"
+echo "=========================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T
 echo
 echo
 
 
 --REGEXPECT--
-01. Upsert/Create the entity E1, with four different instances of E1 in the array
+01. Upsert+Update the entity E1, with four different instances of E1 in the array
 =================================================================================
 HTTP/1.1 207 Multi Status
-Content-Length: 611
+Content-Length: 246
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -96,25 +96,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entities:E1",
             "error": {
-                "detail": "previous instance removed",
-                "status": 400,
-                "title": "Duplicated Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:entities:E1",
-            "error": {
-                "detail": "previous instance removed",
-                "status": 400,
-                "title": "Duplicated Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        },
-        {
-            "entityId": "urn:ngsi-ld:entities:E1",
-            "error": {
-                "detail": "previous instance removed",
+                "detail": "previous instances merged into one",
                 "status": 400,
                 "title": "Duplicated Entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
@@ -127,16 +109,28 @@ Date: REGEX(.*)
 }
 
 
-02. GET all entities and see only the last instance of E1 from step 01
-======================================================================
+02. GET all entities and see the merged E1
+==========================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 209
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
     {
+        "P1": {
+            "type": "Property",
+            "value": "E1/P1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "E1/P2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "E1/P3"
+        },
         "P4": {
             "type": "Property",
             "value": "E1/P4"
