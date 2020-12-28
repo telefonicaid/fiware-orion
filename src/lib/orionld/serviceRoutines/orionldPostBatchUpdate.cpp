@@ -71,6 +71,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own Interface
 
 
+extern void duplicatedInstances(KjNode* incomingTree, bool replace, KjNode* errorsArray);
 
 // ----------------------------------------------------------------------------
 //
@@ -80,11 +81,6 @@ extern "C"
 //
 bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 {
-  KjNode*  incomingTree   = orionldState.requestTree;
-  KjNode*  successArrayP  = kjArray(orionldState.kjsonP, "success");
-  KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  KjNode*  cloneP         = NULL;  // Only for temporal
-
   //
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array with objects
@@ -95,12 +91,9 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   ARRAY_CHECK(orionldState.requestTree, "toplevel");
   EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
 
-  //
-  // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
-  //        Rather than cloning the entire tree, just put them back again after processing
-  //
-  if (temporal)
-    cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+  KjNode*  incomingTree   = orionldState.requestTree;
+  KjNode*  successArrayP  = kjArray(orionldState.kjsonP, "success");
+  KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
 
   KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
 
@@ -247,10 +240,12 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
   UpdateContextRequest  mongoRequest;
 
-  if (orionldState.uriParamOptions.noOverwrite == true)
-    mongoRequest.updateActionType = ActionTypeAppendStrict;
-  else
-    mongoRequest.updateActionType = ActionTypeAppend;
+  duplicatedInstances(incomingTree, orionldState.uriParamOptions.update == false, errorsArrayP);
+
+  if (temporal)
+    orionldState.requestTree = kjClone(orionldState.kjsonP, incomingTree);
+
+  mongoRequest.updateActionType = (orionldState.uriParamOptions.noOverwrite == true)? ActionTypeAppendStrict : ActionTypeAppend;
 
   kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
 
@@ -263,6 +258,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   {
     mongoRequest.contextElementVector[ix]->entityId.modDate = now;
   }
+
 
   UpdateContextResponse mongoResponse;
 
@@ -335,9 +331,6 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNoContent;
     orionldState.responseTree = NULL;
   }
-
-  if ((temporal == true) && (cloneP != NULL))
-    orionldState.requestTree = cloneP;
 
   return true;
 }

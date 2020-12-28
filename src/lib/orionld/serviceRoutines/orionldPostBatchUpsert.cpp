@@ -498,7 +498,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   // 06. Fill in UpdateContextRequest from "incomingTree"
   //
   UpdateContextRequest  mongoRequest;
-  KjNode*               cloneP = NULL;
 
 
   //
@@ -512,14 +511,11 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   duplicatedInstances(incomingTree, orionldState.uriParamOptions.update == false, errorsArrayP);
 
   if (temporal)
-    cloneP = kjClone(orionldState.kjsonP, incomingTree);
+    orionldState.requestTree = kjClone(orionldState.kjsonP, incomingTree);
 
   mongoRequest.updateActionType = ActionTypeAppend;
 
   kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
-
-  if (temporal)
-    orionldState.requestTree = cloneP;
 
   //
   // 07. Set 'modDate' to "RIGHT NOW"
