@@ -60,6 +60,7 @@ extern "C"
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/removeArrayEntityLookup.h"            // removeArrayEntityLookup
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
+#include "orionld/common/duplicatedInstances.h"                // duplicatedInstances
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -71,11 +72,10 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own Interface
 
 
-extern void duplicatedInstances(KjNode* incomingTree, bool replace, KjNode* errorsArray);
 
 // ----------------------------------------------------------------------------
 //
-// orionldPostEntityOperationsUpdate -
+// orionldPostBatchUpdate -
 //
 // POST /ngsi-ld/v1/entityOperations/update
 //
@@ -91,14 +91,22 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   ARRAY_CHECK(orionldState.requestTree, "toplevel");
   EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
 
+
   KjNode*  incomingTree   = orionldState.requestTree;
   KjNode*  successArrayP  = kjArray(orionldState.kjsonP, "success");
   KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
 
+  //
+  // Entities that already exist in the DB cannot have a type != type-in-db
+  // To assure this, we need to extract all existing entities from the database
+  // Also, those entities that do not exist MUST have an entity type present.
+  //
+  // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  //
   KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
 
   //
-  // 02. Check whether some ID from idArray does not exist
+  // 02. Check whether some ID from idArray does not exist - that would be an error for Batch Update
   //     Check also that the entity type is the same, if given in the request
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
@@ -240,7 +248,10 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 
   UpdateContextRequest  mongoRequest;
 
-  duplicatedInstances(incomingTree, orionldState.uriParamOptions.update == false, errorsArrayP);
+  if (orionldState.uriParamOptions.noOverwrite == true)
+    duplicatedInstances(incomingTree, false, false, errorsArrayP);  // attributeReplace == false => existing attrs are ignored
+  else
+    duplicatedInstances(incomingTree, false, true, errorsArrayP);   // attributeReplace == true => existing attrs are replaced
 
   if (temporal)
     orionldState.requestTree = kjClone(orionldState.kjsonP, incomingTree);

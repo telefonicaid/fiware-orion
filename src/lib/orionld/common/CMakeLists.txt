@@ -57,6 +57,7 @@ SET (SOURCES
     attributeNotUpdated.cpp
     isSpecialAttribute.cpp
     isSpecialSubAttribute.cpp
+    duplicatedInstances.cpp
     # qTreeToBson.cpp
 )
 
