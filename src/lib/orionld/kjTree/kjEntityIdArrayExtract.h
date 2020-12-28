@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
-#define SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJENTITYIDARRAYEXTRACT_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJENTITYIDARRAYEXTRACT_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,30 +23,19 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Gabriel Quaresma and Ken Zangelin
+* Author: Ken Zangelin
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                                  // KjNode
 }
-
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// entityErrorPush -
+// kjEntityIdArrayExtract -
 //
-extern void entityErrorPush
-(
-  KjNode*                   errorsArrayP,
-  const char*               entityId,
-  OrionldResponseErrorType  type,
-  const char*               title,
-  const char*               detail,
-  int                       status,
-  bool                      avoidDuplicate
-);
+extern KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode* errorArray);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJENTITYIDARRAYEXTRACT_H_

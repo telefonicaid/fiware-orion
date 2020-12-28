@@ -50,9 +50,9 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                   // orionldHostName, orionldHostNameLen
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
+#include "orionld/common/CHECK.h"                              // CHECK
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/entitySuccessPush.h"                  // Own interface
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityIdCheck.h"                      // entityIdCheck
 #include "orionld/common/entityTypeCheck.h"                    // entityTypeCheck
@@ -67,33 +67,8 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
+#include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityIdPush - add ID to array
-//
-static void entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
-{
-  KjNode* idNodeP = kjString(orionldState.kjsonP, NULL, entityId);
-
-  kjChildAdd(entityIdsArrayP, idNodeP);
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entitySuccessPush -
-//
-static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
-{
-  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
-
-  kjChildAdd(successArrayP, eIdP);
-}
 
 
 
@@ -106,12 +81,19 @@ static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
 bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 {
   KjNode*  incomingTree   = orionldState.requestTree;
-  KjNode*  idArray        = kjArray(orionldState.kjsonP, NULL);
   KjNode*  successArrayP  = kjArray(orionldState.kjsonP, "success");
   KjNode*  errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  KjNode*  entityP;
-  KjNode*  next;
   KjNode*  cloneP         = NULL;  // Only for temporal
+
+  //
+  // Prerequisites for the payload in orionldState.requestTree:
+  // * must be an array with objects
+  // * cannot be empty
+  // * all entities must contain an entity::id (one level down)
+  // * If entity::type is present, it must coincide with what's in the database
+  //
+  ARRAY_CHECK(orionldState.requestTree, "toplevel");
+  EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
 
   //
   // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
@@ -120,34 +102,14 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   if (temporal)
     cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
-  //
-  // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
-  //
-  entityP = incomingTree->value.firstChildP;
-  while (entityP)
-  {
-    next = entityP->next;
-
-    char* entityId;
-    char* entityType;
-
-    //
-    // entityIdAndTypeGet calls entityIdCheck/entityTypeCheck that adds the entity in errorsArrayP if needed
-    //
-    if (entityIdAndTypeGet(entityP, &entityId, &entityType, errorsArrayP) == true)
-      entityIdPush(idArray, entityId);
-    else
-      kjChildRemove(incomingTree, entityP);
-
-    entityP = next;
-  }
-
+  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
 
   //
   // 02. Check whether some ID from idArray does not exist
   //     Check also that the entity type is the same, if given in the request
   //
   KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
+  KjNode* entityP;
 
   if (idTypeAndCreDateFromDb == NULL)
   {
@@ -170,7 +132,13 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
       {
         // This should never happen ...
         LM_E(("Internal Error (Unable to find entity '%s')", entityId));
-        entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity seems to have disappeared from the incomingTree ... ???", NULL, 500, false);
+        entityErrorPush(errorsArrayP,
+                        entityId,
+                        OrionldInternalError,
+                        "entity seems to have disappeared from the incomingTree ... ???",
+                        NULL,
+                        500,
+                        false);
         continue;
       }
 
@@ -240,8 +208,14 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
       {
         if (inTypeP->type != KjString)
         {
-          LM_W(("Bad Inout (Entity type is not a JSON string)"));
-          entityErrorPush(errorsArrayP, entityId, OrionldInternalError, "entity type is not a JSON string", kjValueType(inTypeP->type), 400, false);
+          LM_W(("Bad Input (Entity type is not a JSON string)"));
+          entityErrorPush(errorsArrayP,
+                          entityId,
+                          OrionldInternalError,
+                          "entity type is not a JSON string",
+                          kjValueType(inTypeP->type),
+                          400,
+                          false);
           kjChildRemove(incomingTree, entityP);
           continue;
         }

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
-#define SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYSUCCESSPUSH_H_
+#define SRC_LIB_ORIONLD_COMMON_ENTITYSUCCESSPUSH_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,23 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
-
 
 
 // -----------------------------------------------------------------------------
 //
-// entityErrorPush -
+// entitySuccessPush -
 //
-extern void entityErrorPush
-(
-  KjNode*                   errorsArrayP,
-  const char*               entityId,
-  OrionldResponseErrorType  type,
-  const char*               title,
-  const char*               detail,
-  int                       status,
-  bool                      avoidDuplicate
-);
+extern void entitySuccessPush(KjNode* successsArrayP, const char* entityId);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYSUCCESSPUSH_H_

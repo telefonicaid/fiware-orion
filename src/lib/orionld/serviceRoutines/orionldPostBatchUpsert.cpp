@@ -51,9 +51,8 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECK
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityIdCheck.h"                      // entityIdCheck
 #include "orionld/common/entityTypeCheck.h"                    // entityTypeCheck
@@ -69,26 +68,8 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"      // kjEntityIdLookupInEntityArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
+#include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityIdPush - add ID to array
-//
-static KjNode* entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
-{
-  KjNode* idNodeP = kjStringValueLookupInArray(entityIdsArrayP, entityId);
-
-  if (idNodeP != NULL)  // The Entity with ID "entityId" is already present ...
-    return NULL;
-
-  idNodeP = kjString(orionldState.kjsonP, NULL, entityId);
-  kjChildAdd(entityIdsArrayP, idNodeP);
-
-  return idNodeP;
-}
 
 
 
@@ -109,18 +90,6 @@ static char* entityTypeGet(KjNode* entityNodeP, KjNode** contextNodePP)
   }
 
   return type;
-}
-
-
-// ----------------------------------------------------------------------------
-//
-// entitySuccessPush -
-//
-static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
-{
-  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
-
-  kjChildAdd(successArrayP, eIdP);
 }
 
 
@@ -147,72 +116,6 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
   }
 }
 
-
-
-// -----------------------------------------------------------------------------
-//
-// idArrayExtract -
-//
-static KjNode* idArrayExtract(KjNode* entityArray, KjNode* successArray, KjNode* errorArray)
-{
-  KjNode* entityP = entityArray->value.firstChildP;
-  KjNode* next;
-  KjNode* idArray = kjArray(orionldState.kjsonP, NULL);
-
-  while (entityP)
-  {
-    next = entityP->next;
-
-    char*   entityId;
-    char*   entityType;
-
-    // entityIdAndTypeGet calls entityIdCheck/entityTypeCheck that adds the entity in errorArray if needed
-    if (entityIdAndTypeGet(entityP, &entityId, &entityType, errorArray) == false)
-    {
-      kjChildRemove(entityArray, entityP);
-      entityP = next;
-      continue;
-    }
-
-    //
-    // Check Content-Type and @context in payload
-    //
-    KjNode* contextNodeP  = kjLookup(entityP, "@context");
-
-    if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
-    {
-      LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
-      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400, false);
-      kjChildRemove(entityArray, entityP);
-      entityP = next;
-      continue;
-    }
-
-    if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
-    {
-      LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
-      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400, false);
-      kjChildRemove(entityArray, entityP);
-      entityP = next;
-      continue;
-    }
-
-    if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
-    {
-      LM_W(("Bad Input (@context present both in Link header and in payload data)"));
-      entityErrorPush(errorArray, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400, false);
-      kjChildRemove(entityArray, entityP);
-      entityP = next;
-      continue;
-    }
-
-    entityIdPush(idArray, entityId);
-
-    entityP = next;
-  }
-
-  return idArray;
-}
 
 
 // -----------------------------------------------------------------------------
@@ -462,7 +365,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
   //
-  KjNode* idArray = idArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
+  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
 
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities

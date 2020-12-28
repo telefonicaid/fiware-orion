@@ -42,6 +42,7 @@ SET (SOURCES
     orionldServerConnect.cpp
     dotForEq.cpp
     eqForDot.cpp
+    entitySuccessPush.cpp
     entityErrorPush.cpp
     entityIdCheck.cpp
     entityTypeCheck.cpp

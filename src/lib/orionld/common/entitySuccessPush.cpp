@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
-#define SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -28,25 +25,21 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjString
 }
 
-#include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/entitySuccessPush.h"                    // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// entityErrorPush -
+// entitySuccessPush -
 //
-extern void entityErrorPush
-(
-  KjNode*                   errorsArrayP,
-  const char*               entityId,
-  OrionldResponseErrorType  type,
-  const char*               title,
-  const char*               detail,
-  int                       status,
-  bool                      avoidDuplicate
-);
+void entitySuccessPush(KjNode* successArrayP, const char* entityId)
+{
+  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_
+  kjChildAdd(successArrayP, eIdP);
+}
