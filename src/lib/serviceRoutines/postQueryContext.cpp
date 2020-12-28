@@ -301,7 +301,7 @@ static bool queryForward
     // This is really an internal error in the Context Provider
     // It is not in the orion broker though, so 404 is returned
     //
-    LM_W(("Other Error (context provider response to QueryContext is empty)"));
+    LM_W(("Forwarding Error (context provider response to QueryContext is empty)"));
     return false;
   }
 

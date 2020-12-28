@@ -258,7 +258,7 @@ static bool updateForward
       // This is really an internal error in the Context Provider
       // It is not in the orion broker though, so 404 is returned
       //
-      LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+      LM_W(("Forwarding Error (context provider response to UpdateContext is empty)"));
       upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
@@ -335,7 +335,7 @@ static bool updateForward
       return true;
     }
 
-    LM_W(("Other Error (unexpected response from context provider: %s)", out.c_str()));
+    LM_W(("Forwarding Error (unexpected response from context provider: %s)", out.c_str()));
     upcrsP->errorCode.fill(SccReceiverInternalError);
     return false;
   }
