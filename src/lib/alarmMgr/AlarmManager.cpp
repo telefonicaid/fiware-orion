@@ -192,7 +192,7 @@ void AlarmManager::dbErrorLogAlwaysSet(bool _dbErrorLogAlways)
 /* ****************************************************************************
 *
 * AlarmManager::forwardingErrorLogAlwaysSet -
-+*/
+*/
 void AlarmManager::forwardingErrorLogAlwaysSet(bool _forwardingErrorLogAlways)
 {
   semTake();
