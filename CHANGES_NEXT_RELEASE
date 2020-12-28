@@ -46,3 +46,4 @@
 * Issue  #599   New TRoe databases created when new tenants are used
 * Issue  #658   BATCH Upsert+Replace with more than one item for the same entity id
 * Issue  #660   BATCH Upsert+Update with more than one item for the same entity id
+* Issue  #599   BATCH Update with more than one item for the same entity id
