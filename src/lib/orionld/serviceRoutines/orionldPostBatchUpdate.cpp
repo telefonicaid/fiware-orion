@@ -246,19 +246,17 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
     }
   }
 
-  UpdateContextRequest  mongoRequest;
 
   if (orionldState.uriParamOptions.noOverwrite == true)
     duplicatedInstances(incomingTree, false, false, errorsArrayP);  // attributeReplace == false => existing attrs are ignored
   else
     duplicatedInstances(incomingTree, false, true, errorsArrayP);   // attributeReplace == true => existing attrs are replaced
 
-  if (temporal)
-    orionldState.requestTree = kjClone(orionldState.kjsonP, incomingTree);
+  KjNode*               treeP    = (temporal == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
+  UpdateContextRequest  mongoRequest;
+  mongoRequest.updateActionType  = (orionldState.uriParamOptions.noOverwrite == true)? ActionTypeAppendStrict : ActionTypeAppend;
 
-  mongoRequest.updateActionType = (orionldState.uriParamOptions.noOverwrite == true)? ActionTypeAppendStrict : ActionTypeAppend;
-
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
+  kjTreeToUpdateContextRequest(&mongoRequest, treeP, errorsArrayP, idTypeAndCreDateFromDb);
 
   //
   // 03. Set 'modDate' to "RIGHT NOW"

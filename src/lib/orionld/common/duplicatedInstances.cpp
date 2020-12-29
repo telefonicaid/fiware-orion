@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -37,6 +38,40 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/duplicatedInstances.h"                // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// troeIgnoreMark -
+//
+void troeIgnoreMark(KjNode* entityP)
+{
+  if (orionldState.troeIgnoreIx >= K_VEC_SIZE(orionldState.troeIgnoreV))
+  {
+    LM_W(("TRoE ignore index overflow - this adds an extra entity-instance to the history - should not change anything"));
+    return;
+  }
+
+  orionldState.troeIgnoreV[orionldState.troeIgnoreIx++] = entityP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// troeIgnored -
+//
+bool troeIgnored(KjNode* entityP)
+{
+  for (unsigned int ix = 0; ix < orionldState.troeIgnoreIx; ix++)
+  {
+    if (entityP == orionldState.troeIgnoreV[ix])
+      return true;
+  }
+
+  return false;
+}
 
 
 
@@ -68,7 +103,6 @@ static KjNode* entityIdLookup(KjNode* array, const char* entityId)
 //
 static KjNode* entityInstanceLookup(KjNode* array, const char* entityId, KjNode* entityP)
 {
-  LM_TMP(("IN"));
   for (KjNode* nodeP = array->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
     if (nodeP == entityP)
@@ -145,15 +179,13 @@ static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, KjNode* cop
     next = copyP->next;
 
     //
-    // Got an attribute - if found in 'entityP' then ignore it 
+    // Got an attribute - if found in 'entityP' then ignore it
     //
     KjNode* oldAttrP = kjLookup(entityP, attrP->name);
 
+    kjChildRemove(copyP, attrP);
     if (oldAttrP == NULL)
-    {
-      kjChildRemove(copyP, attrP);
       kjChildAdd(entityP, attrP);
-    }
 
     attrP = next;
   }
@@ -190,7 +222,10 @@ void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attribut
   KjNode* next     = NULL;
 
   //
-  // Remove all entities that have more than one instance
+  // For all entities that have more than one instance in 'incomingTree':
+  //   - Move all instances to orionldState.duplicateArray (except if entityReplace == true)
+  //     - IF (entityReplace == true): Keep the last instance in 'incomingTree' as entities replace eachother
+  //   - If UPDATE - merge all instances into one single instance
   //
   while (entityP)
   {
@@ -207,7 +242,7 @@ void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attribut
     char*   entityId = idP->value.s;
     KjNode* sameIdP  = entityInstanceLookup(incomingTree, entityId, entityP);
 
-    if (entityReplace == false)  // For Updates (All but Upsert+ReplaceEntities) - ALL instances must go
+    if (entityReplace == false)  // For Updates (All 4 combinations except Upsert with ReplaceEntities) - ALL instances must go
     {
       if (orionldState.duplicateArray != NULL)
         sameIdP = entityIdLookup(orionldState.duplicateArray, entityId);
@@ -234,14 +269,21 @@ void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attribut
   if (orionldState.duplicateArray == NULL)  // If no duplicates, we're done
     return;
 
+  //
   // For UPDATE, we need to merge all instances in order into one new entity instance and put the merged result back into incomingTree
-  entityP = orionldState.duplicateArray->value.firstChildP;
+  //
+  // For this algorithm, the entities in orionldState.duplicateArray are removed after beign merged.
+  // However, this is no good for TRoE as the duplicated-array is needed for the TRoE database.
+  // So, if TRoE is on, then we need to clone the array before starting with the merge
+  //
+  KjNode* duplicateArray = (temporal == true)? kjClone(orionldState.kjsonP, orionldState.duplicateArray) : orionldState.duplicateArray;
+
+  entityP = duplicateArray->value.firstChildP;
   while (entityP)
   {
-    LM_TMP(("Here: entityP == %p", entityP));
     // Decouple the first entity and use it as base for the merge
     next = entityP->next;
-    kjChildRemove(orionldState.duplicateArray, entityP);
+    kjChildRemove(duplicateArray, entityP);
 
     KjNode* idP      = kjLookup(entityP, "id");
     char*   entityId = idP->value.s;
@@ -260,7 +302,7 @@ void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attribut
       {
         if (copyP == next)
           next = next->next;
-        kjChildRemove(orionldState.duplicateArray, copyP);
+        kjChildRemove(duplicateArray, copyP);
         if (attributeReplace == true)
           kjEntityMergeReplacingAttributes(entityP, copyP);
         else
@@ -269,7 +311,12 @@ void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attribut
 
       copyP = copyNext;
     }
+
+    // This merged entity should be ignored for TRoE as it is the merged result of all instances
+    // and all instances are already present in orionldState.duplicateArray
+    //
     kjChildAdd(incomingTree, entityP);
+    troeIgnoreMark(entityP);
     entityP = next;
   }
 }

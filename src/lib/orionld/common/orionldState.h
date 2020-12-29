@@ -279,6 +279,8 @@ typedef struct OrionldConnectionState
   bool                    temporalError;
   char                    troeDbName[128];
   KjNode*                 duplicateArray;
+  KjNode*                 troeIgnoreV[20];
+  unsigned int            troeIgnoreIx;
 } OrionldConnectionState;
 
 

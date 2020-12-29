@@ -30,30 +30,6 @@
 
 // -----------------------------------------------------------------------------
 //
-// TEMPORAL_DB - the name of the default database
-//
-#define TEMPORAL_DB "orion"
-
-
-
-// -----------------------------------------------------------------------------
-//
-// TEMPORAL_DB_USER
-//
-#define TEMPORAL_DB_USER "postgres"
-
-
-
-// -----------------------------------------------------------------------------
-//
-// TEMPORAL_DB_PASSWORD
-//
-#define TEMPORAL_DB_PASSWORD "password"
-
-
-
-// -----------------------------------------------------------------------------
-//
 // TemporalMode -
 //
 typedef enum TemporalMode

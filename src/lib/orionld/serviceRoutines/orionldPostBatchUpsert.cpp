@@ -302,7 +302,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   // 06. Fill in UpdateContextRequest from "incomingTree"
   //
-  UpdateContextRequest  mongoRequest;
 
 
   //
@@ -313,14 +312,16 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //   - For REPLACE - remove all entity instances but the last
   //   - For UPDATE  - remove all instances and add a new one - merged from all of them
   //
-  duplicatedInstances(incomingTree, orionldState.uriParamOptions.update == false, true, errorsArrayP);
+  if (orionldState.uriParamOptions.update == true)
+    duplicatedInstances(incomingTree, false, true, errorsArrayP);  // Existing entities are MERGED, existing attributes are replaced
+  else
+    duplicatedInstances(incomingTree, true, true, errorsArrayP);   // Existing entities are REPLACED
 
-  if (temporal)
-    orionldState.requestTree = kjClone(orionldState.kjsonP, incomingTree);
-
+  KjNode*               treeP    = (temporal == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
+  UpdateContextRequest  mongoRequest;
   mongoRequest.updateActionType = ActionTypeAppend;
 
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
+  kjTreeToUpdateContextRequest(&mongoRequest, treeP, errorsArrayP, idTypeAndCreDateFromDb);
 
   //
   // 07. Set 'modDate' to "RIGHT NOW"
