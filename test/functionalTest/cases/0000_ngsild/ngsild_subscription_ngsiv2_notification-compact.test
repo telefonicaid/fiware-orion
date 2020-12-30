@@ -85,7 +85,7 @@ payload='{
     }
   ],
   "notification": {
-    "format": "x-ngsiv2-normalized",
+    "format": "x-ngsiv2-normalized-compacted",
     "endpoint": {
       "uri": "http://localhost:'$LISTENER_PORT'/notify",
       "accept": "application/json"
@@ -142,7 +142,7 @@ payload='{
   ],
   "watchedAttributes": [ "https://uri.etsi.org/ngsi-ld/default-context/P1" ],
   "notification": {
-    "format": "x-ngsiv2-normalized",
+    "format": "x-ngsiv2",
     "endpoint": {
       "uri": "http://localhost:'$LISTENER_PORT'/notify",
       "accept": "application/json"
@@ -201,7 +201,7 @@ payload='{
   "watchedAttributes": [ "https://uri.etsi.org/ngsi-ld/default-context/P3" ],
   "notification": {
     "attributes": [ "https://uri.etsi.org/ngsi-ld/default-context/P3" ],
-    "format": "x-ngsiv2-normalized",
+    "format": "x-ngsiv2-normalized-compacted",
     "endpoint": {
       "uri": "http://localhost:'$LISTENER_PORT'/notify",
       "accept": "application/json"
@@ -263,7 +263,7 @@ payload='{
     }
   ],
   "notification": {
-    "format": "x-ngsiv2-normalized",
+    "format": "x-ngsiv2",
     "endpoint": {
       "uri": "http://localhost:'$LISTENER_PORT'/notify",
       "accept": "application/json"
@@ -396,26 +396,30 @@ Date: REGEX(.*)
 ============================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 236
+Content-Length: 265
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/default-context/P": {
+            "P": {
                 "metadata": {}, 
                 "type": "Property", 
                 "value": 2
             }, 
             "id": "urn:ngsi-ld:entities:E1", 
-            "type": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+            "type": "T1"
         }
     ], 
-    "subscriptionId": "REGEX(.*)"
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub01", 
+    "type": "Notification"
 }
 =======================================
 
@@ -450,26 +454,30 @@ Date: REGEX(.*)
 ===================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 237
+Content-Length: 266
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/default-context/P1": {
+            "P1": {
                 "metadata": {}, 
                 "type": "Property", 
                 "value": 5
             }, 
             "id": "urn:ngsi-ld:entities:E2", 
-            "type": "https://uri.etsi.org/ngsi-ld/default-context/T2"
+            "type": "T2"
         }
     ], 
-    "subscriptionId": "REGEX(.*)"
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub02", 
+    "type": "Notification"
 }
 =======================================
 
@@ -504,26 +512,30 @@ Date: REGEX(.*)
 ================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 238
+Content-Length: 267
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/default-context/P3": {
+            "P3": {
                 "metadata": {}, 
                 "type": "Property", 
                 "value": 10
             }, 
             "id": "urn:ngsi-ld:entities:E3", 
-            "type": "https://uri.etsi.org/ngsi-ld/default-context/T3"
+            "type": "T3"
         }
     ], 
-    "subscriptionId": "REGEX(.*)"
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub03", 
+    "type": "Notification"
 }
 =======================================
 
@@ -558,11 +570,12 @@ Date: REGEX(.*)
 ===============================================================================================
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
-Content-Length: 238
+Content-Length: 312
 User-Agent: REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: localhost:9997
 Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {
@@ -581,10 +594,13 @@ Content-Type: application/json; charset=utf-8
                     "type": "Point"
                 }
             }, 
-            "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+            "type": "T4"
         }
     ], 
-    "subscriptionId": "REGEX(.*)"
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub04", 
+    "type": "Notification"
 }
 =======================================
 
@@ -638,17 +654,31 @@ Date: REGEX(.*)
 =======================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 417
+Content-Length: 462
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/observationSpace": {
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "observationSpace": {
                 "metadata": {
                     "r1": {
                         "type": "Relationship", 
@@ -665,23 +695,13 @@ Content-Type: application/json; charset=utf-8
                     "type": "Point"
                 }
             }, 
-            "id": "urn:ngsi-ld:entities:E4", 
-            "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
-                "value": {
-                    "coordinates": [
-                        1, 
-                        2, 
-                        3
-                    ], 
-                    "type": "Point"
-                }
-            }, 
-            "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+            "type": "T4"
         }
     ], 
-    "subscriptionId": "http://a.b.c/subs/sub04"
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub04", 
+    "type": "Notification"
 }
 =======================================
 
@@ -698,17 +718,31 @@ Date: REGEX(.*)
 =====================================================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 594
+Content-Length: 610
 User-Agent: orion/REGEX(.*)
-Ngsiv2-Attrsformat: x-ngsiv2-normalized
+Ngsiv2-Attrsformat: x-ngsiv2-normalized-compacted
 Host: REGEX(.*)
 Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Content-Type: application/json; charset=utf-8
 
 {
     "data": [
         {
-            "https://uri.etsi.org/ngsi-ld/observationSpace": {
+            "id": "urn:ngsi-ld:entities:E4", 
+            "location": {
+                "metadata": {}, 
+                "type": "GeoProperty", 
+                "value": {
+                    "coordinates": [
+                        1, 
+                        2, 
+                        3
+                    ], 
+                    "type": "Point"
+                }
+            }, 
+            "observationSpace": {
                 "metadata": {
                     "r1": {
                         "type": "Relationship", 
@@ -725,7 +759,7 @@ Content-Type: application/json; charset=utf-8
                     "type": "Point"
                 }
             }, 
-            "https://uri.etsi.org/ngsi-ld/operationSpace": {
+            "operationSpace": {
                 "metadata": {
                     "r2": {
                         "type": "Relationship", 
@@ -742,23 +776,13 @@ Content-Type: application/json; charset=utf-8
                     "type": "Point"
                 }
             }, 
-            "id": "urn:ngsi-ld:entities:E4", 
-            "location": {
-                "metadata": {}, 
-                "type": "GeoProperty", 
-                "value": {
-                    "coordinates": [
-                        1, 
-                        2, 
-                        3
-                    ], 
-                    "type": "Point"
-                }
-            }, 
-            "type": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+            "type": "T4"
         }
     ], 
-    "subscriptionId": "http://a.b.c/subs/sub04"
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)", 
+    "notifiedAt": "REGEX(.*)", 
+    "subscriptionId": "http://a.b.c/subs/sub04", 
+    "type": "Notification"
 }
 =======================================
 

@@ -47,12 +47,13 @@ extern "C"
 //
 static bool formatExtract(char* format, ngsiv2::Subscription* subP)
 {
-  if (SCOMPARE10(format, 'k', 'e', 'y', 'V', 'a', 'l', 'u', 'e', 's', 0))
-    subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
-  else if (SCOMPARE11(format, 'n', 'o', 'r', 'm', 'a', 'l', 'i', 'z', 'e', 'd', 0))
-    subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
-  else if (SCOMPARE18(format, 'N', 'G', 'S', 'I', 'v', '2', '-', 'N', 'o', 'r', 'm', 'a', 'l', 'i', 'z', 'e', 'd', 0))
-    subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED;
+  if      (strcmp(format, "keyValues")                     == 0) subP->attrsFormat = NGSI_LD_V1_KEYVALUES;
+  else if (strcmp(format, "normalized")                    == 0) subP->attrsFormat = NGSI_LD_V1_NORMALIZED;
+  else if (strcmp(format, "x-ngsiv2-normalized")           == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED;
+  else if (strcmp(format, "x-ngsiv2-keyValues")            == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES;
+  else if (strcmp(format, "x-ngsiv2-normalized-compacted") == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED_COMPACT;
+  else if (strcmp(format, "x-ngsiv2")                      == 0) subP->attrsFormat = NGSI_LD_V1_V2_NORMALIZED_COMPACT;
+  else if (strcmp(format, "x-ngsiv2-keyValues-compacted")  == 0) subP->attrsFormat = NGSI_LD_V1_V2_KEYVALUES_COMPACT;
   else
   {
     LM_E(("Invalid value for Notification::format: '%s'", format));
@@ -99,6 +100,15 @@ bool kjTreeToNotification(KjNode* kNodeP, ngsiv2::Subscription* subP, KjNode** e
       LM_T(LmtNotificationFormat, ("Got a subscription format: '%s'", itemP->value.s));
       if (formatExtract(formatP, subP) == false)
         return false;
+
+      if ((subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES) || (subP->attrsFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
+      {
+        LM_W(("Non-supported notification format: %s", itemP->value.s));
+        orionldErrorResponseCreate(OrionldBadRequestData, "Non-supported notification format", itemP->value.s);
+        orionldState.httpStatusCode = 501;
+        return false;
+      }
+
       LM_T(LmtNotificationFormat, ("Extracted subscription format: %d", subP->attrsFormat));
     }
     else if (SCOMPARE9(itemP->name, 'e', 'n', 'd', 'p', 'o', 'i', 'n', 't', 0))

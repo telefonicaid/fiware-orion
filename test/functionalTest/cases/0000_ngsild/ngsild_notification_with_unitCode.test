@@ -1,0 +1,136 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription with unitCode - issue #622
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription matching Entity urn:ngsi-ld:test:E1
+# 02. Create Entity urn:ngsi-ld:test:E1, with a property that has a unitCode sub-property
+# 03. Dump accumulator to see one notification, make sure that unitCode is OK
+#
+
+echo "01. Create a subscription matching Entity urn:ngsi-ld:test:E1"
+echo "============================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:01",
+  "type": "Subscription",
+  "entities": [{"type": "Test"}],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create Entity urn:ngsi-ld:test:E1, with a property that has a unitCode sub-property"
+echo "======================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:test:E1",
+  "type": "Test",
+  "temperature": {
+    "type": "Property",
+    "value": 14,
+    "unitCode": "Degrees Celsius"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see one notification, make sure that unitCode is OK"
+echo "==========================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription matching Entity urn:ngsi-ld:test:E1
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:01
+Date: REGEX(.*)
+
+
+
+02. Create Entity urn:ngsi-ld:test:E1, with a property that has a unitCode sub-property
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:test:E1
+Date: REGEX(.*)
+
+
+
+03. Dump accumulator to see one notification, make sure that unitCode is OK
+===========================================================================
+POST http://REGEX(.*)/notify
+Fiware-Servicepath: /
+Content-Length: 293
+User-Agent: orion/REGEX(.*)
+Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
+Accept: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Content-Type: application/json; charset=utf-8
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:test:E1",
+            "temperature": {
+                "type": "Property",
+                "unitCode": "Degrees Celsius",
+                "value": 14
+            },
+            "type": "Test"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:Subscription:01",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

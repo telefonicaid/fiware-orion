@@ -497,13 +497,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     ci.outMimeType = JSON;
 
     std::string payloadString;
+
     if (renderFormat == NGSI_V1_LEGACY)
     {
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
       payloadString = ncrP->render(ci.apiVersion, asJsonObject);
     }
 #ifdef ORIONLD
-    else if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_NORMALIZED))
+    else if ((renderFormat >= NGSI_LD_V1_NORMALIZED) && (renderFormat <= NGSI_LD_V1_V2_KEYVALUES_COMPACT))
     {
       subP = subCacheItemLookup(tenant.c_str(), ncrP->subscriptionId.c_str());
       if (subP == NULL)
@@ -583,13 +584,24 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     //
     // This is where the Link HTTP header is added, for ngsi-ld subscriptions only
+    // and only if shortnames are used - with longnames, no @context is needed (nothing to translate)
+    //
+    // For normal NGSI-LD notifications, shortnames are always used.
+    // For cross-api notifications (NGSI-LD broker notifies in APIv2 format), either longnames or shortnames are used.
+    // This depends on what the subscriber asked for.
+    // If "x-ngsiv2-normalized-compacted" or "x-ngsiv2-keyValues-compacted", then the link is necessary.
     //
     if (subP != NULL)
     {
-      if ((renderFormat == NGSI_LD_V1_NORMALIZED) || (renderFormat == NGSI_LD_V1_KEYVALUES))
+      if ((renderFormat == NGSI_LD_V1_NORMALIZED)            ||
+          (renderFormat == NGSI_LD_V1_KEYVALUES)             ||
+          (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT) ||
+          (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT))
       {
-        // Subscriptions created using ngsi-ld have a context. those from APIV1/2 do not
-        // This code adds the  Link  header if needed
+        //
+        // Subscriptions created using ngsi-ld have a context - those from APIV1/2 do not
+        // This code adds the "Link" header if needed
+        //
         if (httpInfo.mimeType == JSON)
         {
           if (subP->ldContext == "")
