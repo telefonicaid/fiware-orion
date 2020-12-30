@@ -83,6 +83,8 @@ bool pgAttributeTreat
   uuidGenerate(instanceId);
 
   //
+  // Strip off all special sub-attributes
+  //
   // Get all special sub-attributes and remove them from the tree
   // Only normal sub attributes left in the tree after this loop
   // The sub-attributes must be added to the DB after the attribute, as the InstanceID of the attribute is
@@ -121,6 +123,10 @@ bool pgAttributeTreat
       valueNodeP = subAttrP;
     else if (strcmp(subAttrP->name, "unitCode") == 0)
       unitCode = subAttrP->value.s;
+    else if (strcmp(subAttrP->name, "createdAt") == 0)
+      ;  // Skipping ... not 100% sure ...
+    else if (strcmp(subAttrP->name, "modifiedAt") == 0)
+      ;  // Skipping ... not 100% sure ...
     else
     {
       subAttrs = true;
@@ -132,8 +138,9 @@ bool pgAttributeTreat
     subAttrP = next;
   }
 
+  //
   // Push the attribute to DB
-
+  //
   const char* opModeString = temporalMode(opMode);
   LM_TMP(("APPA: Calling pgAttributePush with opMode %d: '%s'", opMode, opModeString));
   if (pgAttributePush(connectionP, valueNodeP, attributeType, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode, opModeString) == false)
@@ -142,6 +149,9 @@ bool pgAttributeTreat
     return false;
   }
 
+  //
+  // Treating all sub-attrs (except those special ones that were stripped off earlier)
+  //
   for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
     LM_TMP(("TEMP: Got a sub-attr: '%s'", subAttrP->name));

@@ -33,6 +33,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjRender.h"                                      // kjRender - TMP
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
 #include "common/globals.h"                                      // parse8601Time
@@ -134,10 +136,6 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
 
       defaultInstanceP = instanceP;
 
-      // This is an instance with the default datasetId - we don't want it!
-      if (datasetIdP != NULL)
-        kjChildRemove(defaultInstanceP, datasetIdP);
-
       //
       // Remove the instance from 'attrV', where we only want datasetId attr
       //
@@ -158,6 +156,7 @@ KjNode* datasetInstances(KjNode* datasets, KjNode* attrV, char* attributeName, d
 
   // Create an array for the attribute and put all remaining instances in the array
   KjNode* attrArray = kjArray(orionldState.kjsonP, attributeName);
+
   attrArray->value.firstChildP = attrV->value.firstChildP;
   attrArray->lastChild         = attrV->lastChild;
 
@@ -244,6 +243,13 @@ bool orionldPostEntities(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccConflict;
     return false;
   }
+
+  //
+  // This function destroys the incoming tree - must save it for TRoE
+  //
+  KjNode* cloneForTroeP = NULL;
+  if (temporal)
+    cloneForTroeP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   orionldState.entityId = entityId;
 
@@ -386,6 +392,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   //
   if (datasets->value.firstChildP != NULL)  // Not Empty
     orionldState.datasets = datasets;
+
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenant,
@@ -411,6 +418,9 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   orionldState.entityCreated  = true;
 
   httpHeaderLocationAdd(ciP, "/ngsi-ld/v1/entities/", entityId);
+
+  if (cloneForTroeP != NULL)
+    orionldState.requestTree = cloneForTroeP;
 
   return true;
 }

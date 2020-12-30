@@ -104,7 +104,13 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
     }
     else if (attrP->type == KjArray)
     {
-      LM_W(("The attribute '%s' is an array ... datasetId is not supported for TRoE", attrP->name));
+      for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
+      {
+        attrInstanceP->name = attrP->name;  // For array items, the name is NULL - the attr name must be taken from the array itself
+
+        if (pgAttributeTreat(connectionP, attrInstanceP, entityInstanceP, id, createdAt, modifiedAt, opMode) == false)
+          LM_RE(false, ("pgAttributeTreat(datasets) failed for attribute '%s'", attrP->name));
+      }
     }
     else
       LM_E(("Internal Error (The attribute '%s' is neither an Object nor an Array)", attrP->name));

@@ -305,13 +305,9 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   //
   // Here the incoming payload tree should be OK for temporal
   //
-#if 0
-  // <DEBUG>
-  char buf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
-  LM_TMP(("APPA: Tree for temporal: %s", buf));
-  // </DEBUG>
-#endif
+  KjNode* cloneForTroeP = NULL;
+  if (temporal)
+    cloneForTroeP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   // 7. Create an array of the attributes "still left"
   char** attrNameV  = (char**) kaAlloc(&orionldState.kalloc, attrsInPayload * sizeof(char*));
@@ -493,5 +489,9 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   ucr.release();
+
+  if (cloneForTroeP != NULL)
+    orionldState.requestTree = cloneForTroeP;
+
   return true;
 }
