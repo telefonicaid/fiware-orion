@@ -155,6 +155,13 @@ echo
 echo
 
 
+echo "09. GET Entity Types - see five types with details"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/types?details=true
+echo
+echo
+
+
 --REGEXPECT--
 01. GET Entity Types - see empty array
 ======================================
@@ -263,6 +270,74 @@ Date: REGEX(.*)
         "T4"
     ]
 }
+
+
+09. GET Entity Types - see five types with details
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 1101
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "attributeNames": [
+            "https://uri.etsi.org/ngsi-ld/default-context/P1"
+        ],
+        "id": "urn:ngsi-ld:entities:REGEX(.*)",
+        "type": "EntityType",
+        "typeName": "T0"
+    },
+    {
+        "attributeNames": [
+            "https://uri.etsi.org/ngsi-ld/default-context/P1"
+        ],
+        "id": "urn:ngsi-ld:entities:REGEX(.*)",
+        "type": "EntityType",
+        "typeName": "T2"
+    },
+    {
+        "attributeNames": [
+            "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "urn:ngsi-ld:entity:REGEX(.*)",
+        "type": "EntityType",
+        "typeName": "https://uri.etsi.org/ngsi-ld/default-context/T4"
+    },
+    {
+        "attributeNames": [
+            "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "urn:ngsi-ld:entity:REGEX(.*)",
+        "type": "EntityType",
+        "typeName": "https://uri.etsi.org/ngsi-ld/default-context/T3"
+    },
+    {
+        "attributeNames": [
+            "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "urn:ngsi-ld:entity:REGEX(.*)",
+        "type": "EntityType",
+        "typeName": "https://uri.etsi.org/ngsi-ld/default-context/T1"
+    },
+    {
+        "attributeNames": [
+            "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "urn:ngsi-ld:entity:REGEX(.*)",
+        "type": "EntityType",
+        "typeName": "https://uri.etsi.org/ngsi-ld/default-context/T2"
+    }
+]
 
 
 --TEARDOWN--
