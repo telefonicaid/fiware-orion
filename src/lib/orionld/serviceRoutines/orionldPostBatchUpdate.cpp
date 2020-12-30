@@ -64,7 +64,6 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
-#include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/serviceRoutines/orionldPostBatchUpdate.h"    // Own Interface
 
