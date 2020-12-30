@@ -35,7 +35,7 @@
 //
 // numberToDate -
 //
-bool numberToDate(double timestamp, char* date, int dateLen, char** detailsP)
+bool numberToDate(double timestamp, char* date, int dateLen)
 {
   struct tm  tm;
   time_t     fromEpoch = (time_t) timestamp;

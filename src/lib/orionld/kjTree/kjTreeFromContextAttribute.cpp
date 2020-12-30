@@ -226,11 +226,10 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
     if (strcmp(mdName, "observedAt") == 0)
     {
       char     date[128];
-      char*    details;
 
-      if (numberToDate((time_t) mdP->numberValue, date, sizeof(date), &details) == false)
+      if (numberToDate((time_t) mdP->numberValue, date, sizeof(date)) == false)
       {
-        LM_E(("numberToDate failed: %s", details));
+        LM_E(("numberToDate failed"));
         return NULL;
       }
 
