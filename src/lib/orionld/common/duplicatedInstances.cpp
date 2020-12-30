@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                     // K_VEC_SIZE
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
@@ -35,6 +36,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
+#include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/duplicatedInstances.h"                // Own interface
@@ -163,7 +166,7 @@ static void kjEntityMergeReplacingAttributes(KjNode* entityP, KjNode* copyP)
 //
 // kjEntityMergeIgnoringExistingAttributes - merge 'copyP' into 'entityP', ignoring already existing attributes
 //
-static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, KjNode* copyP)
+static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, char* entityId, KjNode* dbEntityV, KjNode* copyP)
 {
   KjNode* next;
   KjNode* attrP = copyP->value.firstChildP;
@@ -179,12 +182,18 @@ static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, KjNode* cop
     next = copyP->next;
 
     //
-    // Got an attribute - if found in 'entityP' then ignore it
+    // Got an attribute - if found in 'DB entity' OR in previous instance - then ignore it
     //
-    KjNode* oldAttrP = kjLookup(entityP, attrP->name);
+    char*   attrName   = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
+    KjNode* dbEntityP  = entityInstanceLookup(dbEntityV, entityId, NULL);
+    KjNode* attrNamesP = kjLookup(dbEntityP, "attrNames");
+    KjNode* oldAttrP   = kjStringValueLookupInArray(attrNamesP, attrName);
+
+    if (oldAttrP == NULL)
+      oldAttrP = kjLookup(entityP, attrP->name);
 
     kjChildRemove(copyP, attrP);
-    if (oldAttrP == NULL)
+    if (oldAttrP == NULL)  // Ignore the attribute, if it already existed
       kjChildAdd(entityP, attrP);
 
     attrP = next;
@@ -216,7 +225,7 @@ static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, KjNode* cop
 // Then, for REPLACE, we'll put back the last, and
 // for UPDATE, we merge them all into a new entity that is added to the original array
 //
-void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attributeReplace, KjNode* errorsArray)
+void duplicatedInstances(KjNode* incomingTree, KjNode* dbEntityV, bool entityReplace, bool attributeReplace, KjNode* errorsArray)
 {
   KjNode* entityP  = incomingTree->value.firstChildP;
   KjNode* next     = NULL;
@@ -306,7 +315,7 @@ void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attribut
         if (attributeReplace == true)
           kjEntityMergeReplacingAttributes(entityP, copyP);
         else
-          kjEntityMergeIgnoringExistingAttributes(entityP, copyP);
+          kjEntityMergeIgnoringExistingAttributes(entityP, entityId, dbEntityV, copyP);
       }
 
       copyP = copyNext;

@@ -36,6 +36,6 @@ extern "C"
 //
 // duplicatedInstances -
 //
-extern void duplicatedInstances(KjNode* incomingTree, bool entityReplace, bool attributeReplace, KjNode* errorsArray);
+extern void duplicatedInstances(KjNode* incomingTree, KjNode* dbEntityV, bool entityReplace, bool attributeReplace, KjNode* errorsArray);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_DUPLICATEDINSTANCES_H_

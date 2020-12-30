@@ -75,7 +75,7 @@ typedef bool    (*DbEntitiesDeleteFunction)(KjNode* entityIdsArray);
 typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, char** detailsP);
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
-typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray);
+typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray, bool attrNames);
 typedef KjNode* (*DbRegistrationLookup)(const char* entityId, const char* attribute, int* noOfRegsP);
 typedef bool    (*DbRegistrationExists)(const char* registrationId);
 typedef bool    (*DbRegistrationDelete)(const char* registrationId);

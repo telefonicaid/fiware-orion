@@ -177,7 +177,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //     whose Entity::Id is part of the array "idArray".
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
+  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
   //
   // 03. Creation Date from DB entities, and type-check
@@ -313,9 +313,9 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //   - For UPDATE  - remove all instances and add a new one - merged from all of them
   //
   if (orionldState.uriParamOptions.update == true)
-    duplicatedInstances(incomingTree, false, true, errorsArrayP);  // Existing entities are MERGED, existing attributes are replaced
+    duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);  // Existing entities are MERGED, existing attributes are replaced
   else
-    duplicatedInstances(incomingTree, true, true, errorsArrayP);   // Existing entities are REPLACED
+    duplicatedInstances(incomingTree, NULL, true, true, errorsArrayP);   // Existing entities are REPLACED
 
   KjNode*               treeP    = (temporal == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
   UpdateContextRequest  mongoRequest;

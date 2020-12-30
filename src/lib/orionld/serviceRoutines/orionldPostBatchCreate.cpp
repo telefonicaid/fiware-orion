@@ -166,7 +166,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   //     whose Entity::Id is part of the array "idArray".
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
+  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
   if (idTypeAndCreDateFromDb != NULL)
   {

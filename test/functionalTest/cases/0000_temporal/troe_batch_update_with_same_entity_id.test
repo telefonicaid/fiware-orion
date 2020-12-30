@@ -432,16 +432,12 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entit
 Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,
 Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2 - Should have been ignored
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2 - Should have been ignored
 Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 1: E1/P3",,
 Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E1,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2 - Should have been ignored
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2 - Should have been ignored
 Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 2: E1/P3",,
 Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance2:R3:E1,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2 - Should have been ignored
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2 - Should have been ignored
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P2",,
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R2:E3,,
 Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P3",,
 Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E3,,
 
