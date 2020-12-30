@@ -96,12 +96,11 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   // notifiedAt
   if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
   {
-    char    date[128];
-    char*   details;
+    char date[128];
 
-    if (numberToDate(orionldState.requestTime, date, sizeof(date), &details) == false)
+    if (numberToDate(orionldState.requestTime, date, sizeof(date)) == false)
     {
-      LM_E(("Runtime Error (numberToDate: %s)", details));
+      LM_E(("Runtime Error (numberToDate failed)"));
       return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "notifiedAt", date);

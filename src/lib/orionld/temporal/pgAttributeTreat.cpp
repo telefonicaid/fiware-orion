@@ -37,41 +37,11 @@ extern "C"
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/temporal/temporal.h"                         // TemporalMode, temporalMode
 #include "orionld/temporal/pgAttributePush.h"                  // pgAttributePush
 #include "orionld/temporal/pgSubAttributeTreat.h"              // pgSubAttributeTreat
 #include "orionld/temporal/pgAttributeTreat.h"                 // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// numberToDate -
-//
-static bool numberToDate(double timestamp, char* date, int dateLen)
-{
-  struct tm  tm;
-  time_t     fromEpoch = timestamp;
-  double     fraction  = timestamp - fromEpoch + 0.0005;
-  int        millis    = fraction * 1000;
-
-  gmtime_r(&fromEpoch, &tm);
-  strftime(date, dateLen, "%Y-%m-%dT%H:%M:%S", &tm);
-
-  //
-  // To add the milliseconds:
-  //   - make 'milliP' pint to the end of the time string (date)
-  //   - add a dot at the end
-  //   - printf the milliseconds after the dot
-  //
-  int   sLen   = strlen(date);
-  char* milliP = &date[sLen];
-
-  *milliP = '.';
-  snprintf(&milliP[1], dateLen - sLen - 1, "%3d", millis);
-
-  return true;
-}
 
 
 

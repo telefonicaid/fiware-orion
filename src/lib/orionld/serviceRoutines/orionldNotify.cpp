@@ -165,13 +165,11 @@ void orionldNotify(void)
   struct iovec  ioVec[6]        = { { requestHeader, 0 }, { contentLenHeader, 0 }, { contentTypeHeaderJson, 32 }, { userAgentHeader, 23 }, { payload, 0 } };
   int           ioVecLen        = 5;
   char          requestTimeV[64];
-  char*         detail;
 
-
-  if (numberToDate(orionldState.requestTime, requestTimeV, sizeof(requestTimeV), &detail) == false)
+  if (numberToDate(orionldState.requestTime, requestTimeV, sizeof(requestTimeV)) == false)
   {
-    LM_E(("Internal Error (converting timestamp to DateTime string: %s)", detail));
-    snprintf(requestTimeV, sizeof(requestTimeV), "1970-01-01T00:00:00Z");
+    LM_E(("Internal Error (converting timestamp to DateTime string)"));
+    snprintf(requestTimeV, sizeof(requestTimeV), "1970-01-01T00:00:00.000Z");
   }
 
   for (int ix = 0; ix < orionldState.notificationRecords; ix++)

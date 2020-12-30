@@ -33,6 +33,6 @@
 //
 // numberToDate -
 //
-extern bool numberToDate(double fromEpoch, char* date, int dateLen, char** detailsP);
+extern bool numberToDate(double fromEpoch, char* date, int dateLen);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_NUMBERTODATE_H_
