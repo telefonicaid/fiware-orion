@@ -49,7 +49,7 @@ extern "C"
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"  // Own interface
 
 
-extern KjNode* mongoCppLegacyDbStringArrayGet(mongo::BSONObj* boP, const char* fieldName);  // FIXME - move to its own module
+
 // -----------------------------------------------------------------------------
 //
 // mongoCppLegacyEntityListLookupWithIdTypeCreDate -
