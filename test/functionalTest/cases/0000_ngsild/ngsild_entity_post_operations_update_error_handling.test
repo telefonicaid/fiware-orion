@@ -39,7 +39,7 @@ brokerStart CB 212-249
 # 06. Attempt to update with an entity with 2 ID fields - see error
 # 07. Attempt to update with an entity with 2 TYPE fields - see error
 # 08. Attempt to update with an empty array - see error
-# 09. Attempt to update with an empty without @context field - see error
+# 09. Attempt to update with an entity without @context field - see error
 # 10. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/create
 # 11. Try to update entity which not exists POST /ngsi-ld/v1/entityOperations/update
 #
@@ -270,8 +270,8 @@ echo
 echo
 
 
-echo "09. Attempt to update with an empty without @context field - see error"
-echo "======================================================================"
+echo "09. Attempt to update with an entity without @context field - see error"
+echo "======================================================================="
 payload='[
   {
     "id": "urn:ngsi-ld:entity:E3",
@@ -606,10 +606,10 @@ Date: REGEX(.*)
 
 
 
-09. Attempt to update with an empty without @context field - see error
-======================================================================
+09. Attempt to update with an entity without @context field - see error
+=======================================================================
 HTTP/1.1 207 Multi Status
-Content-Length: 468
+Content-Length: 565
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -621,7 +621,8 @@ Date: REGEX(.*)
       "entityId": "urn:ngsi-ld:entity:E3",
       "error": {
         "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
-        "title": "entity does not exist",
+        "title": "Invalid payload",
+        "detail": "Content-Type is 'application/ld+json', but no @context in payload data array item",
         "status": 400
       }
     },

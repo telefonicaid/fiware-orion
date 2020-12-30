@@ -46,6 +46,7 @@ extern "C"
 
 
 extern void temporalEntityArrayExpand(KjNode* tree);
+extern bool troeIgnored(KjNode* entityP);
 // ----------------------------------------------------------------------------
 //
 // temporalPostBatchUpsert -
@@ -61,15 +62,15 @@ bool temporalPostBatchUpsert(ConnectionInfo* ciP)
   if (pgTransactionBegin(connectionP) != true)
     LM_RE(false, ("pgTransactionBegin failed"));
 
-  bool ok = true;
+  bool         ok       = true;
+  TemporalMode troeMode = (orionldState.uriParamOptions.update == true)? TEMPORAL_ATTRIBUTE_REPLACE : TEMPORAL_ENTITY_REPLACE;
 
   if (orionldState.duplicateArray != NULL)
   {
     temporalEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do this
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ENTITY_REPLACE) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, troeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;
@@ -85,8 +86,10 @@ bool temporalPostBatchUpsert(ConnectionInfo* ciP)
 
     for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, TEMPORAL_ENTITY_REPLACE) == false)
+      if (troeIgnored(entityP) == true)
+        continue;
+
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, troeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;

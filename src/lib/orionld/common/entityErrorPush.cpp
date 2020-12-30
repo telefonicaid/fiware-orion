@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/entityErrorPush.h"                      // Own interface
 
 
 
@@ -57,7 +58,16 @@ extern "C"
 //
 // This implementation will treat "type", "title", and "status" as MANDATORY, and "detail" as OPTIONAL
 //
-void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status, bool avoidDuplicate)
+void entityErrorPush
+(
+  KjNode*                   errorsArrayP,
+  const char*               entityId,
+  OrionldResponseErrorType  type,
+  const char*               title,
+  const char*               detail,
+  int                       status,
+  bool                      avoidDuplicate
+)
 {
   if (avoidDuplicate == true)
   {

@@ -42,6 +42,7 @@ SET (SOURCES
     orionldServerConnect.cpp
     dotForEq.cpp
     eqForDot.cpp
+    entitySuccessPush.cpp
     entityErrorPush.cpp
     entityIdCheck.cpp
     entityTypeCheck.cpp
@@ -56,6 +57,7 @@ SET (SOURCES
     attributeNotUpdated.cpp
     isSpecialAttribute.cpp
     isSpecialSubAttribute.cpp
+    duplicatedInstances.cpp
     # qTreeToBson.cpp
 )
 

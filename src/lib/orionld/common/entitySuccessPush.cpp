@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYLISTLOOKUPWITHIDTYPECREDATE_H_
-#define SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYLISTLOOKUPWITHIDTYPECREDATE_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,21 +20,26 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Larysse Savanna
+* Author: Gabriel Quaresma and Ken Zangelin
 */
-#include "mongo/client/dbclient.h"                             // mongo::BSONObj
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjString
 }
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/entitySuccessPush.h"                    // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongoCppLegacyEntityListLookupWithIdTypeCreDate -
+// entitySuccessPush -
 //
-extern KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, bool attrNames);
+void entitySuccessPush(KjNode* successArrayP, const char* entityId)
+{
+  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
 
-#endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYLISTLOOKUPWITHIDTYPECREDATE_H_
+  kjChildAdd(successArrayP, eIdP);
+}

@@ -95,7 +95,7 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
   //
   // First get the entities from database to check if they exist
   //
-  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree);
+  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree, false);
   if (dbEntities == NULL)
   {
     LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
