@@ -46,18 +46,28 @@ extern "C"
 #include "orionld/temporal/temporalPostEntity.h"               // Own interface
 
 
-
+extern void temporalSubAttrsExpand(KjNode* treeP);
 // ----------------------------------------------------------------------------
 //
 // temporalPostEntity -
 //
 bool temporalPostEntity(ConnectionInfo* ciP)
 {
-  // <DEBUG>
-  char debugBuf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, debugBuf, sizeof(debugBuf));
-  LM_TMP(("APPA: incoming tree: %s", debugBuf));
-  // </DEBUG>
+  //
+  // The service routine leaves us with the attributes expanded but the sub attributes NOT expanded
+  //
+  for (KjNode* attrP = orionldState.requestTree->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (attrP->type == KjObject)      // Normal attribute
+      temporalSubAttrsExpand(attrP);
+    else if (attrP->type == KjArray)  // An array with datasetId instances of the attribute
+    {
+      for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
+      {
+        temporalSubAttrsExpand(attrInstanceP);
+      }
+    }
+  }
 
   if (orionldState.uriParamOptions.noOverwrite == true)
     return temporalPostEntityNoOverwrite(ciP);
