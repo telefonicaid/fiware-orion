@@ -617,7 +617,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
 #ifdef ORIONLD
     LM_TMP(("POOL: tenant: '%s'", value));
     orionldState.tenant = (char*) value;
-    if (temporal)
+    if (troe)
       snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
 #endif
     headerP->tenant = value;
@@ -633,7 +633,7 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
 
     LM_TMP(("POOL: tenant: '%s'", value));
     orionldState.tenant = (char*) value;
-    if (temporal)
+    if (troe)
       snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
   }
   else if (strcasecmp(ckey, "NGSILD-Path") == 0)

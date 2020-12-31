@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // tenantV, tenants
-#include "orionld/temporal/pgDatabasePrepare.h"                // pgDatabasePrepare
+#include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
 
 
@@ -49,7 +49,7 @@ void orionldTenantCreate(char* tenant)
 
   tenantV[tenants++] = strdup(tenant);
 
-  if (temporal)
+  if (troe)
   {
     LM_TMP(("PGPOOL: calling pgDatabasePrepare for tenant '%s')", orionldState.troeDbName));
     if (pgDatabasePrepare(orionldState.troeDbName) != true)

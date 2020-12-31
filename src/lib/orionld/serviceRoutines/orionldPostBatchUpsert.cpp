@@ -306,7 +306,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 
   //
   // Before the tree is destroyed by kjTreeToUpdateContextRequest(),
-  // remove+merge any duplicated entities from the array and save the array for temporal.
+  // remove+merge any duplicated entities from the array and save the array for TRoE.
   //
   // If more than ONE instance of an entity:
   //   - For REPLACE - remove all entity instances but the last
@@ -317,7 +317,7 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   else
     duplicatedInstances(incomingTree, NULL, true, true, errorsArrayP);   // Existing entities are REPLACED
 
-  KjNode*               treeP    = (temporal == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
+  KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
   UpdateContextRequest  mongoRequest;
   mongoRequest.updateActionType = ActionTypeAppend;
 

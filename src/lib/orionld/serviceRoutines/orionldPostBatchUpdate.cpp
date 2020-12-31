@@ -299,7 +299,7 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
   else
     duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);                     // attributeReplace == true => existing attrs are replaced
 
-  KjNode*               treeP    = (temporal == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
+  KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
   UpdateContextRequest  mongoRequest;
   mongoRequest.updateActionType  = (orionldState.uriParamOptions.noOverwrite == true)? ActionTypeAppendStrict : ActionTypeAppend;
 

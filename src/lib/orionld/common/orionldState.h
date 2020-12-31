@@ -276,7 +276,7 @@ typedef struct OrionldConnectionState
   //
   // TRoE
   //
-  bool                    temporalError;
+  bool                    troeError;
   char                    troeDbName[128];
   KjNode*                 duplicateArray;
   KjNode*                 troeIgnoreV[20];
@@ -313,7 +313,7 @@ extern bool              multitenancy;             // From orionld.cpp
 extern char*             tenant;                   // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
-extern bool              temporal;                 // From orionld.cpp
+extern bool              troe;                     // From orionld.cpp
 extern char              troeHost[64];             // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
 extern char              troeUser[64];             // From orionld.cpp

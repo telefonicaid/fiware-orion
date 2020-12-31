@@ -533,14 +533,15 @@ function brokerStart()
 
   # Check for --noCache and --cache options in 'extraParams'
   xParams=""
-  temporal=OFF
+  troe=OFF
   while [ "$#" != 0 ]
   do
     if   [ "$1" == "--noCache" ];            then noCache=ON;
     elif [ "$1" == "--cache" ];              then noCache=OFF;
     elif [ "$1" == "-noCache" ];             then noCache=ON;
     elif [ "$1" == "-cache" ];               then noCache=OFF;
-    elif [ "$1" == "-temporal" ];            then temporal=ON; 
+    elif [ "$1" == "-troe" ];                then troe=ON; 
+    elif [ "$1" == "-temporal" ];            then troe=ON; 
     elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
     then
       notificationModeGiven=TRUE
@@ -583,9 +584,9 @@ function brokerStart()
   fi
 
 
-  if [ "$temporal" == "ON" ]
+  if [ "$troe" == "ON" ]
   then
-    xParams=$xParams' -temporal'
+    xParams=$xParams' -troe'
   fi
 
   localBrokerStop $role
