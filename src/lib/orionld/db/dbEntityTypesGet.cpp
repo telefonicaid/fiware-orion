@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/db/dbEntityTypesGet.h"                          // Own interface
 
 
+
 // -----------------------------------------------------------------------------
 //
 // kjStringArraySortedInsert -
@@ -66,19 +67,19 @@ static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
 
   if (prev != NULL)
   {
-    if (prev->next == NULL)  // insert as last item
+    if (prev->next == NULL)  // Insert as last item
     {
-      prev->next = newItemP;
-      newItemP->next = NULL;
+      prev->next       = newItemP;
+      newItemP->next   = NULL;
       array->lastChild = newItemP;
     }
-    else  // In the middle
+    else  // Insert the middle
     {
       newItemP->next = prev->next;
-      prev->next = newItemP;
+      prev->next     = newItemP;
     }
   }
-  else  // insert as first item
+  else  // Insert as first item
   {
     newItemP->next = array->value.firstChildP;
     array->value.firstChildP = newItemP;
@@ -123,48 +124,41 @@ static KjNode* typesAndAttributesExtractFromEntities(KjNode* array)
   for (KjNode* entityP = array->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode* nodeResponseP = kjObject(orionldState.kjsonP, NULL);
-
-    char*   typeName    = NULL;
-    KjNode* idP         = entityP->value.firstChildP;  // The entities has a single child '_id'
-    KjNode* idUriP      = kjLookup(idP, "id");
-    KjNode* typeP       = kjLookup(idP, "type");
-    KjNode* attributesP = kjLookup(entityP, "attrNames");
+    KjNode* _idP          = kjLookup(entityP, "_id");
+    KjNode* typeP         = kjLookup(_idP, "type");
+    KjNode* attributesP   = kjLookup(entityP, "attrNames");
 
     if (typeP != NULL)
     {
-      typeName = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
-
-      KjNode* typeIdNodeP             = kjString(orionldState.kjsonP, "id", idUriP->value.s);
-      KjNode* typeNameNodeP           = kjString(orionldState.kjsonP, "typeName", typeName);
+      char*   typeName       = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
+      KjNode* typeIdNodeP    = kjString(orionldState.kjsonP, "id", typeP->value.s);
+      KjNode* typeNameNodeP  = kjString(orionldState.kjsonP, "typeName", typeName);
 
       kjChildAdd(nodeResponseP, typeIdNodeP);
       kjChildAdd(nodeResponseP, typeNameNodeP);
     }
 
-    if (attributesP != NULL) {
+    if (attributesP != NULL)
+    {
       KjNode* attributeNamesNodeListP = kjArray(orionldState.kjsonP,  "attributeNames");
-
-      KjNode* firstChild = attributesP->value.firstChildP;
-      kjChildRemove(attributesP, firstChild);
-      kjChildAdd(attributeNamesNodeListP, firstChild);
-
-      KjNode* nodeP = attributesP->value.firstChildP;
+      KjNode* nodeP                   = attributesP->value.firstChildP;
       KjNode* next;
+
       while (nodeP != NULL)
       {
         next = nodeP->next;
 
         kjChildRemove(attributesP, nodeP);
         nodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, nodeP->value.s, NULL, NULL);
-        LM_TMP(("HEY -> %s", nodeP->value.s));
         kjStringArraySortedInsert(attributeNamesNodeListP, nodeP);
 
         nodeP = next;
       }
+
       kjChildAdd(nodeResponseP, attributeNamesNodeListP);
     }
 
-    kjChildAdd(typeArray, nodeResponseP);  // OK to break tree, as idP is one level up and its next pointer is still intact
+    kjChildAdd(typeArray, nodeResponseP);  // OK to break tree
   }
 
   return typeArray;
@@ -182,34 +176,29 @@ static KjNode* typesAndAttributesExtractFromRegistrations(KjNode* array)
 
   for (KjNode* registrationP = array->value.firstChildP; registrationP != NULL; registrationP = registrationP->next)
   {
-    KjNode* nodeResponseP = kjObject(orionldState.kjsonP, NULL);
+    KjNode* responseNodeP = kjObject(orionldState.kjsonP, NULL);
+    KjNode* typeP         = kjLookup(registrationP, "type");
+    KjNode* attributesP   = kjLookup(registrationP, "attrs");
 
-    KjNode* idP         = kjLookup(registrationP, "id");
-    KjNode* typeP       = kjLookup(registrationP, "type");
-    KjNode* attributesP = kjLookup(registrationP, "attrs");
-
-    if (idP != NULL)
+    if (typeP == NULL)
     {
-      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", idP->value.s);
-      kjChildAdd(nodeResponseP, idNodeP);
+      LM_E(("Internal Error (no 'type' item in registration)"));
+      return NULL;
     }
 
-    if (typeP != NULL)
-    {
-      KjNode* typeNameNodeP = kjString(orionldState.kjsonP, "typeName", typeP->value.s);
-      kjChildAdd(nodeResponseP, typeNameNodeP);
-    }
+    KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", typeP->value.s);
+    char*   typeName       = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
+    KjNode* typeNameNodeP  = kjString(orionldState.kjsonP, "typeName", typeName);
+
+    kjChildAdd(responseNodeP, idNodeP);
+    kjChildAdd(responseNodeP, typeNameNodeP);
 
     if (attributesP != NULL)
     {
       KjNode* attributeNamesNodeListP = kjArray(orionldState.kjsonP,  "attributeNames");
-
-      KjNode* firstChild = attributesP->value.firstChildP;
-      kjChildRemove(attributesP, firstChild);
-      kjChildAdd(attributeNamesNodeListP, firstChild);
-
-      KjNode* nodeP = attributesP->value.firstChildP;
+      KjNode* nodeP                   = attributesP->value.firstChildP;
       KjNode* next;
+
       while (nodeP != NULL)
       {
         next = nodeP->next;
@@ -220,11 +209,13 @@ static KjNode* typesAndAttributesExtractFromRegistrations(KjNode* array)
 
         nodeP = next;
       }
-      kjChildAdd(nodeResponseP, attributeNamesNodeListP);
+
+      kjChildAdd(responseNodeP, attributeNamesNodeListP);
     }
 
-    kjChildAdd(typeArray, nodeResponseP);
+    kjChildAdd(typeArray, responseNodeP);
   }
+
   return typeArray;
 }
 
@@ -245,7 +236,6 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
   fields[0] = (char*) "_id";
 
-
   if (orionldState.uriParams.details == false)
     local  = dbEntitiesGet(fields, 1);
   else
@@ -255,6 +245,8 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   }
 
   remote = dbEntityTypesFromRegistrationsGet();
+  if ((remote != NULL) && (orionldState.uriParams.details == true))
+    remote = typesAndAttributesExtractFromRegistrations(remote);
 
   if (local != NULL)
   {
@@ -275,14 +267,11 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     arrayP = remote;
   else
   {
-    if (orionldState.uriParams.details == false)
-      arrayP = remote;
-    else
-    {
-      remote = typesAndAttributesExtractFromRegistrations(remote);
-      arrayP = remote;
-    }
+    arrayP = remote;
 
+    //
+    // Concatenate remote + local
+    //
     remote->lastChild->next  = local->value.firstChildP;
     remote->lastChild        = local->lastChild;
   }
@@ -314,10 +303,10 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     nodeP = next;
   }
 
-  LM_TMP(("%d", orionldState.uriParams.details));
   if (orionldState.uriParams.details == false)
   {
     char entityTypesId[64];
+
     strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
     uuidGenerate(&entityTypesId[27]);
 
@@ -328,34 +317,35 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     kjChildAdd(typeNodeResponseP, idNodeP);
     kjChildAdd(typeNodeResponseP, typeNodeP);
     kjChildAdd(typeNodeResponseP, sortedArrayP);
+
     return typeNodeResponseP;
   }
-  else
+
+  KjNode* typeNodeDetailsListP = kjArray(orionldState.kjsonP,  NULL);
+
+  for (KjNode* typeValueNodeP = sortedArrayP->value.firstChildP; typeValueNodeP != NULL; typeValueNodeP = typeValueNodeP->next)
   {
-    KjNode* typeNodeDetailsListP = kjArray(orionldState.kjsonP,  NULL);
-    for (KjNode* typeValueNodeP = sortedArrayP->value.firstChildP; typeValueNodeP != NULL; typeValueNodeP = typeValueNodeP->next)
+    KjNode* idP                = kjLookup(typeValueNodeP, "id");
+    KjNode* typeNameP          = kjLookup(typeValueNodeP, "typeName");
+    KjNode* attrsNameP         = kjLookup(typeValueNodeP, "attributeNames");
+    KjNode* typeNodeResponseP  = kjObject(orionldState.kjsonP, NULL);
+
+    if ((idP != NULL) && (typeNameP != NULL))
     {
-      KjNode* idP         = kjLookup(typeValueNodeP, "id");
-      KjNode* typeNameP   = kjLookup(typeValueNodeP, "typeName");
-      KjNode* attrsNameP  = kjLookup(typeValueNodeP, "attributeNames");
+      KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", idP->value.s);
+      KjNode* typeNodeP      = kjString(orionldState.kjsonP, "type", "EntityType");
+      KjNode* typeNameNodeP  = kjString(orionldState.kjsonP, "typeName", typeNameP->value.s);
 
-      KjNode* typeNodeResponseP       = kjObject(orionldState.kjsonP, NULL);
-      if (idP != NULL && typeNameP != NULL)
-      {
-        KjNode* idNodeP                 = kjString(orionldState.kjsonP, "id", idP->value.s);
-        KjNode* typeNodeP               = kjString(orionldState.kjsonP, "type", "EntityType");
-        KjNode* typeNameNodeP           = kjString(orionldState.kjsonP, "typeName", typeNameP->value.s);
-
-        kjChildAdd(typeNodeResponseP, idNodeP);
-        kjChildAdd(typeNodeResponseP, typeNodeP);
-        kjChildAdd(typeNodeResponseP, typeNameNodeP);
-      }
-
-      if (attrsNameP != NULL)
-        kjChildAdd(typeNodeResponseP, attrsNameP);
-
-      kjChildAdd(typeNodeDetailsListP, typeNodeResponseP);
+      kjChildAdd(typeNodeResponseP, idNodeP);
+      kjChildAdd(typeNodeResponseP, typeNodeP);
+      kjChildAdd(typeNodeResponseP, typeNameNodeP);
     }
-    return typeNodeDetailsListP;
+
+    if (attrsNameP != NULL)
+      kjChildAdd(typeNodeResponseP, attrsNameP);
+
+    kjChildAdd(typeNodeDetailsListP, typeNodeResponseP);
   }
+
+  return typeNodeDetailsListP;
 }
