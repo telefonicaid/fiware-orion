@@ -39,9 +39,9 @@ typedef bool (*OrionldServiceRoutine)(ConnectionInfo* ciP);
 
 // -----------------------------------------------------------------------------
 //
-// OrionldTemporalRoutine -
+// OrionldTroeRoutine -
 //
-typedef bool (*OrionldTemporalRoutine)(ConnectionInfo* ciP);
+typedef bool (*OrionldTroeRoutine)(ConnectionInfo* ciP);
 
 
 
@@ -148,7 +148,7 @@ typedef struct OrionLdRestService
 {
   char*                  url;                           // URL Path
   OrionldServiceRoutine  serviceRoutine;                // Function pointer to service routine
-  OrionldTemporalRoutine temporalRoutine;               // Function pointer to routines that saves temporal values
+  OrionldTroeRoutine     troeRoutine;                   // Function pointer to routines that saves temporal values
   int                    wildcards;                     // Number of wildcards in URL: 0, 1, or 2
   int                    charsBeforeFirstWildcard;      // E.g. 9 for [/ngsi-ld/v1/]entities/*
   int                    charsBeforeFirstWildcardSum;   // -"-  'e' + 'n' + 't' + 'i' + 't' + 'i' + 'e' + 's'

@@ -426,10 +426,10 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   //
   // The tree is destroyed during the processing - need it intact for TRoE
   //
-  KjNode* temporalTree = NULL;
-  bool    temporalOk   = true;
+  KjNode* troeTree = NULL;
+  bool    troeOk   = true;
 
-  if (temporal == true)
+  if (troe == true)
   {
     // <DEBUG>
     char debugBuf[1024];
@@ -437,27 +437,27 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     LM_TMP(("APPA: entity from DB: %s", debugBuf));
     // </DEBUG>
 
-    // temporal needs the type of the attribute to be in the tree - let's find it and add it !
+    // TRoE needs the type of the attribute to be in the tree - let's find it and add it !
     KjNode* newTypeP = attributeTypeExtractAndClone(entityP, attrName);
 
     if (newTypeP == NULL)
     {
       LM_E(("Internal Error (attributeTypeExtractAndClone failed)"));
-      temporalOk = false;
+      troeOk = false;
     }
     else
     {
       LM_TMP(("APPA: Got newTypeP"));
       // Now clone and add the attribute type
-      temporalTree = kjClone(orionldState.kjsonP, orionldState.requestTree);
-      if (temporalTree == NULL)
+      troeTree = kjClone(orionldState.kjsonP, orionldState.requestTree);
+      if (troeTree == NULL)
       {
         LM_E(("Internal Error (unable to clone the incoming payload body for TRoE)"));
-        temporalOk = false;
+        troeOk = false;
       }
       else
       {
-        kjChildAdd(temporalTree, newTypeP);
+        kjChildAdd(troeTree, newTypeP);
         LM_TMP(("APPA: added the attribute type '%s'", newTypeP->value.s));
       }
     }
@@ -509,10 +509,10 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
 
   mongoRequest.release();
 
-  if (temporalOk == false)
-    orionldState.temporalError = true;  // indicating that TRoE should not be invoked even though it is turned on
-  else if (temporalTree != NULL)
-    orionldState.requestTree = temporalTree;  // Pointing to the modifed tree for TRoE
+  if (troeOk == false)
+    orionldState.troeError = true;  // indicating that TRoE should not be invoked even though it is turned on
+  else if (troeTree != NULL)
+    orionldState.requestTree = troeTree;  // Pointing to the modifed tree for TRoE
 
   return true;
 }

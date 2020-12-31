@@ -176,7 +176,7 @@ SET (ORION_LIBS
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     orionld_rest
     orionld_serviceRoutines
-    orionld_temporal
+    orionld_troe
     orionld_kjTree
     orionld_context
     orionld_common
@@ -186,7 +186,7 @@ SET (ORION_LIBS
     orionld_mongoCppLegacy
     orionld_db
     orionld_mongoBackend
-    orionld_temporal
+    orionld_troe
 
     serviceRoutines
     serviceRoutinesV2
@@ -260,7 +260,7 @@ SET (DYNAMIC_LIBS
     z
     resolv
     paho-mqtt3c
-    pq #for Temporal & Postgres
+    pq             # for TRoE & Postgres
 )
 
 #
@@ -333,7 +333,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
-  ADD_SUBDIRECTORY(src/lib/orionld/temporal)
+  ADD_SUBDIRECTORY(src/lib/orionld/troe)
   ADD_SUBDIRECTORY(src/lib/orionld/common)
   ADD_SUBDIRECTORY(src/lib/orionld/types)
   ADD_SUBDIRECTORY(src/lib/orionld/context)

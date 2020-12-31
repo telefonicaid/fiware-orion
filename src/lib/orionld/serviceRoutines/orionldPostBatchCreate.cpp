@@ -245,12 +245,8 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   //   - entities that already existed have been removed from the incoming tree,
   // let's clone the tree for TRoE !!!
   //
-  //
-  // FIXME: Entity ID and TYPE are removed from the objects - need them for temporal
-  //        Rather than CLONING the entire tree, just put them back again after processing
-  //
-  KjNode* cloneP = NULL;  // Only for temporal
-  if (temporal)
+  KjNode* cloneP = NULL;  // Only for TRoE
+  if (troe)
     cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   UpdateContextRequest  mongoRequest;
@@ -320,7 +316,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
     return false;
   }
 
-  if ((temporal == true) && (cloneP != NULL))
+  if ((troe == true) && (cloneP != NULL))
     orionldState.requestTree = cloneP;
 
   return true;

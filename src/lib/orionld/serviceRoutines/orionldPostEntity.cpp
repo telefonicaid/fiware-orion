@@ -303,10 +303,10 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   //
-  // Here the incoming payload tree should be OK for temporal
+  // Here the incoming payload tree should be OK for TRoE
   //
   KjNode* cloneForTroeP = NULL;
-  if (temporal)
+  if (troe)
     cloneForTroeP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   // 7. Create an array of the attributes "still left"

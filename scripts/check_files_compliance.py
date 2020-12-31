@@ -270,7 +270,7 @@ for root, dirs, files in os.walk(dir):
             is_orionld = True
         elif 'test/functionalTest/cases/0000_ngsild' in filename:
             is_orionld = True
-        elif 'test/functionalTest/cases/0000_temporal' in filename:
+        elif 'test/functionalTest/cases/0000_troe' in filename:
             is_orionld = True
         elif 'test/unittests/orionld' in filename:
             is_orionld = True

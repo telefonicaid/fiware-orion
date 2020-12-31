@@ -204,7 +204,7 @@ static void kjEntityMergeIgnoringExistingAttributes(KjNode* entityP, char* entit
 
 // -----------------------------------------------------------------------------
 //
-// duplicatedInstances - remove (save in array for temporal) duplicated entities from the array
+// duplicatedInstances - remove (save in array for TRoE) duplicated entities from the array
 //
 // If more than ONE instance of an entity:
 //   - For REPLACE - remove all entity instances but the last
@@ -285,7 +285,7 @@ void duplicatedInstances(KjNode* incomingTree, KjNode* dbEntityV, bool entityRep
   // However, this is no good for TRoE as the duplicated-array is needed for the TRoE database.
   // So, if TRoE is on, then we need to clone the array before starting with the merge
   //
-  KjNode* duplicateArray = (temporal == true)? kjClone(orionldState.kjsonP, orionldState.duplicateArray) : orionldState.duplicateArray;
+  KjNode* duplicateArray = (troe == true)? kjClone(orionldState.kjsonP, orionldState.duplicateArray) : orionldState.duplicateArray;
 
   entityP = duplicateArray->value.firstChildP;
   while (entityP)

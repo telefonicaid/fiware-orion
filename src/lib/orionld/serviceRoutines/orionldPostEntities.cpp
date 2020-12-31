@@ -248,7 +248,7 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   // This function destroys the incoming tree - must save it for TRoE
   //
   KjNode* cloneForTroeP = NULL;
-  if (temporal)
+  if (troe)
     cloneForTroeP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   orionldState.entityId = entityId;

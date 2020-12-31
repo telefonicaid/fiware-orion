@@ -287,8 +287,8 @@ static void setCondsAndInitialNotifyNgsiv1
   // Similar to setCondsAndInitialNotify() in MongoCommonSubscripion.cpp, but
   // entities and notifications attributes are not taken from sub but from subOrig
   //
-  // Most of the following code is copied from mongoGetSubscription logic but, given
-  // that this function is temporal, I don't worry too much about DRY-ness here
+  // Most of the following code is copied from mongoGetSubscription logic
+  //
 
   std::vector<EntID>        entities;
   std::vector<BSONElement>  ents = getFieldF(subOrig, CSUB_ENTITIES).Array();

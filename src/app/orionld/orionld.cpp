@@ -114,7 +114,7 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 #include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
-#include "orionld/temporal/temporalInit.h"                  // temporalInit
+#include "orionld/troe/troeInit.h"                          // troeInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -193,7 +193,7 @@ bool            insecureNotif;
 bool            ngsiv1Autocast;
 int             contextDownloadAttempts;
 int             contextDownloadTimeout;
-bool            temporal;
+bool            troe;
 bool            disableFileLog;
 bool            lmtmp;
 char            troeHost[64];
@@ -262,14 +262,14 @@ int             troePoolSize;
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
-#define TEMPORAL_DESC          "enable temporal evolution of entities"
+#define TROE_DESC              "enable TRoE - temporal representation of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define TMPTRACES_DESC         "disable LM_TMP traces"
-#define TROE_HOST_DESC         "host for temporal database db server"
-#define TROE_PORT_DESC         "port for temporal database db server"
-#define TROE_HOST_USER         "username for temporal database db server"
-#define TROE_HOST_PWD          "password for temporal database db server"
-#define TROE_POOL_DESC         "size of the connection pool for Postgres database connections"
+#define TROE_HOST_DESC         "host for troe database db server"
+#define TROE_PORT_DESC         "port for troe database db server"
+#define TROE_HOST_USER         "username for troe database db server"
+#define TROE_HOST_PWD          "password for troe database db server"
+#define TROE_POOL_DESC         "size of the connection pool for TRoE Postgres database connections"
 
 
 
@@ -332,7 +332,7 @@ PaArgument paArgs[] =
   { "-ngsiv1Autocast",        &ngsiv1Autocast,          "NGSIV1_AUTOCAST",           PaBool,    PaOpt,  false,           false,  true,             NGSIV1_AUTOCAST        },
   { "-ctxTimeout",            &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,     PaOpt,  5000,            0,      20000,            CTX_TMO_DESC           },
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC           },
-  { "-temporal",              &temporal,                "TEMPORAL",                  PaBool,    PaOpt,  false,           false,  true,             TEMPORAL_DESC          },
+  { "-troe",                  &troe,                    "TROE",                      PaBool,    PaOpt,  false,           false,  true,             TROE_DESC              },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC         },
   { "-troeHost",              troeHost,                 "TROE_HOST",                 PaString,  PaOpt,  _i "localhost",  PaNL,   PaNL,             TROE_HOST_DESC         },
   { "-troePort",              &troePort,                "TROE_PORT",                 PaInt,     PaOpt,  5432,            PaNL,   PaNL,             TROE_PORT_DESC         },
@@ -1110,9 +1110,9 @@ int main(int argC, char* argV[])
   // as callbacks to create tenants (== postgres databases) and their tables are called from the
   // initialization routines of mongodb - if postgres is not initialized, this will fail.
   //
-  if (temporal)
+  if (troe)
   {
-    if (temporalInit() == false)
+    if (troeInit() == false)
       LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
   }
 

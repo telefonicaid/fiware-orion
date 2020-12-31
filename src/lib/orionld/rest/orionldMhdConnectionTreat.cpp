@@ -1011,32 +1011,27 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
   //
-  // Call Temporal Routine (if there is one) to save the temporal data.
+  // Call TRoE Routine (if there is one) to save the TRoE data.
   // Only if the Service Routine was successful, of course
   //
   if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
   {
-    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
+    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->troeRoutine != NULL))
     {
       //
       // Also, if something went wrong during processing, the SR can flag this by setting the requestTree to NULL
       //
-      if (orionldState.temporalError == true)
-        LM_E(("TRoE Error - something went wrong during processing for TRoE"));
+      if (orionldState.troeError == true)
+        LM_E(("Internal Error (something went wrong during TRoE processing)"));
       else
       {
         numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
 
-        LM_TMP(("TMPF: Calling Temporal Routine!"));
-        orionldState.serviceP->temporalRoutine(ciP);
-        LM_TMP(("TMPF: After Temporal Routine!"));
+        LM_TMP(("================= Calling TRoE Routine ======================"));
+        orionldState.serviceP->troeRoutine(ciP);
       }
     }
-    else
-      LM_TMP(("TMPF: No temporal routine for this request"));
   }
-  else
-    LM_TMP(("TMPF: The HTTP Status code is %d - no temporal routine is called", orionldState.httpStatusCode));
 
   //
   // Cleanup
