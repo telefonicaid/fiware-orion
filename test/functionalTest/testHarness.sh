@@ -159,7 +159,7 @@ function usage()
   echo "$empty [-v (verbose)]"
   echo "$empty [--loud (loud - see travis extra info)]"
   echo "$empty [-ld (only ngsild tests)]"
-  echo "$empty [-tmp (only ngsild temporal tests)]"
+  echo "$empty [-troe (only ngsild TRoE (Temporal Representation of Entities) tests)]"
   echo "$empty [-eb (external broker)]"
   echo "$empty [-tk (on error, show the diff using tkdiff)]"
   echo "$empty [-meld (on error, show the diff using meld)]"
@@ -402,7 +402,7 @@ noCache=""
 threadpool=ON
 ngsild=OFF
 externalBroker=OFF
-temporal=OFF
+troe=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
@@ -410,7 +410,7 @@ do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
-  elif [ "$1" == "-tmp" ];           then temporal=on;
+  elif [ "$1" == "-troe" ];          then troe=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
   elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
   elif [ "$1" == "-meld" ];          then CB_DIFF_TOOL=meld;
@@ -498,13 +498,13 @@ fi
 
 # -----------------------------------------------------------------------------
 #
-# Only temporal tests?
+# Only TRoE tests?
 #
 # If set, overrides parameter AND -ld option
 #
-if [ "$temporal" == "on" ]
+if [ "$troe" == "on" ]
 then
-  dirOrFile=test/functionalTest/cases/0000_temporal
+  dirOrFile=test/functionalTest/cases/0000_troe
 fi
 
 
