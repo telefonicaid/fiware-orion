@@ -221,6 +221,68 @@ static KjNode* typesAndAttributesExtractFromRegistrations(KjNode* array)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// getEntityTypesResponse - All entity types for which entity instances are
+// currently available in the NGSI-LD system.
+//
+static KjNode* getEntityTypesResponse(KjNode* sortedArrayP)
+{
+  char entityTypesId[64];
+
+  strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
+  uuidGenerate(&entityTypesId[27]);
+
+  KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
+  KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);
+  KjNode* typeNodeP         = kjString(orionldState.kjsonP, "type", "EntityTypeList");
+
+  kjChildAdd(typeNodeResponseP, idNodeP);
+  kjChildAdd(typeNodeResponseP, typeNodeP);
+  kjChildAdd(typeNodeResponseP, sortedArrayP);
+
+  return typeNodeResponseP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// getAvailableEntityTypesDetails - Details of all entity types for which entity
+// instances are currently available in the NGSI-LD system.
+//
+static KjNode* getAvailableEntityTypesDetails(KjNode* sortedArrayP)
+{
+  KjNode* typeNodeDetailsListP = kjArray(orionldState.kjsonP,  NULL);
+
+  for (KjNode* typeValueNodeP = sortedArrayP->value.firstChildP; typeValueNodeP != NULL; typeValueNodeP = typeValueNodeP->next)
+  {
+    KjNode* idP                = kjLookup(typeValueNodeP, "id");
+    KjNode* typeNameP          = kjLookup(typeValueNodeP, "typeName");
+    KjNode* attrsNameP         = kjLookup(typeValueNodeP, "attributeNames");
+    KjNode* typeNodeResponseP  = kjObject(orionldState.kjsonP, NULL);
+
+    if ((idP != NULL) && (typeNameP != NULL))
+    {
+      KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", idP->value.s);
+      KjNode* typeNodeP      = kjString(orionldState.kjsonP, "type", "EntityType");
+      KjNode* typeNameNodeP  = kjString(orionldState.kjsonP, "typeName", typeNameP->value.s);
+
+      kjChildAdd(typeNodeResponseP, idNodeP);
+      kjChildAdd(typeNodeResponseP, typeNodeP);
+      kjChildAdd(typeNodeResponseP, typeNameNodeP);
+    }
+
+    if (attrsNameP != NULL)
+      kjChildAdd(typeNodeResponseP, attrsNameP);
+
+    kjChildAdd(typeNodeDetailsListP, typeNodeResponseP);
+  }
+  return typeNodeDetailsListP;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // dbEntityTypesGet -
@@ -304,48 +366,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   }
 
   if (orionldState.uriParams.details == false)
-  {
-    char entityTypesId[64];
+    return getEntityTypesResponse(sortedArrayP);
 
-    strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
-    uuidGenerate(&entityTypesId[27]);
-
-    KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
-    KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);
-    KjNode* typeNodeP         = kjString(orionldState.kjsonP, "type", "EntityTypeList");
-
-    kjChildAdd(typeNodeResponseP, idNodeP);
-    kjChildAdd(typeNodeResponseP, typeNodeP);
-    kjChildAdd(typeNodeResponseP, sortedArrayP);
-
-    return typeNodeResponseP;
-  }
-
-  KjNode* typeNodeDetailsListP = kjArray(orionldState.kjsonP,  NULL);
-
-  for (KjNode* typeValueNodeP = sortedArrayP->value.firstChildP; typeValueNodeP != NULL; typeValueNodeP = typeValueNodeP->next)
-  {
-    KjNode* idP                = kjLookup(typeValueNodeP, "id");
-    KjNode* typeNameP          = kjLookup(typeValueNodeP, "typeName");
-    KjNode* attrsNameP         = kjLookup(typeValueNodeP, "attributeNames");
-    KjNode* typeNodeResponseP  = kjObject(orionldState.kjsonP, NULL);
-
-    if ((idP != NULL) && (typeNameP != NULL))
-    {
-      KjNode* idNodeP        = kjString(orionldState.kjsonP, "id", idP->value.s);
-      KjNode* typeNodeP      = kjString(orionldState.kjsonP, "type", "EntityType");
-      KjNode* typeNameNodeP  = kjString(orionldState.kjsonP, "typeName", typeNameP->value.s);
-
-      kjChildAdd(typeNodeResponseP, idNodeP);
-      kjChildAdd(typeNodeResponseP, typeNodeP);
-      kjChildAdd(typeNodeResponseP, typeNameNodeP);
-    }
-
-    if (attrsNameP != NULL)
-      kjChildAdd(typeNodeResponseP, attrsNameP);
-
-    kjChildAdd(typeNodeDetailsListP, typeNodeResponseP);
-  }
-
-  return typeNodeDetailsListP;
+  return getAvailableEntityTypesDetails(sortedArrayP);
 }

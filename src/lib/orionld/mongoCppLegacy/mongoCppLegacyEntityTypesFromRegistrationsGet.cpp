@@ -189,7 +189,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   mongo::BSONObjBuilder  filter;
   mongo::BSONObjBuilder  notEmpty;
 
-  fields.append("contextRegistration.entities",     1);  // Entity Type is inside the 'contextRegistration.entities' field ...
+  fields.append("contextRegistration.entities",  1);  // Entity Type is inside the 'contextRegistration.entities' field ...
   if (orionldState.uriParams.details != false)
     fields.append("contextRegistration.attrs",   2);
   fields.append("_id",     0);
