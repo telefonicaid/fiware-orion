@@ -47,7 +47,7 @@ pgDrop ftest_t6
 pgDrop ftest_t7
 pgDrop ftest_t8
 pgDrop ftest_t9
-brokerStart CB 100 IPv4 -temporal -multiservice
+brokerStart CB 100 IPv4 -troe -multiservice
 
 --SHELL--
 
