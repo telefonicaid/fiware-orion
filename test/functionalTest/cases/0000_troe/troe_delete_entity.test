@@ -27,7 +27,7 @@ Simple test of creation of an Entity followed by a DELETE of the entity
 export BROKER=orionld
 dbInit CB
 pgInit $CB_DB_NAME
-brokerStart CB 100 IPv4 -temporal
+brokerStart CB 100 IPv4 -troe
 
 --SHELL--
 

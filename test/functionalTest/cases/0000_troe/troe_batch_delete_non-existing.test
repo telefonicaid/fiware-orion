@@ -27,7 +27,7 @@ Batch Deletion of entities that do not exist
 export BROKER=orionld
 dbInit CB
 pgInit $CB_DB_NAME
-brokerStart CB 100 IPv4 -temporal
+brokerStart CB 100 IPv4 -troe
 
 --SHELL--
 

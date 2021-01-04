@@ -61,7 +61,7 @@ bool troePostEntityNoOverwrite(ConnectionInfo* ciP)
 
   char* entityId   = orionldState.wildcard[0];
   char* entityType = (char*) "APPEND";
-  LM_TMP(("APPA: Calling pgEntityTreat for entity '%s'", entityId));
+
   if (pgEntityTreat(connectionP, orionldState.requestTree, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString, TROE_ATTRIBUTE_APPEND) == false)
   {
     LM_E(("Database Error (post entities TRoE layer failed)"));

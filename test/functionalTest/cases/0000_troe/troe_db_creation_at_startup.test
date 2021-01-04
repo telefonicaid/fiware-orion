@@ -27,7 +27,7 @@ Make sure the broker creates the DB at startup, or not, if it already exists
 export BROKER=orionld
 dbInit CB
 pgDrop $CB_DB_NAME
-brokerStart CB 100 IPv4 -temporal
+brokerStart CB 100 IPv4 -troe
 
 --SHELL--
 
@@ -85,7 +85,7 @@ echo
 echo "04. Restart the broker"
 echo "======================"
 brokerStop CB
-brokerStart CB 0 IPv4 -temporal
+brokerStart CB 0 IPv4 -troe
 sleep 1
 echo
 echo

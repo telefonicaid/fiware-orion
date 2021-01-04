@@ -27,7 +27,7 @@ Make sure the broker creates the DB for a new tenant
 export BROKER=orionld
 dbInit CB
 pgDrop ftest_t1
-brokerStart CB 100 IPv4 -temporal -multiservice
+brokerStart CB 100 IPv4 -troe -multiservice
 
 --SHELL--
 

@@ -27,7 +27,7 @@ Entity Batch Upsert with instances of the same entity
 export BROKER=orionld
 dbInit CB
 pgInit $CB_DB_NAME
-brokerStart CB 100 IPv4 -temporal
+brokerStart CB 100 IPv4 -troe
 
 --SHELL--
 
