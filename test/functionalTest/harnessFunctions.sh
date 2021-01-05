@@ -1433,21 +1433,50 @@ function pgCreate()
 {
   dbName="$1"
   echo "Creating postgres DB $dbName"
-  creation="CREATE DATABASE $dbName"
-  postgis="CREATE EXTENSION IF NOT EXISTS postgis"
-  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'DateTime', 'Geo', 'LanguageMap')"
+  dbCreation="CREATE DATABASE $dbName"
+  plpgsql="CREATE EXTENSION IF NOT EXISTS plpgsql;"
+  postgis="CREATE EXTENSION IF NOT EXISTS postgis;"
+  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'LanguageMap')"
   operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
   entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
-  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
+  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267))"
   subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT, entityId TEXT NOT NULL, attributeRef TEXT NOT NULL REFERENCES attributes(instanceId), attributeId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
 
-  #echo $postgis       | psql --host $PGHOST --port $PGPORT --username $PGUSER
-  echo $creation       | psql --host $PGHOST --port $PGPORT --username $PGUSER
-  echo $operationMode  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo $valuetype      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo $entities       | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo $attributes     | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo $subAttributes  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo $dbCreation:                                                                           > /tmp/pqsql 2>&1
+  echo $dbCreation     | psql --host $PGHOST --port $PGPORT --username $PGUSER               >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $plpgsql:                                                                             >> /tmp/pqsql 2>&1
+  echo $plpgsql        | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $postgis:                                                                             >> /tmp/pqsql 2>&1
+  echo $postgis        | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo "SELECT * FROM pg_extension"                                                          >> /tmp/pqsql 2>&1
+  echo "SELECT * FROM pg_extension" | psql --host $PGHOST --port $PGPORT --username $PGUSER  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $operationMode:                                                                       >> /tmp/pqsql 2>&1
+  echo $operationMode  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $valuetype:                                                                           >> /tmp/pqsql 2>&1
+  echo $valuetype      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $entities                                                                             >> /tmp/pqsql 2>&1
+  echo $entities       | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $attributes:                                                                          >> /tmp/pqsql 2>&1
+  echo $attributes     | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
+
+  echo $subAttributes:                                                                       >> /tmp/pqsql 2>&1
+  echo $subAttributes  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                       >> /tmp/pqsql 2>&1
 
   #
   # Not sure why, but the tables seem to survive the deletion of the database ... done by pgDrop

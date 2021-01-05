@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TROE_PGRELATIONSHIPPUSH_H_
-#define SRC_LIB_ORIONLD_TROE_PGRELATIONSHIPPUSH_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGGEOPOINTPUSH_H_
+#define SRC_LIB_ORIONLD_TROE_PGGEOPOINTPUSH_H_
 
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,17 +27,22 @@
 */
 #include <postgresql/libpq-fe.h>                                 // PGconn
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
 
 
 // -----------------------------------------------------------------------------
 //
-// pgRelationshipPush - push a relationship to its DB table
+// pgGeoPointPush - push a Geo-Point property to its DB table
 //
-extern bool pgRelationshipPush
+extern bool pgGeoPointPush
 (
   PGconn*      connectionP,
   const char*  opMode,
-  const char*  object,
+  KjNode*      coordinatesP,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
@@ -49,4 +54,4 @@ extern bool pgRelationshipPush
   bool         subProperties
 );
 
-#endif  // SRC_LIB_ORIONLD_TROE_PGRELATIONSHIPPUSH_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGGEOPOINTPUSH_H_
