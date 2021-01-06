@@ -34,6 +34,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/troe/pgGeoPointPush.h"                       // pgGeoPointPush
+#include "orionld/troe/pgGeoPolygonPush.h"                     // pgGeoPolygonPush
 #include "orionld/troe/pgGeoPropertyPush.h"                    // Own interface
 
 
@@ -70,13 +71,13 @@ bool pgGeoPropertyPush
 
   if (strcmp(geoTypeP->value.s, "Point") == 0)
     ok = pgGeoPointPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, createdAt, modifiedAt, subProperties);
+  else if (strcmp(geoTypeP->value.s, "Polygon") == 0)
+    ok = pgGeoPolygonPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, createdAt, modifiedAt, subProperties);
 #if 0
   else if (strcmp(geoTypeP->value.s, "LineString") == 0)
     ok = pgGeoLineStringPush();
   else if (strcmp(geoTypeP->value.s, "MultiLineString") == 0)
     ok = pgGeoMultiLineStringPush();
-  else if (strcmp(geoTypeP->value.s, "Polygon") == 0)
-    ok = pgGeoPolygonPush();
   else if (strcmp(geoTypeP->value.s, "MultiPolygon") == 0)
     ok = pgGeoMultiPolygonPush();
 #endif
