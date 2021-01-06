@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 # -*- coding: latin-1 -*-
 # Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -211,12 +211,16 @@ function vMsg()
 }
 
 
+typeset -i errors
+errors=0
 # -----------------------------------------------------------------------------
 #
 # exitFunction
 #
 function exitFunction()
 {
+  errors=$errors+1
+    
   exitCode=$1
   errorText=$2
   testFile=$3
@@ -1197,7 +1201,7 @@ do
 
         init=$testFile" ................................................................................................................."
         init=${init:0:110}
-        printf "%04d/%d: %s %s " "$testNo" "$noOfTests" "$init" "$tryNoInfo"
+        printf "%04d/%d/%d: %s %s " "$testNo" "$noOfTests" "$errors" "$init" "$tryNoInfo"
       else
         printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
       fi
@@ -1235,7 +1239,7 @@ do
     then
       init=$testFile" ................................................................................................................."
       init=${init:0:110}
-      printf "%04d/%d: %s " "$testNo" "$noOfTests" "$init"
+      printf "%04d/%d/%d: %s " "$testNo" "$noOfTests" "$errors" "$init"
     else
       printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
     fi
