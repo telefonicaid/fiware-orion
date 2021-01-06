@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgDatabaseCreate.h"                     // Own interface
 
@@ -46,6 +47,38 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
   if (res == NULL)
     LM_RE(false, ("Database Error (PQexec(BEGIN): %s)", PQresStatus(PQresultStatus(res))));
   PQclear(res);
+
+
+  //
+  // Add extension 'plpgsql' to the database
+  //
+  PGconn* dbConnectionP = pgConnectionGet(dbName);
+  if (dbConnectionP == NULL)
+    LM_RE(false, ("Database Error (unable to connect to postgres database '%s')", dbName));
+
+  res = PQexec(dbConnectionP, "CREATE EXTENSION IF NOT EXISTS plpgsql");
+  if (res == NULL)
+  {
+    PQclear(res);
+    pgConnectionRelease(dbConnectionP);
+    LM_RE(false, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS plpgsql)"));
+  }
+  PQclear(res);
+
+
+  //
+  // Add extension 'postgis' to the database
+  //
+  res = PQexec(dbConnectionP, "CREATE EXTENSION IF NOT EXISTS postgis");
+  if (res == NULL)
+  {
+    PQclear(res);
+    pgConnectionRelease(dbConnectionP);
+    LM_RE(false, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS postgis)"));
+  }
+  PQclear(res);
+
+  pgConnectionRelease(dbConnectionP);
 
   return true;
 }

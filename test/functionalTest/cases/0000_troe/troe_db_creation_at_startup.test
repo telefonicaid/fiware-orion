@@ -110,6 +110,9 @@ echo
 Schema,Name,Type,Owner
 public,attributes,table,postgres
 public,entities,table,postgres
+public,geography_columns,view,postgres
+public,geometry_columns,view,postgres
+public,spatial_ref_sys,table,postgres
 public,subattributes,table,postgres
 
 

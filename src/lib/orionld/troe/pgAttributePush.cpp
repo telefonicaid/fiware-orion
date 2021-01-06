@@ -27,11 +27,12 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/pgRelationshipPush.h"                   // pgRelationshipPush
 #include "orionld/troe/pgStringPropertyPush.h"                 // pgStringPropertyPush
 #include "orionld/troe/pgNumberPropertyPush.h"                 // pgNumberPropertyPush
 #include "orionld/troe/pgCompoundPropertyPush.h"               // pgCompoundPropertyPush
 #include "orionld/troe/pgBoolPropertyPush.h"                   // pgBoolPropertyPush
+#include "orionld/troe/pgRelationshipPush.h"                   // pgRelationshipPush
+#include "orionld/troe/pgGeoPropertyPush.h"                    // pgGeoPropertyPush
 #include "orionld/troe/pgAttributePush.h"                      // Own interface
 
 
@@ -60,17 +61,9 @@ bool pgAttributePush
 {
   LM_TMP(("OBS: In pgAttributePush with observedAt: %s", observedAt));
   //
-  // Relationship
-  //
-  if (strcmp(attributeType, "Relationship") == 0)
-  {
-    if (pgRelationshipPush(connectionP, opMode, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
-      LM_RE(false, ("pgRelationshipPush failed"));
-  }
-  //
   // Property
   //
-  else if (strcmp(attributeType, "Property") == 0)
+  if (strcmp(attributeType, "Property") == 0)
   {
     if (valueNodeP->type == KjString)
     {
@@ -105,12 +98,20 @@ bool pgAttributePush
     }
   }
   //
+  // Relationship
+  //
+  else if (strcmp(attributeType, "Relationship") == 0)
+  {
+    if (pgRelationshipPush(connectionP, opMode, valueNodeP->value.s, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+      LM_RE(false, ("pgRelationshipPush failed"));
+  }
+  //
   // GeoProperty
   //
   else if (strcmp(attributeType, "GeoProperty") == 0)
   {
-    LM_W(("GeoProperty ... not implemented"));
-    // pgGeoPropertyTreat(connectionP, opMode, valueNodeP, entityRef, entityId, id, instanceId, createdAt, modifiedAt, unitCode);
+    if (pgGeoPropertyPush(connectionP, opMode, valueNodeP, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs) == false)
+      LM_RE(false, ("pgGeoPropertyPush failed"));
   }
   else
   {

@@ -63,6 +63,8 @@ SET (SOURCES
     pgNumberSubPropertyPush.cpp
     pgEntityDelete.cpp
     pgAttributeDelete.cpp
+    pgGeoPropertyPush.cpp
+    pgGeoPointPush.cpp
 )
 
 SET (HEADERS
@@ -105,6 +107,8 @@ SET (HEADERS
     pgNumberSubPropertyPush.h
     pgEntityDelete.h
     pgAttributeDelete.h
+    pgGeoPropertyPush.h
+    pgGeoPointPush.h
 )
 
 

@@ -52,7 +52,8 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "'Relationship',"
     "'Compound',"
     "'DateTime',"
-    "'Geo',"
+    "'GeoPoint',"
+    "'GeoPolygon',"
     "'LanguageMap')";
 
   const char* opModeSql = "CREATE TYPE OperationMode AS ENUM("
@@ -88,8 +89,9 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "text            TEXT,"
     "boolean         BOOL,"
     "number          FLOAT8,"
-    "datetime        TIMESTAMP)";
-  // "geo             GEOMETRY"
+    "datetime        TIMESTAMP,"
+    "geoPoint        GEOGRAPHY(POINTZ, 4326),"
+    "geoPolygon      GEOGRAPHY(POLYGON, 4267))";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
     "instanceId      TEXT PRIMARY KEY,"
@@ -108,7 +110,6 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "boolean         BOOL,"
     "number          FLOAT8,"
     "datetime        TIMESTAMP)";
-  // "geo             GEOMETRY"
 
   const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
 

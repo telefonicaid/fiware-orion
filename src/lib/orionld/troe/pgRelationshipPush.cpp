@@ -34,7 +34,7 @@
 
 // -----------------------------------------------------------------------------
 //
-// pgRelationshipPush - push an relationship to its DB table
+// pgRelationshipPush - push a relationship to its DB table
 //
 bool pgRelationshipPush
 (

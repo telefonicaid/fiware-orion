@@ -828,6 +828,12 @@ function partExecute()
   $dirname/$filename.$what > $dirname/$filename.$what.stdout 2> $dirname/$filename.$what.stderr
   exitCode=$?
   logMsg "$what part of $path is done - now checks"
+
+  #
+  # Remove all 'already exists' lines from stderr - postgres is tooooo verbose!!!
+  #
+  grep -v "already exists" $dirname/$filename.$what.stderr >  $dirname/$filename.$what.stderr.withoutAlready_Exists
+  mv $dirname/$filename.$what.stderr.withoutAlready_Exists  $dirname/$filename.$what.stderr
   linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
 
   #

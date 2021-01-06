@@ -48,3 +48,4 @@
 * Issue  #660   BATCH Upsert+Update with more than one item for the same entity id
 * Issue  #599   Implemented TRoE for BATCH Upsert+Update
 * Issue  #599   TRoE now supports datasetId
+* Issue  #599   Geo Attributes for TRoE - only 'Point' so far
