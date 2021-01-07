@@ -35,55 +35,14 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
-#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
 #include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
 #include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+#include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
 #include "orionld/troe/troePostEntities.h"                     // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// troeEntityArrayExpand -
-//
-void troeEntityArrayExpand(KjNode* tree)
-{
-  for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
-  {
-    for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-    {
-      if (strcmp(attrP->name, "type") == 0)
-        attrP->value.s = orionldContextItemExpand(orionldState.contextP, attrP->value.s, true, NULL);
-      else if (strcmp(attrP->name, "id")       == 0) {}
-      else if (strcmp(attrP->name, "location") == 0) {}
-      else
-      {
-        attrP->name = orionldContextItemExpand(orionldState.contextP, attrP->name, true, NULL);
-
-        if (attrP->type == KjObject)
-        {
-          for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
-          {
-            if      (strcmp(subAttrP->name, "type")        == 0) {}
-            else if (strcmp(subAttrP->name, "id")          == 0) {}
-            else if (strcmp(subAttrP->name, "value")       == 0) {}
-            else if (strcmp(subAttrP->name, "object")      == 0) {}
-            else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
-            else if (strcmp(subAttrP->name, "location")    == 0) {}
-            else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
-            else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
-            else
-              subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
-          }
-        }
-      }
-    }
-  }
-}
 
 
 

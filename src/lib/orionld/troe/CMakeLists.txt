@@ -69,6 +69,13 @@ SET (SOURCES
     pgGeoMultiPolygonPush.cpp
     pgGeoLineStringPush.cpp
     pgGeoMultiLineStringPush.cpp
+    kjGeoPointExtract.cpp
+    kjGeoPolygonExtract.cpp
+    kjGeoMultiPolygonExtract.cpp
+    kjGeoLineStringExtract.cpp
+    kjGeoMultiLineStringExtract.cpp
+    troeEntityArrayExpand.cpp
+    troeSubAttrsExpand.cpp
 )
 
 SET (HEADERS
@@ -117,6 +124,13 @@ SET (HEADERS
     pgGeoMultiPolygonPush.h
     pgGeoLineStringPush.h
     pgGeoMultiLineStringPush.h
+    kjGeoPointExtract.h
+    kjGeoPolygonExtract.h
+    kjGeoMultiPolygonExtract.h
+    kjGeoLineStringExtract.h
+    kjGeoMultiLineStringExtract.h
+    troeEntityArrayExpand.h
+    troeSubAttrsExpand.h
 )
 
 

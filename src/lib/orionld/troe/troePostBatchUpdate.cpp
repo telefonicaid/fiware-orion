@@ -36,18 +36,18 @@ extern "C"
 #include "rest/ConnectionInfo.h"                               // ConnectionInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/troeIgnored.h"                        // troeIgnored
 #include "orionld/troe/pgConnectionGet.h"                      // pgConnectionGet
 #include "orionld/troe/pgConnectionRelease.h"                  // pgConnectionRelease
 #include "orionld/troe/pgTransactionBegin.h"                   // pgTransactionBegin
 #include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
 #include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
+#include "orionld/troe/troeEntityArrayExpand.h"                // troeEntityArrayExpand
 #include "orionld/troe/troePostEntities.h"                     // Own interface
 
 
 
-extern void troeEntityArrayExpand(KjNode* tree);  // FIXME: own module
-extern bool troeIgnored(KjNode* entityP);         // FIXME: own module
 // ----------------------------------------------------------------------------
 //
 // troePostBatchUpdate -

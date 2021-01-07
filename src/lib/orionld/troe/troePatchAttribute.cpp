@@ -43,33 +43,8 @@ extern "C"
 #include "orionld/troe/pgTransactionRollback.h"                // pgTransactionRollback
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
 #include "orionld/troe/pgAttributeTreat.h"                     // pgAttyributeTreat
+#include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
 #include "orionld/troe/troePatchAttribute.h"                   // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// troeSubAttrsExpand -
-//
-void troeSubAttrsExpand(KjNode* treeP)
-{
-  for (KjNode* subAttrP = treeP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
-  {
-    if      (strcmp(subAttrP->name, "type")        == 0) {}
-    else if (strcmp(subAttrP->name, "value")       == 0) {}
-    else if (strcmp(subAttrP->name, "object")      == 0) {}
-    else if (strcmp(subAttrP->name, "location")    == 0) {}
-    else if (strcmp(subAttrP->name, "observedAt")  == 0) {}
-    else if (strcmp(subAttrP->name, "unitCode")    == 0) {}
-    else if (strcmp(subAttrP->name, "datasetId")   == 0) {}
-    else
-    {
-      LM_TMP(("EXPAND: FROM '%s' (entity type value)", subAttrP->name));
-      subAttrP->name = orionldContextItemExpand(orionldState.contextP, subAttrP->name, true, NULL);
-      LM_TMP(("EXPAND: TO '%s'", subAttrP->name));
-    }
-  }
-}
 
 
 

@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
+#include "orionld/common/troeIgnored.h"                        // troeIgnored
 #include "orionld/common/duplicatedInstances.h"                // Own interface
 
 
@@ -48,7 +49,7 @@ extern "C"
 //
 // troeIgnoreMark -
 //
-void troeIgnoreMark(KjNode* entityP)
+static void troeIgnoreMark(KjNode* entityP)
 {
   if (orionldState.troeIgnoreIx >= K_VEC_SIZE(orionldState.troeIgnoreV))
   {
@@ -57,23 +58,6 @@ void troeIgnoreMark(KjNode* entityP)
   }
 
   orionldState.troeIgnoreV[orionldState.troeIgnoreIx++] = entityP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// troeIgnored -
-//
-bool troeIgnored(KjNode* entityP)
-{
-  for (unsigned int ix = 0; ix < orionldState.troeIgnoreIx; ix++)
-  {
-    if (entityP == orionldState.troeIgnoreV[ix])
-      return true;
-  }
-
-  return false;
 }
 
 

@@ -43,11 +43,11 @@ extern "C"
 #include "orionld/troe/pgTransactionCommit.h"                  // pgTransactionCommit
 #include "orionld/troe/pgEntityTreat.h"                        // pgEntityTreat
 #include "orionld/troe/troePostEntityNoOverwrite.h"            // troePostEntityNoOverwrite
+#include "orionld/troe/troeSubAttrsExpand.h"                   // troeSubAttrsExpand
 #include "orionld/troe/troePostEntity.h"                       // Own interface
 
 
 
-extern void troeSubAttrsExpand(KjNode* treeP);  // FIXME: own module
 // ----------------------------------------------------------------------------
 //
 // troePostEntity -
