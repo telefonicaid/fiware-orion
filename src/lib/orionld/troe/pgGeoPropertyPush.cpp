@@ -35,7 +35,7 @@ extern "C"
 
 #include "orionld/troe/pgGeoPointPush.h"                       // pgGeoPointPush
 #include "orionld/troe/pgGeoPolygonPush.h"                     // pgGeoPolygonPush
-#include "orionld/troe/pgGeoLineStringPush.h"                     // pgGeoLineStringPush
+#include "orionld/troe/pgGeoLineStringPush.h"                  // pgGeoLineStringPush
 #include "orionld/troe/pgGeoPropertyPush.h"                    // Own interface
 
 
