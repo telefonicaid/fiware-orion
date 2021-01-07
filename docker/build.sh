@@ -298,7 +298,7 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
 
     if [[ -n "${SPEED}" ]]; then _fix_speed; fi
 
-    make prepare_coverage
+    make prepare_coverage_func
     make install_coverage
 
     mkdir -p coverage
