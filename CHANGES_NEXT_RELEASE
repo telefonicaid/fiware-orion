@@ -51,3 +51,4 @@
 * Issue  #599   Geo Attributes for TRoE - only 'Point' so far
 * Issue  #599   Geo Attributes for TRoE - 'Polygon' also supported
 * Issue  #599   Geo Attributes for TRoE - 'LineString' also supported
+* Issue  #599   Geo Attributes for TRoE - 'MultiPolygon' also supported
