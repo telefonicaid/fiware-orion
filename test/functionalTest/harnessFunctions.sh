@@ -1436,10 +1436,10 @@ function pgCreate()
   dbCreation="CREATE DATABASE $dbName"
   plpgsql="CREATE EXTENSION IF NOT EXISTS plpgsql;"
   postgis="CREATE EXTENSION IF NOT EXISTS postgis;"
-  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'GeoMultiPolygon', 'GeoLineString', 'LanguageMap')"
+  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'GeoMultiPolygon', 'GeoLineString', 'GeoMultiLineString', 'LanguageMap')"
   operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
   entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, type TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP)"
-  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING))"
+  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityRef TEXT, entityId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, subProperty BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING))"
   subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityRef TEXT, entityId TEXT NOT NULL, attributeRef TEXT NOT NULL REFERENCES attributes(instanceId), attributeId TEXT NOT NULL, createdAt TIMESTAMP NOT NULL, modifiedAt TIMESTAMP NOT NULL, deletedAt TIMESTAMP, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP)"
 
   echo $dbCreation:                                                                           > /tmp/pqsql 2>&1

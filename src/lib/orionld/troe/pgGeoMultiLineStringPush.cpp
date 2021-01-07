@@ -22,58 +22,64 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdio.h>                                             // snprintf
 #include <postgresql/libpq-fe.h>                               // PGconn
 
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjRender.h"                                    // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/pgGeoMultiPolygonPush.h"                // Own interface
+#include "orionld/troe/pgGeoLineStringPush.h"                  // Own interface
 
 
 
-extern bool kjGeoPolygonExtract(KjNode* coordinatesP, char* polygonCoordsString, int polygonCoordsLen);
+extern bool kjGeoLineStringExtract(KjNode* coordinatesP, char* lineStringCoordsString, int lineStringCoordsLen);
 // -----------------------------------------------------------------------------
 //
-// kjGeoMultiPolygonExtract -
+// kjGeoMultiLineStringExtract -
 //
-bool kjGeoMultiPolygonExtract(KjNode* coordinatesP, char* coordsString, int coordsLen)
+// MULTILINESTRING((0.000000 0.000000,1.000000 1.000000,4.000000 4.000000,1.000000 1.000000,2.000000 2.000000,5.000000 5.000000))'
+// MULTILINESTRING(((0.000000 0.000000,1.000000 1.000000,4.000000 4.000000), (1.000000 1.000000,2.000000 2.000000,5.000000 5.000000)))'
+//
+bool kjGeoMultiLineStringExtract(KjNode* coordinatesP, char* coordsString, int coordsLen)
 {
-  char* polygonCoordsString = kaAlloc(&orionldState.kalloc, 2048);
-  int   coordsIx            = 1;
+  char*   lineStringCoords = kaAlloc(&orionldState.kalloc, 1024);
+  int     coordsIx         = 0;
 
-  if (polygonCoordsString == NULL)
+  if (lineStringCoords == NULL)
     LM_RE(false, ("Internal Error (out of memory)"));
 
-  coordsString[0] = '(';
-
-  for (KjNode* polygonP = coordinatesP->value.firstChildP; polygonP != NULL; polygonP = polygonP->next)
+  for (KjNode* lineStringP = coordinatesP->value.firstChildP; lineStringP != NULL; lineStringP = lineStringP->next)
   {
-    if (kjGeoPolygonExtract(polygonP, polygonCoordsString, 2048) == false)
-      LM_RE(false, ("kjGeoPolygonExtract failed"));
+    if (kjGeoLineStringExtract(lineStringP, lineStringCoords, 1024) == false)
+      LM_RE(false, ("kjGeoLineStringExtract failed"));
 
-    int slen = strlen(polygonCoordsString);
-    if (coordsIx + slen + 1 >= coordsLen)
+    int slen = strlen(lineStringCoords);
+    if (coordsIx + slen + 3 >= coordsLen)
       LM_RE(false, ("Internal Error (not enough room in coordsString)"));
 
-    if (coordsIx != 1)
+    if (coordsIx != 0)
     {
       coordsString[coordsIx] = ',';
       ++coordsIx;
     }
 
-    LM_TMP(("polygonCoordsString: '%s'", polygonCoordsString));
-    LM_TMP(("Room left: %d bytes", coordsLen - coordsIx));
-    strncpy(&coordsString[coordsIx], polygonCoordsString, coordsLen - coordsIx);
+    coordsString[coordsIx] = '(';
+    ++coordsIx;
+
+    strncpy(&coordsString[coordsIx], lineStringCoords, coordsLen - coordsIx);
     coordsIx += slen;
-    LM_TMP(("coordsString: %s", coordsString));
+
+    coordsString[coordsIx] = ')';
+    ++coordsIx;
   }
-  coordsString[coordsIx] = ')';
 
   LM_TMP(("FINAL coordsString: %s", coordsString));
   return true;
@@ -83,9 +89,9 @@ bool kjGeoMultiPolygonExtract(KjNode* coordinatesP, char* coordsString, int coor
 
 // -----------------------------------------------------------------------------
 //
-// pgGeoMultiPolygonPush - push a Geo-MultiPolygon property to its DB table
+// pgGeoMultiLineStringPush - push a Geo-MultiLineString property to its DB table
 //
-bool pgGeoMultiPolygonPush
+bool pgGeoMultiLineStringPush
 (
   PGconn*      connectionP,
   const char*  opMode,
@@ -101,16 +107,15 @@ bool pgGeoMultiPolygonPush
   bool         subProperties
 )
 {
-  char* coordsString = kaAlloc(&orionldState.kalloc, 8 * 1024);
+  char*  coordsString = kaAlloc(&orionldState.kalloc, 10240);
 
   if (coordsString == NULL)
     LM_RE(false, ("Internal Error (out of memory)"));
 
-  if (kjGeoMultiPolygonExtract(coordinatesP, coordsString, 8 * 1024) == false)
+  if (kjGeoMultiLineStringExtract(coordinatesP, coordsString, 10240) == false)
     LM_RE(false, ("unable to extract geo-coordinates from Kj-Tree"));
 
-  int          sqlSize = 10 * 1024;
-  char*        sql     = kaAlloc(&orionldState.kalloc, sqlSize + 1);
+  char*        sql = kaAlloc(&orionldState.kalloc, 12008);
   PGresult*    res;
   const char*  subPropertiesString = (subProperties == false)? "false" : "true";
 
@@ -122,30 +127,30 @@ bool pgGeoMultiPolygonPush
   //
   if ((datasetId != NULL) && (observedAt != NULL))
   {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+    snprintf(sql, 12007, "INSERT INTO attributes("
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
              opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, coordsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+    snprintf(sql, 12007, "INSERT INTO attributes("
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
              opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, coordsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+    snprintf(sql, 12007, "INSERT INTO attributes("
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
              opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, coordsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
-    snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+    snprintf(sql, 12007, "INSERT INTO attributes("
+             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
              opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, coordsString);
   }
 
