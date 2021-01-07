@@ -54,6 +54,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "'DateTime',"
     "'GeoPoint',"
     "'GeoPolygon',"
+    "'GeoMultiPolygon',"
     "'GeoLineString',"
     "'LanguageMap')";
 
@@ -93,6 +94,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "datetime        TIMESTAMP,"
     "geoPoint        GEOGRAPHY(POINTZ, 4326),"
     "geoPolygon      GEOGRAPHY(POLYGON, 4267),"
+    "geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267),"
     "geoLineString   GEOGRAPHY(LINESTRING))";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("

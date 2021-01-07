@@ -35,6 +35,7 @@ extern "C"
 
 #include "orionld/troe/pgGeoPointPush.h"                       // pgGeoPointPush
 #include "orionld/troe/pgGeoPolygonPush.h"                     // pgGeoPolygonPush
+#include "orionld/troe/pgGeoMultiPolygonPush.h"                // pgGeoMultiPolygonPush
 #include "orionld/troe/pgGeoLineStringPush.h"                  // pgGeoLineStringPush
 #include "orionld/troe/pgGeoPropertyPush.h"                    // Own interface
 
@@ -74,13 +75,13 @@ bool pgGeoPropertyPush
     ok = pgGeoPointPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, createdAt, modifiedAt, subProperties);
   else if (strcmp(geoTypeP->value.s, "Polygon") == 0)
     ok = pgGeoPolygonPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, createdAt, modifiedAt, subProperties);
+  else if (strcmp(geoTypeP->value.s, "MultiPolygon") == 0)
+    ok = pgGeoMultiPolygonPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, createdAt, modifiedAt, subProperties);
   else if (strcmp(geoTypeP->value.s, "LineString") == 0)
     ok = pgGeoLineStringPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, createdAt, modifiedAt, subProperties);
 #if 0
   else if (strcmp(geoTypeP->value.s, "MultiLineString") == 0)
     ok = pgGeoMultiLineStringPush();
-  else if (strcmp(geoTypeP->value.s, "MultiPolygon") == 0)
-    ok = pgGeoMultiPolygonPush();
 #endif
   else
     LM_RE(false, ("Bad Input (invalid geometry for GeoProperty: %s)", geoTypeP->value.s));
