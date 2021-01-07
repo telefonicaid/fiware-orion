@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 # -*- coding: latin-1 -*-
 # Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
