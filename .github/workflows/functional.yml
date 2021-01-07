@@ -58,6 +58,12 @@ jobs:
         run: |
           docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_450 -qt
 
+      - name: Upload coverage-report
+        uses: actions/upload-artifact@v2
+        with:
+          name: func1.info
+          path: coverage/broker.info
+
   functional-part2:
     runs-on: ubuntu-18.04
 
@@ -104,6 +110,12 @@ jobs:
       - name: Run functional test
         run: |
           docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_451_700 -qt
+
+      - name: Upload coverage-report
+        uses: actions/upload-artifact@v2
+        with:
+          name: func2.info
+          path: coverage/broker.info
 
   functional-part3:
     runs-on: ubuntu-18.04
@@ -152,6 +164,12 @@ jobs:
         run: |
           docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_701_1000 -qt
 
+      - name: Upload coverage-report
+        uses: actions/upload-artifact@v2
+        with:
+          name: func3.info
+          path: coverage/broker.info
+
   functional-part4:
     runs-on: ubuntu-18.04
 
@@ -198,3 +216,43 @@ jobs:
       - name: Run functional test
         run: |
           docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1001_1400 -qt
+
+      - name: Upload coverage-report
+        uses: actions/upload-artifact@v2
+        with:
+          name: func4.info
+          path: coverage/broker.info
+
+  aggregate-report:
+    needs: |
+      functional-part1
+      functional-part2
+      functional-part3
+      functional-part4
+
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: download func1-coverage
+        uses: actions/download-artifact@v2
+        with:
+          name: func1.info
+          path: coverage/func1.info
+
+      - name: download func2-coverage
+        uses: actions/download-artifact@v2
+        with:
+          name: func2.info
+          path: coverage/func2.info
+
+      - name: download func3-coverage
+        uses: actions/download-artifact@v2
+        with:
+          name: func3.info
+          path: coverage/func3.info
+
+      - name: download func4-coverage
+        uses: actions/download-artifact@v2
+        with:
+          name: func4.info
+          path: coverage/func4.info
