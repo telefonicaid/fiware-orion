@@ -281,8 +281,7 @@ if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
 
     cd ${PATH_TO_SRC}
 
-    make coverage_unit_test: build_unit_test
-    make unit_test
+    make coverage_unit_test
     if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
 
     echo "Builder: unit test ended"
@@ -299,16 +298,33 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
 
     if [[ -n "${SPEED}" ]]; then _fix_speed; fi
 
-    make install_scripts
-    make install
+    make prepare_coverage
+    make install_coverage
+
+    mkdir -p coverage
+    lcov -i --zerocounters --directory BUILD_COVERAGE/
+    lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 
     . scripts/testEnv.sh
 
     if ${FUNC_STATUS}; then
-        CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh --fromIx ${START}  --toIx ${END}
+        CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh -v --fromIx ${START}  --toIx ${END}
     else
         CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh
     fi
+
+    # Generate test report
+    echo "Generating coverage report"
+    lcov --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info
+    lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
+    lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
+    # Remove unit test libraries and libraries developed before contextBroker project init
+    lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
+    genhtml -o coverage coverage/broker.info
 
     if [[ $? -ne 0 ]]; then STATUS=false; else STATUS=true; fi
 
