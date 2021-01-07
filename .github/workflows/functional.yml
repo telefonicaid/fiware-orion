@@ -252,3 +252,16 @@ jobs:
         with:
           name: func4.info
           path: coverage/func4.info
+
+      - name: prepare
+        run: |
+          sudo apt-get install -y lcov
+
+      - name: aggregate
+        run: |
+          lcov --add-tracefile coverage/func1.info -a coverage/func2.info -a coverage/func3.info -a coverage/func4.info -o merged.info
+
+      - uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
