@@ -281,6 +281,7 @@ if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
 
     cd ${PATH_TO_SRC}
 
+    make coverage_unit_test: build_unit_test
     make unit_test
     if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
 
