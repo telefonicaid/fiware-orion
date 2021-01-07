@@ -224,11 +224,7 @@ jobs:
           path: coverage/broker.info
 
   aggregate-report:
-    needs: |
-      functional-part1
-      functional-part2
-      functional-part3
-      functional-part4
+    needs: [functional-part1, functional-part2, functional-part3, functional-part4]
 
     runs-on: ubuntu-18.04
 
