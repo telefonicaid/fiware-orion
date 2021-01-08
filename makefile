@@ -92,7 +92,7 @@ prepare_debug: compile_info
 
 prepare_coverage_func:
 	mkdir -p  BUILD_COVERAGE || true
-	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=False -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_coverage: compile_info
 	mkdir -p  BUILD_COVERAGE || true
