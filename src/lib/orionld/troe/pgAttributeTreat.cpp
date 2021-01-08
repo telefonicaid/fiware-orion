@@ -62,7 +62,7 @@ bool pgAttributeTreat
   if (attrP->type == KjArray)
     LM_RE(false, ("Attribute is an array ... datasetId? Sorry - not yet implemented"));
 
-  char*   attributeType = NULL;
+  char*   attributeType;
   KjNode* typeP         = kjLookup(attrP, "type");
 
   if (typeP == NULL)
@@ -71,7 +71,7 @@ bool pgAttributeTreat
 
   kjChildRemove(attrP, typeP);
 
-  char     instanceId[64];
+  char     instanceId[80];
   char*    id         = attrP->name;
   char*    unitCode   = NULL;
   char*    datasetId  = NULL;
@@ -79,7 +79,7 @@ bool pgAttributeTreat
   KjNode*  valueNodeP = NULL;
   bool     subAttrs   = false;
 
-  uuidGenerate(instanceId);
+  uuidGenerate(instanceId, sizeof(instanceId), true);
 
   //
   // Strip off all special sub-attributes
@@ -103,8 +103,8 @@ bool pgAttributeTreat
     else if (strcmp(subAttrP->name, "value")      == 0)      valueNodeP = subAttrP;
     else if (strcmp(subAttrP->name, "object")     == 0)      valueNodeP = subAttrP;
     else if (strcmp(subAttrP->name, "unitCode")   == 0)      unitCode = subAttrP->value.s;
-    else if (strcmp(subAttrP->name, "createdAt")  == 0)      {}  // Skipping ... not 100% sure ...
-    else if (strcmp(subAttrP->name, "modifiedAt") == 0)      {}  // Skipping ... not 100% sure ...
+    else if (strcmp(subAttrP->name, "createdAt")  == 0)      {}  // Skipping
+    else if (strcmp(subAttrP->name, "modifiedAt") == 0)      {}  // Skipping
     else
     {
       subAttrs = true;

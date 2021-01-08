@@ -56,8 +56,8 @@ bool troeDeleteAttribute(ConnectionInfo* ciP)
   char* entityId      = orionldState.wildcard[0];
   char* attributeName = orionldState.wildcard[1];
 
-  char  instanceId[64];
-  uuidGenerate(instanceId);
+  char  instanceId[80];
+  uuidGenerate(instanceId, sizeof(instanceId), true);
 
   attributeName = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);
   if (pgAttributeDelete(connectionP, entityId, instanceId, attributeName, orionldState.requestTimeString) == false)

@@ -57,8 +57,8 @@ bool troePostBatchDelete(ConnectionInfo* ciP)
   bool allGood = true;
   for (KjNode* entityIdP = orionldState.requestTree->value.firstChildP; entityIdP != NULL; entityIdP = entityIdP->next)
   {
-    char  instanceId[64];
-    uuidGenerate(instanceId);
+    char  instanceId[80];
+    uuidGenerate(instanceId, sizeof(instanceId), true);
 
     if (pgEntityDelete(connectionP, instanceId, entityIdP->value.s, orionldState.requestTimeString) == false)
     {

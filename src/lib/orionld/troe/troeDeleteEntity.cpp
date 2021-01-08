@@ -56,8 +56,8 @@ bool troeDeleteEntity(ConnectionInfo* ciP)
 
   char* entityId = orionldState.wildcard[0];
 
-  char  instanceId[64];
-  uuidGenerate(instanceId);
+  char  instanceId[80];
+  uuidGenerate(instanceId, sizeof(instanceId), true);
 
   if (pgEntityDelete(connectionP, instanceId, entityId, orionldState.requestTimeString) == false)
   {
