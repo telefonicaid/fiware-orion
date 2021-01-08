@@ -233,25 +233,25 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: func1.info
-          path: coverage/func1.info
+          path: coverage/
 
       - name: download func2-coverage
         uses: actions/download-artifact@v2
         with:
           name: func2.info
-          path: coverage/func2.info
+          path: coverage/
 
       - name: download func3-coverage
         uses: actions/download-artifact@v2
         with:
           name: func3.info
-          path: coverage/func3.info
+          path: coverage/
 
       - name: download func4-coverage
         uses: actions/download-artifact@v2
         with:
           name: func4.info
-          path: coverage/func4.info
+          path: coverage/
 
       - name: prepare
         run: |
