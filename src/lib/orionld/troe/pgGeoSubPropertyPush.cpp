@@ -45,9 +45,8 @@ extern "C"
 bool pgGeoSubPropertyPush
 (
   PGconn*      connectionP,
-  const char*  opMode,
-  const char*  instanceId,
   KjNode*      valueNodeP,
+  const char*  instanceId,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
@@ -69,7 +68,7 @@ bool pgGeoSubPropertyPush
 
 
   if (strcmp(geoTypeP->value.s, "Point") == 0)
-    ok = pgGeoSubPointPush(connectionP, opMode, instanceId, coordinatesP, entityRef, entityId, attributeRef, attributeId, subAttributeName, observedAt, createdAt, modifiedAt);
+    ok = pgGeoSubPointPush(connectionP, coordinatesP, instanceId, entityRef, entityId, attributeRef, attributeId, subAttributeName, observedAt, createdAt, modifiedAt);
 #if 0
   else if (strcmp(geoTypeP->value.s, "Polygon") == 0)
     ok = pgGeoSubPolygonPush(connectionP, opMode, instanceId, coordinatesP, entityRef, entityId, attributeRef, attributeInstance, subAttributeName, observedAt, createdAt, modifiedAt);

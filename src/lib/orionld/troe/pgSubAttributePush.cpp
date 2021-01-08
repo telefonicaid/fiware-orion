@@ -102,7 +102,7 @@ bool pgSubAttributePush
   //
   else if (strcmp(subAttributeType, "GeoProperty") == 0)
   {
-    if (pgGeoSubPropertyPush(connectionP, "Create", instanceId, valueNodeP, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
+    if (pgGeoSubPropertyPush(connectionP, valueNodeP, instanceId, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
       LM_RE(false, ("pgGeoPropertyPush failed"));
   }
   else

@@ -41,9 +41,8 @@ extern "C"
 extern bool pgGeoSubPropertyPush
 (
   PGconn*      connectionP,
-  const char*  opMode,
-  const char*  instanceId,
   KjNode*      valueNodeP,
+  const char*  instanceId,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,

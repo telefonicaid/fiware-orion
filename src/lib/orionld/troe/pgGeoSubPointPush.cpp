@@ -38,9 +38,8 @@ extern "C"
 bool pgGeoSubPointPush
 (
   PGconn*      connectionP,
-  const char*  opMode,
-  const char*  instanceId,
   KjNode*      coordinatesP,
+  const char*  instanceId,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
