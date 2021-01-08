@@ -13,13 +13,11 @@ jobs:
   functional-1:
     runs-on: ubuntu-18.04
 
-    # FIXME: currently mongodb runs inside fiware/orion-ci:rpm7 image. Once it gets removed
-    # from it, this part will be enabled
-    #services:
-    #  mongodb:
-    #    image: mongo:4.0
-    #    ports:
-    #      - 27017:27017
+    services:
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
