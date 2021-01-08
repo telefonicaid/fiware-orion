@@ -70,18 +70,18 @@ bool pgSubAttributeTreat
 
   kjChildRemove(subAttrP, typeP);
 
-  char     instanceId[80];
-  char*    id         = subAttrP->name;
-  char*    unitCode   = NULL;
-  char*    observedAt = NULL;
-  KjNode*  valueNodeP = NULL;
-
+  char instanceId[80];
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
   //
   // Get info from all special sub-sub-attributes.
-  // Normal sub-sub-attributes are not used for TRoE.
+  // Normal sub-sub-attributes are not used for TRoE - they're thrown away.
+  // - No need to remove anything from the tree - just extract info and send to pgSubAttributePush
   //
+  char*    observedAt  = NULL;
+  KjNode*  valueNodeP  = NULL;
+  char*    unitCode    = NULL;
+
   for (KjNode* subSubAttrP = subAttrP->value.firstChildP; subSubAttrP != NULL; subSubAttrP = subSubAttrP->next)
   {
     if      (strcmp(subSubAttrP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(subSubAttrP);
@@ -91,8 +91,8 @@ bool pgSubAttributeTreat
   }
 
   // Push the sub-attribute to DB
-  LM_TMP(("TEMP: Push the sub-attribute '%s' to DB", id));
-  if (pgSubAttributePush(connectionP, valueNodeP, instanceId, subAttributeType, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt, unitCode) == false)
+  LM_TMP(("TEMP: Push the sub-attribute '%s' to DB", subAttrP->name));
+  if (pgSubAttributePush(connectionP, valueNodeP, instanceId, subAttributeType, entityRef, entityId, attributeRef, attributeId, subAttrP->name, observedAt, createdAt, modifiedAt, unitCode) == false)
   {
     LM_E(("Internal Error (pgAttributePush failed)"));
     return false;
