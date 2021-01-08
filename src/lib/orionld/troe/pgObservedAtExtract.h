@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_
-#define SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGOBSERVEDATEXTRACT_H_
+#define SRC_LIB_ORIONLD_TROE_PGOBSERVEDATEXTRACT_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,13 +25,17 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// uuidGenerate -
+// pgObservedAtExtract - extract an observedAt as either a string or a float
 //
-extern void uuidGenerate(char* buf, int bufSize, bool uri);
+extern char* pgObservedAtExtract(KjNode* observedAtNodeP);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGOBSERVEDATEXTRACT_H_

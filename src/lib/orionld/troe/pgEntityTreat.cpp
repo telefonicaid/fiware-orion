@@ -51,7 +51,7 @@ extern "C"
 //
 bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt, TroeMode opMode)
 {
-  char  entityInstance[64];
+  char  entityInstance[80];
   char* entityInstanceP = NULL;
 
   // <DEBUG>
@@ -85,7 +85,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
 
   if ((opMode == TROE_ENTITY_CREATE) || (opMode == TROE_ENTITY_REPLACE))
   {
-    uuidGenerate(entityInstance);
+    uuidGenerate(entityInstance, sizeof(entityInstance), true);
     entityInstanceP = entityInstance;
     LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, entityInstanceP, id, type, createdAt, modifiedAt));
 

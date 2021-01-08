@@ -24,6 +24,9 @@
 */
 #include <uuid/uuid.h>                                         // uuid_t, uuid_generate_time_safe, uuid_unparse_lower
 
+#include "logMsg/logMsg.h"                                     // Log library
+#include "logMsg/traceLevels.h"                                // LMT_*
+
 #include "orionld/common/uuidGenerate.h"                       // Own interface
 
 
@@ -32,10 +35,22 @@
 //
 // uuidGenerate -
 //
-void uuidGenerate(char* buf)
+void uuidGenerate(char* buf, int bufSize, bool uri)
 {
   uuid_t uuid;
+  int    bufIx      = 0;
+  int    minBufSize = 37 + (uri == true)? 33 : 0;
+
+  if (bufSize < minBufSize)
+    LM_X(1, ("Implementation Error (not enough room to generate a UUID (%d bytes needed, %d supplied)", minBufSize, bufSize));
 
   uuid_generate_time_safe(uuid);
-  uuid_unparse_lower(uuid, buf);
+
+  if (uri == true)
+  {
+    strncpy(buf, "urn:ngsi-ld:attribute:instance:", bufSize);
+    bufIx = 31;
+  }
+
+  uuid_unparse_lower(uuid, &buf[bufIx]);
 }

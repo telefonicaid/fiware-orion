@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,30 +22,33 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                               // PGconn
+extern "C"
+{
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
+#include "kjson/KjNode.h"                                      // KjNode
+}
 
-#include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
-
-#include "orionld/troe/pgEntityPush.h"                         // Own interface
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/numberToDate.h"                       // numberToDate
+#include "orionld/troe/pgObservedAtExtract.h"                  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pgEntityPush - push an entity to the database
+// pgObservedAtExtract - extract an observedAt as either a string or a float
 //
-bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, char* createdAt, char* modifiedAt, const char* opMode)
+char* pgObservedAtExtract(KjNode* observedAtNodeP)
 {
-  char       sql[512];
-  PGresult*  res;
+  if (observedAtNodeP->type == KjString)
+    return observedAtNodeP->value.s;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s', '%s', NULL)", instanceId, id, opMode, type, createdAt, modifiedAt);
-  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
-  res = PQexec(connectionP, sql);
-  if (res == NULL)
-    LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
-  PQclear(res);
+  if (observedAtNodeP->type == KjFloat)  // Transformed to double before sent to TEMP layer - convert back to string!
+  {
+    char* observedAt = kaAlloc(&orionldState.kalloc, 64);
+    numberToDate(observedAtNodeP->value.f, observedAt, 64);
+    return observedAt;
+  }
 
-  return true;
+  return (char*) "1970:01:01T00:00:00.000Z";
 }

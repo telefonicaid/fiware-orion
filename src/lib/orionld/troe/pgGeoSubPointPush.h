@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_
-#define SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_
+#ifndef SRC_LIB_ORIONLD_TROE_PGGEOSUBPOINTPUSH_H_
+#define SRC_LIB_ORIONLD_TROE_PGGEOSUBPOINTPUSH_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,13 +25,32 @@
 *
 * Author: Ken Zangelin
 */
+#include <postgresql/libpq-fe.h>                                 // PGconn
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// uuidGenerate -
+// pgGeoSubPointPush -
 //
-extern void uuidGenerate(char* buf, int bufSize, bool uri);
+extern bool pgGeoSubPointPush
+(
+  PGconn*      connectionP,
+  KjNode*      coordinatesP,
+  const char*  instanceId,
+  const char*  entityRef,
+  const char*  entityId,
+  const char*  attributeRef,
+  const char*  attributeId,
+  const char*  subAttributeName,
+  const char*  observedAt,
+  const char*  createdAt,
+  const char*  modifiedAt
+);
 
-#endif  // SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_
+#endif  // SRC_LIB_ORIONLD_TROE_PGGEOSUBPOINTPUSH_H_

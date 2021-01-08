@@ -36,11 +36,10 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/troe/troe.h"                                 // TroeMode, troeMode
 #include "orionld/troe/pgAttributePush.h"                      // pgAttributePush
 #include "orionld/troe/pgSubAttributeTreat.h"                  // pgSubAttributeTreat
+#include "orionld/troe/pgObservedAtExtract.h"                  // pgObservedAtExtract
 #include "orionld/troe/pgAttributeTreat.h"                     // Own interface
 
 
@@ -63,7 +62,7 @@ bool pgAttributeTreat
   if (attrP->type == KjArray)
     LM_RE(false, ("Attribute is an array ... datasetId? Sorry - not yet implemented"));
 
-  char*   attributeType = NULL;
+  char*   attributeType;
   KjNode* typeP         = kjLookup(attrP, "type");
 
   if (typeP == NULL)
@@ -72,7 +71,7 @@ bool pgAttributeTreat
 
   kjChildRemove(attrP, typeP);
 
-  char     instanceId[64];
+  char     instanceId[80];
   char*    id         = attrP->name;
   char*    unitCode   = NULL;
   char*    datasetId  = NULL;
@@ -80,7 +79,7 @@ bool pgAttributeTreat
   KjNode*  valueNodeP = NULL;
   bool     subAttrs   = false;
 
-  uuidGenerate(instanceId);
+  uuidGenerate(instanceId, sizeof(instanceId), true);
 
   //
   // Strip off all special sub-attributes
@@ -99,34 +98,13 @@ bool pgAttributeTreat
   {
     next = subAttrP->next;
 
-    if (strcmp(subAttrP->name, "observedAt") == 0)
-    {
-      LM_TMP(("OBS: subAttr is observedAt. JSON type: %s", kjValueType(subAttrP->type)));
-      if (subAttrP->type == KjString)
-      {
-        LM_TMP(("OBS: observedAt: %s", subAttrP->value.s));
-        observedAt = subAttrP->value.s;
-      }
-      else if (subAttrP->type == KjFloat)  // Transformed to double before sent to TEMP layer - convert back!
-      {
-        LM_TMP(("OBS: observedAt is a FLOAT - converting"));
-
-        observedAt = kaAlloc(&orionldState.kalloc, 64);
-        numberToDate(subAttrP->value.f, observedAt, 64);
-      }
-    }
-    else if (strcmp(subAttrP->name, "datasetId") == 0)
-      datasetId = subAttrP->value.s;
-    else if (strcmp(subAttrP->name, "value") == 0)
-      valueNodeP = subAttrP;
-    else if (strcmp(subAttrP->name, "object") == 0)
-      valueNodeP = subAttrP;
-    else if (strcmp(subAttrP->name, "unitCode") == 0)
-      unitCode = subAttrP->value.s;
-    else if (strcmp(subAttrP->name, "createdAt") == 0)
-    {}  // Skipping ... not 100% sure ...
-    else if (strcmp(subAttrP->name, "modifiedAt") == 0)
-    {}  // Skipping ... not 100% sure ...
+    if      (strcmp(subAttrP->name, "observedAt") == 0)      observedAt = pgObservedAtExtract(subAttrP);
+    else if (strcmp(subAttrP->name, "datasetId")  == 0)      datasetId  = subAttrP->value.s;
+    else if (strcmp(subAttrP->name, "value")      == 0)      valueNodeP = subAttrP;
+    else if (strcmp(subAttrP->name, "object")     == 0)      valueNodeP = subAttrP;
+    else if (strcmp(subAttrP->name, "unitCode")   == 0)      unitCode = subAttrP->value.s;
+    else if (strcmp(subAttrP->name, "createdAt")  == 0)      {}  // Skipping
+    else if (strcmp(subAttrP->name, "modifiedAt") == 0)      {}  // Skipping
     else
     {
       subAttrs = true;

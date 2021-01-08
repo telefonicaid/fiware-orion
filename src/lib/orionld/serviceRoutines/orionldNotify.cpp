@@ -179,12 +179,12 @@ void orionldNotify(void)
     unsigned short            port;
     char*                     rest;
     KjNode*                   notificationTree;
-    char                      notificationId[64];
+    char                      notificationId[80];
 
     notificationTree = kjObject(orionldState.kjsonP, NULL);
 
     strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId));
-    uuidGenerate(&notificationId[25]);
+    uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
 
     ipPortAndRest(niP->reference, &ip, &port, &rest);
     snprintf(requestHeader, sizeof(requestHeader), "POST %s HTTP/1.1\r\n", rest);

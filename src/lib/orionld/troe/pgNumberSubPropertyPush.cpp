@@ -81,7 +81,7 @@ bool pgNumberSubPropertyPush
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %f, %s)",
              instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, numberValue, unitCodeString);
   }
-  LM_TMP(("SQL[%p]: %s", connectionP, sql));
+  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
 
   PGresult* res;

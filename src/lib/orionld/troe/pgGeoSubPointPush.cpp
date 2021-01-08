@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2021 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,55 +25,66 @@
 #include <stdio.h>                                             // snprintf
 #include <postgresql/libpq-fe.h>                               // PGconn
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/pgBoolSubPropertyPush.h"                // Own interface
-
+#include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract
+#include "orionld/troe/pgGeoSubPointPush.h"                    // Own interface
 
 
 // -----------------------------------------------------------------------------
 //
-// pgBoolSubPropertyPush - push a Boolean Sub-Property to its DB table
+// pgGeoSubPointPush -
 //
-bool pgBoolSubPropertyPush
+bool pgGeoSubPointPush
 (
   PGconn*      connectionP,
-  const char*  subAttributeName,
+  KjNode*      coordinatesP,
   const char*  instanceId,
-  bool         boolValue,
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
   const char*  attributeId,
+  const char*  subAttributeName,
   const char*  observedAt,
   const char*  createdAt,
   const char*  modifiedAt
 )
 {
-  char sql[1024];
+  double longitude;
+  double latitude;
+  double altitude;
+
+  if (kjGeoPointExtract(coordinatesP, &longitude, &latitude, &altitude) == false)
+    LM_RE(false, ("unable to extract geo-coordinates from Kj-Tree"));
+
+  char         sql[1024];
+  PGresult*    res;
 
   //
-  // Two combinations for NULL/non-NULL 'observedAt' (sub-attributes have no datasetId)
+  // Two combinations for NULL/non-NULL 'observedAt'
   //
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', ST_GeomFromText('POINT Z(%f %f %f)'))",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, longitude, latitude, altitude);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', ST_GeomFromText('POINT Z(%f %f %f)'))",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, longitude, latitude, altitude);
   }
+
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
-
-
-  PGresult* res;
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));

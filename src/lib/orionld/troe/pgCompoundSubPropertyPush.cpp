@@ -86,23 +86,7 @@ bool pgCompoundSubPropertyPush
              instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, renderedValue);
   }
 
-  // <DEBUG>
-  char  c   = 0;
-  char* cut = (char*) "(uncut)";
-
-  if (strlen(sql) > 1024 * 2)
-  {
-    c = sql[1024 * 2];
-    sql[1024 * 2] = 0;
-    cut = (char*) "cut at 2K";
-  }
-
-  LM_TMP(("SQL[%p]: %s %s", connectionP, sql, cut));
-
-  if (c != 0)
-    sql[1024 * 2] = c;
-  // </DEBUG>
-
+  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
   res = PQexec(connectionP, sql);
   if (res == NULL)
