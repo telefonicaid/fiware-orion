@@ -324,7 +324,6 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
     lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info
     lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
     lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
-    genhtml -o coverage coverage/broker.info
 
     if [[ $? -ne 0 ]]; then STATUS=false; else STATUS=true; fi
 
