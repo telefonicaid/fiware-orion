@@ -100,22 +100,27 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING))";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
-    "instanceId      TEXT PRIMARY KEY,"
-    "id              TEXT NOT NULL,"
-    "entityRef       TEXT,"
-    "entityId        TEXT NOT NULL,"
-    "attributeRef    TEXT NOT NULL REFERENCES attributes(instanceId),"
-    "attributeId     TEXT NOT NULL,"
-    "createdAt       TIMESTAMP NOT NULL,"
-    "modifiedAt      TIMESTAMP NOT NULL,"
-    "deletedAt       TIMESTAMP,"
-    "observedAt      TIMESTAMP,"
-    "valueType       ValueType,"
-    "unitCode        TEXT,"
-    "text            TEXT,"
-    "boolean         BOOL,"
-    "number          FLOAT8,"
-    "datetime        TIMESTAMP)";
+    "instanceId          TEXT PRIMARY KEY,"
+    "id                  TEXT NOT NULL,"
+    "entityRef           TEXT,"
+    "entityId            TEXT NOT NULL,"
+    "attributeRef        TEXT NOT NULL REFERENCES attributes(instanceId),"
+    "attributeId         TEXT NOT NULL,"
+    "createdAt           TIMESTAMP NOT NULL,"
+    "modifiedAt          TIMESTAMP NOT NULL,"
+    "deletedAt           TIMESTAMP,"
+    "observedAt          TIMESTAMP,"
+    "valueType           ValueType,"
+    "unitCode            TEXT,"
+    "text                TEXT,"
+    "boolean             BOOL,"
+    "number              FLOAT8,"
+    "datetime            TIMESTAMP,"
+    "geoPoint            GEOGRAPHY(POINTZ, 4326),"
+    "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
+    "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
+    "geoLineString       GEOGRAPHY(LINESTRING),"
+    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING))";
 
   const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
 

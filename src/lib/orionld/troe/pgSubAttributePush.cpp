@@ -27,11 +27,12 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/pgSubRelationshipPush.h"                // pgSubRelationshipPush
 #include "orionld/troe/pgStringSubPropertyPush.h"              // pgStringSubPropertyPush
 #include "orionld/troe/pgBoolSubPropertyPush.h"                // pgBoolSubPropertyPush
 #include "orionld/troe/pgCompoundSubPropertyPush.h"            // pgCompoundSubPropertyPush
 #include "orionld/troe/pgNumberSubPropertyPush.h"              // pgNumberSubPropertyPush
+#include "orionld/troe/pgSubRelationshipPush.h"                // pgSubRelationshipPush
+#include "orionld/troe/pgGeoSubPropertyPush.h"                 // pgGeoSubPropertyPush
 #include "orionld/troe/pgSubAttributePush.h"                   // Own interface
 
 
@@ -58,17 +59,9 @@ bool pgSubAttributePush
 )
 {
   //
-  // Relationship
-  //
-  if (strcmp(subAttributeType, "Relationship") == 0)
-  {
-    if (pgSubRelationshipPush(connectionP, instanceId, valueNodeP->value.s, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
-      LM_RE(false, ("pgRelationshipPush failed"));
-  }
-  //
   // Property
   //
-  else if (strcmp(subAttributeType, "Property") == 0)
+  if (strcmp(subAttributeType, "Property") == 0)
   {
     if (valueNodeP->type == KjString)
     {
@@ -95,6 +88,22 @@ bool pgSubAttributePush
       if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.f, entityRef, entityId, attributeRef, attributeId, observedAt, createdAt, modifiedAt, unitCode) == false)
       LM_RE(false, ("pgNumberSubPropertyPush[Float] failed"));
     }
+  }
+  //
+  // Relationship
+  //
+  else if (strcmp(subAttributeType, "Relationship") == 0)
+  {
+    if (pgSubRelationshipPush(connectionP, instanceId, valueNodeP->value.s, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
+      LM_RE(false, ("pgRelationshipPush failed"));
+  }
+  //
+  // GeoProperty
+  //
+  else if (strcmp(subAttributeType, "GeoProperty") == 0)
+  {
+    if (pgGeoSubPropertyPush(connectionP, "Create", instanceId, valueNodeP, entityRef, entityId, attributeRef, attributeId, id, observedAt, createdAt, modifiedAt) == false)
+      LM_RE(false, ("pgGeoPropertyPush failed"));
   }
   else
   {

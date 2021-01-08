@@ -77,6 +77,8 @@ SET (SOURCES
     troeEntityArrayExpand.cpp
     troeSubAttrsExpand.cpp
     pgObservedAtExtract.cpp
+    pgGeoSubPropertyPush.cpp
+    pgGeoSubPointPush.cpp
 )
 
 SET (HEADERS
@@ -133,6 +135,8 @@ SET (HEADERS
     troeEntityArrayExpand.h
     troeSubAttrsExpand.h
     pgObservedAtExtract.h
+    pgGeoSubPropertyPush.h
+    pgGeoSubPointPush.h
 )
 
 
