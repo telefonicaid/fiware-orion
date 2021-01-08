@@ -90,9 +90,10 @@ prepare_debug: compile_info
 	mkdir -p  BUILD_DEBUG || true
 	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_coverage_func
+prepare_coverage_func:
 	mkdir -p  BUILD_COVERAGE || true
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+
 prepare_coverage: compile_info
 	mkdir -p  BUILD_COVERAGE || true
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
@@ -398,7 +399,6 @@ coverage_functional_test: install_coverage
 	lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info	
 	lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
-	genhtml -o coverage coverage/broker.info
 
 valgrind: install_debug
 	@echo For detailed info: tail -f /tmp/valgrindTestSuiteLog

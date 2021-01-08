@@ -44,7 +44,7 @@ export LOG_FILE=/tmp/testHarness.log
 
 echo $testStartTime > $LOG_FILE
 
-
+echo "Harness executed"
 
 # -----------------------------------------------------------------------------
 #
