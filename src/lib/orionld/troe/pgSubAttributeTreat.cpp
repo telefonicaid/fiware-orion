@@ -37,6 +37,7 @@ extern "C"
 
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/troe/pgSubAttributePush.h"                   // pgSubAttributePush
+#include "orionld/troe/pgObservedAtExtract.h"                  // pgObservedAtExtract
 #include "orionld/troe/pgSubAttributeTreat.h"                  // Own interface
 
 
@@ -91,7 +92,7 @@ bool pgSubAttributeTreat
   //
   for (KjNode* subSubAttrP = subAttrP->value.firstChildP; subSubAttrP != NULL; subSubAttrP = subSubAttrP->next)
   {
-    if      (strcmp(subSubAttrP->name, "observedAt") == 0)  observedAt = subSubAttrP->value.s;
+    if      (strcmp(subSubAttrP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(subSubAttrP);
     else if (strcmp(subSubAttrP->name, "value")      == 0)  valueNodeP = subSubAttrP;
     else if (strcmp(subSubAttrP->name, "object")     == 0)  valueNodeP = subSubAttrP;
     else if (strcmp(subSubAttrP->name, "unitCode")   == 0)  unitCode   = subSubAttrP->value.s;

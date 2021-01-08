@@ -76,6 +76,7 @@ SET (SOURCES
     kjGeoMultiLineStringExtract.cpp
     troeEntityArrayExpand.cpp
     troeSubAttrsExpand.cpp
+    pgObservedAtExtract.cpp
 )
 
 SET (HEADERS
@@ -131,6 +132,7 @@ SET (HEADERS
     kjGeoMultiLineStringExtract.h
     troeEntityArrayExpand.h
     troeSubAttrsExpand.h
+    pgObservedAtExtract.h
 )
 
 
