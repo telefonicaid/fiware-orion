@@ -257,7 +257,7 @@ jobs:
         run: |
           sudo apt-get install -y lcov
 
-    - name: ls
+      - name: ls
         run: |
           ls coverage
           cat coverage/func1.info
