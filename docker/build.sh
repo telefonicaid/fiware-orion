@@ -317,13 +317,6 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
     echo "Generating coverage report"
     lcov --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info
     lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
-    lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
-    lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
-    lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
-    # Remove unit test libraries and libraries developed before contextBroker project init
-    lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info
-    lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
-    lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
 
     if [[ $? -ne 0 ]]; then STATUS=false; else STATUS=true; fi
 
