@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                    // kaAlloc
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
@@ -33,51 +34,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/troe/kjGeoMultiPolygonExtract.h"             // kjGeoMultiPolygonExtract
 #include "orionld/troe/pgGeoMultiPolygonPush.h"                // Own interface
-
-
-
-extern bool kjGeoPolygonExtract(KjNode* coordinatesP, char* polygonCoordsString, int polygonCoordsLen);
-// -----------------------------------------------------------------------------
-//
-// kjGeoMultiPolygonExtract -
-//
-bool kjGeoMultiPolygonExtract(KjNode* coordinatesP, char* coordsString, int coordsLen)
-{
-  char* polygonCoordsString = kaAlloc(&orionldState.kalloc, 2048);
-  int   coordsIx            = 1;
-
-  if (polygonCoordsString == NULL)
-    LM_RE(false, ("Internal Error (out of memory)"));
-
-  coordsString[0] = '(';
-
-  for (KjNode* polygonP = coordinatesP->value.firstChildP; polygonP != NULL; polygonP = polygonP->next)
-  {
-    if (kjGeoPolygonExtract(polygonP, polygonCoordsString, 2048) == false)
-      LM_RE(false, ("kjGeoPolygonExtract failed"));
-
-    int slen = strlen(polygonCoordsString);
-    if (coordsIx + slen + 1 >= coordsLen)
-      LM_RE(false, ("Internal Error (not enough room in coordsString)"));
-
-    if (coordsIx != 1)
-    {
-      coordsString[coordsIx] = ',';
-      ++coordsIx;
-    }
-
-    LM_TMP(("polygonCoordsString: '%s'", polygonCoordsString));
-    LM_TMP(("Room left: %d bytes", coordsLen - coordsIx));
-    strncpy(&coordsString[coordsIx], polygonCoordsString, coordsLen - coordsIx);
-    coordsIx += slen;
-    LM_TMP(("coordsString: %s", coordsString));
-  }
-  coordsString[coordsIx] = ')';
-
-  LM_TMP(("FINAL coordsString: %s", coordsString));
-  return true;
-}
 
 
 

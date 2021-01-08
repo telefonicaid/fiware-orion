@@ -33,59 +33,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract
 #include "orionld/troe/pgGeoPointPush.h"                       // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjGeoPointExtract -
-//
-bool kjGeoPointExtract(KjNode* coordinatesP, double* longitudeP, double* latitudeP, double* altitudeP)
-{
-  // Count children, make sure there are two or three and that all of them are Int or Float
-  int     children = 0;
-  KjNode* childP   = coordinatesP->value.firstChildP;
-
-  while (childP != NULL)
-  {
-    ++children;
-
-    if ((childP->type != KjFloat) && (childP->type != KjInt))
-      LM_RE(false, ("Bad Input (an item of 'coordinates' is not a Number)"));
-
-    childP = childP->next;
-  }
-
-  if ((children < 2) || (children > 3))
-    LM_RE(false, ("Bad Input (invalid num,ber of coordinates: %d)", children));
-
-  KjNode* longitudeNodeP = coordinatesP->value.firstChildP;
-  KjNode* latitudeNodeP  = longitudeNodeP->next;
-  KjNode* altitudeNodeP  = latitudeNodeP->next;
-
-  if (longitudeNodeP->type == KjFloat)
-    *longitudeP = longitudeNodeP->value.f;
-  else
-    *longitudeP = longitudeNodeP->value.i;
-
-  if (latitudeNodeP->type == KjFloat)
-    *latitudeP = latitudeNodeP->value.f;
-  else
-    *latitudeP = latitudeNodeP->value.i;
-
-  if (altitudeNodeP != NULL)
-  {
-    if (altitudeNodeP->type == KjFloat)
-      *altitudeP = altitudeNodeP->value.f;
-    else
-      *altitudeP = altitudeNodeP->value.i;
-  }
-  else
-    *altitudeP = 0;
-
-  return true;
-}
 
 
 

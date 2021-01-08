@@ -36,54 +36,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/troe/kjGeoMultiLineStringExtract.h"          // kjGeoMultiLineStringExtract
 #include "orionld/troe/pgGeoLineStringPush.h"                  // Own interface
-
-
-
-extern bool kjGeoLineStringExtract(KjNode* coordinatesP, char* lineStringCoordsString, int lineStringCoordsLen);
-// -----------------------------------------------------------------------------
-//
-// kjGeoMultiLineStringExtract -
-//
-// MULTILINESTRING((0.000000 0.000000,1.000000 1.000000,4.000000 4.000000,1.000000 1.000000,2.000000 2.000000,5.000000 5.000000))'
-// MULTILINESTRING(((0.000000 0.000000,1.000000 1.000000,4.000000 4.000000), (1.000000 1.000000,2.000000 2.000000,5.000000 5.000000)))'
-//
-bool kjGeoMultiLineStringExtract(KjNode* coordinatesP, char* coordsString, int coordsLen)
-{
-  char*   lineStringCoords = kaAlloc(&orionldState.kalloc, 1024);
-  int     coordsIx         = 0;
-
-  if (lineStringCoords == NULL)
-    LM_RE(false, ("Internal Error (out of memory)"));
-
-  for (KjNode* lineStringP = coordinatesP->value.firstChildP; lineStringP != NULL; lineStringP = lineStringP->next)
-  {
-    if (kjGeoLineStringExtract(lineStringP, lineStringCoords, 1024) == false)
-      LM_RE(false, ("kjGeoLineStringExtract failed"));
-
-    int slen = strlen(lineStringCoords);
-    if (coordsIx + slen + 3 >= coordsLen)
-      LM_RE(false, ("Internal Error (not enough room in coordsString)"));
-
-    if (coordsIx != 0)
-    {
-      coordsString[coordsIx] = ',';
-      ++coordsIx;
-    }
-
-    coordsString[coordsIx] = '(';
-    ++coordsIx;
-
-    strncpy(&coordsString[coordsIx], lineStringCoords, coordsLen - coordsIx);
-    coordsIx += slen;
-
-    coordsString[coordsIx] = ')';
-    ++coordsIx;
-  }
-
-  LM_TMP(("FINAL coordsString: %s", coordsString));
-  return true;
-}
 
 
 
