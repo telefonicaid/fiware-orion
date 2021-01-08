@@ -70,7 +70,7 @@ bool pgBoolSubPropertyPush
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
              instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, (boolValue == true)? "true" : "false");
   }
-  LM_TMP(("SQL[%p]: %s", connectionP, sql));
+  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
 
   PGresult* res;

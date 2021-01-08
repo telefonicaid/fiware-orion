@@ -22,13 +22,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <postgresql/libpq-fe.h>                                 // PGconn
+#include <stdio.h>                                             // snprintf
+#include <postgresql/libpq-fe.h>                               // PGconn
 
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
+#include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract
+#include "orionld/troe/pgGeoSubPointPush.h"                    // Own interface
 
 
 // -----------------------------------------------------------------------------
@@ -50,5 +56,42 @@ bool pgGeoSubPointPush
   const char*  modifiedAt
 )
 {
+  double longitude;
+  double latitude;
+  double altitude;
+
+  if (kjGeoPointExtract(coordinatesP, &longitude, &latitude, &altitude) == false)
+    LM_RE(false, ("unable to extract geo-coordinates from Kj-Tree"));
+
+  char         sql[1024];
+  PGresult*    res;
+
+  //
+  // Two combinations for NULL/non-NULL 'observedAt'
+  //
+  if (observedAt != NULL)
+  {
+    snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', ST_GeomFromText('POINT Z(%f %f %f)'))",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, longitude, latitude, altitude);
+  }
+  else
+  {
+    snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', ST_GeomFromText('POINT Z(%f %f %f)'))",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, longitude, latitude, altitude);
+  }
+
+  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
+  res = PQexec(connectionP, sql);
+  if (res == NULL)
+    LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));
+  PQclear(res);
+
+  if (PQstatus(connectionP) != CONNECTION_OK)
+    LM_E(("SQL[%p]: bad connection: %d", connectionP, PQstatus(connectionP)));  // FIXME: string! (last error?)
+
   return true;
 }

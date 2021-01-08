@@ -72,7 +72,7 @@ bool pgSubRelationshipPush
              instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, object);
   }
 
-  LM_TMP(("SQL[%p]: %s", connectionP, sql));
+  LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)
     LM_RE(false, ("Database Error (%s)", PQresStatus(PQresultStatus(res))));

@@ -1,4 +1,3 @@
-
 * Issue  #280   Made GET /entities?id=EID call the service routine for /entities/{EID}, if just one single entity id
 * Issue  #280   Unified all timestamps, with one single call to clock_gettime()
 * Issue  #550   Added a new notification format for NGSI-LD subscriptions, to notify in NGSIv2 format
@@ -48,8 +47,5 @@
 * Issue  #660   BATCH Upsert+Update with more than one item for the same entity id
 * Issue  #599   Implemented TRoE for BATCH Upsert+Update
 * Issue  #599   TRoE now supports datasetId
-* Issue  #599   Geo Attributes for TRoE - only 'Point' so far
-* Issue  #599   Geo Attributes for TRoE - 'Polygon' also supported
-* Issue  #599   Geo Attributes for TRoE - 'LineString' also supported
-* Issue  #599   Geo Attributes for TRoE - 'MultiPolygon' also supported
-* Issue  #599   Geo Attributes for TRoE - 'MultiLineString' also supported
+* Issue  #599   Geo Attributes for TRoE - 'Point', 'Polygon', 'LineString', 'MultiPolygon', and 'MultiLineString'
+* Issue  #599   Geo Sub-Attributes for TRoE - 'Point'
