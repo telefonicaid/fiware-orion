@@ -79,6 +79,7 @@ SET (SOURCES
     pgObservedAtExtract.cpp
     pgGeoSubPropertyPush.cpp
     pgGeoSubPointPush.cpp
+    pgGeoSubPolygonPush.cpp
 )
 
 SET (HEADERS
@@ -137,6 +138,7 @@ SET (HEADERS
     pgObservedAtExtract.h
     pgGeoSubPropertyPush.h
     pgGeoSubPointPush.h
+    pgGeoSubPolygonPush.h
 )
 
 
