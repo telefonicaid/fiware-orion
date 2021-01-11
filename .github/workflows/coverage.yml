@@ -8,217 +8,217 @@ env:
   IGNORE_TEST: '0706_direct_https_notifications/direct_https_notifications.test 0706_direct_https_notifications/direct_https_notifications_no_accept_selfsigned.test 2015_notification_templates/notification_templates_cache_refresh.test 0000_ipv6_support/ipv4_ipv6_both.test 0000_ngsild/ngsild_uri_params_in_orionldState.test 2145_sem_status_operation/get_admin_sem_request.test'
 
 jobs:
-  functional-part1:
-    runs-on: ubuntu-18.04
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-      mosquitto:
-        image: eclipse-mosquitto:1.6
-        ports:
-          - 1883:1883
-          - 9001:9001
-      postgres:
-        image: postgis/postgis:12-3.1-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 5432:5432
-      mongodb:
-        image: mongo:4.0
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
-
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
-
-      - name: Run functional test
-        run: |
-          docker run --rm  -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_450 -qtC
-
-      - name: Upload coverage-report
-        uses: actions/upload-artifact@v2
-        with:
-          name: func1.info
-          path: coverage/broker.info
-
-  functional-part2:
-    runs-on: ubuntu-18.04
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-      mosquitto:
-        image: eclipse-mosquitto:1.6
-        ports:
-          - 1883:1883
-          - 9001:9001
-      postgres:
-        image: postgis/postgis:12-3.1-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 5432:5432
-      mongodb:
-        image: mongo:4.0
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
-
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
-      
-      - name: Run functional test
-        run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_451_700 -qtC
-
-      - name: Upload coverage-report
-        uses: actions/upload-artifact@v2
-        with:
-          name: func2.info
-          path: coverage/broker.info
-
-  functional-part3:
-    runs-on: ubuntu-18.04
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-      mosquitto:
-        image: eclipse-mosquitto:1.6
-        ports:
-          - 1883:1883
-          - 9001:9001
-      postgres:
-        image: postgis/postgis:12-3.1-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 5432:5432
-      mongodb:
-        image: mongo:4.0
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
-
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
-
-      - name: Run functional test
-        run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_701_1000 -qtC
-
-      - name: Upload coverage-report
-        uses: actions/upload-artifact@v2
-        with:
-          name: func3.info
-          path: coverage/broker.info
-
-  functional-part4:
-    runs-on: ubuntu-18.04
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-      mosquitto:
-        image: eclipse-mosquitto:1.6
-        ports:
-          - 1883:1883
-          - 9001:9001
-      postgres:
-        image: postgis/postgis:12-3.1-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 5432:5432
-      mongodb:
-        image: mongo:4.0
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
-
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          file: docker/Dockerfile-test
-          tags: ${{ env.IMAGE_NAME }}
-
-      - name: Run functional test
-        run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1001_1400 -qtC
-
-      - name: Upload coverage-report
-        uses: actions/upload-artifact@v2
-        with:
-          name: func4.info
-          path: coverage/broker.info
+#  functional-part1:
+#    runs-on: ubuntu-18.04
+#
+#    services:
+#      registry:
+#        image: registry:2
+#        ports:
+#          - 5000:5000
+#      mosquitto:
+#        image: eclipse-mosquitto:1.6
+#        ports:
+#          - 1883:1883
+#          - 9001:9001
+#      postgres:
+#        image: postgis/postgis:12-3.1-alpine
+#        env:
+#          POSTGRES_PASSWORD: postgres
+#          POSTGRES_HOST_AUTH_METHOD: trust
+#        ports:
+#          - 5432:5432
+#      mongodb:
+#        image: mongo:4.0
+#        ports:
+#          - 27017:27017
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v1
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#        with:
+#          driver-opts: network=host
+#
+#      - name: Build and push to local registry
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          file: docker/Dockerfile-test
+#          tags: ${{ env.IMAGE_NAME }}
+#
+#      - name: Run functional test
+#        run: |
+#          docker run --rm  -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_450 -qtC
+#
+#      - name: Upload coverage-report
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: func1.info
+#          path: coverage/broker.info
+#
+#  functional-part2:
+#    runs-on: ubuntu-18.04
+#
+#    services:
+#      registry:
+#        image: registry:2
+#        ports:
+#          - 5000:5000
+#      mosquitto:
+#        image: eclipse-mosquitto:1.6
+#        ports:
+#          - 1883:1883
+#          - 9001:9001
+#      postgres:
+#        image: postgis/postgis:12-3.1-alpine
+#        env:
+#          POSTGRES_PASSWORD: postgres
+#          POSTGRES_HOST_AUTH_METHOD: trust
+#        ports:
+#          - 5432:5432
+#      mongodb:
+#        image: mongo:4.0
+#        ports:
+#          - 27017:27017
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v1
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#        with:
+#          driver-opts: network=host
+#
+#      - name: Build and push to local registry
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          file: docker/Dockerfile-test
+#          tags: ${{ env.IMAGE_NAME }}
+#
+#      - name: Run functional test
+#        run: |
+#          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_451_700 -qtC
+#
+#      - name: Upload coverage-report
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: func2.info
+#          path: coverage/broker.info
+#
+#  functional-part3:
+#    runs-on: ubuntu-18.04
+#
+#    services:
+#      registry:
+#        image: registry:2
+#        ports:
+#          - 5000:5000
+#      mosquitto:
+#        image: eclipse-mosquitto:1.6
+#        ports:
+#          - 1883:1883
+#          - 9001:9001
+#      postgres:
+#        image: postgis/postgis:12-3.1-alpine
+#        env:
+#          POSTGRES_PASSWORD: postgres
+#          POSTGRES_HOST_AUTH_METHOD: trust
+#        ports:
+#          - 5432:5432
+#      mongodb:
+#        image: mongo:4.0
+#        ports:
+#          - 27017:27017
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v1
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#        with:
+#          driver-opts: network=host
+#
+#      - name: Build and push to local registry
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          file: docker/Dockerfile-test
+#          tags: ${{ env.IMAGE_NAME }}
+#
+#      - name: Run functional test
+#        run: |
+#          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_701_1000 -qtC
+#
+#      - name: Upload coverage-report
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: func3.info
+#          path: coverage/broker.info
+#
+#  functional-part4:
+#    runs-on: ubuntu-18.04
+#
+#    services:
+#      registry:
+#        image: registry:2
+#        ports:
+#          - 5000:5000
+#      mosquitto:
+#        image: eclipse-mosquitto:1.6
+#        ports:
+#          - 1883:1883
+#          - 9001:9001
+#      postgres:
+#        image: postgis/postgis:12-3.1-alpine
+#        env:
+#          POSTGRES_PASSWORD: postgres
+#          POSTGRES_HOST_AUTH_METHOD: trust
+#        ports:
+#          - 5432:5432
+#      mongodb:
+#        image: mongo:4.0
+#        ports:
+#          - 27017:27017
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v1
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#        with:
+#          driver-opts: network=host
+#
+#      - name: Build and push to local registry
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          file: docker/Dockerfile-test
+#          tags: ${{ env.IMAGE_NAME }}
+#
+#      - name: Run functional test
+#        run: |
+#          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1001_1400 -qtC
+#
+#      - name: Upload coverage-report
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: func4.info
+#          path: coverage/broker.info
 
   unit:
     runs-on: ubuntu-18.04
@@ -263,7 +263,7 @@ jobs:
 
 
   aggregate-report:
-    needs: [functional-part1, functional-part2, functional-part3, functional-part4, unit]
+    needs: [unit]
 
     runs-on: ubuntu-18.04
 
@@ -305,6 +305,10 @@ jobs:
       - name: aggregate
         run: |
           lcov -a coverage/func1/broker.info -a coverage/func2/broker.info -a coverage/func3/broker.info -a coverage/func4/broker.info -a coverage/unit/broker.info -o merged.info
+
+      - name: cat
+        run: |
+          cat merged.info
 
       - uses: romeovs/lcov-reporter-action@v0.2.16
         with:
