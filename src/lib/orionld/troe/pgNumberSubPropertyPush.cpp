@@ -39,6 +39,7 @@
 bool pgNumberSubPropertyPush
 (
   PGconn*      connectionP,
+  const char*  ts,
   const char*  subAttributeName,
   const char*  instanceId,
   double       numberValue,
@@ -47,8 +48,6 @@ bool pgNumberSubPropertyPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   const char*  unitCode
 )
 {
@@ -70,16 +69,16 @@ bool pgNumberSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, numberValue, unitCodeString);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, ts, observedAt, numberValue, unitCodeString);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %f, %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, numberValue, unitCodeString);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, ts, numberValue, unitCodeString);
   }
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
