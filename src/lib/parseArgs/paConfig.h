@@ -39,7 +39,7 @@
 #endif
 
 #ifndef DEFAULT_COPYRIGHT
-    #define DEFAULT_COPYRIGHT "Copyright 2013-2020 Telefonica Investigacion y Desarrollo, S.A.U\n" \
+    #define DEFAULT_COPYRIGHT "Copyright 2013-2021 Telefonica Investigacion y Desarrollo, S.A.U\n" \
                               "Orion Context Broker is free software: you can redistribute it and/or\n" \
                               "modify it under the terms of the GNU Affero General Public License as\n" \
                               "published by the Free Software Foundation, either version 3 of the\n" \
