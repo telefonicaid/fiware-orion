@@ -171,7 +171,7 @@ static void setAttributes(ngsiv2::Registration* regP, const mongo::BSONObj& cr0)
     mongo::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
     std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
 
-    if (attrName != "")
+    if (!attrName.empty())
     {
       regP->dataProvided.attributes.push_back(attrName);
     }

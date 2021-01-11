@@ -240,11 +240,11 @@ void mongoInit
 
   if (user[0] != 0)
   {
-    LM_I(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
+    LM_I(("Connected to mongo at %s/%s, as user '%s' (poolsize: %d)", dbHost, dbName.c_str(), user, dbPoolSize));
   }
   else
   {
-    LM_I(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
+    LM_I(("Connected to mongo at %s/%s (poolsize: %d)", dbHost, dbName.c_str(), dbPoolSize));
   }
 
   setDbPrefix(dbName);
@@ -455,7 +455,7 @@ std::string composeDatabaseName(const std::string& tenant)
 {
   std::string result;
 
-  if (!multitenant || (tenant == ""))
+  if (!multitenant || (tenant.empty()))
   {
     result = dbPrefix;
   }
@@ -609,8 +609,8 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     idMatch = (en2->id == en1->id);
   }
 
-  // Note that type == "" is like a * wildcard for type
-  return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
+  // Note that type.empty() is like a * wildcard for type
+  return idMatch && (en1->type.empty() || en2->type.empty() || en2->type == en1->type);
 }
 
 
@@ -692,7 +692,7 @@ static void fillQueryEntity(BSONObjBuilder* bobP, const EntityId* enP)
     bobP->append(idString, enP->id);
   }
 
-  if (enP->type != "")
+  if (!enP->type.empty())
   {
     if (enP->isTypePattern)
     {
@@ -721,7 +721,7 @@ bool servicePathFilterNeeded(const std::vector<std::string>& servicePath)
   // Note that by construction servicePath vector must have at least one element. Note that the
   // case in which first element is "" is special, it means that the SP were not provided and
   // we have to apply the default
-  if (servicePath[0] == "")
+  if (servicePath[0].empty())
   {
     return false;
   }
@@ -1266,7 +1266,7 @@ void addBuiltins(ContextElementResponse* cerP)
     }
 
     // actionType
-    if (caP->actionType != "")
+    if (!caP->actionType.empty())
     {
       addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
     }
@@ -1491,7 +1491,7 @@ bool entitiesQuery
   BSONObj query = finalQuery.obj();
   BSONObj sort;
 
-  if (sortOrderList == "")
+  if (sortOrderList.empty())
   {
     sort = BSON(ENT_CREATION_DATE << 1);
   }
@@ -1855,7 +1855,8 @@ static void processContextRegistrationElement
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   MimeType                            mimeType,
-  ProviderFormat                      providerFormat
+  ProviderFormat                      providerFormat,
+  const std::string&                  regId
 )
 {
   ContextRegistrationResponse crr;
@@ -1904,6 +1905,7 @@ static void processContextRegistrationElement
 
     crrP->contextRegistration = crr.contextRegistration;
     crrP->providerFormat      = providerFormat;
+    crrP->regId               = regId;
 
     crrV->push_back(crrP);
   }
@@ -1982,7 +1984,7 @@ bool registrationsQuery
       b.append(crEntitiesId, en->id);
     }
 
-    if (en->type != "")
+    if (!en->type.empty())
     {
       b.append(crEntitiesType, en->type);
       // FIXME P3: this way of accumulating types in the BSONBuilder doesn't avoid duplication. It doesn't
@@ -2073,11 +2075,12 @@ bool registrationsQuery
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
-    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
+    ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
+    std::string               regId                     = getFieldF(r, "_id").OID().toString();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -2508,11 +2511,13 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
+        // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
         getNotifier()->sendNotifyContextRequest(ncr,
                                                 notifyHttpInfo,
                                                 tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
+                                                0,
                                                 renderFormat,
                                                 attrsOrder,
                                                 blacklist,
@@ -2527,11 +2532,13 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
+      // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
       getNotifier()->sendNotifyContextRequest(ncr,
                                               notifyHttpInfo,
                                               tenant,
                                               xauthToken,
                                               fiwareCorrelator,
+                                              0,
                                               renderFormat,
                                               attrsOrder,
                                               blacklist,
@@ -2782,6 +2789,7 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     MimeType        perEntPaMimeType  = NOMIMETYPE;
     MimeType        perAttrPaMimeType = NOMIMETYPE;
     ProviderFormat  providerFormat;
+    std::string     regId;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
@@ -2790,12 +2798,14 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
                          &perEntPaMimeType,
                          &perAttrPa,
                          &perAttrPaMimeType,
-                         &providerFormat);
+                         &providerFormat,
+                         &regId);
 
     /* Looking results after crrV processing */
-    ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->providingApplication.set(perAttrPa.empty() ? perEntPa : perAttrPa);
     ca->providingApplication.setProviderFormat(providerFormat);
-    ca->found = (ca->providingApplication.get() != "");
+    ca->providingApplication.setRegId(regId);
+    ca->found = (!ca->providingApplication.get().empty());
   }
 }
 
@@ -2842,11 +2852,13 @@ void cprLookupByAttribute
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
   MimeType*                                 perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP
+  ProviderFormat*                           providerFormatP,
+  std::string*                              regId
 )
 {
   *perEntPa  = "";
   *perAttrPa = "";
+  *regId = "";
 
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
@@ -2861,13 +2873,13 @@ void cprLookupByAttribute
       {
         // By the moment the only supported pattern is .*. In this case matching is
         // based exclusively in type
-        if (regEn->type != en.type && regEn->type != "")
+        if (regEn->type != en.type && !regEn->type.empty())
         {
           /* No match (keep searching the CRR) */
           continue;
         }
       }
-      else if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      else if (regEn->id != en.id || (regEn->type != en.type && !regEn->type.empty()))
       {
         /* No match (keep searching the CRR) */
         continue;
@@ -2877,7 +2889,8 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+        *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
+        *regId            = crr->regId;
 
         break;  /* enIx */
       }
@@ -2889,8 +2902,9 @@ void cprLookupByAttribute
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
-          *perAttrPa         = crr->contextRegistration.providingApplication.get();
-          *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+          *perAttrPa        = crr->contextRegistration.providingApplication.get();
+          *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
+          *regId            = crr->regId;
 
           return;
         }

@@ -92,6 +92,12 @@ has been renamed to /etc/sysconfig/%{name}.orig-$DATE.
 After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
 EOMSG
+chmod 644 /etc/cron.d/cron-logrotate-contextBroker-size || true
+chmod 644 /etc/logrotate.d/logrotate-contextBroker-daily || true
+chmod 644 /etc/prelink.conf.d/contextBroker.conf || true
+chmod 644 /etc/sysconfig/contextBroker || true
+chmod 644 /etc/sysconfig/logrotate-contextBroker-size || true
+chmod 644 /etc/tmpfiles.d/contextBroker.conf || true
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -176,6 +182,24 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Oct 30 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.5.0-1
+- Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
+- ADD: re-worked INFO log level, simplifying traces and making them much more useful (#3694)
+- Add: library version information in GET /version (#3681)
+- Add: CLI option -logLineMaxSize (#3694)
+- Add: CLI option -logInfoPayloadMaxSize (#3694)
+- Fix: potencial race condition related with DateTime attributes due to the usage of thread unsafe functions
+- Fix: screen log output using the same format for time= than the one used in log files (ISO8601)
+- Fix: improve error response when incorrect URL used (#2231)
+- Fix: POST /v2/registrations allows forbidden attribute names in NGSIv2 (#3468)
+- Fix: log WARN about insecureNotifications mode (#3013)
+- Fix: avoid creating orion database in -multiservice mode (#3179)
+- Fix: wrong 204 code was responded (instead of 501) when using idPattern in POST /v2/op/update operation (#3427)
+- Fix: wrong 413 error when passing from 0 locations to 1 in entity update (#3706)
+- Fix: changed the name of pretty much all the environment variables for Orion. E.g. adding prefix 'ORION_'
+- Hardening: upgrade rapidjson dependecy from 1.0.2 to 1.1.0
+- Hardening: upgrade microhttpd dependency from 0.9.48 to 0.9.70
+
 * Tue Mar 31 2020 Fermin Galan <fermin.galanmarquez@telefonica.com> 2.4.0-1
 - Add: TextUnrestricted attribute type to avoid forbidden chars checking (#3550)
 - Add: notification flow control on update (#3568)

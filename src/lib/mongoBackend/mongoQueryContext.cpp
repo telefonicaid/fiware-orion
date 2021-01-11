@@ -221,6 +221,7 @@ static void addContextProviders
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
     ContextRegistration cr = crrV[ix]->contextRegistration;
+    cr.providingApplication.setRegId(crrV[ix]->regId);
 
     /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP))
@@ -280,7 +281,7 @@ static void processGenericEntities
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* enP = enV[ix];
-    if (enP->type == "" || isTrue(enP->isPattern))
+    if (enP->type.empty() || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);
     }

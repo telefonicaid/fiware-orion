@@ -96,11 +96,11 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20200325)
-    [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker20200325)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20201029)
+    [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker20201029)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20200325)
-    [(jp)](https://www.slideshare.net/fisuda/orion-contextbrokerngsiv2overviewfordevelopersthatalreadyknowngsiv120200325)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20201028)
+    [(jp)](https://www.slideshare.net/fisuda/orion-contextbrokerngsiv2overviewfordevelopersthatalreadyknowngsiv120201028)
 
 [Top](#top)
 
@@ -272,7 +272,7 @@ tag `fiware-orion`
 Orion Context Broker is licensed under [Affero General Public License (GPL)
 version 3](./LICENSE).
 
-© 2020 Telefonica Investigación y Desarrollo, S.A.U
+© 2021 Telefonica Investigación y Desarrollo, S.A.U
 
 ### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 

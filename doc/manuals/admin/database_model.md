@@ -77,9 +77,12 @@ Fields:
         location in the attrs array
     -   **coords**: a GeoJSON representing the location of the entity. See
         below for more details.
--   **lastCorrelator**: value of the `Fiware-Correlator` header in the last
+-   **lastCorrelator**: value of the root correlator in the last
     update request on the entity. Used by the self-notification loop protection
-    logic.
+    logic. By *root correlator* we mean the value of the `Fiware-Correlator` request header
+    in the update request without any suffix. Eg. the root correlator
+    for `Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32`
+    is `f320136c-0192-11eb-a893-000c29df7908`.
 -   **expDate** (optional): expiration timestamp (as a Date object) for the
     entity. Have a look to the [transient entities functionality](../user/transient_entities.md)
     for more detail.  

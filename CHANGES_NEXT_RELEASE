@@ -1,7 +1,6 @@
-- Fix: avoid creating orion database in -multiservice mode (#3179)
-- Fix: upgrade rapidjson dependecy from 1.0.2 to 1.1.0
-- Fix: upgrade microhttpd dependency from 0.9.48 to 0.9.70
-- Fix: wrong 204 code was responded (instead of 501) when using idPattern in POST /v2/op/update operation (#3427)
-- Fix: changed the name of pretty much all the environment variables for Orion. E.g. adding prefix 'ORION_'
-- Add: milliseconds support in DateTime attributes and metadata, included dateCreated and dateModified built-ins (#432, #2670, #3412, #3666)
+- Add: -disableFileLog CLI parameter (ORION_DISABLE_FILE_LOG env var) to prevent Orion from logging into a file
+- Add: support 'true' and 'false' literals (in addition to 'TRUE' and 'FALSE') in flag-like env vars
+- Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
+- Upgrade Dockerfile base image from centos7.7.1908 to centos7.9.2009
+- FIX BUG: Create normal files as 644 permissions for assure backup tools take configuration files
 - Remove: NGSIv1 context availability subscriptions

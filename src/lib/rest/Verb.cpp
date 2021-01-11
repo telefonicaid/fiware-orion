@@ -69,7 +69,7 @@ Verb str2Verb(const std::string& str)
   else if (str == "OPTIONS") return OPTIONS;
   else if (str == "TRACE")   return TRACE;
   else if (str == "CONNECT") return CONNECT;
-  else if (str == "")        return NOVERB;
+  else if (str.empty())      return NOVERB;
 
   return UNKNOWNVERB;
 }

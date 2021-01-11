@@ -258,7 +258,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
   if (eidInURL == false)
   {
-    if (eP->id == "")
+    if (eP->id.empty())
     {
       OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
 

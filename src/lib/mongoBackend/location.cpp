@@ -305,12 +305,12 @@ bool processLocationAtEntityCreation
 
     std::string location = caP->getLocation(apiVersion);
 
-    if (location.length() == 0)
+    if (location.empty())
     {
       continue;
     }
 
-    if (locAttr->length() > 0)
+    if (!locAttr->empty())
     {
       *errDetail = "You cannot use more than one geo location attribute "
                    "when creating an entity [see Orion user manual]";
@@ -358,7 +358,7 @@ bool processLocationAtUpdateAttribute
 
   /* Check that location (if any) is using the correct coordinates string (it only
    * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
     oe->fill(SccBadRequest, *errDetail, "BadRequest");
@@ -369,7 +369,7 @@ bool processLocationAtUpdateAttribute
   // Case 1:
   //   update *to* location. There are 3 sub-cases
   //
-  if (locationString.length() > 0)
+  if (!locationString.empty())
   {
     //
     // Case 1a:
@@ -485,7 +485,7 @@ bool processLocationAtAppendAttribute
 
   /* Check that location (if any) is using the correct coordinates string (it only
      * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
   {
     *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
     oe->fill(SccBadRequest, *errDetail, "BadRequest");
@@ -493,10 +493,10 @@ bool processLocationAtAppendAttribute
   }
 
   /* Case 1: append of new location attribute */
-  if (actualAppend && (locationString.length() > 0))
+  if (actualAppend && (!locationString.empty()))
   {
     /* Case 1a: there is a previous location attribute -> error */
-    if (currentLocAttrName->length() != 0)
+    if (!currentLocAttrName->empty())
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
@@ -520,10 +520,10 @@ bool processLocationAtAppendAttribute
     }
   }
   /* Case 2: append-as-update changing attribute type from no-location -> location */
-  else if (!actualAppend && (locationString.length() > 0))
+  else if (!actualAppend && (!locationString.empty()))
   {
-    /* Case 2a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
+    /* Case 2a: there is a previous (not empty and with different name) location attribute -> error */
+    if ((!currentLocAttrName->empty()) && (*currentLocAttrName != targetAttr->name))
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";
@@ -558,7 +558,7 @@ bool processLocationAtAppendAttribute
   }
   /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
    * attribute, then remove location attribute */
-  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
+  else if (!actualAppend && (locationString.empty()) && (*currentLocAttrName == targetAttr->name))
   {
     *currentLocAttrName = "";
   }

@@ -127,6 +127,8 @@ typedef enum TraceLevels
   LmtNotImplemented,
   LmtCurlContext,
 
+  LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
+
   LmtBug = 250
 } TraceLevels;
 

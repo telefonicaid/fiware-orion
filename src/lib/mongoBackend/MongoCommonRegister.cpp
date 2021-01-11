@@ -117,7 +117,7 @@ HttpStatusCode processRegisterContext
   reg.append(REG_EXPIRATION, expiration);
 
   // FIXME P4: See issue #3078
-  reg.append(REG_SERVICE_PATH, servicePath == "" ? SERVICE_PATH_ROOT : servicePath);
+  reg.append(REG_SERVICE_PATH, servicePath.empty() ? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
 
@@ -136,7 +136,8 @@ HttpStatusCode processRegisterContext
     {
       EntityId* en = cr->entityIdVector[jx];
 
-      if (en->type == "")
+
+      if (en->type.empty())
       {
         entities.append(BSON(REG_ENTITY_ID << en->id));
         LM_T(LmtMongo, ("Entity registration: {id: %s}", en->id.c_str()));

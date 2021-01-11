@@ -341,7 +341,7 @@ static bool hostnameIsValid(const char* hostname)
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
   /* Sanity check */
-  if (url == "")
+  if (url.empty())
   {
     return false;
   }
@@ -372,12 +372,12 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   //
   // Ensuring the host is present
   //
-  if ((urlTokens.size() < 3) || (urlTokens[2] == ""))
+  if ((urlTokens.size() < 3) || (urlTokens[2].empty()))
   {
     return false;
   }
 
-  if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
+  if ((components < 3) || (components == 3 && urlTokens[2].empty()))
   {
     return false;
   }
@@ -392,7 +392,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     path += "/" + urlTokens[ix];
   }
 
-  if (path == "")
+  if (path.empty())
   {
     /* Minimum path is always "/" */
     path = "/";
@@ -435,7 +435,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     if (components == 2)
     {
       /* Sanity check (corresponding to http://xxxx:/path) */
-      if (hostTokens[1].length() == 0)
+      if (hostTokens[1].empty())
       {
         return false;
       }
@@ -1004,8 +1004,6 @@ std::string double2string(double f)
 *
 * isodate2str -
 *
-* FIXME P6: change implementation to use gmtime_r
-*
 */
 std::string isodate2str(double timestamp)
 {
@@ -1052,7 +1050,10 @@ std::string isodate2str(double timestamp)
   int     micros    = ms * 1000000;
   int     millis    = (micros + 1) / 1000;   // (timestamp - seconds) * 1000 gives rounding errors ...
 
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime(&seconds));
+  // Unused, but needed to fullfill gmtime_r() signature
+  struct tm  tmP;
+
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", gmtime_r(&seconds, &tmP));
 
   char* eob = &buffer[strlen(buffer)];
   sprintf(eob, ".%03dZ", millis);

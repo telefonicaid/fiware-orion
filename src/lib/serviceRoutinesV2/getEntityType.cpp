@@ -64,7 +64,7 @@ std::string getEntityType
   std::string         answer;
   bool                noAttrDetail   = ciP->uriParamOptions[OPT_NO_ATTR_DETAIL];
 
-  if (entityTypeName == "")
+  if (entityTypeName.empty())
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_TYPE, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;

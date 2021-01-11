@@ -29,6 +29,8 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/logTracing.h"
+
 #include "alarmMgr/alarmMgr.h"
 
 #include "logMsg/logMsg.h"
@@ -97,7 +99,14 @@ static char* jsonPayloadClean(const char* payload)
 * 7. Freeing memory
 *
 */
-static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
+static bool queryForward
+(
+  ConnectionInfo*        ciP,
+  QueryContextRequest*   qcrP,
+  const std::string&     regId,
+  unsigned int           correlatorCounter,
+  QueryContextResponse*  qcrsP
+)
 {
   std::string     ip;
   std::string     protocol;
@@ -132,21 +141,16 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType;
+  std::string     op;
 
   if (qcrP->providerFormat == PfJson)
   {
-    verb      = "POST";
-    resource  = prefix + "/queryContext";
-    mimeType  = "application/json";
-
+    op        = "/queryContext";
     TIMED_RENDER(payload = qcrP->toJsonV1());
   }
   else
   {
-    verb      = "POST";
-    resource  = prefix + "/op/query";
-    mimeType  = "application/json";
-
+    op        = "/op/query";
     TIMED_RENDER(payload = qcrP->toJson());
 #if 0
     // FIXME #3485: this part is not removed by the moment, in the case it may be useful in the
@@ -164,7 +168,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     // FIXME #3068: For requests where the type comes in the payload (batch op + NGSIv1), we'd need to add an else part
     //              to extract the type from the incoming payload
     //
-    if (ciP->uriParam["type"] != "")
+    if (!ciP->uriParam["type"].empty())
     {
       extraParams += "&type=";
       extraParams += ciP->uriParam["type"];
@@ -212,7 +216,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
       }
     }
 
-    if (ciP->uriParam["attrs"] != "")
+    if (!ciP->uriParam["attrs"].empty())
     {
       extraParams += "&attrs=";
       extraParams += ciP->uriParam["attrs"];
@@ -229,7 +233,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
       }
     }
 
-    if (extraParams != "")
+    if (!extraParams.empty())
     {
       char* xParams = (char*) &(extraParams.c_str())[1];  // Remove first '&'
 
@@ -238,6 +242,10 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     }
 #endif
   }
+
+  verb      = "POST";
+  resource  = prefix + op;
+  mimeType  = "application/json";
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -250,6 +258,10 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::map<std::string, std::string>  noHeaders;
   long long                           statusCode; // not used by the moment
 
+  char suffix[STRING_SIZE_FOR_INT];
+  snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+  std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
   r = httpRequestSend(fromIp,  // thread variable
                       ip,
                       port,
@@ -261,7 +273,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       resource,
                       mimeType,
                       payload,
-                      ciP->httpHeaders.correlator,
+                      effectiveCorrelator,
                       "",
                       &out,
                       &statusCode,
@@ -271,11 +283,11 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   if (r != 0)
   {
     LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     return false;
   }
 
   LM_T(LmtCPrForwardResponsePayload, ("forward queryContext response payload: %s", out.c_str()));
-
 
   //
   // 4. Parse the response and fill in a binary QueryContextResponse
@@ -283,21 +295,22 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   ParseData parseData;
   char*     cleanPayload = jsonPayloadClean(out.c_str());
 
+  if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+  {
+    //
+    // This is really an internal error in the Context Provider
+    // It is not in the orion broker though, so 404 is returned
+    //
+    LM_W(("Other Error (context provider response to QueryContext is empty)"));
+    return false;
+  }
+
+  logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
   if (qcrP->providerFormat == PfJson)
   {
     std::string  s;
     std::string  errorMsg;
-
-    if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
-    {
-      //
-      // This is really an internal error in the Context Provider
-      // It is not in the orion broker though, so 404 is returned
-      //
-      LM_W(("Other Error (context provider response to QueryContext is empty)"));
-      return false;
-    }
 
     //
     // NOTE
@@ -411,7 +424,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (aP->providingApplication.get() != "")
+      if (!aP->providingApplication.get().empty())
       {
         return true;
       }
@@ -443,6 +456,7 @@ std::string postQueryContext
   QueryContextRequest*        qcrP  = &parseDataP->qcr.res;
   std::string                 answer;
   QueryContextRequestVector   requestV;
+  std::vector<std::string>    regIdsV;
   QueryContextResponseVector  responseV;
   long long                   count = 0;
   long long*                  countP = NULL;
@@ -563,6 +577,7 @@ std::string postQueryContext
 
       requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.providingApplicationList[ix].providerFormat);
       requestV.push_back(requestP);
+      regIdsV.push_back(cerP->entity.providingApplicationList[ix].getRegId());
     }
 
     //
@@ -583,7 +598,7 @@ std::string postQueryContext
         // An empty providingApplication means the attribute is local
         // In such a case, the response is already in our hand, we just need to copy it to responseV
         //
-        if (aP->providingApplication.get() == "")
+        if (aP->providingApplication.get().empty())
         {
           if (aP->found == false)
           {
@@ -621,6 +636,7 @@ std::string postQueryContext
         {
           requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name, aP->providingApplication.providerFormat);
           requestV.push_back(requestP);
+          regIdsV.push_back(aP->providingApplication.getRegId());
         }
         else
         {
@@ -666,9 +682,22 @@ std::string postQueryContext
   //
   QueryContextResponse* qP;
 
+  // Note that queryForward() (due to internal calls to httpRequestSend())
+  // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
+  // FIXME P5: maybe this is not the right place to store&recover old transaction.
+  // What about inside httpRequestSend?
+
+  std::string prevCoorId  = correlationIdGet();
+  std::string prevTransId = transactionIdGetAsString();
+
+  if (requestV.size() > 0)
+  {
+    logInfoFwdStart(ciP->method.c_str(), ciP->uriForLogs.c_str());
+  }
+
   for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
   {
-    if (requestV[fIx]->contextProvider == "")
+    if (requestV[fIx]->contextProvider.empty())
     {
       LM_E(("Internal Error (empty context provider string)"));
       continue;
@@ -677,7 +706,7 @@ std::string postQueryContext
     qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
 
-    if (queryForward(ciP, requestV[fIx], qP) == true)
+    if (queryForward(ciP, requestV[fIx], regIdsV[fIx], fIx + 1, qP) == true)
     {
       //
       // Each ContextElementResponse of qP should be tested to see whether there
@@ -691,6 +720,9 @@ std::string postQueryContext
       responseV.push_back(qP);
     }
   }
+
+  correlatorIdSet(prevCoorId.c_str());
+  transactionIdSet(prevTransId.c_str());
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;

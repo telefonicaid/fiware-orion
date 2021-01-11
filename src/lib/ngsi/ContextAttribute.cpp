@@ -306,6 +306,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setProviderFormat(caP->providingApplication.getProviderFormat());
+  providingApplication.setRegId(caP->providingApplication.getRegId());
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
                   compoundValueP,
@@ -876,7 +877,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     defType = defaultType(orion::ValueTypeVector);
   }
 
-  jh.addString("type", type != ""? type : defType);
+  jh.addString("type", !type.empty()? type : defType);
 
   //
   // value
@@ -1100,7 +1101,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return std::string(errorMsg);
   }
 
-  if ((name == "") && (requestType != EntityAttributeValueRequest))
+  if ((name.empty()) && (requestType != EntityAttributeValueRequest))
   {
     return "missing attribute name";
   }
@@ -1253,7 +1254,7 @@ bool ContextAttribute::compoundItemExists(const std::string& compoundPath, orion
   orion::CompoundValueNode*  current = compoundValueP;
   int                        levels;
 
-  if (compoundPath == "")
+  if (compoundPath.empty())
   {
     return false;
   }

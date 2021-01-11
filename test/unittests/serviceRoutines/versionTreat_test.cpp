@@ -71,6 +71,8 @@ TEST(versionTreat, ok)
   // "  \"compile_time\" : \".*\",\n"
   // "  \"compiled_by\" : \".*\",\n"
   // "  \"compiled_in\" : \".*\"\n"
+  // "  \"doc\" : \".*\"\n"
+  // "  \"libversions\" : (drill down) "\n"
   // "}\n"
   // "}\n";
   // bool            match;
@@ -85,6 +87,14 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "compiled_by") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "release_date") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "doc") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libversions") != NULL);
+
+  EXPECT_TRUE(strstr(out.c_str(), "boost") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libcurl") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libmicrohttpd") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "openssl") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "rapidjson") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "mongodriver") != NULL);
 
   extern const char*  orionUnitTestVersion;
   std::string         expected = std::string("\"version\" : \"") + orionUnitTestVersion + "\"";

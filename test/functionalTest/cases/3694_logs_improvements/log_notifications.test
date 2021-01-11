@@ -1,0 +1,213 @@
+# Copyright 2020 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Basic test for notification logs
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -multiservice
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. Create E entity
+# 02. Create subscription SUB1 for E (to the accumulator)
+# 03. Create subscription SUB2 for E (to nowhere)
+# 04. POST /v2/op/update updating twice E (triggering 4 notifications)
+# 05. Check notification logs (sorted by url)
+# 06. Check notification correlators (2 without cbnotif corresponding to initial notifications, 4 with cbnotif for regular notifications)
+#
+
+echo "01. Create E entity"
+echo "==================="
+payload='
+{
+   "id":"E",
+   "type":"T",
+   "A1":{
+      "value":"foo",
+      "type":"Text"
+   }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription SUB1 for E (to the accumulator)"
+echo "======================================================="
+payload='
+{
+    "description": "SUB1",
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"}
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create subscription SUB2 for E (to nowhere)"
+echo "==============================================="
+payload='
+{
+    "description": "SUB2",
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "http": {"url": "http://localhost:12345/notify"}
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. POST /v2/op/update updating twice E (triggering 4 notifications)"
+echo "===================================================================="
+payload='
+{
+  "actionType": "append",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "A": {
+         "type": "Text",
+         "value": "foo"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E",
+      "A": {
+         "type": "Text",
+         "value": "foo"
+      }
+    }
+  ]
+}'
+orionCurl --url '/v2/op/update?options=forcedUpdate' --payload "$payload"
+echo
+echo
+
+
+# Example log trace for notifications (to help understanding the awk/cut stuff :)
+#
+# msg=Notif delivered (subId: 5f904fb3e970f217bde75f98): POST localhost:9997/notify, response code: 200
+
+
+echo "05. Check notification logs (sorted by url)"
+echo "==========================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Notif' | awk -F '|' '{print $10}' | cut -c 57- | sort
+echo
+echo
+
+
+echo "06. Check notification correlators (2 without cbnotif corresponding to initial notifications, 4 with cbnotif for regular notifications)"
+echo "======================================================================================================================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Notif' | awk -F '|' '{print $3}' | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E entity
+===================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create subscription SUB1 for E (to the accumulator)
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create subscription SUB2 for E (to nowhere)
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. POST /v2/op/update updating twice E (triggering 4 notifications)
+====================================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Check notification logs (sorted by url)
+===========================================
+POST localhost:12345/notify, response code: Couldn't connect to server
+POST localhost:12345/notify, response code: Couldn't connect to server
+POST localhost:12345/notify, response code: Couldn't connect to server
+POST localhost:9997/notify, response code: 200
+POST localhost:9997/notify, response code: 200
+POST localhost:9997/notify, response code: 200
+
+
+06. Check notification correlators (2 without cbnotif corresponding to initial notifications, 4 with cbnotif for regular notifications)
+=======================================================================================================================================
+ corr=REGEX([0-9a-f\-]{36})
+ corr=REGEX([0-9a-f\-]{36})
+ corr=REGEX([0-9a-f\-]{36}); cbnotif=1
+ corr=REGEX([0-9a-f\-]{36}); cbnotif=2
+ corr=REGEX([0-9a-f\-]{36}); cbnotif=3
+ corr=REGEX([0-9a-f\-]{36}); cbnotif=4
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

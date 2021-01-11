@@ -379,7 +379,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, hostHeaderName, hostHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- Tenant
-  if (tenant != "")
+  if (!tenant.empty())
   {
     std::string fiwareServiceHeaderValue = tenant;
     httpHeaderAdd(&headers, HTTP_FIWARE_SERVICE, fiwareServiceHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -390,7 +390,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_SERVICEPATH, fiwareServicePathHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // ----- X-Auth-Token
-  if (xauthToken != "")
+  if (!xauthToken.empty())
   {
     std::string xauthTokenHeaderValue = xauthToken;
     httpHeaderAdd(&headers, HTTP_X_AUTH_TOKEN, xauthTokenHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
@@ -398,7 +398,7 @@ int httpRequestSendWithCurl
 
   // ----- Accept
   std::string acceptedFormats = "application/json";
-  if (acceptFormat != "")
+  if (!acceptFormat.empty())
   {
     acceptedFormats = acceptFormat;
   }
@@ -439,7 +439,7 @@ int httpRequestSendWithCurl
   httpHeaderAdd(&headers, HTTP_FIWARE_CORRELATOR, correlationHeaderValue, &outgoingMsgSize, extraHeaders, usedExtraHeaders);
 
   // Notify Format
-  if ((ngsiv2AttrFormat != "") && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
+  if ((!ngsiv2AttrFormat.empty()) && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
   {
     std::string nFormatHeaderValue = ngsiv2AttrFormat;
 
@@ -547,7 +547,7 @@ int httpRequestSendWithCurl
   // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed
   // to check logs in a .test case (case 000 notification_different_sizes.test)
   //
-  LM_I(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  LM_T(LmtOldInfo, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
 
   res = curl_easy_perform(curl);
   if (res != CURLE_OK)
@@ -567,7 +567,7 @@ int httpRequestSendWithCurl
     //
     int   payloadLen  = contentLenParse(httpResponse->memory);
 
-    LM_I(("Notification Successfully Sent to %s", url.c_str()));
+    LM_T(LmtOldInfo, ("Notification Successfully Sent to %s", url.c_str()));
     outP->assign(httpResponse->memory, httpResponse->size);
 
     metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
@@ -576,7 +576,7 @@ int httpRequestSendWithCurl
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, statusCodeP);
     if ((*statusCodeP < 300) && (*statusCodeP > 199))
     {
-      LM_I(("Notification response OK, http code: %d", *statusCodeP));
+      LM_T(LmtOldInfo, ("Notification response OK, http code: %d", *statusCodeP));
     }
     else
     {

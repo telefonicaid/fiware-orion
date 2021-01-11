@@ -44,7 +44,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **location** (オプション) : エンティティの地理的位置です、次のフィールドで構成されます :
     -   **attrName** : attrs 配列内の地理的位置を識別する属性名です
     -   **coords** : エンティティの位置を表す GeoJSON です。詳細は以下を参照してください
--   **lastCorrelator** : エンティティ上の最後の更新要求における `Fiware-Correlator` ヘッダの値です。自己通知ループ保護ロジックによって使用されます
+-   **lastCorrelator** : エンティティ上の最後の更新要求における root correlator の値です。自己通知ループ保護ロジックによって使用されます。*root correlator* とは、サフィックスのない更新要求の `Fiware-Correlator` リクエスト・ヘッダの値を意味します。例えば、`Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32` の root correlator は `f320136c-0192-11eb-a893-000c29df7908` です
 -   **expDate** (オプション): エンティティの有効期限のタイムスタンプ (Date オブジェクトとして)。詳細については、[一時的なエンティティの機能](../user/transient_entities.md)を参照してください
 
 `location.coordsin` については、いくつかの形式を使用することができます :

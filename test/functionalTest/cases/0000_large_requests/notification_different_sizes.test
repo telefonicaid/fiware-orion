@@ -40,7 +40,18 @@ dbInsertEntity $CB_DB_NAME E4 840000
 
 --SHELL--
 
-# Close to the static buffer limit (~19 KB)
+#
+# 01. Close to the static buffer limit (~19 KB)
+# 02. Passing the static buffer limit (~21 KB)
+# 03. Close to the dynamic buffer limit (~7.9 MB)
+# 04. Passing the dynamic buffer limit, causing an error (~8.1 MB)
+# 05. Check number of notifications sent (3)
+# 06. Check number of too large errors (1)
+# 07. Check notification sizes
+#
+
+echo "01. Close to the static buffer limit (~19 KB)"
+echo "============================================="
 url="/v1/subscribeContext"
 payload='{
   "entities": [
@@ -64,10 +75,14 @@ payload='{
 }'
 orionCurl --url "$url" --payload "${payload}"
 echo
+echo
+
 
 sleep 1
-echo "1: ++++++++++++++++++++"
-# Passing the static buffer limit (~21 KB)
+
+
+echo "02. Passing the static buffer limit (~21 KB)"
+echo "============================================"
 url="/v1/subscribeContext"
 payload='{
   "entities": [
@@ -91,11 +106,14 @@ payload='{
 }'
 orionCurl --url "$url" --payload "${payload}"
 echo
+echo
 
 
 sleep 1
-echo "2: ++++++++++++++++++++"
-# Close to the dynamic buffer limit (~7.9 MB)
+
+
+echo "03. Close to the dynamic buffer limit (~7.9 MB)"
+echo "==============================================="
 url="/v1/subscribeContext"
 payload='{
   "entities": [
@@ -119,11 +137,14 @@ payload='{
 }'
 orionCurl --url "$url" --payload "${payload}"
 echo
+echo
 
 
 sleep 1
-echo "3: ++++++++++++++++++++"
-# Passing the dynamic buffer limit, causing an error (~8.1 MB)
+
+
+echo "04. Passing the dynamic buffer limit, causing an error (~8.1 MB)"
+echo "================================================================"
 url="/v1/subscribeContext"
 payload='{
   "entities": [
@@ -147,11 +168,15 @@ payload='{
 }'
 orionCurl --url "$url" --payload "${payload}"
 echo
+echo
 
 
-echo "4: ++++++++++++++++++++"
-echo "** Notifications sent:"
+echo "05. Check number of notifications sent (3)"
+echo "=========================================="
 accumulatorCount
+echo
+echo
+
 
 # ----------------------------------------------------------------------
 # NOTE (not a FIXME):
@@ -169,16 +194,26 @@ accumulatorCount
 #grep "to HTTP server: sending dynamic message of" /tmp/contextBroker.log | wc -l
 # ----------------------------------------------------------------------
 
-# The log has to show exactly 1 error about notification too large
-echo "** Too large errors:"
-grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
 
-# Notification sizes. Note that if don't use the cut, some character in the log line prologue
+echo "06. Check number of too large errors (1)"
+echo "========================================"
+grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
+echo
+echo
+
+
+echo "07. Check notification sizes"
+echo "============================"
+# Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
-echo "** Notification sizes:"
 grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F= '{ print $2 }'
+echo
+echo
+
 
 --REGEXPECT--
+01. Close to the static buffer limit (~19 KB)
+=============================================
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
@@ -192,7 +227,9 @@ Date: REGEX(.*)
     }
 }
 
-1: ++++++++++++++++++++
+
+02. Passing the static buffer limit (~21 KB)
+============================================
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
@@ -206,7 +243,9 @@ Date: REGEX(.*)
     }
 }
 
-2: ++++++++++++++++++++
+
+03. Close to the dynamic buffer limit (~7.9 MB)
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
@@ -220,7 +259,9 @@ Date: REGEX(.*)
     }
 }
 
-3: ++++++++++++++++++++
+
+04. Passing the dynamic buffer limit, causing an error (~8.1 MB)
+================================================================
 HTTP/1.1 200 OK
 Content-Length: 85
 Content-Type: application/json
@@ -234,15 +275,24 @@ Date: REGEX(.*)
     }
 }
 
-4: ++++++++++++++++++++
-** Notifications sent:
+
+05. Check number of notifications sent (3)
+==========================================
 3
-** Too large errors:
+
+
+06. Check number of too large errors (1)
+========================================
 1
-** Notification sizes:
+
+
+07. Check notification sizes
+============================
 Sending message 1 to HTTP server: sending message of REGEX((19485|19490|19486|19491)) bytes to HTTP server
 Sending message 2 to HTTP server: sending message of REGEX((21485|21490|21486|21491)) bytes to HTTP server
 Sending message 3 to HTTP server: sending message of REGEX((8100487|8100492|8100488|8100493)) bytes to HTTP server
+
+
 --TEARDOWN--
 ##
 # NOTE: the different sizes above is to cover for different sizes in the version string

@@ -92,7 +92,7 @@ static bool entityIdMatch(EntityId* e1, EntityId* e2)
     return false;
   }
 
-  if ((e2->type != "") && (e1->type != e2->type))
+  if ((!e2->type.empty()) && (e1->type != e2->type))
   {
     return false;
   }
