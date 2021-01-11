@@ -233,38 +233,33 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: func1.info
-          path: coverage/
+          path: coverage/func1/
 
       - name: download func2-coverage
         uses: actions/download-artifact@v2
         with:
           name: func2.info
-          path: coverage/
+          path: coverage/func2/
 
       - name: download func3-coverage
         uses: actions/download-artifact@v2
         with:
           name: func3.info
-          path: coverage/
+          path: coverage/func3/
 
       - name: download func4-coverage
         uses: actions/download-artifact@v2
         with:
           name: func4.info
-          path: coverage/
+          path: coverage/func4/
 
       - name: prepare
         run: |
           sudo apt-get install -y lcov
 
-      - name: ls
-        run: |
-          ls coverage
-          cat coverage/func1.info
-
       - name: aggregate
         run: |
-          lcov -a coverage/func1.info -a coverage/func2.info -a coverage/func3.info -a coverage/func4.info -o merged.info
+          lcov -a coverage/func1/broker.info -a coverage/func2/broker.info -a coverage/func3/broker.info -a coverage/func4/broker.info -o merged.info
 
       - uses: romeovs/lcov-reporter-action@v0.2.16
         with:
