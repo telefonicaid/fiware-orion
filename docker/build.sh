@@ -278,7 +278,7 @@ fi
 
 # ===================================== UNIT TESTS =====================================================================
 
-if [[ -n "${TEST}" && "${STAGE}" = "unit" && "${COVERAGE}" != "true"  ]]; then
+if [[ -n "${TEST}" && "${STAGE}" = "unit" &&  -z ${COVERAGE+x} ]]; then
 
     echo "Builder: unit test started"
 
@@ -292,20 +292,20 @@ fi
 
 if [[ -n "${TEST}" && "${STAGE}" = "unit" && -n "${COVERAGE}" ]]; then
 
-    echo "Builder: unit test started"
+    echo "Builder: unit test with coverage started"
 
     cd ${PATH_TO_SRC}
 
-    make unit_test
+    make coverage_unit_test
     if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
 
-    echo "Builder: unit test ended"
+    echo "Builder: unit test with coverage ended"
 fi
 
 
 # ===================================== FUNCTIONAL TESTS ===============================================================
 
-if [[ -n "${TEST}" && "${STAGE}" = "functional" && "${COVERAGE}" != "true" ]]; then
+if [[ -n "${TEST}" && "${STAGE}" = "functional" &&  -z ${COVERAGE+x} ]]; then
 
     echo "Builder: functional test started"
 
@@ -336,7 +336,7 @@ fi
 
 if [[ -n "${TEST}" && "${STAGE}" = "functional" && -n "${COVERAGE}" ]]; then
 
-    echo "Builder: functional test started"
+    echo "Builder: functional test with coverage started"
 
     cd ${PATH_TO_SRC}
     STATUS=true
@@ -377,7 +377,7 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" && -n "${COVERAGE}" ]]; then
 
     if ! ${STATUS}; then echo "Builder: functional test failed"; exit 1; fi
 
-    echo "Builder: functional test ended"
+    echo "Builder: functional test with coverage ended"
 fi
 
 # ===================================== BUILDING RPM ===================================================================
