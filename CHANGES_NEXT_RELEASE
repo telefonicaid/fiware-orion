@@ -48,4 +48,4 @@
 * Issue  #599   Implemented TRoE for BATCH Upsert+Update
 * Issue  #599   TRoE now supports datasetId
 * Issue  #599   Geo Attributes for TRoE - 'Point', 'Polygon', 'LineString', 'MultiPolygon', and 'MultiLineString'
-* Issue  #599   Geo Sub-Attributes for TRoE - 'Point', 'Polygon'
+* Issue  #599   Geo Sub-Attributes for TRoE - 'Point', 'Polygon', 'LineString', 'MultiPolygon'
