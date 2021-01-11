@@ -44,8 +44,6 @@ extern bool pgRelationshipPush
   const char*  attributeInstance,
   const char*  datasetId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   bool         subProperties
 );
 

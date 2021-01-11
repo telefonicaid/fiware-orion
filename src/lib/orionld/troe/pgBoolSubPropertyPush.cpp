@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgBoolSubPropertyPush.h"                // Own interface
 
 
@@ -46,9 +47,7 @@ bool pgBoolSubPropertyPush
   const char*  entityId,
   const char*  attributeRef,
   const char*  attributeId,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 )
 {
   char sql[1024];
@@ -59,16 +58,16 @@ bool pgBoolSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, (boolValue == true)? "true" : "false");
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, (boolValue == true)? "true" : "false");
   }
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 

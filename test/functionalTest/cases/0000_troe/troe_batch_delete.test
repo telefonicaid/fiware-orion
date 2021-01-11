@@ -86,7 +86,7 @@ echo
 
 echo "03. See the entities in the temporal database"
 echo "============================================="
-postgresCmd -sql "SELECT opMode,id,type,deletedat FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
@@ -104,7 +104,7 @@ echo
 
 echo "05. See the entities in the temporal database - E2 should be deleted only once in TRoE"
 echo "======================================================================================"
-postgresCmd -sql "SELECT opMode,id,type,deletedat FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
@@ -147,10 +147,10 @@ Date: REGEX(.*)
 
 03. See the entities in the temporal database
 =============================================
-opmode,id,type,deletedat
-Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
-Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,
-Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Delete,urn:ngsi-ld:entities:E1,NULL,REGEX(202.*)
 Delete,urn:ngsi-ld:entities:E3,NULL,REGEX(202.*)
 
@@ -173,10 +173,10 @@ Date: REGEX(.*)
 
 05. See the entities in the temporal database - E2 should be deleted only once in TRoE
 ======================================================================================
-opmode,id,type,deletedat
-Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
-Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,
-Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Delete,urn:ngsi-ld:entities:E1,NULL,REGEX(202.*)
 Delete,urn:ngsi-ld:entities:E3,NULL,REGEX(202.*)
 Delete,urn:ngsi-ld:entities:E2,NULL,REGEX(202.*)

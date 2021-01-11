@@ -33,6 +33,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract
 #include "orionld/troe/pgGeoPointPush.h"                       // Own interface
 
@@ -53,8 +54,6 @@ bool pgGeoPointPush
   const char*  attributeInstance,
   const char*  datasetId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   bool         subProperties
 )
 {
@@ -75,30 +74,30 @@ bool pgGeoPointPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, geoPoint) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, '%s', ST_GeomFromText('POINT Z(%f %f %f)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, longitude, latitude, altitude);
+             "opMode, ts, instanceId, id, entityRef, entityId, observedAt, valueType, subProperty, datasetId, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, '%s', ST_GeomFromText('POINT Z(%f %f %f)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, observedAt, subPropertiesString, datasetId, longitude, latitude, altitude);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, geoPoint) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, ST_GeomFromText('POINT Z(%f %f %f)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, longitude, latitude, altitude);
+             "opMode, ts, instanceId, id, entityRef, entityId, valueType, subProperty, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, ST_GeomFromText('POINT Z(%f %f %f)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, subPropertiesString, longitude, latitude, altitude);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, geoPoint) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, '%s', ST_GeomFromText('POINT Z(%f %f %f)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, longitude, latitude, altitude);
+             "opMode, ts, instanceId, id, entityRef, entityId, valueType, subProperty, datasetId, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, '%s', ST_GeomFromText('POINT Z(%f %f %f)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, subPropertiesString, datasetId, longitude, latitude, altitude);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, geoPoint) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, ST_GeomFromText('POINT Z(%f %f %f)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, longitude, latitude, altitude);
+             "opMode, ts, instanceId, id, entityRef, entityId, observedAt, valueType, subProperty, geoPoint) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', '%s', %s, ST_GeomFromText('POINT Z(%f %f %f)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, observedAt, subPropertiesString, longitude, latitude, altitude);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

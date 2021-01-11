@@ -45,9 +45,7 @@ extern bool pgSubAttributeTreat
   const char*  entityRef,
   const char*  entityId,
   const char*  attributeRef,
-  const char*  attributeId,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  attributeId
 );
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGSUBATTRIBUTETREAT_H_

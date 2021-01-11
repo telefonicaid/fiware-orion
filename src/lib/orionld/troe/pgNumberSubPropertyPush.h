@@ -44,8 +44,6 @@ extern bool pgNumberSubPropertyPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   const char*  unitCode
 );
 

@@ -56,8 +56,6 @@ bool pgGeoMultiLineStringPush
   const char*  attributeInstance,
   const char*  datasetId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   bool         subProperties
 )
 {
@@ -82,30 +80,30 @@ bool pgGeoMultiLineStringPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, coordsString);
+             "opMode, ts, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, observedAt, subPropertiesString, datasetId, coordsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, coordsString);
+             "opMode, ts, instanceId, id, entityRef, entityId, valueType, subProperty, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, subPropertiesString, coordsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, coordsString);
+             "opMode, ts, instanceId, id, entityRef, entityId, valueType, subProperty, datasetId, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, '%s', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, subPropertiesString, datasetId, coordsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, 12007, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, coordsString);
+             "opMode, ts, instanceId, id, entityRef, entityId, observedAt, valueType, subProperty, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', %s, ST_GeomFromText('MULTILINESTRING(%s)'))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, observedAt, subPropertiesString, coordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

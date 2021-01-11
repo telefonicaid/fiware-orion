@@ -93,21 +93,21 @@ echo
 
 echo "03. See E1 in the temporal database"
 echo "==================================="
-postgresCmd -sql "SELECT opMode,id,type,deletedAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
 
 echo "04. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo
 
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -145,24 +145,24 @@ Date: REGEX(.*)
 
 03. See E1 in the temporal database
 ===================================
-opmode,id,type,deletedat
-Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 
 04. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,New P1,,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,P1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,t,,,urn:ngsi-ld:relationships:R1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,t,,,New P1,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P12,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P12,,
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,,REGEX(202.*)
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,,REGEX(202.*)
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P12,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P12,,,REGEX(202.*)
 
 
 --TEARDOWN--

@@ -71,7 +71,7 @@ echo
 echo "03. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present"
 echo "==============================================================================================="
 echo "ENTITIES:"
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
 postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
@@ -93,7 +93,7 @@ echo
 echo "05. Make sure the entity E1 survived the restart"
 echo "================================================"
 echo "ENTITIES:"
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
 postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
@@ -128,7 +128,7 @@ Date: REGEX(.*)
 03. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
 ===============================================================================================
 ENTITIES:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
@@ -147,7 +147,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 05. Make sure the entity E1 survived the restart
 ================================================
 ENTITIES:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:

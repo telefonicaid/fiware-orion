@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgNumberSubPropertyPush.h"              // Own interface
 
 
@@ -39,7 +40,6 @@
 bool pgNumberSubPropertyPush
 (
   PGconn*      connectionP,
-  const char*  ts,
   const char*  subAttributeName,
   const char*  instanceId,
   double       numberValue,
@@ -71,14 +71,14 @@ bool pgNumberSubPropertyPush
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
              "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, number, unitCode) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, ts, observedAt, numberValue, unitCodeString);
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, numberValue, unitCodeString);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
              "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, number, unitCode) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, ts, numberValue, unitCodeString);
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, numberValue, unitCodeString);
   }
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 

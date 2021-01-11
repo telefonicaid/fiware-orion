@@ -53,9 +53,7 @@ bool pgGeoSubMultiPolygonPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 )
 {
   char*  coordsString = kaAlloc(&orionldState.kalloc, 10240);
@@ -79,16 +77,16 @@ bool pgGeoSubMultiPolygonPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, coordsString);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, geoMultiPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, coordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, coordsString);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, geoMultiPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, coordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

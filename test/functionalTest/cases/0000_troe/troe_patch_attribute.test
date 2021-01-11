@@ -92,21 +92,21 @@ echo
 
 echo "03. See E1 in the temporal database"
 echo "==================================="
-postgresCmd -sql "SELECT opMode,id,type,deletedAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
 
 echo "04. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt,deletedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes"
 echo
 echo
 
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt,ts FROM subAttributes"
 echo
 echo
 
@@ -131,25 +131,25 @@ Date: REGEX(.*)
 
 03. See E1 in the temporal database
 ===================================
-opmode,id,type,deletedat
-Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 
 04. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat,deletedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,t,,,P of E1,,,2020-12-10 07:11:00.123,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,
-Update,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,44,,,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,String,urn:ngsi-ld:entities:E1,t,,,P of E1,,,2020-12-10 07:11:00.123,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R,,,2020-12-10 07:11:00.129,REGEX(202.*)
+Update,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,44,,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:rel:R,,,2020-12-10 07:12:00.123
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,pi-i,,33,,2020-12-10 07:12:00.128
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:rel:R2,,,2020-12-10 07:12:00.124
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,Sub-P,,,
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat,ts
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:rel:R,,,2020-12-10 07:12:00.123,REGEX(202.*)
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,pi-i,,33,,2020-12-10 07:12:00.128,REGEX(202.*)
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:rel:R2,,,2020-12-10 07:12:00.124,REGEX(202.*)
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,Sub-P,,,,REGEX(202.*)
 
 
 --TEARDOWN--

@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgStringSubPropertyPush.h"              // Own interface
 
 
@@ -46,9 +47,7 @@ bool pgStringSubPropertyPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 )
 {
   char         sql[2048];
@@ -60,16 +59,16 @@ bool pgStringSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', '%s')",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, stringValue);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', '%s')",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, stringValue);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', '%s')",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, stringValue);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', '%s')",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, stringValue);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

@@ -95,21 +95,21 @@ echo
 
 echo "03. See entities in TRoE - 4 instances of E1, all marked as REPLACED"
 echo "===================================================================="
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
 
 echo "04. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo
 
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -157,21 +157,21 @@ echo
 
 echo "08. See entities in TRoE - still the same 4 instances of E1"
 echo "==========================================================="
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
 
 echo "09. See the attributes in the temporal database - note the new ones, replacing the older ones"
 echo "============================================================================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo
 
 
 echo "10. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -224,7 +224,7 @@ Date: REGEX(.*)
 
 03. See entities in TRoE - 4 instances of E1, all marked as REPLACED
 ====================================================================
-opmode,id,type,createdat
+opmode,id,type,ts
 Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
@@ -233,16 +233,16 @@ Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,R
 
 04. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 4: E1/P4",,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 4: E1/P4",,,REGEX(202.*)
 
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 
 06. Upsert three instances of E1, with options=update - no new entity instance in TRoE entities table, but all new attrs in 'attributes' table marked as REPLACE
@@ -304,7 +304,7 @@ Date: REGEX(.*)
 
 08. See entities in TRoE - still the same 4 instances of E1
 ===========================================================
-opmode,id,type,createdat
+opmode,id,type,ts
 Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
@@ -313,19 +313,19 @@ Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,R
 
 09. See the attributes in the temporal database - note the new ones, replacing the older ones
 =============================================================================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 4: E1/P4",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 1: E1/P1",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 2: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 3: E1/P3",,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 4: E1/P4",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 1: E1/P1",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 06, Instance 3: E1/P3",,,REGEX(202.*)
 
 
 10. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 
 --TEARDOWN--

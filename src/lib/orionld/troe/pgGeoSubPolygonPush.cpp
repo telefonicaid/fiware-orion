@@ -53,9 +53,7 @@ bool pgGeoSubPolygonPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 )
 {
   char*  polygonCoordsString = kaAlloc(&orionldState.kalloc, 10240);
@@ -79,16 +77,16 @@ bool pgGeoSubPolygonPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', ST_GeomFromText('POLYGON(%s)', 4267))",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, polygonCoordsString);
+             "instanceId, ts, id, entityRef, entityId, attributeRef, attributeId, observedAt, valueType, geoPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', ST_GeomFromText('POLYGON(%s)', 4267))",
+             instanceId, orionldState.requestTimeString, subAttributeName, entityRef, entityId, attributeRef, attributeId, observedAt, polygonCoordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, geoPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', ST_GeomFromText('POLYGON(%s)', 4267))",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, polygonCoordsString);
+             "instanceId, ts, id, entityRef, entityId, attributeRef, attributeId, valueType, geoPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', ST_GeomFromText('POLYGON(%s)', 4267))",
+             instanceId, orionldState.requestTimeString, subAttributeName, entityRef, entityId, attributeRef, attributeId, polygonCoordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

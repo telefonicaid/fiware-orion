@@ -70,7 +70,7 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
     troeEntityArrayExpand(orionldState.duplicateArray);  // FIXME: Remove once orionldPostBatchUpsert.cpp has been fixed to do this
     for (KjNode* entityP = orionldState.duplicateArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, troeMode) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;
@@ -89,7 +89,7 @@ bool troePostBatchUpsert(ConnectionInfo* ciP)
       if (troeIgnored(entityP) == true)
         continue;
 
-      if (pgEntityTreat(connectionP, entityP, NULL, NULL, orionldState.requestTimeString, orionldState.requestTimeString, troeMode) == false)
+      if (pgEntityTreat(connectionP, entityP, NULL, NULL, troeMode) == false)
       {
         LM_E(("Database Error (pgEntityTreat failed)"));
         ok = false;

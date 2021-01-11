@@ -53,9 +53,7 @@ bool pgGeoSubLineStringPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 )
 {
   char*  lineStringCoordsString = kaAlloc(&orionldState.kalloc, 10240);
@@ -79,16 +77,16 @@ bool pgGeoSubLineStringPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', ST_GeomFromText('LINESTRING(%s)'))",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, lineStringCoordsString);
+             "instanceId, ts, id, entityRef, entityId, attributeRef, attributeId, observedAt, valueType, geoLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', ST_GeomFromText('LINESTRING(%s)'))",
+             instanceId, orionldState.requestTimeString, subAttributeName, entityRef, entityId, attributeRef, attributeId, observedAt, lineStringCoordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, geoLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', ST_GeomFromText('LINESTRING(%s)'))",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, lineStringCoordsString);
+             "instanceId, ts, id, entityRef, entityId, attributeRef, attributeId, valueType, geoLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoLineString', ST_GeomFromText('LINESTRING(%s)'))",
+             instanceId, orionldState.requestTimeString, subAttributeName, entityRef, entityId, attributeRef, attributeId, lineStringCoordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

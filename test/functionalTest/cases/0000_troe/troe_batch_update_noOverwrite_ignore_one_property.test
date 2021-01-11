@@ -85,21 +85,21 @@ echo
 
 echo "04. See TRoE entities - see one single row for E1"
 echo "================================================="
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo
 
 
 echo "05. See TRoE attributes - see two rows, one for P1 and one for P2"
 echo "================================================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,modifiedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo
 
 
 echo "06. See TRoE sub-attributes - there aren't any"
 echo "=============================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,modifiedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -148,20 +148,20 @@ Date: REGEX(.*)
 
 04. See TRoE entities - see one single row for E1
 =================================================
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T1,REGEX(202.*)
 
 
 05. See TRoE attributes - see two rows, one for P1 and one for P2
 =================================================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,modifiedat
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,Step_01,,,REGEX(202.*)
 Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,Step_02,,,REGEX(202.*)
 
 
 06. See TRoE sub-attributes - there aren't any
 ==============================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,modifiedat
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 
 --TEARDOWN--

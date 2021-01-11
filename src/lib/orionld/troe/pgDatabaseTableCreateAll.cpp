@@ -71,9 +71,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "id           TEXT NOT NULL,"
     "opMode       OperationMode,"
     "type         TEXT NOT NULL,"
-    "createdAt    TIMESTAMP NOT NULL,"
-    "modifiedAt   TIMESTAMP NOT NULL,"
-    "deletedAt    TIMESTAMP)";
+    "ts           TIMESTAMP NOT NULL)";
 
   const char* attributesSql = "CREATE TABLE IF NOT EXISTS attributes ("
     "instanceId          TEXT PRIMARY KEY,"
@@ -81,9 +79,6 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "opMode              OperationMode,"
     "entityRef           TEXT,"
     "entityId            TEXT NOT NULL,"
-    "createdAt           TIMESTAMP NOT NULL,"
-    "modifiedAt          TIMESTAMP NOT NULL,"
-    "deletedAt           TIMESTAMP,"
     "observedAt          TIMESTAMP,"
     "valueType           ValueType,"
     "subProperty         BOOL,"
@@ -97,7 +92,8 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
     "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
     "geoLineString       GEOGRAPHY(LINESTRING),"
-    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING))";
+    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
+    "ts                  TIMESTAMP NOT NULL)";
 
   const char* subAttributesSql = "CREATE TABLE IF NOT EXISTS subAttributes ("
     "instanceId          TEXT PRIMARY KEY,"
@@ -106,9 +102,6 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "entityId            TEXT NOT NULL,"
     "attributeRef        TEXT NOT NULL REFERENCES attributes(instanceId),"
     "attributeId         TEXT NOT NULL,"
-    "createdAt           TIMESTAMP NOT NULL,"
-    "modifiedAt          TIMESTAMP NOT NULL,"
-    "deletedAt           TIMESTAMP,"
     "observedAt          TIMESTAMP,"
     "valueType           ValueType,"
     "unitCode            TEXT,"
@@ -120,7 +113,8 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
     "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
     "geoLineString       GEOGRAPHY(LINESTRING),"
-    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING))";
+    "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
+    "ts                  TIMESTAMP NOT NULL)";
 
   const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
 

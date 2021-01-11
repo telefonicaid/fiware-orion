@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgEntityPush.h"                         // Own interface
 
 
@@ -35,12 +36,12 @@
 //
 // pgEntityPush - push an entity to the database
 //
-bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, char* createdAt, char* modifiedAt, const char* opMode)
+bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, const char* opMode)
 {
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s', '%s', NULL)", instanceId, id, opMode, type, createdAt, modifiedAt);
+  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s')", instanceId, id, opMode, type, orionldState.requestTimeString);
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)

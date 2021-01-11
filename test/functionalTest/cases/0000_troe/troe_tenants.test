@@ -26,6 +26,7 @@ Make sure the broker creates the DB for a new tenant
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
+dbInit CB t1
 pgDrop ftest_t1
 brokerStart CB 100 IPv4 -troe -multiservice
 
@@ -63,13 +64,13 @@ echo
 echo "02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present"
 echo "==============================================================================================="
 echo "ENTITIES:"
-postgresCmd -t ftest_t1 -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -87,16 +88,16 @@ Date: REGEX(.*)
 02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
 ===============================================================================================
 ENTITIES:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
-https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,,REGEX(202.*)
 
 
 --TEARDOWN--
