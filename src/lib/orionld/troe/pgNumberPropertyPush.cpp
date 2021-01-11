@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgNumberPropertyPush.h"                 // Own interface
 
 
@@ -47,8 +48,6 @@ bool pgNumberPropertyPush
   const char*  attributeInstance,
   const char*  datasetId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   bool         subProperties,
   const char*  unitCode
 )
@@ -73,30 +72,30 @@ bool pgNumberPropertyPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, datasetId, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, datasetId, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, numberValue, unitCodeString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, valueType, subProperty, datasetId, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, subPropertiesString, datasetId, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, datasetId, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, '%s', %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, numberValue, unitCodeString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, createdAt, modifiedAt, observedAt, valueType, subProperty, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, createdAt, modifiedAt, observedAt, subPropertiesString, numberValue, unitCodeString);
+             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, number, unitCode) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %s, %f, %s)",
+             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, numberValue, unitCodeString);
   }
 
 

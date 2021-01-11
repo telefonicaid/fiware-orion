@@ -52,9 +52,7 @@ bool pgCompoundSubPropertyPush
   const char*  entityId,
   const char*  attributeRef,
   const char*  attributeId,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 )
 {
   int          renderedValueSize   = 4 * 1024;
@@ -74,16 +72,16 @@ bool pgCompoundSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, valueType, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, observedAt, renderedValue);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, renderedValue);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, renderedValue);
+             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
+             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, renderedValue);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

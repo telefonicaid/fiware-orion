@@ -50,8 +50,6 @@ extern bool pgSubAttributePush
   const char*  attributeId,
   const char*  id,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   const char*  unitCode
 );
 

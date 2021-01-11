@@ -48,9 +48,7 @@ extern bool pgGeoSubPropertyPush
   const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 );
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGGEOSUBPROPERTYPUSH_H_

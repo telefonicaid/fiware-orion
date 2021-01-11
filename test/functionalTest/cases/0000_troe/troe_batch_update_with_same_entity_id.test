@@ -88,13 +88,13 @@ echo
 echo "02. See TRoE content - 3 entities, 6 attributes"
 echo "==============================================="
 echo "ENTITIES:"
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -159,13 +159,13 @@ echo
 echo "04. See TRoE content - 3 entities, 12 attributes"
 echo "================================================"
 echo "ENTITIES:"
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -262,13 +262,13 @@ echo
 echo "06. See TRoE content - 3 entities, 18 attributes"
 echo "================================================"
 echo "ENTITIES:"
-postgresCmd -sql "SELECT opMode,id,type,createdAt FROM entities"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -295,22 +295,22 @@ Date: REGEX(.*)
 02. See TRoE content - 3 entities, 6 attributes
 ===============================================
 ENTITIES:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 
 03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
@@ -351,28 +351,28 @@ Date: REGEX(.*)
 04. See TRoE content - 3 entities, 12 attributes
 ================================================
 ENTITIES:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 1: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E1,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 2: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 1: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 
 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
@@ -413,40 +413,39 @@ Date: REGEX(.*)
 06. See TRoE content - 3 entities, 18 attributes
 ================================================
 ENTITIES:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,
-Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 1: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E1,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 2: E1/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,
-Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 1: E1/P3",,
-Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E1,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 2: E1/P3",,
-Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance2:R3:E1,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P2",,
-Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R2:E3,,
-Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P3",,
-Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E3,,
+opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 1: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 1: E1/P3",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 2: E1/P3",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance2:R3:E1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P2",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R2:E3,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P3",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E3,,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
 pgDrop $CB_DB_NAME
-

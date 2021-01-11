@@ -49,7 +49,7 @@ extern "C"
 //
 // pgEntityTreat -
 //
-bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt, TroeMode opMode)
+bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, TroeMode opMode)
 {
   char  entityInstance[80];
   char* entityInstanceP = NULL;
@@ -85,12 +85,12 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
 
   if ((opMode == TROE_ENTITY_CREATE) || (opMode == TROE_ENTITY_REPLACE))
   {
+    const char* opModeString = (opMode == TROE_ENTITY_CREATE)? "Create" : "Replace";
+
     uuidGenerate(entityInstance, sizeof(entityInstance), true);
     entityInstanceP = entityInstance;
-    LM_TMP(("Calling pgEntityPush(%p, '%s', '%s', '%s', '%s', '%s')", connectionP, entityInstanceP, id, type, createdAt, modifiedAt));
 
-    const char* opModeString = (opMode == TROE_ENTITY_CREATE)? "Create" : "Replace";
-    if (pgEntityPush(connectionP, entityInstanceP, id, type, createdAt, modifiedAt, opModeString) == false)
+    if (pgEntityPush(connectionP, entityInstanceP, id, type, opModeString) == false)
       LM_RE(false, ("pgEntityPush failed"));
   }
 
@@ -99,7 +99,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
     if (attrP->type == KjObject)
     {
       LM_TMP(("APPA: Calling pgAttributeTreat with opMode %s", troeMode(opMode)));
-      if (pgAttributeTreat(connectionP, attrP, entityInstanceP, id, createdAt, modifiedAt, opMode) == false)
+      if (pgAttributeTreat(connectionP, attrP, entityInstanceP, id, opMode) == false)
         LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
     }
     else if (attrP->type == KjArray)
@@ -108,7 +108,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, c
       {
         attrInstanceP->name = attrP->name;  // For array items, the name is NULL - the attr name must be taken from the array itself
 
-        if (pgAttributeTreat(connectionP, attrInstanceP, entityInstanceP, id, createdAt, modifiedAt, opMode) == false)
+        if (pgAttributeTreat(connectionP, attrInstanceP, entityInstanceP, id, opMode) == false)
           LM_RE(false, ("pgAttributeTreat(datasets) failed for attribute '%s'", attrP->name));
       }
     }

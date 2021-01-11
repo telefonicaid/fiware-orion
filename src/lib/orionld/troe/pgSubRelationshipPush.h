@@ -43,9 +43,7 @@ extern bool pgSubRelationshipPush
   const char*  attributeRef,
   const char*  attrbiteId,
   const char*  subAttributeName,
-  const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt
+  const char*  observedAt
 );
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGSUBRELATIONSHIPPUSH_H_

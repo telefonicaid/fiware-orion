@@ -44,8 +44,6 @@ extern bool pgAttributePush
   const char*  instanceId,
   const char*  datasetId,
   const char*  observedAt,
-  const char*  createdAt,
-  const char*  modifiedAt,
   bool         subAttrs,
   const char*  unitCode,
   const char*  opMode

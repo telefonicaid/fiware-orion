@@ -89,7 +89,7 @@ for t in t0 t1 t2 t3 t4 t5 t6 t7 t8 t9
 do
   dbName=ftest_$t
   echo "ENTITIES in DB $dbName:"
-  postgresCmd -t $dbName -sql "SELECT opMode,id,type,createdAt FROM entities"
+  postgresCmd -t $dbName -sql "SELECT opMode,id,type,ts FROM entities"
   echo
   echo "ATTRIBUTES in DB $dbName:"
   postgresCmd -t $dbName -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
@@ -159,7 +159,7 @@ Date: REGEX(.*)
 02. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
 ===============================================================================================
 ENTITIES in DB ftest_t0:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t0:
@@ -172,7 +172,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t1:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t1:
@@ -185,7 +185,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t2:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t2:
@@ -198,7 +198,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t3:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t3:
@@ -211,7 +211,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t4:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t4:
@@ -224,7 +224,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t5:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t5:
@@ -237,7 +237,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t6:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t6:
@@ -250,7 +250,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t7:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t7:
@@ -263,7 +263,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t8:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t8:
@@ -276,7 +276,7 @@ https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entitie
 
 
 ENTITIES in DB ftest_t9:
-opmode,id,type,createdat
+opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t9:

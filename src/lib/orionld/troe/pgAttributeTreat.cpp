@@ -54,8 +54,6 @@ bool pgAttributeTreat
   KjNode*      attrP,
   const char*  entityRef,
   const char*  entityId,
-  const char*  createdAt,
-  const char*  modifiedAt,
   TroeMode     opMode
 )
 {
@@ -121,7 +119,7 @@ bool pgAttributeTreat
   //
   const char* opModeString = troeMode(opMode);
   LM_TMP(("APPA: Calling pgAttributePush with opMode %d: '%s'", opMode, opModeString));
-  if (pgAttributePush(connectionP, valueNodeP, attributeType, entityRef, entityId, id, instanceId, datasetId, observedAt, createdAt, modifiedAt, subAttrs, unitCode, opModeString) == false)
+  if (pgAttributePush(connectionP, valueNodeP, attributeType, entityRef, entityId, id, instanceId, datasetId, observedAt, subAttrs, unitCode, opModeString) == false)
   {
     LM_E(("Internal Error (pgAttributePush failed)"));
     return false;
@@ -133,7 +131,7 @@ bool pgAttributeTreat
   for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
     LM_TMP(("TEMP: Got a sub-attr: '%s'", subAttrP->name));
-    if (pgSubAttributeTreat(connectionP, subAttrP, entityRef, entityId, instanceId, id, createdAt, modifiedAt) == false)
+    if (pgSubAttributeTreat(connectionP, subAttrP, entityRef, entityId, instanceId, id) == false)
     {
       LM_E(("Internal Error (pgSubAttributeTreat failed)"));
       return false;

@@ -116,7 +116,7 @@ bool troePostEntities(ConnectionInfo* ciP)
   LM_TMP(("TEMP: Calling pgEntityTreat for entity at %p", entityP));
   char* entityId   = orionldState.payloadIdNode->value.s;
   char* entityType = orionldContextItemExpand(orionldState.contextP, orionldState.payloadTypeNode->value.s, true, NULL);
-  if (pgEntityTreat(connectionP, entityP, entityId, entityType, orionldState.requestTimeString, orionldState.requestTimeString, TROE_ENTITY_CREATE) == false)
+  if (pgEntityTreat(connectionP, entityP, entityId, entityType, TROE_ENTITY_CREATE) == false)
   {
     LM_E(("Database Error (post entities TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)

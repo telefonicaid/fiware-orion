@@ -40,6 +40,6 @@ extern "C"
 //
 // pgEntityTreat -
 //
-extern bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, char* createdAt, char* modifiedAt, TroeMode mode);
+extern bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, TroeMode mode);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGENTITYTREAT_H_

@@ -33,6 +33,6 @@
 //
 // pgEntityPush - push an entity to the database
 //
-extern bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, char* createdAt, char* modifiedAt, const char* opMode);
+extern bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, const char* opMode);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGENTITYPUSH_H_

@@ -84,7 +84,7 @@ bool troePatchAttribute(ConnectionInfo* ciP)
   //
   orionldState.requestTree->name = orionldContextItemExpand(orionldState.contextP, attributeName, true, NULL);  // FIXME: unitCode, datasetId, ... no expansion!!!
 
-  if (pgAttributeTreat(connectionP, orionldState.requestTree, NULL, entityId, orionldState.requestTimeString, orionldState.requestTimeString, TROE_ATTRIBUTE_UPDATE) == false)
+  if (pgAttributeTreat(connectionP, orionldState.requestTree, NULL, entityId, TROE_ATTRIBUTE_UPDATE) == false)
   {
     LM_E(("Database Error (post entities TRoE layer failed)"));
     if (pgTransactionRollback(connectionP) == false)
