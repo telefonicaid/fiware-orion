@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/troe/pgGeoSubPointPush.h"                    // pgGeoSubPointPush
 #include "orionld/troe/pgGeoSubPolygonPush.h"                  // pgGeoSubPolygonPush
 #include "orionld/troe/pgGeoSubLineStringPush.h"               // pgGeoSubLineStringPush
+#include "orionld/troe/pgGeoSubMultiPolygonPush.h"             // pgGeoSubMultiPolygonPush
 #include "orionld/troe/pgGeoSubPropertyPush.h"                 // Own interface
 
 
@@ -75,9 +76,9 @@ bool pgGeoSubPropertyPush
     ok = pgGeoSubPolygonPush(connectionP, coordinatesP, instanceId, entityRef, entityId, attributeRef, attributeId, subAttributeName, observedAt, createdAt, modifiedAt);
   else if (strcmp(geoTypeP->value.s, "LineString") == 0)
     ok = pgGeoSubLineStringPush(connectionP, coordinatesP, instanceId, entityRef, entityId, attributeRef, attributeId, subAttributeName, observedAt, createdAt, modifiedAt);
-#if 0
   else if (strcmp(geoTypeP->value.s, "MultiPolygon") == 0)
     ok = pgGeoSubMultiPolygonPush(connectionP, coordinatesP, instanceId, entityRef, entityId, attributeRef, attributeId, subAttributeName, observedAt, createdAt, modifiedAt);
+#if 0
   else if (strcmp(geoTypeP->value.s, "MultiLineString") == 0)
     ok = pgGeoSubMultiLineStringPush(connectionP, coordinatesP, instanceId, entityRef, entityId, attributeRef, attributeId, subAttributeName, observedAt, createdAt, modifiedAt);
 #endif
