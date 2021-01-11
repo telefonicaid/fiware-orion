@@ -78,7 +78,7 @@ bool pgNumberSubPropertyPush
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
              "instanceId, id, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, valueType, number, unitCode) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %f, %s)",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Number', %f, %s)",
              instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, createdAt, modifiedAt, numberValue, unitCodeString);
   }
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
