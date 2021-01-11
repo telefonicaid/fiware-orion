@@ -304,7 +304,7 @@ jobs:
 
       - name: aggregate
         run: |
-          lcov -a coverage/unit/broker.info -o merged.info
+          lcov -a coverage/unit/broker.info -o coverage/lcov.info
 
       - name: ls
         run: |
@@ -314,4 +314,3 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: merged.info
