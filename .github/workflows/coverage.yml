@@ -263,7 +263,7 @@ jobs:
 
 
   aggregate-report:
-    needs: [unit]
+    needs: [unit, functional-part1, functional-part2, functional-part3, functional-part4]
 
     runs-on: ubuntu-18.04
 
