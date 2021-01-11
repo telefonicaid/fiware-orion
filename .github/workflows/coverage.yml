@@ -1,10 +1,7 @@
 name: Test with coverage
 
 on:
-  push:
   pull_request:
-    branches:
-      - develop
 
 env:
   IMAGE_NAME: localhost:5000/orion-ld-test:latest
@@ -256,7 +253,7 @@ jobs:
 
       - name: Run unit test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s unit -dqtC
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s unit -qtC
 
       - name: Upload coverage-report
         uses: actions/upload-artifact@v2

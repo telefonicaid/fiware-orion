@@ -2,9 +2,6 @@ name: Functional Test
 
 on:
   push:
-  pull_request:
-    branches:
-      - develop
 
 env:
   IMAGE_NAME: localhost:5000/orion-ld-test:latest
