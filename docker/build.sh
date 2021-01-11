@@ -278,7 +278,7 @@ fi
 
 # ===================================== UNIT TESTS =====================================================================
 
-if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
+if [[ -n "${TEST}" && "${STAGE}" = "unit" && "${COVERAGE}" != "true"  ]]; then
 
     echo "Builder: unit test started"
 
@@ -305,7 +305,7 @@ fi
 
 # ===================================== FUNCTIONAL TESTS ===============================================================
 
-if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
+if [[ -n "${TEST}" && "${STAGE}" = "functional" && "${COVERAGE}" != "true" ]]; then
 
     echo "Builder: functional test started"
 
