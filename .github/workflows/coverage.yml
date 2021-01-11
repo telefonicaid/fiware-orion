@@ -310,7 +310,8 @@ jobs:
         run: |
           cat merged.info
 
-      - uses: romeovs/lcov-reporter-action@v0.2.16
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: merged.info
+          path-to-lcov: merged.info
