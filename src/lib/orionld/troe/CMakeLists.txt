@@ -80,6 +80,7 @@ SET (SOURCES
     pgGeoSubPropertyPush.cpp
     pgGeoSubPointPush.cpp
     pgGeoSubPolygonPush.cpp
+    pgGeoSubLineStringPush.cpp
 )
 
 SET (HEADERS
@@ -139,6 +140,7 @@ SET (HEADERS
     pgGeoSubPropertyPush.h
     pgGeoSubPointPush.h
     pgGeoSubPolygonPush.h
+    pgGeoSubLineStringPush.h
 )
 
 
