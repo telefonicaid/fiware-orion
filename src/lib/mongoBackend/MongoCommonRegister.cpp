@@ -120,12 +120,7 @@ HttpStatusCode processRegisterContext
   reg.append(REG_SERVICE_PATH, servicePath.empty() ? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
-
-  //
-  // We accumulate the subscriptions in a map. The key of the map is the string representing subscription id
-  // 'triggerEntitiesV' is used to define which entities to include in notifications
-  //
-  BSONArrayBuilder                               contextRegistration;
+  BSONArrayBuilder  contextRegistration;
 
   for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix)
   {
