@@ -24,6 +24,13 @@ jobs:
         ports:
           - 1883:1883
           - 9001:9001
+      postgres:
+        image: postgis/postgis:12-3.1-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
       mongodb:
         image: mongo:4.0
         ports:
@@ -49,7 +56,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_0_450 -dqt
+          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_0_431 -dqt
 
   functional-part2:
     runs-on: ubuntu-18.04
@@ -59,6 +66,22 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        ports:
+          - 1883:1883
+          - 9001:9001
+      postgres:
+        image: postgis/postgis:12-3.1-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
@@ -80,7 +103,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_451_700 -dqt
+          docker run --rm -v $(pwd):/opt/orion --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_432_746 -dqt
 
   functional-part3:
     runs-on: ubuntu-18.04
@@ -90,6 +113,22 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        ports:
+          - 1883:1883
+          - 9001:9001
+      postgres:
+        image: postgis/postgis:12-3.1-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
@@ -111,7 +150,7 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_701_1000 -dqt
+          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_747_1105 -dqt
 
   functional-part4:
     runs-on: ubuntu-18.04
@@ -121,6 +160,22 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        ports:
+          - 1883:1883
+          - 9001:9001
+      postgres:
+        image: postgis/postgis:12-3.1-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
@@ -142,4 +197,4 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts ${{ env.IMAGE_NAME }} -s functional_1001_1400 -dqt
+          docker run --rm --network host -e CB_FT_VERBOSE=true -e CB_SKIP_FUNC_TESTS='${{ env.IGNORE_TEST}}' -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON ${{ env.IMAGE_NAME }} -s functional_1106_1400 -dqt
