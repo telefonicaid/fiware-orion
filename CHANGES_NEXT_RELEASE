@@ -3,4 +3,6 @@
 - Fix: crash on MHD_REQUEST_TERMINATED_CLIENT_ABORT situations (#3738)
 - Upgrade Dockerfile base image from centos7.7.1908 to centos7.9.2009
 - FIX BUG: Create normal files as 644 permissions for assure backup tools take configuration files
+- Fix: avoid over-requesting to CPrs attributes that has been filtered out (#3745)
+- Fix: avoid spureous entities spurious entities (eg. '{"id": "E", "type": "T"}') in GET /v2/entities responses
 - Remove: NGSIv1 context availability subscriptions
