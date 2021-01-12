@@ -1,0 +1,18 @@
+name: Test the coverage publis
+
+on:
+  push:
+
+jobs:
+  publish:
+    - uses: actions/checkout@v2
+
+    - name: adjust
+      run: |
+        sed -i 's/\/opt\/orion/./' broker.info
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ${{ github.workspace }}/broker.info
