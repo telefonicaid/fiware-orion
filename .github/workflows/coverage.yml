@@ -269,6 +269,7 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
+      - uses: actions/checkout@v2
 #      - name: download func1-coverage
 #        uses: actions/download-artifact@v2
 #        with:
@@ -316,4 +317,3 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ${{ github.workspace }}/lcov.info
-          base-path: ${{ github.workspace }}
