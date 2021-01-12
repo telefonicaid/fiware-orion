@@ -44,7 +44,6 @@ extern bool pgAttributeTreat
 (
   PGconn*      connectionP,
   KjNode*      attrP,
-  const char*  entityRef,
   const char*  entityId,
   TroeMode     opMode
 );

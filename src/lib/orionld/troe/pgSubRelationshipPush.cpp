@@ -42,9 +42,7 @@ bool pgSubRelationshipPush
   PGconn*      connectionP,
   const char*  instanceId,
   const char*  object,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
   const char*  observedAt
@@ -59,16 +57,16 @@ bool pgSubRelationshipPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Relationship', '%s')",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, object);
+             "instanceId, id, entityId, attributeId, ts, observedAt, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Relationship', '%s')",
+             instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, observedAt, object);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Relationship', '%s')",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, object);
+             "instanceId, id, entityId, attributeId, ts, valueType, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Relationship', '%s')",
+             instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, object);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

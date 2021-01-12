@@ -51,15 +51,6 @@ extern "C"
 //
 bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, TroeMode opMode)
 {
-  char  entityInstance[80];
-  char* entityInstanceP = NULL;
-
-  // <DEBUG>
-  char buf[1024];
-  kjRender(orionldState.kjsonP, entityP, buf, sizeof(buf));
-  LM_TMP(("TEMP: entityP: %s", buf));
-  // </DEBUG>
-
   if (id == NULL)  // Find the entity id in the entity tree
   {
     KjNode* nodeP = kjLookup(entityP, "id");
@@ -86,11 +77,11 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, T
   if ((opMode == TROE_ENTITY_CREATE) || (opMode == TROE_ENTITY_REPLACE))
   {
     const char* opModeString = (opMode == TROE_ENTITY_CREATE)? "Create" : "Replace";
+    char        entityInstance[80];
 
     uuidGenerate(entityInstance, sizeof(entityInstance), true);
-    entityInstanceP = entityInstance;
 
-    if (pgEntityPush(connectionP, entityInstanceP, id, type, opModeString) == false)
+    if (pgEntityPush(connectionP, entityInstance, id, type, opModeString) == false)
       LM_RE(false, ("pgEntityPush failed"));
   }
 
@@ -99,7 +90,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, T
     if (attrP->type == KjObject)
     {
       LM_TMP(("APPA: Calling pgAttributeTreat with opMode %s", troeMode(opMode)));
-      if (pgAttributeTreat(connectionP, attrP, entityInstanceP, id, opMode) == false)
+      if (pgAttributeTreat(connectionP, attrP, id, opMode) == false)
         LM_RE(false, ("pgAttributeTreat failed for attribute '%s'", attrP->name));
     }
     else if (attrP->type == KjArray)
@@ -108,7 +99,7 @@ bool pgEntityTreat(PGconn* connectionP, KjNode* entityP, char* id, char* type, T
       {
         attrInstanceP->name = attrP->name;  // For array items, the name is NULL - the attr name must be taken from the array itself
 
-        if (pgAttributeTreat(connectionP, attrInstanceP, entityInstanceP, id, opMode) == false)
+        if (pgAttributeTreat(connectionP, attrInstanceP, id, opMode) == false)
           LM_RE(false, ("pgAttributeTreat(datasets) failed for attribute '%s'", attrP->name));
       }
     }

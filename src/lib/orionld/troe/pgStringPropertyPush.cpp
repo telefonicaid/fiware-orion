@@ -42,7 +42,6 @@ bool pgStringPropertyPush
   PGconn*      connectionP,
   const char*  opMode,
   const char*  value,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,
@@ -61,30 +60,30 @@ bool pgStringPropertyPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, value);
+             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, value);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, value);
+             "opMode, instanceId, id, entityId, ts, valueType, subProperties, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, value);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, value);
+             "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'String', %s, '%s', '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, value);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, value);
+             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', %s, '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, value);
   }
 
 

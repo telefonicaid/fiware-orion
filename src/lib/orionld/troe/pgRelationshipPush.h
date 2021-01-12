@@ -38,7 +38,6 @@ extern bool pgRelationshipPush
   PGconn*      connectionP,
   const char*  opMode,
   const char*  object,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,

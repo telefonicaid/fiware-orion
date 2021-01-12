@@ -50,9 +50,7 @@ bool pgSubAttributeTreat
 (
   PGconn*      connectionP,
   KjNode*      subAttrP,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId
 )
 {
@@ -90,7 +88,7 @@ bool pgSubAttributeTreat
 
   // Push the sub-attribute to DB
   LM_TMP(("TEMP: Push the sub-attribute '%s' to DB", subAttrP->name));
-  if (pgSubAttributePush(connectionP, valueNodeP, instanceId, subAttributeType, entityRef, entityId, attributeRef, attributeId, subAttrP->name, observedAt, unitCode) == false)
+  if (pgSubAttributePush(connectionP, valueNodeP, instanceId, subAttributeType, entityId, attributeId, subAttrP->name, observedAt, unitCode) == false)
   {
     LM_E(("Internal Error (pgAttributePush failed)"));
     return false;

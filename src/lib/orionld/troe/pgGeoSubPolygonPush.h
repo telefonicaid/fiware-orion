@@ -43,9 +43,7 @@ extern bool pgGeoSubPolygonPush
   PGconn*      connectionP,
   KjNode*      coordinatesP,
   const char*  instanceId,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
   const char*  observedAt

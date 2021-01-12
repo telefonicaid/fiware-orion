@@ -51,7 +51,6 @@ bool pgGeoPropertyPush
   PGconn*      connectionP,
   const char*  opMode,
   KjNode*      valueNodeP,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,
@@ -71,15 +70,15 @@ bool pgGeoPropertyPush
 
 
   if (strcmp(geoTypeP->value.s, "Point") == 0)
-    ok = pgGeoPointPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
+    ok = pgGeoPointPush(connectionP, opMode, coordinatesP, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
   else if (strcmp(geoTypeP->value.s, "Polygon") == 0)
-    ok = pgGeoPolygonPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
+    ok = pgGeoPolygonPush(connectionP, opMode, coordinatesP, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
   else if (strcmp(geoTypeP->value.s, "MultiPolygon") == 0)
-    ok = pgGeoMultiPolygonPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
+    ok = pgGeoMultiPolygonPush(connectionP, opMode, coordinatesP, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
   else if (strcmp(geoTypeP->value.s, "LineString") == 0)
-    ok = pgGeoLineStringPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
+    ok = pgGeoLineStringPush(connectionP, opMode, coordinatesP, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
   else if (strcmp(geoTypeP->value.s, "MultiLineString") == 0)
-    ok = pgGeoMultiLineStringPush(connectionP, opMode, coordinatesP, entityRef, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
+    ok = pgGeoMultiLineStringPush(connectionP, opMode, coordinatesP, entityId, attributeName, attributeInstance, datasetId, observedAt, subProperties);
   else
     LM_RE(false, ("Bad Input (invalid geometry for GeoProperty: %s)", geoTypeP->value.s));
 

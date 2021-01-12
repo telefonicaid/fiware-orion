@@ -43,7 +43,6 @@ extern bool pgGeoLineStringPush
   PGconn*      connectionP,
   const char*  opMode,
   KjNode*      coordinatesP,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,

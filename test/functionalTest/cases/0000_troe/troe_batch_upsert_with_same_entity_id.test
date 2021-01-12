@@ -102,7 +102,7 @@ echo
 
 echo "04. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo
 
@@ -164,7 +164,7 @@ echo
 
 echo "09. See the attributes in the temporal database - note the new ones, replacing the older ones"
 echo "============================================================================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo
 
@@ -233,7 +233,7 @@ Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,R
 
 04. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)
@@ -313,7 +313,7 @@ Replace,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,R
 
 09. See the attributes in the temporal database - note the new ones, replacing the older ones
 =============================================================================================
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 2: E1/P2",,,REGEX(202.*)
 Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 3: E1/P3",,,REGEX(202.*)

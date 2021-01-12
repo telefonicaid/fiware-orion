@@ -67,7 +67,7 @@ echo "ENTITIES:"
 postgresCmd -t ftest_t1 -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
 postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
@@ -92,7 +92,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
 
 SUB-ATTRIBUTES:

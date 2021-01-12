@@ -38,7 +38,6 @@ extern bool pgAttributePush
   PGconn*      connectionP,
   KjNode*      valueNodeP,
   const char*  attributeType,
-  const char*  entityRef,
   const char*  entityId,
   const char*  id,
   const char*  instanceId,

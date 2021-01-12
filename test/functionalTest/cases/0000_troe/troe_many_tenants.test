@@ -92,7 +92,7 @@ do
   postgresCmd -t $dbName -sql "SELECT opMode,id,type,ts FROM entities"
   echo
   echo "ATTRIBUTES in DB $dbName:"
-  postgresCmd -t $dbName -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+  postgresCmd -t $dbName -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean FROM attributes"
   echo
   echo "SUB-ATTRIBUTES in DB $dbName:"
   postgresCmd -t $dbName -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
@@ -163,7 +163,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t0:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t0:
@@ -176,7 +176,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t1:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t1:
@@ -189,7 +189,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t2:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t2:
@@ -202,7 +202,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t3:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t3:
@@ -215,7 +215,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t4:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t4:
@@ -228,7 +228,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t5:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t5:
@@ -241,7 +241,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t6:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t6:
@@ -254,7 +254,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t7:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t7:
@@ -267,7 +267,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t8:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t8:
@@ -280,7 +280,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES in DB ftest_t9:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES in DB ftest_t9:

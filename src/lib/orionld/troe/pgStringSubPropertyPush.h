@@ -38,9 +38,7 @@ extern bool pgStringSubPropertyPush
   PGconn*      connectionP,
   const char*  instanceId,
   const char*  stringValue,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
   const char*  observedAt

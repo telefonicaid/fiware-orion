@@ -48,7 +48,6 @@ bool pgGeoMultiPolygonPush
   PGconn*      connectionP,
   const char*  opMode,
   KjNode*      coordinatesP,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,
@@ -79,30 +78,30 @@ bool pgGeoMultiPolygonPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityRef, entityId, observedAt, valueType, subProperty, datasetId, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, observedAt, subPropertiesString, datasetId, coordsString);
+             "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, datasetId, geoMultiPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, datasetId, coordsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityRef, entityId, valueType, subProperty, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, subPropertiesString, coordsString);
+             "opMode, ts, instanceId, id, entityId, valueType, subProperties, geoMultiPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, coordsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityRef, entityId, valueType, subProperty, datasetId, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, subPropertiesString, datasetId, coordsString);
+             "opMode, ts, instanceId, id, entityId, valueType, subProperties, datasetId, geoMultiPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, '%s', ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, subPropertiesString, datasetId, coordsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, ts, instanceId, id, entityRef, entityId, observedAt, valueType, subProperty, geoMultiPolygon) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
-             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityRef, entityId, observedAt, subPropertiesString, coordsString);
+             "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoMultiPolygon) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiPolygon', %s, ST_GeomFromText('MULTIPOLYGON(%s)', 4267))",
+             opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, coordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

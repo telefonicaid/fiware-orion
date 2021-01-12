@@ -43,9 +43,7 @@ bool pgBoolSubPropertyPush
   const char*  subAttributeName,
   const char*  instanceId,
   bool         boolValue,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId,
   const char*  observedAt
 )
@@ -58,16 +56,16 @@ bool pgBoolSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, observedAt, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, observedAt, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityId, attributeId, ts, observedAt, valueType, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
+             instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, observedAt, (boolValue == true)? "true" : "false");
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityRef, entityId, attributeRef, attributeId, ts, valueType, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
-             instanceId, subAttributeName, entityRef, entityId, attributeRef, attributeId, orionldState.requestTimeString, (boolValue == true)? "true" : "false");
+             "instanceId, id, entityId, attributeId, ts, valueType, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Boolean', %s)",
+             instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, (boolValue == true)? "true" : "false");
   }
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
 
