@@ -348,7 +348,7 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" && -n "${COVERAGE}" ]]; then
 
     mkdir -p coverage
     lcov -i --zerocounters --directory BUILD_COVERAGE/
-    lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
+    lcov --capture --initial --directory BUILD_COVERAGE --output-file coverage/broker.init.info
 
     . scripts/testEnv.sh
 
@@ -360,7 +360,7 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" && -n "${COVERAGE}" ]]; then
 
     # Generate test report
     echo "Generating coverage report"
-    lcov --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info
+    lcov --directory BUILD_COVERAGE --capture --output-file coverage/broker.test.info
     lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
     lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
     lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
