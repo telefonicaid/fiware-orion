@@ -350,13 +350,13 @@ coverage_unit_test: build_unit_test
 	echo "Initializing coverage files"
 	mkdir -p coverage
 	lcov -i --zerocounters --directory BUILD_UNITTEST/
-	lcov --capture --initial --directory BUILD_UNITTEST -b BUILD_UNITTEST --output-file coverage/broker.init.info
+	lcov --capture --initial --directory BUILD_UNITTEST --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
 	BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
 	# Generate test report
 	echo "Generating coverage report"
-	lcov --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
+	lcov --directory BUILD_UNITTEST --capture --output-file coverage/broker.test.info
 	lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
 	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info

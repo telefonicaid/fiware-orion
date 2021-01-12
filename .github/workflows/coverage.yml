@@ -307,9 +307,9 @@ jobs:
         run: |
           lcov -a coverage/unit/broker.info -o coverage/lcov.info
 
-      - name: ls
+      - name: adjust
         run: |
-          ls
+          sed -i 's/\/opt\/orion/./' coverage/lcov.info
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
