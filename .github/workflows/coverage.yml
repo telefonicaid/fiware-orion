@@ -1,6 +1,7 @@
 name: Test with coverage
 
 on:
+  push:
   pull_request:
 
 env:
