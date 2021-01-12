@@ -11,7 +11,7 @@ jobs:
 
       - name: adjust
         run: |
-          sed -i 's/\/opt\/orion/./' broker.info
+          sed -i 's/\/opt\/orion//' broker.info
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
