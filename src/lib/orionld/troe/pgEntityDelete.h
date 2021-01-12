@@ -33,6 +33,6 @@
 //
 // pgEntityDelete - mark an entity as deleted in the database
 //
-extern bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id, char* deletedAt);
+extern bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id);
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGENTITYDELETE_H_

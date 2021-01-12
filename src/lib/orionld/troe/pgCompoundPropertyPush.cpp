@@ -49,7 +49,6 @@ bool pgCompoundPropertyPush
   PGconn*      connectionP,
   const char*  opMode,
   KjNode*      compoundValueNodeP,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,
@@ -76,30 +75,30 @@ bool pgCompoundPropertyPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, renderedValue);
+             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, renderedValue);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, renderedValue);
+             "opMode, instanceId, id, entityId, ts, valueType, subProperties, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, renderedValue);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, datasetId, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, renderedValue);
+             "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s', '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, renderedValue);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sqlSize, "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, text) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, renderedValue);
+             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, text) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', %s, '%s')",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, renderedValue);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

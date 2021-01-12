@@ -75,7 +75,7 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,number,unitCode,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,number,unitCode,observedAt FROM attributes"
 echo
 echo
 
@@ -126,7 +126,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperty,number,unitcode,observedat
+opmode,id,valuetype,entityid,subproperties,number,unitcode,observedat
 Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entities:E1,t,77,milliseconds,2021-01-08 13:15:17.123
 
 

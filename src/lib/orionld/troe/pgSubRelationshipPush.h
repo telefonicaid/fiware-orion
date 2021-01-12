@@ -38,9 +38,7 @@ extern bool pgSubRelationshipPush
   PGconn*      connectionP,
   const char*  instanceId,
   const char*  object,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attrbiteId,
   const char*  subAttributeName,
   const char*  observedAt

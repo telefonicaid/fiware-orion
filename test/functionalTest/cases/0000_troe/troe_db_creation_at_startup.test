@@ -74,7 +74,7 @@ echo "ENTITIES:"
 postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
 postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
@@ -96,7 +96,7 @@ echo "ENTITIES:"
 postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
 postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
@@ -132,7 +132,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES:
@@ -151,7 +151,7 @@ opmode,id,type,ts
 Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
 
 SUB-ATTRIBUTES:

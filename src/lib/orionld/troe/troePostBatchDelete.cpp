@@ -60,7 +60,7 @@ bool troePostBatchDelete(ConnectionInfo* ciP)
     char  instanceId[80];
     uuidGenerate(instanceId, sizeof(instanceId), true);
 
-    if (pgEntityDelete(connectionP, instanceId, entityIdP->value.s, orionldState.requestTimeString) == false)
+    if (pgEntityDelete(connectionP, instanceId, entityIdP->value.s) == false)
     {
       LM_E(("Database Error (batch delete entities TRoE layer failed)"));
       allGood = false;

@@ -59,7 +59,7 @@ bool troeDeleteEntity(ConnectionInfo* ciP)
   char  instanceId[80];
   uuidGenerate(instanceId, sizeof(instanceId), true);
 
-  if (pgEntityDelete(connectionP, instanceId, entityId, orionldState.requestTimeString) == false)
+  if (pgEntityDelete(connectionP, instanceId, entityId) == false)
   {
     LM_E(("Database Error (delete entities troe layer failed)"));
     if (pgTransactionRollback(connectionP) == false)

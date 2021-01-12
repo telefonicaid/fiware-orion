@@ -42,9 +42,7 @@ extern bool pgSubAttributeTreat
 (
   PGconn*      connectionP,
   KjNode*      subAttrP,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId
 );
 

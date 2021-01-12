@@ -91,7 +91,7 @@ echo "ENTITIES:"
 postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
 postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
@@ -162,7 +162,7 @@ echo "ENTITIES:"
 postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
 postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
@@ -265,7 +265,7 @@ echo "ENTITIES:"
 postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
 echo
 echo "ATTRIBUTES:"
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperty,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
 postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
@@ -301,7 +301,7 @@ Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
@@ -357,7 +357,7 @@ Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
@@ -419,7 +419,7 @@ Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,RE
 Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
 
 ATTRIBUTES:
-opmode,id,valuetype,entityid,subproperty,unitcode,datasetid,text,number,boolean,ts
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)

@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/troe/pgEntityDelete.h"                       // Own interface
 
 
@@ -35,12 +36,12 @@
 //
 // pgEntityDelete - mark an entity as deleted in the database
 //
-bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id, char* deletedAt)
+bool pgEntityDelete(PGconn* connectionP, char* instanceId, char* id)
 {
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', 'Delete', 'NULL', '%s')", instanceId, id, deletedAt);
+  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', 'Delete', '%s', 'NULL')", instanceId, orionldState.requestTimeString, id);
   LM_TMP(("SQL[%p]: %s", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)

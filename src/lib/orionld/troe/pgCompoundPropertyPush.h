@@ -43,7 +43,6 @@ extern bool pgCompoundPropertyPush
   PGconn*      connectionP,
   const char*  opMode,
   KjNode*      compoundValueNodeP,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,

@@ -41,7 +41,7 @@ bool pgEntityPush(PGconn* connectionP, char* instanceId, char* id, char* type, c
   char       sql[512];
   PGresult*  res;
 
-  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s')", instanceId, id, opMode, type, orionldState.requestTimeString);
+  snprintf(sql, sizeof(sql), "INSERT INTO entities VALUES ('%s', '%s', '%s', '%s', '%s')", instanceId, orionldState.requestTimeString, opMode, id, type);
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));
   res = PQexec(connectionP, sql);
   if (res == NULL)

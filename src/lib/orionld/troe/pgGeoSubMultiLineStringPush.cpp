@@ -48,9 +48,7 @@ bool pgGeoSubMultiLineStringPush
   PGconn*      connectionP,
   KjNode*      coordinatesP,
   const char*  instanceId,
-  const char*  entityRef,
   const char*  entityId,
-  const char*  attributeRef,
   const char*  attributeId,
   const char*  subAttributeName,
   const char*  observedAt
@@ -77,16 +75,16 @@ bool pgGeoSubMultiLineStringPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, ts, id, entityRef, entityId, attributeRef, attributeId, observedAt, valueType, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
-             instanceId, orionldState.requestTimeString, subAttributeName, entityRef, entityId, attributeRef, attributeId, observedAt, coordsString);
+             "instanceId, ts, id, entityId, attributeId, observedAt, valueType, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attributeId, observedAt, coordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, ts, id, entityRef, entityId, attributeRef, attributeId, valueType, geoMultiLineString) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
-             instanceId, orionldState.requestTimeString, subAttributeName, entityRef, entityId, attributeRef, attributeId, coordsString);
+             "instanceId, ts, id, entityId, attributeId, valueType, geoMultiLineString) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
+             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attributeId, coordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

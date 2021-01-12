@@ -42,7 +42,6 @@ bool pgBoolPropertyPush
   PGconn*      connectionP,
   const char*  opMode,
   bool         value,
-  const char*  entityRef,
   const char*  entityId,
   const char*  attributeName,
   const char*  attributeInstance,
@@ -62,30 +61,30 @@ bool pgBoolPropertyPush
   if ((datasetId != NULL) && (observedAt != NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, datasetId, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, boolValueAsString);
+             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, datasetId, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, datasetId, boolValueAsString);
   }
   else if ((datasetId == NULL) && (observedAt == NULL))
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, boolValueAsString);
+             "opMode, instanceId, id, entityId, ts, valueType, subProperties, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, boolValueAsString);
   }
   else if (datasetId != NULL)  // observedAt == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, valueType, subProperty, datasetId, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, boolValueAsString);
+             "opMode, instanceId, id, entityId, ts, valueType, subProperties, datasetId, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'Boolean', %s, '%s', %s)",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, subPropertiesString, datasetId, boolValueAsString);
   }
   else  // observedAt != NULL, datasetId == NULL
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
-             "opMode, instanceId, id, entityRef, entityId, ts, observedAt, valueType, subProperty, boolean) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
-             opMode, attributeInstance, attributeName, entityRef, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, boolValueAsString);
+             "opMode, instanceId, id, entityId, ts, observedAt, valueType, subProperties, boolean) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Boolean', %s, %s)",
+             opMode, attributeInstance, attributeName, entityId, orionldState.requestTimeString, observedAt, subPropertiesString, boolValueAsString);
   }
 
 
