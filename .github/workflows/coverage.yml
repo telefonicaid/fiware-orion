@@ -305,14 +305,14 @@ jobs:
 
       - name: aggregate
         run: |
-          lcov -a coverage/unit/broker.info -o coverage/lcov.info
+          lcov -a coverage/unit/broker.info -o lcov.info
 
       - name: adjust
         run: |
-          sed -i 's/\/opt\/orion/./' coverage/lcov.info
+          sed -i 's/\/opt\/orion/./' lcov.info
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ${{ github.workspace }}/coverage/lcov.info
+          path-to-lcov: ${{ github.workspace }}/lcov.info
