@@ -218,6 +218,9 @@ Fields:
         The JSON for each attribute contains **name** and **type**.
     -   **providingApplication**: the URL of the providing application
         for this registration (mandatory)
+    -   **mode**: the forwarding mode supported by the provider, either:
+        `all`, `query`, `update` or `none`. If ommited (Orion versions
+        previous to 2.6.0), `all` is assumed.
 
 Example document:
 
@@ -250,7 +253,8 @@ Example document:
                    "type": "TA2"
                }
            ],
-           "providingApplication": "http://foo.bar/notif"
+           "providingApplication": "http://foo.bar/notif",
+           "mode": "all"
       },
       "status": "active"
   ]

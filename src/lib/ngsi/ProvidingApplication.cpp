@@ -43,6 +43,7 @@ ProvidingApplication::ProvidingApplication()
   /* It is better to have a default constructor than to leave mimeType with a random value */
   string         = "";
   providerFormat = PfJson;
+  //forwardingMode = ngsiv2::ForwardAll; FIXME PR: realy needed?
 }
 
 

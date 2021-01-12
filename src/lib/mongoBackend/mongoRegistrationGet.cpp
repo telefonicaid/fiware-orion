@@ -84,11 +84,8 @@ static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 
-  //
-  // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
-  // into account for them).
-  //
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
+  regP->provider.supportedForwardingMode =
+      ngsiv2::stringToForwardingMode(r.hasField(REG_FOWARDING_MODE)? getStringField(r, REG_FOWARDING_MODE) : "all");
 
   std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
   if (format == "JSON")

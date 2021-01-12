@@ -148,7 +148,8 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   contextRegistration.append(
     BSON(REG_ENTITIES              << entities.arr() <<
          REG_ATTRS                 << attrs.arr()    <<
-         REG_PROVIDING_APPLICATION << regP->provider.http.url));
+         REG_PROVIDING_APPLICATION << regP->provider.http.url <<
+         REG_FOWARDING_MODE        << forwardingModeToString(regP->provider.supportedForwardingMode)));
 
   bobP->append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 }
