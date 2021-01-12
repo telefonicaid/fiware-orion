@@ -303,10 +303,7 @@ std::string getEntities
   }
 
   // Get attrs and metadata filters from URL params
-  // Note we cannot set the attrs filter on &parseDataP->qcr.res.attrsFilterList given that parameter is used for querying on DB
-  // and some .test would break. We use a fresh variable (attributeFilter) for that
-  StringList attributeFilter;
-  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &attributeFilter);
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
@@ -331,8 +328,10 @@ std::string getEntities
     }
     else
     {
+      // Filtering again attributes may seem redundant, but it will prevent
+      // that faulty CPrs inject attributes not requested by client
       TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
-                                            attributeFilter.stringV,
+                                            parseDataP->qcr.res.attrsList.stringV,
                                             false,
                                             parseDataP->qcr.res.metadataList.stringV));
       ciP->httpStatusCode = SccOk;
