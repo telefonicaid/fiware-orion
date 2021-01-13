@@ -81,7 +81,7 @@ static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
 
   while (nb < dataLen)
   {
-    int sz = read(fd, &dataP[sz], dataLen - sz);
+    int sz = read(fd, &dataP[sz], dataLen - nb);
     if (sz == -1)
       LM_RE(-1, ("error reading from Socket Service connection"));
     else if (sz == 0)
