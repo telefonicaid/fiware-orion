@@ -1,6 +1,5 @@
 FROM centos:centos7.9.2009
 
-ADD mongodb.repo /etc/yum.repos.d/
 ADD build.sh /opt/bin/
 ADD build-dep.sh /opt/bin/
 ADD makefile /opt/archive/
