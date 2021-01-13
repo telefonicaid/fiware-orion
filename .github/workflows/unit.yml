@@ -24,4 +24,4 @@ jobs:
 
       - name: Run functional test
         run: |
-          docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit
+          docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqdts unit
