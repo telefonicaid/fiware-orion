@@ -35,6 +35,7 @@ yum -y install \
   openssl-devel \
   libuuid-devel \
   make \
+  mongodb-org \
   mongodb-org-shell \
   nc \
   python \
