@@ -45,6 +45,7 @@ function style_check
   fi
 }
 
+style_check src/lib/orionld/socketService
 style_check src/lib/orionld/common
 style_check src/lib/orionld/context
 style_check src/lib/orionld/db

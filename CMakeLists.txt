@@ -186,6 +186,7 @@ SET (ORION_LIBS
     orionld_mongoCppLegacy
     orionld_db
     orionld_mongoBackend
+    orionld_socketService
 
     serviceRoutines
     serviceRoutinesV2
@@ -329,6 +330,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
+  ADD_SUBDIRECTORY(src/lib/orionld/socketService)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/orionld/temporal)
