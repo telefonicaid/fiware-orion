@@ -154,16 +154,18 @@ void socketServiceRun(int listenFd)
     FD_ZERO(&rFds);
     if (fd != -1)
     {
+      LM_TMP(("Adding fd %d to the select fd set", fd));
       FD_SET(fd, &rFds);
       fdMax = fd;
     }
     else
     {
+      LM_TMP(("Adding listen-fd %d to the select fd set", listenFd));
       FD_SET(listenFd, &rFds);
       fdMax = listenFd;
     }
 
-    fds = select(fdMax, &rFds, NULL, NULL, &tv);
+    fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
     if ((fds == -1) && (errno != EINTR))
       LM_RVE(("select error for socket service: %s", strerror(errno)));
 
