@@ -65,6 +65,6 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ steps.increment-semver-minor.outputs.version }}${{ env.IMAGE_TAG_PRE }}
           file: docker/Dockerfile
-          
+
       - name: Push
         run: docker push ${{ env.IMAGE_NAME }}:${{ steps.increment-semver-minor.outputs.version }}${{ env.IMAGE_TAG_PRE }}
