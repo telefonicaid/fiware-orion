@@ -40,9 +40,9 @@
 //
 typedef struct SsHeader
 {
-  unsigned char  msgCode;
-  unsigned char  options;
-  unsigned short dataLen;
+  unsigned short msgCode;
+  unsigned short options;
+  unsigned int   dataLen;
 } SsHeader;
 
 
@@ -81,9 +81,9 @@ static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
 
   while (nb < dataLen)
   {
-    int sz = read(fd, &dataP[sz], dataLen - nb);
+    int sz = read(fd, &dataP[nb], dataLen - nb);
     if (sz == -1)
-      LM_RE(-1, ("error reading from Socket Service connection"));
+      LM_RE(-1, ("error reading from Socket Service connection: %s", strerror(errno)));
     else if (sz == 0)
     {
       LM_TMP(("SS: connection closed"));
@@ -92,6 +92,8 @@ static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
     }
     nb += sz;
   }
+
+  dataP[nb] = 0;
 
   return nb;
 }
@@ -137,9 +139,9 @@ static void ssTreat(int fd, SsHeader* headerP, char* dataP)
 //
 void socketServiceRun(int listenFd)
 {
-  int   fd = -1;
-  int   dataLen = 16 * 1024;  // If more is needed, realloc is used
-  char* dataP   = (char*) malloc(dataLen + 1);
+  int            fd      = -1;
+  unsigned int   dataLen = 16 * 1024;  // If more is needed, realloc is used
+  char*          dataP   = (char*) malloc(dataLen + 1);
 
   if (dataP == NULL)
     LM_RVE(("error allocating Socket Service buffer of %d bytes: %s", dataLen, strerror(errno)));
