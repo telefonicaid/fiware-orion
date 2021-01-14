@@ -22,17 +22,19 @@
 *
 * Author: Ken Zangelin and Gabriel Quaresma
 */
-#include <stdio.h>                           // printf, fprintf, stderr, ...
-#include <unistd.h>                          // write
-#include <errno.h>                           // errno
-#include <string.h>                          // strerror
-#include <stdlib.h>                          // exit
-#include <stddef.h>                          // NULL
-#include <strings.h>                         // bzero
-#include <sys/types.h>                       // types
-#include <sys/socket.h>                      // socket
-#include <netinet/in.h>                      // sockaddr_in
-#include <netdb.h>                           // struct hostent
+#include <stdio.h>                                      // printf, fprintf, stderr, ...
+#include <unistd.h>                                     // write
+#include <errno.h>                                      // errno
+#include <string.h>                                     // strerror
+#include <stdlib.h>                                     // exit
+#include <stddef.h>                                     // NULL
+#include <strings.h>                                    // bzero
+#include <sys/types.h>                                  // types
+#include <sys/socket.h>                                 // socket
+#include <netinet/in.h>                                 // sockaddr_in
+#include <netdb.h>                                      // struct hostent
+
+#include "orionld/socketService/socketService.h"        // SsHeader, SsMsgCode
 
 
 
@@ -78,30 +80,6 @@ int serverConnect(char* host, unsigned short port, char** errorStringP)
 
 // -----------------------------------------------------------------------------
 //
-// SsHeader - FIXME: include src/lib/orionld/socketService/socketService.h
-//
-typedef struct SsHeader
-{
-  unsigned short msgCode;
-  unsigned short options;
-  unsigned int   dataLen;
-} SsHeader;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// SsMsgCode - FIXME: include src/lib/orionld/socketService/socketService.h
-//
-typedef enum SsMsgCode
-{
-  SsPing = 1
-} SsMsgCode;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // main -
 //
 int main(int argC, char* argV[])
@@ -109,13 +87,45 @@ int main(int argC, char* argV[])
   char*           eString;
   char*           server  = (char*) "localhost";
   unsigned short  port    = 1027;
-  int             fd      = serverConnect(server, port, &eString);
   SsMsgCode       msgCode = SsPing;
   char*           data    = NULL;
   int             dataLen = 0;
   unsigned short  options = 0;
   int             nb;
 
+  //
+  // Parse Args
+  //
+  printf("Parse Args: argC: %d\n", argC);
+  for (int ix = 1; ix < argC; ix++)
+  {
+    printf("Parse Args: arg %d: '%s'\n", ix, argV[ix]);
+    if (strcmp(argV[ix], "-m") == 0)
+    {
+      printf("Parse Args: -m '%s'\n", argV[ix + 1]);
+      msgCode = (SsMsgCode) atoi(argV[ix + 1]);
+      ++ix;
+    }
+    else if (strcmp(argV[ix], "-d") == 0)
+    {
+      printf("Parse Args: -d '%s'\n", argV[ix + 1]);
+      data    = argV[ix + 1];
+      dataLen = strlen(data);
+      ++ix;
+    }
+    else if (strcmp(argV[ix], "-u") == 0)
+    {
+      printf("Usage: ssClient [-u (usage)] [-m <message code>] [-d <data>]\n");
+      exit(1);
+    }
+    else
+    {
+      printf("ssClient: non-recognized option: '%s'", argV[ix]);
+      exit(1);
+    }
+  }
+
+  int fd = serverConnect(server, port, &eString);
   if (fd < 0)
   {
     fprintf(stderr, "error connecting to server %s:%d\n", server, port);

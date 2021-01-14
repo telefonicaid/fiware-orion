@@ -30,26 +30,9 @@
 #include "logMsg/logMsg.h"                                   // LM_*
 #include "logMsg/traceLevels.h"                              // Lmt*
 
+#include "orionld/db/dbConfiguration.h"                      // dbEntityRetrieve
+#include "orionld/socketService/socketService.h"             // SsHeader, SsMsgCode
 #include "orionld/socketService/socketServiceRun.h"          // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// SsHeader -
-//
-typedef struct SsHeader
-{
-  unsigned short msgCode;
-  unsigned short options;
-  unsigned int   dataLen;
-} SsHeader;
-
-
-typedef enum SsMsgCode
-{
-  SsPing = 1
-} SsMsgCode;
 
 
 
@@ -110,6 +93,28 @@ static void ssWrite(int fd, const char* data, int dataLen)
 }
 
 
+#if 0
+// -----------------------------------------------------------------------------
+//
+// ssWrite -
+//
+static void ssGetEntity(char* entityId)
+{
+  int     responseLen;
+  KjNode* responseTree = dbEntityRetrieve(entityId,
+                                          NULL,   // attrs
+                                          false,  // attrMandatory
+                                          false,  // sysAttrs
+                                          false,  // keyValues
+                                          NULL);  // datasetId
+
+  char response[2048];
+  kjRender(orionldState.kjsonP, responseTree, response, sizeof(response));
+  responseLen = strlen(response);
+  ssWrite(fd, response, responseLen);
+}
+#endif
+
 
 // -----------------------------------------------------------------------------
 //
@@ -121,6 +126,15 @@ static void ssTreat(int fd, SsHeader* headerP, char* dataP)
   {
   case SsPing:
     ssWrite(fd, "pong", 4);
+    break;
+
+  case SsGetEntity:
+    LM_TMP(("SS: GET Entity '%s'", dataP));
+#if 0
+    ssGetEntity(dataP);
+#else
+    ssWrite(fd, "GET Entity Is Not Implemented", 30);
+#endif
     break;
 
   default:
