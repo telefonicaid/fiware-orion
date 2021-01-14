@@ -302,6 +302,13 @@ bool orionldPostEntity(ConnectionInfo* ciP)
     return true;
   }
 
+  //
+  // Here the incoming payload tree should be OK for TRoE
+  //
+  KjNode* cloneForTroeP = NULL;
+  if (troe)
+    cloneForTroeP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
   // 7. Create an array of the attributes "still left"
   char** attrNameV  = (char**) kaAlloc(&orionldState.kalloc, attrsInPayload * sizeof(char*));
   int    attrNameIx = 0;
@@ -482,5 +489,9 @@ bool orionldPostEntity(ConnectionInfo* ciP)
   }
 
   ucr.release();
+
+  if (cloneForTroeP != NULL)
+    orionldState.requestTree = cloneForTroeP;
+
   return true;
 }

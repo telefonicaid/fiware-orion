@@ -48,7 +48,7 @@ header.append('\s*For those usages not covered by this license please contact wi
 header.append('\s*iot_support at tid dot es$')
 
 header2 = []
-header2.append('\s*Copyright( \(c\))? 20[1|2][1|2|3|4|5|6|7|8|9|0] FIWARE Foundation e.V.$')
+header2.append('\s*Copyright( \(c\))? 20[1|2][0|1|2|3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
 header2.append('\s*$')
 header2.append('\s*This file is part of Orion-LD Context Broker.$')
 header2.append('\s*$')
@@ -115,7 +115,7 @@ def check_file_orionld(file):
                     i = 1
             else:
                 if not re.search(header2[i], line):
-                    return 'mismatch: header <' + header2[i] + '> : line <' + line + '>'
+                    return 'mismatch: HEADER <' + header2[i] + '> : line <' + line + '>'
                 i += 1
                 if i == len(header2):
                     # We have reach the end of the header, so the complete check passes
@@ -272,7 +272,11 @@ for root, dirs, files in os.walk(dir):
             is_orionld = True
         elif 'test/functionalTest/cases/0000_ngsild' in filename:
             is_orionld = True
+        elif 'test/functionalTest/cases/0000_troe' in filename:
+            is_orionld = True
         elif 'test/unittests/orionld' in filename:
+            is_orionld = True
+        elif 'archive/temporal' in filename:
             is_orionld = True
         else:
             is_orionld = False

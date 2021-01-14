@@ -32,6 +32,6 @@
 //
 // uuidGenerate -
 //
-extern void uuidGenerate(char* buf);
+extern void uuidGenerate(char* buf, int bufSize, bool uri);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_UUIDGENERATE_H_

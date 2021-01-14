@@ -87,9 +87,14 @@ char          gtest_filter[1024];
 char          gtest_output[1024];
 int           contextDownloadAttempts = 5;
 int           contextDownloadTimeout  = 10000;
-bool          temporal                = false;
+bool          troe                    = false;
 bool          multitenancy            = false;
 bool          lmtmp                   = false;
+char            troeHost[64];
+unsigned short  troePort;
+char            troeUser[64];
+char            troePwd[64];
+
 
 
 /* ****************************************************************************

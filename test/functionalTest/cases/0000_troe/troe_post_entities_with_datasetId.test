@@ -1,0 +1,164 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of an Entity with attributes with datasetId
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity with a property P1 that has 3 instances (datasetId)
+# 02. GET the entity to see the 3 instances of P1
+# 03. See E1 in the temporal database
+# 04. See the attributes in the temporal database, with special care to the datasetIds
+# 05. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity with a property P1 that has 3 instances (datasetId)"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P1": [
+    {
+      "type": "Property",
+      "value": "ID1_DEFAULT",
+      "observedAt": "2020-12-30T16:00:00.001Z"
+    },
+    {
+      "type": "Property",
+      "value": "ID2",
+      "observedAt": "2020-12-30T16:00:00.002Z",
+      "datasetId": "urn:ngsi-ld:datasetId:2"
+    },
+    {
+      "type": "Property",
+      "value": "ID3",
+      "observedAt": "2020-12-30T16:00:00.003Z",
+      "datasetId": "urn:ngsi-ld:datasetId:3"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. GET the entity to see the 3 instances of P1"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "03. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "04. See the attributes in the temporal database, with special care to the datasetIds"
+echo "===================================================================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,text,number,boolean,datasetid,observedAt FROM attributes"
+echo
+echo
+
+
+echo "05. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with a property P1 that has 3 instances (datasetId)
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. GET the entity to see the 3 instances of P1
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 356
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "P1": [
+        {
+            "observedAt": "2020-12-30T16:00:00.001Z",
+            "type": "Property",
+            "value": "ID1_DEFAULT"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:datasetId:2",
+            "observedAt": "2020-12-30T16:00:00.002Z",
+            "type": "Property",
+            "value": "ID2"
+        },
+        {
+            "datasetId": "urn:ngsi-ld:datasetId:3",
+            "observedAt": "2020-12-30T16:00:00.003Z",
+            "type": "Property",
+            "value": "ID3"
+        }
+    ],
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+03. See E1 in the temporal database
+===================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+04. See the attributes in the temporal database, with special care to the datasetIds
+====================================================================================
+opmode,id,valuetype,entityid,subproperties,unitcode,text,number,boolean,datasetid,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID1_DEFAULT,,,,2020-12-30 16:00:00.001
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID2,,,urn:ngsi-ld:datasetId:2,2020-12-30 16:00:00.002
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,ID3,,,urn:ngsi-ld:datasetId:3,2020-12-30 16:00:00.003
+
+
+05. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

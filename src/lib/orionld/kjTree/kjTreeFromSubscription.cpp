@@ -130,19 +130,18 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   if (orionldState.uriParamOptions.sysAttrs == true)
   {
     char    dateTime[64];
-    char*   detail;
     KjNode* nodeP;
 
     if (subscriptionP->createdAt != -1)
     {
-      numberToDate(subscriptionP->createdAt, dateTime, sizeof(dateTime), &detail);
+      numberToDate(subscriptionP->createdAt, dateTime, sizeof(dateTime));
       nodeP = kjString(orionldState.kjsonP, "createdAt", dateTime);
       kjChildAdd(topP, nodeP);
     }
 
     if (subscriptionP->modifiedAt != -1)
     {
-      numberToDate(subscriptionP->modifiedAt, dateTime, sizeof(dateTime), &detail);
+      numberToDate(subscriptionP->modifiedAt, dateTime, sizeof(dateTime));
       nodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
       kjChildAdd(topP, nodeP);
     }
@@ -339,7 +338,6 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
 
   const char* mimeType = (subscriptionP->notification.httpInfo.mimeType == JSON)? "application/json" : "application/ld+json";
   char        dateTime[128];
-  char*       detail;
 
   nodeP = kjString(orionldState.kjsonP, "accept", mimeType);
   kjChildAdd(endpointP, nodeP);
@@ -357,7 +355,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // notification::lastNotification
   if (subscriptionP->notification.lastNotification > 0)
   {
-    numberToDate(subscriptionP->notification.lastNotification, dateTime, sizeof(dateTime), &detail);
+    numberToDate(subscriptionP->notification.lastNotification, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
     kjChildAdd(objectP, nodeP);
   }
@@ -365,7 +363,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // notification::lastFailure
   if (subscriptionP->notification.lastFailure > 0)
   {
-    numberToDate(subscriptionP->notification.lastFailure, dateTime, sizeof(dateTime), &detail);
+    numberToDate(subscriptionP->notification.lastFailure, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
     kjChildAdd(objectP, nodeP);
   }
@@ -373,7 +371,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // notification::lastSuccess
   if (subscriptionP->notification.lastSuccess > 0)
   {
-    numberToDate(subscriptionP->notification.lastSuccess, dateTime, sizeof(dateTime), &detail);
+    numberToDate(subscriptionP->notification.lastSuccess, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);
     kjChildAdd(objectP, nodeP);
   }
@@ -384,13 +382,12 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP)
   // expires
   if (subscriptionP->expires != 0x7FFFFFFF)
   {
-    char*            details;
-    char             date[64];
+    char date[64];
 
-    if (numberToDate(subscriptionP->expires, date, sizeof(date), &details) == false)
+    if (numberToDate(subscriptionP->expires, date, sizeof(date)) == false)
     {
       LM_E(("Error creating a stringified date for 'expires'"));
-      orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", details);
+      orionldErrorResponseCreate(OrionldInternalError, "Unable to create a stringified expires date", NULL);
       return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "expires", date);

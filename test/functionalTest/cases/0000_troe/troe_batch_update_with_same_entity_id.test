@@ -1,0 +1,451 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Update with instances of the same entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create entities E1, E2, and E3 - all three with P1 and R1
+# 02. See TRoE content - 3 entities, 6 attributes
+# 03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
+# 04. See TRoE content - 3 entities, 12 attributes
+# 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
+# 06. See TRoE content - 3 entities, 18 attributes
+#
+
+echo "01. Create entities E1, E2, and E3 - all three with P1 and R1"
+echo "============================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "Step 01, Instance 1: E1/P1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step1:instance1:R1:E1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "Step 01, Instance 1: E2/P1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step1:instance1:R1:E2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "Step 01, Instance 1: E3/P1"
+    },
+    "R1": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step1:instance1:R1:E3"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$payload"
+echo
+echo
+
+
+echo "02. See TRoE content - 3 entities, 6 attributes"
+echo "==============================================="
+echo "ENTITIES:"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+echo
+echo
+
+
+echo "03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2"
+echo "==================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 03, Instance 1: E1/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step3:instance1:R2:E1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 03, Instance 2: E1/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step3:instance2:R2:E1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E2",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 03, Instance 1: E2/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step3:instance1:R2:E2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E4",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 03, Instance 1: E4/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step3:instance1:R2:E4"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update --payload "$payload"
+echo
+echo
+
+
+echo "04. See TRoE content - 3 entities, 12 attributes"
+echo "================================================"
+echo "ENTITIES:"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+echo
+echo
+
+
+echo "05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3"
+echo "=========================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 05, Instance 1: E1/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance1:R2:E1"
+    },
+    "P3": {
+      "type": "Property",
+      "value": "Step 05, Instance 1: E1/P3"
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance1:R3:E1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 05, Instance 2: E1/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance2:R2:E1"
+    },
+    "P3": {
+      "type": "Property",
+      "value": "Step 05, Instance 2: E1/P3"
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance2:R3:E1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E3",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 05, Instance 1: E3/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance1:R2:E3"
+    },
+    "P3": {
+      "type": "Property",
+      "value": "Step 05, Instance 1: E3/P3"
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance1:R3:E3"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E5",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "Step 05, Instance 1: E5/P2"
+    },
+    "R2": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance1:R2:E5"
+    },
+    "P3": {
+      "type": "Property",
+      "value": "Step 05, Instance 1: E5/P3"
+    },
+    "R3": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:entities:step5:instance1:R3:E5"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/update?options=noOverwrite --payload "$payload"
+echo
+echo
+
+
+echo "06. See TRoE content - 3 entities, 18 attributes"
+echo "================================================"
+echo "ENTITIES:"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E1, E2, and E3 - all three with P1 and R1
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [],
+    "success": [
+        "urn:ngsi-ld:entities:E1",
+        "urn:ngsi-ld:entities:E2",
+        "urn:ngsi-ld:entities:E3"
+    ]
+}
+
+
+02. See TRoE content - 3 entities, 6 attributes
+===============================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+
+
+03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
+===================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 426
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E4",
+            "error": {
+                "status": 400,
+                "title": "entity does not exist",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "detail": "previous instances merged into one",
+                "status": 400,
+                "title": "Duplicated Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E2",
+        "urn:ngsi-ld:entities:E1"
+    ]
+}
+
+
+04. See TRoE content - 3 entities, 12 attributes
+================================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 1: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,,REGEX(202.*)
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+
+
+05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
+==========================================================
+HTTP/1.1 207 Multi Status
+Content-Length: 426
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E5",
+            "error": {
+                "status": 400,
+                "title": "entity does not exist",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        },
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "detail": "previous instances merged into one",
+                "status": 400,
+                "title": "Duplicated Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E3",
+        "urn:ngsi-ld:entities:E1"
+    ]
+}
+
+
+06. See TRoE content - 3 entities, 18 attributes
+================================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E2,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+Create,urn:ngsi-ld:entities:E3,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E1,f,,,"Step 01, Instance 1: E1/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E1,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E2,f,,,"Step 01, Instance 1: E2/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E2,,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entities:E3,f,,,"Step 01, Instance 1: E3/P1",,,REGEX(202.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 1: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E1,f,,,"Step 03, Instance 2: E1/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step3:instance2:R2:E1,,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E2,f,,,"Step 03, Instance 1: E2/P2",,,REGEX(202.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 1: E1/P3",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E1,f,,,"Step 05, Instance 2: E1/P3",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:entities:step5:instance2:R3:E1,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P2",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R2:E3,,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entities:E3,f,,,"Step 05, Instance 1: E3/P3",,,REGEX(202.*)
+Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E3,,,REGEX(202.*)
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+pgDrop $CB_DB_NAME

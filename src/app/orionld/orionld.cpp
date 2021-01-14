@@ -114,6 +114,7 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                // orionldServiceInit
 #include "orionld/db/dbInit.h"                              // dbInit
 #include "orionld/mqtt/mqttRelease.h"                       // mqttRelease
+#include "orionld/troe/troeInit.h"                          // troeInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -195,11 +196,16 @@ bool            insecureNotif;
 bool            ngsiv1Autocast;
 int             contextDownloadAttempts;
 int             contextDownloadTimeout;
-bool            temporal;
+bool            troe;
 bool            disableFileLog;
 bool            lmtmp;
 bool            socketService;
 unsigned short  socketServicePort;
+char            troeHost[64];
+unsigned short  troePort;
+char            troeUser[64];
+char            troePwd[64];
+int             troePoolSize;
 
 
 
@@ -261,9 +267,14 @@ unsigned short  socketServicePort;
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
-#define TEMPORAL_DESC          "enable temporal evolution of entities"
+#define TROE_DESC              "enable TRoE - temporal representation of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define TMPTRACES_DESC         "disable LM_TMP traces"
+#define TROE_HOST_DESC         "host for troe database db server"
+#define TROE_PORT_DESC         "port for troe database db server"
+#define TROE_HOST_USER         "username for troe database db server"
+#define TROE_HOST_PWD          "password for troe database db server"
+#define TROE_POOL_DESC         "size of the connection pool for TRoE Postgres database connections"
 #define SOCKET_SERVICE_DESC    "enable the socket service - accept connections via a normal TCP socket"
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 
@@ -328,9 +339,14 @@ PaArgument paArgs[] =
   { "-ngsiv1Autocast",        &ngsiv1Autocast,          "NGSIV1_AUTOCAST",           PaBool,    PaOpt,  false,           false,  true,             NGSIV1_AUTOCAST          },
   { "-ctxTimeout",            &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,     PaOpt,  5000,            0,      20000,            CTX_TMO_DESC             },
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC             },
-  { "-temporal",              &temporal,                "TEMPORAL",                  PaBool,    PaOpt,  false,           false,  true,             TEMPORAL_DESC            },
+  { "-troe",                  &troe,                    "TROE",                      PaBool,    PaOpt,  false,           false,  true,             TROE_DESC                },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
   { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
+  { "-troeHost",              troeHost,                 "TROE_HOST",                 PaString,  PaOpt,  _i "localhost",  PaNL,   PaNL,             TROE_HOST_DESC           },
+  { "-troePort",              &troePort,                "TROE_PORT",                 PaInt,     PaOpt,  5432,            PaNL,   PaNL,             TROE_PORT_DESC           },
+  { "-troeUser",              troeUser,                 "TROE_USER",                 PaString,  PaOpt,  _i "postgres",   PaNL,   PaNL,             TROE_HOST_USER           },
+  { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD            },
+  { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
 
   PA_END_OF_ARGS
@@ -1081,14 +1097,6 @@ int main(int argC, char* argV[])
   }
 
   //
-  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
-  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
-  // Otherwise, we have empirically checked that CB may randomly crash
-  //
-  contextBrokerInit(dbName, multitenancy);
-
-
-  //
   // If the Env Var ORIONLD_CACHED_CONTEXT_DIRECTORY is set, then at startup, the broker will read all context files
   // inside that directory and add them to the linked list of "downloaded" contexts.
   //
@@ -1105,6 +1113,24 @@ int main(int argC, char* argV[])
   //
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
   dbInit(dbHost, dbName);
+
+  //
+  // The database for Temporal Representation of Entities must be initialized before mongodb
+  // as callbacks to create tenants (== postgres databases) and their tables are called from the
+  // initialization routines of mongodb - if postgres is not initialized, this will fail.
+  //
+  if (troe)
+  {
+    if (troeInit() == false)
+      LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
+  }
+
+  //
+  // Given that contextBrokerInit() may create thread (in the threadpool notification mode,
+  // it has to be done before curl_global_init(), see https://curl.haxx.se/libcurl/c/threaded-ssl.html
+  // Otherwise, we have empirically checked that CB may randomly crash
+  //
+  contextBrokerInit(dbName, multitenancy);
 
   if (https)
   {

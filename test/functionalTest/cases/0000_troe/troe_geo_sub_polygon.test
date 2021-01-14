@@ -1,0 +1,202 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo::Polygon as a Sub-Property
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with an attribute A1 that has a GeoProperty 'Polygon'
+# 02. See E1 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+# 05. GET the entity
+# 06. GET the sub-attributes from TRoE using postgis
+# 07. GET nothing from TRoE using postgis
+#
+
+echo "01. Create an entity E1 with an attribute A1 that has a GeoProperty 'Polygon'"
+echo "============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A1": {
+    "type": "Property",
+    "unitCode": "milliseconds",
+    "value": 77,
+    "observedAt": "2021-01-08T13:15:17.123",
+    "Polygon": {
+      "type": "GeoProperty",
+      "observedAt": "2021-01-08T13:15:17.456Z",
+      "value": {
+        "type": "Polygon",
+        "coordinates": [[ [0,0], [4,0], [4,-2], [0,-2], [0,0] ]]
+      }
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,number,unitCode,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoPolygon,observedAt FROM subAttributes"
+echo
+echo
+
+
+echo "05. GET the entity"
+echo "=================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+echo "06. GET the sub-attributes from TRoE using postgis"
+echo "=================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoPolygon, 'SRID=4267;POINT(2 2)'::geography, 1000000)"
+echo
+echo
+
+
+echo "07. GET nothing from TRoE using postgis"
+echo "======================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoPolygon, 'SRID=4267;POINT(11 12)'::geography, 10)"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with an attribute A1 that has a GeoProperty 'Polygon'
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the temporal database
+===================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,number,unitcode,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entities:E1,t,77,milliseconds,2021-01-08 13:15:17.123
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,geopolygon,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Polygon,GeoPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,0103000020AB10000001000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C000000000000000000000000000000000,2021-01-08 13:15:17.456
+
+
+05. GET the entity
+==================
+HTTP/1.1 200 OK
+Content-Length: 255
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "Polygon": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            4,
+                            -2
+                        ],
+                        [
+                            0,
+                            -2
+                        ],
+                        [
+                            0,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "observedAt": "2021-01-08T13:15:17.123Z",
+        "type": "Property",
+        "unitCode": "milliseconds",
+        "value": 77
+    },
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T"
+}
+
+
+06. GET the sub-attributes from TRoE using postgis
+==================================================
+id,valuetype,entityid,attributeid,unitcode,geopolygon,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Polygon,GeoPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,0103000020AB10000001000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C000000000000000000000000000000000,2021-01-08 13:15:17.456
+
+
+07. GET nothing from TRoE using postgis
+=======================================
+id,valuetype,entityid,attributeid,unitcode,geopolygon,observedat
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

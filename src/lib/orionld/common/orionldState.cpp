@@ -119,7 +119,7 @@ void orionldStateInit(void)
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;
-  orionldState.tenant                  = (char*) "";
+  orionldState.tenant                  = (char*) "";  // FIXME: not NULL due to std::string ... ?
   orionldState.servicePath             = (char*) "";
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);

@@ -51,7 +51,7 @@ char* orionldContextUrlGenerate(char** contextIdP)
   char* url = (char*) kaAlloc(&kalloc, 74 + orionldHostNameLen);
 
   snprintf(url, 74 + orionldHostNameLen, "http://%s:%d/ngsi-ld/ex/v1/contexts/", orionldHostName, portNo);
-  uuidGenerate(&url[36 + orionldHostNameLen]);
+  uuidGenerate(&url[36 + orionldHostNameLen], 100, false);
 
   *contextIdP = &url[36 + orionldHostNameLen];
 

@@ -15,3 +15,39 @@
 * Issue  #559   External contributor "@manaty226" fixed notification on PATCH Entity, updating attributes - Big Thanks!
 * Issue  #622   unitCode not correctly rendered in NGSI-LD notifications
 * Issue  #623   "cross-notifications" NGSI-LD to NGSI-V2 with compacted data (attribute names and entity types)
+* Issue  #599   Implemented a framework for temporal representation of entities
+* Issue  #599   Entities are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Relationship attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   String Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Integer Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Float Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Array Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Object Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Bool Property attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   observedAt sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   sub-attributes are supproed for temporal representation of entities
+* Issue  #599   Relationship sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   String sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Boolean sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Compound sub-attributes (Array, Object) are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Integer sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Float sub-attributes are correctly inserted into the postgres table for temporal representation of entities
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entityOperations/create
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entities
+* Issue  #599   Implemented TRoE for DELETE /ngsi-ld/v1/entities/{entity-id}
+* Issue  #599   Implemented TRoE for DELETE /ngsi-ld/v1/entities/{entity-id}/attrs/{attributeName}
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entityOperations/delete
+* Issue  #599   Added a TRoE table item 'opMode' for the tables 'entities' and 'attributes'
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entities/{entityId} without options=noOverwrite
+* Issue  #599   Implemented TRoE for POST /ngsi-ld/v1/entities/{entityId} with options=noOverwrite
+* Issue  #599   Implemented TRoE for PATCH /ngsi-ld/v1/entities/{entityId}/attrs/{attributeName}
+* Issue  #599   Implemented TRoE for PATCH /ngsi-ld/v1/entities/{entityId}/attrs
+* Issue  #652   BATCH Delete with more than one item for the same entity id
+* Issue  #655   BATCH Create with more than one item for the same entity id
+* Issue  #599   New TRoe databases created when new tenants are used
+* Issue  #658   BATCH Upsert+Replace with more than one item for the same entity id
+* Issue  #660   BATCH Upsert+Update with more than one item for the same entity id
+* Issue  #599   Implemented TRoE for BATCH Upsert+Update
+* Issue  #599   TRoE now supports datasetId
+* Issue  #599   Geo Attributes for TRoE - 'Point', 'Polygon', 'LineString', 'MultiPolygon', and 'MultiLineString'
+* Issue  #599   Geo Sub-Attributes for TRoE - 'Point', 'Polygon', 'LineString', 'MultiPolygon', and 'MultiLineString'
