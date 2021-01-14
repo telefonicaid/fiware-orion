@@ -326,6 +326,7 @@ extern bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,

@@ -357,6 +357,8 @@ HttpStatusCode processRegisterContext
   reg.append(REG_SERVICE_PATH, servicePath.empty() ? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
+  // In NGISv1 forwarding mode is always "all"
+  reg.append(REG_FORWARDING_MODE, "all");
 
   //
   // We accumulate the subscriptions in a map. The key of the map is the string representing subscription id

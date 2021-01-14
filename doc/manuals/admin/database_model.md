@@ -207,6 +207,8 @@ Fields:
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
 -   **expiration**: this is the timestamp (as integer number, meaning seconds) for which the
     registration expires.
+-   **fwdMode**: the forwarding mode supported by the provider, either: `all`, `query`, `update` or `none`.
+    If ommited (Orion versions previous to 2.6.0), `all` is assumed.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
@@ -218,9 +220,6 @@ Fields:
         The JSON for each attribute contains **name** and **type**.
     -   **providingApplication**: the URL of the providing application
         for this registration (mandatory)
-    -   **mode**: the forwarding mode supported by the provider, either:
-        `all`, `query`, `update` or `none`. If ommited (Orion versions
-        previous to 2.6.0), `all` is assumed.
 
 Example document:
 
@@ -228,6 +227,7 @@ Example document:
  {
    "_id": ObjectId("5149f60cf0075f2fabca43da"),
    "format": "JSON",
+   "fwdMode": "all",
    "expiration": 1360232760,
    "contextRegistration": [
        {
@@ -253,8 +253,7 @@ Example document:
                    "type": "TA2"
                }
            ],
-           "providingApplication": "http://foo.bar/notif",
-           "mode": "all"
+           "providingApplication": "http://foo.bar/notif"
       },
       "status": "active"
   ]

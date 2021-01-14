@@ -46,7 +46,7 @@
 */
 #define REG_CONTEXT_REGISTRATION     "contextRegistration"
 #define REG_PROVIDING_APPLICATION    "providingApplication"
-#define REG_FOWARDING_MODE           "mode"
+#define REG_FORWARDING_MODE          "fwdMode"
 #define REG_ENTITIES                 "entities"
 #define REG_ATTRS                    "attrs"
 #define REG_EXPIRATION               "expiration"

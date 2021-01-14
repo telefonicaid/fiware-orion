@@ -1948,6 +1948,7 @@ bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -1976,7 +1977,8 @@ bool registrationsQuery
   //   ],
   //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
   //   servicePath: ... ,
-  //   expiration: { $gt: ... }
+  //   expiration: { $gt: ... },
+  //   fwdMode: ...                           (only when forwardingMode is update or query)
   // }
   //
   // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
@@ -2056,6 +2058,16 @@ bool registrationsQuery
     queryBuilder.appendElements(fillQueryServicePath(REG_SERVICE_PATH, servicePathV));
   }
 
+  // Forwarding mode filter (only when forwardingMode is update or query)
+  // Note that "all" and null (omission of the field) is always included in the filter
+  if (forwardingMode == ngsiv2::ForwardQuery)
+  {
+    queryBuilder.append(REG_FORWARDING_MODE, BSON("$in" << BSON_ARRAY("query" << "all" << mongo::BSONNULL)));
+  }
+  else if (forwardingMode == ngsiv2::ForwardUpdate)
+  {
+    queryBuilder.append(REG_FORWARDING_MODE, BSON("$in" << BSON_ARRAY("update" << "all" << mongo::BSONNULL)));
+  }
 
   //
   // Do the query in MongoDB
@@ -2769,7 +2781,7 @@ bool processAvailabilitySubscription
   std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
   servicePathV.push_back("");                      // While this gets implemented, "" default is used.
 
-  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
+  if (!registrationsQuery(enV, attrL, ngsiv2::ForwardNone, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
   {
     ncar.contextRegistrationResponseVector.release();
     return false;

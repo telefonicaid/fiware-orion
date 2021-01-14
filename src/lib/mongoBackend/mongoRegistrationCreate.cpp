@@ -148,8 +148,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   contextRegistration.append(
     BSON(REG_ENTITIES              << entities.arr() <<
          REG_ATTRS                 << attrs.arr()    <<
-         REG_PROVIDING_APPLICATION << regP->provider.http.url <<
-         REG_FOWARDING_MODE        << forwardingModeToString(regP->provider.supportedForwardingMode)));
+         REG_PROVIDING_APPLICATION << regP->provider.http.url));
 
   bobP->append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 }
@@ -186,6 +185,17 @@ static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
 
 /* ****************************************************************************
 *
+* setForwardingMode -
+*/
+static void setForwardingMode(const ngsiv2::ForwardingMode forwardingMode, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(REG_FORWARDING_MODE, ngsiv2::forwardingModeToString(forwardingMode));
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoRegistrationCreate - 
 */
 void mongoRegistrationCreate
@@ -212,6 +222,7 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
+  setForwardingMode(regP->provider.supportedForwardingMode, &bob);
 
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
   setFormat(format, &bob);

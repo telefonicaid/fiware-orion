@@ -80,12 +80,11 @@ static void setDescription(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 *
 * setProvider -
 */
-static void setProvider(ngsiv2::Registration* regP, const mongo::BSONObj& r)
+static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode forwardingMode, const mongo::BSONObj& r)
 {
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 
-  regP->provider.supportedForwardingMode =
-      ngsiv2::stringToForwardingMode(r.hasField(REG_FOWARDING_MODE)? getStringField(r, REG_FOWARDING_MODE) : "all");
+  regP->provider.supportedForwardingMode = forwardingMode;
 
   std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
   if (format == "JSON")
@@ -195,6 +194,10 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
     return false;
   }
 
+  // Get the forwarding mode to be used later in setProvider()
+  ngsiv2::ForwardingMode forwardingMode =
+      ngsiv2::stringToForwardingMode(r.hasField(REG_FORWARDING_MODE)? getStringField(r, REG_FORWARDING_MODE) : "all");
+
   //
   // Extract the first (and only) CR from the contextRegistration vector
   //
@@ -202,7 +205,7 @@ static bool setDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj& r,
 
   setEntities(regP, cr0);
   setAttributes(regP, cr0);
-  setProvider(regP, cr0);
+  setProvider(regP, forwardingMode, cr0);
 
   return true;
 }

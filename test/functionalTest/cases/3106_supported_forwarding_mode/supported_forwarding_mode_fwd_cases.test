@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-supportedFowardingMode basic CRUD
+supportedFowardingMode forwarding cases
 
 --SHELL-INIT--
 dbInit CB
@@ -30,14 +30,20 @@ brokerStart CB 0-255 IPv4 -statCounters
 --SHELL--
 
 #
-# 01. Register without supportedFowardingMode
-# 02. Register with supportedForwardingMode = all
-# 03. Register with supportedForwardingMode = update
-# 04. Register with supportedForwardingMode = query
-# 05. Register with supportedForwardingMode = none
-# 06. GET registrations and see all them
-# 07. Register with supportedFowardingMode = xxx, get error
-#
+# 01. Create E-A at CP1
+# 02. Create E-A at CP2
+# 03. Create E-A at CP3
+# 04. Create E-A at CP4
+# 05. Register E-A at CP1 without mode
+# 06. Register E-A at CP2 with mode all
+# 07. Register E-A at CP3 with mode query
+# 08. Register E-A at CP4 with mode update
+# 09. Register E-A at CP5 with mode none
+# 10. Query E-A at CB: it reachs CP1, CP2 and CP3
+# 07. Update E-A at CB: it reachs CP1, CP2 and CP4
+# 08. Check CP1 (2 hits)
+# 09. Check CP2 (2 hits)
+# 10. Check CP3 (2 hits)
 
 
 echo "01. Register without supportedForwardingMode"
@@ -401,4 +407,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB

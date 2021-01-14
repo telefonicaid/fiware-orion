@@ -55,7 +55,6 @@ typedef struct ProvidingApplication
 {
   std::string             string;
   ProviderFormat          providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
-  //ngsiv2::ForwardingMode  forwardingMode; FIXME PR: really needed?
   std::string             regId;           // RegId associated to the provider (for log purposes)
 
   ProvidingApplication();
