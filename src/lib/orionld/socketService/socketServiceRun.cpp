@@ -129,7 +129,7 @@ static void ssTreat(int fd, SsHeader* headerP, char* dataP)
     break;
 
   case SsGetEntity:
-    LM_TMP(("SS: GET Entity '%s'", dataP));
+    LM_TMP(("SS: GET Entity '%s' - not implemented", dataP));
 #if 0
     ssGetEntity(dataP);
 #else
@@ -170,13 +170,13 @@ void socketServiceRun(int listenFd)
     FD_ZERO(&rFds);
     if (fd != -1)
     {
-      LM_TMP(("Adding fd %d to the select fd set", fd));
+      // LM_TMP(("Adding fd %d to the select fd set", fd));
       FD_SET(fd, &rFds);
       fdMax = fd;
     }
     else
     {
-      LM_TMP(("Adding listen-fd %d to the select fd set", listenFd));
+      // LM_TMP(("Adding listen-fd %d to the select fd set", listenFd));
       FD_SET(listenFd, &rFds);
       fdMax = listenFd;
     }
@@ -187,11 +187,10 @@ void socketServiceRun(int listenFd)
 
     if (FD_ISSET(listenFd, &rFds))
     {
-      LM_TMP(("SS: incoming connection"));
       fd = ssAccept(listenFd);
       if (fd == -1)
         LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
-      LM_TMP(("SS: connection accepted"));
+      LM_TMP(("SS: incoming connection accepted"));
     }
     else if (FD_ISSET(fd, &rFds))
     {
