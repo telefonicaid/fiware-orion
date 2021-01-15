@@ -65,7 +65,7 @@ echo
 
 
 echo "02. Create Dev1 entity with localAttr=1 in CB"
-echo "=========================="
+echo "============================================="
 payload='{
   "id": "Dev1",
   "type": "Device",
@@ -181,7 +181,7 @@ Date: REGEX(.*)
 
 
 02. Create Dev1 entity with localAttr=1 in CB
-==========================
+=============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/Dev1?type=Device
