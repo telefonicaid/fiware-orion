@@ -52,6 +52,7 @@
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Registration.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 

@@ -30,8 +30,6 @@
 #include "common/MimeType.h"
 #include "ngsi/Request.h"
 
-#include "apiTypesV2/Registration.h"  // ForwardingMode
-
 
 
 /* ****************************************************************************
@@ -53,9 +51,9 @@ typedef enum ProviderFormat
 */
 typedef struct ProvidingApplication
 {
-  std::string             string;
-  ProviderFormat          providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
-  std::string             regId;           // RegId associated to the provider (for log purposes)
+  std::string     string;
+  ProviderFormat  providerFormat;  // PfJson ("JSON" in mongo): NGSIv1, PfV2: NGSIv2
+  std::string     regId;           // RegId associated to the provider (for log purposes)
 
   ProvidingApplication();
   void            set(const std::string& value);
