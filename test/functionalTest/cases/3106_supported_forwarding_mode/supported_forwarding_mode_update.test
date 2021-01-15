@@ -39,8 +39,8 @@ brokerStart CP1 0
 # 05. Query E-A1 at CP1 - get viaCB
 #
 
-echo "01. Create entity E1 with attributes A and B in CB"
-echo "=================================================="
+echo "01. Create E-A=CP1 at CP1"
+echo "========================="
 payload='{
   "id": "E",
   "type": "T",
@@ -109,8 +109,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 with attributes A and B in CB
-==================================================
+01. Create E-A=CP1 at CP1
+=========================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
