@@ -13,6 +13,8 @@
 * Issue   XXX   External contributor "@manaty226" fixed an important bug about subscriptions after broker restart - Thanks!
 * Issue  #605   ORIONLD_MONGO_HOST env var is not parsed correctly - made the buffer for the CLI '-dbHost' bigger (64 -> 1024)
 * Issue  #559   External contributor "@manaty226" fixed notification on PATCH Entity, updating attributes - Big Thanks!
+* Issue  #622   unitCode not correctly rendered in NGSI-LD notifications
+* Issue  #623   "cross-notifications" NGSI-LD to NGSI-V2 with compacted data (attribute names and entity types)
 * Issue  #599   Implemented a framework for temporal representation of entities
 * Issue  #599   Entities are correctly inserted into the postgres table for temporal representation of entities
 * Issue  #599   Relationship attributes are correctly inserted into the postgres table for temporal representation of entities

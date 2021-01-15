@@ -96,7 +96,7 @@ def check_file(file):
 
     # We reach this point if the first header line was not found or if we reach the end of the file before
     # reaching the end of the header. Both cases means false
-    return 'end of file reached without finding header beginning'
+    return 'end of file reached without finding Orion Copyright header'
 
 
 # check_file_orionld returns an error string in the case of error or empty string if everything goes ok
@@ -123,7 +123,7 @@ def check_file_orionld(file):
 
     # We reach this point if the first header line was not found or if we reach the end of the file before
     # reaching the end of the header. Both cases means false
-    return 'end of file reached without finding header beginning'
+    return 'end of file reached without finding Orion-LD Copyright header'
 
 
 def ignore(root, file):
@@ -212,8 +212,8 @@ def supported_extension(root, file):
     :param file:
     :return:
     """
-    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld']
+    extensions = ['py', 'cpp', 'c', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld' ]
     names = ['makefile', 'Makefile', 'CMakeLists.txt.orion', 'CMakeLists.txt.orionld' ]
 
     # Check extensions
@@ -267,6 +267,8 @@ for root, dirs, files in os.walk(dir):
         if 'src/app/orionld/' in filename:
             is_orionld = True
         elif 'src/lib/orionld/' in filename:
+            is_orionld = True
+        elif 'src/app/ssClient/' in filename:
             is_orionld = True
         elif 'test/functionalTest/cases/0000_ngsild' in filename:
             is_orionld = True
