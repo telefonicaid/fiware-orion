@@ -1,5 +1,5 @@
 ## Overview
-Travis is enabled in this repository so each pull request is checked before being allowed to merge.
+GitHub Actions is enabled in this repository so each pull request is checked before being allowed to merge.
 The system is based on `fiware/orion-ci:rpm7` which is built from master branch each time a new PR lands in master,
 providing a clean environment with all build dependencies onboard. The Dockerfile used to build this docker is available
 in the `ci/rpm7` directory.
@@ -10,7 +10,7 @@ to `ci/rpm7/build-dep.sh` and/or `Dockerfile`. Once that PR gets merged into mas
 (checking progress in Dockerhub at: https://hub.docker.com/r/fiware/orion-ci/builds) your PR branch with the new 
 functionality is ready to be tested with travis. 
 
-The Travis checks are divided into stages, which are described in "Supported tests" section.
+The GitHub Actions checks are divided into stages, which are described in "Supported tests" section.
 
 ## Supported tests
 Current version of CI supports:

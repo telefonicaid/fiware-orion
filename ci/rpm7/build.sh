@@ -57,7 +57,8 @@ function _usage()
 function _fix_tests()
 {
     # This function adjust functional tests to reduce time, that is spent on the tests.
-    # TODO: this function created to reduce the time that is spent on functional tests because of travis time limits. Should be fixed.
+    # TODO: this function created to reduce the time that is spent on functional tests (originally due to a travis time limit
+    # that I'm not sure if stills in GitHub Actions). Should be fixed.
     echo "Builder: fix tests"
 
     # This part adjust TTL mongo parameter and 3000_allow_creation_transient_entities sleep parameter.
