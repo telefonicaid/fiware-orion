@@ -1,0 +1,297 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Mixed supportedFowardingMode in a same entity
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+# This test models a case which is quite common in IOTA-CB scenarios: an entity
+# (representing a device) with a mix of local attributes, lazy attribues and
+# commands.
+#
+# 01. Create Dev1 entity with attrs lazyAttr=2 and command=init in CP1
+# 02. Create Dev1 entity with localAttr=1 in CB
+# 03. Register lazyAttr with mode query
+# 04. Register command with mode update
+# 05. Query Dev1 entity in CB - get localAttr=1 and lazyAttrs=2
+# 06. Update Dev1 entity localAttr=10 command=exec in CB
+# 07. Query Dev1 entity in CB - get localAttr=10 and lazyAttrs=2
+# 08. Query Dev1 in CP1 - get lazyAttr=2 and command=exec
+#
+
+echo "01. Create Dev1 entity with attrs lazyAttr=2 and command=init in CP1"
+echo "===================================================================="
+payload='{
+  "id": "Dev1",
+  "type": "Device",
+  "lazyAttr": {
+    "type": "Number",
+    "value": 2
+  },
+  "command": {
+    "type": "command",
+    "value": "init"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "02. Create Dev1 entity with localAttr=1 in CB"
+echo "============================================="
+payload='{
+  "id": "Dev1",
+  "type": "Device",
+  "localAttr": {
+    "type": "Number",
+    "value": 1
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Register lazyAttr with mode query"
+echo "====================================="
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "Dev1",
+         "type": "Device"
+       }
+     ],
+     "attrs": [
+       "lazyAttr"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "supportedForwardingMode": "query"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Register command with mode update"
+echo "====================================="
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "Dev1",
+         "type": "Device"
+       }
+     ],
+     "attrs": [
+       "command"
+     ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "supportedForwardingMode": "update"
+   }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Query Dev1 entity in CB - get localAttr=1 and lazyAttrs=2"
+echo "============================================================="
+orionCurl --url /v2/entities/Dev1
+echo
+echo
+
+
+echo "06. Update Dev1 entity localAttr=10 command=exec in CB"
+echo "======================================================"
+payload='{
+  "localAttr": {
+    "type": "Number",
+    "value": 10
+  },
+  "command": {
+    "type": "command",
+    "value": "exec"
+  }
+}'
+orionCurl --url /v2/entities/Dev1/attrs?type=Device --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. Query Dev1 entity in CB - get localAttr=10 and lazyAttrs=2"
+echo "=============================================================="
+orionCurl --url /v2/entities/Dev1
+echo
+echo
+
+
+echo "08. Query Dev1 in CP1 - get lazyAttr=2 and command=exec"
+echo "======================================================="
+orionCurl --url /v2/entities/Dev1 --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Dev1 entity with attrs lazyAttr=2 and command=init in CP1
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Dev1?type=Device
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create Dev1 entity with localAttr=1 in CB
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Dev1?type=Device
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Register lazyAttr with mode query
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Register command with mode update
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Query Dev1 entity in CB - get localAttr=1 and lazyAttrs=2
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Dev1",
+    "lazyAttr": {
+        "metadata": {},
+        "type": "Number",
+        "value": 2
+    },
+    "localAttr": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "type": "Device"
+}
+
+
+06. Update Dev1 entity localAttr=10 command=exec in CB
+======================================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Query Dev1 entity in CB - get localAttr=10 and lazyAttrs=2
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "Dev1",
+    "lazyAttr": {
+        "metadata": {},
+        "type": "Number",
+        "value": 2
+    },
+    "localAttr": {
+        "metadata": {},
+        "type": "Number",
+        "value": 10
+    },
+    "type": "Device"
+}
+
+
+08. Query Dev1 in CP1 - get lazyAttr=2 and command=exec
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 140
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "command": {
+        "metadata": {},
+        "type": "command",
+        "value": "exec"
+    },
+    "id": "Dev1",
+    "lazyAttr": {
+        "metadata": {},
+        "type": "Number",
+        "value": 2
+    },
+    "type": "Device"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

@@ -57,6 +57,12 @@ std::string EntityVector::toJson
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
+    // This is to avoid spurious entities like '{"id": "E", "type": "T"}'
+    // typically generated when CPrs are in use
+    if (vec[ix]->attributeVector.size() == 0)
+    {
+      continue;
+    }
     jh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
   }
 

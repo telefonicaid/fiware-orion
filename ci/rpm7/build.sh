@@ -37,7 +37,6 @@ function _usage()
     -s   --stage         specify stage (unit/functional/compliance) to use
     -m   --make          cmake/make (works with unit/functional stage only)
     -i   --install       make install (works with unit/functional stage only)
-    -d   --db            start mongodb
     -t   --test          run unit/functional/compliance test (depends on the defined stage)
     -r   --rpm           specify rpm (nightly, release, testing) to build
     -u   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
@@ -50,8 +49,8 @@ function _usage()
     -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
 
   Examples:
-    build -s unit -midt -b master    clone from master, make (for unit testing), make install, run mongo, execute unit tests
-    build -s functional -midtq       get source from mounted folder, make (for functional testing), make install, run mongo, execute speed FIX, functional test
+    build -s unit -mit -b master    clone from master, make (for unit testing), make install, execute unit tests
+    build -s functional -mitq       get source from mounted folder, make (for functional testing), make install, execute speed FIX, functional test
 "
 }
 
@@ -134,12 +133,6 @@ function _show()
 function _execute()
 {
     killall contextBroker
-    killall mongod
-
-    sleep 3
-
-    mongod --dbpath /data/db1 --port 20001 --quiet --nojournal&
-    mongod --dbpath /data/db2 --port 20002 --quiet --nojournal&
 
     sleep 3
 
@@ -165,7 +158,6 @@ do
        --stage) set -- "$@" -s ;;
        --make) set -- "$@" -m ;;
        --install) set -- "$@" -i ;;
-       --db) set -- "$@" -d ;;
        --test) set -- "$@" -t ;;
        --rpm) set -- "$@" -r ;;
        --upload) set - "$@" -u ;;
@@ -178,7 +170,7 @@ do
     esac
 done
 
-while getopts ":hb:S:p:s:midtr:ujJqQeHa:" opt; do
+while getopts ":hb:S:p:s:mitr:ujJqQeHa:" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
         b)  branch=$OPTARG ;;
@@ -187,7 +179,6 @@ while getopts ":hb:S:p:s:midtr:ujJqQeHa:" opt; do
         s)  stage=$OPTARG ;;
         m)  make=true;;
         i)  install=true;;
-        d)  database=true ;;
         t)  test=true ;;
         r)  rpm=$OPTARG ;;
         u)  upload=true ;;
@@ -232,13 +223,6 @@ echo "===================================== PREPARE ============================
 
 echo "Builder: create temp folders"
 rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
-
-if [ -n "${database}" ]; then
-    echo "Builder: starting Mongo"
-    mongod --dbpath /tmp/builder/db  --nojournal --quiet > /dev/null 2>&1 &
-    sleep 3
-    export MONGO_HOST=localhost
-fi
 
 if [ -n "${branch}" ]; then
     echo "===================================== CLONE ============================================"
