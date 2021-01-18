@@ -379,7 +379,6 @@ Orion は、次の点を除いて、NGSIv2 仕様に記載されているレジ�
 * `PATCH /v2/registration/<id>` は実装されていません。したがって、レジストレーションを直接更新することはできません。つまり、レジストレーションを削除して再作成する必要があります。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3007)についてはこちらをご覧ください
 * `idPattern` はサポートされています
 * `typePattern` は実装されていません
-* 唯一の有効な `supportedForwardingMode` は `all` です。他の値を使用しようとすると、501 Not Implemented エラー応答で終了します。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3106) についてはこちらをご覧ください
 * `dataProvided` 内での `expression` フィールドはサポートされていません。フィールドは単に無視されます。これについては [この issue](https://github.com/telefonicaid/fiware-orion/issues/3107) を見てください。
 * `status` での `inactive` 値はサポートされていません。つまり、フィールドは正しく格納され/取得されますが、値が `inactive` の場合でもレジストレーションは常にアクティブです。これについては、[この issue](https://github.com/telefonicaid/fiware-orion/issues/3108) を見てください
 
