@@ -240,7 +240,6 @@ bye
 03. Overwrite P1 and P2 using POST /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1/attrs
 =====================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -301,7 +300,7 @@ bye
 
 05. Attempt to modify the attribute P2=22 with noOverwrite set, see it fail
 ===========================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 162
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -374,7 +373,7 @@ bye
 
 07. Add the attribute P5 and attempt to modify P1 with noOverwrite set. P1: error, P3: ok - see that in the 207 response
 ========================================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 211
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

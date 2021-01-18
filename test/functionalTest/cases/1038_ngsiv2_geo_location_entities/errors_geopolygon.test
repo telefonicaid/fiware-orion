@@ -376,7 +376,7 @@ Date: REGEX(.*)
 
 04. Create entity with two geo:polygon -> fail
 ==============================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -439,7 +439,6 @@ Date: REGEX(.*)
 06. Update attr1 geo:polygon attribute -> OK
 ============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -471,7 +470,7 @@ Date: REGEX(.*)
 
 07. Append a new geo:polygon attribute (attr2) -> fail
 ======================================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -510,7 +509,6 @@ Date: REGEX(.*)
 08. Remove the geo:polygon attribute (attr1) -> OK
 ==================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -533,7 +531,6 @@ Date: REGEX(.*)
 09. Append a new geo:polygon attribute (attr2) -> OK
 ====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -566,7 +563,6 @@ Date: REGEX(.*)
 10. Change attribute type to no-geo:polygon (attr2) -> OK
 =========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -594,7 +590,6 @@ Date: REGEX(.*)
 11. Append new geo:polygon attribute (attr3) -> OK
 ==================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -631,7 +626,7 @@ Date: REGEX(.*)
 
 12. Change attr2 type to geo:polygon again -> fail
 ==================================================
-HTTP/1.1 413 Request Entity Too Large
+HTTP/1.1 413 Payload Too Large
 Content-Length: 148
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

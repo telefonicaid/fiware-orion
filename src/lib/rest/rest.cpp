@@ -134,7 +134,7 @@ static void correlatorGenerate(char* buffer)
 *
 * uriArgumentGet -
 */
-int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
 
@@ -583,7 +583,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 *
 * httpHeaderGet -
 */
-int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
+MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
 {
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
@@ -1285,7 +1285,7 @@ ConnectionInfo* connectionTreatInit
   const char*      url,
   const char*      method,
   const char*      version,
-  int*             retValP
+  MHD_Result*      retValP
 )
 {
   struct timeval   transactionStart;
@@ -1541,7 +1541,7 @@ ConnectionInfo* connectionTreatInit
 *
 * connectionTreatDataReceive -
 */
-static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
+static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
 {
   size_t  dataLen = *upload_data_size;
 
@@ -1622,7 +1622,7 @@ static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_s
 * Call 2: *con_cls != NULL  AND  *upload_data_size != 0
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
-static int connectionTreat
+static MHD_Result connectionTreat
 (
    void*            cls,
    MHD_Connection*  connection,
@@ -1663,8 +1663,7 @@ static int connectionTreat
       *upload_data_size = 0;
 
       // Then treat the request
-      int ret = orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
-      return ret;
+      return orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
     }
   }
 #endif
@@ -1672,7 +1671,7 @@ static int connectionTreat
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
-    int retVal;
+    MHD_Result retVal;
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;
   }

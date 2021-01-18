@@ -110,7 +110,6 @@ Date: REGEX(.*)
 02. Update the attribute P1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs
 ====================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -135,7 +134,7 @@ Date: REGEX(.*)
 
 04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is ignored
 ============================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 181
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

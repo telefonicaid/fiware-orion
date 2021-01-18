@@ -97,7 +97,6 @@ Date: REGEX(.*)
 02. Patch the location property
 ===============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -169,7 +169,6 @@ Content-Type: application/json; charset=utf-8
 04. Update the entity - provoking a notification
 ================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

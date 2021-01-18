@@ -215,7 +215,6 @@ Date: REGEX(.*)
 03. Add the Relationship 'locatedIn',	with metadata
 ===================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -272,7 +271,6 @@ Date: REGEX(.*)
 05. Update 'locatedIn', changing its value
 ==========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -321,7 +319,6 @@ Date: REGEX(.*)
 07. Update 'locatedIn', adding another metadata
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

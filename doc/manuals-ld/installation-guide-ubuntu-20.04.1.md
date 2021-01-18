@@ -44,7 +44,7 @@ sudo aptitude install libssl-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
 * Mongo Driver:   legacy-1.1.2
-* libmicrohttpd:  0.9.48
+* libmicrohttpd:  0.9.72
 * rapidjson:      1.0.2
 * kbase:          0.5
 * klog:           0.5
@@ -82,16 +82,15 @@ After this, you should have the library *libmongoclient.a* under `/usr/local/lib
 ### libmicrohttpd
 
 *libmicrohttpd* is the library that takes care of incoming connections and http/https.
-We use an older version of it, soon to be repaced by the latest release.
 This is how you install libmicrohttpd from source code:
 
 ```bash
 sudo mkdir /opt/libmicrohttpd
 sudo chown $USER:$GROUP /opt/libmicrohttpd
 cd /opt/libmicrohttpd
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
-tar xvf libmicrohttpd-0.9.48.tar.gz
-cd libmicrohttpd-0.9.48
+wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
+tar xvf libmicrohttpd-0.9.72.tar.gz
+cd libmicrohttpd-0.9.72
 ./configure --disable-messages --disable-postprocessor --disable-dauth
 make
 sudo make install
@@ -101,7 +100,7 @@ sudo make install
 
 *rapidjson* is the JSON parser used by the NGSI APIv2 implementation.
 AS Orion-LD includes NGSI APIv2 as well, we need this library.
-Like libmicrohttpd, we use an older version of the library.
+We use an older version of the library.
 This is	how to install it from source code:
 
 ```bash

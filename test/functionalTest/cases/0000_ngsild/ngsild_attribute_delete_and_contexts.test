@@ -115,7 +115,6 @@ Date: REGEX(.*)
 04. Delete P2, without context, using the long name for P2 (according to context from entity creation in step 1) => OK
 ======================================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

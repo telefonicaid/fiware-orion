@@ -128,7 +128,6 @@ echo
 01. Create an entity 'urn:ngsi-ld:testunit:125' using batch upsert
 ==================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -193,7 +192,6 @@ bye
 03. Update the entity 'urn:ngsi-ld:testunit:125' using batch upsert
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

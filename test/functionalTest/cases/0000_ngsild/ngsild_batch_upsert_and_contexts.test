@@ -510,7 +510,6 @@ echo
 01. Upsert 5 entities with context arrays in payload
 ====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -754,7 +753,6 @@ Date: REGEX(.*)
 05. Upsert the same 5 entities, but with different values in some attributes
 ============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

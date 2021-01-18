@@ -423,7 +423,6 @@ Content-Type: application/json; charset=utf-8
 04. Remove the subscription
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -477,7 +476,6 @@ Content-Type: application/json; charset=utf-8
 08. Remove the subscription
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -531,7 +529,6 @@ Content-Type: application/json; charset=utf-8
 12. Remove the subscription
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -629,7 +626,6 @@ bye
 17. Add observationSpace to the entity
 ======================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -689,7 +685,6 @@ Content-Type: application/json; charset=utf-8
 19. Add operationSpace to the entity
 ====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -766,7 +761,6 @@ Content-Type: application/json; charset=utf-8
 21. Remove the subscription
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

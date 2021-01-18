@@ -253,7 +253,6 @@ Date: REGEX(.*)
 04. Update sub (with OK url), matching E1
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -299,7 +298,6 @@ Date: REGEX(.*)
 06. Update E1, to provoke notification that now works
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -399,7 +397,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Update sub (with invalid url)
 =================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

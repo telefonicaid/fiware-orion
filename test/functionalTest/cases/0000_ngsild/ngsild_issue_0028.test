@@ -194,7 +194,6 @@ Date: REGEX(.*)
 04. Append to the entity, overwriting P1
 ========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
