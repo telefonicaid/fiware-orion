@@ -120,6 +120,9 @@ HttpStatusCode processRegisterContext
   reg.append(REG_SERVICE_PATH, servicePath.empty() ? SERVICE_PATH_ROOT : servicePath);
   reg.append(REG_FORMAT, format);
 
+  // In NGISv1 forwarding mode is always "all"
+   reg.append(REG_FORWARDING_MODE, "all");
+
   BSONArrayBuilder  contextRegistration;
 
   for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix)
