@@ -151,6 +151,8 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **status** (オプション) : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)。デフォルト・ステータス (すなわち、ドキュメントがこのフィールドを省略した場合) は "active" です
 -   **description** (オプションフィールド) : サブスクリプションを説明するフリーテキスト文字列。最大長は1024です
 -   **expiration** : これはレジストレーションが失効するタイムスタンプです (整数、秒を意味します)
+-   **fwdMode**: プロバイダがサポートするフォワーディング・モード : `all`, `query`, `update` または `none`.
+    省略した場合 (2.6.0 より前の Orion バージョン)、`all` が想定されます。
 -   **contextRegistration** : 要素に以下の情報が含まれる配列です :
     -   **entities** : エンティティのリストを含む配列です (必須)。各エンティティの JSON には、**id**, **type** および **isPattern** が含まれています
     -   **attrs** : 属性のリストを含む配列です (オプション)。各属性の JSON には、**name** および **type** が含まれています
@@ -162,6 +164,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
  {
    "_id": ObjectId("5149f60cf0075f2fabca43da"),
    "format": "JSON",
+   "fwdMode": "all",
    "expiration": 1360232760,
    "contextRegistration": [
        {
