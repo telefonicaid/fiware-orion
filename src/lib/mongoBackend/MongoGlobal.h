@@ -52,6 +52,7 @@
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Registration.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 
@@ -326,6 +327,7 @@ extern bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,

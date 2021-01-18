@@ -2581,6 +2581,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_EQ("'), expiration: 1360232760, "
               "servicePath: \"/\", "
               "format: \"JSON\", "
+              "fwdMode: \"all\", "
               "contextRegistration: [ "
               "{ entities: [ { id: \"E1\", type: \"T1\" } ], "
               "attrs: [], "
