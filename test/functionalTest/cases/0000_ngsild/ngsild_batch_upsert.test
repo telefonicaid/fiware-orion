@@ -155,7 +155,6 @@ echo
 01. Create entities E1 and E2 with attributes P1 and R1
 =======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -163,7 +162,6 @@ Date: REGEX(.*)
 02. Modify E1 with Batch Upsert (replacing with attrs P2 and R2) and add E3, also with attrs P2 and R2
 ======================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -219,7 +217,6 @@ Date: REGEX(.*)
 04. Modify E2 with Batch Upsert (updating with attrs P2 and R2) and add E4, also with attrs P2 and R2
 =====================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -470,7 +470,6 @@ Date: REGEX(.*)
 04. Patch the registration, adding 'name' and changing 'description'
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -762,7 +761,6 @@ Date: REGEX(.*)
 07. Patch the registration, changing 'endpoint'
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

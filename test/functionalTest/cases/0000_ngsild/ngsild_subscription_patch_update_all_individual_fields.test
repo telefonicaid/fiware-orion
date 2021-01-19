@@ -563,7 +563,6 @@ Date: REGEX(.*)
 04. PATCH 'name'
 ================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -622,7 +621,6 @@ Date: REGEX(.*)
 06. PATCH 'description'
 =======================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -681,7 +679,6 @@ Date: REGEX(.*)
 08. PATCH 'entities'
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -799,7 +796,6 @@ Date: REGEX(.*)
 11. PATCH 'watchedAttributes'
 =============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -931,7 +927,6 @@ Date: REGEX(.*)
 15. PATCH 'q'
 =============
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1049,7 +1044,6 @@ Date: REGEX(.*)
 18. PATCH 'geoQ'
 ================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1188,7 +1182,6 @@ Date: REGEX(.*)
 21. PATCH 'csf'
 ===============
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1271,7 +1264,6 @@ Date: REGEX(.*)
 23. PATCH 'isActive'
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1412,7 +1404,6 @@ Date: REGEX(.*)
 26. PATCH 'notification'
 ========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1553,7 +1544,6 @@ Date: REGEX(.*)
 29. PATCH 'expires'
 ===================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1638,7 +1628,6 @@ Date: REGEX(.*)
 31. PATCH 'throttling'
 ======================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1779,7 +1768,6 @@ bye
 34. PATCH all patchable fields
 ==============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -154,7 +154,7 @@ echo
 --REGEXPECT--
 01. Batch Upsert, Content-Type is JSON, and @context present in an item of the array - see error
 ================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 261
 Content-Type: application/json
 Date: REGEX(.*)
@@ -177,7 +177,7 @@ Date: REGEX(.*)
 
 02. Batch Upsert, Content-Type is LD+JSON, no @context present in an item of the array - see error
 ==================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 249
 Content-Type: application/json
 Date: REGEX(.*)
@@ -201,7 +201,6 @@ Date: REGEX(.*)
 03. Batch Upsert, Content-Type is JSON, and no @context present in an item of the array - OK
 ============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -223,7 +222,6 @@ Date: REGEX(.*)
 05. Issue a Batch upsert command, creating 3 new entities, each with a different context
 ========================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

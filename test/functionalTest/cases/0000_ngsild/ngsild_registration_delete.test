@@ -209,7 +209,6 @@ Date: REGEX(.*)
 04. Delete the R1 registration
 ==============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

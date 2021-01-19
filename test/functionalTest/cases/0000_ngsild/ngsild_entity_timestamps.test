@@ -208,7 +208,6 @@ Date: REGEX(.*)
 04. Update A1
 =============
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

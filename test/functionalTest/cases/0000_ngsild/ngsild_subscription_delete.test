@@ -272,7 +272,6 @@ bye
 04. Delete subscription 'http://a.b.c/subs/sub01'
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

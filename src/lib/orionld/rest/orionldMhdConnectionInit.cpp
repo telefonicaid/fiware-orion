@@ -57,8 +57,8 @@ extern __thread char  clientIp[IP_LENGTH_MAX + 1];
 //
 // External declarations - tmp - should be in their own files (not rest.cpp) and included here
 //
-extern int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value);
-extern int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val);
+extern MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value);
+extern MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val);
 
 
 
@@ -235,7 +235,7 @@ static int orionldHttpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
 //
 // orionldUriArgumentGet -
 //
-static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
+static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
   if (SCOMPARE3(key, 'i', 'd', 0))
   {
@@ -264,7 +264,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       LM_W(("Bad Input (negative value for /offset/ URI param)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /offset/", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.offset = atoi(value);
@@ -278,7 +278,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       LM_W(("Bad Input (negative value for /limit/ URI param)"));
       orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.limit = atoi(value);
@@ -288,7 +288,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       LM_W(("Bad Input (too big value for /limit/ URI param: %d - max allowed is 1000)", orionldState.uriParams.limit));
       orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /limit/ (valid range: 0-1000)", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_LIMIT;
@@ -328,7 +328,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       LM_W(("Bad Input (invalid value for URI parameter 'count': %s)", value));
       orionldErrorResponseCreate(OrionldBadRequestData, "Bad value for URI parameter /count/", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_COUNT;
@@ -346,7 +346,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Not a URI", value);  // FIXME: Include 'detail' and name (datasetId)
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.datasetId = (char*) value;
@@ -362,7 +362,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'deleteAll'", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_DELETEALL;
@@ -400,7 +400,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'details'", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_DETAILS;
@@ -415,7 +415,7 @@ static int orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       orionldErrorResponseCreate(OrionldBadRequestData, "Invalid value for uri parameter 'prettyPrint'", value);
       orionldState.httpStatusCode = 400;
-      return false;
+      return MHD_YES;
     }
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_PRETTYPRINT;
@@ -457,7 +457,7 @@ static void uriArgumentsPresent(void)
 //
 // orionldMhdConnectionInit -
 //
-int orionldMhdConnectionInit
+MHD_Result orionldMhdConnectionInit
 (
   MHD_Connection*  connection,
   const char*      url,

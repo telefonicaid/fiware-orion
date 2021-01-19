@@ -113,7 +113,6 @@ echo
 01. POST /v2/op/update to create Room1, Room2, and Room3 entity in Batch operation.
 ===================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

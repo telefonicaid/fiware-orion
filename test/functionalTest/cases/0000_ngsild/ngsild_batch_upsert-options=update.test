@@ -106,7 +106,6 @@ echo
 01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
 ===========================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -137,7 +136,6 @@ Date: REGEX(.*)
 03. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=update
 ======================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

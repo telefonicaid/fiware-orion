@@ -33,7 +33,7 @@
 *
 * orionldMhdConnectionPayloadRead - 
 */
-extern int orionldMhdConnectionPayloadRead
+extern MHD_Result orionldMhdConnectionPayloadRead
 (
   ConnectionInfo*  ciP,
   size_t*          upload_data_size,

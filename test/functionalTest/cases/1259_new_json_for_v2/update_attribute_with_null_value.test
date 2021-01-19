@@ -321,7 +321,6 @@ Date: REGEX(.*)
 04. Modify E2/A2=null (PATCH)
 =============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -359,7 +358,6 @@ Date: REGEX(.*)
 07. Modify E3/A3=null (PUT)
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -397,7 +395,6 @@ Date: REGEX(.*)
 10. Modify E4/A4=null (POST)
 ============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -460,7 +457,6 @@ Date: REGEX(.*)
 15. Modify E6/A6=null (PATCH), with keyValues (A6 is null)
 ==========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -494,7 +490,6 @@ Date: REGEX(.*)
 18. Modify E7/A7=null (PUT), with keyValues
 ===========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -528,7 +523,6 @@ Date: REGEX(.*)
 21. Modify E8/A8=null (POST), with keyValues
 ============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

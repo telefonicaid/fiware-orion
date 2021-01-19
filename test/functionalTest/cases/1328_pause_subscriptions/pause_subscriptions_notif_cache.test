@@ -234,7 +234,6 @@ Date: REGEX(.*)
 04. Set "active" status
 =======================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -243,7 +242,6 @@ Date: REGEX(.*)
 05. Update entity (triggers notification)
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -290,7 +288,6 @@ Date: REGEX(.*)
 07. Set "inactive" status
 =========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -299,7 +296,6 @@ Date: REGEX(.*)
 08. Update entity (should trigger notification, but subscription is inactive)
 =============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

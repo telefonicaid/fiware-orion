@@ -33,6 +33,6 @@
 *
 * orionldMhdConnectionTreat - 
 */
-extern int orionldMhdConnectionTreat(ConnectionInfo*  ciP);
+extern MHD_Result orionldMhdConnectionTreat(ConnectionInfo*  ciP);
 
 #endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTIONTREAT_H_

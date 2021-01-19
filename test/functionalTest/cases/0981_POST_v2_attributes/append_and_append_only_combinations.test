@@ -149,7 +149,6 @@ Date: REGEX(.*)
 03. POST /v2/entities/E1/attrs attribute 'attr2'
 ================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -182,7 +181,6 @@ Date: REGEX(.*)
 05. POST /v2/entities/E1/attrs?options=append attribute 'attr3'
 ===============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -220,7 +218,6 @@ Date: REGEX(.*)
 07. POST /v2/entities/E1/attrs attribute 'attr3+attr4' (no error)
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

@@ -366,7 +366,6 @@ Content-Type: application/json; charset=utf-8
 06. Update the entity, to provoke a new notification
 ====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -412,7 +411,6 @@ timesSent == 2 - good!
 08. Update the subscription to provoke a newer 'modifiedAt'
 ===========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -463,7 +461,6 @@ Accumulator has been stopped
 11. Update the entity, to provoke a new notification - which will fail as the accumulator is dead
 =================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

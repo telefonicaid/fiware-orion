@@ -46,11 +46,14 @@ MqttConnection* mqttConnectionAdd(bool mqtts, const char* username, const char* 
 
   MqttConnection* mqP = &mqttConnectionList[mqttConnectionListIx];
 
-  mqP->host = (char*) host;
+  mqP->host = strdup(host);
   mqP->port = port;
 
   if (mqttConnect(mqP, mqtts, username, password, host, port) == false)
+  {
+    LM_E(("Internal Error (mqttConnect failed)"));
     return NULL;
+  }
 
   ++mqttConnectionListIx;
 

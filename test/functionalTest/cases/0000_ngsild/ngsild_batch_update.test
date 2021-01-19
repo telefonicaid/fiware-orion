@@ -322,7 +322,6 @@ Date: REGEX(.*)
 03. Batch-update E1 and E3, with attrs P1 and R2 (attribute overwrite is default)
 =================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -426,7 +425,6 @@ Date: REGEX(.*)
 05. Batch-update E1 and E3 with noOverwrite set with attrs P2 and R2
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -137,7 +137,6 @@ echo
 01. Create 2 entities
 =====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -322,7 +321,6 @@ bye
 03. Update the 2 entities, with the exact same payload
 ======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
