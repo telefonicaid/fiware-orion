@@ -199,13 +199,14 @@ int             contextDownloadTimeout;
 bool            troe;
 bool            disableFileLog;
 bool            lmtmp;
-bool            socketService;
-unsigned short  socketServicePort;
 char            troeHost[64];
 unsigned short  troePort;
 char            troeUser[64];
 char            troePwd[64];
 int             troePoolSize;
+bool            socketService;
+unsigned short  socketServicePort;
+bool            mhdTurbo;
 
 
 
@@ -277,6 +278,7 @@ int             troePoolSize;
 #define TROE_POOL_DESC         "size of the connection pool for TRoE Postgres database connections"
 #define SOCKET_SERVICE_DESC    "enable the socket service - accept connections via a normal TCP socket"
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
+#define MHDTURBO_DESC          "turn on MHD TURBO"
 
 
 
@@ -348,6 +350,7 @@ PaArgument paArgs[] =
   { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD            },
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
+  { "-mhdTurbo",              &mhdTurbo,                "MHD_TURBO",                 PaBool,    PaHid,  false,           false,  true,             MHDTURBO_DESC            },
 
   PA_END_OF_ARGS
 };
