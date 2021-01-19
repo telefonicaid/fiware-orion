@@ -308,7 +308,6 @@ echo
 01. Create entities E1 and E2 with attributes P1 and R1, using batch upsert
 ===========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -368,7 +367,6 @@ Date: REGEX(.*)
 03. Upsert entities E1, E2 and E3 with attributes P2 and R2 (Entity content is replaced - default mode)
 =======================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -448,7 +446,6 @@ Date: REGEX(.*)
 05. Upsert entities E1, E2, E3 and E4 with attributes P2, P3 and R3, using options=update - append attrs P3 and R3, replace P2
 ==============================================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

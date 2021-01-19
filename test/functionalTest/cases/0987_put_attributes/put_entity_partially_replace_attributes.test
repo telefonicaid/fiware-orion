@@ -104,7 +104,6 @@ Date: REGEX(.*)
 03. Modify E1 to E1/A2+A3
 =========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

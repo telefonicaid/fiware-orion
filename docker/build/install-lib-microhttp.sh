@@ -25,9 +25,9 @@ set -e
 
 echo
 echo -e "\e[1;32m Builder: installing libmicrohttpd \e[0m"
-curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC ${ROOT_FOLDER}
-cd ${ROOT_FOLDER}/libmicrohttpd-0.9.48
+curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz | tar xzC ${ROOT_FOLDER}
+cd ${ROOT_FOLDER}/libmicrohttpd-0.9.72
 ./configure --disable-messages --disable-postprocessor --disable-dauth
 make
 make install
-cd ${ROOT_FOLDER} && rm -Rf libmicrohttpd-0.9.48
+cd ${ROOT_FOLDER} && rm -Rf libmicrohttpd-0.9.72

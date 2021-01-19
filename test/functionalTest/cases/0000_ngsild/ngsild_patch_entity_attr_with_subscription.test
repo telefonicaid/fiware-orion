@@ -179,7 +179,6 @@ Date: REGEX(.*)
 03. Update the E1 property A1
 =============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -282,7 +281,7 @@ Content-Type: application/json; charset=utf-8
 
 07. Attempt to add a property A3 - should be ignored
 ====================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 132
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

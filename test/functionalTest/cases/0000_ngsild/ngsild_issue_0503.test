@@ -142,7 +142,6 @@ Date: REGEX(.*)
 02. Update two of them using Batch Update, one with a correct entity type present and the other one without entity type
 =======================================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

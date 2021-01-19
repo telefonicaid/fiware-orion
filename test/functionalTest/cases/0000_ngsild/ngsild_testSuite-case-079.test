@@ -223,7 +223,6 @@ bye
 03. Append to E1 two attributes: R1 and location (test case 079)
 ================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -362,7 +361,6 @@ Date: REGEX(.*)
 06. Overwrite P1, with @context in payload (test case 080)
 ==========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -409,7 +407,7 @@ Date: REGEX(.*)
 
 08. With options=noOverwrite, attempt to append two attrs P1 and P2. P1 already exists and should be ignored. P2 should be appended (test case 081)
 ===================================================================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 211
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

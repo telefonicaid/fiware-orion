@@ -149,7 +149,6 @@ Date: REGEX(.*)
 02. Update the E1 property attr_A1
 ==================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -189,7 +188,6 @@ Date: REGEX(.*)
 05. Update the E2 relationship attr_A3
 ======================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

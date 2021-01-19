@@ -474,7 +474,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Update sub2, setting attrsFormat to keyValues
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -483,7 +482,6 @@ Date: REGEX(.*)
 10. Update E1/A3, to see notification in sub2
 =============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

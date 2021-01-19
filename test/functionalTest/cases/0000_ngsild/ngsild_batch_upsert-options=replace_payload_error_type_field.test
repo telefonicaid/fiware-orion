@@ -194,14 +194,13 @@ echo
 01. POST /ngsi-ld/v1/entityOperations/upsert?options=replace - 4 entities
 =========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
 
 02. Update all four entities. Vehicle:00001 with a entity::type that differs
 ============================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 289
 Content-Type: application/json
 Date: REGEX(.*)

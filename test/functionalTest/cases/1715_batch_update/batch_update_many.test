@@ -268,7 +268,6 @@ echo
 01. Create E1/T1/A1=1, E2/T2/A2=2, E3/T3/A3=3, E4/T4/A4=4, using POST /v2/op/update with APPEND
 ===============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -309,7 +308,6 @@ Date: REGEX(.*)
 03. Add attributes A1=1 for E2,E3 and E4 using POST /v2/op/update with APPEND
 =============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -381,7 +379,6 @@ Date: REGEX(.*)
 05. 'Change' the A1 attributes using POST /v2/op/update with UPDATE, all different values the the A1s
 =====================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -425,7 +422,6 @@ Date: REGEX(.*)
 07. Replace attributes for A6 in all four entities using POST /v2/update?options=keyValues with REPLACE
 =======================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -466,7 +462,6 @@ Date: REGEX(.*)
 09. DELETE the attribute A6 in E1, E2 and E4
 ============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -504,7 +499,6 @@ Date: REGEX(.*)
 11. DELETE entities E1 and E3
 =============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

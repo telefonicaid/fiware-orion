@@ -291,7 +291,6 @@ Date: REGEX(.*)
 05. Update R1 with all new timestamps
 =====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

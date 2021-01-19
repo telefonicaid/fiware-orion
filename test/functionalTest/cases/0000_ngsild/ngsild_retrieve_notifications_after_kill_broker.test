@@ -214,7 +214,6 @@ bye
 04. Add P3 to E01
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -265,7 +264,6 @@ Content-Type: application/json; charset=utf-8
 07. Add P4 to E01
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

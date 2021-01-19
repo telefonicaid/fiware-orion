@@ -439,7 +439,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 11. Update s01/A w/o tenant
 ===========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -448,7 +447,6 @@ Date: REGEX(.*)
 12. Update s11/A for tenant t1
 ==============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -457,7 +455,6 @@ Date: REGEX(.*)
 13. Update s21/A for tenant t2
 ==============================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

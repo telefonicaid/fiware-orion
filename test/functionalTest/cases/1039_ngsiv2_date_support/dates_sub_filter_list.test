@@ -168,7 +168,6 @@ Date: REGEX(.*)
 03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (notif)
 ===============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -177,7 +176,6 @@ Date: REGEX(.*)
 05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -186,7 +184,6 @@ Date: REGEX(.*)
 06. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (notif)
 ===============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -195,7 +192,6 @@ Date: REGEX(.*)
 07. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (not notif)
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

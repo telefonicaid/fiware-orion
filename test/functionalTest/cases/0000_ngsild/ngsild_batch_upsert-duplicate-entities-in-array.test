@@ -103,7 +103,7 @@ echo
 --REGEXPECT--
 01. Create entities E1-E5 using Batch Upsert, but two copies of E4
 ==================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 338
 Content-Type: application/json
 Date: REGEX(.*)

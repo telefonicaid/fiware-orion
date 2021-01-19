@@ -1920,7 +1920,7 @@ Date: REGEX(*.)
 
 21. Attempt to update entities with entityOperations using @id invalid - see error
 ==================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 458
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1954,7 +1954,7 @@ Date: REGEX(*.)
 
 22. Attempt to update entities with entityOperations using @type invalid - see error
 ====================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 540
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1988,7 +1988,7 @@ Date: REGEX(*.)
 
 23. Attempt to update entities with entityOperations using @id and @type invalid - see error
 ============================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 458
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2022,7 +2022,7 @@ Date: REGEX(*.)
 
 24. Attempt to update entities with entityOperations w/o @id - see error
 ========================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 279
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2047,7 +2047,7 @@ Date: REGEX(*.)
 
 25. Attempt to update entities with entityOperations w/o @id and @type - see error
 ==================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 279
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2072,7 +2072,7 @@ Date: REGEX(*.)
 
 26. Attempt to upsert - options=update - entities with entityOperations using @id invalid - see error
 =====================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 299
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2104,7 +2104,7 @@ Date: REGEX(*.)
 
 27. Attempt to upsert - options=update - entities with entityOperations using @type invalid - see error
 =======================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 389
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2136,7 +2136,7 @@ Date: REGEX(*.)
 
 28. Attempt to upsert - options=update - entities with entityOperations using @id and @type invalid - see error
 ===============================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 299
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2168,7 +2168,7 @@ Date: REGEX(*.)
 
 29. Attempt to upsert - options=update - entities with entityOperations w/o @id - see error
 ===========================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2191,7 +2191,7 @@ Date: REGEX(*.)
 
 30. Attempt to upsert - options=update - entities with entityOperations w/o @type - see error
 =============================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 425
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2223,7 +2223,7 @@ Date: REGEX(*.)
 
 31. Attempt to upsert - options=update - entities with entityOperations w/o @id and @type - see error
 =====================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2246,7 +2246,7 @@ Date: REGEX(*.)
 
 32. Attempt to upsert - options=replace - entities with entityOperations using @id invalid - see error
 ======================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 299
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2278,7 +2278,7 @@ Date: REGEX(*.)
 
 33. Attempt to upsert - options=replace - entities with entityOperations using @type invalid - see error
 ========================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 389
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2310,7 +2310,7 @@ Date: REGEX(*.)
 
 34. Attempt to upsert - options=replace - entities with entityOperations using @id and @type invalid - see error
 ================================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 299
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2342,7 +2342,7 @@ Date: REGEX(*.)
 
 35. Attempt to upsert - options=replace - entities with entityOperations w/o @id - see error
 ============================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2365,7 +2365,7 @@ Date: REGEX(*.)
 
 36. Attempt to upsert - options=replace - entities with entityOperations w/o @type - see error
 ==============================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 425
 Content-Type: application/json
 Date: REGEX(*.)
@@ -2397,7 +2397,7 @@ Date: REGEX(*.)
 
 37. Attempt to upsert - options=replace - entities with entityOperations w/o @id and @type - see error
 ======================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 193
 Content-Type: application/json
 Date: REGEX(*.)

@@ -88,7 +88,7 @@ Date: REGEX(.*)
     "kjson version": "REGEX(.*)"
     "libcurl version": "REGEX(.*)",
     "libuuid version": "UNKNOWN",
-    "microhttpd version": "0.9.48-0",
+    "microhttpd version": "0.9.72-0",
     "mongo version": "REGEX(.*)",
     "openssl version": "REGEX(.*)",
     "rapidjson version": "REGEX(.*)"

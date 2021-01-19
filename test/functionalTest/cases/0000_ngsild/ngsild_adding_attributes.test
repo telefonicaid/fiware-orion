@@ -174,7 +174,6 @@ bye
 03. Add two attributes, also with @context in payload
 =====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

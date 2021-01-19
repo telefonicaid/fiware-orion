@@ -51,6 +51,3 @@ MqttConnection* mqttConnectionLookup(const char* host, unsigned short port)
 
   return NULL;
 }
-
-
-
