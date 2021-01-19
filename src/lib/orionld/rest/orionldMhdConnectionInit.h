@@ -37,7 +37,7 @@ extern "C" {
 *
 * orionldMhdConnectionInit -
 */
-extern int orionldMhdConnectionInit
+extern MHD_Result orionldMhdConnectionInit
 (
   MHD_Connection*  connection,
   const char*      url,

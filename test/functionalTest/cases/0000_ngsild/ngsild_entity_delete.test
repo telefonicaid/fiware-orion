@@ -106,7 +106,6 @@ Date: REGEX(.*)
 03. Delete E1
 =============
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

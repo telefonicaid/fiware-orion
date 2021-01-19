@@ -249,7 +249,6 @@ Date: REGEX(.*)
 04. Update the attribute 'name' of the entity, with datasets 1 and 3
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -347,7 +346,6 @@ Date: REGEX(.*)
 07. Update the attribute 'name' of the entity, with datasets 2, 4, and default
 ==============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

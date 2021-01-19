@@ -176,7 +176,6 @@ Date: REGEX(.*)
 02. Append P2 and R2 with noOverwrite set (pure append - P2 and R2 did not previously exist)
 ============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -207,7 +206,7 @@ https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:ent
 
 06. Append P1 and R3 with noOverwrite set (P1 will be ignored as it already existed)
 ====================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 211
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

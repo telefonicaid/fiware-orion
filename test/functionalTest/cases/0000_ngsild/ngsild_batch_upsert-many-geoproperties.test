@@ -202,7 +202,6 @@ echo
 01. Batch Creation via UPSERT of two entities with a single GeoProperty each
 ============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -256,7 +255,6 @@ Date: REGEX(.*)
 03. New Batch Upsert, modifying one of the two entities and adding another entity (also with one GeoProperty)
 =============================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -99,7 +99,7 @@ Date: REGEX(.*)
 
 02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'
 ===============================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 142
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

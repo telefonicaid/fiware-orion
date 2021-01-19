@@ -74,7 +74,7 @@ Date: REGEX(.*)
   "khash version": "0.5",
   "kjson version": "0.5",
   "boost version": "REGEX(.*)",
-  "microhttpd version": "0.9.48-0",
+  "microhttpd version": "0.9.72-0",
   "openssl version": "REGEX(.*)",
   "mongo version": "REGEX(.*)",
   "rapidjson version": "REGEX(.*)",

@@ -230,7 +230,6 @@ Date: REGEX(.*)
 04. Modify the attribute P1 (value: 2)
 ======================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

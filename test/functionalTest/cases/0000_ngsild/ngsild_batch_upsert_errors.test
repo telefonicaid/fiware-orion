@@ -171,7 +171,7 @@ Date: REGEX(.*)
 
 02. Attempt to upsert/create an entity with a duplicated entity id
 ==================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 196
 Content-Type: application/json
 Date: REGEX(.*)
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 
 03. Attempt to upsert/create an entity with a duplicated entity type
 ====================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 198
 Content-Type: application/json
 Date: REGEX(.*)
@@ -217,7 +217,7 @@ Date: REGEX(.*)
 
 04. Attempt to upsert/create an entity with a missing entity id
 ===============================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 193
 Content-Type: application/json
 Date: REGEX(.*)
@@ -240,7 +240,7 @@ Date: REGEX(.*)
 
 05. Attempt to upsert/create an entity with a missing entity type
 =================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 223
 Content-Type: application/json
 Date: REGEX(.*)
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 
 06. Attempt to upsert/update an entity with a non-matching entity type (E1/TT)
 ==============================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 196
 Content-Type: application/json
 Date: REGEX(.*)
@@ -287,7 +287,6 @@ Date: REGEX(.*)
 07. Upsert/Update an entity with a matching entity type (E1/T)
 ==============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -86,7 +86,7 @@ echo
 --REGEXPECT--
 01. Upsert/Create the entity E1, with four different instances of E1 in the array
 =================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 246
 Content-Type: application/json
 Date: REGEX(.*)

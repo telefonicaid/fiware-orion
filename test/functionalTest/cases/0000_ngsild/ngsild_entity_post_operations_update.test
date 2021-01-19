@@ -212,7 +212,6 @@ bye
 04. Update entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/update
 ============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

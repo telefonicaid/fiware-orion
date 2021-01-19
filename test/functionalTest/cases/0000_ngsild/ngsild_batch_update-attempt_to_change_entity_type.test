@@ -100,14 +100,13 @@ echo
 01. Batch Creation via UPSERT of two entities, urn:E1 and urn:E2
 ================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
 
 02. Attempt to change entity type of entity urn:E1 in a batch update operation
 ==============================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 179
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -131,7 +130,7 @@ Date: REGEX(.*)
 
 03. Attempt to change entity type of entity urn:E1 in a batch upsert operation
 ==============================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 179
 Content-Type: application/json
 Date: REGEX(.*)

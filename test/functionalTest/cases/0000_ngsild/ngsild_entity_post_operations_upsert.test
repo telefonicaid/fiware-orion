@@ -231,7 +231,6 @@ echo
 01. POST /ngsi-ld/v1/entityOperations/upsert?options=update - 4 Entities
 ========================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -370,7 +369,6 @@ Date: REGEX(.*)
 04. POST /ngsi-ld/v1/entityOperations/upsert?options=update - Change 2 Entities
 ===============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -176,7 +176,6 @@ Date: REGEX(.*)
 02. Append P2 and R2 (pure append - P2 and R2 did not previously exist)
 =======================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -208,7 +207,6 @@ https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:ent
 06. Append P1 and R3 (P1 will overwrite the previous P1)
 ========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

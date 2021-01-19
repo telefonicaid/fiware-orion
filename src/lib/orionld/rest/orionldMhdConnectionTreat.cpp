@@ -733,7 +733,7 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //
 //
 //
-int orionldMhdConnectionTreat(ConnectionInfo* ciP)
+MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;

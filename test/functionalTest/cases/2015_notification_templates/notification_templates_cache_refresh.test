@@ -156,7 +156,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 05. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 600
+Content-Length: 602
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)

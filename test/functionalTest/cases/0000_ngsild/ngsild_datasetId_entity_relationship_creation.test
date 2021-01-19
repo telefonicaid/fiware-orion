@@ -153,7 +153,6 @@ Date: REGEX(.*)
 02. Update the entity with a few datasetId instances for the attr 'furniture'
 =============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

@@ -180,7 +180,6 @@ bye
 03. Adding a Prop2/Prop2 using POST /entities/<EID>/attrs
 =========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

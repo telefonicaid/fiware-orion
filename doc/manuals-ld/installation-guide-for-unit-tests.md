@@ -8,7 +8,7 @@ cd /opt
 sudo mkdir gmock
 sudo chown $USER:$GROUP gmock  # export GROUP with the value of your group name
 cd gmock
-wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
+wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2
 tar xfvj gmock-1.5.0.tar.bz2
 cd gmock-1.5.0
 ./configure

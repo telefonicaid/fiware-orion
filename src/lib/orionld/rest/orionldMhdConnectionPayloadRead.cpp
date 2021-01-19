@@ -49,7 +49,7 @@ extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 *
 * orionldMhdConnectionPayloadRead - 
 */
-int orionldMhdConnectionPayloadRead
+MHD_Result orionldMhdConnectionPayloadRead
 (
   ConnectionInfo*  ciP,
   size_t*          upload_data_size,
