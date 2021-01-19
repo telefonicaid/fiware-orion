@@ -54,47 +54,6 @@ function _usage()
 "
 }
 
-function _fix_tests()
-{
-    # This function adjust functional tests to reduce time, that is spent on the tests.
-    # TODO: this function created to reduce the time that is spent on functional tests because of travis time limits. Should be fixed.
-    echo "Builder: fix tests"
-
-    # This part adjust TTL mongo parameter and 3000_allow_creation_transient_entities sleep parameter.
-    test='3000_allow_creation_transient_entities'
-    echo "Builder: ${test}"
-
-    list=('create_transient_entity.test' \
-          'replace_to_transient_entity.test' \
-          'update_to_regular_entity.test' \
-          'update_to_transient_entity.test')
-
-    for i in ${list[@]}; do
-        cp ${path}/test/functionalTest/cases/${test}/${i} /tmp/builder/bu/${test}-${i}
-        sed 's/sleep [0-9]*/sleep 3/g' ${path}/test/functionalTest/cases/${test}/${i} > /tmp/test.tmp && mv -f /tmp/test.tmp ${path}/test/functionalTest/cases/${test}/${i}
-    done
-
-    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 3});"
-}
-
-function _unfix_tests()
-{
-    echo "Builder: revert tests"
-    test='3000_allow_creation_transient_entities'
-    echo "Builder: ${test}"
-
-    list=('create_transient_entity.test' \
-          'replace_to_transient_entity.test' \
-          'update_to_regular_entity.test' \
-          'update_to_transient_entity.test')
-
-    for i in ${list[@]}; do
-        mv -f /tmp/builder/bu/${test}-${i} ${path}/test/functionalTest/cases/${test}/${i}
-    done
-
-    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 60});"
-}
-
 function _fix_jenkins()
 {
     # FIXME: ipv4_ipv6_both.test is disabled as IPV6 is disabled in CI environment. This should be fixed.
@@ -170,7 +129,7 @@ do
     esac
 done
 
-while getopts ":hb:S:p:s:mitr:ujJqQeHa:" opt; do
+while getopts ":hb:S:p:s:mitr:ujJeHa:" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
         b)  branch=$OPTARG ;;
@@ -184,8 +143,6 @@ while getopts ":hb:S:p:s:mitr:ujJqQeHa:" opt; do
         u)  upload=true ;;
         j)  fix_j=true ;;
         J)  fix_J=true ;;
-        q)  fix_q=true ;;
-        Q)  fix_Q=true ;;
         e)  execute=true ;;
         H)  show=true ;;
         a)  attempts=$OPTARG ;;
@@ -302,7 +259,6 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
     echo "===================================== FUNCTIONAL TESTS ================================="
 
     if [ -n "${fix_j}" ]; then _fix_jenkins; fi
-    if [ -n "${fix_q}" ]; then _fix_tests; fi
 
     _fix
 
@@ -314,7 +270,6 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
     _unfix
 
     if [ -n "${fix_j}" ]; then _unfix_jenkins; fi
-    if [ -n "${fix_q}" ]; then _unfix_tests; fi
 
     if ! ${status}; then echo "Builder: functional test failed"; exit 1; fi
 
@@ -383,4 +338,3 @@ fi
 
 if [ -n "${show}" ]; then _show; fi
 if [ -n "${fix_J}" ]; then _fix_jenkins; fi
-if [ -n "${fix_Q}" ]; then _fix_tests; fi

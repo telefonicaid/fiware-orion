@@ -22,6 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run functional test
+      - name: Run unit tests
         run: |
           docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit
