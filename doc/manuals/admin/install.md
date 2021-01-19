@@ -10,7 +10,7 @@
     * [Standard upgrade](#standard-upgrade)
 
 ---
-> :warning: **If you plan to run orion in production, also read the [ha-documentation](extra/ha.md) and the [preformance tuning section](perf_tuning.md)**
+> :warning: **If you plan to run orion in production, also read the information about [high availability](extra/ha.md) and [preformance tuning](perf_tuning.md).**
 ---
 
 ## Introduction
