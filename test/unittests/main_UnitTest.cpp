@@ -90,6 +90,8 @@ int           contextDownloadTimeout  = 10000;
 bool          temporal                = false;
 bool          multitenancy            = false;
 bool          lmtmp                   = false;
+bool          mhdTurbo                = false;
+
 
 
 /* ****************************************************************************
