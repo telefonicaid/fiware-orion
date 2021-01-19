@@ -48,6 +48,10 @@ However, in order to help administrators in this task, the following *general* i
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that this is a compound index and key order matters in this case)
     * `creDate`
 
+Loadtests showed that setting the following index drastically improves the performance of updates :
+
+* `{_id.id:1}` 
+
 In addition, depending on your queries, you may need *additional* indexes.
 
 * In the case of using attribute filters in queries (e.g. `GET /v2/entities?q=A<10`), it is recommended to create
