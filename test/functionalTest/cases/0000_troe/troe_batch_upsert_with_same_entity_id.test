@@ -179,7 +179,7 @@ echo
 --REGEXPECT--
 01. Upsert/Create the entity E1, with four different instances of E1 in the array
 =================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 246
 Content-Type: application/json
 Date: REGEX(.*)
@@ -247,7 +247,7 @@ id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 06. Upsert three instances of E1, with options=update - no new entity instance in TRoE entities table, but all new attrs in 'attributes' table marked as REPLACE
 ================================================================================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 246
 Content-Type: application/json
 Date: REGEX(.*)

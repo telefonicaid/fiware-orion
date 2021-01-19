@@ -124,7 +124,7 @@ Date: REGEX(.*)
 
 02. Patch E1 with P1 and P2 (P1 will replace old P1, while P2 is ignored)
 =========================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 181
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

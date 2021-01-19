@@ -117,7 +117,6 @@ Date: REGEX(.*)
 02. BATCH Update/noOverwrite of E1/P1+P2 => P1 is ignored while P2 is added to E1
 =================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

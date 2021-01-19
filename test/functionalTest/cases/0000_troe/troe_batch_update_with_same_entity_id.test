@@ -315,7 +315,7 @@ id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
 ===================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 426
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -377,7 +377,7 @@ id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
 
 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
 ==========================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 426
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

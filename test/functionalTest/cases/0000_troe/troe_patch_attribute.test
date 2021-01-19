@@ -124,7 +124,6 @@ Date: REGEX(.*)
 02. PATCH E1:P, replacing Sub-R and adding Sub-P, and changing its value to 44
 ==============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
