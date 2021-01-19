@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
+#include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -292,6 +294,43 @@ KjNode* kjTreeAttributeMerge(KjNode* entityP, KjNode* newAttrP, const char* attr
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attributeTypeExtractAndClone -
+//
+static KjNode* attributeTypeExtractAndClone(KjNode* entityP, char* attrName)
+{
+  KjNode* attrsFromDb = kjLookup(entityP, "attrs");
+
+  if (attrsFromDb == NULL)
+    LM_RE(NULL, ("Database Error (can't find the 'attrs' item)"));
+
+  LM_TMP(("APPA: Got attrsFromDb"));
+  // Lookup the attribute
+  char* eqAttrName = kaStrdup(&orionldState.kalloc, attrName);
+  dotForEq(eqAttrName);
+  KjNode* attrP = kjLookup(attrsFromDb, eqAttrName);
+  if (attrP  == NULL)
+    LM_RE(NULL, ("Database Error (can't find the attribute '%s' in 'attrs')", attrName));
+  LM_TMP(("APPA: Got attrP"));
+
+  // Lookup the type of the attribute
+  KjNode* typeP = kjLookup(attrP, "type");
+  if (typeP == NULL)
+    LM_RE(NULL, ("Database Error (can't find the type of the attribute '%s')", attrName));
+  LM_TMP(("APPA: Got attr type"));
+
+  KjNode* newTypeP = kjString(orionldState.kjsonP, "type", typeP->value.s);
+
+  if (newTypeP == NULL)
+    LM_RE(NULL, ("Internal Error (unable to create the attribute type node)"));
+
+  LM_TMP(("APPA: clones attr type"));
+  return newTypeP;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPatchAttribute -
@@ -383,6 +422,47 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     return false;
   }
 
+
+  //
+  // The tree is destroyed during the processing - need it intact for TRoE
+  //
+  KjNode* troeTree = NULL;
+  bool    troeOk   = true;
+
+  if (troe == true)
+  {
+    // <DEBUG>
+    char debugBuf[1024];
+    kjRender(orionldState.kjsonP, entityP, debugBuf, sizeof(debugBuf));
+    LM_TMP(("APPA: entity from DB: %s", debugBuf));
+    // </DEBUG>
+
+    // TRoE needs the type of the attribute to be in the tree - let's find it and add it !
+    KjNode* newTypeP = attributeTypeExtractAndClone(entityP, attrName);
+
+    if (newTypeP == NULL)
+    {
+      LM_E(("Internal Error (attributeTypeExtractAndClone failed)"));
+      troeOk = false;
+    }
+    else
+    {
+      LM_TMP(("APPA: Got newTypeP"));
+      // Now clone and add the attribute type
+      troeTree = kjClone(orionldState.kjsonP, orionldState.requestTree);
+      if (troeTree == NULL)
+      {
+        LM_E(("Internal Error (unable to clone the incoming payload body for TRoE)"));
+        troeOk = false;
+      }
+      else
+      {
+        kjChildAdd(troeTree, newTypeP);
+        LM_TMP(("APPA: added the attribute type '%s'", newTypeP->value.s));
+      }
+    }
+  }
+
   // All OK, now merge incoming payload (orionldState.requestPayload) with the entity from the database (entityP)
   KjNode* mergedP = kjTreeAttributeMerge(entityP, orionldState.requestTree, attrName);
 
@@ -428,5 +508,11 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   mongoRequest.release();
+
+  if (troeOk == false)
+    orionldState.troeError = true;  // indicating that TRoE should not be invoked even though it is turned on
+  else if (troeTree != NULL)
+    orionldState.requestTree = troeTree;  // Pointing to the modifed tree for TRoE
+
   return true;
 }

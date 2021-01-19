@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -33,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/entityErrorPush.h"                      // Own interface
 
 
 
@@ -56,8 +58,29 @@ extern "C"
 //
 // This implementation will treat "type", "title", and "status" as MANDATORY, and "detail" as OPTIONAL
 //
-void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status)
+void entityErrorPush
+(
+  KjNode*                   errorsArrayP,
+  const char*               entityId,
+  OrionldResponseErrorType  type,
+  const char*               title,
+  const char*               detail,
+  int                       status,
+  bool                      avoidDuplicate
+)
 {
+  if (avoidDuplicate == true)
+  {
+    // If the entity 'entityId' is present already, then don't add another one
+    for (KjNode* nodeP = errorsArrayP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
+    {
+      KjNode* entityIdP = kjLookup(nodeP, "entityId");
+
+      if ((entityIdP != NULL) && (strcmp(entityIdP->value.s, entityId) == 0))
+        return;
+    }
+  }
+
   KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
   KjNode* eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);
   KjNode* problemDetailsP = kjObject(orionldState.kjsonP,  "error");

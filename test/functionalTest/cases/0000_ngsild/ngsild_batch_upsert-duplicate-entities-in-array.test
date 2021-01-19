@@ -104,7 +104,7 @@ echo
 01. Create entities E1-E5 using Batch Upsert, but two copies of E4
 ==================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 329
+Content-Length: 338
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -113,7 +113,7 @@ Date: REGEX(.*)
         {
             "entityId": "urn:ngsi-ld:entity:E4",
             "error": {
-                "detail": "previous instance removed",
+                "detail": "previous instances merged into one",
                 "status": 400,
                 "title": "Duplicated Entity",
                 "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"

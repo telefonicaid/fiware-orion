@@ -177,9 +177,9 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     nodeP = next;
   }
 
-  char entityTypesId[64];
+  char entityTypesId[80];
   strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
-  uuidGenerate(&entityTypesId[27]);
+  uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
 
   KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);

@@ -49,7 +49,7 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
   if (entityIdNodeP == NULL)
   {
     LM_W(("Bad Input (CREATE/UPSERT: mandatory field missing: entity::id)"));
-    entityErrorPush(errorsArrayP, "no entity::id", OrionldBadRequestData, "mandatory field missing", "entity::id", 400);
+    entityErrorPush(errorsArrayP, "no entity::id", OrionldBadRequestData, "mandatory field missing", "entity::id", 400, true);
     return false;
   }
 
@@ -57,7 +57,7 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
   if (entityIdNodeP->type != KjString)
   {
     LM_W(("Bad Input (CREATE/UPSERT: entity::id not a string)"));
-    entityErrorPush(errorsArrayP, "invalid entity::id", OrionldBadRequestData, "field with invalid type", "entity::id", 400);
+    entityErrorPush(errorsArrayP, "invalid entity::id", OrionldBadRequestData, "field with invalid type", "entity::id", 400, false);
     return false;
   }
 
@@ -66,7 +66,7 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
   if (pcheckUri(entityIdNodeP->value.s, &detail) == false)
   {
     LM_W(("Bad Input (CREATE/UPSERT: entity::id is a string but not a valid URI)"));
-    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400);  // FIXME: Include 'detail' and name (entityId) ?
+    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Not a URI", entityIdNodeP->value.s, 400, false);
     return false;
   }
 
@@ -74,7 +74,7 @@ bool entityIdCheck(KjNode* entityIdNodeP, bool duplicatedId, KjNode* errorsArray
   if (duplicatedId == true)
   {
     LM_W(("Bad Input (CREATE/UPSERT: Duplicated entity::id)"));
-    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Duplicated field", "entity::id", 400);
+    entityErrorPush(errorsArrayP, entityIdNodeP->value.s, OrionldBadRequestData, "Duplicated field", "entity::id", 400, true);
     return false;
   }
 

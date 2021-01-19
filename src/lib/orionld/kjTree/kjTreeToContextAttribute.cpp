@@ -352,6 +352,8 @@ bool metadataAdd(ContextAttribute* caP, KjNode* nodeP, char* caName)
 
         if (SCOMPARE9(kNodeP->value.s, 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
           isProperty = true;
+        else if (SCOMPARE12(kNodeP->value.s, 'G', 'e', 'o', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+          isProperty = true;
         else if (SCOMPARE13(kNodeP->value.s, 'R', 'e', 'l', 'a', 't', 'i', 'o', 'n', 's', 'h', 'i', 'p', 0))
           isRelationship = true;
         else

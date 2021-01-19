@@ -50,7 +50,6 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
 #include "orionld/mongoBackend/mongoAttributeExists.h"           // mongoAttributeExists
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own Interface
 

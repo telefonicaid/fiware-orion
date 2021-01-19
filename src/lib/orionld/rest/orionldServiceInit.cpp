@@ -67,6 +67,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"          // orionldPostBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchCreate.h"          // orionldPostBatchCreate
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"          // orionldPostBatchUpsert
+#include "orionld/serviceRoutines/orionldPostBatchUpdate.h"          // orionldPostBatchUpdate
 #include "orionld/serviceRoutines/orionldPostQuery.h"                // orionldPostQuery
 #include "orionld/serviceRoutines/orionldGetTenants.h"               // orionldGetTenants
 #include "orionld/serviceRoutines/orionldGetDbIndexes.h"             // orionldGetDbIndexes
@@ -76,18 +77,17 @@ extern "C"
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"       // orionldDeleteRegistration
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"        // orionldPatchSubscription
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"       // orionldDeleteSubscription
-#include "orionld/serviceRoutines/orionldPostBatchUpdate.h"          // orionldPostBatchUpdate
 #include "orionld/serviceRoutines/orionldGetEntityTypes.h"           // orionldGetEntityTypes
-#include "orionld/temporal/temporalPostEntities.h"                   // temporalPostEntities
-#include "orionld/temporal/temporalPostBatchDelete.h"                // temporalPostBatchDelete
-#include "orionld/temporal/temporalDeleteAttribute.h"                // temporalDeleteAttribute
-#include "orionld/temporal/temporalDeleteEntity.h"                   // temporalDeleteEntity
-#include "orionld/temporal/temporalPatchAttribute.h"                 // temporalPatchAttribute
-#include "orionld/temporal/temporalPatchEntity.h"                    // temporalPatchEntity
-#include "orionld/temporal/temporalPostBatchCreate.h"                // temporalPostBatchCreate
-#include "orionld/temporal/temporalPostBatchUpsert.h"                // temporalPostBatchUpsert
-#include "orionld/temporal/temporalPostBatchUpdate.h"                // temporalPostBatchUpdate
-#include "orionld/temporal/temporalPostEntity.h"                     // temporalPostEntity
+#include "orionld/troe/troePostEntities.h"                   // troePostEntities
+#include "orionld/troe/troePostBatchDelete.h"                // troePostBatchDelete
+#include "orionld/troe/troeDeleteAttribute.h"                // troeDeleteAttribute
+#include "orionld/troe/troeDeleteEntity.h"                   // troeDeleteEntity
+#include "orionld/troe/troePatchAttribute.h"                 // troePatchAttribute
+#include "orionld/troe/troePatchEntity.h"                    // troePatchEntity
+#include "orionld/troe/troePostBatchCreate.h"                // troePostBatchCreate
+#include "orionld/troe/troePostBatchUpsert.h"                // troePostBatchUpsert
+#include "orionld/troe/troePostBatchUpdate.h"                // troePostBatchUpdate
+#include "orionld/troe/troePostEntity.h"                     // troePostEntity
 #include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
 #include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
 
@@ -397,30 +397,28 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
 
-  if (temporal)  // CLI Option to turn on Temporal Evolution of Entities
+  if (troe)  // CLI Option to turn on Temporal Representation of Entities
   {
     if (serviceP->serviceRoutine == orionldPostEntities)
-      serviceP->temporalRoutine  = temporalPostEntities;
+      serviceP->troeRoutine = troePostEntities;
     else if (serviceP->serviceRoutine == orionldPostBatchDelete)
-      serviceP->temporalRoutine   = temporalPostBatchDelete;
+      serviceP->troeRoutine = troePostBatchDelete;
     else if (serviceP->serviceRoutine == orionldPostEntity)
-      serviceP->temporalRoutine = temporalPostEntity;
+      serviceP->troeRoutine = troePostEntity;
     else if (serviceP->serviceRoutine == orionldDeleteAttribute)
-      serviceP->temporalRoutine = temporalDeleteAttribute;
+      serviceP->troeRoutine = troeDeleteAttribute;
     else if (serviceP->serviceRoutine == orionldDeleteEntity)
-      serviceP->temporalRoutine = temporalDeleteEntity;
+      serviceP->troeRoutine = troeDeleteEntity;
     else if (serviceP->serviceRoutine == orionldPatchAttribute)
-      serviceP->temporalRoutine = temporalPatchAttribute;
+      serviceP->troeRoutine = troePatchAttribute;
     else if (serviceP->serviceRoutine == orionldPatchEntity)
-      serviceP->temporalRoutine = temporalPatchEntity;
+      serviceP->troeRoutine = troePatchEntity;
     else if (serviceP->serviceRoutine == orionldPostBatchCreate)
-      serviceP->temporalRoutine = temporalPostBatchCreate;
+      serviceP->troeRoutine = troePostBatchCreate;
     else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
-      serviceP->temporalRoutine = temporalPostBatchUpsert;
-#if 0
+      serviceP->troeRoutine = troePostBatchUpsert;
     else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
-      serviceP->temporalRoutine = temporalPostBatchUpdate;
-#endif
+      serviceP->troeRoutine = troePostBatchUpdate;
   }
 }
 

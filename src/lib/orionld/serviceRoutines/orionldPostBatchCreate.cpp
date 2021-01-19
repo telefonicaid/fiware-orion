@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjClone.h"                                     // kjClone
+#include "kjson/kjRender.h"                                    // kjRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -158,12 +160,13 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
     entityP = next;
   }
+
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
   //     whose Entity::Id is part of the array "idArray".
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
+  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
   if (idTypeAndCreDateFromDb != NULL)
   {
@@ -174,7 +177,7 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
 
       // Get entity id, type and creDate from the DB
       entityIdGet(dbEntityP, &idInDb);
-      entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "entity already exists", NULL, 400);
+      entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "entity already exists", NULL, 400, true);
 
       entityP = entityLookupById(incomingTree, idInDb);
 
@@ -183,6 +186,68 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
   }
 
   typeCheckForNonExistingEntities(incomingTree, idTypeAndCreDateFromDb, errorsArrayP, NULL);
+
+
+  //
+  // Attempts to create an entity more than once (more than one instance with the same Entity ID in the entity array)
+  // shall result in an error message (part of 207 response) for the all but the first instance
+  //
+  KjNode* eidP = orionldState.requestTree->value.firstChildP;
+  while (eidP != NULL)
+  {
+    next = eidP->next;
+
+    //
+    // Get the 'id' field
+    //
+    KjNode* idP = kjLookup(eidP, "id");
+    if (idP == NULL)
+    {
+      LM_E(("Internal Error (no 'id' for entity in batch create entity array - how did this get all the way here?)"));
+      eidP = next;
+      continue;
+    }
+
+    //
+    // Compare the 'id' field of current (eidP) with all nextcoming EIDs is the array
+    // If match, remove the latter
+    //
+    KjNode* copyP = eidP->next;
+    KjNode* copyNext;
+
+    while (copyP != NULL)
+    {
+      copyNext = copyP->next;
+
+      // Lookup the 'id' field
+      KjNode* copyIdP = kjLookup(copyP, "id");
+      if (copyIdP == NULL)
+      {
+        LM_E(("Internal Error (no 'id' for entity in batch create entity array - how did this get all the way here?)"));
+        copyP = copyNext;
+        continue;
+      }
+
+      if (strcmp(idP->value.s, copyIdP->value.s) == 0)
+      {
+        entityErrorPush(errorsArrayP, copyIdP->value.s, OrionldBadRequestData, "Entity ID repetition", NULL, 400, true);
+        kjChildRemove(orionldState.requestTree, copyP);
+      }
+      copyP = copyNext;
+    }
+
+    eidP = next;
+  }
+
+  //
+  // Now that:
+  //   - the erroneous entities have been removed from the incoming tree,
+  //   - entities that already existed have been removed from the incoming tree,
+  // let's clone the tree for TRoE !!!
+  //
+  KjNode* cloneP = NULL;  // Only for TRoE
+  if (troe)
+    cloneP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   UpdateContextRequest  mongoRequest;
 
@@ -219,7 +284,8 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400);
+                        400,
+                        false);
     }
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)
@@ -249,6 +315,9 @@ bool orionldPostBatchCreate(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccReceiverInternalError;
     return false;
   }
+
+  if ((troe == true) && (cloneP != NULL))
+    orionldState.requestTree = cloneP;
 
   return true;
 }

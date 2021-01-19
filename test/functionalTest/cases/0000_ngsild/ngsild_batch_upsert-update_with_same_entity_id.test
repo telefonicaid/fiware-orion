@@ -1,0 +1,146 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert-Update with instances of the same entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Upsert+Update the entity E1, with four different instances of E1 in the array
+# 02. GET all entities and see the merged E1
+#
+
+echo "01. Upsert+Update the entity E1, with four different instances of E1 in the array"
+echo "================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P1": {
+      "type": "Property",
+      "value": "E1/P1"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P2": {
+      "type": "Property",
+      "value": "E1/P2"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P3": {
+      "type": "Property",
+      "value": "E1/P3"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:entities:E1",
+    "type": "T",
+    "P4": {
+      "type": "Property",
+      "value": "E1/P4"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
+echo
+echo
+
+
+echo "02. GET all entities and see the merged E1"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+--REGEXPECT--
+01. Upsert+Update the entity E1, with four different instances of E1 in the array
+=================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 246
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:ngsi-ld:entities:E1",
+            "error": {
+                "detail": "previous instances merged into one",
+                "status": 400,
+                "title": "Duplicated Entity",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+            }
+        }
+    ],
+    "success": [
+        "urn:ngsi-ld:entities:E1"
+    ]
+}
+
+
+02. GET all entities and see the merged E1
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 209
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "E1/P1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "E1/P2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "E1/P3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "E1/P4"
+        },
+        "id": "urn:ngsi-ld:entities:E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

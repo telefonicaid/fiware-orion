@@ -759,17 +759,16 @@ bool setWriteConcern
   std::string*         err
 )
 {
-  LM_T(LmtMongo, ("setWritteConcern(): '%d'", wc.nodes()));
+  LM_T(LmtMongo, ("setWriteConcern(): '%d'", wc.nodes()));
 
   try
   {
     connection->setWriteConcern(wc);
-    LM_I(("Database Operation Successful (setWriteConcern: %d)", wc.nodes()));
   }
   catch (const std::exception &e)
   {
     // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
-    std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() +*/
+    std::string msg = std::string("setWriteConcern(): ") + /*wc.nodes() +*/
       " - exception: " + e.what();
 
     *err = "Database Error (" + msg + ")";
@@ -780,7 +779,7 @@ bool setWriteConcern
   catch (...)
   {
     // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
-    std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() + */
+    std::string msg = std::string("setWriteConcern(): ") + /*wc.nodes() + */
       " - exception: generic";
 
     *err = "Database Error (" + msg + ")";
@@ -811,7 +810,6 @@ bool getWriteConcern
   try
   {
     *wc = connection->getWriteConcern();
-    LM_I(("Database Operation Successful (getWriteConcern)"));
   }
   catch (const std::exception &e)
   {

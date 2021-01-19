@@ -170,8 +170,9 @@ typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
   ConnectionInfo*         ciP;
-  struct timespec         timestamp;    // The time when the request entered
-  double                  requestTime;  // Same same, but at a floating point
+  struct timespec         timestamp;              // The time when the request entered
+  double                  requestTime;            // Same same, but at a floating point
+  char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
@@ -271,6 +272,15 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    forwardAttrsCompacted;
+
+  //
+  // TRoE
+  //
+  bool                    troeError;
+  char                    troeDbName[128];
+  KjNode*                 duplicateArray;
+  KjNode*                 troeIgnoreV[20];
+  unsigned int            troeIgnoreIx;
 } OrionldConnectionState;
 
 
@@ -303,7 +313,12 @@ extern bool              multitenancy;             // From orionld.cpp
 extern char*             tenant;                   // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
-extern bool              temporal;                 // From orionld.cpp
+extern bool              troe;                     // From orionld.cpp
+extern char              troeHost[64];             // From orionld.cpp
+extern unsigned short    troePort;                 // From orionld.cpp
+extern char              troeUser[64];             // From orionld.cpp
+extern char              troePwd[64];              // From orionld.cpp
+extern int               troePoolSize;             // From orionld.cpp
 extern bool              mhdTurbo;                 // From orionld.cpp
 extern const char*       orionldVersion;
 extern char*             tenantV[100];

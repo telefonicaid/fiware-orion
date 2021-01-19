@@ -9,7 +9,7 @@
 <br>
 [![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion-ld.readthedocs.io/en/latest/?badge=latest)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/incubating.svg)
-
+[![Coverage Status](https://coveralls.io/repos/github/FIWARE/context.Orion-LD/badge.svg?branch=feature/temporal)](https://coveralls.io/github/FIWARE/context.Orion-LD?branch=feature/temporal)
 
 This Generic Enabler implements the [NGSI-LD API](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.02.01_60/gs_CIM009v010201p.pdf)
 Orion-LD extends [the Orion Context Broker](https://github.com/telefonicaid/fiware-orion)

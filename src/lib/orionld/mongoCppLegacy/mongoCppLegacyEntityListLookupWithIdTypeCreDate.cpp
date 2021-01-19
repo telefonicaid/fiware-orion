@@ -30,6 +30,8 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                                // KjNode
 #include "kjson/kjBuilder.h"                                             // kjArray, ...
+#include "kjson/kjParse.h"                                               // kjParse
+#include "kjson/kjRender.h"                                              // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                               // LM_*
@@ -43,6 +45,7 @@ extern "C"
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbNumberFieldGet.h"       // mongoCppLegacyDbNumberFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"       // mongoCppLegacyDbStringFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbObjectFieldGet.h"       // mongoCppLegacyDbObjectFieldGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyDbArrayFieldGet.h"        // mongoCppLegacyDbArrayFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"  // Own interface
 
 
@@ -57,7 +60,7 @@ extern "C"
 //   * Entity Type
 //   * Entity Creation Date
 //
-KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
+KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, bool attrNames)
 {
   char collectionPath[256];
 
@@ -86,6 +89,9 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
   //
   fields.append("_id",     1);  // "id" and "type" are inside "_id"
   fields.append("creDate", 1);
+
+  if (attrNames)
+    fields.append("attrNames", 1);
 
   mongo::BSONObj                        fieldsToReturn = fields.obj();
   mongo::Query                          query(filter.obj());
@@ -144,6 +150,24 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray)
     kjChildAdd(entityTree, typeNodeP);
     kjChildAdd(entityTree, creDateNodeP);
 
+    if (attrNames)
+    {
+      mongo::BSONArray  bArray;
+      KjNode*           attrNamesV = kjArray(orionldState.kjsonP, "attrNames");
+
+      if (mongoCppLegacyDbArrayFieldGet(&bsonObj, "attrNames", &bArray) == true)
+      {
+        // Loop over bArray to extract all strings and add to attrNamesV
+        for (int ix = 0; ix < bArray.nFields(); ix++)
+        {
+          KjNode* aNameNodeP = kjString(orionldState.kjsonP, NULL, bArray[ix].valuestr());
+          kjChildAdd(attrNamesV, aNameNodeP);
+          LM_TMP(("KZ: DB-Attribute '%s' for Entity '%s'", aNameNodeP->value.s, idString));
+        }
+      }
+
+      kjChildAdd(entityTree, attrNamesV);
+    }
 
     // Create the entity array if it doesn't already exist
     if (entitiesArray == NULL)

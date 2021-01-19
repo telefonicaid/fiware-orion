@@ -65,7 +65,6 @@ static void kjChildPrepend(KjNode* container, KjNode* child)
 static bool timestampToString(KjNode* nodeP)
 {
   char*   dateBuf = kaAlloc(&orionldState.kalloc, 64);
-  char*   detail;
   double  timestamp;
 
   if (nodeP->type == KjFloat)
@@ -78,9 +77,9 @@ static bool timestampToString(KjNode* nodeP)
     return false;
   }
 
-  if (numberToDate(timestamp, dateBuf, 64, &detail) == false)
+  if (numberToDate(timestamp, dateBuf, 64) == false)
   {
-    LM_E(("Database Error (numberToDate: %s)", detail));
+    LM_E(("Database Error (numberToDate failed)"));
     return false;
   }
 

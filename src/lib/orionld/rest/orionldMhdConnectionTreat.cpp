@@ -38,7 +38,6 @@ extern "C"
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
 #include "common/string.h"                                       // FT
@@ -57,6 +56,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
+#include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
@@ -1011,13 +1011,26 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
   //
-  // Call Temporal Routine (if there is one) to save the temporal data.
+  // Call TRoE Routine (if there is one) to save the TRoE data.
   // Only if the Service Routine was successful, of course
   //
   if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
   {
-    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
-      orionldState.serviceP->temporalRoutine(ciP);
+    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->troeRoutine != NULL))
+    {
+      //
+      // Also, if something went wrong during processing, the SR can flag this by setting the requestTree to NULL
+      //
+      if (orionldState.troeError == true)
+        LM_E(("Internal Error (something went wrong during TRoE processing)"));
+      else
+      {
+        numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
+
+        LM_TMP(("================= Calling TRoE Routine ======================"));
+        orionldState.serviceP->troeRoutine(ciP);
+      }
+    }
   }
 
   //
