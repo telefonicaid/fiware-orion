@@ -111,9 +111,7 @@ recommended to have a look to the brief
 Build and Install documentation for Orion Context Broker can be found at
 [the corresponding section of the Admin Manual](doc/manuals/admin/install.md).
 
----
 > :point_up_2: If you want to run a production-grade instance of orion, carefully read all information of the [admin-section](doc/manuals/admin). 
----
 
 [Top](#top)
 
