@@ -195,6 +195,7 @@ int             contextDownloadTimeout;
 bool            temporal;
 bool            disableFileLog;
 bool            lmtmp;
+bool            mhdTurbo;
 
 
 
@@ -259,6 +260,7 @@ bool            lmtmp;
 #define TEMPORAL_DESC          "enable temporal evolution of entities"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define TMPTRACES_DESC         "disable LM_TMP traces"
+#define MHDTURBO_DESC          "turn on MHD TURBO"
 
 
 
@@ -323,6 +325,7 @@ PaArgument paArgs[] =
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC           },
   { "-temporal",              &temporal,                "TEMPORAL",                  PaBool,    PaOpt,  false,           false,  true,             TEMPORAL_DESC          },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC         },
+  { "-mhdTurbo",              &mhdTurbo,                "MHD_TURBO",                 PaBool,    PaHid,  false,           false,  true,             MHDTURBO_DESC          },
 
   PA_END_OF_ARGS
 };
