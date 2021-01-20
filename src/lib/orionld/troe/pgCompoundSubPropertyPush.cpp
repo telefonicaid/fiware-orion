@@ -70,14 +70,14 @@ bool pgCompoundSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attributeId, ts, observedAt, valueType, text) "
+             "instanceId, id, entityId, attributeId, ts, observedAt, valueType, compound) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
              instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, observedAt, renderedValue);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attributeId, ts, valueType, text) "
+             "instanceId, id, entityId, attributeId, ts, valueType, compound) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'Compound', '%s')",
              instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, renderedValue);
   }
