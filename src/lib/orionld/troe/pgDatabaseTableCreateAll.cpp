@@ -113,6 +113,13 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
     "ts                  TIMESTAMP NOT NULL)";
 
+#if 0
+  const char* entitiesTimescale      = "SELECT create_hypertable('entities', 'ts')";
+  const char* attributesTimescale    = "SELECT create_hypertable('attributes', 'ts')";
+  const char* subAttributesTimescale = "SELECT create_hypertable('subAttributes', 'ts')";
+  const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql, entitiesTimescale, attributesTimescale, subAttributesTimescale };
+#endif
+
   const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
 
   if (pgTransactionBegin(connectionP) == false)

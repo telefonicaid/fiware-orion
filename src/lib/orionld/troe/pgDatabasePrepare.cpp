@@ -57,7 +57,7 @@ bool pgDatabasePrepare(const char* dbName)
   // For now, we just create the Postgres database for the default tenant
   // This will fail if the database already exists - that's OK
   LM_TMP(("PGPOOL: creating db '%s'", dbName));
-  if (pgDatabaseCreate(connectionP, dbName) == false)
+  if (pgDatabaseCreate(connectionP, dbName) == false)  // FIXME: return the connection to the new DB ?
   {
     LM_TMP(("PGPOOL: database '%s' seems to exist already", dbName));
     pgConnectionRelease(connectionP);
@@ -65,7 +65,7 @@ bool pgDatabasePrepare(const char* dbName)
   }
   LM_TMP(("PGPOOL: db '%s' has been created", dbName));
 
-  // Disconnect from the NULL connection
+  // Disconnect from the "NULL" DB
   pgConnectionRelease(connectionP);
 
   // Connect to the newly created database

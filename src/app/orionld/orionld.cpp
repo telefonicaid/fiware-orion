@@ -1124,6 +1124,8 @@ int main(int argC, char* argV[])
   //
   if (troe)
   {
+    // Close stderr, as postgres driver prints garbage to it!
+    close(2);
     if (troeInit() == false)
       LM_X(1, ("Database Error (unable to initialize the layer for Temporal Representation of Entities)"));
   }

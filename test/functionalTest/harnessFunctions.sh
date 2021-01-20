@@ -1409,7 +1409,7 @@ function neqTimestamp()
 function pgDrop()
 {
   dbName="$1"
-  echo "DROP DATABASE IF EXISTS $dbName" | psql --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01 > /tmp/pg-stdout
+  echo "DROP DATABASE IF EXISTS $dbName" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01 > /tmp/pg-stdout
   egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
   egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
 
@@ -1434,7 +1434,6 @@ function pgCreate()
   dbName="$1"
   echo "Creating postgres DB $dbName"
   dbCreation="CREATE DATABASE $dbName"
-  plpgsql="CREATE EXTENSION IF NOT EXISTS plpgsql;"
   postgis="CREATE EXTENSION IF NOT EXISTS postgis;"
   valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'GeoMultiPolygon', 'GeoLineString', 'GeoMultiLineString', 'LanguageMap')"
   operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
@@ -1442,50 +1441,67 @@ function pgCreate()
   attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, subProperties BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING), ts TIMESTAMP NOT NULL)"
   subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityId TEXT NOT NULL, attributeId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING), ts TIMESTAMP NOT NULL)"
 
-  echo $dbCreation:                                                                           > /tmp/pqsql 2>&1
-  echo $dbCreation     | psql --host $PGHOST --port $PGPORT --username $PGUSER               >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  # timescaledb="CREATE EXTENSION IF NOT EXISTS timescaledb;"
+  # entitiesTimescale="SELECT create_hypertable('entities', 'ts')"
+  # attributesTimescale="SELECT create_hypertable('attributes', 'ts')"
+  # subAttributesTimescale="SELECT create_hypertable('subAttributes', 'ts')"
 
-  echo $plpgsql:                                                                             >> /tmp/pqsql 2>&1
-  echo $plpgsql        | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $dbCreation:                                                                                          > /tmp/pqsql 2>&1
+  echo $dbCreation            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER               >> /tmp/pqsql 2>&1
+  echo                                                                                                      >> /tmp/pqsql 2>&1
 
-  echo $postgis:                                                                             >> /tmp/pqsql 2>&1
-  echo $postgis        | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $timescaledb:                                                                                        >> /tmp/pqsql 2>&1
+  echo $timescaledb           | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                                      >> /tmp/pqsql 2>&1
 
-  echo "SELECT * FROM pg_extension"                                                          >> /tmp/pqsql 2>&1
-  echo "SELECT * FROM pg_extension" | psql --host $PGHOST --port $PGPORT --username $PGUSER  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $postgis:                                                                                    >> /tmp/pqsql 2>&1
+  echo $postgis               | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
 
-  echo $operationMode:                                                                       >> /tmp/pqsql 2>&1
-  echo $operationMode  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo "SELECT * FROM pg_extension:"                                                                >> /tmp/pqsql 2>&1
+  echo "SELECT * FROM pg_extension" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER         >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
 
-  echo $valuetype:                                                                           >> /tmp/pqsql 2>&1
-  echo $valuetype      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $operationMode:                                                                              >> /tmp/pqsql 2>&1
+  echo $operationMode         | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
 
-  echo $entities                                                                             >> /tmp/pqsql 2>&1
-  echo $entities       | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $valuetype:                                                                                  >> /tmp/pqsql 2>&1
+  echo $valuetype             | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
 
-  echo $attributes:                                                                          >> /tmp/pqsql 2>&1
-  echo $attributes     | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $entities:                                                                                   >> /tmp/pqsql 2>&1
+  echo $entities              | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
 
-  echo $subAttributes:                                                                       >> /tmp/pqsql 2>&1
-  echo $subAttributes  | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
-  echo                                                                                       >> /tmp/pqsql 2>&1
+  echo $attributes:                                                                                 >> /tmp/pqsql 2>&1
+  echo $attributes            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo $subAttributes:                                                                              >> /tmp/pqsql 2>&1
+  echo $subAttributes         | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  # echo $entitiesTimescale:                                                                          >> /tmp/pqsql 2>&1
+  # echo $entitiesTimescale     | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  # echo                                                                                              >> /tmp/pqsql 2>&1
+
+  # echo $attributesTimescale:                                                                        >> /tmp/pqsql 2>&1
+  # echo $attributesTimescale    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName" >> /tmp/pqsql 2>&1
+  # echo                                                                                              >> /tmp/pqsql 2>&1
+
+  # echo $subAttributesTimescale:                                                                     >> /tmp/pqsql 2>&1
+  # echo $subAttributesTimescale | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName" >> /tmp/pqsql 2>&1
+  # echo                                                                                              >> /tmp/pqsql 2>&1
 
   #
   # Not sure why, but the tables seem to survive the deletion of the database ... done by pgDrop
   # This is pretty strange.
   # To fix the problem, the tables are emptied here:
   #
-  echo "DELETE FROM subattributes" | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo "DELETE FROM attributes"    | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
-  echo "DELETE FROM entities"      | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo "DELETE FROM subattributes" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo "DELETE FROM attributes"    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo "DELETE FROM entities"      | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
 }
 
 
@@ -1532,7 +1548,7 @@ function postgresCmd()
     exit 1
   fi
 
-  echo "$sqlCommand" | psql --host $PGHOST --port $PGPORT --username $PGUSER -d "$tenant" --csv
+  echo "$sqlCommand" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$tenant" --csv
 }
 
 
