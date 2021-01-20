@@ -87,6 +87,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "boolean             BOOL,"
     "number              FLOAT8,"
     "datetime            TIMESTAMP,"
+    "compound            JSONB,"
     "geoPoint            GEOGRAPHY(POINTZ, 4326),"
     "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
     "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
@@ -106,12 +107,20 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "boolean             BOOL,"
     "number              FLOAT8,"
     "datetime            TIMESTAMP,"
+    "compound            JSONB,"
     "geoPoint            GEOGRAPHY(POINTZ, 4326),"
     "geoPolygon          GEOGRAPHY(POLYGON, 4267),"
     "geoMultiPolygon     GEOGRAPHY(MULTIPOLYGON, 4267),"
     "geoLineString       GEOGRAPHY(LINESTRING),"
     "geoMultiLineString  GEOGRAPHY(MULTILINESTRING),"
     "ts                  TIMESTAMP NOT NULL)";
+
+#if 0
+  const char* entitiesTimescale      = "SELECT create_hypertable('entities', 'ts')";
+  const char* attributesTimescale    = "SELECT create_hypertable('attributes', 'ts')";
+  const char* subAttributesTimescale = "SELECT create_hypertable('subAttributes', 'ts')";
+  const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql, entitiesTimescale, attributesTimescale, subAttributesTimescale };
+#endif
 
   const char* sqlV[] = { valueTypeSql, opModeSql, entitiesSql, attributesSql, subAttributesSql };
 

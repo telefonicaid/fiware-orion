@@ -37,11 +37,17 @@
 //
 // pgDatabaseCreate - create a postgres database
 //
+// FIXME: the connection to the new database could be returned - avoid an extra close/connect
+//
 bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
 {
   char       sql[512];
   PGresult*  res;
+  PGconn*    dbConnectionP;
 
+  //
+  // Create the database (using an already established connection to the "NULL" database)
+  //
   snprintf(sql, sizeof(sql), "CREATE DATABASE %s", dbName);
   res = PQexec(connectionP, sql);
   if (res == NULL)
@@ -50,21 +56,25 @@ bool pgDatabaseCreate(PGconn* connectionP, const char* dbName)
 
 
   //
-  // Add extension 'plpgsql' to the database
+  // Connect to the newly created database
   //
-  PGconn* dbConnectionP = pgConnectionGet(dbName);
+  dbConnectionP = pgConnectionGet(dbName);
   if (dbConnectionP == NULL)
     LM_RE(false, ("Database Error (unable to connect to postgres database '%s')", dbName));
 
-  res = PQexec(dbConnectionP, "CREATE EXTENSION IF NOT EXISTS plpgsql");
+#if 0
+  //
+  // Add extension 'timescaledb' to the database
+  //
+  res = PQexec(dbConnectionP, "CREATE EXTENSION IF NOT EXISTS timescaledb");
   if (res == NULL)
   {
     PQclear(res);
     pgConnectionRelease(dbConnectionP);
-    LM_RE(false, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS plpgsql)"));
+    LM_RE(false, ("Database Error (Failing command: CREATE EXTENSION IF NOT EXISTS timescaledb)"));
   }
   PQclear(res);
-
+#endif
 
   //
   // Add extension 'postgis' to the database

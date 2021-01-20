@@ -134,14 +134,14 @@ echo
 
 echo "03. See the attributes in the temporal database"
 echo "==============================================="
-postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt FROM attributes"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
 echo
 echo
 
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
 echo
 echo
 
@@ -164,26 +164,26 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 
 03. See the attributes in the temporal database
 ===============================================
-opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat
-Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,2020-12-10 07:11:00.123
-Create,https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,cm,,,1,,2020-12-10 07:11:00.124
-Create,https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14,,2020-12-10 07:11:00.125
-Create,https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,"{""A"":1,""vec"":[1,2,3]}",,,2020-12-10 07:11:00.126
-Create,https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,"[""S1"",""S2"",""S3""]",,,2020-12-10 07:11:00.127
-Create,https://uri.etsi.org/ngsi-ld/default-context/B,Boolean,urn:ngsi-ld:entities:E1,f,,,,,t,2020-12-10 07:11:00.128
-Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,,,2020-12-10 07:11:00.129
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,,2020-12-10 07:11:00.123
+Create,https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,cm,,,1,,,2020-12-10 07:11:00.124
+Create,https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14,,,2020-12-10 07:11:00.125
+Create,https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,,,,"{""A"": 1, ""vec"": [1, 2, 3]}",2020-12-10 07:11:00.126
+Create,https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,,,,"[""S1"", ""S2"", ""S3""]",2020-12-10 07:11:00.127
+Create,https://uri.etsi.org/ngsi-ld/default-context/B,Boolean,urn:ngsi-ld:entities:E1,f,,,,,t,,2020-12-10 07:11:00.128
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,,,,2020-12-10 07:11:00.129
 
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R1,,,2020-12-10 07:12:00.123
-https://uri.etsi.org/ngsi-ld/default-context/Sub-String,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,string sub-property,,,2020-12-10 07:12:00.124
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,t,2020-12-10 07:12:00.125
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Array,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,"[1,2,3]",,,2020-12-10 07:12:00.126
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Object,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,"{""pi"":3.14,""bTrue"":true,""c3"":""3""}",,,2020-12-10 07:12:00.127
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,2020-12-10 07:12:00.128
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Float,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-f,,3.141593,,2020-12-10 07:12:00.129
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,compound,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R1,,,,2020-12-10 07:12:00.123
+https://uri.etsi.org/ngsi-ld/default-context/Sub-String,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,string sub-property,,,,2020-12-10 07:12:00.124
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,t,,2020-12-10 07:12:00.125
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Array,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,,"[1, 2, 3]",2020-12-10 07:12:00.126
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Object,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,,"{""c3"": ""3"", ""pi"": 3.14, ""bTrue"": true}",2020-12-10 07:12:00.127
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,,2020-12-10 07:12:00.128
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Float,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-f,,3.141593,,,2020-12-10 07:12:00.129
 
 
 --TEARDOWN--
