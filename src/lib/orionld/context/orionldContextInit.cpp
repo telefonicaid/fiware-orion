@@ -255,7 +255,7 @@ bool orionldContextInit(OrionldProblemDetails* pdP)
     if (gotCoreContext == false)
       LM_E(("Unable to cache pre-loaded contexts from '%s'", cacheContextDir));
   }
-  LM_TMP(("ORIONLD_CACHED_CONTEXT_DIRECTORY == '%s'", cacheContextDir));
+  LM_TMP(("ORIONLD_CACHED_CONTEXT_DIRECTORY == '%s'", cacheContextDir));  // #if DEBUG
 #endif
 
   if (gotCoreContext == false)

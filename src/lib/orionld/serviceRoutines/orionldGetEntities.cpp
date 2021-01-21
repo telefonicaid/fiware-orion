@@ -112,8 +112,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
 
-  LM_TMP(("GET: type == '%s'", type));
-
   //
   // FIXME: Move all this to orionldMhdConnectionInit()
   //
@@ -322,8 +320,6 @@ bool orionldGetEntities(ConnectionInfo* ciP)
     //
     type = orionldContextItemExpand(orionldState.contextP, type, true, NULL);
 
-    LM_TMP(("GET: context is: %s", orionldState.contextP->url));
-    LM_TMP(("GET: expanded type: %s", type));
     isTypePattern = false;  // Just in case ...
   }
 

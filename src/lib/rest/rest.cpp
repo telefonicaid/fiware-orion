@@ -589,7 +589,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   HttpHeaders*     headerP = &ciP->httpHeaders;
   std::string      key     = ckey;
 
-  LM_TMP(("Got HTTP Header:   %s: %s", ckey, value));
   LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", ckey, value));
 
   if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
@@ -615,7 +614,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), HTTP_FIWARE_SERVICE) == 0)
   {
 #ifdef ORIONLD
-    LM_TMP(("POOL: tenant: '%s'", value));
     orionldState.tenant = (char*) value;
     if (troe)
       snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
@@ -631,7 +629,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     ciP->tenant     = value;
     toLowercase((char*) headerP->tenant.c_str());
 
-    LM_TMP(("POOL: tenant: '%s'", value));
     orionldState.tenant = (char*) value;
     if (troe)
       snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);

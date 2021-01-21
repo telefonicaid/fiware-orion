@@ -1026,8 +1026,6 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
       {
         numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
-
-        LM_TMP(("================= Calling TRoE Routine ======================"));
         orionldState.serviceP->troeRoutine(ciP);
       }
     }

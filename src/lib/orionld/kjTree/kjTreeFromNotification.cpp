@@ -60,8 +60,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextCacheLookup(context);
 
-  LM_TMP(("V2NFY: Rendering Notification. Format: %s", renderFormatToString(renderFormat, false, false)));
-
   if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
   {
     // id

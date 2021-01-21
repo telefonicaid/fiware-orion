@@ -163,7 +163,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   char* entityId   = orionldState.wildcard[0];
   char* detail;
 
-  LM_TMP(("PATCH: entity id: '%s'", entityId));
   // 1. Is the Entity ID in the URL a valid URI?
   if (pcheckUri(entityId, &detail) == false)
   {
@@ -175,10 +174,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
   // 2. Is the payload not a JSON object?
   OBJECT_CHECK(orionldState.requestTree, kjValueType(orionldState.requestTree->type));
 
-  char buf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, buf, sizeof(buf));
-  LM_TMP(("PATCH: incoming payload body: %s", buf));
-
   // 3. Get the entity from mongo
   KjNode* dbEntityP;
   if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
@@ -187,9 +182,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity does not exist", entityId);
     return false;
   }
-
-  kjRender(orionldState.kjsonP, dbEntityP, buf, sizeof(buf));
-  LM_TMP(("PATCH: entity in DB: %s", buf));
 
   // 3. Get the Entity Type, needed later in the call to the constructor of ContextElement
   KjNode* idNodeP = kjLookup(dbEntityP, "_id");
@@ -228,8 +220,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     orionldErrorResponseCreate(OrionldInternalError, "Corrupt Database", "'attrs' field of entity from DB not found");
     return false;
   }
-  kjRender(orionldState.kjsonP, inDbAttrsP, buf, sizeof(buf));
-  LM_TMP(("PATCH: inDbAttrsP: %s", buf));
 
   //
   // 5. Loop over the incoming payload data
@@ -249,7 +239,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     char*    title;
     char*    detail;
 
-    LM_TMP(("PATCH: attribute name: '%s'", newAttrP->name));
     next = newAttrP->next;
 
     if ((strcmp(newAttrP->name, "location")         != 0) &&
@@ -259,7 +248,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
     {
       newAttrP->name = orionldContextItemExpand(orionldState.contextP, newAttrP->name, true, NULL);
     }
-    LM_TMP(("PATCH: attribute name expanded: '%s'", newAttrP->name));
 
     // Is the attribute in the incoming payload a valid attribute?
     if (attributeCheck(ciP, newAttrP, &title, &detail) == false)
@@ -272,16 +260,14 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
 
     char* eqName = kaStrdup(&orionldState.kalloc, newAttrP->name);
     dotForEq(eqName);
-    LM_TMP(("PATCH: looking up the attribute '%s' in the db attrs array (where '.' is replaced with '=')", eqName));
+
     dbAttrP = kjLookup(inDbAttrsP, eqName);
     if (dbAttrP == NULL)  // Doesn't already exist - must be discarded
     {
-      LM_TMP(("PATCH: attribute '%s' doesn't exist - it's discarded", eqName));
       attributeNotUpdated(notUpdatedP, newAttrP->name, "attribute doesn't exist");
       newAttrP = next;
       continue;
     }
-    LM_TMP(("PATCH: attribute '%s' exists and will be modified (real attr name: '%s')", eqName, newAttrP->name));
 
     // Steal createdAt from dbAttrP?
 
@@ -308,7 +294,6 @@ bool orionldPatchEntity(ConnectionInfo* ciP)
       ContextAttribute* caP = new ContextAttribute();
 
       eqForDot(attrP->name);
-      LM_TMP(("PATCH: converting attribute '%s' to a ContextAttribute", attrP->name));
 
       if (kjTreeToContextAttribute(orionldState.contextP, attrP, caP, NULL, &detail) == false)
       {

@@ -165,7 +165,6 @@ bool pgTablesCreate(PGconn* pgConnectionP)
   {
     PGresult* pgResult = PQexec(pgConnectionP, sqlV[ix]);
 
-    LM_TMP(("SQL: %s", sqlV[ix]));
     if (PQresultStatus(pgResult) != PGRES_COMMAND_OK)
     {
       LM_E(("Database Error (Postgres DB command '%s': %s)", sqlV[ix], PQerrorMessage(pgConnectionP)));

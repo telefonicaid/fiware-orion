@@ -69,53 +69,6 @@ extern "C"
 
 
 
-// -----------------------------------------------------------------------------
-//
-// entityArrayPresent -
-//
-void entityArrayPresent(KjNode* entityV, const char* msg)
-{
-  int eIx = 0;
-  for (KjNode* eP = entityV->value.firstChildP; eP != NULL; eP = eP->next)
-  {
-    LM_TMP(("%s: Entity %d:", msg, eIx));
-    for (KjNode* aP = eP->value.firstChildP; aP != NULL; aP = aP->next)
-    {
-      if (aP->type == KjString)
-        LM_TMP(("%s:   %s:\t %s", msg, aP->name, aP->value.s));
-      else if (aP->type == KjObject)
-      {
-        KjNode* type = kjLookup(aP, "type");
-
-        if ((type != NULL) && (strcmp(type->value.s, "Property") == 0))
-        {
-          KjNode* value = kjLookup(aP, "value");
-
-          if (value->type == KjString)
-            LM_TMP(("%s:   %s:\t %s", msg, aP->name, value->value.s));
-          else
-            LM_TMP(("%s:   %s:\t %s Property", msg, aP->name, kjValueType(value->type)));
-        }
-        else if ((type != NULL) && (strcmp(type->value.s, "Relationship") == 0))
-        {
-          KjNode* value = kjLookup(aP, "value");
-
-          if (value == NULL)
-            value = kjLookup(aP, "object");
-
-          LM_TMP(("%s:  %s:\t %s (Relationship)", msg, aP->name, value->value.s));
-        }
-      }
-      else
-        LM_TMP(("%s:   %s:\t %s", msg, aP->name, kjValueType(aP->type)));
-    }
-    LM_TMP(("%s: --------------------------------------------", msg));
-    ++eIx;
-  }
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldPostBatchUpdate -
@@ -124,15 +77,6 @@ void entityArrayPresent(KjNode* entityV, const char* msg)
 //
 bool orionldPostBatchUpdate(ConnectionInfo* ciP)
 {
-#if 0
-  if (orionldState.uriParamOptions.noOverwrite == true)
-    LM_TMP(("UR: POST /ngsi-ld/v1/entityOperations/update?options=noOverwrite => IGNORE attributes that already exist"));
-  else
-    LM_TMP(("UR: POST /ngsi-ld/v1/entityOperations/update?options=noOverwrite => REPLACE attributes that already exist"));
-  entityArrayPresent(orionldState.requestTree, "UR: incoing payload");
-  LM_TMP(("UR: ******************************************"));
-#endif
-
   //
   // Prerequisites for the payload in orionldState.requestTree:
   // * must be an array with objects
@@ -277,12 +221,8 @@ bool orionldPostBatchUpdate(ConnectionInfo* ciP)
         {
           char* longName = orionldContextItemExpand(orionldState.contextP, aP->name, true, NULL);
 
-          LM_TMP(("TROE: treating attribute '%s' of entity '%s'", longName, idNodeP->value.s));
           if (kjStringValueLookupInArray(attrNames, longName) != NULL)
-          {
             kjChildRemove(entityP, aP);
-            LM_TMP(("TROE: Removed attribute '%s' (%s) from '%s' as it already exists", aP->name, longName, idNodeP->value.s));
-          }
         }
 
         aP = next;

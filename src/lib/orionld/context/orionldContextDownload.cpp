@@ -51,8 +51,6 @@ char* orionldContextDownload(const char* url, bool* downloadFailedP, OrionldProb
 
   *downloadFailedP = true;
 
-  LM_TMP(("Downloading the context '%s'", url));
-
   char                 protocol[16];
   char                 ip[256];
   uint16_t             port    = 0;
