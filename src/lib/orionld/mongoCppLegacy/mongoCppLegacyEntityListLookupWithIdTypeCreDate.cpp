@@ -162,7 +162,6 @@ KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, 
         {
           KjNode* aNameNodeP = kjString(orionldState.kjsonP, NULL, bArray[ix].valuestr());
           kjChildAdd(attrNamesV, aNameNodeP);
-          LM_TMP(("KZ: DB-Attribute '%s' for Entity '%s'", aNameNodeP->value.s, idString));
         }
       }
 

@@ -69,7 +69,6 @@ static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
       LM_RE(-1, ("error reading from Socket Service connection: %s", strerror(errno)));
     else if (sz == 0)
     {
-      LM_TMP(("SS: connection closed"));
       *connectionClosedP = true;
       return -1;
     }
@@ -129,7 +128,6 @@ static void ssTreat(int fd, SsHeader* headerP, char* dataP)
     break;
 
   case SsGetEntity:
-    LM_TMP(("SS: GET Entity '%s' - not implemented", dataP));
 #if 0
     ssGetEntity(dataP);
 #else
@@ -170,13 +168,11 @@ void socketServiceRun(int listenFd)
     FD_ZERO(&rFds);
     if (fd != -1)
     {
-      // LM_TMP(("Adding fd %d to the select fd set", fd));
       FD_SET(fd, &rFds);
       fdMax = fd;
     }
     else
     {
-      // LM_TMP(("Adding listen-fd %d to the select fd set", listenFd));
       FD_SET(listenFd, &rFds);
       fdMax = listenFd;
     }
@@ -190,7 +186,6 @@ void socketServiceRun(int listenFd)
       fd = ssAccept(listenFd);
       if (fd == -1)
         LM_RVE(("error accepting incoming connection over Socket Service: %s", strerror(errno)));
-      LM_TMP(("SS: incoming connection accepted"));
     }
     else if (FD_ISSET(fd, &rFds))
     {
@@ -204,7 +199,6 @@ void socketServiceRun(int listenFd)
       {
         if (connectionClosed)
         {
-          LM_TMP(("SS: Connection Closed"));
           close(fd);
           fd = -1;
           continue;  // back to 'while (1)'
@@ -212,10 +206,6 @@ void socketServiceRun(int listenFd)
 
         LM_RVE(("Error reading SS header from Socket Service header: %s", strerror(errno)));
       }
-
-      LM_TMP(("SS: msgCode: 0x%x", header.msgCode));
-      LM_TMP(("SS: options: 0x%x", header.options));
-      LM_TMP(("SS: dataLen: %d",   header.dataLen));
 
       //
       // Is the data buffer big enough?
@@ -238,7 +228,6 @@ void socketServiceRun(int listenFd)
       {
         if (connectionClosed)
         {
-          LM_TMP(("SS: Connection Closed reading data part ... that's kind of weird!"));
           close(fd);
           fd = -1;
           continue;  // back to 'while (1)'
@@ -251,10 +240,6 @@ void socketServiceRun(int listenFd)
       // Treat the request
       //
       ssTreat(fd, &header, dataP);
-    }
-    else
-    {
-      // LM_TMP(("SS: timeout"));
     }
   }
 }

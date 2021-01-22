@@ -62,19 +62,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// lmLogTree - FIXME: move to logMsg.h/cpp
-//
-void lmLogTree(const char* prefix, const char* what, KjNode* tree)
-{
-  char buf[4096];
-  kjRender(orionldState.kjsonP, tree, buf, sizeof(buf));
-  LM_TMP(("%s: %s: %s", prefix, what, buf));
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // dbValueEnumString -
 //
 static const char* dbValueEnumString(OrionldTemporalAttributeValueTypeEnum valueType)
@@ -135,8 +122,6 @@ void entityExtract
     allTab->entityTableArray[entityIndex].createdAt  = now;
     allTab->entityTableArray[entityIndex].modifiedAt = now;
   }
-
-  LM_TMP (("CCSR : entityExtract func and allTab->entityTableArray[entityIndex].entityId %s", allTab->entityTableArray[entityIndex].entityId));
 
   allTab->entityTableArray[entityIndex].createdAt  = now;
   allTab->entityTableArray[entityIndex].modifiedAt = now;
@@ -204,8 +189,6 @@ OrionldTemporalDbAllTables* temporalEntityExtract(void)
   //  OrionldTemporalDbAttributeTable*     dbAttributeTableLocal;
   //  OrionldTemporalDbSubAttributeTable*  dbSubAttributeTableLocal;
 
-  lmLogTree("CCSR", "orionldState.requestTree", orionldState.requestTree);
-
   int entityIndex  = 0;
   int attrIndex    = 0;
   int subAttrIndex = 0;
@@ -236,13 +219,8 @@ OrionldTemporalDbAllTables* temporalEntityExtract(void)
 
     for (KjNode* entityP = orionldState.requestTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
-      LM_TMP(("CCSR : at func & second FOR loop temporalEntityExtract entityP %i", entityP));
       entityExtract (dbAllTablesLocal, entityP, true, entityIndex, &attrIndex, &subAttrIndex );
       // dbAllTablesLocal->entityTableArrayItems++;
-
-      LM_TMP(("CCSR: After callig entityExtract - Array and attributeValueType %i, entityId %s, attribute %s",
-              dbAllTablesLocal->attributeTableArray[5].attributeValueType, dbAllTablesLocal->attributeTableArray[5].entityId,
-              dbAllTablesLocal->attributeTableArray[5].attributeName));
 
       entityIndex++;
     }
@@ -278,11 +256,9 @@ void attrExtract
 {
   double now = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;  // FIXME: to orionldState
 
-  LM_TMP(("CCSR - In attrExtract function "));
   int subAttrIx = *subAttrIndexP;
 
   dbAttributeTableLocal->attributeName = attrP->name;
-  LM_TMP(("CCSR - In attrExtract function attributename %s ", attrP->name));
 
   if (attrP->type != KjObject)
   {
@@ -301,14 +277,12 @@ void attrExtract
     //    dbAttributeTableLocal->observedAt = parse8601Time(observedAtP->value.s);
     // else
     dbAttributeTableLocal->observedAt = 49;
-    LM_TMP(("CCSR - Temporal - attrP Found observedAt %s",observedAtP->value.s));
     kjChildRemove(attrP,observedAtP);
   }
 
   KjNode* nodeP  = kjLookup(attrP, "unitCode");
   if (nodeP != NULL)
   {
-    LM_TMP(("CCSR - attrP Found unitCode "));
     kjChildRemove (attrP,nodeP);
     // Chandra-TBI
   }
@@ -316,7 +290,6 @@ void attrExtract
   nodeP  = kjLookup(attrP, "location");
   if (nodeP != NULL)
   {
-    LM_TMP(("CCSR - attrP Found Location "));
     kjChildRemove (attrP,nodeP);
     geoPropertyExtract(nodeP, attrP->name, dbAttributeTableLocal->instanceId, dbAttributeTableLocal->entityId);
   }
@@ -324,7 +297,6 @@ void attrExtract
   nodeP  = kjLookup(attrP, "operationSpace");
   if (nodeP != NULL)
   {
-    LM_TMP(("CCSR - attrP Found operationSpace "));
     kjChildRemove (attrP,nodeP);
     // Chandra-TBI
   }
@@ -332,7 +304,6 @@ void attrExtract
   nodeP  = kjLookup(attrP, "observationSpace");
   if (nodeP != NULL)
   {
-    LM_TMP(("CCSR - attrP Found observationSpace "));
     kjChildRemove (attrP,nodeP);
     // Chandra-TBI
   }
@@ -340,7 +311,6 @@ void attrExtract
   nodeP  = kjLookup(attrP, "datasetId");
   if (nodeP != NULL)
   {
-    LM_TMP(("CCSR - attrP Found datasetId "));
     kjChildRemove (attrP,nodeP);
     // Chandra-TBI
   }
@@ -355,11 +325,9 @@ void attrExtract
   KjNode* attrTypeP  = kjLookup(attrP, "type");
   if (attrTypeP != NULL)
   {
-    LM_TMP(("CCSR - attrTypeP Found type  "));
     kjChildRemove (attrP,attrTypeP);
   }
 
-  LM_TMP(("CCSR:  after kjChildRemove (attrP,attrTypeP); : '%i'", attrTypeP));
   dbAttributeTableLocal->attributeType = attrTypeP->value.s;
 
   if (strcmp(dbAttributeTableLocal->attributeType,"Relationship") == 0)
@@ -372,7 +340,6 @@ void attrExtract
     // dbEntityTableLocal.attributeValueType  = kjLookup(attrP, "object");
     dbAttributeTableLocal->attributeValueType  = EnumValueRelation;
     dbAttributeTableLocal->valueString = attributeObject->value.s;
-    LM_TMP(("CCSR:  Relationship : '%s'", dbAttributeTableLocal->valueString));
   }
   else if (strcmp(dbAttributeTableLocal->attributeType, "GeoProperty") == 0)
   {
@@ -382,7 +349,6 @@ void attrExtract
 
     dbAttributeTableLocal->geoPropertyType = ...
 #endif
-    LM_TMP(("CCSR:  Found GeoProperty : "));
   }
   else if (strcmp(dbAttributeTableLocal->attributeType, "Property") == 0)
   {
@@ -395,13 +361,11 @@ void attrExtract
     {
       dbAttributeTableLocal->attributeValueType  = EnumValueNumber;
       dbAttributeTableLocal->valueNumber = valueP->value.f;
-      LM_TMP(("CCSR:  attribute value number  : %f", dbAttributeTableLocal->valueNumber));
     }
     else if (valueP->type == KjInt)
     {
       dbAttributeTableLocal->attributeValueType  = EnumValueNumber;
       dbAttributeTableLocal->valueNumber = valueP->value.i;
-      LM_TMP(("CCSR:  attribute value number  : %i", dbAttributeTableLocal->valueNumber));
     }
     else if (valueP->type == KjArray)
     {
@@ -424,18 +388,13 @@ void attrExtract
     {
       dbAttributeTableLocal->attributeValueType  = EnumValueString;
       dbAttributeTableLocal->valueString = valueP->value.s;
-      LM_TMP(("CCSR:  attribute value string  : %s", dbAttributeTableLocal->valueString));
     }
-
-    LM_TMP(("CCSR:  Attribute Value type : %d", dbAttributeTableLocal->attributeValueType));
   }
 
   // Now we look the special sub attributes - unitCode, observacationspace, dataSetId, instanceid, location & operationSpace
 
   if (attrP->value.firstChildP != NULL)
   {
-    LM_TMP(("CCSR:  Tring to extract subattribute "));
-
     dbAttributeTableLocal->subProperty = true;
 
     for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
@@ -482,13 +441,11 @@ void attrSubAttrExtract(KjNode* subAttrP, OrionldTemporalDbSubAttributeTable* db
 
     dbSubAttributeTableLocal->subAttributeValueType   = EnumValueRelation;
     dbSubAttributeTableLocal->subAttributeValueString = attributeObject->value.s;
-    LM_TMP(("CCSR:  Relationship : '%s'", dbSubAttributeTableLocal->subAttributeValueString));
   }
   else if (strcmp(dbSubAttributeTableLocal->subAttributeType, "GeoProperty") == 0)
   {
     KjNode* valueP = kjLookup(subAttrP, "value");  //Chandra-TBD
     kjChildRemove(subAttrP, valueP);
-    LM_TMP(("CCSR:  Found GeoProperty : "));         // Chandra-TBI
   }
   else if (strcmp(dbSubAttributeTableLocal->subAttributeType, "Property") == 0)
   {
@@ -642,25 +599,18 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
   char* dbEntityStrBuffer = kaAlloc(&orionldState.kalloc, dbEntityBufferSize);
   bzero(dbEntityStrBuffer, dbEntityBufferSize);
 
-  LM_TMP(("CCSR: step1 TemporalConstructInsertSQLStatement:  entity count   %i", dbAllTablesLocal->entityTableArrayItems));
-
   for (int dbEntityLoop=0; dbEntityLoop < dbAllTablesLocal->entityTableArrayItems; dbEntityLoop++)
   {
-    LM_TMP(("CCSR: step1.1 TemporalConstructInsertSQLStatement: %s", dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType));
     char* expandedEntityType = orionldContextItemExpand(orionldState.contextP,
                                                         dbAllTablesLocal->entityTableArray[dbEntityLoop].entityType,
                                                         true,
                                                         NULL);
-
-    LM_TMP(("CCSR: step2 TemporalConstructInsertSQLStatement: "));
 
     char entCreatedAt[64];
     char entModifiedAt[64];
 
     numberToDate(dbAllTablesLocal->entityTableArray[dbEntityLoop].createdAt, entCreatedAt, sizeof(entCreatedAt));
     numberToDate(dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt, entModifiedAt, sizeof(entModifiedAt));
-
-    LM_TMP(("CCSR: step3 TemporalConstructInsertSQLStatement: "));
 
     if (entityUpdateFlag)
     {
@@ -670,8 +620,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                // dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt,
                entModifiedAt,
                dbAllTablesLocal->entityTableArray[dbEntityLoop].entityId);
-
-      LM_TMP(("CCSR: step4 TemporalConstructInsertSQLStatement:"));
     }
     else
     {
@@ -683,11 +631,7 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                // dbAllTablesLocal->entityTableArray[dbEntityLoop].modifiedAt
                entCreatedAt,
                entModifiedAt);
-
-      LM_TMP(("CCSR: step5 TemporalConstructInsertSQLStatement: "));
     }
-
-    LM_TMP(("CCSR: dbEntityStrBuffer: '%s'", dbEntityStrBuffer));
 
     if (!temporalExecSqlStatement(dbEntityStrBuffer))
       return false;
@@ -703,9 +647,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 
     int   allValuesSize = 2048;
     char* allValues     = kaAlloc(&orionldState.kalloc,allValuesSize);
-
-    LM_TMP(("CCSR: TemporalConstructInsertSQLStatement dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName :  %s",
-            dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
 
     allValuesRenderAttr(&dbAllTablesLocal->attributeTableArray[dbAttribLoop], allValues, allValuesSize);
 
@@ -726,8 +667,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
                                                       dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeType,
                                                       true,
                                                       NULL);
-
-    LM_TMP (("CCSR - Printing attributeName %s", dbAllTablesLocal->attributeTableArray[dbAttribLoop].attributeName));
 
     //"type,", Fix me - put type back Chandra TBC
     snprintf(dbAttribStrBuffer, dbAttribBufferSize, "INSERT INTO attributes_table("
@@ -757,7 +696,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
              (dbAllTablesLocal->attributeTableArray[dbAttribLoop].subProperty==true)? "true" : "false",
              uuidBuffer, allValues, attrCreatedAt, attrModifiedAt, attrObservedAt);
 
-    LM_TMP (("CCSR - Printing SQL attribute %s", dbAttribStrBuffer));
     if (!temporalExecSqlStatement (dbAttribStrBuffer))
       return false;
 
@@ -813,8 +751,6 @@ bool TemporalConstructInsertSQLStatement(OrionldTemporalDbAllTables* dbAllTables
 //
 void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allValues, int allValuesSize)
 {
-  LM_TMP(("Temporal allValuesRenderAttr - attrLocalP->attributeValueType %i , %s",attrLocalP->attributeValueType, attrLocalP->entityId));
-
   char attributeValue[512];
 
   switch (attrLocalP->attributeValueType)
@@ -895,8 +831,6 @@ void allValuesRenderAttr(OrionldTemporalDbAttributeTable* attrLocalP, char* allV
 
   snprintf(allValues, allValuesSize, "%s, %s, %s, %s, %s",
            unitCodeValue, dataSetIdValue, attributeValue, geoPropertyValue, observedAtValue);
-
-  LM_TMP(("Printing all Values in the end in attribute extract %s", allValues));
 }
 
 
@@ -1039,7 +973,6 @@ bool TemporalPgTenantDBConnectorOpen(const char* tenant)
     return false;
   }
 
-  LM_TMP(("TEMP: Connection is ok with the Postgres database"));
   return true;  // FIXME: return instead the connection handler
 }
 
