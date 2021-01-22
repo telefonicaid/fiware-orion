@@ -89,7 +89,7 @@ The following table provides information about the last Orion version supporting
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
-| NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.3.0                                     | November 5th, 2019              |
+| NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.5.2                                     | December 17th, 2020              |
 | Rush (along with CLI: `-rush`)                                             | 2.2.0                                     | February 21st, 2019             |
 | `id` metadata (and associated NGSIv1 operations)                           | 2.1.0                                     | December 19th, 2018             |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |
