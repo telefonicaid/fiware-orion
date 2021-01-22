@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creation and a simple notification
+Notifications after killing and restarting broker
 
 --SHELL-INIT--
 export BROKER=orionld

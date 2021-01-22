@@ -143,7 +143,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   if (ldContext != "")  // NGSI-LD subscription
   {
-    cSubP->ldContext = strdup(ldContext.c_str());
+    char* contextCopy = strdup(ldContext.c_str());
+
+    cSubP->ldContext = contextCopy;
+    orionldStateDelayedFreeEnqueue(contextCopy);
 
     if (renderFormat == NGSI_V2_NORMALIZED)
       renderFormat = NGSI_LD_V1_NORMALIZED;
