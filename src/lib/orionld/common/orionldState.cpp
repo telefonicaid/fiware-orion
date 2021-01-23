@@ -56,7 +56,10 @@ const char* orionldVersion = ORIONLD_VERSION;
 // orionldState - the state of the connection
 //
 __thread OrionldConnectionState orionldState;
+
+#ifdef REQUEST_PERFORMANCE
 __thread Timestamps timestamps;
+#endif
 
 
 

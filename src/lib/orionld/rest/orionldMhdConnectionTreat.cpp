@@ -988,8 +988,8 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // FIXME: Smarter allocation !!!
     //
+    kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
     orionldState.responsePayload = responsePayload;
-    kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, sizeof(responsePayload));
   }
 
   //
