@@ -493,6 +493,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     else
       orionldErrorResponseCreate(OrionldResourceNotFound, "Entity Not Found", orionldState.wildcard[0]);
     orionldState.httpStatusCode = SccContextElementNotFound;  // 404
+
     return false;
   }
 

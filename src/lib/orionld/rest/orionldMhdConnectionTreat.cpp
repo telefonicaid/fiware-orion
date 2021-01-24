@@ -30,6 +30,7 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
@@ -733,6 +734,7 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //
 //
 //
+static __thread char responsePayload[1024 * 1024];
 MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;
@@ -881,10 +883,13 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Call the SERVICE ROUTINE
   //
-  LM_T(LmtServiceRoutine, ("Calling Service Routine %s (context at %p)", orionldState.serviceP->url, orionldState.contextP));
-
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.serviceRoutineStart);
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
-  LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
+  kTimeGet(&timestamps.serviceRoutineEnd);
+#else
+  serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
+#endif
 
   //
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
@@ -897,7 +902,8 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
   else  // Service Routine worked
   {
-    dbGeoIndexes();
+    if (orionldState.geoAttrs > 0)
+      dbGeoIndexes();
 
     // New tenant?
     if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
@@ -982,19 +988,8 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // FIXME: Smarter allocation !!!
     //
-    int bufLen = 1024 * 1024 * 32;
-    orionldState.responsePayload = (char*) malloc(bufLen);
-    if (orionldState.responsePayload != NULL)
-    {
-      orionldState.responsePayloadAllocated = true;
-      kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, bufLen);
-    }
-    else
-    {
-      LM_E(("Error allocating buffer for response payload"));
-      orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
-      orionldState.httpStatusCode = 500;  // If ever able to send the response ...
-    }
+    kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+    orionldState.responsePayload = responsePayload;
   }
 
   //

@@ -283,6 +283,18 @@ typedef struct OrionldConnectionState
   unsigned int            troeIgnoreIx;
 } OrionldConnectionState;
 
+#ifdef REQUEST_PERFORMANCE
+typedef struct Timestamps
+{
+  struct timespec reqStart;
+  struct timespec serviceRoutineStart;
+  struct timespec serviceRoutineEnd;
+  struct timespec reqEnd;
+} Timestamps;
+
+extern __thread Timestamps timestamps;
+#endif
+
 
 
 // -----------------------------------------------------------------------------

@@ -802,6 +802,25 @@ static void requestCompleted
 #endif
 
   *con_cls = NULL;
+
+#ifdef REQUEST_PERFORMANCE
+  struct timespec diffBefore;
+  struct timespec diffDuring;
+  struct timespec diffAfter;
+  float           diffBeforeF;
+  float           diffDuringF;
+  float           diffAfterF;
+
+  kTimeGet(&timestamps.reqEnd);
+
+  kTimeDiff(&timestamps.serviceRoutineEnd,   &timestamps.reqEnd,              &diffAfter,  &diffAfterF);
+  kTimeDiff(&timestamps.serviceRoutineStart, &timestamps.serviceRoutineEnd,   &diffDuring, &diffDuringF);
+  kTimeDiff(&timestamps.reqStart,            &timestamps.serviceRoutineStart, &diffBefore, &diffBeforeF);
+
+  LM_TMP(("TPUT: Before Service Routine: %f", diffBeforeF));
+  LM_TMP(("TPUT: Durinf Service Routine: %f", diffDuringF));
+  LM_TMP(("TPUT: Ahfter Service Routine: %f", diffAfterF));
+#endif
 }
 
 
@@ -1308,7 +1327,7 @@ ConnectionInfo* connectionTreatInit
   orionldState.responseTree = NULL;
   orionldState.notify       = false;
 
-    *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
+  *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics
   if (metricsMgr.isOn())
@@ -1656,9 +1675,17 @@ static MHD_Result connectionTreat
     {
       orionldState.apiVersion = NGSI_LD_V1;
 
-      if      (*con_cls == NULL)        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
-      else if (*upload_data_size != 0)  return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
+      if (*con_cls == NULL)
+      {
+#ifdef REQUEST_PERFORMANCE
+        kTimeGet(&timestamps.reqStart);
+#endif
+        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
+      }
+      else if (*upload_data_size != 0)
+        return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
 
+      // else ...
       //
       // The entire message has been read, we're allowed to respond.
       //
