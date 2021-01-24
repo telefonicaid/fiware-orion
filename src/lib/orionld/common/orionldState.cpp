@@ -85,6 +85,7 @@ char*             tenantV[100];
 unsigned int      tenants                  = 0;
 OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
+bool              orionldStartup           = true;
 
 
 //

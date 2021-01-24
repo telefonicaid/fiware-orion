@@ -282,7 +282,7 @@ function add()
 
 # -----------------------------------------------------------------------------
 #
-# Start broker
+# Start broker - this functions is no longer in use and shoud be removed
 #
 function brokerStart()
 {
@@ -291,6 +291,7 @@ function brokerStart()
     dbReset "$1"
     killall contextBroker 2> /dev/null
     echo 'db.dropDatabase()' | mongo valgrindtest --quiet > /dev/null
+    # Use the CLI --gen-suppressions=all for valgrind to get suppressions (to put in suppressions.supp)
     valgrind --memcheck:leak-check=full --show-reachable=yes --trace-children=yes contextBroker -port ${CB_TEST_PORT} -db leaktest -harakiri -t0-255 > ${NAME}.out 2>&1 &
     valgrindPid=$!
 
@@ -324,7 +325,7 @@ function brokerStart()
 
 # -----------------------------------------------------------------------------
 #
-# Stop broker
+# Stop broker - this functions is no longer in use and shoud be removed
 #
 function brokerStop()
 {

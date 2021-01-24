@@ -40,6 +40,11 @@
 #include "cache/subCache.h"
 
 #ifdef ORIONLD
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
+}
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #endif
 
@@ -143,10 +148,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   if (ldContext != "")  // NGSI-LD subscription
   {
-    char* contextCopy = strdup(ldContext.c_str());
-
-    cSubP->ldContext = contextCopy;
-    orionldStateDelayedFreeEnqueue(contextCopy);
+    if (orionldStartup == false)
+      cSubP->ldContext = kaStrdup(&orionldState.kalloc, ldContext.c_str());
+    else
+      cSubP->ldContext = ldContext;
 
     if (renderFormat == NGSI_V2_NORMALIZED)
       renderFormat = NGSI_LD_V1_NORMALIZED;
