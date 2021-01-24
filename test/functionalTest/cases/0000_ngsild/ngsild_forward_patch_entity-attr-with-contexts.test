@@ -27,7 +27,7 @@ Forwarding of PATCH Entity-Attribute requests with contexts
 export BROKER=orionld
 dbInit CB
 dbInit C1
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -forwarding
 brokerStart CP1
 
 --SHELL--

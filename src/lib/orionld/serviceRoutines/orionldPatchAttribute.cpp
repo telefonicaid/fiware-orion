@@ -387,17 +387,20 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     attrName = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
   }
 
-  //
-  // If a matching registration is found, no local treatment will be done.
-  // The request is simply forwarded to the matching Context Provider
-  //
-  regArray = dbRegistrationLookup(entityId, attrName, &matchingRegs);
-  if (regArray != NULL)
+  if (forwarding)
   {
-    if (matchingRegs > 1)
-      dbRegistrationsOnlyOneAllowed(regArray, matchingRegs, entityId, attrName);
+    //
+    // If a matching registration is found, no local treatment will be done.
+    // The request is simply forwarded to the matching Context Provider
+    //
+    regArray = dbRegistrationLookup(entityId, attrName, &matchingRegs);
+    if (regArray != NULL)
+    {
+      if (matchingRegs > 1)
+        dbRegistrationsOnlyOneAllowed(regArray, matchingRegs, entityId, attrName);
 
-    return orionldForwardPatchAttribute(ciP, regArray->value.firstChildP, entityId, attrName, orionldState.requestTree);
+      return orionldForwardPatchAttribute(ciP, regArray->value.firstChildP, entityId, attrName, orionldState.requestTree);
+    }
   }
 
   // ----------------------------------------------------------------
