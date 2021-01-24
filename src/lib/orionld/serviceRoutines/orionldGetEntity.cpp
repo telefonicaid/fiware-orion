@@ -296,7 +296,7 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType)
 {
   //
-  // If URI param 'attrs' was used, split the attr-names into an array and expanmd according to @context
+  // If URI param 'attrs' was used, split the attr-names into an array and expand according to @context
   //
   char* uriParamAttrsV[100];
   int   uriParamAttrs = 0;
@@ -415,7 +415,7 @@ static char** attrsListToArray(char* attrList, char* attrV[], int attrVecLen)
 bool orionldGetEntity(ConnectionInfo* ciP)
 {
   char*    detail;
-  KjNode*  regArray;
+  KjNode*  regArray = NULL;
 
   //
   // Make sure the ID (orionldState.wildcard[0]) is a valid URI
@@ -427,7 +427,8 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     return false;
   }
 
-  regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
+  if (forwarding)
+    regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
 
   LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
 

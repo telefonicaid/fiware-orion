@@ -331,7 +331,7 @@ extern unsigned short    troePort;                 // From orionld.cpp
 extern char              troeUser[64];             // From orionld.cpp
 extern char              troePwd[64];              // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
-extern bool              mhdTurbo;                 // From orionld.cpp
+extern bool              forwarding;               // From orionld.cpp
 extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;

@@ -88,7 +88,12 @@ static int ssRead(int fd, char* dataP, int dataLen, bool* connectionClosedP)
 //
 static void ssWrite(int fd, const char* data, int dataLen)
 {
-  write(fd, data, dataLen);
+  int nb = write(fd, data, dataLen);
+
+  if (nb == -1)
+    LM_E(("Internal Error (unable to write to socket service client: %s)", strerror(errno)));
+  else if (nb != dataLen)
+    LM_E(("Internal Error (written only %d bytes out of %d to socket service client)", nb, dataLen));
 }
 
 

@@ -94,7 +94,7 @@ char            troeHost[64];
 unsigned short  troePort;
 char            troeUser[64];
 char            troePwd[64];
-bool            mhdTurbo                = false;
+bool            forwarding              = true;
 
 
 

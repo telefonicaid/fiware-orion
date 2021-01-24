@@ -26,7 +26,7 @@ NGSI-LD Forward of GET /entities/{entityId}?attrs=<Only URI Parameter Attributes
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -forwarding
 accumulatorStart --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1"
 
 --SHELL--

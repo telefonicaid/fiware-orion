@@ -1915,9 +1915,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 #endif
   }
 
-  if (mhdTurbo == true)
-    serverMode |= MHD_USE_TURBO;
-
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   {
     memset(&sad, 0, sizeof(sad));

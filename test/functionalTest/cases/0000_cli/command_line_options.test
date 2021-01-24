@@ -88,5 +88,6 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-troeUser' <username for troe database db server>]
                 [option '-troePwd' <password for troe database db server>]
                 [option '-troePoolSize' <size of the connection pool for TRoE Postgres database connections>]
+                [option '-forwarding' (turn on forwarding)]
 
 --TEARDOWN--

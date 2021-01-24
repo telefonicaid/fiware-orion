@@ -27,7 +27,7 @@ NGSI-LD Forward of GET /entities/{entityId}?attrs=<merge between Registered Attr
 export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB
+brokerStart CB 0 IPv4 -forwarding
 brokerStart CP1
 
 --SHELL--
