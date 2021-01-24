@@ -337,6 +337,7 @@ extern char*             tenantV[100];
 extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
+extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 
 
 

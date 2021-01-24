@@ -3432,7 +3432,13 @@ static void updateEntity
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
     if (orionldState.apiVersion == NGSI_LD_V1)
+    {
+      notifyCerP->release();
+      delete notifyCerP;
+      cerP->release();
+      delete cerP;
       return;
+    }
 
     //
     // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this

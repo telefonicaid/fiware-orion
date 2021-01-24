@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creation and a simple notification
+Notifications after killing and restarting broker - sub on type only
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -34,7 +34,7 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT} -v
 #
 # 01. Create an Entity E01 with attr P1 and P2
 # 02. Create a subscription with accumulator receiving notifications for ALL attributes of type T
-# 03. See notification in DB
+# 03. See subscription in DB
 # 04. Add P3 to E01
 # 05. Dump accumulator to see one notification - NGSI-LD has no initial notifications
 # 06. Kill and restart Broker
@@ -88,7 +88,7 @@ echo
 echo
 
 
-echo "03. See notification in DB"
+echo "03. See subscription in DB"
 echo "=========================="
 mongoCmd2 ftest "db.csubs.findOne()"
 echo
@@ -166,7 +166,7 @@ Date: REGEX(.*)
 
 
 
-03. See notification in DB
+03. See subscription in DB
 ==========================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb:REGEX(.*)

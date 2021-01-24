@@ -1081,6 +1081,7 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
+    orionldStartup = true;
     subCacheInit(multitenancy);
 
     if (subCacheInterval == 0)
@@ -1093,6 +1094,7 @@ int main(int argC, char* argV[])
       // Populate subscription cache AND start sub-cache-refresh-thread
       subCacheStart();
     }
+    orionldStartup = false;
   }
   else
   {
