@@ -130,9 +130,10 @@ void orionldStateInit(void)
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);
   orionldState.contextP                = orionldCoreContextP;
-  orionldState.prettyPrintSpaces       = 2;
   orionldState.forwardAttrsCompacted   = true;
   orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
+
+  orionldState.uriParams.spaces        = 2;
 
   // Paginataion
   orionldState.uriParams.offset        = 0;

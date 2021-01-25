@@ -297,12 +297,12 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     if (strcmp(val, "yes") == 0)
     {
-      orionldState.prettyPrint = true;
+      orionldState.uriParams.prettyPrint = true;
     }
   }
   else if (key == URI_PARAM_SPACES)
   {
-    orionldState.prettyPrintSpaces = atoi(val);
+    orionldState.uriParams.spaces = atoi(val);
   }
 #endif
   else if ((key != URI_PARAM_Q)       &&
