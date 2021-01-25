@@ -40,11 +40,13 @@ extern "C"
 #include "common/MimeType.h"                                     // MimeType
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
+
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
-#include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 

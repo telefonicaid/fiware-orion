@@ -1,0 +1,168 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Performance tests for POST /ngsi-ld/v1/entities
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Create 100 entities
+#
+
+echo "01. Create 100 entities"
+echo "======================="
+typeset -i eNo
+eNo=1
+
+while [ $eNo -le 100 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:'
+done
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 100 entities
+=======================
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E01
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E02
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E03
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E04
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E05
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E06
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E07
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E08
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E09
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E10
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E11
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E12
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E13
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E14
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E15
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E16
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E17
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E18
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E19
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E20
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E21
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E22
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E23
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E24
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E25
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E26
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E27
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E28
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E29
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E30
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E31
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E32
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E33
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E34
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E35
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E36
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E37
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E38
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E39
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E40
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E41
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E42
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E43
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E44
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E45
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E46
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E47
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E48
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E49
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E50
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E51
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E52
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E53
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E54
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E55
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E56
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E57
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E58
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E59
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E60
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E61
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E62
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E63
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E64
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E65
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E66
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E67
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E68
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E69
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E70
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E71
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E72
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E73
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E74
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E75
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E76
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E77
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E78
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E79
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E80
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E81
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E82
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E83
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E84
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E85
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E86
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E87
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E88
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E89
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E90
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E91
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E92
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E93
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E94
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E95
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E96
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E97
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E98
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E99
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E100
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

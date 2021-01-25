@@ -58,11 +58,12 @@ extern "C"
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/rest/orionldMhdConnectionInit.h"
-#include "orionld/rest/orionldMhdConnectionPayloadRead.h"
-#include "orionld/rest/orionldMhdConnectionTreat.h"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
+#include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
+#include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
 #include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
 #endif
 
@@ -306,7 +307,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 #endif
   else if ((key != URI_PARAM_Q)       &&
            (key != URI_PARAM_MQ)      &&
-           (key != URI_PARAM_LEVEL))  // FIXME P1: possible more known options here ...
+           (key != URI_PARAM_LEVEL))  // FIXME P1: possibly more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
@@ -807,19 +808,23 @@ static void requestCompleted
   struct timespec diffBefore;
   struct timespec diffDuring;
   struct timespec diffAfter;
+  struct timespec diffTotal;
   float           diffBeforeF;
   float           diffDuringF;
   float           diffAfterF;
+  float           diffTotalF;
 
   kTimeGet(&timestamps.reqEnd);
 
-  kTimeDiff(&timestamps.serviceRoutineEnd,   &timestamps.reqEnd,              &diffAfter,  &diffAfterF);
-  kTimeDiff(&timestamps.serviceRoutineStart, &timestamps.serviceRoutineEnd,   &diffDuring, &diffDuringF);
   kTimeDiff(&timestamps.reqStart,            &timestamps.serviceRoutineStart, &diffBefore, &diffBeforeF);
+  kTimeDiff(&timestamps.serviceRoutineStart, &timestamps.serviceRoutineEnd,   &diffDuring, &diffDuringF);
+  kTimeDiff(&timestamps.serviceRoutineEnd,   &timestamps.reqEnd,              &diffAfter,  &diffAfterF);
+  kTimeDiff(&timestamps.reqStart,            &timestamps.reqEnd,              &diffTotal,  &diffTotalF);
 
   LM_TMP(("TPUT: Before Service Routine: %f", diffBeforeF));
-  LM_TMP(("TPUT: Durinf Service Routine: %f", diffDuringF));
-  LM_TMP(("TPUT: Ahfter Service Routine: %f", diffAfterF));
+  LM_TMP(("TPUT: During Service Routine: %f", diffDuringF));
+  LM_TMP(("TPUT: After  Service Routine: %f", diffAfterF));
+  LM_TMP(("TPUT: Entire request:         %f", diffTotalF));
 #endif
 }
 
