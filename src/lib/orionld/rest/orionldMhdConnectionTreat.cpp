@@ -58,6 +58,7 @@ extern "C"
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
 #include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
