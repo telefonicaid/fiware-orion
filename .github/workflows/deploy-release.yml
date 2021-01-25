@@ -8,7 +8,7 @@ on:
 env:
   IMAGE_NAME: fiware/orion-ld
 
-obs:
+jobs:
   deploy-release:
 
     runs-on: ubuntu-18.04
