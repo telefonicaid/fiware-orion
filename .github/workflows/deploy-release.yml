@@ -22,9 +22,15 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
+      - uses: jungwinter/split@v1
+        id: split
+        with:
+          msg: ${{ steps.extract_branch.outputs.branch }}
+          seperator: /
+
       - name:  Extract version
         run: |
-          echo ${{ steps.extract_branch.outputs.branch }}
+          echo ${{ steps.split.outputs._2 }}
 #
 #      - name: Set up QEMU
 #        uses: docker/setup-qemu-action@v1
