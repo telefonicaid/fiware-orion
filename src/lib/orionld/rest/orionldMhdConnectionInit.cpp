@@ -594,10 +594,10 @@ MHD_Result orionldMhdConnectionInit
   //
   // Format of response payload
   //
-  if (orionldState.prettyPrint == true)
+  if (orionldState.uriParams.prettyPrint == true)
   {
     // Human readable output
-    orionldState.kjsonP->spacesPerIndent   = orionldState.prettyPrintSpaces;
+    orionldState.kjsonP->spacesPerIndent   = orionldState.uriParams.spaces;
     orionldState.kjsonP->nlString          = (char*) "\n";
     orionldState.kjsonP->stringBeforeColon = (char*) "";
     orionldState.kjsonP->stringAfterColon  = (char*) " ";

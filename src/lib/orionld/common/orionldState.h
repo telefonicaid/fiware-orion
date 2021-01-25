@@ -212,8 +212,6 @@ typedef struct OrionldConnectionState
   char*                   urlPath;
   Verb                    verb;
   char*                   verbString;
-  bool                    prettyPrint;
-  char                    prettyPrintSpaces;
   bool                    acceptJson;
   bool                    acceptJsonld;
   bool                    ngsildContent;
