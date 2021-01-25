@@ -30,7 +30,7 @@ jobs:
 
       - name:  Extract version
         run: |
-          echo ${{ steps.split.outputs._2 }}
+          echo ${{ steps.split.outputs._1 }}
 #
 #      - name: Set up QEMU
 #        uses: docker/setup-qemu-action@v1
