@@ -765,11 +765,9 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Save a copy of the incoming payload before it is destroyed during kjParse AND
   // parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
-  // FIXME - Only use kaStrdup for "some" requests - right now only for "PATCH /ngsi-ld/v1/entities/*/attrs/*"
-  //
   if (ciP->payload != NULL)
   {
-    if (orionldState.serviceP->serviceRoutine != orionldPatchAttribute)  // FIXME: use ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD instead
+    if ((orionldState.serviceP->uriParams & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD)
       orionldState.requestPayload = ciP->payload;
     else
       orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
