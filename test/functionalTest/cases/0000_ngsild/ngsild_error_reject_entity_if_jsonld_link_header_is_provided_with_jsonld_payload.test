@@ -49,7 +49,7 @@ echo
 01. Attempt to create an entity with application/ld+json and with context in HTTP Link Header - see error
 =========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 233
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
