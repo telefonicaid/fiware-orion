@@ -767,7 +767,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   if (ciP->payload != NULL)
   {
-    if ((orionldState.serviceP->uriParams & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD)
+    if ((orionldState.serviceP->uriParams & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == 0)
       orionldState.requestPayload = ciP->payload;
     else
       orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
