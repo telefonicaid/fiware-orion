@@ -42,16 +42,12 @@ speeds up reads) and write efficiency (the usage of indexes slows down writes) a
 consume space in database and mapped RAM memory) and it is the administrator (not Orion) who has
 to decide what to prioritize.
 
-However, in order to help administrators in this task, the following *general* indexes are recommended:
+However, in order to help administrators in this task, the following *general* indexes are recommended. They improve 
+read **and** write performance:
 
 * Collection [entities](database_model.md#entities-collection)
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that this is a compound index and key order matters in this case)
     * `creDate`
-
-In order to improve the performance of updates, we also highly recommend using the following index:
-
-* Collection [entities](database_model.md#entities-collection)
-    * `{_id.id:1}` 
 
 In addition, depending on your queries, you may need *additional* indexes.
 
