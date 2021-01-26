@@ -278,7 +278,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPatchAttribute)
   {
-    serviceP->uriParams |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
