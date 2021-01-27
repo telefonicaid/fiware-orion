@@ -43,7 +43,7 @@ std::string Reference::check(RequestType requestType)
 {
   if (string.empty())
   {
-    if ((requestType == SubscribeContextAvailability) || (requestType == SubscribeContext))
+    if (requestType == SubscribeContext)
     {
       return "Empty Reference";
     }

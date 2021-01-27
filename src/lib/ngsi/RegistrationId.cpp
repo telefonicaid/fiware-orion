@@ -117,7 +117,7 @@ std::string RegistrationId::toJsonV1(RequestType requestType, bool comma)
     if (requestType == RegisterResponse)  // registrationId is MANDATORY for RegisterContextResponse
     {
       string = "000000000000000000000000";
-      LM_I(("No registrationId - setting the registrationId to 24 zeroes"));
+      LM_T(LmtOldInfo, ("No registrationId - setting the registrationId to 24 zeroes"));
     }
     else
     {

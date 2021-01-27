@@ -4,7 +4,6 @@
 * [エンティティ・コレクション](#entities-collection)
 * [レジストレーション・コレクション](#registrations-collection)
 * [csubs コレクション](#csubs-collection)
-* [casubs コレクション](#casubs-collection)
 
 <a name="introduction"></a>
 ## イントロダクション
@@ -45,7 +44,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **location** (オプション) : エンティティの地理的位置です、次のフィールドで構成されます :
     -   **attrName** : attrs 配列内の地理的位置を識別する属性名です
     -   **coords** : エンティティの位置を表す GeoJSON です。詳細は以下を参照してください
--   **lastCorrelator** : エンティティ上の最後の更新要求における `Fiware-Correlator` ヘッダの値です。自己通知ループ保護ロジックによって使用されます
+-   **lastCorrelator** : エンティティ上の最後の更新要求における root correlator の値です。自己通知ループ保護ロジックによって使用されます。*root correlator* とは、サフィックスのない更新要求の `Fiware-Correlator` リクエスト・ヘッダの値を意味します。例えば、`Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32` の root correlator は `f320136c-0192-11eb-a893-000c29df7908` です
 -   **expDate** (オプション): エンティティの有効期限のタイムスタンプ (Date オブジェクトとして)。詳細については、[一時的なエンティティの機能](../user/transient_entities.md)を参照してください
 
 `location.coordsin` については、いくつかの形式を使用することができます :
@@ -145,12 +144,14 @@ Orion Context Broker は、データベース内で次のサブセクション�
 
 -   **\_id** : レジストレーション ID (レジストレーションを更新するためにユーザに提供される値) です。このために \_id を使用すると、レジストレーション ID は一意であり、レジストレーション ID によるクエリは非常に高速になります (\_id に自動のデフォルト・インデックスがあるため)
 -   **format**: 転送されたリクエストを送信するために使用するフォーマット
-    NGSIv1 フォーマットの場合、`format` の値として **JSON**を使用してください
-    NGSIv2 では、今日現在、**normalized** フォーマットのみがサポートされています
+    NGSIv1 フォーマットの場合、`format` の値として **JSON**を使用してください
+    NGSIv2 では、今日現在、**normalized** フォーマットのみがサポートされています
 -   **servicePath** : [サービスパス機能](../user/service_path.md)に関連します
 -   **status** (オプション) : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)。デフォルト・ステータス (すなわち、ドキュメントがこのフィールドを省略した場合) は "active" です
 -   **description** (オプションフィールド) : サブスクリプションを説明するフリーテキスト文字列。最大長は1024です
 -   **expiration** : これはレジストレーションが失効するタイムスタンプです (整数、秒を意味します)
+-   **fwdMode**: プロバイダがサポートするフォワーディング・モード : `all`, `query`, `update` または `none`.
+    省略した場合 (2.6.0 より前の Orion バージョン)、`all` が想定されます。
 -   **contextRegistration** : 要素に以下の情報が含まれる配列です :
     -   **entities** : エンティティのリストを含む配列です (必須)。各エンティティの JSON には、**id**, **type** および **isPattern** が含まれています
     -   **attrs** : 属性のリストを含む配列です (オプション)。各属性の JSON には、**name** および **type** が含まれています
@@ -162,6 +163,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
  {
    "_id": ObjectId("5149f60cf0075f2fabca43da"),
    "format": "JSON",
+   "fwdMode": "all",
    "expiration": 1360232760,
    "contextRegistration": [
        {
@@ -265,51 +267,5 @@ Orion Context Broker は、データベース内で次のサブセクション�
         "description": "this is an example subscription",
         "status" : "active"
 }
-```
-[トップ](#top)
-
-<a name="casubs-collection"></a>
-## casubs コレクション
-
-*casubs* コレクションは、コンテキスト・アベイラビリティのサブスクリプションに関する情報を格納します。コレクション内の各ドキュメントはサブスクリプションに対応しています。
-
-フィールド :
-
--   **\_id** : サブスクリプション ID (サブスクリプションを更新およびキャンセルするためにユーザに提供される値) です。このために \_id を使用すると、サブスクリプション ID は一意であり、サブスクリプション ID によるクエリは非常に高速です (\_id に自動デフォルト・インデックスがあるため)
--   **expiration** : これは、サブスクリプションが期限切れになるタイムスタンプです
--   **reference** : 通知を送信する URL です
--   **entities** : エンティティの配列 (必須) です。各エンティティの JSON には、**id**, **type**, および **isPattern** が含まれています。**isTypePattern** は `true` または `false` (boolean) であるのに対し、従来の理由から、**isPattern ** は `"true"` または `"false"` (text) であることに注意してください
--   **attrs** : 属性名の配列 (文字列) (オプション) です
--   **lastNotification** : 特定のサブスクリプションに関連付けられて送信された最後の通知に通知するタイムスタンプです
--   **count** : サブスクリプションに関連付けられて送信された通知の数です。
--   **format** : 通知を送信するための形式です。現在、JSON 通知を意味する "JSON" は NGSIv1 形式です。
-
-サンプルドキュメント :
-
-```
- {
-   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
-   "expiration": 1360236300,
-   "reference": "http://notify.me",
-   "entities": [
-       {
-           "id": "E5",
-           "type": "T5",
-           "isPattern": "false"
-       },
-       {
-           "id": "E6",
-           "type": "T6",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-       "A1",
-       "A2"
-   ],
-   "lastNotification" : 1381132312,
-   "count": 42,
-   "format": "JSON"
- }
 ```
 [トップ](#top)

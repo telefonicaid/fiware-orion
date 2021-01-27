@@ -68,14 +68,6 @@ static void resetStatistics(void)
   noOfRegistrationUpdateErrors                    = -1;
   noOfDiscoveries                                 = -1;
   noOfDiscoveryErrors                             = -1;
-  noOfAvailabilitySubscriptions                   = -1;
-  noOfAvailabilitySubscriptionErrors              = -1;
-  noOfAvailabilityUnsubscriptions                 = -1;
-  noOfAvailabilityUnsubscriptionErrors            = -1;
-  noOfAvailabilitySubscriptionUpdates             = -1;
-  noOfAvailabilitySubscriptionUpdateErrors        = -1;
-  noOfAvailabilityNotificationsReceived           = -1;
-  noOfAvailabilityNotificationsSent               = -1;
 
   noOfQueries                                     = -1;
   noOfQueryErrors                                 = -1;
@@ -174,11 +166,6 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
   renderUsedCounter(&js, "discoveries",                               noOfDiscoveries);
-  renderUsedCounter(&js, "availabilitySubscriptions",                 noOfAvailabilitySubscriptions);
-  renderUsedCounter(&js, "availabilitySubscriptionUpdates",           noOfAvailabilitySubscriptionUpdates);
-  renderUsedCounter(&js, "availabilityUnsubscriptions",               noOfAvailabilityUnsubscriptions);
-  renderUsedCounter(&js, "availabilityNotificationsReceived",         noOfAvailabilityNotificationsReceived);
-  renderUsedCounter(&js, "availabilityNotificationsSent",             noOfAvailabilityNotificationsSent);
   renderUsedCounter(&js, "queries",                                   noOfQueries);
   renderUsedCounter(&js, "updates",                                   noOfUpdates);
   renderUsedCounter(&js, "subscriptions",                             noOfSubscriptions);

@@ -250,7 +250,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Fiware-Service: t_01
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -288,7 +288,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Fiware-Service: t_02
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [

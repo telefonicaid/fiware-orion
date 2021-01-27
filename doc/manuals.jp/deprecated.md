@@ -10,6 +10,8 @@
 
 * Orion 2.1.0 の Rush サポート (関連するCLIパラメータ : `-rush`)  (Orion 2.3.0 で削除)
 * Orion 2.0.0 での NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)。代わりに NGSIv2 API を使用してください
+    * Orion 2.0.0 の NGSIv1 の一部としてのコンテキスト・アベイラビリティ・サブスクリプション (別名 NGSI9 サブスクリプション)
+      (Orion 2.6.0 で削除)
 * `POST /v2/op/query` の `attributes` フィールドは、Orion 1.15.0 にあります。これらの属性を持つエンティティのみを返すためには、クエリに対するレスポンスにどの属性を含めるかを選択する `attrs` と、`expression` 内の `q` の単項属性フィルタ (unary attribute filter) の組み合わせです。それらを代わりに指定していください
 * Orion 1.14.0 では `POST /v2/op/update` の `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE`,  `REPLACE` の使用は非推奨です。`append`, `appendStrict`, `update`, `delete`, `replace` を代わりに使ってください
 * Orion 1.13.0 ではメタデータ ID が推奨されていません (Orion 2.2.0 で削除されました)。一方、この機能は NGSIv2 と互換性がありません。JSON 表現形式の属性名は JSON オブジェクトのキーとして使用されるため、名前を複製することはできません。一方、IDs は、属性名にプレフィックス/サフィックスを使用して簡単に実装することができます。たとえば、`temperature:ground` および `temperature:ceiling` です。 この非推奨の結果、次のオペレーションも非推奨になりました :
@@ -57,6 +59,7 @@
 | URI パラメータでの `dateCreated` および `dateModified`                     | まだ定義されていません                          | まだ定義されていません          |
 | `/ngsi10` および `/ngsi9` URL プレフィックス                                  | まだ定義されていません                          | まだ定義されていません          |
 | エンティティのロケーションを指定する `location` メタデータ                 | まだ定義されていません                          | まだ定義されていません          |
+| NGSIv1 コンテキスト・アベイラビリティ・サブスクリプション (NGSI9 サブスクリプション) | 2.5.2                                 | 2020年12月17日                   |
 | Rush (関連する CLI パラメータ : `-rush`)                                   | 2.2.0                                           | 2019年2月21日                   |
 | `id` メタデータとそれに関連する NGSIv1 オペレーション                      | 2.1.0                                           | 2018年12月19日                  |
 | XML API                                                                    | 0.28.0                                          | 2016年2月29日                   |

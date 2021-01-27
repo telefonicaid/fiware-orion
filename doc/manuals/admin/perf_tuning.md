@@ -99,11 +99,11 @@ with the notification. Once the notification is sent and the response is receive
 is destroyed. This is the recommended mode for low load scenarios. In high level cases, it might lead to
 a [thread exhaustion problem](#orion-thread-model-and-its-implications).
 
-Permanent mode is similar, except that the connection context is not destroyed at the end. Thus,
+Persistent mode is similar, except that the connection context is not destroyed at the end. Thus,
 new notifications associated to the same connection context (i.e. the same destination URL) can
 reuse the connection and save the HTTP connection time (i.e. TCP handshake, etc.). Of course,
 this requires that the server (i.e. the component that receives the notification) also maintains the connection
-open. Note that while in some cases the permanent mode could improve performance (as it saves
+open. Note that while in some cases the persistent mode could improve performance (as it saves
 the time required to create and destroy HTTP connections), in others it may cause notifications
 associated to the same connection context to have to wait (as only one of them may use the
 connection at a time). In other words, only one notification thread can use the connection at a time, so if the
@@ -407,8 +407,7 @@ outgoing HTTP connections, overriding the default operating system timeout.
 
 ## Subscription cache
 
-Orion implements a context subscription cache in order to speed up notification triggering. In the current
-version (this may change in the future), context availability subscriptions doesn't use any cache.
+Orion implements a context subscription cache in order to speed up notification triggering.
 
 The cache synchronization period is controlled by the `-subCacheIval` (by default it is 60 seconds).
 Synchronization involves two different tasks:

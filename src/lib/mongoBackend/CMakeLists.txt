@@ -26,17 +26,13 @@ SET (SOURCES
     MongoCommonRegister.cpp
     MongoCommonSubscription.cpp
     mongoRegisterContext.cpp
-    mongoDiscoverContextAvailability.cpp
-    mongoSubscribeContextAvailability.cpp
-    mongoUnsubscribeContextAvailability.cpp
-    mongoUpdateContextAvailabilitySubscription.cpp
+    mongoDiscoverContextAvailability.cpp   
     mongoUpdateContext.cpp
     mongoQueryContext.cpp
     mongoSubscribeContext.cpp
     mongoUnsubscribeContext.cpp
     mongoUpdateContextSubscription.cpp
     mongoNotifyContext.cpp
-    mongoNotifyContextAvailability.cpp
     mongoQueryTypes.cpp
     mongoCreateSubscription.cpp
     mongoUpdateSubscription.cpp
@@ -60,16 +56,12 @@ SET (HEADERS
     MongoCommonSubscription.h
     mongoRegisterContext.h
     mongoDiscoverContextAvailability.h
-    mongoSubscribeContextAvailability.h
-    mongoUnsubscribeContextAvailability.h
-    mongoUpdateContextAvailabilitySubscription.h
     mongoUpdateContext.h
     mongoQueryContext.h
     mongoSubscribeContext.h
     mongoUnsubscribeContext.h
     mongoUpdateContextSubscription.h
     mongoNotifyContext.h
-    mongoNotifyContextAvailability.h
     mongoQueryTypes.h
     mongoCreateSubscription.h
     mongoUpdateSubscription.h

@@ -83,7 +83,7 @@ bool orion::collectionQuery
     {
       throw mongo::DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -175,7 +175,7 @@ bool orion::collectionRangedQuery
     {
       throw mongo::DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    LM_I(("Database Operation Successful (query: %s)", query.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", query.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -240,7 +240,7 @@ bool orion::collectionCount
     *c = connection.get()->count(col.c_str(), q);
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_I(("Database Operation Successful (count: %s)", q.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (count: %s)", q.toString().c_str()));
   }
   catch (const std::exception& e)
   {
@@ -312,7 +312,7 @@ bool orion::collectionFindOne
     *doc = orion::BSONObj(connection.get()->findOne(col.c_str(), q));
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_I(("Database Operation Successful (findOne: %s)", q.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (findOne: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -384,7 +384,7 @@ bool orion::collectionInsert
     connection.get()->insert(col.c_str(), doc);
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_I(("Database Operation Successful (insert: %s)", doc.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (insert: %s)", doc.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -463,7 +463,7 @@ bool orion::collectionUpdate
     connection.get()->update(col.c_str(), q, doc, upsert);
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_I(("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
   }
   catch (const std::exception& e)
   {
@@ -535,7 +535,7 @@ bool orion::collectionRemove
     connection.get()->remove(col.c_str(), q);
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_I(("Database Operation Successful (remove: %s)", q.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (remove: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -619,7 +619,7 @@ bool orion::collectionCreateIndex
 
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -734,7 +734,7 @@ bool orion::runCollectionCommand
       orion::releaseMongoConnection(connection);
       TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
-    LM_I(("Database Operation Successful (command: %s)", command.toString().c_str()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (command: %s)", command.toString().c_str()));
   }
   catch (const std::exception &e)
   {
@@ -794,7 +794,7 @@ bool setWriteConcern
   try
   {
     connection->setWriteConcern(wc);
-    LM_I(("Database Operation Successful (setWriteConcern: %d)", wc.nodes()));
+    LM_T(LmtOldInfo, ("Database Operation Successful (setWriteConcern: %d)", wc.nodes()));
   }
   catch (const std::exception &e)
   {
@@ -841,7 +841,7 @@ bool getWriteConcern
   try
   {
     *wc = connection->getWriteConcern();
-    LM_I(("Database Operation Successful (getWriteConcern)"));
+    LM_T(LmtOldInfo, ("Database Operation Successful (getWriteConcern)"));
   }
   catch (const std::exception &e)
   {

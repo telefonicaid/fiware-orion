@@ -257,10 +257,6 @@ static JsonRequest jsonRequest[] =
   // NGSI9
   { RegisterContext,                       "POST", "registerContextRequest",                        FUNCS(Rcr)   },
   { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            FUNCS(Dcar)  },
-  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           FUNCS(Scar)  },
-  { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         FUNCS(Ucar)  },
-  { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              FUNCS(Ncar)  },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
 
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           FUNCS(Qcr)   },
@@ -381,9 +377,6 @@ typedef struct ParseData
 
   RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
-  SubscribeContextAvailabilityData            scar;
-  UnsubscribeContextAvailabilityData          ucar;
-  UpdateContextAvailabilitySubscriptionData   ucas;
   ...
 } ParseData;
 ```

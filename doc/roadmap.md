@@ -17,7 +17,7 @@ any time.
 
 Disclaimer:
 
-* This section has been last updated in March 2020. Please take into account its 
+* This section has been last updated in January 2021. Please take into account its 
   content could be obsolete.
 * Note we develop this software in Agile way, so development plan is continuously 
   under review. Thus, this roadmap has to be understood as rough plan of features 
@@ -32,9 +32,9 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
-- Unrestricted text attributes ([#3550](https://github.com/telefonicaid/fiware-orion/issues/3550))
-- Notification flow control ([#3568](https://github.com/telefonicaid/fiware-orion/issues/3568))
-- Improvements and fixed based on pentesting reports
+- Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
+- Attribute update operators (inc, push, etc.)
+- MQTT notifications (community)
 
 ## Medium term
 
@@ -42,11 +42,8 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
-- Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
-- Attribute update operators (inc, push, etc.)
-- MQTT notifications (community)
-- Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
 - Advanced query language
+- Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
 
 ## Long term

@@ -186,7 +186,7 @@ static orion::DBConnection mongoConnect
   }
   alarmMgr.dbErrorReset();
 
-  LM_I(("Successful connection to database"));
+  LM_T(LmtOldInfo, ("Successful connection to database"));
 
   // FIXME OLD-DR: no write concerns or authenticatio by the moment
 #if 0

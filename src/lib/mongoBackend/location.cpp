@@ -558,8 +558,8 @@ bool processLocationAtAppendAttribute
   /* Case 2: append-as-update changing attribute type from no-location -> location */
   else if (!actualAppend && (!locationString.empty()))
   {
-    /* Case 2a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
+    /* Case 2a: there is a previous (not empty and with different name) location attribute -> error */
+    if ((!currentLocAttrName->empty()) && (*currentLocAttrName != targetAttr->name))
     {
       *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
                    " when another one has been previously defined [" + *currentLocAttrName + "]";

@@ -38,8 +38,6 @@
 TEST(commonStatistics, statisticsUpdate)
 {
   noOfDiscoveries                            = 0;
-  noOfAvailabilitySubscriptionUpdates        = 0;
-  noOfAvailabilityNotificationsReceived      = 0;
   noOfUpdates                                = 0;
   noOfSubscriptions                          = 0;
   noOfUnsubscriptions                        = 0;
@@ -56,13 +54,9 @@ TEST(commonStatistics, statisticsUpdate)
   noOfInvalidRequests                        = 0;
   noOfJsonRequests                           = 0;
 
-  noOfRtSubscribeContextAvailabilityResponse          = 0;
-  noOfRtUnsubscribeContextAvailabilityResponse        = 0;
   noOfRtSubscribeResponse                             = 0;
 
   statisticsUpdate(DiscoverContextAvailability, JSON);
-  statisticsUpdate(UpdateContextAvailabilitySubscription, JSON);
-  statisticsUpdate(NotifyContextAvailability, JSON);
   statisticsUpdate(SubscribeContext, JSON);
   statisticsUpdate(UnsubscribeContext, JSON);
   statisticsUpdate(UpdateContext, JSON);
@@ -79,13 +73,9 @@ TEST(commonStatistics, statisticsUpdate)
   statisticsUpdate(VersionRequest, JSON);
   statisticsUpdate(LeakRequest, JSON);
   statisticsUpdate(InvalidRequest, JSON);
-  statisticsUpdate(RtSubscribeContextAvailabilityResponse, JSON);
-  statisticsUpdate(RtUnsubscribeContextAvailabilityResponse, JSON);
   statisticsUpdate(RtSubscribeResponse, JSON);
 
   EXPECT_EQ(1, noOfDiscoveries);
-  EXPECT_EQ(1, noOfAvailabilitySubscriptionUpdates);
-  EXPECT_EQ(1, noOfAvailabilityNotificationsReceived);
   EXPECT_EQ(1, noOfUpdates);
   EXPECT_EQ(1, noOfSubscriptions);
   EXPECT_EQ(1, noOfUnsubscriptions);
@@ -100,9 +90,7 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfVersionRequests);
   EXPECT_EQ(1, noOfLeakRequests);
   EXPECT_EQ(1, noOfInvalidRequests);
-  EXPECT_EQ(1, noOfRtSubscribeContextAvailabilityResponse);
-  EXPECT_EQ(1, noOfRtUnsubscribeContextAvailabilityResponse);
   EXPECT_EQ(1, noOfRtSubscribeResponse);
 
-  EXPECT_EQ(21, noOfJsonRequests);
+  EXPECT_EQ(17, noOfJsonRequests);
 }

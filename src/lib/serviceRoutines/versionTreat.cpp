@@ -35,10 +35,13 @@
 #include "common/defaultValues.h"
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
+#include "openssl/opensslv.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rapidjson/rapidjson.h"
 #include "serviceRoutines/versionTreat.h"
+#include "mongo/version.h"
 
 
 
@@ -48,7 +51,35 @@
 */
 static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 
+/* ****************************************************************************
+*  
+* libVersions -
+*/
+std::string libVersions(void)
+{
+  // libuuid should also be included here, but we haven't found fo sar any way
+  // of getting its version without hardcoding it. If somebody knows how to
+  // get it, please tell us about :)
 
+  std::string  total  = "\"libversions\": {\n";
+  std::string  boost  = "     \"boost\": ";
+  std::string  curl   = "     \"libcurl\": ";
+  std::string  mhd    = "     \"libmicrohttpd\": ";
+  std::string  ssl    = "     \"openssl\": ";
+  std::string  rjson  = "     \"rapidjson\": ";
+  std::string  mongo  = "     \"mongodriver\": ";
+
+  char*        curlVersion = curl_version();
+
+  total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
+  total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
+  total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
+  total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
+  total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
+  total += mongo   + "\"legacy-" + mongo::client::kVersionString + "\"" + "\n";
+
+  return total;
+}
 
 /* ****************************************************************************
 *
@@ -116,7 +147,8 @@ std::string versionTreat
   out += "  \"compiled_by\" : \"" + std::string(COMPILED_BY) + "\",\n";
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
-  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
+  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
+  out += "  }\n";
   out += "}\n";
   out += "}\n";
 

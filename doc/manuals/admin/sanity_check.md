@@ -24,14 +24,15 @@ curl --header 'Accept: application/json' localhost:1026/version
 ```
 {
   "orion" : {
-    "version" : "1.8.0-next",
+    "version" : "2.4.0-next",
     "uptime" : "0 d, 0 h, 2 m, 30 s",
-    "git_hash" : "c49692a996fb8d23cb2e78992094e26b1ca45dac",
-    "compile_time" : "Wed Sep 27 16:56:16 CEST 2017",
+    "git_hash" : "f2a3d436b2b507c5fd1611492ad7fad386901952",
+    "compile_time" : "Thu Oct 29 16:56:16 CEST 2020",
     "compiled_by" : "fermin",
     "compiled_in" : "debvm",
-    "release_date" : "Wed Sep 27 16:56:16 CEST 2017",
-    "doc" : "https://fiware-orion.rtfd.io/"
+    "release_date" : "Thu Oct 29 16:56:16 CEST 2020",
+    "doc" : "https://fiware-orion.rtfd.io/",
+    "libversions": ...
   }
 }
 ```
@@ -90,7 +91,6 @@ given moment.
 > db.registrations.count()
 > db.entities.count()
 > db.csubs.count()
-> db.casubs.count()
 ```
 
 [Top](#top)

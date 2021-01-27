@@ -126,7 +126,7 @@ Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:9997
 Accept: application/json
 Content-Type: text/plain; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 A string with double-quotes: "a1"=======================================
 

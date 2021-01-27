@@ -50,6 +50,7 @@ extern unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
+  unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion       = V1,
   Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
 );

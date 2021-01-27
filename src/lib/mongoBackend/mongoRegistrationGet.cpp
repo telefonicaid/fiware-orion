@@ -80,15 +80,11 @@ static void setDescription(ngsiv2::Registration* regP, const orion::BSONObj& r)
 *
 * setProvider -
 */
-static void setProvider(ngsiv2::Registration* regP, const orion::BSONObj& r)
+static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode forwardingMode, const orion::BSONObj& r)
 {
   regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldFF(r, REG_PROVIDING_APPLICATION): "";
 
-  //
-  // FIXME #3106: for the moment supportedForwardingMode is hardwired (i.e. DB is not taken
-  // into account for them).
-  //
-  regP->provider.supportedForwardingMode = ngsiv2::ForwardAll;
+  regP->provider.supportedForwardingMode = forwardingMode;
 
   std::string format = r.hasField(REG_FORMAT)? getStringFieldFF(r, REG_FORMAT) : "JSON";
   if (format == "JSON")
@@ -198,6 +194,10 @@ static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r,
     return false;
   }
 
+  // Get the forwarding mode to be used later in setProvider()
+  ngsiv2::ForwardingMode forwardingMode =
+      ngsiv2::stringToForwardingMode(r.hasField(REG_FORWARDING_MODE)? getStringField(r, REG_FORWARDING_MODE) : "all");
+
   //
   // Extract the first (and only) CR from the contextRegistration vector
   //
@@ -205,7 +205,7 @@ static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r,
 
   setEntities(regP, cr0);
   setAttributes(regP, cr0);
-  setProvider(regP, cr0);
+  setProvider(regP, forwardingMode, cr0);
 
   return true;
 }

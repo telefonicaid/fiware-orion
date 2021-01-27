@@ -4,7 +4,6 @@
 * [entities collection](#entities-collection)
 * [registrations collection](#registrations-collection)
 * [csubs collection](#csubs-collection)
-* [casubs collection](#casubs-collection)
 
 ## Introduction
 
@@ -78,9 +77,12 @@ Fields:
         location in the attrs array
     -   **coords**: a GeoJSON representing the location of the entity. See
         below for more details.
--   **lastCorrelator**: value of the `Fiware-Correlator` header in the last
+-   **lastCorrelator**: value of the root correlator in the last
     update request on the entity. Used by the self-notification loop protection
-    logic.
+    logic. By *root correlator* we mean the value of the `Fiware-Correlator` request header
+    in the update request without any suffix. Eg. the root correlator
+    for `Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32`
+    is `f320136c-0192-11eb-a893-000c29df7908`.
 -   **expDate** (optional): expiration timestamp (as a Date object) for the
     entity. Have a look to the [transient entities functionality](../user/transient_entities.md)
     for more detail.  
@@ -204,6 +206,8 @@ Fields:
 -   **description** (optional): a free text string describing the registration. Maximum length is 1024.
 -   **expiration**: this is the timestamp (as integer number, meaning seconds) for which the
     registration expires.
+-   **fwdMode**: the forwarding mode supported by the provider, either: `all`, `query`, `update` or `none`.
+    If ommited (Orion versions previous to 2.6.0), `all` is assumed.
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
@@ -222,6 +226,7 @@ Example document:
  {
    "_id": ObjectId("5149f60cf0075f2fabca43da"),
    "format": "JSON",
+   "fwdMode": "all",
    "expiration": 1360232760,
    "contextRegistration": [
        {
@@ -348,60 +353,5 @@ Example document:
         "format" : "JSON",
         "status" : "active"
 }
-```
-[Top](#top)
-
-## casubs collection
-
-The *casubs* collection stores information about context availability subscriptions.
-Each document in the collection corresponds to a subscription.
-
-Fields:
-
--   **\_id** is the subscription ID (the value that is provided to the
-    user to update and cancel the subscription). Given that we use \_id
-    for this, we ensure that subscription IDs are unique and that
-    queries by subscription IDs are very fast (as there is an automatic
-    default index in \_id).
--   **expiration**: this is the timestamp on which the subscription
-    will expire.
--   **reference**: the URL to send notifications
--   **entities**: an array of entities (mandatory). The JSON for each
-    entity contains **id**, **type** and **isPattern**.
--   **attrs**: an array of attribute names (strings) (optional).
--   **lastNotification**: timestamp corresponding to the last
-    notification sent associated to a given subscription.
--   **count**: the number of notifications sent associated to
-    the subscription.
--   **format**: the format to use to send notification, currently "JSON"
-    meaning JSON notifications in NGSIv1 format.
-
-Example document:
-
-```
- {
-   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
-   "expiration": 1360236300,
-   "reference": "http://notify.me",
-   "entities": [
-       {
-           "id": "E5",
-           "type": "T5",
-           "isPattern": "false"
-       },
-       {
-           "id": "E6",
-           "type": "T6",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-       "A1",
-       "A2"
-   ],
-   "lastNotification" : 1381132312,
-   "count": 42,
-   "format": "JSON"
- }
 ```
 [Top](#top)

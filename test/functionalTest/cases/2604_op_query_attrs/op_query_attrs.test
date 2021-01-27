@@ -33,10 +33,10 @@ brokerStart CB
 # 01. Create entity E1 with attributes A, B, C
 # 02. Create entity E2 with attributes B, C
 # 03. Create entity E3 with attribute C
-# 04. Query attrs: A, without q: E1-A, E2-none, E3-none
+# 04. Query attrs: A, without q: E1-A
 # 05. Query attrs: A, with q=A: E1-A
 # 06. Query attrs: C, with q=A: E1-C
-# 07. Query attrs: A, with q=!A: E2-none, E3-none
+# 07. Query attrs: A, with q=!A: nothing
 # 08. Query attrs: C, with q=!A: E2-C, E3-C
 #
 
@@ -98,8 +98,8 @@ echo
 echo
 
 
-echo "04. Query attrs: A, without q: E1-A, E2-none, E3-none"
-echo "====================================================="
+echo "04. Query attrs: A, without q: E1-A"
+echo "==================================="
 payload='{
   "entities": [
     {
@@ -152,8 +152,8 @@ echo
 echo
 
 
-echo "07. Query attrs: A, with q=!A: E2-none, E3-none"
-echo "==============================================="
+echo "07. Query attrs: A, with q=!A: nothing"
+echo "======================================"
 payload='{
   "entities": [
     {
@@ -221,10 +221,10 @@ Date: REGEX(.*)
 
 
 
-04. Query attrs: A, without q: E1-A, E2-none, E3-none
-=====================================================
+04. Query attrs: A, without q: E1-A
+===================================
 HTTP/1.1 200 OK
-Content-Length: 117
+Content-Length: 71
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,14 +237,6 @@ Date: REGEX(.*)
             "value": "1A"
         },
         "id": "E1",
-        "type": "T"
-    },
-    {
-        "id": "E2",
-        "type": "T"
-    },
-    {
-        "id": "E3",
         "type": "T"
     }
 ]
@@ -292,24 +284,15 @@ Date: REGEX(.*)
 ]
 
 
-07. Query attrs: A, with q=!A: E2-none, E3-none
-===============================================
+07. Query attrs: A, with q=!A: nothing
+======================================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 2
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-[
-    {
-        "id": "E2",
-        "type": "T"
-    },
-    {
-        "id": "E3",
-        "type": "T"
-    }
-]
+[]
 
 
 08. Query attrs: C, with q=!A: E2-C, E3-C

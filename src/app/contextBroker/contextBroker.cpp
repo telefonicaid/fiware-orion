@@ -52,7 +52,7 @@
 * To override the security added with the certificate, curl can always be called using the
 * CLI option '--insecure'.
 */
-#include <stdio.h>
+#include <stdio.h>                              // snprintf
 #include <unistd.h>                             // getppid, for, setuid, etc.
 #include <string.h>
 #include <fcntl.h>                              // open
@@ -73,6 +73,10 @@
 #include "parseArgs/paBuiltin.h"
 #include "parseArgs/paIsSet.h"
 #include "parseArgs/paUsage.h"
+#include "parseArgs/paIterate.h"
+#include "parseArgs/paPrivate.h"
+#include "parseArgs/paLogSetup.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -173,7 +177,10 @@ bool            relogAlarms;
 bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
+unsigned long   logLineMaxSize;
+unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
+bool            disableFileLog;
 int             reqTimeout;
 bool            insecureNotif;
 bool            ngsiv1Autocast;
@@ -240,8 +247,10 @@ unsigned long   fcMaxInterval;
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
-#define LOG_TO_SCREEN_DESC     "log to screen"
+#define DISABLE_FILE_LOG       "disable logging into file"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
+#define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
+#define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
 #define METRICS_DESC           "turn off the 'metrics' feature"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
@@ -320,7 +329,11 @@ PaArgument paArgs[] =
   { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,             CHECK_v1_ID_DESC             },
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,             DISABLE_CUSTOM_NOTIF         },
 
+  { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,             DISABLE_FILE_LOG             },
   { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,             LOG_FOR_HUMANS_DESC          },
+  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,             LOG_LINE_MAX_SIZE_DESC       },
+  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,             LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
+
   { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,             METRICS_DESC                 },
 
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,             INSECURE_NOTIF               },
@@ -492,7 +505,7 @@ void daemonize(void)
 */
 void sigHandler(int sigNo)
 {
-  LM_I(("Signal Handler (caught signal %d)", sigNo));
+  LM_T(LmtOldInfo, ("Signal Handler (caught signal %d)", sigNo));
 
   switch (sigNo)
   {
@@ -813,6 +826,69 @@ static void notifFlowControlParse
 }
 
 
+/* ****************************************************************************
+*
+* cmdLineString -
+*
+* Exceptionally, this function return value doesn't follow the coding style rule
+* of not returning objects. It is due to simplicity. Note this function is
+* used only at startup, so no impact in performance is expected
+*/
+static std::string cmdLineString(int argC, char* argV[])
+{
+  std::string s;
+  for (int ix =  0; ix < argC; ix++)
+  {
+    s += std::string(argV[ix]);
+    if (ix != argC -1)
+    {
+      s += " ";
+    }
+  }
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* logEnvVars -
+*
+* Print env var configuration in INFO traces
+*/
+static void logEnvVars(void)
+{
+  PaiArgument* aP;
+  paIterateInit();
+  while ((aP = paIterateNext(paiList)) != NULL)
+  {
+    if ((aP->from == PafEnvVar) && (aP->isBuiltin == false))
+    {
+      if (aP->type == PaString)
+      {
+        LM_I(("env var ORION_%s (%s): %s", aP->envName, aP->option, (char*) aP->varP));
+      }
+      else if (aP->type == PaBool)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, (bool) aP->varP));
+      }
+      else if (aP->type == PaInt)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
+      }
+      else if (aP->type == PaDouble)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
+      }
+      else
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+      }
+    }
+  }
+}
+
+
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -864,9 +940,9 @@ int main(int argC, char* argV[])
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
   paConfig("man version",                   (void*) versionString.c_str());
-  paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
+  paConfig("screen time format",            (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("prefix",                        (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
@@ -874,15 +950,14 @@ int main(int argC, char* argV[])
   paConfig("valid log level strings",       validLogLevels);
   paConfig("default value",                 "-logLevel", "WARN");
 
-
+  
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
   //
-  if (paIsSet(argC, argV, "-fg"))
+  if (paIsSet(argC, argV, (PaArgument*) paArgs, "-fg"))
   {
-    paConfig("log to screen",                 (void*) true);
-
-    if (paIsSet(argC, argV, "-logForHumans"))
+    paConfig("log to screen",                 (void*) true);  
+    if (paIsSet(argC, argV, (PaArgument*) paArgs, "-logForHumans"))
     {
       paConfig("screen line format", (void*) "TYPE@TIME  FILE[LINE]: TEXT");
     }
@@ -890,6 +965,18 @@ int main(int argC, char* argV[])
     {
       paConfig("screen line format", LOG_FILE_LINE_FORMAT);
     }
+  }
+
+  //
+  // disable file logging if the corresponding option is set. 
+  //
+  if (paIsSet(argC, argV, (PaArgument *) paArgs, "-disableFileLog"))
+  {
+    paConfig("log to file", (void*) false);
+  } 
+  else
+  {
+    paConfig("log to file", (void*) true);
   }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
@@ -910,6 +997,10 @@ int main(int argC, char* argV[])
   {
     _exit(s);
   }
+
+  // print startup info in logs
+  LM_I(("start command line <%s>", cmdLineString(argC, argV).c_str()));
+  logEnvVars();
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))

@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=centos7.7.1908
+ARG  IMAGE_TAG=centos7.9.2009
 FROM centos:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -89,10 +89,8 @@ RUN \
     make install && \
     # reduce size of installed binaries
     strip /usr/bin/contextBroker && \
-    # create needed log and run paths
-    mkdir -p /var/log/contextBroker && \
+    # create needed run path
     mkdir -p /var/run/contextBroker && \
-    chown ${ORION_USER} /var/log/contextBroker && \
     chown ${ORION_USER} /var/run/contextBroker && \
     cd /opt && \
     if [ ${CLEAN_DEV_TOOLS} -eq 0 ] ; then yum clean all && exit 0 ; fi && \
@@ -149,7 +147,9 @@ RUN \
     rm -f /var/log/*log
 
 WORKDIR /
-ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast" ]
+
+# Note we disable log file as docker container will output by stdout
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast", "-disableFileLog" ]
 EXPOSE 1026
 
 LABEL "maintainer"="Orion Team. Telefónica I+D"

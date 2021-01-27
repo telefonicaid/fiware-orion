@@ -25,7 +25,6 @@
 *
 * Author: Fermin Galan
 */
-#include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "mongoBackend/safeMongo.h"
 
@@ -36,7 +35,6 @@
 #define REGISTRATIONS_COLL          DBPREFIX ".registrations"
 #define ENTITIES_COLL               DBPREFIX ".entities"
 #define SUBSCRIBECONTEXT_COLL       DBPREFIX ".csubs"
-#define SUBSCRIBECONTEXTAVAIL_COLL  DBPREFIX ".casubs"
 
 
 
@@ -68,16 +66,5 @@ extern void setupDatabase(void);
 */
 extern bool matchNotifyContextRequest(NotifyContextRequest* expected, NotifyContextRequest* arg);
 
-
-
-/* ****************************************************************************
-*
-* matchNotifyContextAvailabilityRequest -
-*/
-extern bool matchNotifyContextAvailabilityRequest
-(
-  NotifyContextAvailabilityRequest* expected,
-  NotifyContextAvailabilityRequest* arg
-);
 
 #endif  // TEST_UNITTESTS_TESTINIT_H_

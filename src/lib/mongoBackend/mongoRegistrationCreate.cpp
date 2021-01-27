@@ -190,6 +190,17 @@ static void setFormat(const std::string& format, orion::BSONObjBuilder* bobP)
 
 /* ****************************************************************************
 *
+* setForwardingMode -
+*/
+static void setForwardingMode(const ngsiv2::ForwardingMode forwardingMode, orion::BSONObjBuilder* bobP)
+{
+  bobP->append(REG_FORWARDING_MODE, ngsiv2::forwardingModeToString(forwardingMode));
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoRegistrationCreate - 
 */
 void mongoRegistrationCreate
@@ -216,6 +227,7 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
+  setForwardingMode(regP->provider.supportedForwardingMode, &bob);
 
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
   setFormat(format, &bob);

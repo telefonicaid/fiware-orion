@@ -40,6 +40,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
+#include "ngsi/ContextRegistrationResponseVector.h"
 #include "ngsi/ConditionValueList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -50,6 +51,7 @@
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Registration.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "mongoDriver/BSONArray.h"
@@ -167,14 +169,6 @@ extern void setSubscribeContextCollectionName(const std::string& name);
 
 /* ****************************************************************************
 *
-* setSubscribeContextAvailabilityCollectionName -
-*/
-extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
 * composeDatabaseName -
 *
 */
@@ -203,14 +197,6 @@ extern std::string getRegistrationsCollectionName(const std::string& tenant);
 * getSubscribeContextCollectionName -
 */
 extern std::string getSubscribeContextCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
 
 
 
@@ -325,6 +311,7 @@ extern bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -433,22 +420,6 @@ extern orion::BSONArray processConditionVector
 
 /* ****************************************************************************
 *
-* processAvailabilitySubscriptions -
-*/
-extern bool processAvailabilitySubscription(
-    const EntityIdVector& enV,
-    const StringList&     attrL,
-    const std::string&    subId,
-    const std::string&    notifyUrl,
-    RenderFormat          renderFormat,
-    const std::string&    tenant,
-    const std::string&    fiwareCorrelator
-);
-
-
-
-/* ****************************************************************************
-*
 * slashEscape - 
 *
 * When the 'to' buffer is full, slashEscape returns.
@@ -513,7 +484,8 @@ extern void cprLookupByAttribute
   MimeType*                                perEntPaMimeType,
   std::string*                             perAttrPa,
   MimeType*                                perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP
+  ProviderFormat*                          providerFormatP,
+  std::string*                             regId
 );
 
 

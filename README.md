@@ -10,7 +10,9 @@
 [![NGSI v2](https://nexus.lab.fiware.org/repository/raw/public/badges/specifications/ngsiv2.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
-[![Build badge](https://img.shields.io/travis/telefonicaid/fiware-orion.svg)](https://travis-ci.org/telefonicaid/fiware-orion/)
+![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
+![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
+![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context
@@ -96,11 +98,11 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20200325)
-    [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker20200325)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20201029)
+    [(jp)](https://www.slideshare.net/fisuda/orion-contextbroker20201029)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20200325)
-    [(jp)](https://www.slideshare.net/fisuda/orion-contextbrokerngsiv2overviewfordevelopersthatalreadyknowngsiv120200325)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20201028)
+    [(jp)](https://www.slideshare.net/fisuda/orion-contextbrokerngsiv2overviewfordevelopersthatalreadyknowngsiv120201028)
 
 [Top](#top)
 
@@ -272,7 +274,7 @@ tag `fiware-orion`
 Orion Context Broker is licensed under [Affero General Public License (GPL)
 version 3](./LICENSE).
 
-© 2020 Telefonica Investigación y Desarrollo, S.A.U
+© 2021 Telefonica Investigación y Desarrollo, S.A.U
 
 ### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 

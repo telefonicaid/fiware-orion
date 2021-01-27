@@ -136,10 +136,10 @@ The list of available options is the following:
 -   **-noCache**. Disables the context subscription cache, so subscriptions searches are
     always done in DB (not recommended but useful for debugging).
 -   **-notificationMode**. Allows to select notification mode, either:
-    `transient`, `permanent` or `threadpool:q:n`. Default mode is `transient`.
+    `transient`, `persistent` or `threadpool:q:n`. Default mode is `transient`.
     * In transient mode, connections are closed by the CB right after sending the notification.
-    * In permanent connection mode, a permanent connection is created the first time a notification
-      is sent to a given URL path (if the receiver supports permanent connections). Following notifications to the same
+    * In persistent connection mode, a persistent connection is created the first time a notification
+      is sent to a given URL path (if the receiver supports persistent connections). Following notifications to the same
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and perform the outgoing requests asynchronously. Please have a look at the
@@ -166,7 +166,10 @@ The list of available options is the following:
 -   **-disableCustomNotifications**. Disabled NGSIv2 custom notifications. In particular:
     * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
     * No `${...}` macro substitution is performed.
+-   **-disableFileLog**. To prevent Orion from logging into a file (default behaviour is use a log file). This option might be useful if you are running on kubernetes.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
+-   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes.
+-   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes.
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
@@ -182,8 +185,8 @@ Two facts have to be taken into account:
 
 * Environment variables for CLI parameters that work in a "flag" way 
   (i.e. they are either enabled or not, but don't have an actual value - `-fg` is one of them)
-  can take the case-sensitive values `TRUE` (to enable the parameter) or
-  `FALSE` (to disable it).
+  can take the case-sensitive values `TRUE` or `true`(to enable the parameter) or
+  `FALSE` or `false` (to disable it).
 * In case of conflict (i.e. using at the same time the environment variable
   and the CLI parameter) the CLI parameter is used.
 
@@ -238,7 +241,10 @@ Two facts have to be taken into account:
 |	ORION_RELOG_ALARMS	|	relogAlarms	|
 |	ORION_CHECK_ID_V1	|	strictNgsiv1Ids	|
 |	ORION_DISABLE_CUSTOM_NOTIF	|	disableCustomNotifications	|
+|   ORION_DISABLE_FILE_LOG  |   disableFileLog  |
 |	ORION_LOG_FOR_HUMANS	|	logForHumans	|
+|   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
+|   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
 |	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
