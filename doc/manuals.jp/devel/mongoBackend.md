@@ -507,9 +507,8 @@ _MB-18: mongoRegisterContext_
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォ が取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * `mongoRegisterContext()` の場合、リクエストにレジストレーション ID が指定されていれば、レジストレーション*更新*を示します。したがって、`registrations` モジュールは `collectionFindOne()` を使ってデータベースから検索されます (ステップ3と4)
 * `processRegisterContext()` がレジストレーションを処理するために呼び出されます (ステップ5)
-* リクエストの各レジストレーションに対して、`addTriggeredSubscriptions()` が呼び出されます (ステップ6)。この関数は  `registrationOperations` モジュールで `collectionQuery()` を順番に使用して、レジストレーションがサブスクリプションをトリガするかどうかをチェックします (ステップ7と8)。`subsToNotify` マップは、トリガーされたサブスクリプションを格納するために使用されます
-* `registration` ドキュメントは、データベースで作成または更新されます。そうするために、`upsert` パラメータを `true` に設定する `connectionOperations` モジュールの `collectionUpdate()` が使われます (ステップ9と10)
-* ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ11)
+* `registration` ドキュメントはデータベースで作成または更新されます。これを行うには、`connectionOperations` モジュールの `collectionUpdate()` を使用して、`upsert` パラメータを `true` に設定します（ステップ6および7)
+* リクエスト・セマフォがステップ2で取得された場合、戻る前に解放されます (ステップ8)
 
 [Top](#top)
 
