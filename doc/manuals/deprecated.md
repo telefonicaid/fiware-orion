@@ -18,8 +18,8 @@ A list of deprecated features and the version in which they were deprecated foll
 * Rush support (along with the related CLI parameter: `-rush`) in Orion 2.1.0 (removed in Orion 2.3.0).
 * NGSIv1 API (along with related CLI parameters: `-strictNgsiv1Ids` and `-ngsiv1Autocast`) in Orion 2.0.0.
   Use NGSIv2 API instead.
-    * Context availability subscriptions (AKA NGSI9 subscriptions), as part of NGSIv1, in Orion 2.2.0
-      (removed in Orion 2.4.0)
+    * Context availability subscriptions (AKA NGSI9 subscriptions), as part of NGSIv1, in Orion 2.0.0
+      (removed in Orion 2.6.0)
 * `attributes` field in `POST /v2/op/query` is in Orion 1.15.0. It is a combination of `attrs` (to select
   which attributes to include in the response to the query) and unary attribute filter in `q` within
   `expression` (to return only entities which have these attributes). Use them instead.
