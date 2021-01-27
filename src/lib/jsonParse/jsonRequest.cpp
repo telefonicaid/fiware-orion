@@ -39,10 +39,6 @@
 
 #include "jsonParse/jsonRegisterContextRequest.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
-#include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
-#include "jsonParse/jsonUnsubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonQueryContextResponse.h"
@@ -76,10 +72,6 @@ static JsonRequest jsonRequest[] =
   // NGSI9
   { RegisterContext,                       "POST", "registerContextRequest",                        FUNCS(Rcr)   },
   { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            FUNCS(Dcar)  },
-  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           FUNCS(Scar)  },
-  { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         FUNCS(Ucar)  },
-  { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              FUNCS(Ncar)  },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
 
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           FUNCS(Qcr)   },
@@ -107,7 +99,7 @@ static JsonRequest jsonRequest[] =
 
   { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
-  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
+
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   FUNCS(Acer)  },

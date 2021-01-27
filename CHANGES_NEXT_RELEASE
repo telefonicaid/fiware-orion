@@ -7,3 +7,4 @@
 - Add: supportedForwardingMode full support according to NGSIv2 spec (#3106)
 - Fix: avoid over-requesting to CPrs attributes that has been filtered out (#3745)
 - Fix: avoid spureous entities spurious entities (eg. '{"id": "E", "type": "T"}') in GET /v2/entities responses
+- Remove: NGSIv1 context availability subscriptions

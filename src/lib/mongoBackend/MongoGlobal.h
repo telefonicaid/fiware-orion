@@ -42,6 +42,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
+#include "ngsi/ContextRegistrationResponseVector.h"
 #include "ngsi/ConditionValueList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -169,14 +170,6 @@ extern void setSubscribeContextCollectionName(const std::string& name);
 
 /* ****************************************************************************
 *
-* setSubscribeContextAvailabilityCollectionName -
-*/
-extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
 * composeDatabaseName -
 *
 */
@@ -205,14 +198,6 @@ extern std::string getRegistrationsCollectionName(const std::string& tenant);
 * getSubscribeContextCollectionName -
 */
 extern std::string getSubscribeContextCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
 
 
 
@@ -430,22 +415,6 @@ extern mongo::BSONArray processConditionVector
   bool                               blacklist,
   const bool&                        skipInitialNotification,
   ApiVersion                         apiVersion
-);
-
-
-
-/* ****************************************************************************
-*
-* processAvailabilitySubscriptions -
-*/
-extern bool processAvailabilitySubscription(
-    const EntityIdVector& enV,
-    const StringList&     attrL,
-    const std::string&    subId,
-    const std::string&    notifyUrl,
-    RenderFormat          renderFormat,
-    const std::string&    tenant,
-    const std::string&    fiwareCorrelator
 );
 
 

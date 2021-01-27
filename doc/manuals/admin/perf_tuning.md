@@ -407,8 +407,7 @@ outgoing HTTP connections, overriding the default operating system timeout.
 
 ## Subscription cache
 
-Orion implements a context subscription cache in order to speed up notification triggering. In the current
-version (this may change in the future), context availability subscriptions doesn't use any cache.
+Orion implements a context subscription cache in order to speed up notification triggering.
 
 The cache synchronization period is controlled by the `-subCacheIval` (by default it is 60 seconds).
 Synchronization involves two different tasks:
