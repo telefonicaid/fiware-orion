@@ -66,10 +66,9 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
-#include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
+#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
-#include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
-#include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
 
@@ -238,34 +237,6 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
     ciP->outMimeType = JSONLD;
 
   return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// serviceLookup - lookup the Service
-//
-// orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
-// orionldServiceLookup makes sure the URL supprts the verb
-//
-static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
-{
-  OrionLdRestService* serviceP;
-
-  serviceP = orionldServiceLookup(&orionldRestServiceV[ciP->verb]);
-  if (serviceP == NULL)
-  {
-    if (orionldBadVerb(ciP) == true)
-      orionldState.httpStatusCode = SccBadVerb;
-    else
-    {
-      orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
-      orionldState.httpStatusCode = 404;
-    }
-  }
-
-  return serviceP;
 }
 
 
@@ -744,17 +715,9 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
   //
-  // 01. Predetected Error?
+  // Predetected Error from orionldMhdConnectionInit?
   //
-  if (orionldState.httpStatusCode != SccOk)
-    goto respond;
-
-  //
-  // 02. Lookup the Service
-  //
-  // Invalid Verb is checked for in orionldMhdConnectionInit()
-  //
-  if ((orionldState.serviceP = serviceLookup(ciP)) == NULL)
+  if (orionldState.httpStatusCode != 200)
     goto respond;
 
   //
@@ -799,19 +762,19 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 
   //
-  // Save a copy of the incoming payload before it is destroyed during kjParse
-  //
-  // FIXME - Only for "some" requests - right now only for "PATCH /ngsi-ld/v1/entities/*/attrs/*"
+  // Save a copy of the incoming payload before it is destroyed during kjParse AND
+  // parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
   if (ciP->payload != NULL)
-    orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
+  {
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == 0)
+      orionldState.requestPayload = ciP->payload;
+    else
+      orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
 
-  //
-  // 04. Parse the payload, and check for empty payload, also, find @context in payload and check it's OK
-  //
-  if ((ciP->payload != NULL) && (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false))
-    goto respond;
-
+    if (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false)
+      goto respond;
+  }
 
   //
   // 05. Check the Content-Type

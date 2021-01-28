@@ -32,7 +32,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, ...
 #include "kjson/kjParse.h"                                       // kjParse
-#include "kjson/kjRender.h"  // kjRender - TMP
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -293,36 +292,14 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 //
 // orionldForwardGetEntity -
 //
-static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType)
+static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType, char** attrsV, int attrs)
 {
   //
-  // If URI param 'attrs' was used, split the attr-names into an array and expand according to @context
-  //
-  char* uriParamAttrsV[100];
-  int   uriParamAttrs = 0;
-
-  if (!ciP->uriParam["attrs"].empty())
-  {
-    char* uriParamAttrsString = (char*) ciP->uriParam["attrs"].c_str();
-
-    uriParamAttrs = kStringSplit(uriParamAttrsString, ',', uriParamAttrsV, K_VEC_SIZE(uriParamAttrsV));
-
-    //
-    // Populate the array uriParamAttrsV with the expanded attribute names
-    //
-    for (int ix = 0; ix < uriParamAttrs; ix++)
-    {
-      uriParamAttrsV[ix] = orionldContextItemExpand(orionldState.contextP, uriParamAttrsV[ix], true, NULL);
-    }
-  }
-
-  //
-  // Treating all hits from the registrations
+  // Treat all hits from the registrations
   //
   for (KjNode* regP = regArrayP->value.firstChildP; regP != NULL; regP = regP->next)
   {
-    KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, uriParamAttrsV, uriParamAttrs);
-
+    KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, attrsV, attrs);
     if (partTree == NULL)
     {
       LM_E(("Internal Error (forwarded request failed)"));
@@ -375,20 +352,26 @@ static KjNode* orionldForwardGetEntity(ConnectionInfo* ciP, char* entityId, KjNo
 
 
 
-static char** attrsListToArray(char* attrList, char* attrV[], int attrVecLen)
+// -----------------------------------------------------------------------------
+//
+// attrsListToArray -
+//
+static char** attrsListToArray(char* attrList, char* dotAttrV[], char* eqAttrV[], int attrVecLen, int* attrsCountP)
 {
-  int items = kStringSplit(attrList, ',', attrV, attrVecLen);
+  int items = kStringSplit(attrList, ',', eqAttrV, attrVecLen);
 
-  attrV[items] = NULL;
+  dotAttrV[items] = NULL;
+  eqAttrV[items]  = NULL;
 
   for (int ix = 0; ix < items; ix++)
   {
-    attrV[ix] = orionldContextItemExpand(orionldState.contextP, attrV[ix], true, NULL);
-    attrV[ix] = kaStrdup(&orionldState.kalloc, attrV[ix]);
-    dotForEq(attrV[ix]);
+    eqAttrV[ix]  = orionldContextItemExpand(orionldState.contextP, eqAttrV[ix], true, NULL);
+    dotAttrV[ix] = kaStrdup(&orionldState.kalloc, eqAttrV[ix]);
+    dotForEq(eqAttrV[ix]);
   }
 
-  return attrV;
+  *attrsCountP = items;
+  return eqAttrV;
 }
 
 
@@ -469,19 +452,20 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     orionldState.responseTree = kjTreeFromQueryContextResponse(true, orionldState.uriParams.attrs, keyValues, &response);
   }
 #else
-  char*  attrs[100];
-  char** attrsP         = NULL;
+  char*  dotAttrs[100]  = { NULL };
+  char*  eqAttrs[100]   = { NULL };
+  int    noOfAttrs      = 0;
   bool   attrsMandatory = false;
 
   if (orionldState.uriParams.attrs != NULL)
   {
-    attrsP = (char**) attrsListToArray(orionldState.uriParams.attrs, attrs, 100);
+    attrsListToArray(orionldState.uriParams.attrs, dotAttrs, eqAttrs, 100, &noOfAttrs);
     if (regArray == NULL)  // No matching registrations
       attrsMandatory = true;
   }
 
   orionldState.responseTree = dbEntityRetrieve(orionldState.wildcard[0],
-                                               attrsP,
+                                               eqAttrs,
                                                attrsMandatory,
                                                orionldState.uriParamOptions.sysAttrs,
                                                orionldState.uriParamOptions.keyValues,
@@ -525,7 +509,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
       needEntityType = true;  // Get it from Forward-response
     }
 
-    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType);
+    orionldForwardGetEntity(ciP, orionldState.wildcard[0], regArray, orionldState.responseTree, needEntityType, dotAttrs, noOfAttrs);
   }
 
   return true;

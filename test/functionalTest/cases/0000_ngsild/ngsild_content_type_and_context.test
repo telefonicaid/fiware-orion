@@ -217,7 +217,7 @@ Date: REGEX(.*)
 06. Content-Type: application/ld+json + context in HTTP Header - see error
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 233
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -231,7 +231,7 @@ Date: REGEX(.*)
 07. Content-Type: application/ld+json + context in HTTP Header + context in payload - see error
 ===============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 233
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 

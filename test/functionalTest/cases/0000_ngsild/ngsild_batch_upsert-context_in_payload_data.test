@@ -208,7 +208,7 @@ Date: REGEX(.*)
 04. Batch Upsert, Content-Type is LD+JSON, @context in payload data but ALSO in HTTP link header
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 233
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 

@@ -31,13 +31,11 @@ brokerStart CB 31
 --SHELL--
 
 #
-# NOTE: never mind that the requests 01 and 03 fail - the URI Arg parsing is done lone before the
+# NOTE: never mind that the requests 01 and 03 fail - the URI Arg parsing is done long before the
 #       error is discovered by the broker and does not alter the test results.
 #
 # 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values
-# 02. Grep from log-file - see all four with their corresponding values
-# 03. GET Entity with 'id=' - no value for id
-# 04. Grep from log-file - see that ID is given but that its value is empty - the other three: null values
+# 02. GET Entity with 'id=' - no value for id
 #
 
 echo "01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values"
@@ -48,23 +46,9 @@ echo
 
 
 
-echo "02. Grep from log-file - see all four with their corresponding values"
-echo "====================================================================="
-grep "orionldUriArguments" /tmp/orionld.log | awk -Fmsg= '{ print $2 }'
-echo
-echo
-
-
-echo "03. GET Entity with 'id=' - no value for id"
+echo "02. GET Entity with 'id=' - no value for id"
 echo "==========================================="
 orionCurl --url "/ngsi-ld/v1/entities?id="
-echo
-echo
-
-
-echo "04. Grep from log-file - see that ID is given but that its value is empty - the other three: null values"
-echo "========================================================================================================"
-grep "orionldUriArguments" /tmp/orionld.log | awk -Fmsg= '{ print $2 }'
 echo
 echo
 
@@ -84,16 +68,7 @@ Date: REGEX(.*)
 }
 
 
-02. Grep from log-file - see all four with their corresponding values
-=====================================================================
-orionldUriArguments: id:        'E1,E2,E3'
-orionldUriArguments: type:      'T1,T2,T3'
-orionldUriArguments: idPattern: 'E.*'
-orionldUriArguments: attrs:     'A1,A2,A3'
-orionldUriArguments: options:   '(null)'
-
-
-03. GET Entity with 'id=' - no value for id
+02. GET Entity with 'id=' - no value for id
 ===========================================
 HTTP/1.1 400 Bad Request
 Content-Length: 183
@@ -105,20 +80,6 @@ Date: REGEX(.*)
     "title": "Too broad query",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
-
-
-04. Grep from log-file - see that ID is given but that its value is empty - the other three: null values
-========================================================================================================
-orionldUriArguments: id:        'E1,E2,E3'
-orionldUriArguments: type:      'T1,T2,T3'
-orionldUriArguments: idPattern: 'E.*'
-orionldUriArguments: attrs:     'A1,A2,A3'
-orionldUriArguments: options:   '(null)'
-orionldUriArguments: id:        ''
-orionldUriArguments: type:      '(null)'
-orionldUriArguments: idPattern: '(null)'
-orionldUriArguments: attrs:     '(null)'
-orionldUriArguments: options:   '(null)'
 
 
 --TEARDOWN--

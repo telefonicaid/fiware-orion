@@ -403,11 +403,9 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   releaseMongoConnection(connectionP);
   // semGive()
 
-  if (dbTree == NULL)
-  {
-    // Entity not found
+  if (dbTree == NULL)  // Entity not found
     return NULL;
-  }
+
 
   KjNode*  dbAttrsP           = kjLookup(dbTree, "attrs");      // Must be there
   KjNode*  dbDataSetsP        = kjLookup(dbTree, "@datasets");  // May not be there
@@ -427,7 +425,7 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   // Else (no 'attrs' given):
   //
   //
-  if (attrs == NULL)     // Include all attributes in the response
+  if ((attrs == NULL) || (attrs[0] == NULL))     // Include all attributes in the response
   {
     if (keyValues == false)
     {

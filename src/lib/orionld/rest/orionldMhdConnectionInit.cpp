@@ -38,7 +38,10 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
+#include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
+#include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
+#include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
@@ -146,31 +149,26 @@ static Verb verbGet(const char* method)
 //
 static void ipAddressAndPort(ConnectionInfo* ciP)
 {
-  char      ip[IP_LENGTH_MAX];
-  uint16_t  port = 0;
-
   const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(ciP->connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
 
   if (mciP != NULL)
   {
     struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
 
-    port = (addr->sa_data[0] << 8) + addr->sa_data[1];
-    snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
+    ciP->port = (addr->sa_data[0] << 8) + addr->sa_data[1];
+    snprintf(clientIp, sizeof(clientIp), "%d.%d.%d.%d",
              addr->sa_data[2] & 0xFF,
              addr->sa_data[3] & 0xFF,
              addr->sa_data[4] & 0xFF,
              addr->sa_data[5] & 0xFF);
-    snprintf(clientIp, sizeof(clientIp), "%s", ip);
   }
   else
   {
-    port = 0;
-    snprintf(ip, sizeof(ip), "IP unknown");
+    ciP->port = 0;
+    strncpy(clientIp, "IP unknown", sizeof(clientIp));
   }
-
-  ciP->port = port;
 }
+
 
 
 // -----------------------------------------------------------------------------
@@ -440,15 +438,28 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
 
 // -----------------------------------------------------------------------------
 //
-// uriArgumentsPresent - necessary for functest "ngsild_uri_params_in_orionldState.test"
+// serviceLookup - lookup the Service
 //
-static void uriArgumentsPresent(void)
+// orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
+// orionldServiceLookup makes sure the URL supprts the verb
+//
+static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
 {
-  LM_T(LmtUriParams, ("orionldUriArguments: id:        '%s'", orionldState.uriParams.id));
-  LM_T(LmtUriParams, ("orionldUriArguments: type:      '%s'", orionldState.uriParams.type));
-  LM_T(LmtUriParams, ("orionldUriArguments: idPattern: '%s'", orionldState.uriParams.idPattern));
-  LM_T(LmtUriParams, ("orionldUriArguments: attrs:     '%s'", orionldState.uriParams.attrs));
-  LM_T(LmtUriParams, ("orionldUriArguments: options:   '%s'", orionldState.uriParams.options));
+  OrionLdRestService* serviceP;
+
+  serviceP = orionldServiceLookup(&orionldRestServiceV[orionldState.verb]);
+  if (serviceP == NULL)
+  {
+    if (orionldBadVerb(ciP) == true)
+      orionldState.httpStatusCode = 405;  // SccBadVerb
+    else
+    {
+      orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
+      orionldState.httpStatusCode = 404;
+    }
+  }
+
+  return serviceP;
 }
 
 
@@ -474,6 +485,7 @@ MHD_Result orionldMhdConnectionInit
   //
   LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
 
+
   //
   // 1. Prepare connectionInfo
   //
@@ -485,22 +497,27 @@ MHD_Result orionldMhdConnectionInit
   // Remember ciP for consequent connection callbacks from MHD
   *con_cls = ciP;
 
+  // The 'connection', as given by MHD is very important. No responses can be sent without it
+  ciP->connection = connection;
+
+  // IP Address and port of caller
+  ipAddressAndPort(ciP);
+
+
   //
-  // 1. Prepare orionldState
+  // 2. Prepare orionldState
   //
   orionldStateInit();
   orionldState.ciP = ciP;
 
-
-  // The 'connection', as given by MHD is very important. No responses can be sent without it
-  ciP->connection = connection;
+  // By default, no whitespace in output
+  orionldState.kjsonP->spacesPerIndent   = 0;
+  orionldState.kjsonP->nlString          = (char*) "";
+  orionldState.kjsonP->stringBeforeColon = (char*) "";
+  orionldState.kjsonP->stringAfterColon  = (char*) "";
 
   // Flagging all as OK - errors will be flagged when occurring
   orionldState.httpStatusCode = 200;
-
-
-  // IP Address and port of caller
-  ipAddressAndPort(ciP);
 
   // Keep a pointer to the method/verb
   orionldState.verbString = (char*) method;
@@ -525,7 +542,7 @@ MHD_Result orionldMhdConnectionInit
     if (orionldState.urlPath[urlLen - 1] == '/')
     {
       LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
-      orionldState.responsePayload = (char*) doubleSlashPayload;
+      orionldState.responsePayload = (char*) doubleSlashPayload;  // FIXME: use orionldErrorResponseCreate - after setting prettyPrint
       orionldState.httpStatusCode  = 400;
       return MHD_YES;
     }
@@ -537,58 +554,25 @@ MHD_Result orionldMhdConnectionInit
   if (orionldState.verb == NOVERB)
   {
     LM_T(LmtVerb, ("NOVERB for (%s)", method));
-    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);
+    orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);  // FIXME: do this after setting prettyPrint
     orionldState.httpStatusCode   = 400;
     return MHD_YES;
   }
 
-  // 4. Get HTTP Headers
-  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: implement orionldHttpHeaderGet in C !!!
+  // 4. GET Service Pointer from VERB and URL-PATH
+  orionldState.serviceP = serviceLookup(ciP);
 
-  if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
-  {
-    orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
-    orionldState.httpStatusCode  = 400;
+  if (orionldState.serviceP == NULL)  // 405 or 404 - no need to continue - prettyPrint not possible here
     return MHD_YES;
-  }
 
-  // 5. Check payload too big
-  if (ciP->httpHeaders.contentLength > 2000000)
-  {
-    orionldState.responsePayload = (char*) payloadTooLargePayload;
-    orionldState.httpStatusCode  = 400;
-    return MHD_YES;
-  }
+  //
+  // 5. GET URI params
+  //    Those Service Routines that DON'T USE mongoBackend don't need to call uriArgumentGet
+  //    [ mongoBackend needs stuff in ciP->uriParams ]
+  //
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS) == 0)
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
-  // 6. Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
-  ciP->servicePathV.push_back((orionldState.verb == GET)? "/#" : "/");
-
-
-  // 7.  Check that GET/DELETE has no payload
-  // 8.  Check that POST/PUT/PATCH has payload
-  // 9.  Check validity of tenant
-  // 10. Check Accept header
-  // 11. Check URL path is OK
-
-  // 12. Check Content-Type is accepted
-  if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
-  {
-    //
-    // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
-    //
-    if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
-    {
-      LM_W(("Bad Input (invalid Content-Type: '%s'", ciP->httpHeaders.contentType.c_str()));
-      orionldErrorResponseCreate(OrionldBadRequestData,
-                                 "unsupported format of payload",
-                                 "only application/json and application/ld+json are supported");
-      orionldState.httpStatusCode = 415;  // Unsupported Media Type
-      return MHD_YES;
-    }
-  }
-
-  // 13. Get URI parameters
-  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);           // FIXME: To Be Removed!
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
   //
@@ -602,18 +586,16 @@ MHD_Result orionldMhdConnectionInit
     orionldState.kjsonP->stringBeforeColon = (char*) "";
     orionldState.kjsonP->stringAfterColon  = (char*) " ";
   }
-  else
-  {
-    // By default, no whitespace in output
-    orionldState.kjsonP->spacesPerIndent   = 0;
-    orionldState.kjsonP->nlString          = (char*) "";
-    orionldState.kjsonP->stringBeforeColon = (char*) "";
-    orionldState.kjsonP->stringAfterColon  = (char*) "";
-  }
 
-  if (orionldState.httpStatusCode != 200)
+
+  //
+  // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH
+  // If any other verb is used, even if a valid REST Verb, a generic error will be returned
+  //
+  if ((orionldState.verb != POST) && (orionldState.verb != GET) && (orionldState.verb != DELETE) && (orionldState.verb != PATCH))
   {
-    LM_W(("Bad Input (invalid URI parameter)"));
+    LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
+    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
     orionldState.httpStatusCode = 400;
   }
 
@@ -634,26 +616,50 @@ MHD_Result orionldMhdConnectionInit
     orionldState.httpStatusCode = 400;
   }
 
-  if (lmTraceIsSet(LmtUriParams))
-    uriArgumentsPresent();
+  // Get HTTP Headers
+  MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);  // FIXME: implement orionldHttpHeaderGet in C !!!
 
-  // 14. Check ...
-
-  // 20. Lookup the Service Routine
-  // 21. Not found?  Look it up in the badVerb vector
-  // 22. Not found still? Return error
-
-  //
-  // NGSI-LD only accepts the verbs POST, GET, DELETE and PATCH
-  // If any other verb is used, even if a valid REST Verb, a generic error will be returned
-  //
-  if ((orionldState.verb != POST) && (orionldState.verb != GET) && (orionldState.verb != DELETE) && (orionldState.verb != PATCH))
+  if ((orionldState.ngsildContent == true) && (orionldState.linkHttpHeaderPresent == true))
   {
-    LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
-    orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
-    orionldState.httpStatusCode = 400;
+    orionldErrorResponseCreate(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed");
+    orionldState.httpStatusCode  = 400;
+    return MHD_YES;
   }
 
-  LM_T(LmtMhd, ("Connection Init DONE"));
+  // Check payload too big
+  if (ciP->httpHeaders.contentLength > 2000000)
+  {
+    orionldState.responsePayload = (char*) payloadTooLargePayload;
+    orionldState.httpStatusCode  = 400;
+    return MHD_YES;
+  }
+
+  // Set servicePath: "/#" for GET requests, "/" for all others (ehmmm ... creation of subscriptions ...)
+  ciP->servicePathV.push_back((orionldState.verb == GET)? "/#" : "/");
+
+
+  // Check that GET/DELETE has no payload
+  // Check that POST/PUT/PATCH has payload
+  // Check validity of tenant
+  // Check Accept header
+  // Check URL path is OK
+
+  // Check Content-Type is accepted
+  if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
+  {
+    //
+    // FIXME: Instead of multiple strcmps, save an enum constant in ciP about content-type
+    //
+    if ((strcmp(ciP->httpHeaders.contentType.c_str(), "application/json") != 0) && (strcmp(ciP->httpHeaders.contentType.c_str(), "application/ld+json") != 0))
+    {
+      LM_W(("Bad Input (invalid Content-Type: '%s'", ciP->httpHeaders.contentType.c_str()));
+      orionldErrorResponseCreate(OrionldBadRequestData,
+                                 "unsupported format of payload",
+                                 "only application/json and application/ld+json are supported");
+      orionldState.httpStatusCode = 415;  // Unsupported Media Type
+      return MHD_YES;
+    }
+  }
+
   return MHD_YES;
 }

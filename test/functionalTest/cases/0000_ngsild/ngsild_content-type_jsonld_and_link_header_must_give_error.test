@@ -70,7 +70,7 @@ echo
 01. Attempt to create an entity E1 with a context in HTTP header 'Link' AND Content-Type ==	application/ld+json + @content in payload
 =====================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 233
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -84,7 +84,7 @@ Date: REGEX(.*)
 02. Attempt to create two entities, using batch upsert, with a context in HTTP header 'Link' AND Content-Type == application/ld+json + @content in payload
 ==========================================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 233
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 

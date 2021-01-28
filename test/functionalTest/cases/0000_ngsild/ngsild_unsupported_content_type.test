@@ -50,7 +50,7 @@ echo
 01. Attempt to send a payload with Content-Type image/gif - see error
 =====================================================================
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 186
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
 
