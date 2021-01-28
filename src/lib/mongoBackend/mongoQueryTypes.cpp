@@ -103,28 +103,29 @@ static void getAttributeTypes
   orion::DBCursor  cursor;
   std::string      err;
 
-  TIME_STAT_MONGO_READ_WAIT_START();
+  TIME_STAT_MONGO_COMMAND_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
   if (!orion::collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
     orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     return;
   }
-  TIME_STAT_MONGO_READ_WAIT_STOP();
+  TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
   unsigned int  docs = 0;
 
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj r;
+  while (cursor.next(&r))
   {
-    orion::BSONObj r;
-
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
+    */
 
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
@@ -170,53 +171,6 @@ static long long countEntities
   return c;
 }
 
-/* ****************************************************************************
-*
-* countCmd -
-*
-*/
-static unsigned int countCmd(const std::string& tenant, const orion::BSONArray& pipelineForCount)
-{
-  orion::BSONObj result;
-
-  orion::BSONObjBuilder bobBatchSize;
-  bobBatchSize.append("batchSize", BATCH_SIZE);
-  orion::BSONObjBuilder bobCmd;
-  bobCmd.append("aggregate", COL_ENTITIES);
-  bobCmd.append("cursor", bobBatchSize.obj());
-  bobCmd.append("pipeline", pipelineForCount);
-
-  orion::BSONObj cmd = bobCmd.obj();
-
-  std::string err;
-
-  if (!orion::runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
-  {
-    LM_E(("Runtime Error (executing: %s, error %s)", cmd.toString().c_str(), err.c_str()));
-    return 0;
-  }
-
-  // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
-  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
-
-  if (result.hasField("cursor"))
-  {
-    // abcense of "count" field in the "firtBatch" array means "zero result"
-    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
-    if ((resultsArray.size() > 0) && (resultsArray[0].embeddedObject().hasField("count")))
-    {
-      return getIntFieldFF(resultsArray[0].embeddedObject(), "count");
-    }
-  }
-  else
-  {
-    LM_E(("Runtime Error (executing: %s, result hasn't cursor field", cmd.toString().c_str()));
-  }
-
-  return 0;
-}
 
 
 /* ****************************************************************************
@@ -226,6 +180,7 @@ static unsigned int countCmd(const std::string& tenant, const orion::BSONArray& 
 * "Simplified" version of mongoEntityTypes(), using a simpler aggregation command
 * and the processing logic afterwards. Note that apiVersion is not included in this
 * operation as it can be used only in NGSIv2
+*
 */
 HttpStatusCode mongoEntityTypesValues
 (
@@ -247,43 +202,27 @@ HttpStatusCode mongoEntityTypesValues
 
   /* Compose query based on this aggregation command:
    *
-   * db.runCommand({aggregate: "entities",
-   *                cursor: { batchSize: 1000 },
-   *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
-   *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
-   *                (2)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]} },
-   *                            {$sort: {_id: 1} },
-   *                            {$skip: ... },
-   *                            {$limit: ... }
-   *                          ]
-   *                })
+   * db.entities.aggregate([{$match: { "_id.servicePath": /.../ } },
+   *                (1)      {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
+   *                (2)      {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]} },
+   *                         {$sort: {_id: 1} }
+   *                       ])
    *
    * (1) The $ifNull causes that entities without _id.type have _id.type: null (used by (2))
    *
    * (2) The $cond used in this $group is to group together entities with empty type ("") and null type
    *
-   * Up to Orion 2.0.0 we didn't use $skip and $limit. We got all the results in order to get the count
-   * (to be used in fiware-total-count if the user request so). However, support to MongoDB 3.6 with the
-   * old driver needs using cursor and bathSize so the old approach is no longer valid and we do now
-   * the count in a separate operation. Note that with this approach in some cases the count could not
-   * be accurate if some entity creation/deletion operation takes place in the middle. However, it is a
-   * reasonable price to pay to support MongoDB 3.6.
-   *
-   * The new approach also assumes that the batch will not surpass 16MB. It is hardly improbable to reach
-   * the 16MB limit given that each individual result is small (just a short list of attribute names).
-   *
-   * For more detail on this, check dicussion in the following links. Old implementation can be retrieved
-   * in tag 2.0.0 in the case it could be uselful (for instance, due to a change in the mongo driver).
-   *
-   * https://github.com/telefonicaid/fiware-orion/issues/3070
-   * https://github.com/telefonicaid/fiware-orion/pull/3251
+   * Previous version of this code (see for instance Orion 2.5.0) use also skip and limit stages.
+   * Current code follows the original approach in Orion 2.0.0 and before. The skip and limit stages
+   * were introduced in Orion 2.1.0 due to limitations in legacy driver with MongodDB >=3.6.
+   * Current approach needs a cursor with all the data (drawdback) but avoids the need of a separate
+   * aggregation operation to count, so is simpler and more precise (advantage).
    *
    */
 
   orion::BSONArrayBuilder pipeline;
-  orion::BSONArrayBuilder pipelineForCount;
 
-  // Common elements to both pipelines
+  // $match
   if (servicePathFilterNeeded(servicePathV))
   {
     orion::BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
@@ -293,7 +232,6 @@ HttpStatusCode mongoEntityTypesValues
     orion::BSONObj match = bobMatch.obj();
 
     pipeline.append(match);
-    pipelineForCount.append(match);
   }
   // $project
   orion::BSONArrayBuilder baIfNull;
@@ -341,78 +279,47 @@ HttpStatusCode mongoEntityTypesValues
 
   pipeline.append(project);
   pipeline.append(group);
-  pipelineForCount.append(project);
-  pipelineForCount.append(group);
 
-  // Specific elements for pipeline
+  // $sort
   orion::BSONObjBuilder bobSortId;
   bobSortId.append("_id", 1);
   orion::BSONObjBuilder bobSort;
   bobSort.append("$sort", bobSortId.obj());
   pipeline.append(bobSort.obj());
 
-  orion::BSONObjBuilder bobSkip;
-  bobSkip.append("$skip", (int) offset);
-  pipeline.append(bobSkip.obj());
-
-  orion::BSONObjBuilder bobLimit;
-  bobLimit.append("$limit", (int) limit);
-  pipeline.append(bobLimit.obj());
-
-  // Specific elements for pipelineForCount
-  orion::BSONObjBuilder bobCount;
-  bobCount.append("$count", "count");
-  pipelineForCount.append(bobCount.obj());
-
-  orion::BSONObjBuilder bobBatchSize;
-  bobBatchSize.append("batchSize", BATCH_SIZE);
-  orion::BSONObjBuilder bobCmd;
-  bobCmd.append("aggregate", COL_ENTITIES);
-  bobCmd.append("cursor", bobBatchSize.obj());
-  bobCmd.append("pipeline", pipeline.arr());
-
-  orion::BSONObj result;
-
   std::string err;
 
-  if (!orion::runCollectionCommand(composeDatabaseName(tenant), bobCmd.obj(), &result, &err))
+  orion::DBCursor  cursor;
+
+  TIME_STAT_MONGO_COMMAND_WAIT_START();
+  orion::DBConnection connection = orion::getMongoConnection();
+
+  if (!orion::collectionAggregate(connection, getEntitiesCollectionName(tenant), pipeline.arr(), BATCH_SIZE, &cursor, &err))
   {
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+    orion::releaseMongoConnection(connection);
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
   }
-
-  // Get count if user requested (i.e. if totalTypesP is not NULL)
-  if (totalTypesP != NULL)
-  {
-    *totalTypesP = countCmd(tenant, pipelineForCount.arr());
-  }
+  TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
-  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
-
-  if (result.hasField("cursor"))
+  orion::BSONObj resultItem;
+  unsigned int docs = 0;
+  while (cursor.next(&resultItem))
   {
-    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
-  }
+    if ((docs < offset) || (docs > offset + limit - 1))
+    {
+      docs++;
+      continue;
+    }
 
-  if (resultsArray.size() == 0)
-  {
-    responseP->statusCode.fill(SccOk);
-    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+    docs++;
+    LM_T(LmtMongo, ("aggregation result [%d]: %s", docs, resultItem.toString().c_str()));
 
-    return SccOk;
-  }
-
-  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
-  {
-    orion::BSONObj  resultItem = resultsArray[ix].embeddedObject();
     std::string     type;
-
-    LM_T(LmtMongo, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
 
     if (getFieldFF(resultItem, "_id").isNull())
     {
@@ -424,6 +331,13 @@ HttpStatusCode mongoEntityTypesValues
     }
 
     responseP->entityTypeVector.push_back(new EntityType(type));
+  }
+  orion::releaseMongoConnection(connection);
+
+  // Get count if user requested (i.e. if totalTypesP is not NULL)
+  if (totalTypesP != NULL)
+  {
+    *totalTypesP = docs;
   }
 
   responseP->statusCode.fill(SccOk);
@@ -437,6 +351,7 @@ HttpStatusCode mongoEntityTypesValues
 /* ****************************************************************************
 *
 * mongoEntityTypes -
+*
 */
 HttpStatusCode mongoEntityTypes
 (
@@ -460,22 +375,17 @@ HttpStatusCode mongoEntityTypes
 
   /* Compose query based on this aggregation command:
    *
-   * db.runCommand({aggregate: "entities",
-   *                cursor: { batchSize: 1000 },
-   *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
-   *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
-   *                            {$project: { "attrNames"
-   *                (2)               {$cond: [ {$eq: [ "$attrNames", [ ] ] }, [null], "$attrNames"] }
-   *                               }
-   *                            },
-   *                            {$unwind: "$attrNames"},
-   *                (3)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
-   *                                      attrs: {$addToSet: "$attrNames"}},
-   *                            {$sort: {_id: 1} },
-   *                            {$skip: ... },
-   *                            {$limit: ... },
-   *                          ]
-   *                })
+   * db.entities.aggregate([ {$match: { "_id.servicePath": /.../ } },
+   *                (1)      {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
+   *                         {$project: { "attrNames"
+   *                (2)            {$cond: [ {$eq: [ "$attrNames", [ ] ] }, [null], "$attrNames"] }
+   *                            }
+   *                         },
+   *                         {$unwind: "$attrNames"},
+   *                (3)      {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
+   *                                   attrs: {$addToSet: "$attrNames"}},
+   *                         {$sort: {_id: 1} }
+   *                       ])
    *
    * (1) The $ifNull causes that entities without _id.type have _id.type: null (used by (3))
    *
@@ -490,28 +400,19 @@ HttpStatusCode mongoEntityTypes
    *           If collapse=true so we don't need attributes, the
    *           following command can be used:
    *
-   *           db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
+   *           db.entities.aggregate({[ {$group: {_id: "$_id.type"} }]})
    *
-   * Up to Orion 2.0.0 we didn't use $skip and $limit. We got all the results in order to get the count
-   * (to be used in fiware-total-count if the user request so). However, support to MongoDB 3.6 with the
-   * old driver needs using cursor and bathSize so the old approach is no longer valid and we do now
-   * the count in a separate operation. Note that with this approach in some cases the count could not
-   * be accurate if some entity creation/deletion operation takes place in the middle. However, it is a
-   * reasonable price to pay to support MongoDB 3.6.
+   * Previous version of this code (see for instance Orion 2.5.0) use also skip and limit stages.
+   * Current code follows the original approach in Orion 2.0.0 and before. The skip and limit stages
+   * were introduced in Orion 2.1.0 due to limitations in legacy driver with MongodDB >=3.6.
+   * Current approach needs a cursor with all the data (drawdback) but avoids the need of a separate
+   * aggregation operation to count, so is simpler and more precise (advantage).
    *
-   * The new approach also assumes that the batch will not surpass 16MB. It is hardly improbable to reach
-   * the 16MB limit given that each individual result is small (just a short list of attribute names).
-   *
-   * For more detail on this, check dicussion in the following links. Old implementation can be retrieved
-   * in tag 2.0.0 in the case it could be uselful (for instance, due to a change in the mongo driver).
    */
 
-  orion::BSONObj result;
-
   orion::BSONArrayBuilder pipeline;
-  orion::BSONArrayBuilder pipelineForCount;
 
-  // Common elements to both pipelines
+  // $match
   if (servicePathFilterNeeded(servicePathV))
   {
     orion::BSONObj spQuery = fillQueryServicePath(C_ID_SERVICEPATH, servicePathV);
@@ -520,7 +421,6 @@ HttpStatusCode mongoEntityTypes
     orion::BSONObj match = bobMatch.obj();
 
     pipeline.append(match);
-    pipelineForCount.append(match);
   }
 
   // $project - FIXME OLD-DR: duplicated code in another fucntion
@@ -617,86 +517,45 @@ HttpStatusCode mongoEntityTypes
   pipeline.append(unwind);
   pipeline.append(group);
 
-  pipelineForCount.append(project);
-  pipelineForCount.append(projection);
-  pipelineForCount.append(unwind);
-  pipelineForCount.append(group);
-
-  // Specific elements for pipeline - FIXME OLD-DR: duplicated code in another function
+  // $sort - FIXME OLD-DR: duplicated code in another function
   orion::BSONObjBuilder bobSortId;
   bobSortId.append("_id", 1);
   orion::BSONObjBuilder bobSort;
   bobSort.append("$sort", bobSortId.obj());
   pipeline.append(bobSort.obj());
 
-  orion::BSONObjBuilder bobSkip;
-  bobSkip.append("$skip", (int) offset);
-  pipeline.append(bobSkip.obj());
-
-  orion::BSONObjBuilder bobLimit;
-  bobLimit.append("$limit", (int) limit);
-  pipeline.append(bobLimit.obj());
-
-  // Specific elements for pipelineForCount - FIXME OLD-DR: duplicated code in another function
-  orion::BSONObjBuilder bobCount;
-  bobCount.append("$count", "count");
-  pipelineForCount.append(bobCount.obj());
-
-  orion::BSONObjBuilder bobBatchSize;
-  bobBatchSize.append("batchSize", BATCH_SIZE);
-  orion::BSONObjBuilder bobCmd;
-  bobCmd.append("aggregate", COL_ENTITIES);
-  bobCmd.append("cursor", bobBatchSize.obj());
-  bobCmd.append("pipeline", pipeline.arr());
-
   std::string err;
 
-  if (!orion::runCollectionCommand(composeDatabaseName(tenant), bobCmd.obj(), &result, &err))
+  orion::DBCursor  cursor;
+
+  TIME_STAT_MONGO_COMMAND_WAIT_START();
+  orion::DBConnection connection = orion::getMongoConnection();
+
+  if (!orion::collectionAggregate(connection, getEntitiesCollectionName(tenant), pipeline.arr(), BATCH_SIZE, &cursor, &err))
   {
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+    orion::releaseMongoConnection(connection);
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
   }
-
-  // Get count if user requested (i.e. if totalTypesP is not NULL)
-  if (totalTypesP != NULL)
-  {
-    *totalTypesP = countCmd(tenant, pipelineForCount.arr());
-  }
+  TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
-  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
-
-  if (result.hasField("cursor"))
+  orion::BSONObj resultItem;
+  unsigned int docs = 0;
+  while (cursor.next(&resultItem))
   {
-    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
-  }
-
-  // Early return if no element was found
-  if (resultsArray.size() == 0)
-  {
-    if (totalTypesP != NULL)
+    if ((docs < offset) || (docs > offset + limit - 1))
     {
-      char detailsMsg[256];
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
-      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
-    }
-    else
-    {
-      responseP->statusCode.fill(SccContextElementNotFound);
+      docs++;
+      continue;
     }
 
-    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+    docs++;
+    LM_T(LmtMongo, ("aggregation result [%d]: %s", docs, resultItem.toString().c_str()));
 
-    return SccOk;
-  }
-
-  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
-  {
-    orion::BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
     std::vector<orion::BSONElement>  attrsArray  = getFieldFF(resultItem, "attrs").Array();
     EntityType*                      entityType;
 
@@ -746,19 +605,39 @@ HttpStatusCode mongoEntityTypes
         }
       }
     }
-
     responseP->entityTypeVector.push_back(entityType);
   }
+  orion::releaseMongoConnection(connection);
 
-  if (totalTypesP != NULL)
+  // Get count if user requested (i.e. if totalTypesP is not NULL)
+  // Special processing if result array is 0
+  if (docs == 0)
   {
-    char detailsMsg[256];
-    snprintf(detailsMsg, sizeof(detailsMsg), "Count: %u", *totalTypesP);
-    responseP->statusCode.fill(SccOk, detailsMsg);
+    if (totalTypesP != NULL)
+    {
+      *totalTypesP = docs;
+      char detailsMsg[256];
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
+      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccContextElementNotFound);
+    }
   }
   else
   {
-    responseP->statusCode.fill(SccOk);
+    if (totalTypesP != NULL)
+    {
+      *totalTypesP = docs;
+      char detailsMsg[256];
+      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %u", *totalTypesP);
+      responseP->statusCode.fill(SccOk, detailsMsg);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccOk);
+    }
   }
 
   reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
@@ -771,6 +650,7 @@ HttpStatusCode mongoEntityTypes
 /* ****************************************************************************
 *
 * mongoAttributesForEntityType -
+*
 */
 HttpStatusCode mongoAttributesForEntityType
 (
@@ -807,18 +687,15 @@ HttpStatusCode mongoAttributesForEntityType
 
   /* Compose query based on this aggregation command:
    *
-   * db.runCommand({aggregate: "entities",
-   *                cursor: { batchSize: 1000 },
-   *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
-   *                (1)         {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
-   *                            {$unwind: "$attrNames"},
-   *                (2)         {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
-   *                                      attrs: {$addToSet: "$attrNames"}},
-   *                            {$unwind: "$attrs"},
-   *                            {$group: {_id: "$attrs" }},
-   *                            {$sort: {_id: 1}}
-   *                          ]
-   *                })
+   * db.entities.aggreagte([ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
+   *                (1)      {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } },
+   *                         {$unwind: "$attrNames"},
+   *                (2)      {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
+   *                                   attrs: {$addToSet: "$attrNames"}},
+   *                         {$unwind: "$attrs"},
+   *                         {$group: {_id: "$attrs" }},
+   *                         {$sort: {_id: 1}}
+   *                       ])
    *
    * (1) The $ifNull causes that entities without _id.type have _id.type: null (used by (2))
    *
@@ -845,7 +722,6 @@ HttpStatusCode mongoAttributesForEntityType
 
   orion::BSONObjBuilder bobCond;
   bobCond.append("$cond", baCond.arr());
-
 
   // $match
   orion::BSONObjBuilder bobMatchContent;
@@ -916,60 +792,49 @@ HttpStatusCode mongoAttributesForEntityType
   pipeline.append(bobGroup2.obj());
   pipeline.append(bobSort.obj());
 
-  orion::BSONObj result;
-
-  // FIXME OLD-DR: duplicated code in another function
-  orion::BSONObjBuilder bobBatchSize;
-  bobBatchSize.append("batchSize", BATCH_SIZE);
-  orion::BSONObjBuilder bobCmd;
-  bobCmd.append("aggregate", COL_ENTITIES);
-  bobCmd.append("cursor", bobBatchSize.obj());
-  bobCmd.append("pipeline", pipeline.arr());
-
   std::string err;
-  if (!orion::runCollectionCommand(composeDatabaseName(tenant), bobCmd.obj(), &result, &err))
+
+  TIME_STAT_MONGO_COMMAND_WAIT_START();
+  orion::DBConnection connection = orion::getMongoConnection();
+  orion::DBCursor cursor;
+
+  if (!orion::collectionAggregate(connection, getEntitiesCollectionName(tenant), pipeline.arr(), BATCH_SIZE, &cursor, &err))
   {
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+    orion::releaseMongoConnection(connection);
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
   }
+  TIME_STAT_MONGO_COMMAND_WAIT_STOP();
 
   /* Processing result to build response */
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
-
-  std::vector<orion::BSONElement> resultsArray = std::vector<orion::BSONElement>();
-
-  if (result.hasField("cursor"))
+  orion::BSONObj resultItem;
+  unsigned int docs = 0;
+  while (cursor.next(&resultItem))
   {
-    resultsArray = getFieldFF(getObjectFieldFF(result, "cursor"), "firstBatch").Array();
-  }
+    if ((docs < offset) || (docs > offset + limit - 1))
+    {
+      docs++;
+      continue;
+    }
 
-  responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
+    docs++;
+    LM_T(LmtMongo, ("aggregation result [%d]: %s", docs, resultItem.toString().c_str()));
 
-  if (resultsArray.size() == 0)
-  {
-    responseP->statusCode.fill(SccContextElementNotFound);
-    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
-
-    return SccOk;
-  }
-
-  /* See comment above in the other method regarding this strategy to implement pagination */
-  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
-  {
-    orion::BSONElement idField = getFieldFF(resultsArray[ix].embeddedObject(), "_id");
+    orion::BSONElement idField = getFieldFF(resultItem, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'getFieldF(resultsArray[ix].embeddedObject(), "_id")' is not found, if we continue,
+    // Now, if 'getFieldF(resultItem.embeddedObject(), "_id")' is not found, if we continue,
     // calling embeddedObject() on it, then we get an exception and the broker crashes.
     //
     if (idField.eoo() == true)
     {
       std::string details = std::string("error retrieving _id field in doc: '") +
-                            resultsArray[ix].embeddedObject().toString() + "'";
+                            resultItem.toString() + "'";
 
       alarmMgr.dbError(details);
       continue;
@@ -1008,6 +873,17 @@ HttpStatusCode mongoAttributesForEntityType
       responseP->entityType.contextAttributeVector.push_back(caP);
     }
   }
+  orion::releaseMongoConnection(connection);
+
+  responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
+
+  if (docs == 0)
+  {
+    responseP->statusCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+
+    return SccOk;
+  }
 
   char detailsMsg[256];
 
@@ -1015,7 +891,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (count)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
+      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) docs);
       responseP->statusCode.fill(SccOk, detailsMsg);
     }
     else
@@ -1027,7 +903,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (count)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %u", docs, offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else

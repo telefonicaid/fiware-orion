@@ -27,8 +27,7 @@
 */
 
 #include <string>
-
-#include "mongo/bson/bson.h"  // FIXME OLD-DR: change in next PoC stage
+#include <bson/bson.h>
 
 namespace orion
 {
@@ -39,7 +38,7 @@ namespace orion
 class OID
 {
  private:
-  mongo::OID  oid;
+  bson_oid_t  oid;
 
  public:
   // methods to be used by client code (without references to low-level driver code)
@@ -49,8 +48,7 @@ class OID
   std::string toString(void);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
-  explicit OID(const mongo::OID& _bo);
-  mongo::OID get(void) const;
+  bson_oid_t get(void) const;
 };
 }
 

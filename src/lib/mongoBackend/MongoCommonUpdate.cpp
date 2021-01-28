@@ -1469,16 +1469,18 @@ static bool addTriggeredSubscriptions_noCache
 
   /* For each one of the subscriptions found, add it to the map (if not already there),
    * after checking triggering attributes */
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj sub;
+  while (cursor.next(&sub))
   {
-    orion::BSONObj sub;
+
+    /* FIXME OLD-DR: remove?
     std::string    err;
 
     if (!nextSafeOrErrorFF(cursor, &sub, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), bgP->query.toString().c_str()));
       continue;
-    }
+    }*/
     orion::BSONElement  idField  = getFieldFF(sub, "_id");
 
     //
@@ -1850,8 +1852,8 @@ static unsigned int processSubscriptions
         continue;
       }
 
-      orion::BSONObj areaFilter;
-      if (!processAreaScopeV2(&geoScope, &areaFilter))
+      orion::BSONObjBuilder bobQuery;
+      if (!processAreaScopeV2(&geoScope, &bobQuery, true))
       {
         // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
         continue;
@@ -1862,16 +1864,14 @@ static unsigned int processSubscriptions
       std::string  keyId   = "_id." ENT_ENTITY_ID;
       std::string  keyType = "_id." ENT_ENTITY_TYPE;
       std::string  keySp   = "_id." ENT_SERVICE_PATH;
-      std::string  keyLoc  = ENT_LOCATION "." ENT_LOCATION_COORDS;
+
       std::string  id      = notifyCerP->entity.id;
       std::string  type    = notifyCerP->entity.type;
       std::string  sp      = notifyCerP->entity.servicePath;
 
-      orion::BSONObjBuilder bobQuery;
       bobQuery.append(keyId, id);
       bobQuery.append(keyType, type);
       bobQuery.append(keySp, sp);
-      bobQuery.append(keyLoc, areaFilter);
 
       unsigned long long n;
       if (!collectionCount(getEntitiesCollectionName(tenant), bobQuery.obj(), &n, &filterErr))
@@ -3598,15 +3598,15 @@ unsigned int processContextElement
   std::vector<orion::BSONObj>  results;
   unsigned int                 docs = 0;
 
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj r;
+  while (cursor.next(&r))
   {
-    orion::BSONObj r;
-
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
-    }
+    }*/
 
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
@@ -3633,7 +3633,8 @@ unsigned int processContextElement
     // FIXME OLD-DR: this is a kind of black magic... would we need this owned thing with the new driver? let's see...
     // by the moment we are using the "low level" forbidden methods to solve the issue
     //
-    results.push_back(orion::BSONObj(r.get().getOwned()));
+    //results.push_back(orion::BSONObj(r.get().getOwned()));
+    results.push_back(r);
   }
 
   orion::releaseMongoConnection(connection);

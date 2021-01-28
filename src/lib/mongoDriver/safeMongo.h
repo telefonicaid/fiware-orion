@@ -57,7 +57,7 @@
 #define getFieldFF(b, field)                 orion::getField(b, field, __FUNCTION__,  __LINE__)
 #define setStringVectorFF(b, field, v)       orion::setStringVector(b, field, v, __FUNCTION__,  __LINE__)
 
-#define nextSafeOrErrorFF(c, r, err)         orion::nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
+//#define nextSafeOrErrorFF(c, r, err)         orion::nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
 
 namespace orion
 {
@@ -201,7 +201,7 @@ extern void setStringVector
 );
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * moreSafe -
@@ -222,6 +222,7 @@ extern bool nextSafeOrError
   const std::string&  caller = "<none>",
   int                 line   = 0
 );
+#endif
 
 
 

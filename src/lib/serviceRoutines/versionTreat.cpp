@@ -41,9 +41,8 @@
 #include "rest/ConnectionInfo.h"
 #include "rapidjson/rapidjson.h"
 #include "serviceRoutines/versionTreat.h"
-#include "mongo/version.h"
 
-
+#include <boost/version.hpp>
 
 /* ****************************************************************************
 *
@@ -76,7 +75,10 @@ std::string libVersions(void)
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
-  total += mongo   + "\"legacy-" + mongo::client::kVersionString + "\"" + "\n";
+  // FIXME OLD-DR: do this the proper way, see:
+  // http://mongoc.org/libmongoc/current/mongoc_version.html
+  // http://mongoc.org/libbson/current/version.html
+  total += mongo   + "\"legacy-1.1.2\"" + "\n";
 
   return total;
 }

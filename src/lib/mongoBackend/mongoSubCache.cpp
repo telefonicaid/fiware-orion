@@ -467,16 +467,17 @@ void mongoSubCacheRefresh(const std::string& database)
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   int subNo = 0;
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj  sub;
+  while (cursor.next(&sub))
   {
-    orion::BSONObj  sub;
+    /* FIXME OLD-DR: remove?
     std::string     err;
 
     if (!nextSafeOrErrorFF(cursor, &sub, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
-    }
+    }*/
 
     int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
     if (r == 0)

@@ -106,20 +106,22 @@ HttpStatusCode mongoUnsubscribeContext
 
   if (!orion::collectionFindOne(getSubscribeContextCollectionName(tenant), bobId.obj(), &sub, &err))
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+    // FIXME OLD-DR: at the present moment we are unable to know if false means: "no result" or
+    // "fail in cursor". Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-find-function
+    // We assume "no result" by the moment, so disabling this code.
+    /*reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->statusCode.fill(SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
 
-    return SccOk;
+    return SccOk;*/
   }
 
   if (sub.isEmpty())
   {
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
 
-    responseP->statusCode.fill(SccContextElementNotFound,
-                               std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
+    responseP->statusCode.fill(SccContextElementNotFound);
     responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
 
     return SccOk;

@@ -28,6 +28,8 @@
 
 #include "mongoDriver/BSONObj.h"
 
+#include "logMsg/logMsg.h"  // FIXME OLD-DR: remove after use
+
 namespace orion
 {
 /* ****************************************************************************
@@ -36,6 +38,29 @@ namespace orion
 */
 BSONObj::BSONObj()
 {
+  b = bson_new();
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObj::BSONObj -
+*/
+BSONObj::BSONObj(const BSONObj& _bo)
+{
+  b = bson_copy(_bo.b);
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObj::~BSONObj -
+*/
+BSONObj::~BSONObj(void)
+{
+  bson_destroy(b);
 }
 
 
@@ -45,8 +70,21 @@ BSONObj::BSONObj()
 * BSONObj::getFieldNames -
 */
 int BSONObj::getFieldNames(std::set<std::string>& fields) const
-{
-  return bo.getFieldNames(fields);
+{ 
+  bson_iter_t iter;
+  unsigned int n;
+
+  if (bson_iter_init(&iter, b))
+  {
+     while (bson_iter_next(&iter))
+     {
+        n++;
+        fields.insert(std::string(bson_iter_key(&iter)));
+     }
+     return n;
+  }
+
+  return -1;
 }
 
 
@@ -57,7 +95,7 @@ int BSONObj::getFieldNames(std::set<std::string>& fields) const
 */
 bool BSONObj::hasField(const std::string& field) const
 {
-  return bo.hasField(field);
+  return bson_has_field(b, field.c_str());
 }
 
 
@@ -68,7 +106,7 @@ bool BSONObj::hasField(const std::string& field) const
 */
 int BSONObj::nFields(void) const
 {
-  return bo.nFields();
+  return bson_count_keys(b);
 }
 
 
@@ -79,7 +117,10 @@ int BSONObj::nFields(void) const
 */
 std::string BSONObj::toString(void) const
 {
-  return bo.toString();
+  char* str = bson_as_relaxed_extended_json(b, NULL);
+  std::string s(str);
+  bson_free(str);
+  return s;
 }
 
 
@@ -90,7 +131,7 @@ std::string BSONObj::toString(void) const
 */
 bool BSONObj::isEmpty(void)
 {
-  return bo.isEmpty();
+  return (bson_count_keys(b) == 0);
 }
 
 
@@ -101,11 +142,20 @@ bool BSONObj::isEmpty(void)
 */
 void BSONObj::toStringMap(std::map<std::string, std::string>* m)
 {
-  for (mongo::BSONObj::iterator i = bo.begin(); i.more();)
+  bson_iter_t iter;
+  if (bson_iter_init(&iter, b))
   {
-    mongo::BSONElement e = i.next();
-
-    (*m)[e.fieldName()] = e.String();
+     while (bson_iter_next(&iter))
+     {
+       if (bson_iter_type(&iter) == BSON_TYPE_UTF8)
+       {
+         (*m)[bson_iter_key(&iter)] = bson_iter_utf8(&iter, NULL);
+       }
+       else
+       {
+         // FIXME OLD-DR: trace as fatal error
+       }
+     }
   }
 }
 
@@ -117,11 +167,34 @@ void BSONObj::toStringMap(std::map<std::string, std::string>* m)
 */
 void BSONObj::toElementsVector(std::vector<BSONElement>* v)
 {
-  for (mongo::BSONObj::iterator i = bo.begin(); i.more();)
+  bson_iter_t iter;
+  if (bson_iter_init(&iter, b))
   {
-    BSONElement e(i.next());
-    v->push_back(e);
+     while (bson_iter_next(&iter))
+     {
+        v->push_back(BSONElement(bson_iter_key(&iter), bson_iter_value(&iter)));
+     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObj::operator= -
+*
+* FIXME OLD-DR: we should try to use const BSONObj& as argument
+*/
+BSONObj& BSONObj::operator= (BSONObj rhs)
+{
+  // check not self-assignment
+  if (this != &rhs)
+  {
+    // destroy existing b object, then copy rhs.b object
+    bson_destroy(b);
+    b = bson_copy(rhs.b);
+  }
+  return *this;
 }
 
 
@@ -133,10 +206,11 @@ void BSONObj::toElementsVector(std::vector<BSONElement>* v)
 /* ****************************************************************************
 *
 * BSONObj::BSONObj -
+*
 */
-BSONObj::BSONObj(const mongo::BSONObj& _bo)
+BSONObj::BSONObj(const bson_t* _b)
 {
-  bo = _bo;
+  b = bson_copy(_b);
 }
 
 
@@ -145,8 +219,8 @@ BSONObj::BSONObj(const mongo::BSONObj& _bo)
 *
 * BSONObj::get -
 */
-mongo::BSONObj BSONObj::get(void) const
+bson_t* BSONObj::get(void) const
 {
-  return bo;
+  return b;
 }
 }

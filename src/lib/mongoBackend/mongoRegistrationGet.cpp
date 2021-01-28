@@ -282,9 +282,10 @@ void mongoRegistrationGet
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (orion::moreSafe(&cursor))
+  orion::BSONObj r;
+  if (cursor.next(&r))
   {
-    orion::BSONObj r;
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       orion::releaseMongoConnection(connection);
@@ -292,7 +293,7 @@ void mongoRegistrationGet
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
-    }
+    }*/
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     //
@@ -313,6 +314,7 @@ void mongoRegistrationGet
     setExpires(regP, r);
     setStatus(regP, r);
 
+    /* FIXME OLD-DR: excesive checking. Looking by _id you cannot get more than one result!
     if (orion::moreSafe(&cursor))  // Can only be one ...
     {
       orion::releaseMongoConnection(connection);
@@ -320,7 +322,7 @@ void mongoRegistrationGet
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccConflict, "");
       return;
-    }
+    }*/
   }
   else
   {
@@ -393,16 +395,17 @@ void mongoRegistrationsGet
 
   /* Process query result */
   int docs = 0;
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj        r;
+  while (cursor.next(&r))
   {
-    orion::BSONObj        r;
     ngsiv2::Registration  reg;
 
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
-    }
+    }*/
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ++docs;

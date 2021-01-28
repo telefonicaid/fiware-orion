@@ -26,6 +26,7 @@
 #include <semaphore.h>
 #include <string>
 #include <vector>
+#include <mongoc/mongoc.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -110,11 +111,14 @@ static orion::DBConnection mongoConnect
   double       timeout
 )
 {
-  std::string   err;
-  mongo::DBClientBase* connection = NULL;
+  std::string       err;
+  mongoc_client_t*  connection = NULL;
 
   // FIXME OLD-DR: remove orion:: mark
   LM_T(LmtMongo, ("orion:: Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
+
+#if 0
+  // FIXME OLD-DR: we are skiping a lot of code to deal with reaplica sets and errors. It return NULL on fail
 
   bool connected     = false;
   int  retries       = RECONNECT_RETRIES;
@@ -187,9 +191,11 @@ static orion::DBConnection mongoConnect
   alarmMgr.dbErrorReset();
 
   LM_T(LmtOldInfo, ("Successful connection to database"));
+#endif
 
-  // FIXME OLD-DR: no write concerns or authenticatio by the moment
 #if 0
+  // FIXME OLD-DR: no write concerns or authenticatio by the moment
+
   //
   // WriteConcern
   //
@@ -241,25 +247,9 @@ static orion::DBConnection mongoConnect
   }
 #endif
 
-  /* Get mongo version with the 'buildinfo' command */
-  orion::BSONObj  result;
-  std::string     extra;
-
-  orion::BSONObjBuilder bob;
-  bob.append("buildinfo", 1);
-
-  orion::runCollectionCommand(orion::DBConnection(connection), "admin", bob.obj(), &result, &err);
-  std::string versionString = std::string(getStringFieldFF(result, "version"));
-  if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
-  {
-    LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
-    return orion::DBConnection(NULL);
-  }
-  LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)",
-                  versionString.c_str(),
-                  mongoVersionMayor,
-                  mongoVersionMinor,
-                  extra.c_str()));
+  // FIXME OLD-DR: mongoc_client_destroy() should be called some point
+  // FIXME OLD-DR: unhardwire localhost
+  connection = mongoc_client_new("mongodb://localhost:27017");
 
   return orion::DBConnection(connection);
 }
@@ -272,13 +262,46 @@ static orion::DBConnection mongoConnect
 */
 static void shutdownClient(void)
 {
-  mongo::Status status = mongo::client::shutdown();
+  // FIXME OLD-DR: do proper shutdown here
+  /*mongo::Status status = mongo::client::shutdown();
   if (!status.isOK())
   {
     LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
-  }
+  }*/
 }
 
+
+
+/* ****************************************************************************
+*
+* mongoDriverLogger -
+*/
+static void mongoDriverLogger
+(
+  mongoc_log_level_t  log_level,
+  const char          *log_domain,
+  const char          *message,
+  void                *user_data
+)
+{
+  // FIXME P3: don't know what to do with user_data...
+
+  // Match driver errors to our own log levels
+  switch (log_level)
+  {
+  case MONGOC_LOG_LEVEL_CRITICAL:
+  case MONGOC_LOG_LEVEL_ERROR:
+    LM_E(("mongoc driver: <%s> <%s>", log_domain, message));
+    break;
+  case MONGOC_LOG_LEVEL_WARNING:
+  case MONGOC_LOG_LEVEL_MESSAGE:
+  case MONGOC_LOG_LEVEL_INFO:
+  case MONGOC_LOG_LEVEL_DEBUG:
+  case MONGOC_LOG_LEVEL_TRACE:
+    LM_W(("mongoc driver: <%s> <%s>", log_domain, message));
+    break;
+  }
+}
 
 
 
@@ -306,17 +329,33 @@ int orion::mongoConnectionPoolInit
   // We cannot move status variable declaration outside the if block. That fails at compilation time
   bool statusOk = false;
   std::string statusString;
+
+  // Contrary to intuition (as you would expect that mongoc_init is the very first
+  // driver function you have to call :) the mongoc_log_set_handler function
+  // has to be called *before* or some problems with some traces will occur.
+  // Details at: https://jira.mongodb.org/browse/CDRIVER-3904
+
+  // Ref: http://mongoc.org/libmongoc/current/logging.html
+  mongoc_log_set_handler(mongoDriverLogger, NULL);
+
   if (dbSSL)
   {
-    mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
-    statusOk = status.isOK();
-    statusString = status.toString();
+    // FIXME OLD-DR: auth not taken into account by the moment
+    // FIXME OLD-DR: if we call mongoc_init() then mongoc_cleanup() should be called.. someplace
+    mongoc_init();
+    //mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
+    //statusOk = status.isOK();
+    statusOk = true;
+    //statusString = status.toString();
   }
   else
   {
-    mongo::Status status = mongo::client::initialize();
-    statusOk = status.isOK();
-    statusString = status.toString();
+    // FIXME OLD-DR: if we call mongoc_init() then mongoc_cleanup() should be called.. someplace
+    mongoc_init();
+    //mongo::Status status = mongo::client::initialize();
+    //statusOk = status.isOK();
+    statusOk = true;
+    //statusString = status.toString();
   }
 
   if (!statusOk)
@@ -381,6 +420,26 @@ int orion::mongoConnectionPoolInit
 
   // Measure accumulated semaphore waiting time?
   semStatistics = semTimeStat;
+
+  /* Get mongo version with the 'buildinfo' command */
+  orion::BSONObj  result;
+  std::string     extra;
+  std::string     err;
+
+  orion::BSONObjBuilder bob;
+  bob.append("buildinfo", 1);
+
+  orion::runDatabaseCommand("admin", bob.obj(), &result, &err);
+  std::string versionString = std::string(getStringFieldFF(result, "version"));
+  if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
+  {
+    LM_X(1, ("Fatal Error (MongoDB invalid version format: %s)", versionString.c_str()));
+  }
+  LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)",
+                  versionString.c_str(),
+                  mongoVersionMayor,
+                  mongoVersionMinor,
+                  extra.c_str()));
 
   return 0;
 #endif

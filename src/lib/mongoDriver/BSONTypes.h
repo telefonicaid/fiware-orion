@@ -51,7 +51,8 @@ enum BSONType {
     NumberInt = 16,
     Timestamp = 17,
     NumberLong = 18,
-    JSTypeMax = 18,
+    JSTypeMax = 19,
+    BigDecimal = 20,
     MaxKey = 127
 };
 }

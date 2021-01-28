@@ -332,7 +332,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
   orion::BSONObjBuilder bob;
   bob.append("listDatabases", 1);
 
-  if (!orion::runCollectionCommand("admin", bob.obj(), &result, &err))
+  if (!orion::runDatabaseCommand("admin", bob.obj(), &result, &err))
   {
     return false;
   }
@@ -552,7 +552,9 @@ void ensureLocationIndex(const std::string& tenant)
     orion::BSONObjBuilder bobIndex;
     bobIndex.append(index, "2dsphere");
 
-    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), bobIndex.obj(), false, &err);
+    std::string indexName = index + "_2dsphere";
+
+    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), indexName, bobIndex.obj(), false, &err);
     LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
@@ -574,8 +576,10 @@ void ensureDateExpirationIndex(const std::string& tenant)
     orion::BSONObjBuilder bobIndex;
     bobIndex.append(index, 1);
 
-    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), bobIndex.obj(), true, &err);
-    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    std::string indexName = index + "_1";
+
+    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), indexName, bobIndex.obj(), true, &err);
+    LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant <%s>)", index.c_str(), tenant.c_str()));
   }
 }
 /* ****************************************************************************
@@ -828,10 +832,12 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 *
 * Returns true if 'areaQueryP' was filled, false otherwise
 */
-static bool processAreaScope(const Scope* scoP, orion::BSONObj* areaQueryP)
+static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
 {
   // FIXME OLD-DR: previously this function was based in streamming construction instead of append()
   // should be changed?
+
+  std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
 
   if (!mongoLocationCapable())
   {
@@ -928,13 +934,13 @@ static bool processAreaScope(const Scope* scoP, orion::BSONObj* areaQueryP)
     bobAreaQuery.append("$exists", true);
     bobAreaQuery.append("$not", bobGeoWithin.obj());
 
-    *areaQueryP = bobAreaQuery.obj();
+    queryP->append(locCoords, bobAreaQuery.obj());
   }
   else
   {
     orion::BSONObjBuilder bobAreaQuery;
     bobAreaQuery.append("$geoWithin", geoWithin);
-    *areaQueryP = bobAreaQuery.obj();
+    queryP->append(locCoords, bobAreaQuery.obj());
   }
 
   return true;
@@ -1026,10 +1032,12 @@ static std::string sortCriteria(const std::string& sortToken)
 *
 * Returns true if areaQueryP was filled, false otherwise
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObj* areaQueryP)
+bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsage)
 {
   // FIXME OLD-DR: previously this function was based in streamming construction instead of append()
   // should be changed?
+
+  std::string  keyLoc  = ENT_LOCATION "." ENT_LOCATION_COORDS;
 
   if (!mongoLocationCapable())
   {
@@ -1132,36 +1140,103 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObj* areaQueryP)
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    orion::BSONObjBuilder near;
-
-    near.append("$geometry", geometry);
-
-    if (scoP->georel.maxDistance >= 0)
+    if (avoidNearUsage)
     {
-      near.append("$maxDistance", scoP->georel.maxDistance);
-    }
+      // $near operation is problematic in countDocument()
+      // operation (see https://stackoverflow.com/questions/66143435/countdocuments-with-geo-queries-using-mindistance-semantics)
+      // In abscence of a better alternative I have used a solution as the one
+      // described at https://jira.mongodb.org/browse/DOCS-12834
+      // This works as far as we don't have any other $and field in the query, in which
+      // case the array for $and here needs to be combined with other items
 
-    if (scoP->georel.minDistance >= 0)
+      // Why don't use this query style without $near all the time? Because $near provides
+      // ordering of results based in distance to the center, so in regular find() is the one
+      // we want to use
+
+      // FIXME OLD-DR: this logic may be problematic if neither maxDistance and minDistance are not used
+      // because it leads to a $and: [ ] filter. Is this checked at parsing stage?
+
+      orion::BSONArrayBuilder andArray;
+
+      orion::BSONArrayBuilder coordsBuilder;
+      coordsBuilder.append(scoP->point.longitude());
+      coordsBuilder.append(scoP->point.latitude());
+      orion::BSONArray coords = coordsBuilder.arr();
+
+      if (scoP->georel.maxDistance >= 0)
+      {
+        orion::BSONObjBuilder andToken;
+
+        orion::BSONObjBuilder geoWithinMax;
+        orion::BSONArrayBuilder centerMax;
+        centerMax.append(coords);
+        centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
+        geoWithinMax.append("$centerSphere", centerMax.arr());
+
+        orion::BSONObjBuilder loc;
+        loc.append("$geoWithin", geoWithinMax.obj());
+
+        andToken.append(keyLoc, loc.obj());
+
+        andArray.append(andToken.obj());
+      }
+
+      if (scoP->georel.minDistance >= 0)
+      {
+        orion::BSONObjBuilder andToken;
+
+        orion::BSONObjBuilder geoWithinMin;
+        orion::BSONArrayBuilder centerMin;
+        centerMin.append(coords);
+        centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
+        geoWithinMin.append("$centerSphere", centerMin.arr());
+
+        orion::BSONObjBuilder loc;
+        loc.append("$geoWithin", geoWithinMin.obj());
+
+        orion::BSONObjBuilder notx;
+        notx.append("$not", loc.obj());
+
+        andToken.append(keyLoc, notx.obj());
+
+        andArray.append(andToken.obj());
+      }
+
+      queryP->append("$and", andArray.arr());
+    }
+    else
     {
-      near.append("$minDistance", scoP->georel.minDistance);
-    }
+      orion::BSONObjBuilder near;
 
-    bobArea.append("$near", near.obj());
-    *areaQueryP = bobArea.obj();
+      near.append("$geometry", geometry);
+
+      if (scoP->georel.maxDistance >= 0)
+      {
+        near.append("$maxDistance", scoP->georel.maxDistance);
+      }
+
+      if (scoP->georel.minDistance >= 0)
+      {
+        near.append("$minDistance", scoP->georel.minDistance);
+      }
+
+      bobArea.append("$near", near.obj());
+      queryP->append(keyLoc, bobArea.obj());
+    }
   }
   else if (scoP->georel.type == "coveredBy")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoWithin", bobGeom.obj());
-    *areaQueryP = bobArea.obj();
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "intersects")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoIntersects", bobGeom.obj());
-    *areaQueryP = bobArea.obj();
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "disjoint")
   {
@@ -1172,11 +1247,11 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObj* areaQueryP)
     bobArea.append("$exists", true);
     bobArea.append("$not", bobNot.obj());
 
-    *areaQueryP = bobArea.obj();
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "equals")
   {
-    *areaQueryP = geometry;
+    queryP->append(keyLoc, geometry);
   }
   else
   {
@@ -1544,22 +1619,13 @@ bool entitiesQuery
       }
       else
       {
-        orion::BSONObj areaQuery;
-
-        bool result;
         if (scopeP->type == FIWARE_LOCATION_V2)
         {
-          result = processAreaScopeV2(scopeP, &areaQuery);
+           processAreaScopeV2(scopeP, &finalQuery);
         }
         else  // FIWARE Location NGSIv1 (legacy)
         {
-          result = processAreaScope(scopeP, &areaQuery);
-        }
-
-        if (result)
-        {
-          std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-          finalQuery.append(locCoords, areaQuery);
+          processAreaScope(scopeP, &finalQuery);
         }
       }
     }
@@ -1658,49 +1724,13 @@ bool entitiesQuery
   /* Process query result */
   unsigned int docs = 0;
 
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj  r;
+  int             errType;
+  std::string     nextSafeErr;
+
+  //while (orion::moreSafe(&cursor))
+  while (cursor.next(&r, &errType, &nextSafeErr))
   {
-    orion::BSONObj  r;
-    int             errType;
-    std::string     nextSafeErr;
-
-    r = cursor.nextSafe(&errType, &nextSafeErr);
-
-    if (errType == NEXTSAFE_CODE_MONGO_EXCEPTION)
-    {
-      ContextElementResponse*  cer   = new ContextElementResponse();
-
-      alarmMgr.dbError(nextSafeErr);
-
-      //
-      // It would be nice to fill in the entity but it is difficult to do this.
-      //
-      // Solution:
-      //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
-      //   if more than one entity is in the vector, an empty entity is returned.
-      //
-      if (enV.size() == 1)
-      {
-        cer->entity.fill(enV[0]->id, enV[0]->type, enV[0]->isPattern);
-      }
-      else
-      {
-        cer->entity.fill("", "", "");
-      }
-
-      cer->statusCode.fill(SccReceiverInternalError, nextSafeErr);
-      cerV->push_back(cer);
-      orion::releaseMongoConnection(connection);
-      return true;
-    }
-    else if (errType == NEXTSAFE_CODE_NO_MONGO_EXCEPTION)
-    {
-      *err = nextSafeErr;
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", nextSafeErr.c_str(), query.toString().c_str()));
-      orion::releaseMongoConnection(connection);
-      return false;
-    }
-
     alarmMgr.dbErrorReset();
 
     // Build CER from BSON retrieved from DB
@@ -1745,7 +1775,42 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
+
   orion::releaseMongoConnection(connection);
+
+  if (errType == ON_NEXT_MANAGED_ERROR)
+  {
+    ContextElementResponse*  cer   = new ContextElementResponse();
+
+    alarmMgr.dbError(nextSafeErr);
+
+    //
+    // It would be nice to fill in the entity but it is difficult to do this.
+    //
+    // Solution:
+    //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
+    //   if more than one entity is in the vector, an empty entity is returned.
+    //
+    if (enV.size() == 1)
+    {
+      cer->entity.fill(enV[0]->id, enV[0]->type, enV[0]->isPattern);
+    }
+    else
+    {
+      cer->entity.fill("", "", "");
+    }
+
+    cer->statusCode.fill(SccReceiverInternalError, nextSafeErr);
+    cerV->push_back(cer);
+    return true;
+  }
+  else if (errType == ON_NEXT_UNMANAGED_ERROR)
+  {
+    *err = nextSafeErr;
+    LM_E(("Runtime Error (exception in next(): %s - query: %s)", nextSafeErr.c_str(), query.toString().c_str()));
+    return false;
+  }
+
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
@@ -2185,14 +2250,15 @@ bool registrationsQuery
   /* Process query result */
   unsigned int docs = 0;
 
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj r;
+  while (cursor.next(&r))
   {
-    orion::BSONObj r;
-    if (!nextSafeOrErrorFF(cursor, &r, err))
+    /* FIXME OLD-DR: remove?
+    if (!(cursor, &r, err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err->c_str(), query.toString().c_str()));
       continue;
-    }
+    }*/
     docs++;
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));

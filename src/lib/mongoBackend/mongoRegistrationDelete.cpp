@@ -99,10 +99,10 @@ void mongoRegistrationDelete
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (orion::moreSafe(&cursor))
+  orion::BSONObj r;
+  if (cursor.next(&r))
   {
-    orion::BSONObj r;
-
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       orion::releaseMongoConnection(connection);
@@ -110,10 +110,11 @@ void mongoRegistrationDelete
       reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
-    }
+    }*/
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
+    /* Useless checking: by definition _id is unique
     if (orion::moreSafe(&cursor))  // There can only be one registration for a given ID
     {
       orion::releaseMongoConnection(connection);
@@ -121,7 +122,7 @@ void mongoRegistrationDelete
       reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
       oeP->fill(SccConflict, "");
       return;
-    }
+    }*/
 
     if (!orion::collectionRemove(getRegistrationsCollectionName(tenant), q, &err))
     {

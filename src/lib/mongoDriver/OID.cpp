@@ -27,6 +27,17 @@
 
 #include "mongoDriver/OID.h"
 
+
+/* ****************************************************************************
+*
+* FAILBACK_OID constant
+*
+* 24 zeros
+*
+*/
+#define FAILBACK_OID "000000000000000000000000"
+
+
 namespace orion
 {
 /* ****************************************************************************
@@ -38,14 +49,21 @@ OID::OID()
 }
 
 
-
 /* ****************************************************************************
 *
 * OID::OID -
 */
 OID::OID(const std::string& id)
 {
-  oid = mongo::OID(id);
+  // If the id is not valid (i.e. an empty string) we use a failback id
+  if (bson_oid_is_valid(id.c_str(), strlen(id.c_str())))
+  {
+    bson_oid_init_from_string(&oid, id.c_str());
+  }
+  else
+  {
+    bson_oid_init_from_string(&oid, FAILBACK_OID);
+  }
 }
 
 
@@ -56,7 +74,7 @@ OID::OID(const std::string& id)
 */
 void OID::init(void)
 {
-  oid.init();
+  bson_oid_init(&oid, NULL);
 }
 
 
@@ -67,7 +85,9 @@ void OID::init(void)
 */
 std::string OID::toString(void)
 {
-  return oid.toString();
+  char str[25];  // OID fixed length is 24 chars
+  bson_oid_to_string(&oid, str);
+  return std::string(str);
 }
 
 
@@ -80,19 +100,11 @@ std::string OID::toString(void)
 *
 * OID::get -
 */
-mongo::OID OID::get(void) const
+bson_oid_t OID::get(void) const
 {
   return oid;
 }
 
 
 
-/* ****************************************************************************
-*
-* OID::OID -
-*/
-OID::OID(const mongo::OID& _oid)
-{
-  oid = _oid;
-}
 }

@@ -30,6 +30,7 @@
 #include "mongoDriver/DBConnection.h"
 #include "mongoDriver/DBCursor.h"
 #include "mongoDriver/BSONObj.h"
+#include "mongoDriver/BSONArray.h"
 
 namespace orion
 
@@ -148,8 +149,42 @@ extern bool collectionRemove
 extern bool collectionCreateIndex
 (
   const std::string&  col,
+  const std::string&  name,
   const BSONObj&      indexes,
   const bool&         isTTL,
+  std::string*        err
+);
+
+
+
+/* ****************************************************************************
+*
+* orion::collectionQuery -
+*
+* FIXME OLD-DR: connection should be passed by reference
+*/
+extern bool collectionAggregate
+(
+  DBConnection        connection,
+  const std::string&  col,
+  const BSONArray&      pipeline,
+  unsigned int        batchSize,
+  DBCursor*           cursor,
+  std::string*        err
+);
+
+
+
+/* ****************************************************************************
+*
+* runDatabaseCommand -
+*
+*/
+extern bool runDatabaseCommand
+(
+  const std::string&  db,
+  const BSONObj&      command,
+  BSONObj*            result,
   std::string*        err
 );
 

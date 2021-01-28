@@ -126,14 +126,14 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for orion::BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  orion::BSONObj                attrs = getObjectFieldFF(entityDoc, ENT_ATTRS);
+  orion::BSONObj         attrs = getObjectFieldFF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName                = *i;
-    orion::BSONObj            attr                    = getObjectFieldFF(attrs, attrName);
+    orion::BSONObj     attr                    = getObjectFieldFF(attrs, attrName);
     ContextAttribute*  caP                     = NULL;
     ContextAttribute   ca;
     bool               noLocationMetadata      = true;

@@ -29,8 +29,8 @@
 #include <string>
 #include <vector>
 #include <map>
-
-#include "mongo/bson/bson.h"  // FIXME OLD-DR: change in next PoC stage
+#include <set>
+#include <bson/bson.h>
 
 #include "mongoDriver/BSONElement.h"
 
@@ -39,6 +39,12 @@ namespace orion
 // Forward declaration
 class BSONElement;
 
+// FIXME OLD-DR (this applies to several classes but I'm including only here)
+// According to http://mongoc.org/libbson/current/bson_t.html#performance-notes
+// we could use bson_t instead of bson_t* to take advantage of stack for
+// small BSON objects. However, not sure how bson_destroy() has teo be used
+// in that case. Create an issue about this
+
 /* ****************************************************************************
 *
 * BSONObj -
@@ -46,11 +52,12 @@ class BSONElement;
 class BSONObj
 {
  private:
-  mongo::BSONObj  bo;
+  bson_t*  b;
 
  public:
   // methods to be used by client code (without references to low-level driver code)
   BSONObj();
+  BSONObj(const BSONObj& _bo);
   int getFieldNames(std::set<std::string>& fields) const;
   bool hasField(const std::string& field) const;
   int nFields(void) const;
@@ -58,10 +65,12 @@ class BSONObj
   bool isEmpty(void);
   void toStringMap(std::map<std::string, std::string>* m);
   void toElementsVector(std::vector<BSONElement>* v);
+  BSONObj& operator= (BSONObj rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
-  explicit BSONObj(const mongo::BSONObj& _bo);
-  mongo::BSONObj get(void) const;
+  ~BSONObj(void);
+  bson_t* get(void) const;
+  BSONObj(const bson_t* _b);
 };
 }
 
