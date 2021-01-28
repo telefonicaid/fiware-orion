@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5|6|7|8|9] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 20[1|2][0|1|2|3|4|5|6|7|8|9] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -48,7 +48,7 @@ header.append('\s*For those usages not covered by this license please contact wi
 header.append('\s*iot_support at tid dot es$')
 
 header2 = []
-header2.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0] FIWARE Foundation e.V.$')
+header2.append('\s*Copyright( \(c\))? 20[1|2][0|1|2|3|4|5|6|7|8|9] FIWARE Foundation e.V.$')
 header2.append('\s*$')
 header2.append('\s*This file is part of Orion-LD Context Broker.$')
 header2.append('\s*$')
@@ -96,7 +96,7 @@ def check_file(file):
 
     # We reach this point if the first header line was not found or if we reach the end of the file before
     # reaching the end of the header. Both cases means false
-    return 'end of file reached without finding header beginning'
+    return 'end of file reached without finding Orion Copyright header'
 
 
 # check_file_orionld returns an error string in the case of error or empty string if everything goes ok
@@ -115,7 +115,7 @@ def check_file_orionld(file):
                     i = 1
             else:
                 if not re.search(header2[i], line):
-                    return 'mismatch: header <' + header2[i] + '> : line <' + line + '>'
+                    return 'mismatch: HEADER <' + header2[i] + '> : line <' + line + '>'
                 i += 1
                 if i == len(header2):
                     # We have reach the end of the header, so the complete check passes
@@ -123,7 +123,7 @@ def check_file_orionld(file):
 
     # We reach this point if the first header line was not found or if we reach the end of the file before
     # reaching the end of the header. Both cases means false
-    return 'end of file reached without finding header beginning'
+    return 'end of file reached without finding Orion-LD Copyright header'
 
 
 def ignore(root, file):
@@ -212,8 +212,8 @@ def supported_extension(root, file):
     :param file:
     :return:
     """
-    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld']
+    extensions = ['py', 'cpp', 'c', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'jsonld', 'supp' ]
     names = ['makefile', 'Makefile', 'CMakeLists.txt.orion', 'CMakeLists.txt.orionld' ]
 
     # Check extensions
@@ -268,9 +268,15 @@ for root, dirs, files in os.walk(dir):
             is_orionld = True
         elif 'src/lib/orionld/' in filename:
             is_orionld = True
+        elif 'src/app/ssClient/' in filename:
+            is_orionld = True
         elif 'test/functionalTest/cases/0000_ngsild' in filename:
             is_orionld = True
+        elif 'test/functionalTest/cases/0000_troe' in filename:
+            is_orionld = True
         elif 'test/unittests/orionld' in filename:
+            is_orionld = True
+        elif 'archive/temporal' in filename:
             is_orionld = True
         else:
             is_orionld = False

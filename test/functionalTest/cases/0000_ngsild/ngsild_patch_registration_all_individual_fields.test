@@ -590,7 +590,6 @@ Date: REGEX(.*)
 04. PATCH the registration with a new name
 ==========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -664,7 +663,6 @@ Date: REGEX(.*)
 06. PATCH the registration with a new description
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -738,7 +736,6 @@ Date: REGEX(.*)
 08. PATCH the registration with a new information array
 =======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -882,7 +879,6 @@ bye
 11. PATCH the registration with a new observationInterval
 =========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -955,7 +951,6 @@ Date: REGEX(.*)
 13. PATCH the registration with a new managementInterval
 ========================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1028,7 +1023,6 @@ Date: REGEX(.*)
 15. PATCH the registration with a new location
 ==============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1101,7 +1095,6 @@ Date: REGEX(.*)
 17. PATCH the registration with a new observationSpace
 ======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1174,7 +1167,6 @@ Date: REGEX(.*)
 19. PATCH the registration with a new operationSpace
 ====================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1247,7 +1239,6 @@ Date: REGEX(.*)
 21. PATCH the registration with a new expires
 =============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1320,7 +1311,6 @@ Date: REGEX(.*)
 23. PATCH the registration with a new endpoint
 ==============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1393,7 +1383,6 @@ Date: REGEX(.*)
 25. PATCH the registration with a new P1
 ========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -1617,7 +1606,6 @@ bye
 30. PATCH all the fields of the registration
 ============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

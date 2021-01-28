@@ -95,7 +95,7 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
   //
   // First get the entities from database to check if they exist
   //
-  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree);
+  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree, false);
   if (dbEntities == NULL)
   {
     LM_E(("mongoCppLegacyEntityListLookupWithIdTypeCreDate returned NULL"));
@@ -151,6 +151,33 @@ bool orionldPostBatchDelete(ConnectionInfo* ciP)
     reqEntityId = next;
   }
 
+
+  //
+  // Eliminate any copies
+  //
+  KjNode* eidP = orionldState.requestTree->value.firstChildP;
+  KjNode* next;
+  while (eidP != NULL)
+  {
+    next = eidP->next;
+
+    //
+    // Compare current (eidP) string value with all nextcoming EIDs is the array
+    // If match, remove the latter
+    //
+    KjNode* copyP = eidP->next;
+    KjNode* copyNext;
+
+    while (copyP != NULL)
+    {
+      copyNext = copyP->next;
+      if (strcmp(eidP->value.s, copyP->value.s) == 0)
+        kjChildRemove(orionldState.requestTree, copyP);
+      copyP = copyNext;
+    }
+
+    eidP = next;
+  }
 
   //
   // Call batch delete function

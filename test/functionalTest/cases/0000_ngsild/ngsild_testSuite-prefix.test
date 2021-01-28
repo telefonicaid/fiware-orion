@@ -31,14 +31,15 @@ brokerStart CB 212-249
 --SHELL--
 
 #
-# 01. Create an entity with an attribute schema:name and a @context containing https://schema.org
+# 01. Create an entity with an attribute ex:P100 and a @context containing 'ex'
 # 02. See the entity in mongo
-# 03. Get the entity without @context to see how 'schema:name' was expanded
-# 04. Get the entity with @context containing https://schema.org to see how schema:name is compacted
-# 05. Query over entities using 'q=schema:name==XX', and @context containing https://schema.org - see the entity
+# 03. Get the entity without @context to see how 'ex:P100' was expanded
+# 04. Get the entity with @context containing 'ex' to see how 'ex:P100' is compacted
+# 05. Query over entities using 'q=ex:P100==XX', and @context containing 'ex' - see the entity
 #
-echo "01. Create an entity with an attribute schema:name and a @context containing https://schema.org"
-echo "==============================================================================================="
+
+echo "01. Create an entity with an attribute ex:P100 and a @context containing 'ex'"
+echo "============================================================================="
 payload='{
   "id": "urn:ngsi-ld:T:I123k467:Context",
   "type": "ex:T_Query",
@@ -50,11 +51,7 @@ payload='{
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789"
   },
-  "schema:name": {
-    "type": "Property",
-    "value": "XX"
-  },
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContextPlusSchema.jsonld"
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json"
 echo
@@ -68,30 +65,30 @@ echo
 echo
 
 
-echo "03. Get the entity without @context to see how 'schema:name' was expanded"
-echo "========================================================================="
+echo "03. Get the entity without @context to see how 'ex:P100' was expanded"
+echo "====================================================================="
 orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context?prettyPrint=yes&spaces=2" --noPayloadCheck
 echo
 echo
 
 
-echo "04. Get the entity with @context containing https://schema.org to see how schema:name is compacted"
-echo "=================================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context?prettyPrint=yes&spaces=2" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContextPlusSchema.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --noPayloadCheck
+echo "04. Get the entity with @context containing 'ex' to see how 'ex:P100' is compacted"
+echo "=================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context?prettyPrint=yes&spaces=2" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --noPayloadCheck
 echo
 echo
 
-
-echo "05. Query over entities using 'q=schema:name==XX', and @context containing https://schema.org - see the entity"
-echo "=============================================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&q=schema%3Aname==%22XX%22" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContextPlusSchema.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --noPayloadCheck
+      
+echo "05. Query over entities using 'q=ex:P100==XX', and @context containing 'ex' - see the entity"
+echo "============================================================================================"
+orionCurl --url "/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&q=ex%3AP100==12" -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' --noPayloadCheck
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an entity with an attribute schema:name and a @context containing https://schema.org
-===============================================================================================
+01. Create an entity with an attribute ex:P100 and a @context containing 'ex'
+=============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:I123k467:Context
@@ -112,8 +109,7 @@ MongoDB server version: REGEX(.*)
 	},
 	"attrNames" : [
 		"http://example.org/P100",
-		"http://example.org/R100",
-		"http://schema.org/name"
+		"http://example.org/R100"
 	],
 	"attrs" : {
 		"http://example=org/P100" : {
@@ -129,13 +125,6 @@ MongoDB server version: REGEX(.*)
 			"modDate" : REGEX(.*),
 			"value" : "urn:ngsi-ld:T2:6789",
 			"mdNames" : [ ]
-		},
-		"http://schema=org/name" : {
-			"type" : "Property",
-			"creDate" : REGEX(.*),
-			"modDate" : REGEX(.*),
-			"value" : "XX",
-			"mdNames" : [ ]
 		}
 	},
 	"creDate" : REGEX(.*),
@@ -145,10 +134,10 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Get the entity without @context to see how 'schema:name' was expanded
-=========================================================================
+03. Get the entity without @context to see how 'ex:P100' was expanded
+=====================================================================
 HTTP/1.1 200 OK
-Content-Length: 338
+Content-Length: 261
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -163,21 +152,17 @@ Date: REGEX(.*)
   "http://example.org/R100": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789"
-  },
-  "http://schema.org/name": {
-    "type": "Property",
-    "value": "XX"
   }
 }
 
 
 
-04. Get the entity with @context containing https://schema.org to see how schema:name is compacted
-==================================================================================================
+04. Get the entity with @context containing 'ex' to see how 'ex:P100' is compacted
+==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 204
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContextPlusSchema.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 {
@@ -190,21 +175,17 @@ Date: REGEX(.*)
   "R100": {
     "type": "Relationship",
     "object": "urn:ngsi-ld:T2:6789"
-  },
-  "name": {
-    "type": "Property",
-    "value": "XX"
   }
 }
 
 
 
-05. Query over entities using 'q=schema:name==XX', and @context containing https://schema.org - see the entity
-==============================================================================================================
+05. Query over entities using 'q=ex:P100==XX', and @context containing 'ex' - see the entity
+============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 299
+Content-Length: 232
 Content-Type: application/json
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContextPlusSchema.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
 [
@@ -218,10 +199,6 @@ Date: REGEX(.*)
     "R100": {
       "type": "Relationship",
       "object": "urn:ngsi-ld:T2:6789"
-    },
-    "name": {
-      "type": "Property",
-      "value": "XX"
     }
   }
 ]

@@ -28,7 +28,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjString, kjObject, ...
 #include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -51,15 +51,15 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/CHECK.h"                              // CHECK
-#include "orionld/common/urlCheck.h"                           // urlCheck
-#include "orionld/common/urnCheck.h"                           // urnCheck
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityIdCheck.h"                      // entityIdCheck
 #include "orionld/common/entityTypeCheck.h"                    // entityTypeCheck
 #include "orionld/common/entityIdAndTypeGet.h"                 // entityIdAndTypeGet
 #include "orionld/common/entityLookupById.h"                   // entityLookupById
 #include "orionld/common/typeCheckForNonExistingEntities.h"    // typeCheckForNonExistingEntities
+#include "orionld/common/duplicatedInstances.h"                // duplicatedInstances
 #include "orionld/types/OrionldProblemDetails.h"               // OrionldProblemDetails
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
@@ -69,26 +69,8 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"      // kjEntityIdLookupInEntityArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
+#include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own Interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// entityIdPush - add ID to array
-//
-static KjNode* entityIdPush(KjNode* entityIdsArrayP, const char* entityId)
-{
-  KjNode* idNodeP = kjStringValueLookupInArray(entityIdsArrayP, entityId);
-
-  if (idNodeP != NULL)  // The Entity with ID "entityId" is already present ...
-    return NULL;
-
-  idNodeP = kjString(orionldState.kjsonP, NULL, entityId);
-  kjChildAdd(entityIdsArrayP, idNodeP);
-
-  return idNodeP;
-}
 
 
 
@@ -109,18 +91,6 @@ static char* entityTypeGet(KjNode* entityNodeP, KjNode** contextNodePP)
   }
 
   return type;
-}
-
-
-// ----------------------------------------------------------------------------
-//
-// entitySuccessPush -
-//
-static void entitySuccessPush(KjNode* successArrayP, const char* entityId)
-{
-  KjNode* eIdP = kjString(orionldState.kjsonP, "id", entityId);
-
-  kjChildAdd(successArrayP, eIdP);
 }
 
 
@@ -168,16 +138,6 @@ static void entityTypeAndCreDateGet(KjNode* dbEntityP, char** idP, char** typeP,
 bool orionldPostBatchUpsert(ConnectionInfo* ciP)
 {
   //
-  // Prerequisites for the payload in orionldState.requestTree:
-  // * must be an array
-  // * cannot be empty
-  // * all entities must contain a entity::id (one level down)
-  // * no entity can contain an entity::type (one level down)
-  //
-  ARRAY_CHECK(orionldState.requestTree, "toplevel");
-  EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
-
-  //
   // Prerequisites for URI params:
   // * both 'update' and 'replace' cannot be set in options (replace is default)
   //
@@ -188,85 +148,36 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
     return false;
   }
 
+  //
+  // Prerequisites for the payload in orionldState.requestTree:
+  // * must be an array with objects
+  // * cannot be empty
+  // * all entities must contain an entity::id (one level down)
+  // * no entity can contain an entity::type (one level down)
+  //
+  ARRAY_CHECK(orionldState.requestTree, "toplevel");
+  EMPTY_ARRAY_CHECK(orionldState.requestTree, "toplevel");
+
+
   KjNode* incomingTree   = orionldState.requestTree;
-  KjNode* idArray        = kjArray(orionldState.kjsonP, NULL);
   KjNode* successArrayP  = kjArray(orionldState.kjsonP, "success");
   KjNode* errorsArrayP   = kjArray(orionldState.kjsonP, "errors");
-  KjNode* entityP;
-  KjNode* next;
 
   //
-  // 01. Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  // Entities that already exist in the DB cannot have a type != type-in-db
+  // To assure this, we need to extract all existing entities from the database
+  // Also, those entities that do not exist MUST have an entity type present.
   //
-  entityP = incomingTree->value.firstChildP;
-  while (entityP)
-  {
-    next = entityP->next;
-
-    char*   entityId;
-    char*   entityType;
-
-    // entityIdAndTypeGet calls entityIdCheck/entityTypeCheck that adds the entity in errorsArrayP if needed
-    if (entityIdAndTypeGet(entityP, &entityId, &entityType, errorsArrayP) == false)
-    {
-      kjChildRemove(incomingTree, entityP);
-      entityP = next;
-      continue;
-    }
-
-    //
-    // Check Content-Type and @context in payload
-    //
-    KjNode* contextNodeP  = kjLookup(entityP, "@context");
-
-    if ((orionldState.ngsildContent == true) && (contextNodeP == NULL))
-    {
-      LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/ld+json', but no @context in payload data array item", 400);
-      kjChildRemove(incomingTree, entityP);
-    }
-    else if ((orionldState.ngsildContent == false) && (contextNodeP != NULL))
-    {
-      LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid payload", "Content-Type is 'application/json', and an @context is present in the payload data array item", 400);
-      kjChildRemove(incomingTree, entityP);
-    }
-    else if ((contextNodeP != NULL) && (orionldState.linkHttpHeaderPresent == true))
-    {
-      LM_W(("Bad Input (@context present both in Link header and in payload data)"));
-      entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Inconsistency between HTTP headers and payload data", "@context present both in Link header and in payload data", 400);
-      kjChildRemove(incomingTree, entityP);
-    }
-    else
-    {
-      if (entityIdPush(idArray, entityId) == NULL)  // NULL means the Entity ID was a duplicate
-      {
-        // Look up the previous entity and remove it from the tree
-        KjNode* eP = kjEntityIdLookupInEntityArray(incomingTree, entityId);
-
-        if (eP != NULL)
-        {
-          entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Duplicated Entity", "previous instance removed", 400);
-
-          //
-          // Save the entity in a KjNode array in orionldState: orionldState.batchEntityArray
-          // Pass the array to temporal module before passing the batch request
-          //
-          kjChildRemove(incomingTree, eP);
-        }
-      }
-    }
-
-    entityP = next;
-  }
-
+  // Create idArray as an array of entity IDs, extracted from orionldState.requestTree
+  //
+  KjNode* idArray = kjEntityIdArrayExtract(orionldState.requestTree, successArrayP, errorsArrayP);
 
   //
   // 02. Query database extracting three fields: { id, type and creDate } for each of the entities
   //     whose Entity::Id is part of the array "idArray".
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray);
+  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
 
   //
   // 03. Creation Date from DB entities, and type-check
@@ -330,9 +241,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
           // - not added to "removeArray"
           //
           LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayloadExpanded));
-          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400);
+          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400, false);
           kjChildRemove(incomingTree, entityP);
-          entityP = next;
           continue;
         }
       }
@@ -360,9 +270,6 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
       KjNode* idNodeP = kjString(orionldState.kjsonP, NULL, idInDb);
       kjChildAdd(removeArray, idNodeP);
       ++entitiesToRemove;
-
-      // Point to the next entity and continue
-      entityP = next;
     }
   }
 
@@ -395,12 +302,26 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
   //
   // 06. Fill in UpdateContextRequest from "incomingTree"
   //
-  UpdateContextRequest  mongoRequest;
 
+
+  //
+  // Before the tree is destroyed by kjTreeToUpdateContextRequest(),
+  // remove+merge any duplicated entities from the array and save the array for TRoE.
+  //
+  // If more than ONE instance of an entity:
+  //   - For REPLACE - remove all entity instances but the last
+  //   - For UPDATE  - remove all instances and add a new one - merged from all of them
+  //
+  if (orionldState.uriParamOptions.update == true)
+    duplicatedInstances(incomingTree, NULL, false, true, errorsArrayP);  // Existing entities are MERGED, existing attributes are replaced
+  else
+    duplicatedInstances(incomingTree, NULL, true, true, errorsArrayP);   // Existing entities are REPLACED
+
+  KjNode*               treeP    = (troe == true)? kjClone(orionldState.kjsonP, incomingTree) : incomingTree;
+  UpdateContextRequest  mongoRequest;
   mongoRequest.updateActionType = ActionTypeAppend;
 
-  kjTreeToUpdateContextRequest(&mongoRequest, incomingTree, errorsArrayP, idTypeAndCreDateFromDb);
-
+  kjTreeToUpdateContextRequest(&mongoRequest, treeP, errorsArrayP, idTypeAndCreDateFromDb);
 
   //
   // 07. Set 'modDate' to "RIGHT NOW"
@@ -451,7 +372,8 @@ bool orionldPostBatchUpsert(ConnectionInfo* ciP)
                         OrionldBadRequestData,
                         "",
                         mongoResponse.contextElementResponseVector.vec[ix]->statusCode.reasonPhrase.c_str(),
-                        400);
+                        400,
+                        false);
     }
 
     for (unsigned int ix = 0; ix < mongoRequest.contextElementVector.vec.size(); ix++)

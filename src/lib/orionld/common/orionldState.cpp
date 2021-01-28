@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // Own interface
 
 
@@ -56,6 +57,10 @@ const char* orionldVersion = ORIONLD_VERSION;
 // orionldState - the state of the connection
 //
 __thread OrionldConnectionState orionldState;
+
+#ifdef REQUEST_PERFORMANCE
+__thread Timestamps timestamps;
+#endif
 
 
 
@@ -85,6 +90,7 @@ char*             tenantV[100];
 unsigned int      tenants                  = 0;
 OrionldGeoIndex*  geoIndexList             = NULL;
 OrionldPhase      orionldPhase             = OrionldPhaseStartup;
+bool              orionldStartup           = true;
 
 
 //
@@ -119,14 +125,15 @@ void orionldStateInit(void)
   orionldState.requestTime             = orionldState.timestamp.tv_sec + ((double) orionldState.timestamp.tv_nsec) / 1000000000;
   orionldState.kjsonP                  = kjBufferCreate(&orionldState.kjson, &orionldState.kalloc);
   orionldState.requestNo               = requestNo;
-  orionldState.tenant                  = (char*) "";
+  orionldState.tenant                  = (char*) "";  // FIXME: not NULL due to std::string ... ?
   orionldState.servicePath             = (char*) "";
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);
   orionldState.contextP                = orionldCoreContextP;
-  orionldState.prettyPrintSpaces       = 2;
   orionldState.forwardAttrsCompacted   = true;
   orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
+
+  orionldState.uriParams.spaces        = 2;
 
   // Paginataion
   orionldState.uriParams.offset        = 0;

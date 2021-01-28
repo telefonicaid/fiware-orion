@@ -44,17 +44,8 @@ extern "C"
 #include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
 #include "orionld/payloadCheck/pcheckUri.h"                     // pcheckUri
+#include "orionld/kjTree/kjChildAddOrReplace.h"                 // kjChildAddOrReplace
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"   // Own Interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjChildAddOrReplace -
-//
-// FIXME: move to kjson library - defined in orionldPatchSubscription.cpp
-//
-extern void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replacementP);
 
 
 

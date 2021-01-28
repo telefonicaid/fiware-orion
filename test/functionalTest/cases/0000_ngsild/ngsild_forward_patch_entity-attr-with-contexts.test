@@ -27,7 +27,7 @@ Forwarding of PATCH Entity-Attribute requests with contexts
 export BROKER=orionld
 dbInit CB
 dbInit C1
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -forwarding
 brokerStart CP1
 
 --SHELL--
@@ -201,7 +201,6 @@ bye
 05. PATCH tweets in CB - it gets forwarded to CP1
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

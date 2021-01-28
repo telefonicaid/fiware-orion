@@ -1,0 +1,191 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Simple test of creation of an Entity with all types of Attributes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# 01. Create an entity with all possible combinations
+# 02. See E1 in the temporal database
+# 03. See the attributes in the temporal database
+# 04. See the sub-attributes in the temporal database
+#
+
+echo "01. Create an entity with all possible combinations"
+echo "==================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "SP": {
+    "type": "Property",
+    "value": "SP of E1",
+    "observedAt": "2020-12-10T07:11:00.123Z",
+    "Sub-R": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:rel:R1",
+      "observedAt": "2020-12-10T07:12:00.123Z"
+    },
+    "Sub-String": {
+      "type": "Property",
+      "value": "string sub-property",
+      "observedAt": "2020-12-10T07:12:00.124Z"
+    },
+    "Sub-Bool": {
+      "type": "Property",
+      "value": true,
+      "observedAt": "2020-12-10T07:12:00.125Z"
+    },
+    "Sub-Array": {
+      "type": "Property",
+      "value": [ 1, 2, 3 ],
+      "observedAt": "2020-12-10T07:12:00.126Z"
+    },
+    "Sub-Object": {
+      "type": "Property",
+      "value": { "pi": 3.14, "bTrue": true, "c3": "3" },
+      "observedAt": "2020-12-10T07:12:00.127Z"
+    },
+    "Sub-Int": {
+      "type": "Property",
+      "value": 33,
+      "observedAt": "2020-12-10T07:12:00.128Z",
+      "unitCode": "pi-i"
+    },
+    "Sub-Float": {
+      "type": "Property",
+      "value": 3.1415927,
+      "observedAt": "2020-12-10T07:12:00.129Z",
+      "unitCode": "pi-f"
+    }
+  },
+  "I": {
+    "type": "Property",
+    "value": 1,
+    "observedAt": "2020-12-10T07:11:00.124Z",
+    "unitCode": "cm"
+  },
+  "F": {
+    "type": "Property",
+    "value": 3.14,
+    "observedAt": "2020-12-10T07:11:00.125Z"
+  },
+  "Object": {
+    "type": "Property",
+    "value": {
+      "A": 1,
+      "vec": [ 1, 2, 3 ]
+    },
+    "observedAt": "2020-12-10T07:11:00.126Z"
+  },
+  "Array": {
+    "type": "Property",
+    "value": [ "S1", "S2", "S3" ],
+    "observedAt": "2020-12-10T07:11:00.127Z"
+  },
+  "B": {
+    "type": "Property",
+    "value": true,
+    "observedAt": "2020-12-10T07:11:00.128Z"
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:relationships:R1",
+    "observedAt": "2020-12-10T07:11:00.129Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type FROM entities"
+echo
+echo
+
+
+echo "03. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,compound,observedAt FROM attributes"
+echo
+echo
+
+
+echo "04. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity with all possible combinations
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. See E1 in the temporal database
+===================================
+opmode,id,type
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
+
+
+03. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,compound,observedat
+Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entities:E1,t,,,SP of E1,,,,2020-12-10 07:11:00.123
+Create,https://uri.etsi.org/ngsi-ld/default-context/I,Number,urn:ngsi-ld:entities:E1,f,cm,,,1,,,2020-12-10 07:11:00.124
+Create,https://uri.etsi.org/ngsi-ld/default-context/F,Number,urn:ngsi-ld:entities:E1,f,,,,3.14,,,2020-12-10 07:11:00.125
+Create,https://uri.etsi.org/ngsi-ld/default-context/Object,Compound,urn:ngsi-ld:entities:E1,f,,,,,,"{""A"": 1, ""vec"": [1, 2, 3]}",2020-12-10 07:11:00.126
+Create,https://uri.etsi.org/ngsi-ld/default-context/Array,Compound,urn:ngsi-ld:entities:E1,f,,,,,,"[""S1"", ""S2"", ""S3""]",2020-12-10 07:11:00.127
+Create,https://uri.etsi.org/ngsi-ld/default-context/B,Boolean,urn:ngsi-ld:entities:E1,f,,,,,t,,2020-12-10 07:11:00.128
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E1,f,,,urn:ngsi-ld:relationships:R1,,,,2020-12-10 07:11:00.129
+
+
+04. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean,compound,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R1,,,,2020-12-10 07:12:00.123
+https://uri.etsi.org/ngsi-ld/default-context/Sub-String,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,string sub-property,,,,2020-12-10 07:12:00.124
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,t,,2020-12-10 07:12:00.125
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Array,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,,"[1, 2, 3]",2020-12-10 07:12:00.126
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Object,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,,"{""c3"": ""3"", ""pi"": 3.14, ""bTrue"": true}",2020-12-10 07:12:00.127
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,,2020-12-10 07:12:00.128
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Float,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-f,,3.141593,,,2020-12-10 07:12:00.129
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

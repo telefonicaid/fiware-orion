@@ -306,7 +306,6 @@ Date: REGEX(.*)
 09. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -315,7 +314,6 @@ Date: REGEX(.*)
 10. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -324,7 +322,6 @@ Date: REGEX(.*)
 11. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

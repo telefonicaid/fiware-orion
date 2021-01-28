@@ -154,7 +154,7 @@ bye
 
 02. Attempt to ADD the attribute P2=22 with noOverwrite set
 ===========================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 162
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -197,7 +197,6 @@ Date: REGEX(.*)
 04. ADD the attribute P2=42 without noOverwrite
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

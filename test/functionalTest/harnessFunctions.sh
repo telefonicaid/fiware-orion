@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+
+
 # ------------------------------------------------------------------------------
 #
 # harnessInit - 
@@ -409,7 +411,8 @@ function localBrokerStart()
     #
     # Important: the -v flag must be present so that the text "X errors in context Y of Z" is present in the output
     #
-    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes $CB_START_CMD > /tmp/valgrind.out 2>&1 &
+    # Use the CLI --gen-suppressions=all for valgrind to get suppressions (to put in suppressions.supp)
+    valgrind -v --leak-check=full --track-origins=yes --trace-children=yes --suppressions=../valgrind/suppressions.supp $CB_START_CMD > /tmp/valgrind.out 2>&1 &
   fi
 
   # Waiting for broker/valgrind to start
@@ -531,12 +534,15 @@ function brokerStart()
 
   # Check for --noCache and --cache options in 'extraParams'
   xParams=""
+  troe=OFF
   while [ "$#" != 0 ]
   do
     if   [ "$1" == "--noCache" ];            then noCache=ON;
     elif [ "$1" == "--cache" ];              then noCache=OFF;
     elif [ "$1" == "-noCache" ];             then noCache=ON;
     elif [ "$1" == "-cache" ];               then noCache=OFF;
+    elif [ "$1" == "-troe" ];                then troe=ON; 
+    elif [ "$1" == "-temporal" ];            then troe=ON; 
     elif [ "$1" == "-notificationMode" ] || [ "$1" == "--notificationMode" ]
     then
       notificationModeGiven=TRUE
@@ -578,6 +584,11 @@ function brokerStart()
     ipVersion=BOTH
   fi
 
+
+  if [ "$troe" == "ON" ]
+  then
+    xParams=$xParams' -troe'
+  fi
 
   localBrokerStop $role
   localBrokerStart $role $traceLevels $ipVersion $xParams
@@ -780,7 +791,6 @@ function mqttTestClientStart()
 
   $REPO_HOME/scripts/mqttTestClient.py $*   &
   sleep 0.2
-  ps aux | grep mqttTestClient > /tmp/kz
   logMsg Started MQTT notification client
 }
 
@@ -1392,6 +1402,157 @@ function neqTimestamp()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# pgDrop [dbName]
+#
+function pgDrop()
+{
+  dbName="$1"
+  echo "DROP DATABASE IF EXISTS $dbName" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER 2> /tmp/pg-stderr-01 > /tmp/pg-stdout
+  egrep -v "^NOTICE:" /tmp/pg-stderr-01 > /tmp/pg-stderr-02
+  egrep -v "does not exist" /tmp/pg-stderr-02 > /tmp/pg-stderr-03
+
+  lines=$(wc -l /tmp/pg-stderr-03 | awk '{print $1}')
+  if [ "$lines" != 0 ]
+  then
+    cat /tmp/pg-stderr-01
+    echo FT unable to drop DB $dbName 1>&2
+  else
+    echo Postgres DB $dbName has been dropped
+  fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# pgCreate [dbName]
+#
+function pgCreate()
+{
+  dbName="$1"
+  echo "Creating postgres DB $dbName"
+  dbCreation="CREATE DATABASE $dbName"
+  postgis="CREATE EXTENSION IF NOT EXISTS postgis;"
+  valuetype="CREATE TYPE ValueType AS ENUM('String', 'Number', 'Boolean', 'Relationship', 'Compound', 'GeoPoint', 'GeoPolygon', 'GeoMultiPolygon', 'GeoLineString', 'GeoMultiLineString', 'LanguageMap')"
+  operationMode="CREATE TYPE OperationMode AS ENUM('Create', 'Append', 'Update', 'Replace', 'Delete')"
+  entities="CREATE TABLE entities(instanceId TEXT PRIMARY KEY, ts TIMESTAMP NOT NULL, opMode OperationMode, id TEXT NOT NULL, type TEXT NOT NULL)"
+  attributes="CREATE TABLE attributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, opMode OperationMode, entityId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, subProperties BOOL, unitCode TEXT, datasetId TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING), ts TIMESTAMP NOT NULL)"
+  subAttributes="CREATE TABLE subAttributes(instanceId TEXT PRIMARY KEY, id TEXT NOT NULL, entityId TEXT NOT NULL, attributeId TEXT NOT NULL, observedAt TIMESTAMP, valueType ValueType, unitCode TEXT, text TEXT, boolean BOOL, number FLOAT8, compound JSONB, datetime TIMESTAMP, geoPoint GEOGRAPHY(POINTZ, 4326), geoPolygon GEOGRAPHY(POLYGON, 4267), geoMultiPolygon GEOGRAPHY(MULTIPOLYGON, 4267), geoLineString GEOGRAPHY(LINESTRING), geoMultiLineString GEOGRAPHY(MULTILINESTRING), ts TIMESTAMP NOT NULL)"
+
+  # timescaledb="CREATE EXTENSION IF NOT EXISTS timescaledb;"
+  # entitiesTimescale="SELECT create_hypertable('entities', 'ts')"
+  # attributesTimescale="SELECT create_hypertable('attributes', 'ts')"
+  # subAttributesTimescale="SELECT create_hypertable('subAttributes', 'ts')"
+
+  echo $dbCreation:                                                                                          > /tmp/pqsql 2>&1
+  echo $dbCreation            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER               >> /tmp/pqsql 2>&1
+  echo                                                                                                      >> /tmp/pqsql 2>&1
+
+  echo $timescaledb:                                                                                        >> /tmp/pqsql 2>&1
+  echo $timescaledb           | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                                      >> /tmp/pqsql 2>&1
+
+  echo $postgis:                                                                                    >> /tmp/pqsql 2>&1
+  echo $postgis               | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo "SELECT * FROM pg_extension:"                                                                >> /tmp/pqsql 2>&1
+  echo "SELECT * FROM pg_extension" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER         >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo $operationMode:                                                                              >> /tmp/pqsql 2>&1
+  echo $operationMode         | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo $valuetype:                                                                                  >> /tmp/pqsql 2>&1
+  echo $valuetype             | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo $entities:                                                                                   >> /tmp/pqsql 2>&1
+  echo $entities              | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo $attributes:                                                                                 >> /tmp/pqsql 2>&1
+  echo $attributes            | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  echo $subAttributes:                                                                              >> /tmp/pqsql 2>&1
+  echo $subAttributes         | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  echo                                                                                              >> /tmp/pqsql 2>&1
+
+  # echo $entitiesTimescale:                                                                          >> /tmp/pqsql 2>&1
+  # echo $entitiesTimescale     | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"  >> /tmp/pqsql 2>&1
+  # echo                                                                                              >> /tmp/pqsql 2>&1
+
+  # echo $attributesTimescale:                                                                        >> /tmp/pqsql 2>&1
+  # echo $attributesTimescale    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName" >> /tmp/pqsql 2>&1
+  # echo                                                                                              >> /tmp/pqsql 2>&1
+
+  # echo $subAttributesTimescale:                                                                     >> /tmp/pqsql 2>&1
+  # echo $subAttributesTimescale | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName" >> /tmp/pqsql 2>&1
+  # echo                                                                                              >> /tmp/pqsql 2>&1
+
+  #
+  # Not sure why, but the tables seem to survive the deletion of the database ... done by pgDrop
+  # This is pretty strange.
+  # To fix the problem, the tables are emptied here:
+  #
+  echo "DELETE FROM subattributes" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo "DELETE FROM attributes"    | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+  echo "DELETE FROM entities"      | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$dbName"
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# pgInit [dbName]
+#
+function pgInit()
+{
+  dbName="$1"
+  pgDrop $dbName
+  pgCreate $dbName
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# postgresCmd [-t <tenant>] [-sql <SQL command as a string>]
+#
+function postgresCmd()
+{
+  #
+  # Parsing parameters
+  #
+  tenant=$CB_DB_NAME
+  sqlCommand=""
+
+  while [ "$#" != 0 ]
+  do
+    if   [ "$1" == "-t" ];   then  tenant=$2;     shift;
+    elif [ "$1" == "-sql" ]; then  sqlCommand=$2; shift;
+    else
+      echo "Invalid option/parameter for postgresCmd: $1"
+      exit 1
+    fi
+    shift;
+  done
+
+  if [ "$sqlCommand" == "" ]
+  then
+    echo "SQL command missing ... (-sql <SQL command as a string>)"
+    exit 1
+  fi
+
+  echo "$sqlCommand" | psql --quiet --host $PGHOST --port $PGPORT --username $PGUSER -d "$tenant" --csv
+}
+
+
+
 export -f dbInit
 export -f dbList
 export -f dbDrop
@@ -1422,3 +1583,7 @@ export -f mqttTestClientStop
 export -f mqttTestClientDump
 export -f eqTimestamp
 export -f neqTimestamp
+export -f postgresCmd
+export -f pgDrop
+export -f pgInit
+export -f pgCreate

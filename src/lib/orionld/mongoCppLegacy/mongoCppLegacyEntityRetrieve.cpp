@@ -65,7 +65,6 @@ static void kjChildPrepend(KjNode* container, KjNode* child)
 static bool timestampToString(KjNode* nodeP)
 {
   char*   dateBuf = kaAlloc(&orionldState.kalloc, 64);
-  char*   detail;
   double  timestamp;
 
   if (nodeP->type == KjFloat)
@@ -78,9 +77,9 @@ static bool timestampToString(KjNode* nodeP)
     return false;
   }
 
-  if (numberToDate(timestamp, dateBuf, 64, &detail) == false)
+  if (numberToDate(timestamp, dateBuf, 64) == false)
   {
-    LM_E(("Database Error (numberToDate: %s)", detail));
+    LM_E(("Database Error (numberToDate failed)"));
     return false;
   }
 
@@ -404,11 +403,9 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   releaseMongoConnection(connectionP);
   // semGive()
 
-  if (dbTree == NULL)
-  {
-    // Entity not found
+  if (dbTree == NULL)  // Entity not found
     return NULL;
-  }
+
 
   KjNode*  dbAttrsP           = kjLookup(dbTree, "attrs");      // Must be there
   KjNode*  dbDataSetsP        = kjLookup(dbTree, "@datasets");  // May not be there
@@ -428,7 +425,7 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   // Else (no 'attrs' given):
   //
   //
-  if (attrs == NULL)     // Include all attributes in the response
+  if ((attrs == NULL) || (attrs[0] == NULL))     // Include all attributes in the response
   {
     if (keyValues == false)
     {

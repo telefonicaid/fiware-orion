@@ -67,6 +67,7 @@ function _usage()
     -U   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
 
     -T   --token         specify token to clone k* tools
+    -C   --coverage      run with coverage
 "
 }
 
@@ -94,11 +95,12 @@ do
        --rpm) set -- "$@" -P ;;
        --upload) set - "$@" -U ;;
        --token) set -- "$@" -T ;;
+       --coverage) set -- "$@" -C ;;
        *) set -- "$@" "$arg" ;;
     esac
 done
 
-while getopts "hs:tdqp:o:bcr:R:P:UT:" opt; do
+while getopts "hs:tdqp:o:bcr:R:P:UT:C" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
         s)  STAGE=$OPTARG ;;
@@ -114,6 +116,7 @@ while getopts "hs:tdqp:o:bcr:R:P:UT:" opt; do
         P)  RPM=$OPTARG ;;
         U)  UPLOAD=true ;;
         T)  TOKEN=$OPTARG ;;
+        C) COVERAGE=true ;;
         *) _usage && exit 0;;
     esac
 done
@@ -275,21 +278,34 @@ fi
 
 # ===================================== UNIT TESTS =====================================================================
 
-if [[ -n "${TEST}" && "${STAGE}" = "unit" ]]; then
+if [[ -n "${TEST}" && "${STAGE}" = "unit" &&  -z ${COVERAGE+x} ]]; then
 
     echo "Builder: unit test started"
 
     cd ${PATH_TO_SRC}
 
-    make unit_test
+    make coverage_unit_test
     if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
 
     echo "Builder: unit test ended"
 fi
 
+if [[ -n "${TEST}" && "${STAGE}" = "unit" && -n "${COVERAGE}" ]]; then
+
+    echo "Builder: unit test with coverage started"
+
+    cd ${PATH_TO_SRC}
+
+    make coverage_unit_test
+    if [[ $? -ne 0 ]]; then echo "Builder: unit test failed"; exit 1; fi
+
+    echo "Builder: unit test with coverage ended"
+fi
+
+
 # ===================================== FUNCTIONAL TESTS ===============================================================
 
-if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
+if [[ -n "${TEST}" && "${STAGE}" = "functional" &&  -z ${COVERAGE+x} ]]; then
 
     echo "Builder: functional test started"
 
@@ -316,6 +332,52 @@ if [[ -n "${TEST}" && "${STAGE}" = "functional" ]]; then
     if ! ${STATUS}; then echo "Builder: functional test failed"; exit 1; fi
 
     echo "Builder: functional test ended"
+fi
+
+if [[ -n "${TEST}" && "${STAGE}" = "functional" && -n "${COVERAGE}" ]]; then
+
+    echo "Builder: functional test with coverage started"
+
+    cd ${PATH_TO_SRC}
+    STATUS=true
+
+    if [[ -n "${SPEED}" ]]; then _fix_speed; fi
+
+    make prepare_coverage_func
+    make install_coverage
+
+    mkdir -p coverage
+    lcov -i --zerocounters --directory BUILD_COVERAGE/
+    lcov --capture --initial --directory BUILD_COVERAGE --output-file coverage/broker.init.info
+
+    . scripts/testEnv.sh
+
+    if ${FUNC_STATUS}; then
+        CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh --fromIx ${START}  --toIx ${END}
+    else
+        CB_DIFF_TOOL="diff -u" ${PATH_TO_SRC}/test/functionalTest/testHarness.sh
+    fi
+
+    # Generate test report
+    echo "Generating coverage report"
+    lcov --directory BUILD_COVERAGE --capture --output-file coverage/broker.test.info
+    lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
+    lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
+    # Remove unit test libraries and libraries developed before contextBroker project init
+    lcov -r coverage/broker.info "/opt/orion/test/unittests/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "/opt/orion/src/lib/logMsg/*" -o coverage/broker.info
+    lcov -r coverage/broker.info "/opt/orion/src/lib/parseArgs/*" -o coverage/broker.info
+
+
+    if [[ $? -ne 0 ]]; then STATUS=false; else STATUS=true; fi
+
+    if [[ -n "${SPEED}" ]]; then _unfix_speed; fi
+
+    if ! ${STATUS}; then echo "Builder: functional test failed"; exit 1; fi
+
+    echo "Builder: functional test with coverage ended"
 fi
 
 # ===================================== BUILDING RPM ===================================================================

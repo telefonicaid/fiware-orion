@@ -164,7 +164,6 @@ bye
 04. ADD the attribute P2 and modify P1
 ======================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

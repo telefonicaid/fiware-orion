@@ -167,6 +167,7 @@ bool orionldRequestSend
     if (rBufP == NULL)
       LM_X(1, ("Out of memory"));
 
+    rBufP->buf[0] = 0;
     orionldState.delayedFreePointer = rBufP->buf;  // Saved the pointer to be freed once the request thread ends
   }
 

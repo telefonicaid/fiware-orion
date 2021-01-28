@@ -60,8 +60,6 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   char             idBuffer[] = "urn:ngsi-ld:Notification:012345678901234567890123";  // The 012345678901234567890123 will be overwritten
   OrionldContext*  contextP   = orionldContextCacheLookup(context);
 
-  LM_TMP(("V2NFY: Rendering Notification. Format: %s", renderFormatToString(renderFormat, false, false)));
-
   if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
   {
     // id
@@ -96,12 +94,11 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   // notifiedAt
   if (renderFormat != NGSI_LD_V1_V2_NORMALIZED)
   {
-    char    date[128];
-    char*   details;
+    char date[128];
 
-    if (numberToDate(orionldState.requestTime, date, sizeof(date), &details) == false)
+    if (numberToDate(orionldState.requestTime, date, sizeof(date)) == false)
     {
-      LM_E(("Runtime Error (numberToDate: %s)", details));
+      LM_E(("Runtime Error (numberToDate failed)"));
       return NULL;
     }
     nodeP = kjString(orionldState.kjsonP, "notifiedAt", date);

@@ -38,6 +38,6 @@ extern "C"
 //
 // mongoCppLegacyEntityListLookupWithIdTypeCreDate -
 //
-extern KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray);
+extern KjNode* mongoCppLegacyEntityListLookupWithIdTypeCreDate(KjNode* entityIdsArray, bool attrNames);
 
 #endif  // SRC_LIB_ORIONLD_MONGOCPPLEGACY_MONGOCPPLEGACYENTITYLISTLOOKUPWITHIDTYPECREDATE_H_

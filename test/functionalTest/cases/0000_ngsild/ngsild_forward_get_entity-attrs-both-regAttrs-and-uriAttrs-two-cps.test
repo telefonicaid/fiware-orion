@@ -28,7 +28,7 @@ export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
-brokerStart CB
+brokerStart CB 0 IPv4 -forwarding
 brokerStart CP1
 brokerStart CP2
 

@@ -198,7 +198,7 @@ Date: REGEX(.*)
 
 04. Attempt to patch a non-existing attribute P3 of E1 - see 207
 ================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 132
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -217,7 +217,7 @@ Date: REGEX(.*)
 
 05. Attempt to patch a non-existing attribute	P3 and an existing attribute P2 - see 207 MultiStatus
 ===================================================================================================
-HTTP/1.1 207 Multi Status
+HTTP/1.1 207 Multi-Status
 Content-Length: 181
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -239,7 +239,6 @@ Date: REGEX(.*)
 06. Patch P1 - see 204 No Content
 =================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

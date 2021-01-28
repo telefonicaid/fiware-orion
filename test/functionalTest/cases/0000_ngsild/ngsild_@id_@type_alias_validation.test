@@ -386,7 +386,6 @@ Date: REGEX(.*)
 03. Update of subscription using @id and @type
 ==============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -403,7 +402,6 @@ Date: REGEX(.*)
 05. Update of registration using @id and @type
 ==============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -429,7 +427,6 @@ Date: REGEX(.*)
 07. Update of entities with entityOperations using @id and @type
 ================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -438,7 +435,6 @@ Date: REGEX(.*)
 08. Upsert of entities - options=update - with entityOperations using @id and @type
 ===================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -446,7 +442,6 @@ Date: REGEX(.*)
 09. Upsert of entities - options=replace - with entityOperations using @id and @type
 ====================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

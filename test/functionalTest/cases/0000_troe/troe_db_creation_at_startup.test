@@ -1,0 +1,164 @@
+# Copyright 2020 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Make sure the broker creates the DB at startup, or not, if it already exists
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgDrop $CB_DB_NAME
+brokerStart CB 100 IPv4 -troe
+
+--SHELL--
+
+#
+# The broker was started without the default database ($CB_DB_NAME), but the broker creates it on startup
+#
+# 01. Make sure the default database exists, with tables and all
+# 02. Create an entity E1 - making the broker create the postgres db
+# 03. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
+# 04. Restart the broker
+# 05. Make sure the entity E1 survived the restart
+#
+
+echo "01. Make sure the default database exists, with tables and all"
+echo "=============================================================="
+postgresCmd -t $CB_DB_NAME -sql "\\d" 2>&1
+echo
+echo
+
+
+echo "02. Create an entity E1 - making the broker create the postgres db"
+echo "=================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "P": {
+    "type": "Property",
+    "value": 1,
+    "observedAt": "2020-12-19T09:54:00.123Z",
+    "PR": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:relationships:PR"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present"
+echo "==============================================================================================="
+echo "ENTITIES:"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+echo "04. Restart the broker"
+echo "======================"
+brokerStop CB
+brokerStart CB 0 IPv4 -troe
+sleep 1
+echo
+echo
+
+echo "05. Make sure the entity E1 survived the restart"
+echo "================================================"
+echo "ENTITIES:"
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo "ATTRIBUTES:"
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean FROM attributes"
+echo
+echo "SUB-ATTRIBUTES:"
+postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Make sure the default database exists, with tables and all
+==============================================================
+Schema,Name,Type,Owner
+public,attributes,table,postgres
+public,entities,table,postgres
+public,geography_columns,view,postgres
+public,geometry_columns,view,postgres
+public,spatial_ref_sys,table,postgres
+public,subattributes,table,postgres
+
+
+02. Create an entity E1 - making the broker create the postgres db
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+03. Make sure the entity postgres db exists and that entities, attrs, and sub-attrs are present
+===============================================================================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+04. Restart the broker
+======================
+
+
+05. Make sure the entity E1 survived the restart
+================================================
+ENTITIES:
+opmode,id,type,ts
+Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T,REGEX(202.*)
+
+ATTRIBUTES:
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean
+Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,
+
+SUB-ATTRIBUTES:
+id,valuetype,entityid,attributeid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

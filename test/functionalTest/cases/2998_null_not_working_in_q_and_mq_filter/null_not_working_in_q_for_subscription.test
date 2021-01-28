@@ -201,7 +201,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. Modify E1::t to 4
 =====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -214,7 +213,6 @@ Date: REGEX(.*)
 06. Modify E1::t to null
 ========================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -252,7 +250,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 08. Modify E1::t to the string 'null'
 =====================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

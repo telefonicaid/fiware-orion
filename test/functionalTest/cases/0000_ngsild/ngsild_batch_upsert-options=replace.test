@@ -191,7 +191,6 @@ echo
 01. Create entities E1 and E2 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
 ============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -268,7 +267,6 @@ Slept 3 seconds
 05. Modify E2 and add E3 using POST /ngsi-ld/v1/entityOperations/upsert?options=replace
 =======================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

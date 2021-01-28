@@ -38,6 +38,15 @@ extern "C"
 //
 // entityErrorPush -
 //
-extern void entityErrorPush(KjNode* errorsArrayP, const char* entityId, OrionldResponseErrorType type, const char* title, const char* detail, int status);
+extern void entityErrorPush
+(
+  KjNode*                   errorsArrayP,
+  const char*               entityId,
+  OrionldResponseErrorType  type,
+  const char*               title,
+  const char*               detail,
+  int                       status,
+  bool                      avoidDuplicate
+);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ENTITYERRORPUSH_H_

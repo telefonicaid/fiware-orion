@@ -55,6 +55,8 @@ std::string httpStatusCodeString(HttpStatusCode code)
   case SccAttributeListRequired:             return "Attribute List required by the receiver";
   case SccReceiverInternalError:             return "Internal Server Error";
   case SccNotImplemented:                    return "Not Implemented";
+  case SccPGConnHasProblem:                  return "Postgrest connection problem";
+  case SccPGTenantConnHasProblem:            return "Postgrest Tenant DB cannot be accessed";  
   default:                                   return "Undefined";
   }
 }

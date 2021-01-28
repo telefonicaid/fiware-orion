@@ -43,6 +43,9 @@ void mqttRelease(void)
   {
     MqttConnection* mcP = &mqttConnectionList[ix];
 
+    if (mcP->host != NULL)
+      free(mcP->host);
+
     MQTTClient_disconnect(&mcP->client, 10000);
     MQTTClient_destroy(&mcP->client);
   }

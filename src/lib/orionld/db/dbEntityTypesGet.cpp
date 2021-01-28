@@ -223,15 +223,14 @@ static KjNode* typesAndAttributesExtractFromRegistrations(KjNode* array)
 
 // -----------------------------------------------------------------------------
 //
-// getEntityTypesResponse - All entity types for which entity instances are
-// currently available in the NGSI-LD system.
+// getEntityTypesResponse - All entity types for which entity instances are currently available in the NGSI-LD system.
 //
 static KjNode* getEntityTypesResponse(KjNode* sortedArrayP)
 {
   char entityTypesId[64];
 
   strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId));
-  uuidGenerate(&entityTypesId[27]);
+  uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
 
   KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);
@@ -364,6 +363,7 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
     nodeP = next;
   }
+
 
   if (orionldState.uriParams.details == false)
     return getEntityTypesResponse(sortedArrayP);

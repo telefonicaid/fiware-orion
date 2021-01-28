@@ -82,6 +82,12 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-ngsiv1Autocast' (automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations)]
                 [option '-ctxTimeout' <Timeout in milliseconds for downloading of contexts>]
                 [option '-ctxAttempts' <Number of attempts for downloading of contexts>]
-                [option '-temporal' (enable temporal evolution of entities)]
+                [option '-troe' (enable TRoE - temporal representation of entities)]
+                [option '-troeHost' <host for troe database db server>]
+                [option '-troePort' <port for troe database db server>]
+                [option '-troeUser' <username for troe database db server>]
+                [option '-troePwd' <password for troe database db server>]
+                [option '-troePoolSize' <size of the connection pool for TRoE Postgres database connections>]
+                [option '-forwarding' (turn on forwarding)]
 
 --TEARDOWN--

@@ -30,6 +30,7 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
@@ -38,7 +39,6 @@ extern "C"
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
 #include "common/string.h"                                       // FT
@@ -57,6 +57,8 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
+#include "orionld/common/numberToDate.h"                         // numberToDate
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
@@ -64,10 +66,9 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
-#include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
+#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
-#include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
-#include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
 
@@ -236,34 +237,6 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
     ciP->outMimeType = JSONLD;
 
   return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// serviceLookup - lookup the Service
-//
-// orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
-// orionldServiceLookup makes sure the URL supprts the verb
-//
-static OrionLdRestService* serviceLookup(ConnectionInfo* ciP)
-{
-  OrionLdRestService* serviceP;
-
-  serviceP = orionldServiceLookup(&orionldRestServiceV[ciP->verb]);
-  if (serviceP == NULL)
-  {
-    if (orionldBadVerb(ciP) == true)
-      orionldState.httpStatusCode = SccBadVerb;
-    else
-    {
-      orionldErrorResponseCreate(OrionldInvalidRequest, "Service Not Found", orionldState.urlPath);
-      orionldState.httpStatusCode = 404;
-    }
-  }
-
-  return serviceP;
 }
 
 
@@ -733,7 +706,8 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //
 //
 //
-int orionldMhdConnectionTreat(ConnectionInfo* ciP)
+static __thread char responsePayload[1024 * 1024];
+MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 {
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
@@ -741,17 +715,9 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   LM_T(LmtMhd, ("Read all the payload - treating the request!"));
 
   //
-  // 01. Predetected Error?
+  // Predetected Error from orionldMhdConnectionInit?
   //
-  if (orionldState.httpStatusCode != SccOk)
-    goto respond;
-
-  //
-  // 02. Lookup the Service
-  //
-  // Invalid Verb is checked for in orionldMhdConnectionInit()
-  //
-  if ((orionldState.serviceP = serviceLookup(ciP)) == NULL)
+  if (orionldState.httpStatusCode != 200)
     goto respond;
 
   //
@@ -796,19 +762,19 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
 
   //
-  // Save a copy of the incoming payload before it is destroyed during kjParse
-  //
-  // FIXME - Only for "some" requests - right now only for "PATCH /ngsi-ld/v1/entities/*/attrs/*"
+  // Save a copy of the incoming payload before it is destroyed during kjParse AND
+  // parse the payload, and check for empty payload, also, find @context in payload and check it's OK
   //
   if (ciP->payload != NULL)
-    orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
+  {
+    if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD) == 0)
+      orionldState.requestPayload = ciP->payload;
+    else
+      orionldState.requestPayload = kaStrdup(&orionldState.kalloc, ciP->payload);
 
-  //
-  // 04. Parse the payload, and check for empty payload, also, find @context in payload and check it's OK
-  //
-  if ((ciP->payload != NULL) && (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false))
-    goto respond;
-
+    if (payloadParseAndExtractSpecialFields(ciP, &contextToBeCashed) == false)
+      goto respond;
+  }
 
   //
   // 05. Check the Content-Type
@@ -881,10 +847,13 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Call the SERVICE ROUTINE
   //
-  LM_T(LmtServiceRoutine, ("Calling Service Routine %s (context at %p)", orionldState.serviceP->url, orionldState.contextP));
-
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.serviceRoutineStart);
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
-  LM_T(LmtServiceRoutine, ("service routine '%s %s' done", orionldState.verbString, orionldState.serviceP->url));
+  kTimeGet(&timestamps.serviceRoutineEnd);
+#else
+  serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
+#endif
 
   //
   // If the service routine failed (returned FALSE), but no HTTP status ERROR code is set,
@@ -897,7 +866,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   }
   else  // Service Routine worked
   {
-    dbGeoIndexes();
+    if (orionldState.geoAttrs > 0)
+      dbGeoIndexes();
 
     // New tenant?
     if ((orionldState.tenant != NULL) && (orionldState.tenant[0] != 0))
@@ -982,19 +952,8 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // FIXME: Smarter allocation !!!
     //
-    int bufLen = 1024 * 1024 * 32;
-    orionldState.responsePayload = (char*) malloc(bufLen);
-    if (orionldState.responsePayload != NULL)
-    {
-      orionldState.responsePayloadAllocated = true;
-      kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, bufLen);
-    }
-    else
-    {
-      LM_E(("Error allocating buffer for response payload"));
-      orionldErrorResponseCreate(OrionldInternalError, "Out of memory", NULL);
-      orionldState.httpStatusCode = 500;  // If ever able to send the response ...
-    }
+    kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+    orionldState.responsePayload = responsePayload;
   }
 
   //
@@ -1011,13 +970,24 @@ int orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
   //
-  // Call Temporal Routine (if there is one) to save the temporal data.
+  // Call TRoE Routine (if there is one) to save the TRoE data.
   // Only if the Service Routine was successful, of course
   //
   if ((orionldState.httpStatusCode >= 200) && (orionldState.httpStatusCode <= 300))
   {
-    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->temporalRoutine != NULL))
-      orionldState.serviceP->temporalRoutine(ciP);
+    if ((orionldState.serviceP != NULL) && (orionldState.serviceP->troeRoutine != NULL))
+    {
+      //
+      // Also, if something went wrong during processing, the SR can flag this by setting the requestTree to NULL
+      //
+      if (orionldState.troeError == true)
+        LM_E(("Internal Error (something went wrong during TRoE processing)"));
+      else
+      {
+        numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
+        orionldState.serviceP->troeRoutine(ciP);
+      }
+    }
   }
 
   //

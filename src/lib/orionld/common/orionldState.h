@@ -40,11 +40,13 @@ extern "C"
 #include "common/MimeType.h"                                     // MimeType
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
+
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/QNode.h"                                // QNode
+#include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldGeoJsonType.h"                    // OrionldGeoJsonType
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache
-#include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
@@ -61,7 +63,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v0.5"
+#define ORIONLD_VERSION "post-v0.6"
 
 
 
@@ -170,8 +172,9 @@ typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
   ConnectionInfo*         ciP;
-  struct timespec         timestamp;    // The time when the request entered
-  double                  requestTime;  // Same same, but at a floating point
+  struct timespec         timestamp;              // The time when the request entered
+  double                  requestTime;            // Same same, but at a floating point
+  char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
@@ -209,8 +212,6 @@ typedef struct OrionldConnectionState
   char*                   urlPath;
   Verb                    verb;
   char*                   verbString;
-  bool                    prettyPrint;
-  char                    prettyPrintSpaces;
   bool                    acceptJson;
   bool                    acceptJsonld;
   bool                    ngsildContent;
@@ -271,7 +272,28 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    forwardAttrsCompacted;
+
+  //
+  // TRoE
+  //
+  bool                    troeError;
+  char                    troeDbName[128];
+  KjNode*                 duplicateArray;
+  KjNode*                 troeIgnoreV[20];
+  unsigned int            troeIgnoreIx;
 } OrionldConnectionState;
+
+#ifdef REQUEST_PERFORMANCE
+typedef struct Timestamps
+{
+  struct timespec reqStart;
+  struct timespec serviceRoutineStart;
+  struct timespec serviceRoutineEnd;
+  struct timespec reqEnd;
+} Timestamps;
+
+extern __thread Timestamps timestamps;
+#endif
 
 
 
@@ -303,12 +325,19 @@ extern bool              multitenancy;             // From orionld.cpp
 extern char*             tenant;                   // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
-extern bool              temporal;                 // From orionld.cpp
+extern bool              troe;                     // From orionld.cpp
+extern char              troeHost[64];             // From orionld.cpp
+extern unsigned short    troePort;                 // From orionld.cpp
+extern char              troeUser[64];             // From orionld.cpp
+extern char              troePwd[64];              // From orionld.cpp
+extern int               troePoolSize;             // From orionld.cpp
+extern bool              forwarding;               // From orionld.cpp
 extern const char*       orionldVersion;
 extern char*             tenantV[100];
 extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
+extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 
 
 

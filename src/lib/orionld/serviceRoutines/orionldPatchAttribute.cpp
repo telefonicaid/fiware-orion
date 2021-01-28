@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
+#include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -36,9 +38,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/HttpStatusCode.h"                                 // SccNotFound
 #include "ngsi/ContextElement.h"                                 // ContextElement
-
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
-#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -292,6 +292,40 @@ KjNode* kjTreeAttributeMerge(KjNode* entityP, KjNode* newAttrP, const char* attr
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attributeTypeExtractAndClone -
+//
+static KjNode* attributeTypeExtractAndClone(KjNode* entityP, char* attrName)
+{
+  KjNode* attrsFromDb = kjLookup(entityP, "attrs");
+
+  if (attrsFromDb == NULL)
+    LM_RE(NULL, ("Database Error (can't find the 'attrs' item)"));
+
+  // Lookup the attribute
+  char* eqAttrName = kaStrdup(&orionldState.kalloc, attrName);
+  dotForEq(eqAttrName);
+
+  KjNode* attrP = kjLookup(attrsFromDb, eqAttrName);
+  if (attrP  == NULL)
+    LM_RE(NULL, ("Database Error (can't find the attribute '%s' in 'attrs')", attrName));
+
+  // Lookup the type of the attribute
+  KjNode* typeP = kjLookup(attrP, "type");
+  if (typeP == NULL)
+    LM_RE(NULL, ("Database Error (can't find the type of the attribute '%s')", attrName));
+
+  KjNode* newTypeP = kjString(orionldState.kjsonP, "type", typeP->value.s);
+
+  if (newTypeP == NULL)
+    LM_RE(NULL, ("Internal Error (unable to create the attribute type node)"));
+
+  return newTypeP;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPatchAttribute -
@@ -351,17 +385,20 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     attrName = orionldContextItemExpand(orionldState.contextP, attrName, true, NULL);
   }
 
-  //
-  // If a matching registration is found, no local treatment will be done.
-  // The request is simply forwarded to the matching Context Provider
-  //
-  regArray = dbRegistrationLookup(entityId, attrName, &matchingRegs);
-  if (regArray != NULL)
+  if (forwarding)
   {
-    if (matchingRegs > 1)
-      dbRegistrationsOnlyOneAllowed(regArray, matchingRegs, entityId, attrName);
+    //
+    // If a matching registration is found, no local treatment will be done.
+    // The request is simply forwarded to the matching Context Provider
+    //
+    regArray = dbRegistrationLookup(entityId, attrName, &matchingRegs);
+    if (regArray != NULL)
+    {
+      if (matchingRegs > 1)
+        dbRegistrationsOnlyOneAllowed(regArray, matchingRegs, entityId, attrName);
 
-    return orionldForwardPatchAttribute(ciP, regArray->value.firstChildP, entityId, attrName, orionldState.requestTree);
+      return orionldForwardPatchAttribute(ciP, regArray->value.firstChildP, entityId, attrName, orionldState.requestTree);
+    }
   }
 
   // ----------------------------------------------------------------
@@ -381,6 +418,37 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
     orionldState.httpStatusCode = SccNotFound;
     orionldErrorResponseCreate(OrionldBadRequestData, "Entity/Attribute not found", pair);
     return false;
+  }
+
+
+  //
+  // The tree is destroyed during the processing - need it intact for TRoE
+  //
+  KjNode* troeTree = NULL;
+  bool    troeOk   = true;
+
+  if (troe == true)
+  {
+    // TRoE needs the type of the attribute to be in the tree - let's find it and add it !
+    KjNode* newTypeP = attributeTypeExtractAndClone(entityP, attrName);
+
+    if (newTypeP == NULL)
+    {
+      LM_E(("Internal Error (attributeTypeExtractAndClone failed)"));
+      troeOk = false;
+    }
+    else
+    {
+      // Now clone and add the attribute type
+      troeTree = kjClone(orionldState.kjsonP, orionldState.requestTree);
+      if (troeTree == NULL)
+      {
+        LM_E(("Internal Error (unable to clone the incoming payload body for TRoE)"));
+        troeOk = false;
+      }
+      else
+        kjChildAdd(troeTree, newTypeP);
+    }
   }
 
   // All OK, now merge incoming payload (orionldState.requestPayload) with the entity from the database (entityP)
@@ -428,5 +496,11 @@ bool orionldPatchAttribute(ConnectionInfo* ciP)
   }
 
   mongoRequest.release();
+
+  if (troeOk == false)
+    orionldState.troeError = true;  // indicating that TRoE should not be invoked even though it is turned on
+  else if (troeTree != NULL)
+    orionldState.requestTree = troeTree;  // Pointing to the modifed tree for TRoE
+
   return true;
 }

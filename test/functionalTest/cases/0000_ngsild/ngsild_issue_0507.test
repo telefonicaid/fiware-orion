@@ -146,7 +146,6 @@ Date: REGEX(.*)
 02. Update two of them using batch update
 =========================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

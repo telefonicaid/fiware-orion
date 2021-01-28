@@ -159,7 +159,6 @@ echo
 01. Create entity E1
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -172,7 +171,6 @@ Slept 2 seconds
 03. Create entity E2
 ====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 
@@ -191,7 +189,6 @@ Slept 2 seconds
 06. Replace E1 and E2 using batch upsert with options=replace
 =============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

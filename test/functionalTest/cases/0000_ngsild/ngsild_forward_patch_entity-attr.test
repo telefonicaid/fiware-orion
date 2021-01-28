@@ -27,7 +27,7 @@ Forwarding of PATCH Entity-Attribute requests
 export BROKER=orionld
 dbInit CB
 dbInit C1
-brokerStart CB 0-255
+brokerStart CB 0 IPv4 -forwarding
 brokerStart CP1
 
 --SHELL--
@@ -149,7 +149,6 @@ Date: REGEX(.*)
 04. PATCH E1/A1 in CB
 =====================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Date: REGEX(.*)
 
 

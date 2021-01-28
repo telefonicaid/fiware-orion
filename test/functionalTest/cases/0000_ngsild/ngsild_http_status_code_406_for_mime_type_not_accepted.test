@@ -54,7 +54,7 @@ echo
 01. Attempt to Create an NGSI-LD Entity with a Content-Type HTTP header of text/plain
 =====================================================================================
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 186
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
 

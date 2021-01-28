@@ -26,6 +26,11 @@ date
 export BROKER=${BROKER:-orionld}
 export ORIONLD_SUPPRESS_LOG_FILE_OUTPUT=${ORIONLD_SUPPRESS_LOG_FILE_OUTPUT:-NO}
 
+export PGHOST=${PGHOST:-localhost} # /var/run/postgresql
+export PGPORT=${PGPORT:-5432}
+export PGUSER=${PGUSER:-postgres}
+export PGPASSWORD=${PGPASSWORD:-password}
+
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
 
@@ -39,7 +44,7 @@ export LOG_FILE=/tmp/testHarness.log
 
 echo $testStartTime > $LOG_FILE
 
-
+echo "Harness executed"
 
 # -----------------------------------------------------------------------------
 #
@@ -154,6 +159,7 @@ function usage()
   echo "$empty [-v (verbose)]"
   echo "$empty [--loud (loud - see travis extra info)]"
   echo "$empty [-ld (only ngsild tests)]"
+  echo "$empty [-troe (only ngsild TRoE (Temporal Representation of Entities) tests)]"
   echo "$empty [-eb (external broker)]"
   echo "$empty [-tk (on error, show the diff using tkdiff)]"
   echo "$empty [-meld (on error, show the diff using meld)]"
@@ -205,12 +211,16 @@ function vMsg()
 }
 
 
+typeset -i errors
+errors=0
 # -----------------------------------------------------------------------------
 #
 # exitFunction
 #
 function exitFunction()
 {
+  errors=$errors+1
+    
   exitCode=$1
   errorText=$2
   testFile=$3
@@ -396,6 +406,7 @@ noCache=""
 threadpool=ON
 ngsild=OFF
 externalBroker=OFF
+troe=OFF
 
 logMsg "parsing options"
 while [ "$#" != 0 ]
@@ -403,6 +414,7 @@ do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
   elif [ "$1" == "-ld" ];            then ngsild=on;
+  elif [ "$1" == "-troe" ];          then troe=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
   elif [ "$1" == "-tk" ];            then CB_DIFF_TOOL=tkdiff;
   elif [ "$1" == "-meld" ];          then CB_DIFF_TOOL=meld;
@@ -484,6 +496,19 @@ fi
 if [ "$ngsild" == "on" ]
 then
   dirOrFile=test/functionalTest/cases/0000_ngsild
+fi
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Only TRoE tests?
+#
+# If set, overrides parameter AND -ld option
+#
+if [ "$troe" == "on" ]
+then
+  dirOrFile=test/functionalTest/cases/0000_troe
 fi
 
 
@@ -807,6 +832,12 @@ function partExecute()
   $dirname/$filename.$what > $dirname/$filename.$what.stdout 2> $dirname/$filename.$what.stderr
   exitCode=$?
   logMsg "$what part of $path is done - now checks"
+
+  #
+  # Remove all 'already exists' lines from stderr - postgres is tooooo verbose!!!
+  #
+  grep -v "already exists" $dirname/$filename.$what.stderr >  $dirname/$filename.$what.stderr.withoutAlready_Exists
+  mv $dirname/$filename.$what.stderr.withoutAlready_Exists  $dirname/$filename.$what.stderr
   linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
 
   #
@@ -966,6 +997,8 @@ function runTest()
   $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
   exitCode=$?
   logMsg "SHELL-INIT part for $path DONE. exitCode=$exitCode"
+  grep -v "already exists" $dirname/$filename.shellInit.stderr >  $dirname/$filename.shellInit.stderr.withoutAlready_Exists
+  mv $dirname/$filename.shellInit.stderr.withoutAlready_Exists  $dirname/$filename.shellInit.stderr
   linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
@@ -997,7 +1030,8 @@ function runTest()
     $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
     exitCode=$?
     logMsg "SHELL-INIT (again) part for $path DONE. exitCode=$exitCode"
-
+    grep -v "^NOTICE: " $dirname/$filename.shellInit.stderr > $dirname/$filename.shellInit.stderr2
+    mv $dirname/$filename.shellInit.stderr2 $dirname/$filename.shellInit.stderr
     linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
 
     if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
@@ -1167,7 +1201,7 @@ do
 
         init=$testFile" ................................................................................................................."
         init=${init:0:110}
-        printf "%04d/%d: %s %s " "$testNo" "$noOfTests" "$init" "$tryNoInfo"
+        printf "%04d/%d/%d: %s %s " "$testNo" "$noOfTests" "$errors" "$init" "$tryNoInfo"
       else
         printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
       fi
@@ -1205,7 +1239,7 @@ do
     then
       init=$testFile" ................................................................................................................."
       init=${init:0:110}
-      printf "%04d/%d: %s " "$testNo" "$noOfTests" "$init"
+      printf "%04d/%d/%d: %s " "$testNo" "$noOfTests" "$errors" "$init"
     else
       printf "Running test %04d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
     fi

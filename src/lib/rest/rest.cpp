@@ -58,11 +58,12 @@ extern "C"
 #include "parse/forbiddenChars.h"
 
 #ifdef ORIONLD
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/rest/orionldMhdConnectionInit.h"
-#include "orionld/rest/orionldMhdConnectionPayloadRead.h"
-#include "orionld/rest/orionldMhdConnectionTreat.h"
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
+#include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
+#include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
+#include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
 #include "orionld/serviceRoutines/orionldNotify.h"               // orionldNotify
 #endif
 
@@ -134,7 +135,7 @@ static void correlatorGenerate(char* buffer)
 *
 * uriArgumentGet -
 */
-int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
 
@@ -296,17 +297,17 @@ int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const ch
   {
     if (strcmp(val, "yes") == 0)
     {
-      orionldState.prettyPrint = true;
+      orionldState.uriParams.prettyPrint = true;
     }
   }
   else if (key == URI_PARAM_SPACES)
   {
-    orionldState.prettyPrintSpaces = atoi(val);
+    orionldState.uriParams.spaces = atoi(val);
   }
 #endif
   else if ((key != URI_PARAM_Q)       &&
            (key != URI_PARAM_MQ)      &&
-           (key != URI_PARAM_LEVEL))  // FIXME P1: possible more known options here ...
+           (key != URI_PARAM_LEVEL))  // FIXME P1: possibly more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
@@ -583,7 +584,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 *
 * httpHeaderGet -
 */
-int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
+MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
 {
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
@@ -615,6 +616,8 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
   {
 #ifdef ORIONLD
     orionldState.tenant = (char*) value;
+    if (troe)
+      snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
 #endif
     headerP->tenant = value;
     ciP->tenant     = value;
@@ -623,7 +626,13 @@ int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const cha
 #ifdef ORIONLD
   else if (strcasecmp(ckey, "NGSILD-Tenant") == 0)
   {
+    headerP->tenant = value;
+    ciP->tenant     = value;
+    toLowercase((char*) headerP->tenant.c_str());
+
     orionldState.tenant = (char*) value;
+    if (troe)
+      snprintf(orionldState.troeDbName, sizeof(orionldState.troeDbName), "%s_%s", dbName, value);
   }
   else if (strcasecmp(ckey, "NGSILD-Path") == 0)
     orionldState.servicePath = (char*) value;
@@ -794,6 +803,29 @@ static void requestCompleted
 #endif
 
   *con_cls = NULL;
+
+#ifdef REQUEST_PERFORMANCE
+  struct timespec diffBefore;
+  struct timespec diffDuring;
+  struct timespec diffAfter;
+  struct timespec diffTotal;
+  float           diffBeforeF;
+  float           diffDuringF;
+  float           diffAfterF;
+  float           diffTotalF;
+
+  kTimeGet(&timestamps.reqEnd);
+
+  kTimeDiff(&timestamps.reqStart,            &timestamps.serviceRoutineStart, &diffBefore, &diffBeforeF);
+  kTimeDiff(&timestamps.serviceRoutineStart, &timestamps.serviceRoutineEnd,   &diffDuring, &diffDuringF);
+  kTimeDiff(&timestamps.serviceRoutineEnd,   &timestamps.reqEnd,              &diffAfter,  &diffAfterF);
+  kTimeDiff(&timestamps.reqStart,            &timestamps.reqEnd,              &diffTotal,  &diffTotalF);
+
+  LM_TMP(("TPUT: Before Service Routine: %f", diffBeforeF));
+  LM_TMP(("TPUT: During Service Routine: %f", diffDuringF));
+  LM_TMP(("TPUT: After  Service Routine: %f", diffAfterF));
+  LM_TMP(("TPUT: Entire request:         %f", diffTotalF));
+#endif
 }
 
 
@@ -1285,7 +1317,7 @@ ConnectionInfo* connectionTreatInit
   const char*      url,
   const char*      method,
   const char*      version,
-  int*             retValP
+  MHD_Result*      retValP
 )
 {
   struct timeval   transactionStart;
@@ -1300,7 +1332,7 @@ ConnectionInfo* connectionTreatInit
   orionldState.responseTree = NULL;
   orionldState.notify       = false;
 
-    *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
+  *retValP = MHD_YES;  // Only MHD_NO if allocation of ConnectionInfo fails
 
   // Create point in time for transaction metrics
   if (metricsMgr.isOn())
@@ -1541,7 +1573,7 @@ ConnectionInfo* connectionTreatInit
 *
 * connectionTreatDataReceive -
 */
-static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
+static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_size, const char* upload_data)
 {
   size_t  dataLen = *upload_data_size;
 
@@ -1622,7 +1654,7 @@ static int connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload_data_s
 * Call 2: *con_cls != NULL  AND  *upload_data_size != 0
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
-static int connectionTreat
+static MHD_Result connectionTreat
 (
    void*            cls,
    MHD_Connection*  connection,
@@ -1648,9 +1680,17 @@ static int connectionTreat
     {
       orionldState.apiVersion = NGSI_LD_V1;
 
-      if      (*con_cls == NULL)        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
-      else if (*upload_data_size != 0)  return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
+      if (*con_cls == NULL)
+      {
+#ifdef REQUEST_PERFORMANCE
+        kTimeGet(&timestamps.reqStart);
+#endif
+        return orionldMhdConnectionInit(connection, url, method, version, con_cls);
+      }
+      else if (*upload_data_size != 0)
+        return orionldMhdConnectionPayloadRead((ConnectionInfo*) *con_cls, upload_data_size, upload_data);
 
+      // else ...
       //
       // The entire message has been read, we're allowed to respond.
       //
@@ -1663,8 +1703,7 @@ static int connectionTreat
       *upload_data_size = 0;
 
       // Then treat the request
-      int ret = orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
-      return ret;
+      return orionldMhdConnectionTreat((ConnectionInfo*) *con_cls);
     }
   }
 #endif
@@ -1672,7 +1711,7 @@ static int connectionTreat
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
-    int retVal;
+    MHD_Result retVal;
     *con_cls = connectionTreatInit(connection, url, method, version, &retVal);
     return retVal;
   }
@@ -1880,7 +1919,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     serverMode = MHD_USE_SELECT_INTERNALLY | MHD_USE_EPOLL_LINUX_ONLY;
 #endif
   }
-
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   {
