@@ -85,7 +85,7 @@ curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cf
 # may fail otherwise. Note that due to Python 2.7 End-of-Life we have to add "pip < 21.0"
 # (see https://stackoverflow.com/questions/65896334/python-pip-broken-wiith-sys-stderr-writeferror-exc)
 cd /opt \
-&& pip install --upgrade pip "pip < 21.0" \
+&& pip install --upgrade "pip < 21.0" \
 && pip install virtualenv \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
