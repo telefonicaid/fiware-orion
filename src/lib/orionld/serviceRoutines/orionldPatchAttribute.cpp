@@ -38,9 +38,7 @@ extern "C"
 #include "rest/ConnectionInfo.h"                                 // ConnectionInfo
 #include "rest/HttpStatusCode.h"                                 // SccNotFound
 #include "ngsi/ContextElement.h"                                 // ContextElement
-
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
-#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
 
 #include "orionld/common/orionldErrorResponse.h"                 // orionldErrorResponseCreate
 #include "orionld/common/orionldState.h"                         // orionldState

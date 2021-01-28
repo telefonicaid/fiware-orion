@@ -560,17 +560,19 @@ MHD_Result orionldMhdConnectionInit
   }
 
   // 4. GET Service Pointer from VERB and URL-PATH
-  LM_TMP(("URI: Verb: %s", method));
-  LM_TMP(("URI: URL:  %s", url));
   orionldState.serviceP = serviceLookup(ciP);
 
   if (orionldState.serviceP == NULL)  // 405 or 404 - no need to continue - prettyPrint not possible here
     return MHD_YES;
 
-  LM_TMP(("URI: serviceP at %p", orionldState.serviceP));
-
+  //
   // 5. GET URI params
-  MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);           // FIXME: To Be Removed!
+  //    Those Service Routines that DON'T USE mongoBackend don't need to call uriArgumentGet
+  //    [ mongoBackend needs stuff in ciP->uriParams ]
+  //
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS) == 0)
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
 
   //
