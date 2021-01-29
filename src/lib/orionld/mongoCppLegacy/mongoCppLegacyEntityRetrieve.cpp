@@ -394,7 +394,9 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     char*           title;
     char*           details;
 
-    dbTree = dbDataToKjTree(&bsonObj, &title, &details);
+//    dbTree = dbDataToKjTree(&bsonObj, &title, &details);
+    extern KjNode* mongoCppLegacyDataToKjTree(const void* dataP, bool isArray, char** titleP, char** detailsP);
+    dbTree = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
     if (dbTree == NULL)
       LM_E(("%s: %s", title, details));
     break;
