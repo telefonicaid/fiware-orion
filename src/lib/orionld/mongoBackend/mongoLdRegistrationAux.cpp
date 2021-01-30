@@ -27,6 +27,11 @@
 
 #include "mongo/client/dbclient.h"                                   // mongo::BSONObj, mongo::BSONElement
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                            // KjNode
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -36,7 +41,7 @@
 #include "orionld/common/orionldState.h"                             // orionldState
 
 #include "orionld/context/orionldContextItemAliasLookup.h"           // orionldContextItemAliasLookup
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"       // mongoCppLegacyDataToKjTree
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"             // Own interface
 
 
@@ -202,7 +207,7 @@ bool mongoSetLdTimeInterval(OrionldGeoLocation* geoLocationP, const char* name, 
   if (bobj.hasField(name))
   {
     mongo::BSONObj   locBobj   = getObjectFieldF(bobj, name);
-    KjNode*          tree      = mongoCppLegacyKjTreeFromBsonObj(&locBobj, titleP, detailP);
+    KjNode*          tree      = mongoCppLegacyDataToKjTree(&locBobj, false, titleP, detailP);
 
     for (KjNode* nodeP = tree->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
@@ -232,9 +237,9 @@ bool mongoSetLdProperties(ngsiv2::Registration* regP, const char* name, const mo
 {
   if (bobj.hasField(name))
   {
-    mongo::BSONObj  propertiesObj   = getObjectFieldF(bobj, name);
+    mongo::BSONObj  propertiesObj = getObjectFieldF(bobj, name);
 
-    regP->properties = mongoCppLegacyKjTreeFromBsonObj(&propertiesObj, titleP, detailP);
+    regP->properties = mongoCppLegacyDataToKjTree(&propertiesObj, false, titleP, detailP);
 
     if (regP->properties == NULL)
     {

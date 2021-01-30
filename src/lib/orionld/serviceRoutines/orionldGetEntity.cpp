@@ -28,6 +28,7 @@ extern "C"
 #include "kbase/kStringSplit.h"                                  // kStringSplit
 #include "kbase/kStringArrayJoin.h"                              // kStringArrayJoin
 #include "kbase/kStringArrayLookup.h"                            // kStringArrayLookup
+#include "kbase/kTime.h"                                         // kTimeGet
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, ...
@@ -413,8 +414,6 @@ bool orionldGetEntity(ConnectionInfo* ciP)
   if (forwarding)
     regArray = dbRegistrationLookup(orionldState.wildcard[0], NULL, NULL);
 
-  LM_T(LmtServiceRoutine, ("In orionldGetEntity: %s", orionldState.wildcard[0]));
-
 #ifdef USE_MONGO_BACKEND
   bool                  keyValues = orionldState.uriParamOptions.keyValues;
   EntityId              entityId(orionldState.wildcard[0], "", "false", false);
@@ -452,10 +451,13 @@ bool orionldGetEntity(ConnectionInfo* ciP)
     orionldState.responseTree = kjTreeFromQueryContextResponse(true, orionldState.uriParams.attrs, keyValues, &response);
   }
 #else
-  char*  dotAttrs[100]  = { NULL };
-  char*  eqAttrs[100]   = { NULL };
+  char*  dotAttrs[100];
+  char*  eqAttrs[100];
   int    noOfAttrs      = 0;
   bool   attrsMandatory = false;
+
+  dotAttrs[0] = NULL;
+  eqAttrs[0]  = NULL;
 
   if (orionldState.uriParams.attrs != NULL)
   {
@@ -471,6 +473,7 @@ bool orionldGetEntity(ConnectionInfo* ciP)
                                                orionldState.uriParamOptions.keyValues,
                                                orionldState.uriParams.datasetId);
 #endif
+
   if ((orionldState.responseTree == NULL) && (regArray == NULL))
   {
     if (attrsMandatory == true)

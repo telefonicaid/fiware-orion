@@ -27,7 +27,7 @@ SET (SOURCES
     mongoCppLegacyEntityUpdate.cpp
     mongoCppLegacyEntityDelete.cpp
     mongoCppLegacyEntitiesDelete.cpp
-    mongoCppLegacyKjTreeFromBsonObj.cpp
+    mongoCppLegacyDataToKjTree.cpp
     mongoCppLegacyKjTreeToBsonObj.cpp
     mongoCppLegacySubscriptionMatchEntityIdAndAttributes.cpp
     mongoCppLegacyEntityListLookupWithIdTypeCreDate.cpp

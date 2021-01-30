@@ -142,7 +142,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   mongo::Query                          query(filter.obj());
   std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
 
-  KjNode*  regArray = NULL;
+  KjNode*  regArray   = NULL;
   KjNode*  typeArray  = NULL;
 
   while (cursorP->more())
@@ -150,15 +150,15 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, &title, &details);
+    KjNode*         regNode = dbDataToKjTree(&bsonObj, false, &title, &details);
 
-    if (kjTree == NULL)
+    if (regNode == NULL)
       LM_E(("%s: %s", title, details));
     else
     {
       if (regArray == NULL)
         regArray = kjArray(orionldState.kjsonP, NULL);
-      kjChildAdd(regArray, kjTree);
+      kjChildAdd(regArray, regNode);
     }
   }
 

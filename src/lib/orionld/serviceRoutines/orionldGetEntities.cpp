@@ -29,6 +29,7 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
 #include "kbase/kStringSplit.h"                                // kStringSplit
+#include "kbase/kTime.h"                                       // kTimeGet
 #include "kjson/kjBuilder.h"                                   // kjArray, kjChildAdd, ...
 }
 
@@ -421,6 +422,9 @@ bool orionldGetEntities(ConnectionInfo* ciP)
   if ((countP != NULL) && (orionldState.uriParams.limit == 0))
     orionldState.onlyCount = true;
 
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.dbStart);
+#endif
   orionldState.httpStatusCode = mongoQueryContext(&mongoRequest,
                                                   &mongoResponse,
                                                   orionldState.tenant,
@@ -429,7 +433,9 @@ bool orionldGetEntities(ConnectionInfo* ciP)
                                                   ciP->uriParamOptions,
                                                   countP,
                                                   ciP->apiVersion);
-
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.dbEnd);
+#endif
 
   //
   // Transform QueryContextResponse to KJ-Tree

@@ -38,8 +38,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                             // tenants, tenantV
 #include "orionld/db/dbCollectionPathGet.h"                          // dbCollectionPathGetWithTenant
 #include "orionld/db/dbGeoIndexLookup.h"                             // dbGeoIndexLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"       // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"     // mongoCppLegacyGeoIndexCreate
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"  // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexInit.h"       // Own interface
 
 
@@ -78,7 +78,7 @@ void mongoCppLegacyGeoIndexInit(void)
     {
       if (orionldState.jsonBuf != NULL)
       {
-        // mongoCppLegacyKjTreeFromBsonObj uses orionldState.jsonBuf for its output tree
+        // mongoCppLegacyDataToKjTree uses orionldState.jsonBuf for its output tree
         free(orionldState.jsonBuf);
         orionldState.jsonBuf = NULL;
       }
@@ -87,8 +87,8 @@ void mongoCppLegacyGeoIndexInit(void)
 
       char*           title;
       char*           detail;
-      KjNode*         kjTree  = mongoCppLegacyKjTreeFromBsonObj(&bsonObj, &title, &detail);
-      KjNode*         attrsP = kjTree->value.firstChildP;
+      KjNode*         kjTree  = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &detail);
+      KjNode*         attrsP  = kjTree->value.firstChildP;
 
       if (attrsP == NULL)  //  Entity without attributes ?
         continue;
