@@ -289,6 +289,8 @@ typedef struct Timestamps
   struct timespec reqStart;
   struct timespec serviceRoutineStart;
   struct timespec serviceRoutineEnd;
+  struct timespec dbStart;
+  struct timespec dbEnd;
   struct timespec reqEnd;
 } Timestamps;
 

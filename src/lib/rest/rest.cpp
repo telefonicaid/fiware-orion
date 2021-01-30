@@ -808,9 +808,11 @@ static void requestCompleted
   struct timespec diffBefore;
   struct timespec diffDuring;
   struct timespec diffAfter;
+  struct timespec diffDb;
   struct timespec diffTotal;
   float           diffBeforeF;
   float           diffDuringF;
+  float           diffDbF;
   float           diffAfterF;
   float           diffTotalF;
 
@@ -818,11 +820,13 @@ static void requestCompleted
 
   kTimeDiff(&timestamps.reqStart,            &timestamps.serviceRoutineStart, &diffBefore, &diffBeforeF);
   kTimeDiff(&timestamps.serviceRoutineStart, &timestamps.serviceRoutineEnd,   &diffDuring, &diffDuringF);
+  kTimeDiff(&timestamps.dbStart,             &timestamps.dbEnd,               &diffDb,     &diffDbF);
   kTimeDiff(&timestamps.serviceRoutineEnd,   &timestamps.reqEnd,              &diffAfter,  &diffAfterF);
   kTimeDiff(&timestamps.reqStart,            &timestamps.reqEnd,              &diffTotal,  &diffTotalF);
 
   LM_TMP(("TPUT: Before Service Routine: %f", diffBeforeF));
   LM_TMP(("TPUT: During Service Routine: %f", diffDuringF));
+  LM_TMP(("TPUT: Awaiting Mongo:         %f", diffDbF));
   LM_TMP(("TPUT: After  Service Routine: %f", diffAfterF));
   LM_TMP(("TPUT: Entire request:         %f", diffTotalF));
 #endif

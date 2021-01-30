@@ -26,6 +26,7 @@ SET (SOURCES
     mongoLdRegistrationAux.cpp
     mongoLdRegistrationGet.cpp
     mongoLdRegistrationsGet.cpp
+    mongoTypeName.cpp
 )
 
 # Include directories

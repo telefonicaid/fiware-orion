@@ -32,7 +32,7 @@
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"    // mongoCppLegacyEntityAttributeLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"   // mongoCppLegacyEntityAttributesDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"       // mongoCppLegacyEntityFieldReplace
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"        // mongoCppLegacyKjTreeFromBsonObj
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"             // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"          // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityDelete.h"             // mongoCppLegacyEntityDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"           // mongoCppLegacyEntitiesDelete
@@ -79,7 +79,7 @@ void dbInit(const char* dbHost, const char* dbName)
   dbEntityAttributesDelete                 = mongoCppLegacyEntityAttributesDelete;
   dbEntityUpdate                           = mongoCppLegacyEntityUpdate;
   dbEntityFieldReplace                     = mongoCppLegacyEntityFieldReplace;
-  dbDataToKjTree                           = mongoCppLegacyKjTreeFromBsonObj;
+  dbDataToKjTree                           = mongoCppLegacyDataToKjTree;
   dbDataFromKjTree                         = mongoCppLegacyKjTreeToBsonObj;
   dbEntityDelete                           = mongoCppLegacyEntityDelete;
   dbEntitiesDelete                         = mongoCppLegacyEntitiesDelete;

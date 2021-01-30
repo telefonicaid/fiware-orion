@@ -37,6 +37,7 @@ brokerStart CB 212-249
 # 04. GET E2, see test context, pretty-print with default number of spaces (2)
 # 05. GET E2, but without prettyPrint
 # 06. Attempt to GET non-existing E3, see 404 not Found
+# 07. GET both entities
 #
 
 
@@ -95,6 +96,13 @@ echo
 echo "06. Attempt to GET non-existing E3, see 404 not Found"
 echo "====================================================="
 orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E3?prettyPrint=yes' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo "07. GET both entities"
+echo "====================="
+orionCurl --url '/ngsi-ld/v1/entities?type=A&prettyPrint=yes' --noPayloadCheck -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -178,6 +186,35 @@ Date: REGEX(.*)
   "title": "Entity Not Found",
   "detail": "http://a.b.c/entity/E3"
 }
+
+
+
+07. GET both entities
+=====================
+HTTP/1.1 200 OK
+Content-Length: 267
+Content-Type: application/json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+  {
+    "id": "http://a.b.c/entity/E1",
+    "type": "A",
+    "name": {
+      "type": "Property",
+      "value": "John 6"
+    }
+  },
+  {
+    "id": "http://a.b.c/entity/E2",
+    "type": "A",
+    "name": {
+      "type": "Property",
+      "value": "John 6"
+    }
+  }
+]
 
 
 

@@ -76,7 +76,7 @@ KjNode* mongoCppLegacyEntityAttributeLookup(const char* entityId, const char* at
     char*           title;
     char*           details;
 
-    kjTree = dbDataToKjTree(&bsonObj, &title, &details);
+    kjTree = dbDataToKjTree(&bsonObj, false, &title, &details);
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
   }

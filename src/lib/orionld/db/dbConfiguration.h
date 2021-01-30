@@ -72,7 +72,7 @@ typedef bool    (*DbEntityUpdateFunction)(const char* entityId, KjNode* requestT
 typedef bool    (*DbEntityFieldReplaceFunction)(const char* entityId, const char* fieldName, KjNode* fieldValeNodeP);
 typedef bool    (*DbEntityDeleteFunction)(const char* entityId);
 typedef bool    (*DbEntitiesDeleteFunction)(KjNode* entityIdsArray);
-typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, char** titleP, char** detailsP);
+typedef KjNode* (*DbDataToKjTreeFunction)(const void* dbData, bool isArray, char** titleP, char** detailsP);
 typedef void    (*DbDataFromKjTreeFunction)(KjNode* nodeP, void* dbDataP);
 typedef void    (*DbSubscriptionMatchEntityIdAndAttributes)(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree, DbSubscriptionMatchCallback callback);
 typedef KjNode* (*DbEntityListLookupWithIdTypeCreDate)(KjNode* entityIdsArray, bool attrNames);

@@ -78,7 +78,7 @@ KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields)
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, &title, &details);
+    KjNode*         kjTree = dbDataToKjTree(&bsonObj, false, &title, &details);
 
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));

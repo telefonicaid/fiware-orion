@@ -1,2 +1,2 @@
-* Issue  #280   Implemented a native function for conversion from BSON to a KjNode tree
+* Issue  #280   Implemented a native function for conversion from BSON to a KjNode tree - to gain performance
 
