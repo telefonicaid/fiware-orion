@@ -1,0 +1,1676 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Performance tests for GET /ngsi-ld/v1/entities=type=X
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0
+
+typeset -i eNo
+eNo=1
+
+while [ $eNo -le 100 ]
+do
+  eId=$(printf "urn:ngsi-ld:entities:E%02d" $eNo)
+  
+  payload='{
+    "id": "'$eId'",
+    "type": "T'$eNo'",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:'
+  eNo=$eNo+1
+done
+
+--SHELL--
+
+# 01. Query for a single entity 100 times
+
+echo "01. Query for a single entity 100 times"
+echo "======================================="
+typeset -i eNo
+eNo=1
+
+while [ $eNo -le 100 ]
+do
+  eType=T$eNo
+  orionCurl --url /ngsi-ld/v1/entities?type=$eType
+  eNo=$eNo+1
+done
+echo
+echo
+
+
+--REGEXPECT--
+01. Query for a single entity 100 times
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E1:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E01",
+        "type": "T1"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E2:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E02",
+        "type": "T2"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E3:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E03",
+        "type": "T3"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E4:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E04",
+        "type": "T4"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E5:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E05",
+        "type": "T5"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E6:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E06",
+        "type": "T6"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E7:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E07",
+        "type": "T7"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E8:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E08",
+        "type": "T8"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E9:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E09",
+        "type": "T9"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E10:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E10",
+        "type": "T10"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E11:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E11",
+        "type": "T11"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E12:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E12",
+        "type": "T12"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E13:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E13",
+        "type": "T13"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E14:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E14",
+        "type": "T14"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E15:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E15",
+        "type": "T15"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E16:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E16",
+        "type": "T16"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E17:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E17",
+        "type": "T17"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E18:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E18",
+        "type": "T18"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E19:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E19",
+        "type": "T19"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E20:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E20",
+        "type": "T20"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E21:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E21",
+        "type": "T21"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E22:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E22",
+        "type": "T22"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E23:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E23",
+        "type": "T23"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E24:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E24",
+        "type": "T24"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E25:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E25",
+        "type": "T25"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E26:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E26",
+        "type": "T26"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E27:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E27",
+        "type": "T27"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E28:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E28",
+        "type": "T28"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E29:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E29",
+        "type": "T29"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E30:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E30",
+        "type": "T30"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E31:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E31",
+        "type": "T31"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E32:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E32",
+        "type": "T32"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E33:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E33",
+        "type": "T33"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E34:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E34",
+        "type": "T34"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E35:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E35",
+        "type": "T35"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E36:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E36",
+        "type": "T36"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E37:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E37",
+        "type": "T37"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E38:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E38",
+        "type": "T38"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E39:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E39",
+        "type": "T39"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E40:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E40",
+        "type": "T40"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E41:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E41",
+        "type": "T41"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E42:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E42",
+        "type": "T42"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E43:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E43",
+        "type": "T43"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E44:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E44",
+        "type": "T44"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E45:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E45",
+        "type": "T45"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E46:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E46",
+        "type": "T46"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E47:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E47",
+        "type": "T47"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E48:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E48",
+        "type": "T48"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E49:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E49",
+        "type": "T49"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E50:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E50",
+        "type": "T50"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E51:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E51",
+        "type": "T51"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E52:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E52",
+        "type": "T52"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E53:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E53",
+        "type": "T53"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E54:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E54",
+        "type": "T54"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E55:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E55",
+        "type": "T55"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E56:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E56",
+        "type": "T56"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E57:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E57",
+        "type": "T57"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E58:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E58",
+        "type": "T58"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E59:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E59",
+        "type": "T59"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E60:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E60",
+        "type": "T60"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E61:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E61",
+        "type": "T61"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E62:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E62",
+        "type": "T62"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E63:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E63",
+        "type": "T63"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E64:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E64",
+        "type": "T64"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E65:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E65",
+        "type": "T65"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E66:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E66",
+        "type": "T66"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E67:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E67",
+        "type": "T67"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E68:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E68",
+        "type": "T68"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E69:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E69",
+        "type": "T69"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E70:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E70",
+        "type": "T70"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E71:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E71",
+        "type": "T71"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E72:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E72",
+        "type": "T72"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E73:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E73",
+        "type": "T73"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E74:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E74",
+        "type": "T74"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E75:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E75",
+        "type": "T75"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E76:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E76",
+        "type": "T76"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E77:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E77",
+        "type": "T77"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E78:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E78",
+        "type": "T78"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E79:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E79",
+        "type": "T79"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E80:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E80",
+        "type": "T80"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E81:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E81",
+        "type": "T81"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E82:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E82",
+        "type": "T82"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E83:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E83",
+        "type": "T83"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E84:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E84",
+        "type": "T84"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E85:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E85",
+        "type": "T85"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E86:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E86",
+        "type": "T86"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E87:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E87",
+        "type": "T87"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E88:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E88",
+        "type": "T88"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E89:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E89",
+        "type": "T89"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E90:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E90",
+        "type": "T90"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E91:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E91",
+        "type": "T91"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E92:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E92",
+        "type": "T92"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E93:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E93",
+        "type": "T93"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E94:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E94",
+        "type": "T94"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E95:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E95",
+        "type": "T95"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E96:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E96",
+        "type": "T96"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E97:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E97",
+        "type": "T97"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E98:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E98",
+        "type": "T98"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E99:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E99",
+        "type": "T99"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 93
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E100:A1"
+        },
+        "id": "urn:ngsi-ld:entities:E100",
+        "type": "T100"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
