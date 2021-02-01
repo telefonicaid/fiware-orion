@@ -510,7 +510,7 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
   if (geoqP != NULL)
     geoqFilter(&queryBuilder, geoqP);
 
-  KjNode* kjTree = kjArray(orionldState.kjsonP, NULL);
+  KjNode* arrayP = kjArray(orionldState.kjsonP, NULL);
 
   // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
@@ -531,7 +531,7 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
     catch (const std::exception &e)
     {
       LM_E(("Database Error (asking for the number of hits: %s)", e.what()));
-      kjTree = NULL;
+      arrayP = NULL;
       limit = 0;  // Just to avoid performing the query
     }
   }
@@ -555,11 +555,11 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
         char*           details;
         KjNode*         entityP;
 
-        entityP = dbDataToKjTree(&bsonObj, &title, &details);
+        entityP = dbDataToKjTree(&bsonObj, false, &title, &details);
         if (entityP == NULL)
           LM_E(("dbDataToKjTree: %s: %s", title, details));
 
-        kjChildAdd(kjTree, entityP);
+        kjChildAdd(arrayP, entityP);
       }
     }
     catch (const std::exception &e)
@@ -572,5 +572,5 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
 
   // semGive()
 
-  return kjTree;
+  return arrayP;
 }

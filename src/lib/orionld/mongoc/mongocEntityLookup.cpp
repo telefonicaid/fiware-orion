@@ -35,6 +35,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/db/dbNameGet.h"                                // dbNameGet
+#include "orionld/mongoc/mongocKjTreeFromBsonObj.h"              // mongocKjTreeFromBsonObj
+#include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
 
 
 
@@ -73,7 +75,7 @@ KjNode* mongocEntityLookup(const char* entityId)
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    entityNodeP = dbDataToKjTree(mongoDocP, &title, &details);  // FIXME: Don't use the DB layer Function Pointers here - use mongocXXXX directly
+    entityNodeP = mongocKjTreeFromBsonObj(mongoDocP, &title, &details);
     break;  // Just using the first one - should be no more than one!
   }
 

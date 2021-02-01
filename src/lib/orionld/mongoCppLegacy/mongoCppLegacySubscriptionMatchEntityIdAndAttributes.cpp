@@ -38,7 +38,6 @@ extern "C"
 #include "orionld/db/dbCollectionPathGet.h"                      // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 
-#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeFromBsonObj.h"                        // mongoCppLegacyKjTreeFromBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // Own interface
 
 
@@ -118,7 +117,7 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 
     bsonObj = cursorP->nextSafe();
 
-    subscriptionTree = mongoCppLegacyKjTreeFromBsonObj(&bsonObj, &title, &detail);
+    subscriptionTree = dbDataToKjTree(&bsonObj, false, &title, &detail);
     if (subscriptionTree == NULL)
     {
       LM_E(("Internal Error (unable to create KjNode tree from mongo::BSONObj '%s')", bsonObj.toString().c_str()));

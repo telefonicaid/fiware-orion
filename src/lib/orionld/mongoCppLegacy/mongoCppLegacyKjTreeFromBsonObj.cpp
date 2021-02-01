@@ -28,9 +28,10 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                         // kaStrdup
 #include "kjson/KjNode.h"                                            // KjNode
 #include "kjson/kjParse.h"                                           // kjParse
-#include "kalloc/kaStrdup.h"                                         // kaStrdup
+#include "kjson/kjBuilder.h"                                         // kjBuilder
 }
 
 #include "logMsg/logMsg.h"                                           // LM_*

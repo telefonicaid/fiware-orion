@@ -96,7 +96,6 @@ KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attri
       *noOfRegsP += 1;
   }
 
-  // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(filter.obj());
@@ -108,7 +107,7 @@ KjNode* mongoCppLegacyRegistrationLookup(const char* entityId, const char* attri
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, &title, &details);
+    KjNode*         kjTree = dbDataToKjTree(&bsonObj, false, &title, &details);
 
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));

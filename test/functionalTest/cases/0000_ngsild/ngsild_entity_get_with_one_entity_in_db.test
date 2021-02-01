@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2021 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -18,22 +18,46 @@
 # For those usages not covered by this license please contact with
 # orionld at fiware dot org
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
-SET (SOURCES
-    mongoAttributeExists.cpp
-    mongoEntityExists.cpp
-    mongoLdRegistrationAux.cpp
-    mongoLdRegistrationGet.cpp
-    mongoLdRegistrationsGet.cpp
-    mongoTypeName.cpp
-)
+--NAME--
+Entity Retrieval with one single entity in database
 
-# Include directories
-# -----------------------------------------------------------------
-include_directories("${PROJECT_SOURCE_DIR}/src/lib")
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity
+# 02. GET E1
+#
 
 
-# Library declaration
-# -----------------------------------------------------------------
-ADD_LIBRARY(orionld_mongoBackend STATIC ${SOURCES})
+echo "01. GET E1, see not found"
+echo "========================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. GET E1, see not found
+=========================
+HTTP/1.1 404 Not Found
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:entities:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

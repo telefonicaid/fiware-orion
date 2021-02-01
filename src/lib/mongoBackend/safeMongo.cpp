@@ -30,6 +30,8 @@
 #include "ngsi/RegistrationId.h"
 #include "ngsi/StatusCode.h"
 
+#include "orionld/mongoBackend/mongoTypeName.h"
+
 #include "mongoBackend/safeMongo.h"
 
 
@@ -44,42 +46,6 @@ using mongo::BSONElement;
 using mongo::DBClientCursor;
 using mongo::OID;
 using mongo::AssertionException;
-
-
-
-/* ****************************************************************************
-*
-* mongoTypeName -
-*/
-const char* mongoTypeName(mongo::BSONType type)
-{
-  switch (type)
-  {
-  case mongo::MinKey:        return "MinKey";
-  case mongo::EOO:           return "EOO";
-  case mongo::NumberDouble:  return "NumberDouble";
-  case mongo::String:        return "String";
-  case mongo::Object:        return "Object";
-  case mongo::Array:         return "Array";
-  case mongo::BinData:       return "BinData";
-  case mongo::Undefined:     return "Undefined";
-  case mongo::jstOID:        return "jstOID";
-  case mongo::Bool:          return "Bool";
-  case mongo::Date:          return "Date";
-  case mongo::jstNULL:       return "jstNULL";
-  case mongo::RegEx:         return "RegEx";
-  case mongo::DBRef:         return "DBRef";
-  case mongo::Code:          return "Code";
-  case mongo::Symbol:        return "Symbol";
-  case mongo::CodeWScope:    return "CodeWScope";
-  case mongo::NumberInt:     return "NumberInt";
-  case mongo::Timestamp:     return "Timestamp";
-  case mongo::NumberLong:    return "NumberLong";  // Same value as mongo::JSTypeMax
-  case mongo::MaxKey:        return "MaxKey";
-  }
-
-  return "Unknown Mongo Type";
-}
 
 
 

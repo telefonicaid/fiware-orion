@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                          // K_FT
+#include "kbase/kTime.h"                                            // kTimeGet
 #include "kalloc/kaStrdup.h"                                        // kaStrdup
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjLookup.h"                                         // kjLookup
@@ -364,7 +365,6 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   //
 
 
-  // semTake()
   mongo::DBClientBase*                  connectionP = getMongoConnection();
   std::auto_ptr<mongo::DBClientCursor>  cursorP;
   mongo::Query                          query(queryBuilder.obj());
@@ -386,7 +386,13 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
   //
   // Querying mongo and retrieving the results
   //
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.dbStart);
+#endif
   cursorP = connectionP->query(collectionPath, query, 0, 0, &retFieldsObj);
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.dbEnd);
+#endif
 
   while (cursorP->more())
   {
@@ -394,14 +400,13 @@ KjNode* mongoCppLegacyEntityRetrieve(const char* entityId, char** attrs, bool at
     char*           title;
     char*           details;
 
-    dbTree = dbDataToKjTree(&bsonObj, &title, &details);
+    dbTree = dbDataToKjTree(&bsonObj, false, &title, &details);
     if (dbTree == NULL)
       LM_E(("%s: %s", title, details));
     break;
   }
 
   releaseMongoConnection(connectionP);
-  // semGive()
 
   if (dbTree == NULL)  // Entity not found
     return NULL;

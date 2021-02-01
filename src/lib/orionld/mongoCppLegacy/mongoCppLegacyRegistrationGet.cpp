@@ -84,7 +84,7 @@ KjNode* mongoCppLegacyRegistrationGet(const char* registrationId)
   char*    details;
   KjNode*  registrationP;
 
-  registrationP = dbDataToKjTree(&bsonObj, &title, &details);
+  registrationP = dbDataToKjTree(&bsonObj, false, &title, &details);
 
   if (registrationP == NULL)
     LM_E(("%s: %s", title, details));

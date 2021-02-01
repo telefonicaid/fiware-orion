@@ -283,16 +283,35 @@ typedef struct OrionldConnectionState
   unsigned int            troeIgnoreIx;
 } OrionldConnectionState;
 
+
+
+// -----------------------------------------------------------------------------
+//
+// Timestamps - timestamps for performance tests
+//
 #ifdef REQUEST_PERFORMANCE
 typedef struct Timestamps
 {
-  struct timespec reqStart;
-  struct timespec serviceRoutineStart;
-  struct timespec serviceRoutineEnd;
-  struct timespec reqEnd;
+  struct timespec reqStart;               // Start of          REQUEST
+  struct timespec reqEnd;                 // End of            REQUEST
+  struct timespec parseStart;             // Start of          REQUEST PAYLOAD BODY JSON PARSE
+  struct timespec parseEnd;               // End of            REQUEST PAYLOAD BODY JSON PARSE
+  struct timespec serviceRoutineStart;    // Start of          SERVICE ROUTINE
+  struct timespec serviceRoutineEnd;      // End of            SERVICE ROUTINE
+  struct timespec dbStart;                // Start of    Main  DB query/update
+  struct timespec dbEnd;                  // End of      Main  DB query/update
+  struct timespec extraDbStart;           // Start of "extra"  DB query, e.g. query before an update
+  struct timespec extraDbEnd;             // End of   "extra"  DB query, e.g. query before an update
+  struct timespec notifDbStart;           // Start of          DB query for Notifications
+  struct timespec notifDbEnd;             // End of            DB query for Notifications
+  struct timespec forwardDbStart;         // Start of          DB query for Forwaring
+  struct timespec forwardDbEnd;           // End of            DB query for Forwaring
+  struct timespec renderStart;            // Start of          RESONSE PAYLOAD BODY RENDER JSON
+  struct timespec renderEnd;              // End of            RESONSE PAYLOAD BODY RENDER JSON
 } Timestamps;
 
 extern __thread Timestamps timestamps;
+
 #endif
 
 
