@@ -1,0 +1,63 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Retrieval with one single entity in database
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity
+# 02. GET E1
+#
+
+
+echo "01. GET E1, see not found"
+echo "========================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. GET E1, see not found
+=========================
+HTTP/1.1 404 Not Found
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:entities:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

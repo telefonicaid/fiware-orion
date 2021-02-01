@@ -393,6 +393,10 @@ bool orionldPostEntities(ConnectionInfo* ciP)
   if (datasets->value.firstChildP != NULL)  // Not Empty
     orionldState.datasets = datasets;
 
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.dbStart);
+#endif
+
   orionldState.httpStatusCode = mongoUpdateContext(&mongoRequest,
                                                    &mongoResponse,
                                                    orionldState.tenant,
@@ -404,6 +408,9 @@ bool orionldPostEntities(ConnectionInfo* ciP)
                                                    ciP->apiVersion,
                                                    NGSIV2_NO_FLAVOUR);
 
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.dbEnd);
+#endif
   mongoRequest.release();
   mongoResponse.release();
 
