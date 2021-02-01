@@ -53,6 +53,8 @@ static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
   KjNode* prev  = NULL;
   KjNode* itemP = array->value.firstChildP;
 
+  LM_TMP(("ETYP: In kjStringArraySortedInsert"));
+
   while (itemP != NULL)
   {
     int cmp = strcmp(itemP->value.s, newItemP->value.s);  // <0 if itemP < newItemP,  ==0 id equal
@@ -284,9 +286,65 @@ static KjNode* getAvailableEntityTypesDetails(KjNode* sortedArrayP)
 
 // ----------------------------------------------------------------------------
 //
-// dbEntityTypesGet -
+// detailTypeMerge -
 //
-// FIXME: Move to db library - no direct DB handling is done here
+bool detailTypeMerge(KjNode* fromP, KjNode* toP)
+{
+  // <DEBUG>
+  char buf[1024];
+
+  kjRender(orionldState.kjsonP, toP, buf, sizeof(buf));
+  LM_TMP(("ETYP: toP: %s", buf));
+  kjRender(orionldState.kjsonP, fromP, buf, sizeof(buf));
+  LM_TMP(("ETYP: fromP: %s", buf));
+  // <DEBUG>
+
+  KjNode* fromAttributes = kjLookup(fromP, "attributeNames");
+  KjNode* toAttributes   = kjLookup(toP,   "attributeNames");
+
+  if ((fromAttributes == NULL) || (toAttributes == NULL))
+    LM_RE(false, ("Internal Error ('attributeNames' missing in a entity-type object)"));
+
+  LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
+  LM_TMP(("ETYP: fromAttributes->lastChild at %p", fromAttributes->lastChild));
+
+  KjNode* fromAttrP = fromAttributes->value.firstChildP;
+  KjNode* next;
+
+  while (fromAttrP != NULL)
+  {
+    next = fromAttrP->next;
+
+    if (kjLookup(toAttributes, fromAttrP->value.s) == NULL)
+    {
+      // Not there - let's add it!
+      LM_TMP(("ETYP: Move attribute '%s' from 'fromAttributes' to 'toAttributes'", fromAttrP->value.s));
+      kjRender(orionldState.kjsonP, fromAttributes, buf, sizeof(buf));
+      LM_TMP(("ETYP: 'fromAttributes': %s", buf));
+      kjRender(orionldState.kjsonP, toAttributes, buf, sizeof(buf));
+      LM_TMP(("ETYP: 'toAttributes': %s", buf));
+      LM_TMP(("ETYP: fromAttributes->lastChild at %p", fromAttributes->lastChild));
+      kjChildRemove(fromAttributes, fromAttrP);
+      LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
+      LM_TMP(("ETYP: removed '%s' from 'fromAttributes'", fromAttrP->value.s));
+      LM_TMP(("ETYP: fromAttributes->lastChild at %p", fromAttributes->lastChild));
+      LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
+      kjChildAdd(toAttributes, fromAttrP);
+      LM_TMP(("ETYP: added '%s' to 'toAttributes'", fromAttrP->value.s));
+      LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
+    }
+
+    fromAttrP = next;
+  }
+
+  return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// dbEntityTypesGet -
 //
 KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 {
@@ -297,6 +355,9 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
   fields[0] = (char*) "_id";
 
+  //
+  // GET local types - i.e. from the "entities" collection
+  //
   if (orionldState.uriParams.details == false)
     local  = dbEntitiesGet(fields, 1);
   else
@@ -305,10 +366,6 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     local  = dbEntitiesGet(fields, 2);
   }
 
-  remote = dbEntityTypesFromRegistrationsGet();
-  if ((remote != NULL) && (orionldState.uriParams.details == true))
-    remote = typesAndAttributesExtractFromRegistrations(remote);
-
   if (local != NULL)
   {
     if (orionldState.uriParams.details == false)
@@ -316,6 +373,173 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     else
       local = typesAndAttributesExtractFromEntities(local);
   }
+  if (local) LM_TMP(("ETYP: local->lastChild 1t %p", local->lastChild));
+
+  //
+  // GET remote types - i.e. from the "registrations" collection
+  //
+  remote = dbEntityTypesFromRegistrationsGet();
+  if (remote)
+    LM_TMP(("ETYP: remote->lastChild 1t %p", remote->lastChild));
+  if ((remote != NULL) && (orionldState.uriParams.details == true))
+    remote = typesAndAttributesExtractFromRegistrations(remote);
+
+
+
+  // <DEBUG>
+  char buf[1024];
+  if (local != NULL)
+  {
+    kjRender(orionldState.kjsonP, local, buf, sizeof(buf));
+    LM_TMP(("ETYP: local: %s", buf));
+  }
+  else
+    LM_TMP(("ETYP: local: NOTHING"));
+
+  if (remote != NULL)
+  {
+    kjRender(orionldState.kjsonP, remote, buf, sizeof(buf));
+    LM_TMP(("ETYP: remote: %s", buf));
+  }
+  else
+    LM_TMP(("ETYP: remote: NOTHING"));
+  // </DEBUG>
+
+
+  //
+  // Fix duplicates in 'local'
+  //
+  if (local != NULL)
+  {
+    //
+    // If 'details' is not on - just remove the duplicates
+    //
+    KjNode* typeP = local->value.firstChildP;
+    KjNode* next;
+
+    while (typeP)
+    {
+      next = typeP->next;
+
+      //
+      // Search for the same name AFTER 'typeP' in the string array - if found, remove 'typeP' from the array + merge if details are on
+      //
+      if (orionldState.uriParams.details == true)
+      {
+        LM_TMP(("ETYP: Processing '%s'", typeP->value.s));
+        char* typeName = typeP->value.s;
+        for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
+        {
+          if (strcmp(nodeP->value.s, typeName) == 0)
+          {
+            LM_TMP(("ETYP: Removing '%s'", typeName));
+            kjChildRemove(local, typeP);
+            if (local) LM_TMP(("ETYP: local->lastChild 1t %p", local->lastChild));
+            break;
+          }
+        }
+      }
+      else
+      {
+        KjNode* idP = kjLookup(typeP, "id");
+
+        if (idP == NULL)
+          LM_RE(NULL, ("Internal Error (no 'id' in type object)"));
+
+        LM_TMP(("ETYP: Processing '%s'", idP->value.s));
+
+        for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
+        {
+          KjNode* nodeIdP = kjLookup(nodeP, "id");
+
+          if (nodeIdP == NULL)
+            LM_RE(NULL, ("Internal Error (no 'id' in type object)"));
+
+          if (strcmp(idP->value.s, nodeIdP->value.s) == 0)
+          {
+            LM_TMP(("ETYP: Merge type '%s' with details on", idP->value.s));
+            char buf[512];
+            kjRender(orionldState.kjsonP, nodeP, buf, sizeof(buf));
+            LM_TMP(("ETYP: nodeP: %s", buf));
+            detailTypeMerge(typeP, nodeP);
+            kjChildRemove(local, typeP);
+            if (local) LM_TMP(("ETYP: local->lastChild 1t %p", local->lastChild));
+          }
+        }
+      }
+
+      typeP = next;
+    }
+  }
+
+
+  
+  //
+  // Fix duplicates in 'remote' 
+  //
+  if (remote != NULL)
+  {
+    //
+    // If 'details' is not on - just remove the duplicates
+    //
+    KjNode* typeP = remote->value.firstChildP;
+    KjNode* next;
+
+    while (typeP)
+    {
+      next = typeP->next;
+
+      //
+      // Search for the same name AFTER 'typeP' in the string array - if found, remove 'typeP' from the array + merge if details are on
+      //
+      if (orionldState.uriParams.details == false)
+      {
+        LM_TMP(("ETYP: Processing '%s'", typeP->value.s));
+        char* typeName = typeP->value.s;
+        for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
+        {
+          if (strcmp(nodeP->value.s, typeName) == 0)
+          {
+            LM_TMP(("ETYP: Removing '%s'", typeName));
+            kjChildRemove(remote, typeP);
+            if (remote) LM_TMP(("ETYP: remote->lastChild 1t %p", remote->lastChild));
+            break;
+          }
+        }
+      }
+      else
+      {
+        KjNode* idP = kjLookup(typeP, "id");
+
+        if (idP == NULL)
+          LM_RE(NULL, ("Internal Error (no 'id' in type object)"));
+
+        LM_TMP(("ETYP: Processing '%s'", idP->value.s));
+
+        for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
+        {
+          KjNode* nodeIdP = kjLookup(nodeP, "id");
+
+          if (nodeIdP == NULL)
+            LM_RE(NULL, ("Internal Error (no 'id' in type object)"));
+
+          if (strcmp(idP->value.s, nodeIdP->value.s) == 0)
+          {
+            LM_TMP(("ETYP: Merge type '%s' with detail", idP->value.s));
+            char buf[512];
+            kjRender(orionldState.kjsonP, nodeP, buf, sizeof(buf));
+            LM_TMP(("ETYP: nodeP: %s", buf));
+            detailTypeMerge(typeP, nodeP);
+            kjChildRemove(remote, typeP);
+            if (remote) LM_TMP(("ETYP: remote->lastChild 1t %p", remote->lastChild));
+          }
+        }
+      }
+
+      typeP = next;
+    }
+  }
+
 
   if ((remote == NULL) && (local == NULL))
   {

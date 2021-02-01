@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjArray, kjChildAdd, ...
 #include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -99,11 +100,12 @@ void entitiesAndProprertiesExtract(KjNode* regArray, KjNode* typeArray)
     {
       KjNode* eNodeV        = kjLookup(crNodeP, "entities");
       KjNode* attrsNodeV    = kjLookup(crNodeP, "attrs");
+
       for (KjNode* entityP = eNodeV->value.firstChildP; entityP != NULL; entityP = entityP->next)
       {
         KjNode* nodeResponseP = kjObject(orionldState.kjsonP, NULL);
-        KjNode* idP   = kjLookup(entityP, "id");
-        KjNode* typeP = kjLookup(entityP, "type");
+        KjNode* idP           = kjLookup(entityP, "id");
+        KjNode* typeP         = kjLookup(entityP, "type");
 
         if (idP != NULL)
         {
@@ -183,6 +185,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
 {
   char collectionPath[256];
 
+  LM_TMP(("ETYP: In mongoCppLegacyEntityTypesFromRegistrationsGet"));
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   mongo::BSONObjBuilder  fields;
@@ -196,12 +199,12 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   notEmpty.append("$ne", "");
   filter.append("contextRegistration.entities.type", notEmpty.obj());
 
+  mongo::Query                          query(filter.obj());
   mongo::BSONObj                        fieldsToReturn = fields.obj();
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
-  mongo::Query                          query(filter.obj());
   std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
 
-  KjNode*  regArray = NULL;
+  KjNode*  regArray   = NULL;
   KjNode*  typeArray  = NULL;
 
   while (cursorP->more())
@@ -231,5 +234,32 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   }
 
   releaseMongoConnection(connectionP);
+
+
+  // <DEBUG>
+  LM_TMP(("ETYP: =============================================================================================="));
+  LM_TMP(("ETYP: typeArray->value.firstChildP == %p", typeArray->value.firstChildP));
+  for (KjNode* typeP = typeArray->value.firstChildP; typeP != NULL; typeP = typeP->next)
+  {
+    KjNode* attrsP = kjLookup(typeP, "attrs");
+    KjNode* idP    = kjLookup(typeP, "id");
+
+    if (attrsP)
+    {
+      LM_TMP(("ETYP: attributeNames::firstChild of '%s' at %p", idP->value.s, attrsP->value.firstChildP));
+      LM_TMP(("ETYP: attributeNames::lastChild  of '%s' at %p", idP->value.s, attrsP->lastChild));
+    }
+    else
+      LM_TMP(("ETYP: no 'attrs' found in '%s'", typeP->name));
+  }
+
+  char buf[1024];
+  kjRender(orionldState.kjsonP, typeArray, buf, sizeof(buf));
+  LM_TMP(("ETYP: typeArray: %s", buf));
+
+  LM_TMP(("ETYP: returning typeArray at %p", typeArray));
+  LM_TMP(("ETYP: =============================================================================================="));
+  // </DEBUG>
+
   return typeArray;
 }
