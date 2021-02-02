@@ -30,15 +30,15 @@ accumulatorStart --pretty-print
 
 --SHELL--
 #
-# 01. Create sub1 with payload="abc", includePayload=false
+# 01. Create sub1 with payload="{ %22x%22: 1}", includePayload=false
 # 02. Create sub2 without payload, includePayload=false
 # 03. Create entity E1/T1
 # 04. Dumps acummulator (see 2 notifications, both without payload)
 #
 
 
-echo '01. Create sub1 with payload="abc", includePayload=false'
-echo "========================================================"
+echo '01. Create sub1 with payload="{ %22x%22: 1}", includePayload=false'
+echo "=================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -53,7 +53,7 @@ payload='{
   "notification": {
     "httpCustom": {
       "url":      "http://localhost:'${LISTENER_PORT}'/notify",
-      "payload": "abc",
+      "payload": "{ %22x%22: 1}",
       "includePayload":false
     }
   }
@@ -108,8 +108,8 @@ echo
 
 
 --REGEXPECT--
-01. Create sub1 with payload="abc", includePayload=false
-========================================================
+01. Create sub1 with payload="{ %22x%22: 1}", includePayload=false
+==================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -142,21 +142,42 @@ Dumps acummulator (see 2 notifications, both without payload)
 =============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 0
+Content-Length: 129
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
+Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=2
+
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "E1",
+            "type": "T1"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 0
+Content-Length: 9
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
+Ngsiv2-Attrsformat: custom
 Host: localhost:REGEX(\d+)
 Accept: application/json
+Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "x": 1
+}
 =======================================
 
 

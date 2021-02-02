@@ -146,7 +146,6 @@ std::string Notification::toJson(const std::string& attrsFormat)
 
   jh.addString("attrsFormat", attrsFormat);
 
-
   if (this->httpInfo.custom)
   {
     jh.addRaw("httpCustom", this->httpInfo.toJson());

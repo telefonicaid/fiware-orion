@@ -166,8 +166,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    if (httpInfo.includePayload)
-    {
     if (httpInfo.payload.empty())
     {
       NotifyContextRequest   ncr;
@@ -205,7 +203,6 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       renderFormat = NGSI_V2_CUSTOM;
       mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
       curl_free(pload);
-    }
     }
 
     //

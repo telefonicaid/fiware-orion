@@ -437,19 +437,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       subsP->notification.httpInfo.payload = payloadOpt.value;
     }
 
-    // includePayload
-    if (httpCustom.HasMember("includePayload"))
-    {
-      Opt<bool> includePayloadOpt = getBoolOpt(httpCustom, "includePayload", "payload httpCustom notification");
-
-      if (!includePayloadOpt.ok())
-      {
-        return badInput(ciP, includePayloadOpt.error);
-      }
-      subsP->notification.httpInfo.includePayload = includePayloadOpt.value;
-    }
-
-
     // qs
     if (httpCustom.HasMember("qs"))
     {
