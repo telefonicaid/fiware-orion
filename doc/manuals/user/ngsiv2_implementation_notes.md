@@ -400,9 +400,6 @@ for the following aspects:
   see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3007) about this.
 * `idPattern` is supported but only for the exact regular expression `.*`
 * `typePattern` is not implemented.
-* The only valid `supportedForwardingMode` is `all`. Trying to use any other value will end
-  in a 501 Not Implemented error response. Please
-  see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3106) about this.
 * The `expression` field (within `dataProvided`) is not supported. The field is simply
   ignored. Please see [this issue](https://github.com/telefonicaid/fiware-orion/issues/3107) about it.
 * The `inactive` value for `status` is not supported. I.e., the field is stored/retrieved correctly,

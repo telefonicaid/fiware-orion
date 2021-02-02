@@ -1,0 +1,40 @@
+name: Build CI Image
+
+## Will only run on pushes to the CI folder
+on:
+  push:
+    paths:
+      - ci/**
+
+env:
+  IMAGE_NAME: fiware/orion-ci:rpm7
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ci/rpm7/
+          load: true
+          tags: ${{ env.IMAGE_NAME }}
+          file: ci/rpm7/Dockerfile
+
+      - name: Push
+        run: docker push ${{ env.IMAGE_NAME }}

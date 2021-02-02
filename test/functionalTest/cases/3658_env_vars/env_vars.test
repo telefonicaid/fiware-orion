@@ -30,7 +30,7 @@ broker env vars set on command line
 # 02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb3658.pid, start the broker in BG, make sure that /tmp/cb3658.pid has been created
 #
 # NOTE about '| cut -c 1-200'
-#   In step 01 we ran into inexplicable differences between Ubuntu 18.04 and the CentOS of travis, about the number of spaces
+#   In step 01 we ran into inexplicable differences between Ubuntu 18.04 and the CentOS docker of GitHub Actions, about the number of spaces
 #   between the two last output items of "contextBroker -U". Seems like e.g. snprintf("%-20s", "abc") behaves differently ... A Poltergeist.
 #   As a workaround, only the first 200 characters of each line of the output of "contextBroker -U" are compared.
 #

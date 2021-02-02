@@ -72,11 +72,8 @@ brokerStart CB 0-255 IPv4 -statCounters
 # 41. status is not a string
 # 42. invalid value for status
 # 43. legacyForwarding not a boolean
-# 44. supportedForwardingMode set to 'none'
-# 45. supportedForwardingMode set to 'query'
-# 46. supportedForwardingMode set to 'update'
-# 47. dataProvided:entities:entity:idPattern too complex
-# 48. dataProvided:entities:entity:typePattern is used (it's not supported)
+# 44. dataProvided:entities:entity:idPattern too complex
+# 45. dataProvided:entities:entity:typePattern is used (it's not supported)
 #
 
 
@@ -841,85 +838,7 @@ echo
 echo
 
 
-echo "44. supportedForwardingMode set to 'none'"
-echo "========================================="
-payload='{
-  "description": "DESC",
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ],
-    "attrs": [ "A1", "A2" ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true,
-    "supportedForwardingMode": "none"
-  }
-}'
-orionCurl --url /v2/registrations --payload "$payload"
-echo
-echo
-
-
-echo "45. supportedForwardingMode set to 'query'"
-echo "=========================================="
-payload='{
-  "description": "DESC",
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ],
-    "attrs": [ "A1", "A2" ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true,
-    "supportedForwardingMode": "query"
-  }
-}'
-orionCurl --url /v2/registrations --payload "$payload"
-echo
-echo
-
-
-echo "46. supportedForwardingMode set to 'update'"
-echo "==========================================="
-payload='{
-  "description": "DESC",
-  "dataProvided": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ],
-    "attrs": [ "A1", "A2" ]
-  },
-  "provider": {
-    "http": {
-      "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true,
-    "supportedForwardingMode": "update"
-  }
-}'
-orionCurl --url /v2/registrations --payload "$payload"
-echo
-echo
-
-
-echo "47. dataProvided:entities:entity:idPattern too complex"
+echo "44. dataProvided:entities:entity:idPattern too complex"
 echo "======================================================"
 payload='{
   "description": "DESC",
@@ -944,7 +863,7 @@ echo
 echo
 
 
-echo "48. dataProvided:entities:entity:typePattern is used (it's not supported)"
+echo "45. dataProvided:entities:entity:typePattern is used (it's not supported)"
 echo "========================================================================="
 payload='{
   "description": "DESC",
@@ -1572,49 +1491,7 @@ Date: REGEX(.*)
 }
 
 
-44. supportedForwardingMode set to 'none'
-=========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "non-supported Forwarding Mode",
-    "error": "NotImplemented"
-}
-
-
-45. supportedForwardingMode set to 'query'
-==========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "non-supported Forwarding Mode",
-    "error": "NotImplemented"
-}
-
-
-46. supportedForwardingMode set to 'update'
-===========================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "non-supported Forwarding Mode",
-    "error": "NotImplemented"
-}
-
-
-47. dataProvided:entities:entity:idPattern too complex
+44. dataProvided:entities:entity:idPattern too complex
 ======================================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 64
@@ -1628,7 +1505,7 @@ Date: REGEX(.*)
 }
 
 
-48. dataProvided:entities:entity:typePattern is used (it's not supported)
+45. dataProvided:entities:entity:typePattern is used (it's not supported)
 =========================================================================
 HTTP/1.1 501 Not Implemented
 Content-Length: 71

@@ -63,6 +63,7 @@ static HttpStatusCode processDiscoverContextAvailability
 
   if (!registrationsQuery(requestP->entityIdVector,
                           requestP->attributeList,
+                          ngsiv2::ForwardNone,
                           &responseP->responseVector,
                           &err,
                           tenant,

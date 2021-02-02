@@ -30,7 +30,7 @@ def check_coll(collection, collection_name):
     for doc in collection.find():
 
         id = doc['_id']
-        if collection_name == CSUB_COLL or collection_name == CASUB_COLL:
+        if collection_name == CSUB_COLL:
             ref = doc['reference']
             prefix = '-- ID ' + str(id) + ' (' + ref + '): '
         elif collection_name == REG_COLL:
@@ -80,7 +80,6 @@ def check_coll(collection, collection_name):
 DB = 'orion'
 REG_COLL   = 'registrations'
 CSUB_COLL  = 'csubs'
-CASUB_COLL = 'casubs'
 
 client = MongoClient('localhost', 27017)
 db = client[DB]
@@ -97,6 +96,3 @@ if REG_COLL in argv:
 if CSUB_COLL in argv:
    print 'Checking collection: ' + CSUB_COLL
    check_coll(db[CSUB_COLL], CSUB_COLL)
-if CASUB_COLL in argv:
-   print 'Checking collection: ' + CASUB_COLL
-   check_coll(db[CASUB_COLL], CASUB_COLL)

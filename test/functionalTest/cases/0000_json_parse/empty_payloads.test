@@ -34,38 +34,29 @@ echo "1: ++++++++++++++++++++"
 orionCurl --url "/v1/registry/discoverContextAvailability" --payload "{}"
 echo "2: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/subscribeContextAvailability" --payload "{}"
+orionCurl --url "/v1/queryContext" --payload "{}"
 echo "3: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "{}"
+orionCurl --url "/v1/updateContext" --payload "{}"
 echo "4: ++++++++++++++++++++"
 
-orionCurl --url "/v1/registry/unsubscribeContextAvailability" --payload "{}"
+orionCurl --url "/v1/subscribeContext" --payload "{}"
 echo "5: ++++++++++++++++++++"
 
-orionCurl --url "/v1/queryContext" --payload "{}"
+orionCurl --url "/v1/updateContextSubscription" --payload "{}"
 echo "6: ++++++++++++++++++++"
 
-orionCurl --url "/v1/updateContext" --payload "{}"
+orionCurl --url "/v1/unsubscribeContext" --payload "{}"
 echo "7: ++++++++++++++++++++"
 
-orionCurl --url "/v1/subscribeContext" --payload "{}"
+orionCurl --url "/v1/registry/notSupportedRequest" --payload "{}"
 echo "8: ++++++++++++++++++++"
 
-orionCurl --url "/v1/updateContextSubscription" --payload "{}"
+orionCurl --url "/v1/notSupportedRequest" --payload "{}"
 echo "9: ++++++++++++++++++++"
 
-orionCurl --url "/v1/unsubscribeContext" --payload "{}"
-echo "10: ++++++++++++++++++++"
-
-orionCurl --url "/v1/registry/notSupportedRequest" --payload "{}"
-echo "11: ++++++++++++++++++++"
-
-orionCurl --url "/v1/notSupportedRequest" --payload "{}"
-echo "12: ++++++++++++++++++++"
-
 orionCurl --url "/notSupportedRequest" --payload "{}"
-echo "13: ++++++++++++++++++++"
+echo "10: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -97,50 +88,6 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "400",
-        "details": "No entities",
-        "reasonPhrase": "Bad Request"
-    },
-    "subscriptionId": "000000000000000000000000"
-}
-3: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "400",
-        "details": "No entities",
-        "reasonPhrase": "Bad Request"
-    },
-    "subscriptionId": "000000000000000000000000"
-}
-4: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 115
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "statusCode": {
-        "code": "404",
-        "reasonPhrase": "No context element found"
-    },
-    "subscriptionId": "000000000000000000000000"
-}
-5: ++++++++++++++++++++
-HTTP/1.1 200 OK
 Content-Length: 81
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -153,7 +100,7 @@ Date: REGEX(.*)
         "reasonPhrase": "Bad Request"
     }
 }
-6: ++++++++++++++++++++
+3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 89
 Content-Type: application/json
@@ -167,7 +114,7 @@ Date: REGEX(.*)
         "reasonPhrase": "Bad Request"
     }
 }
-7: ++++++++++++++++++++
+4: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 117
 Content-Type: application/json
@@ -183,7 +130,7 @@ Date: REGEX(.*)
         }
     }
 }
-8: ++++++++++++++++++++
+5: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 133
 Content-Type: application/json
@@ -199,7 +146,7 @@ Date: REGEX(.*)
         "subscriptionId": "000000000000000000000000"
     }
 }
-9: ++++++++++++++++++++
+6: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 115
 Content-Type: application/json
@@ -213,49 +160,49 @@ Date: REGEX(.*)
     },
     "subscriptionId": "000000000000000000000000"
 }
+7: ++++++++++++++++++++
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "Service not found. Check your URL as probably it is wrong.",
+        "reasonPhrase": "Bad Request"
+    }
+}
+8: ++++++++++++++++++++
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "Service not found. Check your URL as probably it is wrong.",
+        "reasonPhrase": "Bad Request"
+    }
+}
+9: ++++++++++++++++++++
+HTTP/1.1 400 Bad Request
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "Service not found. Check your URL as probably it is wrong.",
+        "reasonPhrase": "Bad Request"
+    }
+}
 10: ++++++++++++++++++++
-HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orionError": {
-        "code": "400",
-        "details": "Service not found. Check your URL as probably it is wrong.",
-        "reasonPhrase": "Bad Request"
-    }
-}
-11: ++++++++++++++++++++
-HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orionError": {
-        "code": "400",
-        "details": "Service not found. Check your URL as probably it is wrong.",
-        "reasonPhrase": "Bad Request"
-    }
-}
-12: ++++++++++++++++++++
-HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "orionError": {
-        "code": "400",
-        "details": "Service not found. Check your URL as probably it is wrong.",
-        "reasonPhrase": "Bad Request"
-    }
-}
-13: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

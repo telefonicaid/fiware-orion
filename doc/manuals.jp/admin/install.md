@@ -9,6 +9,10 @@
     * [DB に格納されたデータの移行](#migrating-the-data-stored-in-db)
     * [標準アップグレード](#standard-upgrade)
 
+---
+> :warning: **orion を本番環境で実行する場合は、[高可用性](extra/ha.md) および[パフォーマンス・チューニング](perf_tuning.md)に関する情報もお読みください。**
+---
+
 <a name="introduction"></a>
 ## イントロダクション
 

@@ -19,8 +19,7 @@ Installation and Administration
 manual](../admin/database_admin.md#multiservicemultitenant-database-separation).
 
 In addition, note that when "-multiservice" is used Orion includes the
-"Fiware-Service" header in the notifyContextRequest and
-notifyContextAvailability request messages associated to subscriptions
+"Fiware-Service" header in the notifyContextRequest request messages associated to subscriptions
 in the given tenant/service (except for the default service/tenant, in
 which case the header is not present), e.g.:
 

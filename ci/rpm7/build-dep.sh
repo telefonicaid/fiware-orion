@@ -35,7 +35,6 @@ yum -y install \
   openssl-devel \
   libuuid-devel \
   make \
-  mongodb-org \
   mongodb-org-shell \
   nc \
   python \
@@ -62,7 +61,7 @@ curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar x
 && make install \
 && rm -Rf /opt/libmicrohttpd-0.9.70
 
-curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
+curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
 && ./configure \
 && make \
@@ -83,9 +82,10 @@ curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.t
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
 #
 # In addition, note we upgrade pip before installing virtualenv. The virtualenv installation
-# may fail otherwise
+# may fail otherwise. Note that due to Python 2.7 End-of-Life we have to add "pip < 21.0"
+# (see https://stackoverflow.com/questions/65896334/python-pip-broken-wiith-sys-stderr-writeferror-exc)
 cd /opt \
-&& pip install --upgrade pip \
+&& pip install --upgrade "pip < 21.0" \
 && pip install virtualenv \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \

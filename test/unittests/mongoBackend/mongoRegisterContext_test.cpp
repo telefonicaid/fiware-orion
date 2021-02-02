@@ -86,10 +86,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 * In addition, we include some tests to check of notify context availability triggering upon
 * creation of context registration:
 *
-* - NotifyContextAvailability1
-* - NotifyContextAvailability2
-* - NotifyContextAvailability3
-*
 * In addition, we include a test to check default duration
 *
 * - defaultDuration
@@ -120,24 +116,6 @@ static void prepareDatabase(void)
 {
     /* Clean database */
     setupDatabase();
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-    BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 1879048191 <<
-                        "reference" << "http://notify1.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5" << "isPattern" << "false")) <<
-                        "attrs" << BSONArray());
-
-    BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 1879048191 <<
-                        "reference" << "http://notify2.me" <<
-                        "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5" << "isPattern" << "false")) <<
-                        "attrs" << BSON_ARRAY("A1"));
-
-    connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub1);
-    connection->insert(SUBSCRIBECONTEXTAVAIL_COLL, sub2);
 }
 
 
@@ -2226,233 +2204,6 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
 }
 
 
-/* ****************************************************************************
-*
-* NotifyContextAvailability1 -
-*/
-TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
-{
-  utInit();
-
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
-
-  NotifierMock* notifierMock = new NotifierMock();
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
-                                                                  "http://notify1.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
-                                                                  "http://notify2.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_FALSE(res.registrationId.isEmpty());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Delete mock */
-  delete notifierMock;
-  delete timerMock;
-  utExit();
-}
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability2 -
-*/
-TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
-{
-  utInit();
-
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar1, expectedNcar2;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationAttribute mockCra("A1", "TA1");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.contextRegistrationAttributeVector.push_back(&mockCra);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar1.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar1.subscriptionId.set("51307b66f481db11bf860001");
-
-  expectedNcar2.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar2.subscriptionId.set("51307b66f481db11bf860002");
-
-  NotifierMock* notifierMock = new NotifierMock();
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),
-                                                                  "http://notify1.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),
-                                                                  "http://notify2.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistrationAttribute cra("A1", "TA1");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_FALSE(res.registrationId.isEmpty());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Delete mock */
-  delete notifierMock;
-  delete timerMock;
-  utExit();
-}
-
-/* ****************************************************************************
-*
-* NotifyContextAvailability3 -
-*/
-TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
-{
-  utInit();
-
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifyContextAvailabilityRequest expectedNcar;
-  EntityId mockEn1("E5", "T5", "false");
-  ContextRegistrationAttribute mockCra("A2", "TA2");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&mockEn1);
-  crr.contextRegistration.contextRegistrationAttributeVector.push_back(&mockCra);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  expectedNcar.contextRegistrationResponseVector.push_back(&crr);
-  expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
-
-  NotifierMock* notifierMock = new NotifierMock();
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),
-                                                                  "http://notify1.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(1);
-
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,
-                                                                  "http://notify2.me",
-                                                                  "",
-                                                                  "no correlator",
-                                                                  NGSI_V1_LEGACY)).Times(0);
-
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E5", "T5", "false");
-  ContextRegistrationAttribute cra("A2", "TA2");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_FALSE(res.registrationId.isEmpty());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* The only collection affected by this operation is registrations, which has been extensively
-   * testbed by other unit tests, so we don't include checking in the present unit test */
-
-  /* Delete mock */
-  delete notifierMock;
-  delete timerMock;
-  utExit();
-}
 
 /* ****************************************************************************
 *
@@ -2581,6 +2332,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_EQ("'), expiration: 1360232760, "
               "servicePath: \"/\", "
               "format: \"JSON\", "
+              "fwdMode: \"all\", "
               "contextRegistration: [ "
               "{ entities: [ { id: \"E1\", type: \"T1\" } ], "
               "attrs: [], "
@@ -2592,6 +2344,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 
     /* Release mock */
     delete connectionMock;
+    delete cursorMockCAsub;
 
     /* check collection has not been touched */
     EXPECT_EQ(0, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
