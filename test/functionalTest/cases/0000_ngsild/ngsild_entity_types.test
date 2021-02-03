@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2020 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entity Types
+Entity Types - simple test with no collisions of entity types between regs and entities
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -32,13 +32,12 @@ brokerStart CB
 
 #
 # 01. GET Entity Types - see empty array
-# 02. Create a registration with two types
-# 03. Create another registration with two other types
-# 04. GET Entity Types - see four types
-# 05. Creating an Entity E1 with type T2
-# 06. GET Entity Types - see four types
-# 07. Creating an Entity E2 with type T0
-# 08. GET Entity Types - see five types
+# 02. Create a registration with two types - T1 and T2
+# 03. Create another registration with two other types - T3 and T4
+# 04. GET Entity Types - see four types (T1-T4)
+# 05. Creating an Entity E0 with type T0
+# 06. GET Entity Types - see five types (T0-T4)
+# 07. GET Entity Types WITH details - see five types (T0-T4)
 #
 
 echo "01. GET Entity Types - see empty array"
@@ -48,8 +47,8 @@ echo
 echo
 
 
-echo "02. Create a registration with two types"
-echo "========================================"
+echo "02. Create a registration with two types - T1 and T2"
+echo "===================================================="
 payload='{
   "id": "urn:ngsi-ld:reg:1",
   "type": "ContextSourceRegistration",
@@ -57,39 +56,11 @@ payload='{
     {
       "entities": [
         {
-          "id": "urn:ngsi-ld:entity:1",
-          "type": "T4"
-        },
-        {
-          "id": "urn:ngsi-ld:entity:2",
-          "type": "T3"
-        }
-      ],
-      "properties": [ "brandName", "speed" ],
-      "relationships": [ "isParked" ]
-    }
-  ],
-  "endpoint": "http://my.csource.org:1026"
-}'
-orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
-echo
-echo
-
-
-echo "03. Create another registration with two other types"
-echo "===================================================="
-payload='{
-  "id": "urn:ngsi-ld:reg:2",
-  "type": "ContextSourceRegistration",
-  "information": [
-    {
-      "entities": [
-        {
-          "id": "urn:ngsi-ld:entity:3",
+          "id": "urn:ngsi-ld:entity:E1",
           "type": "T1"
         },
         {
-          "id": "urn:ngsi-ld:entity:4",
+          "id": "urn:ngsi-ld:entity:E2",
           "type": "T2"
         }
       ],
@@ -104,39 +75,45 @@ echo
 echo
 
 
-echo "04. GET Entity Types - see four types"
-echo "====================================="
-orionCurl --url /ngsi-ld/v1/types
-echo
-echo
-
-
-echo "05. Creating an Entity E1 with type T2"
-echo "======================================"
+echo "03. Create another registration with two other types - T3 and T4"
+echo "================================================================"
 payload='{
-  "id": "urn:ngsi-ld:entities:E1",
-  "type": "T2",
-  "P1": {
-    "type": "Property",
-    "value": 1
-  }
+  "id": "urn:ngsi-ld:reg:2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E3",
+          "type": "T3"
+        },
+        {
+          "id": "urn:ngsi-ld:entity:E4",
+          "type": "T4"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
 echo
 
 
-echo "06. GET Entity Types - see four types"
-echo "====================================="
+echo "04. GET Entity Types - see four types (T1-T4)"
+echo "============================================="
 orionCurl --url /ngsi-ld/v1/types
 echo
 echo
 
 
-echo "07. Creating an Entity E2 with type T0"
+echo "05. Creating an Entity E0 with type T0"
 echo "======================================"
 payload='{
-  "id": "urn:ngsi-ld:entities:E2",
+  "id": "urn:ngsi-ld:entities:E0",
   "type": "T0",
   "P1": {
     "type": "Property",
@@ -148,9 +125,16 @@ echo
 echo
 
 
-echo "08. GET Entity Types - see five types"
-echo "====================================="
+echo "06. GET Entity Types - see five types (T0-T4)"
+echo "============================================="
 orionCurl --url /ngsi-ld/v1/types
+echo
+echo
+
+
+echo "07. GET Entity Types WITH details - see five types (T0-T4)"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/types?details=true
 echo
 echo
 
@@ -168,8 +152,8 @@ Date: REGEX(.*)
 
 
 
-02. Create a registration with two types
-========================================
+02. Create a registration with two types - T1 and T2
+====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:1
@@ -177,8 +161,8 @@ Date: REGEX(.*)
 
 
 
-03. Create another registration with two other types
-====================================================
+03. Create another registration with two other types - T3 and T4
+================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:2
@@ -186,8 +170,8 @@ Date: REGEX(.*)
 
 
 
-04. GET Entity Types - see four types
-=====================================
+04. GET Entity Types - see four types (T1-T4)
+=============================================
 HTTP/1.1 200 OK
 Content-Length: 129
 Content-Type: application/json
@@ -206,46 +190,17 @@ Date: REGEX(.*)
 }
 
 
-05. Creating an Entity E1 with type T2
+05. Creating an Entity E0 with type T0
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
 Date: REGEX(.*)
 
 
 
-06. GET Entity Types - see four types
-=====================================
-HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-Date: REGEX(.*)
-
-{
-    "id": "urn:ngsi-ld:EntityTypeList:REGEX(.*)",
-    "type": "EntityTypeList",
-    "typeList": [
-        "T1",
-        "T2",
-        "T3",
-        "T4"
-    ]
-}
-
-
-07. Creating an Entity E2 with type T0
-======================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
-Date: REGEX(.*)
-
-
-
-08. GET Entity Types - see five types
-=====================================
+06. GET Entity Types - see five types (T0-T4)
+=============================================
 HTTP/1.1 200 OK
 Content-Length: 134
 Content-Type: application/json
@@ -263,6 +218,66 @@ Date: REGEX(.*)
         "T4"
     ]
 }
+
+
+07. GET Entity Types WITH details - see five types (T0-T4)
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 690
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "attributeNames": [
+            "P1"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T0",
+        "type": "EntityType",
+        "typeName": "T0"
+    },
+    {
+        "attributeNames": [
+            "brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+        "type": "EntityType",
+        "typeName": "T1"
+    },
+    {
+        "attributeNames": [
+            "brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T2",
+        "type": "EntityType",
+        "typeName": "T2"
+    },
+    {
+        "attributeNames": [
+            "brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T3",
+        "type": "EntityType",
+        "typeName": "T3"
+    },
+    {
+        "attributeNames": [
+            "brandName",
+            "isParked",
+            "speed"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T4",
+        "type": "EntityType",
+        "typeName": "T4"
+    }
+]
 
 
 --TEARDOWN--

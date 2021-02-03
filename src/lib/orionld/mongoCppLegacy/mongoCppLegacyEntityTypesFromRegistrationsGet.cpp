@@ -81,6 +81,64 @@ void typeExtract(KjNode* regArray, KjNode* typeArray)
 
 // -----------------------------------------------------------------------------
 //
+// entitiesAndProprertiesExtract -
+//
+void entitiesAndProprertiesExtract(KjNode* regArray, KjNode* typeArray)
+{
+  for (KjNode* arrItemP = regArray->value.firstChildP; arrItemP != NULL; arrItemP = arrItemP->next)
+  {
+    KjNode* contextRegistrationV = kjLookup(arrItemP, "contextRegistration");
+
+    if (contextRegistrationV == NULL)
+    {
+      LM_W(("No contextRegistration in tree ..."));
+      continue;
+    }
+
+    for (KjNode* crNodeP = contextRegistrationV->value.firstChildP; crNodeP != NULL; crNodeP = crNodeP->next)
+    {
+      KjNode* eNodeV        = kjLookup(crNodeP, "entities");
+      KjNode* attrsNodeV    = kjLookup(crNodeP, "attrs");
+
+      for (KjNode* entityP = eNodeV->value.firstChildP; entityP != NULL; entityP = entityP->next)
+      {
+        KjNode* nodeResponseP = kjObject(orionldState.kjsonP, NULL);
+        KjNode* idP           = kjLookup(entityP, "id");
+        KjNode* typeP         = kjLookup(entityP, "type");
+
+        if (idP != NULL)
+        {
+          KjNode* idNodeP  = kjString(orionldState.kjsonP, "id", idP->value.s);
+          kjChildAdd(nodeResponseP, idNodeP);
+        }
+
+        if (typeP != NULL)
+        {
+          KjNode* typeNodeP  = kjString(orionldState.kjsonP, "type", typeP->value.s);
+          kjChildAdd(nodeResponseP, typeNodeP);
+        }
+
+        if (attrsNodeV != NULL)
+        {
+          KjNode* attrsP = kjArray(orionldState.kjsonP, "attrs");
+          for (KjNode* attrP = attrsNodeV->value.firstChildP; attrP != NULL; attrP = attrP->next)
+          {
+            KjNode* nameP = kjLookup(attrP, "name");
+            kjChildAdd(attrsP, nameP);
+          }
+          kjChildAdd(nodeResponseP, attrsP);
+        }
+
+        kjChildAdd(typeArray, nodeResponseP);
+      }
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongoCppLegacyEntityTypesFromRegistrationsGet -
 //
 // With NGSIv2 database model, a registration loks like this:
@@ -132,14 +190,18 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   mongo::BSONObjBuilder  filter;
   mongo::BSONObjBuilder  notEmpty;
 
-  fields.append("contextRegistration.entities",     1);  // Entity Type is inside the 'contextRegistration.entities' field ...
+  fields.append("contextRegistration.entities",  1);  // Entity Type is inside the 'contextRegistration.entities' field ...
+
+  if (orionldState.uriParams.details == true)
+    fields.append("contextRegistration.attrs",   1);
+
   fields.append("_id",     0);
   notEmpty.append("$ne", "");
   filter.append("contextRegistration.entities.type", notEmpty.obj());
 
+  mongo::Query                          query(filter.obj());
   mongo::BSONObj                        fieldsToReturn = fields.obj();
   mongo::DBClientBase*                  connectionP    = getMongoConnection();
-  mongo::Query                          query(filter.obj());
   std::auto_ptr<mongo::DBClientCursor>  cursorP        = connectionP->query(collectionPath, query, 0, 0, &fieldsToReturn);
 
   KjNode*  regArray   = NULL;
@@ -165,9 +227,13 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   if (regArray != NULL)
   {
     typeArray = kjArray(orionldState.kjsonP, NULL);
-    typeExtract(regArray, typeArray);
+    if (orionldState.uriParams.details == false)
+      typeExtract(regArray, typeArray);
+    else
+      entitiesAndProprertiesExtract(regArray, typeArray);
   }
 
   releaseMongoConnection(connectionP);
+
   return typeArray;
 }

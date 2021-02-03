@@ -1,0 +1,224 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Types - merge of types from local entities
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1, type T1, with attributes P1 and R1
+# 02. Create entity E2, type T1, with attributes P2 and R2
+# 03. Create registration R1, entity type T1, with attributes P1, P3 and R4
+# 04. Create registration R2, entity type T1, with attributes P4 and R4
+# 05. GET Types - see T1
+# 06. GET Types with details - see T1 with P1-P4 and R1-R4
+#
+
+echo "01. Create entity E1, type T1, with attributes P1 and R1"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T1",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E2, type T1, with attributes P2 and R2"
+echo "========================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T1",
+  "P2": {
+    "type": "Property",
+    "value": 2
+  },
+  "R2": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:entities:E1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create registration R1, entity type T1, with attributes P1, P3 and R4"
+echo "========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:reg:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:entity:E1",
+          "type": "T1"
+        }
+      ],
+      "properties": [ "P1", "P3" ],
+      "relationships": [ "R3" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Create registration R2, entity type T1, with attributes P4 and R4"
+echo "====================================================================="
+payload='{
+  "id": "urn:ngsi-ld:reg:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T1"
+        }
+      ],
+      "properties": [ "P4" ],
+      "relationships": [ "R4" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. GET Types - see T1"
+echo "======================"
+orionCurl --url /ngsi-ld/v1/types
+echo
+echo
+
+
+echo "06. GET Types with details - see T1 with P1-P4 and R1-R4"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/types?details=true
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1, type T1, with attributes P1 and R1
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Create entity E2, type T1, with attributes P2 and R2
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+03. Create registration R1, entity type T1, with attributes P1, P3 and R4
+=========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:R1
+Date: REGEX(.*)
+
+
+
+04. Create registration R2, entity type T1, with attributes P4 and R4
+=====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:R2
+Date: REGEX(.*)
+
+
+
+05. GET Types - see T1
+======================
+HTTP/1.1 200 OK
+Content-Length: 114
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "id": "urn:ngsi-ld:EntityTypeList:REGEX(.*)",
+    "type": "EntityTypeList",
+    "typeList": [
+        "T1"
+    ]
+}
+
+
+06. GET Types with details - see T1 with P1-P4 and R1-R4
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 153
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+[
+    {
+        "attributeNames": [
+            "P2",
+            "R2",
+            "P1",
+            "R1",
+            "P4",
+            "R4",
+            "P3",
+            "R3"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
+        "type": "EntityType",
+        "typeName": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
