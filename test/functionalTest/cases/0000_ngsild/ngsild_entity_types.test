@@ -231,6 +231,14 @@ Date: REGEX(.*)
 [
     {
         "attributeNames": [
+            "P1"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T0",
+        "type": "EntityType",
+        "typeName": "T0"
+    },
+    {
+        "attributeNames": [
             "brandName",
             "isParked",
             "speed"
@@ -268,14 +276,6 @@ Date: REGEX(.*)
         "id": "https://uri.etsi.org/ngsi-ld/default-context/T4",
         "type": "EntityType",
         "typeName": "T4"
-    },
-    {
-        "attributeNames": [
-            "P1"
-        ],
-        "id": "https://uri.etsi.org/ngsi-ld/default-context/T0",
-        "type": "EntityType",
-        "typeName": "T0"
     }
 ]
 

@@ -29,7 +29,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjArray, kjChildAdd, ...
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjRender.h"                                      // kjRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -185,7 +184,6 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
 {
   char collectionPath[256];
 
-  LM_TMP(("ETYP: In mongoCppLegacyEntityTypesFromRegistrationsGet"));
   dbCollectionPathGet(collectionPath, sizeof(collectionPath), "registrations");
 
   mongo::BSONObjBuilder  fields;
@@ -193,8 +191,10 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   mongo::BSONObjBuilder  notEmpty;
 
   fields.append("contextRegistration.entities",  1);  // Entity Type is inside the 'contextRegistration.entities' field ...
-  if (orionldState.uriParams.details != false)
-    fields.append("contextRegistration.attrs",   2);
+
+  if (orionldState.uriParams.details == true)
+    fields.append("contextRegistration.attrs",   1);
+
   fields.append("_id",     0);
   notEmpty.append("$ne", "");
   filter.append("contextRegistration.entities.type", notEmpty.obj());
@@ -234,32 +234,6 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(void)
   }
 
   releaseMongoConnection(connectionP);
-
-
-  // <DEBUG>
-  LM_TMP(("ETYP: =============================================================================================="));
-  LM_TMP(("ETYP: typeArray->value.firstChildP == %p", typeArray->value.firstChildP));
-  for (KjNode* typeP = typeArray->value.firstChildP; typeP != NULL; typeP = typeP->next)
-  {
-    KjNode* attrsP = kjLookup(typeP, "attrs");
-    KjNode* idP    = kjLookup(typeP, "id");
-
-    if (attrsP)
-    {
-      LM_TMP(("ETYP: attributeNames::firstChild of '%s' at %p", idP->value.s, attrsP->value.firstChildP));
-      LM_TMP(("ETYP: attributeNames::lastChild  of '%s' at %p", idP->value.s, attrsP->lastChild));
-    }
-    else
-      LM_TMP(("ETYP: no 'attrs' found in '%s'", typeP->name));
-  }
-
-  char buf[1024];
-  kjRender(orionldState.kjsonP, typeArray, buf, sizeof(buf));
-  LM_TMP(("ETYP: typeArray: %s", buf));
-
-  LM_TMP(("ETYP: returning typeArray at %p", typeArray));
-  LM_TMP(("ETYP: =============================================================================================="));
-  // </DEBUG>
 
   return typeArray;
 }

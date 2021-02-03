@@ -29,7 +29,7 @@ extern "C"
 #include "kjson/KjNode.h"                                         // KjNode
 #include "kjson/kjBuilder.h"                                      // kjArray, kjObject
 #include "kjson/kjLookup.h"                                       // kjLookup
-#include "kjson/kjRender.h"                                       // kjRender
+#include "kjson/kjClone.h"                                        // kjClone
 }
 
 #include "logMsg/logMsg.h"                                        // LM_*
@@ -46,14 +46,29 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// kjArrayStringLookup -
+//
+KjNode* kjArrayStringLookup(KjNode* stringArray, const char* string)
+{
+  for (KjNode* sNodeP = stringArray->value.firstChildP; sNodeP != NULL; sNodeP = sNodeP->next)
+  {
+    if (strcmp(sNodeP->value.s, string) == 0)
+      return sNodeP;
+  }
+
+  return NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjStringArraySortedInsert -
 //
 static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
 {
   KjNode* prev  = NULL;
   KjNode* itemP = array->value.firstChildP;
-
-  LM_TMP(("ETYP: In kjStringArraySortedInsert"));
 
   while (itemP != NULL)
   {
@@ -62,7 +77,7 @@ static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
     if (cmp < 0)
       prev = itemP;
     else if (cmp == 0)
-      return;  // We skip values that are already present
+      return;  // Already present values are skipped
 
     itemP = itemP->next;
   }
@@ -85,6 +100,9 @@ static void kjStringArraySortedInsert(KjNode* array, KjNode* newItemP)
   {
     newItemP->next = array->value.firstChildP;
     array->value.firstChildP = newItemP;
+
+    if (array->lastChild == NULL)
+      array->lastChild = newItemP;
   }
 }
 
@@ -150,10 +168,10 @@ static KjNode* typesAndAttributesExtractFromEntities(KjNode* array)
       {
         next = nodeP->next;
 
-        kjChildRemove(attributesP, nodeP);
-        nodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, nodeP->value.s, NULL, NULL);
-        kjStringArraySortedInsert(attributeNamesNodeListP, nodeP);
+        KjNode* cloneP = kjClone(orionldState.kjsonP, nodeP);
 
+        cloneP->value.s = orionldContextItemAliasLookup(orionldState.contextP, cloneP->value.s, NULL, NULL);
+        kjStringArraySortedInsert(attributeNamesNodeListP, cloneP);
         nodeP = next;
       }
 
@@ -205,10 +223,10 @@ static KjNode* typesAndAttributesExtractFromRegistrations(KjNode* array)
       {
         next = nodeP->next;
 
-        kjChildRemove(attributesP, nodeP);
-        nodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, nodeP->value.s, NULL, NULL);
-        kjStringArraySortedInsert(attributeNamesNodeListP, nodeP);
+        KjNode* cloneP = kjClone(orionldState.kjsonP, nodeP);
 
+        cloneP->value.s = orionldContextItemAliasLookup(orionldState.contextP, cloneP->value.s, NULL, NULL);
+        kjStringArraySortedInsert(attributeNamesNodeListP, cloneP);
         nodeP = next;
       }
 
@@ -290,23 +308,11 @@ static KjNode* getAvailableEntityTypesDetails(KjNode* sortedArrayP)
 //
 bool detailTypeMerge(KjNode* fromP, KjNode* toP)
 {
-  // <DEBUG>
-  char buf[1024];
-
-  kjRender(orionldState.kjsonP, toP, buf, sizeof(buf));
-  LM_TMP(("ETYP: toP: %s", buf));
-  kjRender(orionldState.kjsonP, fromP, buf, sizeof(buf));
-  LM_TMP(("ETYP: fromP: %s", buf));
-  // <DEBUG>
-
   KjNode* fromAttributes = kjLookup(fromP, "attributeNames");
   KjNode* toAttributes   = kjLookup(toP,   "attributeNames");
 
   if ((fromAttributes == NULL) || (toAttributes == NULL))
     LM_RE(false, ("Internal Error ('attributeNames' missing in a entity-type object)"));
-
-  LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
-  LM_TMP(("ETYP: fromAttributes->lastChild at %p", fromAttributes->lastChild));
 
   KjNode* fromAttrP = fromAttributes->value.firstChildP;
   KjNode* next;
@@ -315,29 +321,42 @@ bool detailTypeMerge(KjNode* fromP, KjNode* toP)
   {
     next = fromAttrP->next;
 
-    if (kjLookup(toAttributes, fromAttrP->value.s) == NULL)
+    if (kjArrayStringLookup(toAttributes, fromAttrP->value.s) == NULL)
     {
       // Not there - let's add it!
-      LM_TMP(("ETYP: Move attribute '%s' from 'fromAttributes' to 'toAttributes'", fromAttrP->value.s));
-      kjRender(orionldState.kjsonP, fromAttributes, buf, sizeof(buf));
-      LM_TMP(("ETYP: 'fromAttributes': %s", buf));
-      kjRender(orionldState.kjsonP, toAttributes, buf, sizeof(buf));
-      LM_TMP(("ETYP: 'toAttributes': %s", buf));
-      LM_TMP(("ETYP: fromAttributes->lastChild at %p", fromAttributes->lastChild));
       kjChildRemove(fromAttributes, fromAttrP);
-      LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
-      LM_TMP(("ETYP: removed '%s' from 'fromAttributes'", fromAttrP->value.s));
-      LM_TMP(("ETYP: fromAttributes->lastChild at %p", fromAttributes->lastChild));
-      LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
       kjChildAdd(toAttributes, fromAttrP);
-      LM_TMP(("ETYP: added '%s' to 'toAttributes'", fromAttrP->value.s));
-      LM_TMP(("ETYP: toAttributes->lastChild at %p", toAttributes->lastChild));
     }
 
     fromAttrP = next;
   }
 
   return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// typeObjectLookup -
+//
+KjNode* typeObjectLookup(KjNode* arrayP, const char* type)
+{
+  if (arrayP == NULL)
+    return NULL;
+
+  for (KjNode* typeObjectP = arrayP->value.firstChildP; typeObjectP != NULL; typeObjectP = typeObjectP->next)
+  {
+    KjNode* idP = kjLookup(typeObjectP, "id");
+
+    if (idP == NULL)
+      continue;
+
+    if (strcmp(idP->value.s, type) == 0)
+      return typeObjectP;
+  }
+
+  return NULL;
 }
 
 
@@ -373,37 +392,14 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     else
       local = typesAndAttributesExtractFromEntities(local);
   }
-  if (local) LM_TMP(("ETYP: local->lastChild 1t %p", local->lastChild));
 
   //
   // GET remote types - i.e. from the "registrations" collection
   //
   remote = dbEntityTypesFromRegistrationsGet();
-  if (remote)
-    LM_TMP(("ETYP: remote->lastChild 1t %p", remote->lastChild));
+
   if ((remote != NULL) && (orionldState.uriParams.details == true))
     remote = typesAndAttributesExtractFromRegistrations(remote);
-
-
-
-  // <DEBUG>
-  char buf[1024];
-  if (local != NULL)
-  {
-    kjRender(orionldState.kjsonP, local, buf, sizeof(buf));
-    LM_TMP(("ETYP: local: %s", buf));
-  }
-  else
-    LM_TMP(("ETYP: local: NOTHING"));
-
-  if (remote != NULL)
-  {
-    kjRender(orionldState.kjsonP, remote, buf, sizeof(buf));
-    LM_TMP(("ETYP: remote: %s", buf));
-  }
-  else
-    LM_TMP(("ETYP: remote: NOTHING"));
-  // </DEBUG>
 
 
   //
@@ -424,17 +420,14 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
       //
       // Search for the same name AFTER 'typeP' in the string array - if found, remove 'typeP' from the array + merge if details are on
       //
-      if (orionldState.uriParams.details == true)
+      if (orionldState.uriParams.details == false)
       {
-        LM_TMP(("ETYP: Processing '%s'", typeP->value.s));
         char* typeName = typeP->value.s;
         for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
         {
           if (strcmp(nodeP->value.s, typeName) == 0)
           {
-            LM_TMP(("ETYP: Removing '%s'", typeName));
             kjChildRemove(local, typeP);
-            if (local) LM_TMP(("ETYP: local->lastChild 1t %p", local->lastChild));
             break;
           }
         }
@@ -446,8 +439,6 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
         if (idP == NULL)
           LM_RE(NULL, ("Internal Error (no 'id' in type object)"));
 
-        LM_TMP(("ETYP: Processing '%s'", idP->value.s));
-
         for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
         {
           KjNode* nodeIdP = kjLookup(nodeP, "id");
@@ -457,13 +448,8 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
           if (strcmp(idP->value.s, nodeIdP->value.s) == 0)
           {
-            LM_TMP(("ETYP: Merge type '%s' with details on", idP->value.s));
-            char buf[512];
-            kjRender(orionldState.kjsonP, nodeP, buf, sizeof(buf));
-            LM_TMP(("ETYP: nodeP: %s", buf));
             detailTypeMerge(typeP, nodeP);
             kjChildRemove(local, typeP);
-            if (local) LM_TMP(("ETYP: local->lastChild 1t %p", local->lastChild));
           }
         }
       }
@@ -473,9 +459,8 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
   }
 
 
-  
   //
-  // Fix duplicates in 'remote' 
+  // Fix duplicates in 'remote'
   //
   if (remote != NULL)
   {
@@ -494,15 +479,12 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
       //
       if (orionldState.uriParams.details == false)
       {
-        LM_TMP(("ETYP: Processing '%s'", typeP->value.s));
         char* typeName = typeP->value.s;
         for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
         {
           if (strcmp(nodeP->value.s, typeName) == 0)
           {
-            LM_TMP(("ETYP: Removing '%s'", typeName));
             kjChildRemove(remote, typeP);
-            if (remote) LM_TMP(("ETYP: remote->lastChild 1t %p", remote->lastChild));
             break;
           }
         }
@@ -514,8 +496,6 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
         if (idP == NULL)
           LM_RE(NULL, ("Internal Error (no 'id' in type object)"));
 
-        LM_TMP(("ETYP: Processing '%s'", idP->value.s));
-
         for (KjNode* nodeP = typeP->next; nodeP != NULL; nodeP = nodeP->next)
         {
           KjNode* nodeIdP = kjLookup(nodeP, "id");
@@ -525,13 +505,8 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
 
           if (strcmp(idP->value.s, nodeIdP->value.s) == 0)
           {
-            LM_TMP(("ETYP: Merge type '%s' with detail", idP->value.s));
-            char buf[512];
-            kjRender(orionldState.kjsonP, nodeP, buf, sizeof(buf));
-            LM_TMP(("ETYP: nodeP: %s", buf));
             detailTypeMerge(typeP, nodeP);
             kjChildRemove(remote, typeP);
-            if (remote) LM_TMP(("ETYP: remote->lastChild 1t %p", remote->lastChild));
           }
         }
       }
@@ -552,45 +527,88 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP)
     arrayP = remote;
   else
   {
-    arrayP = remote;
+    if (orionldState.uriParams.details == false)
+    {
+      arrayP = remote;
 
-    //
-    // Concatenate remote + local
-    //
-    remote->lastChild->next  = local->value.firstChildP;
-    remote->lastChild        = local->lastChild;
-  }
-
-  // Sort
-  KjNode* sortedArrayP = kjArray(orionldState.kjsonP, "typeList");
-
-  //
-  // The very first item can be inserted directly, without caring about sorting
-  // This is faster and it also makes the sorting algorithm a little easier as the out-array is never empty
-  //
-  KjNode* firstChild = arrayP->value.firstChildP;
-  kjChildRemove(arrayP, firstChild);
-  kjChildAdd(sortedArrayP, firstChild);
-
-  //
-  // Looping over arrayP, removing all items and inserting them in sortedArray.
-  // Duplicated items are skipped.
-  //
-  KjNode* nodeP = arrayP->value.firstChildP;
-  KjNode* next;
-  while (nodeP != NULL)
-  {
-    next = nodeP->next;
-
-    kjChildRemove(arrayP, nodeP);
-    kjStringArraySortedInsert(sortedArrayP, nodeP);
-
-    nodeP = next;
+      //
+      // Concatenate remote + local
+      //
+      remote->lastChild->next  = local->value.firstChildP;
+      remote->lastChild        = local->lastChild;
+    }
+    // else - do nothing for now - the treatment comes at the end of the function
   }
 
 
+  //
+  // Sort the typeList array, if options=details is not set
+  //
   if (orionldState.uriParams.details == false)
-    return getEntityTypesResponse(sortedArrayP);
+  {
+    KjNode* sortedArrayP = kjArray(orionldState.kjsonP, "typeList");
 
-  return getAvailableEntityTypesDetails(sortedArrayP);
+    //
+    // The very first item can be inserted directly, without caring about sorting
+    // This is faster and it also makes the sorting algorithm a little easier as 'sortedArrayP' is never empty
+    //
+    KjNode* firstChild = arrayP->value.firstChildP;
+    kjChildRemove(arrayP, firstChild);
+    kjChildAdd(sortedArrayP, firstChild);
+
+    //
+    // Looping over arrayP, removing all items and inserting them in sortedArray.
+    // Duplicated items are skipped.
+    //
+    KjNode* nodeP = arrayP->value.firstChildP;
+    KjNode* next;
+    while (nodeP != NULL)
+    {
+      next = nodeP->next;
+
+      kjChildRemove(arrayP, nodeP);
+      kjStringArraySortedInsert(sortedArrayP, nodeP);
+
+      nodeP = next;
+    }
+
+
+    return getEntityTypesResponse(sortedArrayP);
+  }
+
+  //
+  // At this point, options=details is set
+  //
+  arrayP = (local != NULL)? local : kjArray(orionldState.kjsonP, NULL);
+
+  //
+  // Merge 'remote' into 'local', item by item
+  //
+  KjNode* remoteObjP = (remote != NULL)? remote->value.firstChildP : NULL;
+  KjNode* next;
+
+  while (remoteObjP != NULL)
+  {
+    next = remoteObjP->next;
+
+    KjNode* typeP = kjLookup(remoteObjP, "id");
+    char*   type  = (typeP != NULL)? typeP->value.s : NULL;
+
+    if (type == NULL)
+    {
+      LM_E(("Internal Error (no 'id' found in remote type object)"));
+      remoteObjP = next;
+      continue;
+    }
+
+    KjNode* localObjP = typeObjectLookup(arrayP, type);
+    if (localObjP == NULL)        // Not found?  - just add it
+      kjChildAdd(arrayP, remoteObjP);
+    else
+      detailTypeMerge(remoteObjP, localObjP);
+
+    remoteObjP = next;
+  }
+
+  return getAvailableEntityTypesDetails(arrayP);
 }

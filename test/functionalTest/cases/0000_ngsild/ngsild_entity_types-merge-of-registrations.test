@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity Types - test with collisions of entity types between regs and entities
+Entity Types - test with merge of entity types between two registrations
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -148,7 +148,7 @@ Date: REGEX(.*)
 04. GET Entity Types WITH details - see three types (T1-T3)
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 427
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -157,11 +157,20 @@ Date: REGEX(.*)
     {
         "attributeNames": [
             "brandName",
-            "isParked",
-            "isNotParked",
-            "speed"
+            "isParked"
         ],
-        "id": "urn:ngsi-ld:entity:E1",
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T2",
+        "type": "EntityType",
+        "typeName": "T2"
+    },
+    {
+        "attributeNames": [
+            "isNotParked",
+            "speed",
+            "brandName",
+            "isParked"
+        ],
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
         "type": "EntityType",
         "typeName": "T1"
     },
@@ -170,22 +179,11 @@ Date: REGEX(.*)
             "isNotParked",
             "speed"
         ],
-        "id": "urn:ngsi-ld:entity:E3",
+        "id": "https://uri.etsi.org/ngsi-ld/default-context/T3",
         "type": "EntityType",
         "typeName": "T3"
-    },
-    {
-        "attributeNames": [
-            "brandName",
-            "isParked"
-        ],
-        "id": "urn:ngsi-ld:entity:E2",
-        "type": "EntityType",
-        "typeName": "T2"
     }
 ]
-
-
 
 
 --TEARDOWN--
