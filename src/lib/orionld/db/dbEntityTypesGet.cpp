@@ -48,11 +48,11 @@ extern "C"
 //
 // kjArrayStringLookup -
 //
-KjNode* kjArrayStringLookup(KjNode* stringArray, const char* string)
+KjNode* kjArrayStringLookup(KjNode* stringArray, const char* str)
 {
   for (KjNode* sNodeP = stringArray->value.firstChildP; sNodeP != NULL; sNodeP = sNodeP->next)
   {
-    if (strcmp(sNodeP->value.s, string) == 0)
+    if (strcmp(sNodeP->value.s, str) == 0)
       return sNodeP;
   }
 
