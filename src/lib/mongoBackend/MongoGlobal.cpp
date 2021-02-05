@@ -256,6 +256,10 @@ void mongoInit
   // "If you call multiple ensureIndex() methods with the same index specification at the same time,
   // only the first operation will succeed, all other operations will have no effect."
   //
+
+  if (idIndex == true)
+    ensureIdIndex("");
+
   ensureLocationIndex("");
   ensureDateExpirationIndex("");
 
@@ -270,6 +274,9 @@ void mongoInit
     {
       std::string orionDb = orionDbs[ix];
       std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+
+      if (idIndex == true)
+        ensureIdIndex(tenant);
 
       ensureLocationIndex(tenant);
       ensureDateExpirationIndex(tenant);
@@ -704,6 +711,18 @@ bool mongoExpirationCapable(void)
 
 
 
+/* ****************************************************************************
+*
+* ensureIdIndex -
+*/
+void ensureIdIndex(const std::string& tenant)
+{
+  std::string err;
+  collectionCreateIndex(getEntitiesCollectionName(tenant), BSON("_id.id" << 1), false, &err);
+}
+
+
+
 /* ***************************************************************************
 *
 * ensureLocationIndex -
@@ -739,6 +758,9 @@ void ensureDateExpirationIndex(const std::string& tenant)
     LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
+
+
+
 /* ****************************************************************************
 *
 * matchEntity -

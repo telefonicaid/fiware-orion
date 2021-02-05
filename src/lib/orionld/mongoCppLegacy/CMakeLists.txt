@@ -45,6 +45,7 @@ SET (SOURCES
     mongoCppLegacyTenantsGet.cpp
     mongoCppLegacyGeoIndexInit.cpp
     mongoCppLegacyGeoIndexCreate.cpp
+    mongoCppLegacyIdIndexCreate.cpp
     mongoCppLegacyDbFieldGet.cpp
     mongoCppLegacyDbStringFieldGet.cpp
     mongoCppLegacyDbArrayFieldGet.cpp

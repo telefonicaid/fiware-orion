@@ -292,22 +292,32 @@ typedef struct OrionldConnectionState
 #ifdef REQUEST_PERFORMANCE
 typedef struct Timestamps
 {
-  struct timespec reqStart;               // Start of          REQUEST
-  struct timespec reqEnd;                 // End of            REQUEST
-  struct timespec parseStart;             // Start of          REQUEST PAYLOAD BODY JSON PARSE
-  struct timespec parseEnd;               // End of            REQUEST PAYLOAD BODY JSON PARSE
-  struct timespec serviceRoutineStart;    // Start of          SERVICE ROUTINE
-  struct timespec serviceRoutineEnd;      // End of            SERVICE ROUTINE
+  struct timespec reqStart;               // Start of          Request
+  struct timespec reqEnd;                 // End of            Request
+  struct timespec parseStart;             // Start of          Request Payload body JSON parse
+  struct timespec parseEnd;               // End of            Request Payload body JSON parse
+  struct timespec serviceRoutineStart;    // Start of          Service Routine
+  struct timespec serviceRoutineEnd;      // End of            Service Routine
   struct timespec dbStart;                // Start of    Main  DB query/update
   struct timespec dbEnd;                  // End of      Main  DB query/update
   struct timespec extraDbStart;           // Start of "extra"  DB query, e.g. query before an update
   struct timespec extraDbEnd;             // End of   "extra"  DB query, e.g. query before an update
+  struct timespec notifStart;             // Start of          Sending of Notifications
+  struct timespec notifEnd;               // End of            Sending of Notifications
   struct timespec notifDbStart;           // Start of          DB query for Notifications
   struct timespec notifDbEnd;             // End of            DB query for Notifications
+  struct timespec forwardStart;           // Start of          Sending of Forwarded messages
+  struct timespec forwardEnd;             // End of            Sending of Forwarded messages
   struct timespec forwardDbStart;         // Start of          DB query for Forwaring
   struct timespec forwardDbEnd;           // End of            DB query for Forwaring
-  struct timespec renderStart;            // Start of          RESONSE PAYLOAD BODY RENDER JSON
-  struct timespec renderEnd;              // End of            RESONSE PAYLOAD BODY RENDER JSON
+  struct timespec renderStart;            // Start of          Resonse Payload body render JSON
+  struct timespec renderEnd;              // End of            Resonse Payload body render JSON
+  struct timespec restReplyStart;         // Start of          REST Reply
+  struct timespec restReplyEnd;           // End of            REST Reply
+  struct timespec troeStart;              // Start of          TRoE processing
+  struct timespec troeEnd;                // End of            TRoE processing
+  struct timespec requestPartEnd;         // End of            MHD-1-2-3 processing
+  struct timespec requestCompletedStart;  // Start of          Request Completed
 } Timestamps;
 
 extern __thread Timestamps timestamps;
@@ -357,6 +367,7 @@ extern unsigned int      tenants;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
+extern bool              idIndex;                  // From orionld.cpp
 
 
 

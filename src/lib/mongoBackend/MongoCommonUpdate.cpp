@@ -2950,6 +2950,9 @@ static bool createEntity
   if (orionldState.apiVersion != NGSI_LD_V1)
     ensureLocationIndex(tenant);
 
+  if (idIndex == true)
+    ensureIdIndex(tenant);
+
   ensureDateExpirationIndex(tenant);
 
   if (!legalIdUsage(attrsV))

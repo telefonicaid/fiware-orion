@@ -55,6 +55,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/payloadCheck/pcheckEntity.h"                   // pcheckEntity
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand

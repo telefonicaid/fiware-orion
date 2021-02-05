@@ -588,7 +588,7 @@ bool collectionCreateIndex
     /**
      * Differently from other indexes, a TTL index must contain the "expireAfterSeconds" field set to 0
      * in the query issued to Mongo DB, in order to be defined with an "expireAt" behaviour.
-     * This filed is implemented in the Mongo driver with the Index Spec class.
+     * This field is implemented in the Mongo driver with the Index Spec class.
      */
     if (isTTL)
     {

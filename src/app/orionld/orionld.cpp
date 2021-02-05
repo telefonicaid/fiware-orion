@@ -207,6 +207,7 @@ int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            forwarding;
+bool            idIndex;
 
 
 
@@ -279,6 +280,7 @@ bool            forwarding;
 #define SOCKET_SERVICE_DESC    "enable the socket service - accept connections via a normal TCP socket"
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 #define FORWARDING_DESC        "turn on forwarding"
+#define ID_INDEX_DESC          "automatic mongo index on _id.id"
 
 
 
@@ -305,6 +307,7 @@ PaArgument paArgs[] =
   { "-dbTimeout",             &dbTimeout,               "MONGO_TIMEOUT",             PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC              },
   { "-dbPoolSize",            &dbPoolSize,              "MONGO_POOL_SIZE",           PaInt,     PaOpt,  10,              1,      10000,            DBPS_DESC                },
   { "-writeConcern",          &writeConcern,            "MONGO_WRITE_CONCERN",       PaInt,     PaOpt,  1,               0,      1,                WRITE_CONCERN_DESC       },
+  { "-idIndex",               &idIndex,                 "MONGO_ID_INDEX",            PaBool,    PaHid,  false,           false,  true,             ID_INDEX_DESC            },
   { "-ipv4",                  &useOnlyIPv4,             "USEIPV4",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV4_DESC             },
   { "-ipv6",                  &useOnlyIPv6,             "USEIPV6",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV6_DESC             },
   { "-harakiri",              &harakiri,                "HARAKIRI",                  PaBool,    PaHid,  false,           false,  true,             HARAKIRI_DESC            },

@@ -89,7 +89,8 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     if (ciP->apiVersion != NGSI_LD_V1)
     {
-      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+      if (metricsMgr.isOn())
+        metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
     }
     
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
@@ -109,7 +110,8 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   {
     if (ciP->apiVersion != NGSI_LD_V1)
     {
-      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
+      if (metricsMgr.isOn())
+        metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_RESP_SIZE, answerLen);
     }
   }
 

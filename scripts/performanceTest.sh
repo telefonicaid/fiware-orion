@@ -81,7 +81,7 @@
 #   TPUT: Before Service .000174 seconds (average of 100 runs)
 #   TPUT: During Service .002187 seconds (average of 100 runs)
 #   TPUT: Awaiting Mongo .001531 seconds (average of 100 runs)
-#   TPUT: After  Service .000171 seconds (average of 100 runs)
+#   TPUT: After Service  .000171 seconds (average of 100 runs)
 #   TPUT: Entire request .002532 seconds (average of 100 runs)
 #   TPUT: Entire request 394 requests per second
 #   => "During Service" - "Awaiting Mongo"  == (2187 - 1531) us == 656 microseconds
@@ -91,7 +91,7 @@
 #   TPUT: Before Service .000106 seconds (average of 100 runs)
 #   TPUT: During Service .000447 seconds (average of 100 runs)
 #   TPUT: Awaiting Mongo .000419 seconds (average of 100 runs)
-#   TPUT: After  Service .000222 seconds (average of 100 runs)
+#   TPUT: After Service  .000222 seconds (average of 100 runs)
 #   TPUT: Entire request .000776 seconds (average of 100 runs)
 #   TPUT: Entire request 1288 requests per second
 #   => "During Service" - "Awaiting Mongo"  == (447 - 419) us == 28 microseconds
@@ -101,7 +101,7 @@
 #   TPUT: Before Service .000113 seconds (average of 100 runs)
 #   TPUT: During Service .000402 seconds (average of 100 runs)
 #   TPUT: Awaiting Mongo .000372 seconds (average of 100 runs)
-#   TPUT: After  Service .000230 seconds (average of 100 runs)
+#   TPUT: After Service  .000230 seconds (average of 100 runs)
 #   TPUT: Entire request .000746 seconds (average of 100 runs)
 #   TPUT: Entire request 1340 requests per second
 #   => "During Service" - "Awaiting Mongo"  == (402 - 372) us == 30 microseconds
@@ -111,7 +111,7 @@
 #   TPUT: Before Service .000110 seconds (average of 100 runs)
 #   TPUT: During Service .000629 seconds (average of 100 runs)
 #   TPUT: Awaiting Mongo .000611 seconds (average of 100 runs) - this is not just mongo - it's the entire mongoBackend
-#   TPUT: After  Service .000187 seconds (average of 100 runs)
+#   TPUT: After Service  .000187 seconds (average of 100 runs)
 #   TPUT: Entire request .000927 seconds (average of 100 runs)
 #   TPUT: Entire request 1078 requests per second
 #   => "During Service" - "Awaiting Mongo"  == (629 - 611) us == 18 microseconds (can't use as comparison as ALL of mongoBackend is subtracted)
@@ -121,7 +121,7 @@
 #   TPUT: Before Service .000119 seconds (average of 100 runs)
 #   TPUT: During Service .000606 seconds (average of 100 runs)
 #   TPUT: Awaiting Mongo .000587 seconds (average of 100 runs) - this is not just	mongo -	it's the entire	mongoBackend
-#   TPUT: After  Service .000208 seconds (average of 100 runs)
+#   TPUT: After Service  .000208 seconds (average of 100 runs)
 #   TPUT: Entire request .000933 seconds (average of 100 runs)
 #   TPUT: Entire request 1071 requests per second
 #   => "During Service" - "Awaiting Mongo"  == (606 - 587) us == 19 microseconds (can't use as comparison as ALL of mongoBackend is subtracted)
@@ -137,6 +137,35 @@
 # GET /entities/{EID} is 30% faster than GET /entities
 # GET /entities/{EID} is >300% faster than POST /entities
 # GET /entities       is 250% faster than POST /entities
+#
+
+
+#
+# New timestamps
+#
+# * MHD1 Start
+#   * serviceLookup
+# * MHD1 End
+#
+# * MHD2 Start of first call
+# * MHD2 End of last call
+#
+# * MHD3 Start
+#   * jsonParse
+#   * Service Routine
+#     * mongoBackend (if used)
+#     * mongo1 (lookup)
+#     * mongo2 (update)
+#   * Forwarding
+#     * DB Query
+#     * Handling
+#   * TRoE
+# * MHD3 End
+#
+# * MHD4 Start
+#   * Notifications
+#   * TRoE
+# * MHD4 End
 #
 
 
@@ -159,7 +188,7 @@ function perfCalc
 
   SUM=0
   TITLE="$PATTERN: ........................................................................"
-  TITLE=${TITLE:0:20}
+  TITLE=${TITLE:0:40}
 
   typeset -i loopNo
   typeset -i sums
@@ -178,15 +207,20 @@ function perfCalc
     fi
     loopNo=$loopNo+1
   done
-  echo sums: $sums >> /tmp/kz
-  AVG=$(echo "$SUM * 0.01" | bc)
-  echo "$TITLE $AVG seconds (average of 100 runs)"
 
-  if [ "$doTput" == 1 ]
+  if [ $sums != 0 ]
   then
-    TPUT=$(echo "1 / $AVG" | bc)
-    echo $TITLE $TPUT requests per second
+    echo sums: $sums >> /tmp/kz
+    AVG=$(echo "$SUM * 0.01" | bc)
+    echo "$TITLE  $AVG seconds (average of 100 runs)"
+
+    if [ "$doTput" == 1 ]
+    then
+      TPUT=$(echo "1 / $AVG" | bc)
+      echo '=> ' $TPUT requests per second
+    fi
   fi
+
   echo >> /tmp/kz
   echo >> /tmp/kz
 }
@@ -201,13 +235,33 @@ function perfCalcLoop
 {
   TITLE="$1"
   skip=$2
+  echo
   echo $TITLE:
+  echo "------------------------------------------------------"
   echo $TITLE: >> /tmp/kz
-  perfCalc "TPUT: Before Service Routine" "Before SR" 0 $skip
-  perfCalc "TPUT: During Service Routine" "During SR" 0 $skip
-  perfCalc "TPUT: Awaiting Mongo" "In Mongo"  0 $skip
-  perfCalc "TPUT: After  Service Routine" "After SR"  0 $skip
-  perfCalc "TPUT: Entire request" "Total"     1 $skip
+
+  perfCalc "TPUT: Before Service Routine"     "Before SR"         0 $skip
+  perfCalc "TPUT: During Service Routine"     "During SR"         0 $skip
+  avgDuring=$AVG
+  perfCalc "TPUT: After Service Routine"      "After SR"          0 $skip
+
+  perfCalc "TPUT: Awaiting Mongo"             "In Mongo"          0 $skip
+  avgAwaitingMongo=$AVG
+
+  perfCalc "TPUT: Payload Parse"              "Payload Parse"     0 $skip
+  perfCalc "TPUT: Sending Response"           "Queueing Response" 0 $skip
+  perfCalc "TPUT: Rendering Response"         "Render Response"   0 0
+  perfCalc "TPUT: TRoE Processing"            "TRoE Processing"   0 0
+  perfCalc "TPUT: MHD Delay (send response)"  "MHD Delay"         0 $skip
+
+  duringExceptDb=$(echo "$avgDuring - $avgAwaitingMongo" | bc)
+  echo "SR excl DB: ............................  $duringExceptDb (average)"
+
+  perfCalc "TPUT: Entire request"          "Total"            1 $skip
+
+  echo "------------------------------------------------------"
+  echo
+
   echo "==============================================" >> /tmp/kz
   echo >> /tmp/kz
 }

@@ -77,6 +77,23 @@ extern "C"
 #include "rest/rest.h"
 
 
+#ifdef REQUEST_PERFORMANCE
+// -----------------------------------------------------------------------------
+//
+// TIME_REPORT -
+//
+#define TIME_REPORT(start, end, text)                    \
+{                                                        \
+  struct timespec diff;                                  \
+  float           diffF;                                 \
+                                                         \
+  kTimeDiff(&start, &end, &diff, &diffF);                \
+  if (diffF > 0)                                         \
+    LM_TMP(("TPUT: %s %f", text, diffF));                \
+}
+#endif
+
+
 
 /* ****************************************************************************
 *
@@ -702,12 +719,26 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.requestCompletedStart);
+#endif
+
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
   std::string      spath    = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";
   struct timespec  reqEndTime;
 
   if (orionldState.notify == true)
+  {
+#ifdef REQUEST_PERFORMANCE
+    kTimeGet(&timestamps.notifStart);
+#endif
+
     orionldNotify();
+
+#ifdef REQUEST_PERFORMANCE
+    kTimeGet(&timestamps.notifEnd);
+#endif
+  }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
@@ -761,14 +792,16 @@ static void requestCompleted
   //
   // Metrics
   //
-  metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
+  if (metricsMgr.isOn())
+    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN, 1);
 
   //
   // If the httpStatusCode is above the set of 200s, an error has occurred
   //
   if (ciP->httpStatusCode >= SccBadRequest)
   {
-    metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_ERRORS, 1);
   }
 
   if (metricsMgr.isOn() && (ciP->transactionStart.tv_sec != 0))
@@ -805,30 +838,29 @@ static void requestCompleted
   *con_cls = NULL;
 
 #ifdef REQUEST_PERFORMANCE
-  struct timespec diffBefore;
-  struct timespec diffDuring;
-  struct timespec diffAfter;
-  struct timespec diffDb;
-  struct timespec diffTotal;
-  float           diffBeforeF;
-  float           diffDuringF;
-  float           diffDbF;
-  float           diffAfterF;
-  float           diffTotalF;
-
   kTimeGet(&timestamps.reqEnd);
 
-  kTimeDiff(&timestamps.reqStart,            &timestamps.serviceRoutineStart, &diffBefore, &diffBeforeF);
-  kTimeDiff(&timestamps.serviceRoutineStart, &timestamps.serviceRoutineEnd,   &diffDuring, &diffDuringF);
-  kTimeDiff(&timestamps.dbStart,             &timestamps.dbEnd,               &diffDb,     &diffDbF);
-  kTimeDiff(&timestamps.serviceRoutineEnd,   &timestamps.reqEnd,              &diffAfter,  &diffAfterF);
-  kTimeDiff(&timestamps.reqStart,            &timestamps.reqEnd,              &diffTotal,  &diffTotalF);
+  TIME_REPORT(timestamps.reqStart,            timestamps.serviceRoutineStart,    "Before Service Routine:    ");
+  TIME_REPORT(timestamps.serviceRoutineStart, timestamps.serviceRoutineEnd,      "During Service Routine:    ");
+  TIME_REPORT(timestamps.serviceRoutineEnd,   timestamps.reqEnd,                 "After Service Routine:     ");
+  TIME_REPORT(timestamps.dbStart,             timestamps.dbEnd,                  "Awaiting Mongo:            ");
+  TIME_REPORT(timestamps.parseStart,          timestamps.parseEnd,               "Payload Parse:             ");
+  TIME_REPORT(timestamps.renderStart,         timestamps.renderEnd,              "Rendering Response:        ");
+  TIME_REPORT(timestamps.restReplyStart,      timestamps.restReplyEnd,           "Sending Response:          ");
+  TIME_REPORT(timestamps.forwardStart,        timestamps.forwardEnd,             "Forwarding:                ");
+  TIME_REPORT(timestamps.forwardDbStart,      timestamps.forwardDbEnd,           "DB Query for Forwarding:   ");
+  TIME_REPORT(timestamps.reqStart,            timestamps.reqEnd,                 "Entire request:            ");
+  TIME_REPORT(timestamps.troeStart,           timestamps.troeEnd,                "TRoE Processing:           ");
+  TIME_REPORT(timestamps.requestPartEnd,      timestamps.requestCompletedStart,  "MHD Delay (send response): ");
 
-  LM_TMP(("TPUT: Before Service Routine: %f", diffBeforeF));
-  LM_TMP(("TPUT: During Service Routine: %f", diffDuringF));
-  LM_TMP(("TPUT: Awaiting Mongo:         %f", diffDbF));
-  LM_TMP(("TPUT: After  Service Routine: %f", diffAfterF));
-  LM_TMP(("TPUT: Entire request:         %f", diffTotalF));
+  struct timespec  all;
+  struct timespec  mongo;
+  float            allF;
+  float            mongoF;
+
+  kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
+  kTimeDiff(&timestamps.dbStart,  &timestamps.dbEnd,  &mongo, &mongoF);
+  LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));
 #endif
 }
 
@@ -1687,6 +1719,7 @@ static MHD_Result connectionTreat
       if (*con_cls == NULL)
       {
 #ifdef REQUEST_PERFORMANCE
+        bzero(&timestamps, sizeof(timestamps));
         kTimeGet(&timestamps.reqStart);
 #endif
         return orionldMhdConnectionInit(connection, url, method, version, con_cls);

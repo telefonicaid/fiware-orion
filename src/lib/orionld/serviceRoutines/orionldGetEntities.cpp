@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/qTreeToBsonObj.h"                     // qTreeToBsonObj
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldErrorResponse.h"               // orionldErrorResponseCreate
+#include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE
 #include "orionld/payloadCheck/pcheckUri.h"                    // pcheckUri
 #include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/context/orionldCoreContext.h"                // orionldDefaultUrl
