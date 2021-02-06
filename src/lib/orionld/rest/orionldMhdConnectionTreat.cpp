@@ -295,7 +295,13 @@ static bool payloadParseAndExtractSpecialFields(ConnectionInfo* ciP, bool* conte
   //
   // Parse the payload
   //
+#ifdef REQUEST_PERFORMANCE
+    kTimeGet(&timestamps.parseStart);
+#endif
   orionldState.requestTree = kjParse(orionldState.kjsonP, ciP->payload);
+#ifdef REQUEST_PERFORMANCE
+    kTimeGet(&timestamps.parseEnd);
+#endif
 
   //
   // Parse Error?
@@ -843,16 +849,19 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 
   orionldState.link = orionldState.contextP->url;
 
-  // ********************************************************************************************
+
+  // -----------------------------------------------------------------------------
   //
   // Call the SERVICE ROUTINE
   //
 #ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.serviceRoutineStart);
+#endif
+
   serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
+
+#ifdef REQUEST_PERFORMANCE
   kTimeGet(&timestamps.serviceRoutineEnd);
-#else
-  serviceRoutineResult = orionldState.serviceP->serviceRoutine(ciP);
 #endif
 
   //
@@ -877,14 +886,19 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
         if (orionldTenantLookup(orionldState.tenant) == NULL)
         {
           char prefixed[64];
+
           snprintf(prefixed, sizeof(prefixed), "%s-%s", dbName, orionldState.tenant);
           orionldTenantCreate(prefixed);
+
+          if (idIndex == true)
+            dbIdIndexCreate(prefixed);
         }
       }
     }
   }
 
  respond:
+
   //
   // For error responses, there is ALWAYS payload, describing the error
   // If, for some reason (bug!) this payload is missing, then we add a generic error response here
@@ -952,7 +966,14 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // FIXME: Smarter allocation !!!
     //
+#ifdef REQUEST_PERFORMANCE
+    kTimeGet(&timestamps.renderStart);
+#endif
     kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+
+#ifdef REQUEST_PERFORMANCE
+    kTimeGet(&timestamps.renderEnd);
+#endif
     orionldState.responsePayload = responsePayload;
   }
 
@@ -962,10 +983,18 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   ciP->httpStatusCode = (HttpStatusCode) orionldState.httpStatusCode;
 
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.restReplyStart);
+#endif
+
   if (orionldState.responsePayload != NULL)
     restReply(ciP, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   else
     restReply(ciP, "");
+
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.restReplyEnd);
+#endif
 
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
@@ -985,7 +1014,16 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
       else
       {
         numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
+
+#ifdef REQUEST_PERFORMANCE
+        kTimeGet(&timestamps.troeStart);
+#endif
+
         orionldState.serviceP->troeRoutine(ciP);
+
+#ifdef REQUEST_PERFORMANCE
+        kTimeGet(&timestamps.troeEnd);
+#endif
       }
     }
   }
@@ -994,6 +1032,10 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Cleanup
   //
   orionldStateRelease();
+
+#ifdef REQUEST_PERFORMANCE
+  kTimeGet(&timestamps.requestPartEnd);
+#endif
 
   return MHD_YES;
 }

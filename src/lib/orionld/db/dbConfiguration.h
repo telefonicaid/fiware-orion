@@ -87,6 +87,7 @@ typedef bool    (*DbRegistrationReplace)(const char* registrationId, KjNode* dbR
 typedef KjNode* (*DbEntitiesGet)(char** fieldV, int fields);
 typedef KjNode* (*DbEntityTypesFromRegistrationsGet)(void);
 typedef bool    (*DbGeoIndexCreate)(const char* tenant, const char* attrName);
+typedef bool    (*DbIdIndexCreate)(const char* tenant);
 typedef KjNode* (*DbEntitiesQuery)(KjNode* entityInfoArrayP, KjNode* attrsP, QNode* qP, KjNode* geoqP, int limit, int offset, int* countP);
 
 
@@ -119,6 +120,7 @@ extern DbRegistrationReplace                     dbRegistrationReplace;
 extern DbEntityTypesFromRegistrationsGet         dbEntityTypesFromRegistrationsGet;
 extern DbEntitiesGet                             dbEntitiesGet;
 extern DbGeoIndexCreate                          dbGeoIndexCreate;
+extern DbIdIndexCreate                           dbIdIndexCreate;
 extern DbEntitiesQuery                           dbEntitiesQuery;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBCONFIGURATION_H_

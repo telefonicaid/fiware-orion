@@ -275,6 +275,14 @@ extern bool mongoExpirationCapable(void);
 
 /* ****************************************************************************
 *
+* ensureIdIndex -
+*/
+extern void ensureIdIndex(const std::string& tenant);
+
+
+
+/* ****************************************************************************
+*
 * ensureLocationIndex -
 */
 extern void ensureLocationIndex(const std::string& tenant);

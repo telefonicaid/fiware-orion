@@ -273,7 +273,8 @@ int httpRequestSendWithCurl
   char                            servicePath0[SERVICE_PATH_MAX_COMPONENT_LEN + 1];  // +1 for zero termination
 
   firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
-  metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
+  if (metricsMgr.isOn())
+    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT, 1);
 
   ++callNo;
 
@@ -294,7 +295,8 @@ int httpRequestSendWithCurl
   // Preconditions check
   if (port == 0)
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (port is ZERO)"));
     lmTransactionEnd();
 
@@ -304,7 +306,8 @@ int httpRequestSendWithCurl
 
   if (ip.empty())
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (ip is empty)"));
     lmTransactionEnd();
 
@@ -314,7 +317,8 @@ int httpRequestSendWithCurl
 
   if (verb.empty())
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (verb is empty)"));
     lmTransactionEnd();
 
@@ -324,7 +328,8 @@ int httpRequestSendWithCurl
 
   if (resource.empty())
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (resource is empty)"));
     lmTransactionEnd();
 
@@ -334,7 +339,8 @@ int httpRequestSendWithCurl
 
   if ((content_type.empty()) && (!content.empty()))
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
     lmTransactionEnd();
 
@@ -344,7 +350,8 @@ int httpRequestSendWithCurl
 
   if ((!content_type.empty()) && (content.empty()))
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     lmTransactionEnd();
 
@@ -520,7 +527,8 @@ int httpRequestSendWithCurl
   // Check if total outgoing message size is too big
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
 
     curl_slist_free_all(headers);
@@ -602,7 +610,8 @@ int httpRequestSendWithCurl
     alarmMgr.notificationError(url, "(curl_easy_perform failed: " + std::string(curl_easy_strerror(res)) + ")");
     *outP = "notification failure";
 
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
   }
   else
   {
@@ -614,12 +623,14 @@ int httpRequestSendWithCurl
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     outP->assign(httpResponse->memory, httpResponse->size);
 
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_RESP_SIZE, payloadLen);
   }
 
   if (payloadSize > 0)
   {
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_REQ_SIZE, payloadSize);
+    if (metricsMgr.isOn())
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_REQ_SIZE, payloadSize);
   }
 
   // Cleanup curl environment
@@ -686,8 +697,11 @@ int httpRequestSend
 
     firstServicePath(servicePath.c_str(), servicePath0, sizeof(servicePath0));
 
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
-    metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    if (metricsMgr.isOn())
+    {
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT,        1);
+      metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
+    }
 
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));

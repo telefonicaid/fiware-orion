@@ -95,6 +95,7 @@ unsigned short  troePort;
 char            troeUser[64];
 char            troePwd[64];
 bool            forwarding              = true;
+bool            idIndex                 = false;
 
 
 

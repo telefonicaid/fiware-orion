@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_FT
+#include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -500,15 +501,16 @@ MHD_Result orionldMhdConnectionInit
   // The 'connection', as given by MHD is very important. No responses can be sent without it
   ciP->connection = connection;
 
+
   // IP Address and port of caller
   ipAddressAndPort(ciP);
-
 
   //
   // 2. Prepare orionldState
   //
   orionldStateInit();
   orionldState.ciP = ciP;
+
 
   // By default, no whitespace in output
   orionldState.kjsonP->spacesPerIndent   = 0;
@@ -534,14 +536,12 @@ MHD_Result orionldMhdConnectionInit
 
   if (orionldState.urlPath[urlLen - 1] == '/')
   {
-    LM_T(LmtUriPath, ("URI PATH ends in SLASH - removing it"));
     orionldState.urlPath[urlLen - 1] = 0;
     urlLen -= 1;
 
     // Now check for a second '/'
     if (orionldState.urlPath[urlLen - 1] == '/')
     {
-      LM_T(LmtUriPath, ("URI PATH ends in DOUBLE SLASH - flagging error"));
       orionldState.responsePayload = (char*) doubleSlashPayload;  // FIXME: use orionldErrorResponseCreate - after setting prettyPrint
       orionldState.httpStatusCode  = 400;
       return MHD_YES;
@@ -553,7 +553,6 @@ MHD_Result orionldMhdConnectionInit
   ciP->verb = orionldState.verb;  // FIXME: to be removed
   if (orionldState.verb == NOVERB)
   {
-    LM_T(LmtVerb, ("NOVERB for (%s)", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "not a valid verb", method);  // FIXME: do this after setting prettyPrint
     orionldState.httpStatusCode   = 400;
     return MHD_YES;
@@ -594,7 +593,6 @@ MHD_Result orionldMhdConnectionInit
   //
   if ((orionldState.verb != POST) && (orionldState.verb != GET) && (orionldState.verb != DELETE) && (orionldState.verb != PATCH))
   {
-    LM_T(LmtVerb, ("The verb '%s' is not supported by NGSI-LD", method));
     orionldErrorResponseCreate(OrionldBadRequestData, "Verb not supported by NGSI-LD", method);
     orionldState.httpStatusCode = 400;
   }

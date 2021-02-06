@@ -38,8 +38,10 @@ extern "C"
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
 #include "mongoBackend/MongoGlobal.h"                               // getMongoConnection, releaseMongoConnection, ...
+
 #include "orionld/common/numberToDate.h"                            // numberToDate
 #include "orionld/common/eqForDot.h"                                // eqForDot
+#include "orionld/common/performance.h"                             // REQUEST_PERFORMANCE
 #include "orionld/db/dbCollectionPathGet.h"                         // dbCollectionPathGet
 #include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
