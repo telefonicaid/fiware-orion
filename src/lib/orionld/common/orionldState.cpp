@@ -51,6 +51,9 @@ extern "C"
 const char* orionldVersion = ORIONLD_VERSION;
 
 
+#ifdef REQUEST_PERFORMANCE
+const bool performanceTestInluded = true;
+#endif
 
 // -----------------------------------------------------------------------------
 //
