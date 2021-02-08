@@ -240,18 +240,17 @@ void mongoInit
 
   if (user[0] != 0)
   {
-    LM_I(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
+    LM_I(("Connected to mongo at %s/%s, as user '%s' (poolsize: %d)", dbHost, dbName.c_str(), user, dbPoolSize));
   }
   else
   {
-    LM_I(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
+    LM_I(("Connected to mongo at %s/%s (poolsize: %d)", dbHost, dbName.c_str(), dbPoolSize));
   }
 
   setDbPrefix(dbName);
   setEntitiesCollectionName(COL_ENTITIES);
   setRegistrationsCollectionName(COL_REGISTRATIONS);
   setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
 
   //
   // Note that index creation operation is idempotent.
@@ -259,9 +258,13 @@ void mongoInit
   // "If you call multiple ensureIndex() methods with the same index specification at the same time,
   // only the first operation will succeed, all other operations will have no effect."
   //
-  ensureLocationIndex("");
-  ensureDateExpirationIndex("");
-  if (mtenant)
+  if (!mtenant)
+  {
+    // To avoid creating and empty 'orion' database when -multiservice is in use
+    ensureLocationIndex("");
+    ensureDateExpirationIndex("");
+  }
+  else
   {
     /* We get tenant database names and apply ensure the location and date expiration indexes in each one */
     std::vector<std::string> orionDbs;
@@ -431,17 +434,6 @@ void setSubscribeContextCollectionName(const std::string& name)
 
 /* ***************************************************************************
 *
-* setSubscribeContextAvailabilityCollectionName -
-*/
-void setSubscribeContextAvailabilityCollectionName(const std::string& name)
-{
-  subscribeContextAvailabilityCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
 * composeCollectionName -
 *
 * Common helper function for composing collection names
@@ -463,7 +455,7 @@ std::string composeDatabaseName(const std::string& tenant)
 {
   std::string result;
 
-  if (!multitenant || (tenant == ""))
+  if (!multitenant || (tenant.empty()))
   {
     result = dbPrefix;
   }
@@ -509,17 +501,6 @@ std::string getRegistrationsCollectionName(const std::string& tenant)
 std::string getSubscribeContextCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, subscribeContextCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextAvailabilityCollectionName -
-*/
-std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
 
 
@@ -628,8 +609,8 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     idMatch = (en2->id == en1->id);
   }
 
-  // Note that type == "" is like a * wildcard for type
-  return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
+  // Note that type.empty() is like a * wildcard for type
+  return idMatch && (en1->type.empty() || en2->type.empty() || en2->type == en1->type);
 }
 
 
@@ -711,7 +692,7 @@ static void fillQueryEntity(BSONObjBuilder* bobP, const EntityId* enP)
     bobP->append(idString, enP->id);
   }
 
-  if (enP->type != "")
+  if (!enP->type.empty())
   {
     if (enP->isTypePattern)
     {
@@ -740,7 +721,7 @@ bool servicePathFilterNeeded(const std::vector<std::string>& servicePath)
   // Note that by construction servicePath vector must have at least one element. Note that the
   // case in which first element is "" is special, it means that the SP were not provided and
   // we have to apply the default
-  if (servicePath[0] == "")
+  if (servicePath[0].empty())
   {
     return false;
   }
@@ -1124,7 +1105,7 @@ static void addIfNotPresentAttr
 
 /* ****************************************************************************
 *
-* addIfNotPresentAttrMetadata (double version) -
+* addIfNotPresentMetadata (double version) -
 *
 * If the metadata doesn't exist in the attribute, then add it (shadowed, render will depend on filter)
 */
@@ -1143,6 +1124,7 @@ static void addIfNotPresentMetadata
     caP->metadataVector.push_back(mdP);
   }
 }
+
 
 
 /* ****************************************************************************
@@ -1271,7 +1253,7 @@ void addBuiltins(ContextElementResponse* cerP)
   {
     ContextAttribute* caP = cerP->entity.attributeVector[ix];
 
-    // dateCreated medatada
+    // dateCreated metadata
     if (caP->creDate != 0)
     {
       addIfNotPresentMetadata(caP, NGSI_MD_DATECREATED, DATE_TYPE, caP->creDate);
@@ -1284,12 +1266,12 @@ void addBuiltins(ContextElementResponse* cerP)
     }
 
     // actionType
-    if (caP->actionType != "")
+    if (!caP->actionType.empty())
     {
       addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
     }
 
-    // previosValue
+    // previousValue
     if (caP->previousValue != NULL)
     {
       addIfNotPresentPreviousValueMetadata(caP);
@@ -1509,7 +1491,7 @@ bool entitiesQuery
   BSONObj query = finalQuery.obj();
   BSONObj sort;
 
-  if (sortOrderList == "")
+  if (sortOrderList.empty())
   {
     sort = BSON(ENT_CREATION_DATE << 1);
   }
@@ -1873,7 +1855,8 @@ static void processContextRegistrationElement
   const StringList&                   attrL,
   ContextRegistrationResponseVector*  crrV,
   MimeType                            mimeType,
-  ProviderFormat                      providerFormat
+  ProviderFormat                      providerFormat,
+  const std::string&                  regId
 )
 {
   ContextRegistrationResponse crr;
@@ -1922,6 +1905,7 @@ static void processContextRegistrationElement
 
     crrP->contextRegistration = crr.contextRegistration;
     crrP->providerFormat      = providerFormat;
+    crrP->regId               = regId;
 
     crrV->push_back(crrP);
   }
@@ -1941,6 +1925,7 @@ bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
+  const ngsiv2::ForwardingMode        forwardingMode,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -1969,7 +1954,8 @@ bool registrationsQuery
   //   ],
   //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
   //   servicePath: ... ,
-  //   expiration: { $gt: ... }
+  //   expiration: { $gt: ... },
+  //   fwdMode: ...                           (only when forwardingMode is update or query)
   // }
   //
   // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
@@ -2000,7 +1986,7 @@ bool registrationsQuery
       b.append(crEntitiesId, en->id);
     }
 
-    if (en->type != "")
+    if (!en->type.empty())
     {
       b.append(crEntitiesType, en->type);
       // FIXME P3: this way of accumulating types in the BSONBuilder doesn't avoid duplication. It doesn't
@@ -2049,6 +2035,16 @@ bool registrationsQuery
     queryBuilder.appendElements(fillQueryServicePath(REG_SERVICE_PATH, servicePathV));
   }
 
+  // Forwarding mode filter (only when forwardingMode is update or query)
+  // Note that "all" and null (omission of the field) is always included in the filter
+  if (forwardingMode == ngsiv2::ForwardQuery)
+  {
+    queryBuilder.append(REG_FORWARDING_MODE, BSON("$in" << BSON_ARRAY("query" << "all" << mongo::BSONNULL)));
+  }
+  else if (forwardingMode == ngsiv2::ForwardUpdate)
+  {
+    queryBuilder.append(REG_FORWARDING_MODE, BSON("$in" << BSON_ARRAY("update" << "all" << mongo::BSONNULL)));
+  }
 
   //
   // Do the query in MongoDB
@@ -2091,11 +2087,12 @@ bool registrationsQuery
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
-    ProviderFormat            providerFormat            = (format == "")? PfJson : (format == "JSON")? PfJson : PfV2;
+    ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
+    std::string               regId                     = getFieldF(r, "_id").OID().toString();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat);
+      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -2526,11 +2523,13 @@ static bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
+        // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
         getNotifier()->sendNotifyContextRequest(ncr,
                                                 notifyHttpInfo,
                                                 tenant,
                                                 xauthToken,
                                                 fiwareCorrelator,
+                                                0,
                                                 renderFormat,
                                                 attrsOrder,
                                                 blacklist,
@@ -2545,11 +2544,13 @@ static bool processOnChangeConditionForSubscription
     }
     else
     {
+      // correlatorCounter == 0 to omit cbnotif= in initial notifications as this one
       getNotifier()->sendNotifyContextRequest(ncr,
                                               notifyHttpInfo,
                                               tenant,
                                               xauthToken,
                                               fiwareCorrelator,
+                                              0,
                                               renderFormat,
                                               attrsOrder,
                                               blacklist,
@@ -2706,88 +2707,6 @@ BSONArray processConditionVector
 
 /* ****************************************************************************
 *
-* mongoUpdateCasubNewNotification -
-*/
-static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, std::string tenant)
-{
-  LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
-
-  /* Update the document */
-  BSONObj     query  = BSON("_id" << OID(subId));
-  BSONObj     update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) <<
-                            "$inc" << BSON(CASUB_COUNT << 1));
-
-  collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), query, update, false, err);
-
-  return SccOk;
-}
-
-
-
-/* ****************************************************************************
-*
-* processAvailabilitySubscription -
-*
-* This function is called from two places:
-*
-* 1) initial processing of subscribeContextAvailability (and updateContextAvailabilitySubscription),
-*   so an "initial" notification for all matching context registrations is sent
-* 2) registerContext processing logic when the new (or updated) context registration
-*   matches an availability subscription
-*
-* The enV arguments is set with all the entities included in the subscription (case 1) or
-* with only the triggering entities (case 2).
-*
-* This method returns true if the notification was actually send. Otherwise, false
-* is returned.
-*/
-bool processAvailabilitySubscription
-(
-  const EntityIdVector& enV,
-  const StringList&     attrL,
-  const std::string&    subId,
-  const std::string&    notifyUrl,
-  RenderFormat          renderFormat,
-  const std::string&    tenant,
-  const std::string&    fiwareCorrelator
-)
-{
-  std::string                       err;
-  NotifyContextAvailabilityRequest  ncar;
-  std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
-  servicePathV.push_back("");                      // While this gets implemented, "" default is used.
-
-  if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
-  {
-    ncar.contextRegistrationResponseVector.release();
-    return false;
-  }
-
-  if (ncar.contextRegistrationResponseVector.size() > 0)
-  {
-    /* Complete the fields in NotifyContextRequest */
-    ncar.subscriptionId.set(subId);
-
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, renderFormat);
-    ncar.contextRegistrationResponseVector.release();
-
-    /* Update database fields due to new notification */
-    if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk)
-    {
-      return false;
-    }
-
-    return true;
-  }
-
-  ncar.contextRegistrationResponseVector.release();
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * slashEscape - escape all slashes in 'from' into 'to'
 *
 * If the 'to' buffer is not big enough, slashEscape returns with to's content set to 'ERROR'.
@@ -2882,6 +2801,7 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     MimeType        perEntPaMimeType  = NOMIMETYPE;
     MimeType        perAttrPaMimeType = NOMIMETYPE;
     ProviderFormat  providerFormat;
+    std::string     regId;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
@@ -2890,12 +2810,14 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
                          &perEntPaMimeType,
                          &perAttrPa,
                          &perAttrPaMimeType,
-                         &providerFormat);
+                         &providerFormat,
+                         &regId);
 
     /* Looking results after crrV processing */
-    ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->providingApplication.set(perAttrPa.empty() ? perEntPa : perAttrPa);
     ca->providingApplication.setProviderFormat(providerFormat);
-    ca->found = (ca->providingApplication.get() != "");
+    ca->providingApplication.setRegId(regId);
+    ca->found = (!ca->providingApplication.get().empty());
   }
 }
 
@@ -2942,11 +2864,13 @@ void cprLookupByAttribute
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
   MimeType*                                 perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP
+  ProviderFormat*                           providerFormatP,
+  std::string*                              regId
 )
 {
   *perEntPa  = "";
   *perAttrPa = "";
+  *regId = "";
 
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
@@ -2961,13 +2885,13 @@ void cprLookupByAttribute
       {
         // By the moment the only supported pattern is .*. In this case matching is
         // based exclusively in type
-        if (regEn->type != en.type && regEn->type != "")
+        if (regEn->type != en.type && !regEn->type.empty())
         {
           /* No match (keep searching the CRR) */
           continue;
         }
       }
-      else if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      else if (regEn->id != en.id || (regEn->type != en.type && !regEn->type.empty()))
       {
         /* No match (keep searching the CRR) */
         continue;
@@ -2977,7 +2901,8 @@ void cprLookupByAttribute
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+        *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
+        *regId            = crr->regId;
 
         break;  /* enIx */
       }
@@ -2989,8 +2914,9 @@ void cprLookupByAttribute
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
-          *perAttrPa         = crr->contextRegistration.providingApplication.get();
-          *providerFormatP  =  crr->contextRegistration.providingApplication.getProviderFormat();
+          *perAttrPa        = crr->contextRegistration.providingApplication.get();
+          *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
+          *regId            = crr->regId;
 
           return;
         }

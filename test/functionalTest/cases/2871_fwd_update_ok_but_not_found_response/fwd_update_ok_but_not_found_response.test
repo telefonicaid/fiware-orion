@@ -42,7 +42,7 @@ accumulatorStart --pretty-print
 # 05. Update turn attribute using batch update
 # 06. Update turn attribute using PUT on attribute value
 # 07. Update turn attribute using NGSIv1 update
-# 08. Dump accumulator and see four forwarded updates
+# 08. Dump accumulator and see five forwarded updates
 #
 
 echo "01. Create registration directly in DB"
@@ -233,7 +233,6 @@ WriteResult({ "nInserted" : 1 })
 03. Update turn attribute using PATCH on entity
 ===============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -242,7 +241,6 @@ Date: REGEX(.*)
 04. Update turn attribute using PUT on attribute
 ================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -251,7 +249,6 @@ Date: REGEX(.*)
 05. Update turn attribute using batch update
 ============================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -260,7 +257,6 @@ Date: REGEX(.*)
 06. Update turn attribute using PUT on attribute value
 ======================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -307,7 +303,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
 
 {
     "contextElements": [
@@ -334,7 +330,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
 
 {
     "contextElements": [
@@ -361,7 +357,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
 
 {
     "contextElements": [
@@ -388,7 +384,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
 
 {
     "contextElements": [
@@ -415,7 +411,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
 
 {
     "contextElements": [

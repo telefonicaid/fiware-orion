@@ -95,7 +95,7 @@ static bool dataProvidedParse
   {
     ngsiv2::EntID* eP = &dataProvidedP->entities[eIx];
 
-    if ((eP->idPattern != "") && (eP->idPattern != ".*"))
+    if ((!eP->idPattern.empty()) && (eP->idPattern != ".*"))
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
@@ -105,7 +105,7 @@ static bool dataProvidedParse
       return false;
     }
 
-    if (eP->typePattern != "")
+    if (!eP->typePattern.empty())
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
@@ -167,7 +167,7 @@ static bool httpParse
 
   httpP->url = url.GetString();
 
-  if (httpP->url == "")
+  if (httpP->url.empty())
   {
     *errorStringP = "/url/ field of /" + fieldName + "/ cannot be the empty string";
     return false;
@@ -384,7 +384,7 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
 
     if (!expires.empty())
     {
-      expiresValue = parse8601Time(expires);
+      expiresValue = (int64_t) parse8601Time(expires);
       if (expiresValue == -1)
       {
         return badInput(ciP, "the field /expires/ has an invalid format");

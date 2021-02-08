@@ -87,7 +87,7 @@ std::string deleteIndividualContextEntity
   response.fill(parseDataP->upcrs.res);
 
   // 04. If not found, put entity info in details
-  if ((response.code == SccContextElementNotFound) && (response.details == ""))
+  if ((response.code == SccContextElementNotFound) && (response.details.empty()))
   {
     response.details = entityId;
   }

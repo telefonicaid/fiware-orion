@@ -192,7 +192,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 04. Update subscription conditions (to re-trigger initial notification)
 =======================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

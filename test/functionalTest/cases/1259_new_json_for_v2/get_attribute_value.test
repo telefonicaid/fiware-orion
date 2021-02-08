@@ -255,7 +255,6 @@ Date: REGEX(.*)
 02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
 ==================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -289,7 +288,6 @@ Date: REGEX(.*)
 05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
 =================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -324,7 +322,6 @@ Date: REGEX(.*)
 08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload
 ===============================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -358,7 +355,6 @@ Date: REGEX(.*)
 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload
 ================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -392,7 +388,6 @@ true
 14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -426,7 +421,6 @@ Date: REGEX(.*)
 17. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.14
 ===================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -460,7 +454,6 @@ Date: REGEX(.*)
 20. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload -12.1
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -494,7 +487,6 @@ Date: REGEX(.*)
 23. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.2e2
 ====================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 

@@ -60,22 +60,10 @@ std::string postRegistration
 )
 {
   // FIXME P4: See issue #3078 about servicePath for registrations
-  std::string           servicePath = (ciP->servicePathV[0] == "")? SERVICE_PATH_ROOT : ciP->servicePathV[0];
-  ngsiv2::Registration  registration;
-  OrionError            oe;
-  std::string           regId;
-  std::string           answer;
-
-  //
-  // FIXME P4: Forwarding modes "none", "query", and "update" to be implemented
-  //
-  if (parseDataP->reg.provider.supportedForwardingMode != ngsiv2::ForwardAll)
-  {
-    oe.fill(SccNotImplemented, "non-supported Forwarding Mode");
-    ciP->httpStatusCode = oe.code;
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
-    return answer;
-  }
+  std::string  servicePath = (ciP->servicePathV[0].empty())? SERVICE_PATH_ROOT : ciP->servicePathV[0];
+  OrionError   oe;
+  std::string  regId;
+  std::string  answer;
 
   TIMED_MONGO(mongoRegistrationCreate(&parseDataP->reg, ciP->tenant, servicePath, &regId, &oe));
   ciP->httpStatusCode = oe.code;

@@ -365,7 +365,7 @@ void paExtendedUsage(void)
 
   snprintf(progNAME, sizeof(progNAME), "Extended Usage: %s ", progName);
   spacePad = (char*) strdup(progNAME);
-  spacePad = (char*) strdup(progName);
+
   if (spacePad == NULL)
   {
     // strdup could return NULL if we run of of memory. Very unlikely, but

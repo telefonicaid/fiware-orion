@@ -139,8 +139,8 @@ NGSIv2 仕様の "Special Attribute Types" セクションから :
     * `MM`: month (2桁)
     * `DD`: day (2桁)
 * これについて `<time>` は、[ISO8601 仕様](https://en.wikipedia.org/wiki/ISO_8601#Times)に記述されているパターンのいずれかに従わなければならない :
-    * `hh:mm:ss.sss` または `hhmmss.sss`。現時点では、Orion は内部的には `.00` として保存されますが、マイクロ秒 (またはより小さい解像度) を含む時間を処理することができます。ただし、これは将来変更される可能性があります ([関連する問題](https://github.com/telefonicaid/fiware-orion/issues/2670)を参照)
-    * `hh:mm:ss` または `hhmmss` です
+    * `hh:mm:ss.sss` または `hhmmss.sss`
+    * `hh:mm:ss` または `hhmmss`。この場合、ミリ秒は `000` に設定されます
     * ``hh:mm` または `hhmm`。この場合、秒は `00` に設定されます
     * `hh`。この場合、分と秒は `00` に設定されます
     * もし `<time>` 省略された場合、時、分、秒が `00` に設定されます
@@ -151,7 +151,15 @@ NGSIv2 仕様の "Special Attribute Types" セクションから :
     * `±hh`
 * ISO8601 は、*" 時間表現で UTC 関係情報が与えられていない場合、その時間は現地時間であると想定される "* と規定している。ただし、クライアントとサーバが異なるゾーンにある場合、これはあいまいです。したがって、この曖昧さを解決するために、時間帯指定子が省略されている場合、Orion は常にタイムゾーン `Z` を想定します
 
-Orion は常にフォーマット `YYYY-MM-DDThh:mm:ss.ssZ` を使用して日時属性/メタデータを提供します。クライアント/レシーバが任意のタイムゾーンで実行されている可能性があるため、UTC/Zulu タイムゾーンを使用していることに注意してください。これは将来変更される可能性があります ([関連する問題](https://github.com/telefonicaid/fiware-orion/issues/2663)を参照)。
+Orion は常に、`YYYY-MM-DDThh:mm:ss.sssZ` という形式を使用して日時の属性/メタデータを提供します。ただし、Orion は
+`YYYY-MM-DDThh:mm:ss.ssZ` 形式を使用して他のタイムスタンプ (レジストレーション/サブスクリプションの有効期限、
+最後の通知/失敗/成功など) を提供することに注意してください
+(これについては、[関連する問題](https://github.com/telefonicaid/fiware-orion/issues/3671)を参照してください)。
+
+さらに、Orion は日付時刻を提供するときに常に UTC/Zulu タイムゾーンを使用することに注意してください (クライアント/
+レシーバーが任意のタイムゾーンで実行されている可能性があるため、これは最良のデフォルト・オプションです)
+これは将来変更される可能性があります ([関連する問題](https://github.com/telefonicaid/fiware-orion/issues/2663)を
+参照してください)。
 
 属性とメタデータの型としての文字列 "ISO8601" もサポートされています。この効果は、"DateTime" を使用した場合と同じです。
 
@@ -371,7 +379,6 @@ Orion は、次の点を除いて、NGSIv2 仕様に記載されているレジ�
 * `PATCH /v2/registration/<id>` は実装されていません。したがって、レジストレーションを直接更新することはできません。つまり、レジストレーションを削除して再作成する必要があります。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3007)についてはこちらをご覧ください
 * `idPattern` はサポートされています
 * `typePattern` は実装されていません
-* 唯一の有効な `supportedForwardingMode` は `all` です。他の値を使用しようとすると、501 Not Implemented エラー応答で終了します。[この issue](https://github.com/telefonicaid/fiware-orion/issues/3106) についてはこちらをご覧ください
 * `dataProvided` 内での `expression` フィールドはサポートされていません。フィールドは単に無視されます。これについては [この issue](https://github.com/telefonicaid/fiware-orion/issues/3107) を見てください。
 * `status` での `inactive` 値はサポートされていません。つまり、フィールドは正しく格納され/取得されますが、値が `inactive` の場合でもレジストレーションは常にアクティブです。これについては、[この issue](https://github.com/telefonicaid/fiware-orion/issues/3108) を見てください
 

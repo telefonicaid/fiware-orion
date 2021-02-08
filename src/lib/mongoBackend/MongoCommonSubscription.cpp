@@ -124,7 +124,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
   }
 
-  if (httpInfo.payload != "")
+  if (!httpInfo.payload.empty())
   {
     b->append(CSUB_PAYLOAD, httpInfo.payload);
     LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
@@ -183,7 +183,7 @@ void setServicePath(const std::string& servicePath, BSONObjBuilder* b)
 */
 void setDescription(const Subscription& sub, BSONObjBuilder* b)
 {
-  if (sub.description != "")
+  if (!sub.description.empty())
   {
     b->append(CSUB_DESCRIPTION, sub.description);
     LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
@@ -198,7 +198,7 @@ void setDescription(const Subscription& sub, BSONObjBuilder* b)
 */
 void setStatus(const Subscription& sub, BSONObjBuilder* b)
 {
-  std::string  status = (sub.status == "")? STATUS_ACTIVE : sub.status;
+  std::string  status = (sub.status.empty())? STATUS_ACTIVE : sub.status;
 
   b->append(CSUB_STATUS, status);
   LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
@@ -226,23 +226,23 @@ void setEntities(const Subscription& sub, BSONObjBuilder* b)
     // Note that, due to legacy reasons, isPattern may be "true" or "false" (text)
     // while isTypePattern may be true or false (boolean).
     //
-    if (en.idPattern != "")
+    if (!en.idPattern.empty())
     {
       finalId     = en.idPattern;
       isIdPattern = "true";
     }
-    else if (en.id != "")
+    else if (!en.id.empty())
     {
       finalId     = en.id;
       isIdPattern = "false";
     }
 
-    if (en.typePattern != "")
+    if (!en.typePattern.empty())
     {
       finalType     = en.typePattern;
       isTypePattern = true;
     }
-    else if (en.type != "")
+    else if (!en.type.empty())
     {
       finalType     = en.type;
       isTypePattern = false;
@@ -378,7 +378,7 @@ void setLastFailure(long long lastFailure, const std::string& lastFailureReason,
   b->append(CSUB_LASTFAILURE, lastFailure);
   LM_T(LmtMongo, ("Subscription lastFailure: %lu", lastFailure));
 
-  if (lastFailureReason != "")
+  if (!lastFailureReason.empty())
   {
     b->append(CSUB_LASTFAILUREASON, lastFailureReason);
     LM_T(LmtMongo, ("Subscription lastFailureReason: %s", lastFailureReason.c_str()));

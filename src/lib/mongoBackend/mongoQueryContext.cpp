@@ -221,6 +221,7 @@ static void addContextProviders
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
     ContextRegistration cr = crrV[ix]->contextRegistration;
+    cr.providingApplication.setRegId(crrV[ix]->regId);
 
     /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP))
@@ -280,7 +281,7 @@ static void processGenericEntities
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* enP = enV[ix];
-    if (enP->type == "" || isTrue(enP->isPattern))
+    if (enP->type.empty() || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);
     }
@@ -363,7 +364,7 @@ HttpStatusCode mongoQueryContext
   /* In the case of empty response, if only generic processing is needed */
   if (rawCerV.size() == 0)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -377,7 +378,7 @@ HttpStatusCode mongoQueryContext
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(rawCerV))
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -394,7 +395,7 @@ HttpStatusCode mongoQueryContext
 
   if (someContextElementNotFound(rawCerV))
   {
-    if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, attrNullList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -411,7 +412,7 @@ HttpStatusCode mongoQueryContext
    */
   if (requestP->attributeList.size() == 0)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {

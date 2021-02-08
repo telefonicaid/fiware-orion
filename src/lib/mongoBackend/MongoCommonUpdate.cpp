@@ -83,6 +83,39 @@ using orion::CompoundValueNode;
 
 /* ****************************************************************************
 *
+* correlatorRoot -
+*
+* This functions returns the "correlator root", i.e. correlator without the "cbnotif" decorator
+*
+* For instance if full correlator is
+*
+*   f320136c-0192-11eb-a893-000c29df7908; cbnotif=32
+*
+* then the correlator root is:
+*
+*   f320136c-0192-11eb-a893-000c29df7908
+*
+* This is needed as the self-notification loop protection logic is based on the correlator root
+* so we store that in the DB.
+*
+*/
+inline std::string correlatorRoot(const std::string& fullCorrelator)
+{
+  size_t p = fullCorrelator.find(";");
+  if (p == std::string::npos)
+  {
+    return fullCorrelator;
+  }
+  else
+  {
+    return fullCorrelator.substr(0, p);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * isNotCustomMetadata -
 *
 * Check that the parameter is a not custom metadata, i.e. one metadata without
@@ -283,7 +316,7 @@ static bool attrValueChanges(const BSONObj& attr, ContextAttribute* caP, const b
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
   {
-    return (caP->valueType != orion::ValueTypeString || caP->stringValue != "");
+    return (caP->valueType != orion::ValueTypeString || !caP->stringValue.empty());
   }
 
   /* No value in the request means that the value stays as it was before, so it is not a change */
@@ -349,7 +382,7 @@ static void appendMetadata
   mdNamesBuilder->append(mdP->name);
   std::string effectiveName = dbDotEncode(mdP->name);
 
-  if (type != "")
+  if (!type.empty())
   {
     switch (mdP->valueType)
     {
@@ -491,7 +524,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   }
 
   /* 2. Add type, if present in request. If not, just use the one that is already present in the database. */
-  if (caP->type != "")
+  if (!caP->type.empty())
   {
     ab.append(ENT_ATTRS_TYPE, caP->type);
   }
@@ -566,7 +599,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getIntFieldF(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -583,7 +616,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
     actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                    ((caP->type != "") &&
+                    ((!caP->type.empty()) &&
                      (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                     mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
   }
@@ -607,7 +640,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -702,7 +735,7 @@ static bool updateAttribute
   if (isReplace)
   {
     BSONObjBuilder newAttr;
-    int            now = getCurrentTime();
+    double         now = getCurrentTime();
 
     *actualUpdate = true;
 
@@ -836,7 +869,7 @@ static bool appendAttribute
   ab.append(ENT_ATTRS_MDNAMES, mdNames);
 
   /* 4. Dates */
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   ab.append(ENT_ATTRS_CREATION_DATE, now);
   ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
@@ -901,7 +934,7 @@ static void servicePathSubscription(const std::string& servicePath, BSONArrayBui
   //
   // Split Service Path in 'path components'
   //
-  if (servicePath != "")
+  if (!servicePath.empty())
   {
     spathComponents = stringSplit(servicePath, '/', spathV);
   }
@@ -969,7 +1002,7 @@ static bool addTriggeredSubscriptions_withCache
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     CachedSubscription* cSubP = subVec[ix];
@@ -977,7 +1010,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
-      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)",
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%f, DIFF: %f)",
                          cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
@@ -989,6 +1022,41 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
+    // Throttling
+    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
+    {
+      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
+      {
+        LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
+                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f)",
+                           cSubP->subscriptionId,
+                           cSubP->throttling,
+                           cSubP->lastNotificationTime,
+                           now,
+                           now - cSubP->lastNotificationTime));
+        continue;
+      }
+      else
+      {
+        LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
+                           "(T: %lu, LNT: %lu, NOW: %f, NOW-LNT: %f)",
+                           cSubP->subscriptionId,
+                           cSubP->throttling,
+                           cSubP->lastNotificationTime,
+                           now,
+                           now - cSubP->lastNotificationTime));
+      }
+    }
+    else
+    {
+      LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
+                         "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu)",
+                         cSubP->subscriptionId,
+                         cSubP->throttling,
+                         cSubP->lastNotificationTime,
+                         now,
+                         now - cSubP->lastNotificationTime));
+    }
 
     //
     // FIXME P4: See issue #2076.
@@ -1013,45 +1081,6 @@ static bool addTriggeredSubscriptions_withCache
     else
     {
       aList.fill(cSubP->attributes);
-    }
-
-    // Throttling
-    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
-    {
-      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
-      {
-        LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                           cSubP->subscriptionId,
-                           cSubP->throttling,
-                           cSubP->lastNotificationTime,
-                           now,
-                           now - cSubP->lastNotificationTime,
-                           cSubP->throttling));
-        continue;
-      }
-      else
-      {
-        LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling "
-                           "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                           cSubP->subscriptionId,
-                           cSubP->throttling,
-                           cSubP->lastNotificationTime,
-                           now,
-                           now - cSubP->lastNotificationTime,
-                           cSubP->throttling));
-      }
-    }
-    else
-    {
-      LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II "
-                         "(T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                         cSubP->subscriptionId,
-                         cSubP->throttling,
-                         cSubP->lastNotificationTime,
-                         now,
-                         now - cSubP->lastNotificationTime,
-                         cSubP->throttling));
     }
 
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,
@@ -1330,7 +1359,7 @@ static bool addTriggeredSubscriptions_noCache
   //
   // Allocating buffer to hold all these BIG variables, necessary for the population of
   // the four parts of the final query.
-  // The necessary variables are too big for the stack and thus moved to the head, inside BsonGroup.
+  // The necessary variables are too big for the stack and thus moved to the heap, inside CSubQueryGroup.
   //
   CSubQueryGroup* bgP = new CSubQueryGroup();
 
@@ -1467,7 +1496,7 @@ static bool addTriggeredSubscriptions_noCache
         trigs->fillExpression(georel, geometry, coords);
 
         // Parsing q
-        if (q != "")
+        if (!q.empty())
         {
           StringFilter* stringFilterP = new StringFilter(SftQ);
 
@@ -1499,7 +1528,7 @@ static bool addTriggeredSubscriptions_noCache
         }
 
         // Parsing mq
-        if (mq != "")
+        if (!mq.empty())
         {
           StringFilter* mdStringFilterP = new StringFilter(SftMq);
 
@@ -1592,6 +1621,7 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   const ngsiv2::HttpInfo&          httpInfo,
   bool                             blacklist = false
 )
@@ -1654,6 +1684,7 @@ static bool processOnChangeConditionForUpdateContext
                                           tenant,
                                           xauthToken,
                                           fiwareCorrelator,
+                                          correlatorCounter,
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
@@ -1677,7 +1708,8 @@ static unsigned int processSubscriptions
   std::string*                                   err,
   const std::string&                             tenant,
   const std::string&                             xauthToken,
-  const std::string&                             fiwareCorrelator
+  const std::string&                             fiwareCorrelator,
+  unsigned int                                   notifStartCounter
 )
 {
   *err = "";
@@ -1726,7 +1758,7 @@ static unsigned int processSubscriptions
     /* Check 3: expression (georel, which also uses geometry and coords)
      * This should be always the last check, as it is the most expensive one, given that it interacts with DB
      * (Issue #2396 should solve that) */
-    if ((tSubP->expression.georel != "") && (tSubP->expression.coords != "") && (tSubP->expression.geometry != ""))
+    if ((!tSubP->expression.georel.empty()) && (!tSubP->expression.coords.empty()) && (!tSubP->expression.geometry.empty()))
     {
       Scope        geoScope;
       std::string  filterErr;
@@ -1788,6 +1820,7 @@ static unsigned int processSubscriptions
                                                                 tenant,
                                                                 xauthToken,
                                                                 fiwareCorrelator,
+                                                                notifStartCounter + notifSent + 1,
                                                                 tSubP->httpInfo,
                                                                 tSubP->blacklist);
 
@@ -1795,18 +1828,20 @@ static unsigned int processSubscriptions
     {
       notifSent++;
 
-      long long rightNow = getCurrentTime();
-      BSONObj query  = BSON("_id" << OID(mapSubId));
-      BSONObj update;
+      long long  rightNow  = getCurrentTime();
+      BSONObj    query     = BSON("_id" << OID(mapSubId));
+      BSONObj    update;
+
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB
       //
       if (subCacheActive == false)
       {
-        BSONObj subOrig;
-        std::string newErr;
+        BSONObj      subOrig;
+        std::string  newErr;
+        std::string  status;
+
         collectionFindOne(getSubscribeContextCollectionName(tenant), query, &subOrig, &newErr);
-        std::string status;
         if (!subOrig.isEmpty())
         {
           if (subOrig.hasField(CSUB_STATUS))
@@ -1833,7 +1868,7 @@ static unsigned int processSubscriptions
       //
       // Saving lastNotificationTime and count for cached subscription
       //
-      if (tSubP->cacheSubId != "")
+      if (!tSubP->cacheSubId.empty())
       {
         cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
 
@@ -1993,7 +2028,7 @@ static void updateAttrInNotifyCer
       }
 
       /* Set attribute type (except if new value is "", which means that the type is not going to change) */
-      if (targetAttr->type != "")
+      if (!targetAttr->type.empty())
       {
         caP->type = targetAttr->type;
       }
@@ -2002,7 +2037,7 @@ static void updateAttrInNotifyCer
       caP->actionType = actionType;
 
       /* Set modification date */
-      int now = getCurrentTime();
+      double now = getCurrentTime();
       caP->modDate = now;
 
       /* Metadata. Note we clean any previous content as updating an attribute means that all
@@ -2042,7 +2077,7 @@ static void updateAttrInNotifyCer
             mdP->compoundValueP       = targetMdP->compoundValueP;
             targetMdP->compoundValueP = NULL;
 
-            if (targetMdP->type != "")
+            if (!targetMdP->type.empty())
             {
               mdP->type = targetMdP->type;
             }
@@ -2067,7 +2102,7 @@ static void updateAttrInNotifyCer
   /* Reached this point, it means that it is a new attribute (APPEND case) */
   ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
 
-  int now = getCurrentTime();
+  double now = getCurrentTime();
   caP->creDate = now;
   caP->modDate = now;
 
@@ -2278,7 +2313,7 @@ static bool deleteContextAttributeItem
     *entityModified = true;
 
     /* Check aspects related with location */
-    if (targetAttr->getLocation(apiVersion).length() > 0)
+    if (!targetAttr->getLocation(apiVersion).empty())
     {
       std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +
@@ -2515,13 +2550,12 @@ static bool processContextAttributeVector
 /* ****************************************************************************
 *
 * createEntity -
-*
 */
 static bool createEntity
 (
   Entity*                          eP,
   const ContextAttributeVector&    attrsV,
-  int                              now,
+  double                           now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -2612,7 +2646,7 @@ static bool createEntity
 
   bsonId.append(ENT_ENTITY_ID, eP->id);
 
-  if (eP->type == "")
+  if (eP->type.empty())
   {
     if (apiVersion == V2)
     {
@@ -2625,7 +2659,7 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? SERVICE_PATH_ROOT : servicePathV[0]);
+  bsonId.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
 
   BSONObjBuilder insertedDoc;
 
@@ -2636,7 +2670,7 @@ static bool createEntity
   insertedDoc.append(ENT_MODIFICATION_DATE, now);
 
   /* Add location information in the case it was found */
-  if (locAttr.length() > 0)
+  if (!locAttr.empty())
   {
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                           ENT_LOCATION_COORDS   << geoJson.obj()));
@@ -2649,7 +2683,9 @@ static bool createEntity
   }
 
   // Correlator (for notification loop detection logic)
-  insertedDoc.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+  // Note entity creation could be caused by a notification request
+  // (with cbnotif= in the correlator) so we need to use correlatorRoot()
+  insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
@@ -2682,7 +2718,7 @@ static bool removeEntity
   BSONObjBuilder       bob;
 
   bob.append(idString, entityId);
-  if (entityType == "")
+  if (entityType.empty())
   {
     bob.append(typeString, BSON("$exists" << false));
   }
@@ -2691,7 +2727,7 @@ static bool removeEntity
     bob.append(typeString, entityType);
   }
 
-  if (servicePath == "")
+  if (servicePath.empty())
   {
     bob.append(servicePathString, BSON("$exists" << false));
   }
@@ -2742,7 +2778,7 @@ static void searchContextProviders
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrL, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -2764,7 +2800,7 @@ static void searchContextProviders
   StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrNullList, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
       if (crrV.size() > 0)
       {
@@ -2799,7 +2835,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (aP->providingApplication.get() != "")
+      if (!aP->providingApplication.get().empty())
       {
         return true;
       }
@@ -2832,6 +2868,7 @@ static unsigned int updateEntity
   const bool&                     forcedUpdate,
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
+  unsigned int                    notifStartCounter,
   const std::string&              ngsiV2AttrsFormat
 )
 {
@@ -2946,15 +2983,15 @@ static unsigned int updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == fiwareCorrelator);
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == correlatorRoot(fiwareCorrelator));
   }
 
   if (!processContextAttributeVector(eP,
@@ -3011,14 +3048,14 @@ static unsigned int updateEntity
 
   if (action != ActionTypeReplace)
   {
-    int now = getCurrentTime();
+    double now = getCurrentTime();
     toSet.append(ENT_MODIFICATION_DATE, now);
     notifyCerP->entity.modDate = now;
   }
 
   // We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
-  if (locAttr.length() > 0)
+  if (!locAttr.empty())
   {
     newGeoJson = geoJson.obj();
 
@@ -3054,9 +3091,11 @@ static unsigned int updateEntity
 
   // Correlator (for notification loop detection logic). We don't touch toSet in the replace case, due to
   // the way in which BSON is composed in that case (see below)
+  // Note entity update could be caused by a notification request
+  // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   if (action != ActionTypeReplace)
   {
-    toSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+    toSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
   }
 
   /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
@@ -3071,14 +3110,16 @@ static unsigned int updateEntity
   {
     // toSet: { A1: { ... }, A2: { ... } }
     BSONObjBuilder replaceSet;
-    int            now = getCurrentTime();
+    double         now = getCurrentTime();
 
     // In order to enable easy append management of fields (e.g. location, dateExpiration),
     // we use a BSONObjBuilder instead the BSON stream macro.
+    // Note entity replacement could be caused by a notification request
+    // (with cbnotif= in the correlator) so we need to use correlatorRoot()
     replaceSet.append(ENT_ATTRS, toSetObj);
     replaceSet.append(ENT_ATTRNAMES, toPushArr);
     replaceSet.append(ENT_MODIFICATION_DATE, now);
-    replaceSet.append(ENT_LAST_CORRELATOR, fiwareCorrelator);
+    replaceSet.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
     if (dateExpirationInPayload)
     {
@@ -3134,7 +3175,7 @@ static unsigned int updateEntity
   // idString, typeString from earlier in this function
   query.append(idString, entityId);
 
-  if (entityType == "")
+  if (entityType.empty())
   {
     query.append(typeString, BSON("$exists" << false));
   }
@@ -3175,7 +3216,8 @@ static unsigned int updateEntity
                                                 &err,
                                                 tenant,
                                                 xauthToken,
-                                                fiwareCorrelator);
+                                                fiwareCorrelator,
+                                                notifStartCounter);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -3261,7 +3303,7 @@ static bool contextElementPreconditionsCheck
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
       ContextAttribute* aP = eP->attributeVector[ix];
-      if (aP->valueType == orion::ValueTypeNotGiven && aP->type == "" && (aP->metadataVector.size() == 0))
+      if (aP->valueType == orion::ValueTypeNotGiven && aP->type.empty() && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
@@ -3321,6 +3363,7 @@ unsigned int processContextElement
   const std::string&                   fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
   const bool&                          forcedUpdate,
+  unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3340,7 +3383,7 @@ unsigned int processContextElement
 
   bob.append(idString, eP->id);
 
-  if (eP->type != "")
+  if (!eP->type.empty())
   {
     bob.append(typeString, eP->type);
   }
@@ -3494,6 +3537,7 @@ unsigned int processContextElement
                              forcedUpdate,
                              apiVersion,
                              fiwareCorrelator,
+                             notifStartCounter,
                              ngsiV2AttrsFormat);
   }
 
@@ -3562,7 +3606,7 @@ unsigned int processContextElement
     {
       std::string  errReason;
       std::string  errDetail;
-      int          now = getCurrentTime();
+      double       now = getCurrentTime();
 
       if (!createEntity(eP, eP->attributeVector, now, &errDetail, tenant, servicePathV, apiVersion, fiwareCorrelator, &(responseP->oe)))
       {
@@ -3631,7 +3675,8 @@ unsigned int processContextElement
                                          &errReason,
                                          tenant,
                                          xauthToken,
-                                         fiwareCorrelator);
+                                         fiwareCorrelator,
+                                         notifStartCounter);
 
         notifyCerP->release();
         delete notifyCerP;

@@ -146,8 +146,18 @@ function usage()
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
   echo ""
   echo "Env Vars:"
-  echo "CB_SKIP_LIST:        default value for option --skipList"
-  echo "CB_SKIP_FUNC_TESTS:  list of names of func tests to skip"
+  echo "CB_MAX_TRIES:             The number of tries before giving up on a failing test case"
+  echo "CB_SKIP_LIST:             Default value for option --skipList"
+  echo "CB_SKIP_FUNC_TESTS:       List of names of func tests to skip"
+  echo "CB_NO_CACHE:              Start the broker without subscription cache (if set to 'ON')"
+  echo "CB_THREADPOOL:            Start the broker without thread pool (if set to 'OFF')"
+  echo "CB_DIFF_TOOL:             To view diff of failing tests with diff/tkdiff/meld/... (e.g. export CB_DIFF_TOOL=tkdiff)"
+  echo "CB_WITH_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
+  echo ""
+  echo "FT_FROM_IX: alternative to commandline parameter  'fromIx', index of test where to start (inclusive) "
+  echo "FT_TO_IX: alternative to commandline parameter  'toIx', index of test where to end (inclusive)"
+  echo
+  echo "Please note that, if using CB_WITH_EXTERNAL_BROKER (or --xbroker, which is the same), only a single test case should be run."
   echo
   exit $1
 }
@@ -282,8 +292,6 @@ done
 
 vMsg "options parsed"
 
-
-
 # -----------------------------------------------------------------------------
 #
 # The function brokerStart looks at the env var CB_NO_CACHE to decide
@@ -305,7 +313,27 @@ then
   export CB_THREADPOOL=$threadpool
 fi
 
+# -----------------------------------------------------------------------------
+#
+# Check if fromIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_FROM_IX" != "" ] && [ $fromIx == 0 ]
+then
+  fromIx=$FT_FROM_IX
+fi
 
+# -----------------------------------------------------------------------------
+#
+# Check if toIx is set through an env var and use if nothing
+# else is set through commandline parameter
+#
+if [ "$FT_TO_IX" != "" ] && [ $toIx == 0 ]
+then
+  toIx=$FT_TO_IX
+fi
+
+echo "Run tests $fromIx to $toIx"
 
 # ------------------------------------------------------------------------------
 #
@@ -402,7 +430,7 @@ toBeStopped=false
 #
 if [ "$xbroker" == "ON" ]
 then
-    export CB_WITH_EXTERNAL_BROKER=1
+    export CB_WITH_EXTERNAL_BROKER=ON
 fi
 
 

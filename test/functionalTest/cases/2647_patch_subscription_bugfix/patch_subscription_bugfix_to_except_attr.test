@@ -125,14 +125,14 @@ Date: REGEX(.*)
 02. Get subscription, see notification.attrs
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 617
+Content-Length: 618
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "One subscription to rule them all",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2016-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
@@ -183,7 +183,6 @@ Date: REGEX(.*)
 03. Patch subscription
 ======================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -192,14 +191,14 @@ Date: REGEX(.*)
 04. Get subscription again, see notification.exceptAttrs
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 570
+Content-Length: 571
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "One subscription to rule them all",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2016-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrsFormat": "normalized",

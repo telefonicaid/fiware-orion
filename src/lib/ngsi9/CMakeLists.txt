@@ -25,29 +25,13 @@ SET (SOURCES
     RegisterContextResponse.cpp
     DiscoverContextAvailabilityRequest.cpp
     DiscoverContextAvailabilityResponse.cpp
-    NotifyContextAvailabilityRequest.cpp
-    SubscribeContextAvailabilityRequest.cpp
-    SubscribeContextAvailabilityResponse.cpp
-    UnsubscribeContextAvailabilityRequest.cpp
-    UnsubscribeContextAvailabilityResponse.cpp
-    UpdateContextAvailabilitySubscriptionRequest.cpp
-    UpdateContextAvailabilitySubscriptionResponse.cpp
-    NotifyContextAvailabilityResponse.cpp
 )
 
 SET (HEADERS
     DiscoverContextAvailabilityRequest.h
     DiscoverContextAvailabilityResponse.h
-    NotifyContextAvailabilityRequest.h
     RegisterContextRequest.h
     RegisterContextResponse.h
-    SubscribeContextAvailabilityRequest.h
-    SubscribeContextAvailabilityResponse.h
-    UnsubscribeContextAvailabilityRequest.h
-    UnsubscribeContextAvailabilityResponse.h
-    UpdateContextAvailabilitySubscriptionRequest.h
-    UpdateContextAvailabilitySubscriptionResponse.h
-    NotifyContextAvailabilityResponse.h
 )
 
 

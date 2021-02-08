@@ -65,7 +65,7 @@ std::string SubscriptionId::check(void)
 {
   std::string out = "OK";
 
-  if (string != "")
+  if (!string.empty())
   {
     out = idCheck(string);
   }
@@ -81,7 +81,7 @@ std::string SubscriptionId::check(void)
 */
 bool SubscriptionId::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -127,13 +127,9 @@ std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
 {
   std::string xString = string;
 
-  if (xString == "")
+  if (xString.empty())
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||
@@ -172,13 +168,9 @@ void SubscriptionId::release(void)
 */
 bool SubscriptionId::rendered(RequestType container)
 {
-  if ((string == "") || (string == "000000000000000000000000"))
+  if ((string.empty()) || (string == "000000000000000000000000"))
   {
-    if ((container == RtSubscribeContextAvailabilityResponse)          ||
-        (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
-        (container == RtUnsubscribeContextAvailabilityResponse)        ||
-        (container == NotifyContextAvailability)                       ||
-        (container == UpdateContextSubscription)                       ||
+    if ((container == UpdateContextSubscription)                       ||
         (container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||

@@ -41,7 +41,8 @@ extern std::string parseContextAttributeCompoundValue
 (
   const rapidjson::Value::ConstMemberIterator&  node,
   ContextAttribute*                             caP,
-  orion::CompoundValueNode*                     parent
+  orion::CompoundValueNode*                     parent,
+  int                                           deep
 );
 
 

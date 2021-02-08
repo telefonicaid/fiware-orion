@@ -61,3 +61,19 @@ As a reference, in our lab tests in a machine with Orion 1.13.0 running with 4 G
 of subscriptions got higher than 211.000 subscriptions.
 
 There is [an issue in the repository](https://github.com/telefonicaid/fiware-orion/issues/2780) about improvements related with this.
+
+## Maximum nesting level
+
+There is a maximum nesting level for compound attributes and metadata values. This limit is 50 levels.
+If you try to create or update an attribute/metadata with a value overpassing this limit you will get a
+400 Bad Request error with this payload:
+
+```
+{
+   "description": "attribute or metadata value has overpassed maximum nesting limit: 50",
+   "error": "ParseError"
+}
+```
+
+Note that other systems dealing with JSON also use to have this kind of limit (for instance,
+[the limit in MongoDB](https://docs.mongodb.com/manual/reference/limits/#Nested-Depth-for-BSON-Documents)).

@@ -66,7 +66,7 @@ static void setRegistrationId(mongo::BSONObjBuilder* bobP, std::string* regIdP)
 */
 static void setDescription(const std::string& description, mongo::BSONObjBuilder* bobP)
 {
-  if (description != "")
+  if (!description.empty())
   {
     bobP->append(REG_DESCRIPTION, description);
   }
@@ -94,7 +94,7 @@ static void setExpiration(long long expires, mongo::BSONObjBuilder* bobP)
 */
 static void setServicePath(const std::string& servicePath, mongo::BSONObjBuilder* bobP)
 {
-  if (servicePath != "")
+  if (!servicePath.empty())
   {
     bobP->append(REG_SERVICE_PATH, servicePath);
   }
@@ -116,9 +116,9 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (eP->idPattern == "")
+    if (eP->idPattern.empty())
     {
-      if (eP->type == "")
+      if (eP->type.empty())
       {
         entities.append(BSON(REG_ENTITY_ID << eP->id));
       }
@@ -129,7 +129,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
     }
     else
     {
-      if (eP->type == "")
+      if (eP->type.empty())
       {
         entities.append(BSON(REG_ENTITY_ID << eP->idPattern << REG_ENTITY_ISPATTERN << "true"));
       }
@@ -161,7 +161,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
 */
 static void setStatus(const std::string& status, mongo::BSONObjBuilder* bobP)
 {
-  if (status != "")
+  if (!status.empty())
   {
     bobP->append(REG_STATUS, status);
   }
@@ -175,10 +175,21 @@ static void setStatus(const std::string& status, mongo::BSONObjBuilder* bobP)
 */
 static void setFormat(const std::string& format, mongo::BSONObjBuilder* bobP)
 {
-  if (format != "")
+  if (!format.empty())
   {
     bobP->append(REG_FORMAT, format);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* setForwardingMode -
+*/
+static void setForwardingMode(const ngsiv2::ForwardingMode forwardingMode, mongo::BSONObjBuilder* bobP)
+{
+  bobP->append(REG_FORWARDING_MODE, ngsiv2::forwardingModeToString(forwardingMode));
 }
 
 
@@ -211,6 +222,7 @@ void mongoRegistrationCreate
   setServicePath(servicePath, &bob);
   setContextRegistrationVector(regP, &bob);
   setStatus(regP->status, &bob);
+  setForwardingMode(regP->provider.supportedForwardingMode, &bob);
 
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
   setFormat(format, &bob);

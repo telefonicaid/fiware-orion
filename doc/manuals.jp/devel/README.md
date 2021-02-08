@@ -1,6 +1,6 @@
 # <a name="top"></a>開発マニュアル
 
-*注 : このドキュメントでは、リリース 2.3.x の Orion Context Broker について説明しています。*
+*注 : このドキュメントでは、リリース 2.5.x の Orion Context Broker について説明しています。*
 
 ## 対象読者
 

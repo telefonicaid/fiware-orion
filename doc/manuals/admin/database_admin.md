@@ -170,8 +170,8 @@ you in that task, the garbage-collector.py script is provided along with
 the Orion Context Broker (in
 /usr/share/contextBroker/garbage-collector.py after installing the RPM).
 
-The garbage-collector.py looks for expired documents in registrations,
-csubs and casubs collection, "marking" them with the following field:
+The garbage-collector.py looks for expired documents in registrations and
+csubs collection, "marking" them with the following field:
 
 ```
 {
@@ -182,10 +182,10 @@ csubs and casubs collection, "marking" them with the following field:
 ```
 
 The garbage-collector.py program takes as arguments the collection to be
-analyzed. E.g. to analyze csubs and casubs, run:
+analyzed. E.g. to analyze csubs, run:
 
 ```
-garbage-collector.py csubs casubs
+garbage-collector.py csubs
 ```
 
 After running garbage-collector.py you can easily remove the expired
@@ -195,7 +195,6 @@ documents using the following commands in the mongo console:
 mongo <host>/<db>
 > db.registrations.remove({expired: 1})
 > db.csubs.remove({expired: 1})
-> db.casubs.remove({expired: 1})
 ```
 [Top](#top)
 

@@ -69,6 +69,7 @@ void Notifier::sendNotifyContextRequest
     const std::string&               tenant,
     const std::string&               xauthToken,
     const std::string&               fiwareCorrelator,
+    unsigned int                     correlatorCounter,
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsFilter,
     bool                             blacklist,
@@ -81,6 +82,7 @@ void Notifier::sendNotifyContextRequest
                                                                           tenant,
                                                                           xauthToken,
                                                                           fiwareCorrelator,
+                                                                          correlatorCounter,
                                                                           renderFormat,
                                                                           attrsFilter,
                                                                           blacklist,
@@ -108,78 +110,6 @@ void Notifier::sendNotifyContextRequest
 
 /* ****************************************************************************
 *
-* Notifier::sendNotifyContextAvailabilityRequest -
-*
-* FIXME: this method is very similar to sendNotifyContextRequest and probably
-* they could be refactored in the future to have a common part using a parent
-* class for both types of notifications and using it as first argument
-*/
-void Notifier::sendNotifyContextAvailabilityRequest
-(
-  NotifyContextAvailabilityRequest*  ncar,
-  const std::string&                 url,
-  const std::string&                 tenant,
-  const std::string&                 fiwareCorrelator,
-  RenderFormat                       renderFormat
-)
-{
-    /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->toJsonV1();
-
-    /* Parse URL */
-    std::string  host;
-    int          port;
-    std::string  uriPath;
-    std::string  protocol;
-
-    if (!parseUrl(url, host, port, uriPath, protocol))
-    {
-      std::string details = std::string("sending NotifyContextAvailabilityRequest: malformed URL: '") + url + "'";
-      alarmMgr.badInput(clientIp, details);
-
-      return;
-    }
-
-    /* Set Content-Type */
-    std::string content_type = "application/json";
-
-    /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-    pthread_t            tid;
-    SenderThreadParams*  params = new SenderThreadParams();
-
-    params->from             = fromIp;  // note fromIp is a thread variable
-    params->ip               = host;
-    params->port             = port;
-    params->protocol         = protocol;
-    params->verb             = "POST";
-    params->tenant           = tenant;
-    params->resource         = uriPath;
-    params->content_type     = content_type;
-    params->content          = payload;
-    params->mimeType         = JSON;
-    params->fiwareCorrelator = fiwareCorrelator;
-    params->renderFormat     = renderFormatToString(renderFormat);
-    params->registration     = true;
-
-    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
-
-    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>;
-    paramsV->push_back(params);
-
-    int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
-    if (ret != 0)
-    {
-      LM_E(("Runtime Error (error creating thread: %d)", ret));
-      return;
-    }
-    pthread_detach(tid);
-}
-
-
-
-
-/* ****************************************************************************
-*
 * buildSenderParamsCustom -
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
@@ -190,6 +120,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   tenant,
     const std::string&                   xauthToken,
     const std::string&                   fiwareCorrelator,
+    unsigned int                         correlatorCounter,
     RenderFormat                         renderFormat,
     const std::vector<std::string>&      attrsFilter,
     bool                                 blacklist,
@@ -235,7 +166,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    if (httpInfo.payload == "")
+    if (httpInfo.payload.empty())
     {
       NotifyContextRequest   ncr;
       ContextElementResponse cer;
@@ -289,7 +220,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         return paramsV;  // empty vector
       }
 
-      if ((value == "") || (key == ""))
+      if ((value.empty()) || (key.empty()))
       {
         // To avoid e.g '?a=&b=&c='
         continue;
@@ -312,7 +243,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         return paramsV;  // empty vector
       }
 
-      if (key == "")
+      if (key.empty())
       {
         // To avoid empty header name
         continue;
@@ -375,10 +306,22 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->content          = payload;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
     params->registration     = false;
     params->subscriptionId   = subscriptionId.get();
+
+    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
+    // case of initial notification)
+    if (correlatorCounter > 0)
+    {
+      char suffix[STRING_SIZE_FOR_INT];
+      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
+    }
+    else
+    {
+      params->fiwareCorrelator = fiwareCorrelator;
+    }
 
     paramsV->push_back(params);
   }
@@ -399,6 +342,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
+  unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
@@ -438,6 +382,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                                      tenant,
                                      xauthToken,
                                      fiwareCorrelator,
+                                     correlatorCounter,
                                      renderFormat,
                                      attrsFilter,
                                      blacklist,
@@ -457,7 +402,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     {
       Entity* eP = &ncr.contextElementResponseVector[ix]->entity;
 
-      if (spathList != "")
+      if (!spathList.empty())
       {
         spathList += ",";
       }
@@ -523,9 +468,21 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->content          = payloadString;
     params->mimeType         = JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
-    params->fiwareCorrelator = fiwareCorrelator;
     params->subscriptionId   = ncr.subscriptionId.get();
     params->registration     = false;
+
+    // If correlatorCounter >0, use it (0 correlatorCounter is expected only in the
+    // case of initial notification)
+    if (correlatorCounter > 0)
+    {
+      char suffix[STRING_SIZE_FOR_INT];
+      snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+      params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
+    }
+    else
+    {
+      params->fiwareCorrelator = fiwareCorrelator;
+    }
 
     paramsV->push_back(params);
     return paramsV;

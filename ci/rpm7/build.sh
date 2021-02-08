@@ -37,7 +37,6 @@ function _usage()
     -s   --stage         specify stage (unit/functional/compliance) to use
     -m   --make          cmake/make (works with unit/functional stage only)
     -i   --install       make install (works with unit/functional stage only)
-    -d   --db            start mongodb
     -t   --test          run unit/functional/compliance test (depends on the defined stage)
     -r   --rpm           specify rpm (nightly, release, testing) to build
     -u   --upload        upload rpm, REPO_USER and REPO_PASSWORD ENV variables should be provided
@@ -50,50 +49,9 @@ function _usage()
     -H   --show          show the list of necessary commands that should be executed before starting functional tests manually
 
   Examples:
-    build -s unit -midt -b master    clone from master, make (for unit testing), make install, run mongo, execute unit tests
-    build -s functional -midtq       get source from mounted folder, make (for functional testing), make install, run mongo, execute speed FIX, functional test
+    build -s unit -mit -b master    clone from master, make (for unit testing), make install, execute unit tests
+    build -s functional -mitq       get source from mounted folder, make (for functional testing), make install, execute speed FIX, functional test
 "
-}
-
-function _fix_tests()
-{
-    # This function adjust functional tests to reduce time, that is spent on the tests.
-    # TODO: this function created to reduce the time that is spent on functional tests because of travis time limits. Should be fixed.
-    echo "Builder: fix tests"
-
-    # This part adjust TTL mongo parameter and 3000_allow_creation_transient_entities sleep parameter.
-    test='3000_allow_creation_transient_entities'
-    echo "Builder: ${test}"
-
-    list=('create_transient_entity.test' \
-          'replace_to_transient_entity.test' \
-          'update_to_regular_entity.test' \
-          'update_to_transient_entity.test')
-
-    for i in ${list[@]}; do
-        cp ${path}/test/functionalTest/cases/${test}/${i} /tmp/builder/bu/${test}-${i}
-        sed 's/sleep [0-9]*/sleep 3/g' ${path}/test/functionalTest/cases/${test}/${i} > /tmp/test.tmp && mv -f /tmp/test.tmp ${path}/test/functionalTest/cases/${test}/${i}
-    done
-
-    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 3});"
-}
-
-function _unfix_tests()
-{
-    echo "Builder: revert tests"
-    test='3000_allow_creation_transient_entities'
-    echo "Builder: ${test}"
-
-    list=('create_transient_entity.test' \
-          'replace_to_transient_entity.test' \
-          'update_to_regular_entity.test' \
-          'update_to_transient_entity.test')
-
-    for i in ${list[@]}; do
-        mv -f /tmp/builder/bu/${test}-${i} ${path}/test/functionalTest/cases/${test}/${i}
-    done
-
-    mongo --eval "db.adminCommand({setParameter:1, ttlMonitorSleepSecs: 60});"
 }
 
 function _fix_jenkins()
@@ -134,12 +92,6 @@ function _show()
 function _execute()
 {
     killall contextBroker
-    killall mongod
-
-    sleep 3
-
-    mongod --dbpath /data/db1 --port 20001 --quiet --nojournal&
-    mongod --dbpath /data/db2 --port 20002 --quiet --nojournal&
 
     sleep 3
 
@@ -165,7 +117,6 @@ do
        --stage) set -- "$@" -s ;;
        --make) set -- "$@" -m ;;
        --install) set -- "$@" -i ;;
-       --db) set -- "$@" -d ;;
        --test) set -- "$@" -t ;;
        --rpm) set -- "$@" -r ;;
        --upload) set - "$@" -u ;;
@@ -178,7 +129,7 @@ do
     esac
 done
 
-while getopts ":hb:S:p:s:midtr:ujJqQeHa:" opt; do
+while getopts ":hb:S:p:s:mitr:ujJeHa:" opt; do
     case ${opt} in
         h)  _usage; exit 0 ;;
         b)  branch=$OPTARG ;;
@@ -187,14 +138,11 @@ while getopts ":hb:S:p:s:midtr:ujJqQeHa:" opt; do
         s)  stage=$OPTARG ;;
         m)  make=true;;
         i)  install=true;;
-        d)  database=true ;;
         t)  test=true ;;
         r)  rpm=$OPTARG ;;
         u)  upload=true ;;
         j)  fix_j=true ;;
         J)  fix_J=true ;;
-        q)  fix_q=true ;;
-        Q)  fix_Q=true ;;
         e)  execute=true ;;
         H)  show=true ;;
         a)  attempts=$OPTARG ;;
@@ -232,13 +180,6 @@ echo "===================================== PREPARE ============================
 
 echo "Builder: create temp folders"
 rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
-
-if [ -n "${database}" ]; then
-    echo "Builder: starting Mongo"
-    mongod --dbpath /tmp/builder/db  --nojournal --quiet > /dev/null 2>&1 &
-    sleep 3
-    export MONGO_HOST=localhost
-fi
 
 if [ -n "${branch}" ]; then
     echo "===================================== CLONE ============================================"
@@ -318,7 +259,6 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
     echo "===================================== FUNCTIONAL TESTS ================================="
 
     if [ -n "${fix_j}" ]; then _fix_jenkins; fi
-    if [ -n "${fix_q}" ]; then _fix_tests; fi
 
     _fix
 
@@ -330,7 +270,6 @@ if [ -n "${test}" ] && [ "${stage}" = "functional" ]; then
     _unfix
 
     if [ -n "${fix_j}" ]; then _unfix_jenkins; fi
-    if [ -n "${fix_q}" ]; then _unfix_tests; fi
 
     if ! ${status}; then echo "Builder: functional test failed"; exit 1; fi
 
@@ -399,4 +338,3 @@ fi
 
 if [ -n "${show}" ]; then _show; fi
 if [ -n "${fix_J}" ]; then _fix_jenkins; fi
-if [ -n "${fix_Q}" ]; then _fix_tests; fi

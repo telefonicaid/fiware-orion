@@ -66,7 +66,7 @@ HttpStatusCode mongoNotifyContext
     Entity*                             eP           = &requestP->contextElementResponseVector[ix]->entity;
     bool                                forcedUpdate = false;
 
-    processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate);
+    processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate, 0);
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);

@@ -375,14 +375,6 @@ static void scopeFilter
   {
     restrictionP = &parseDataP->dcar.res.restriction;
   }
-  else if (ciP->restServiceP->request == SubscribeContextAvailability)
-  {
-    restrictionP = &parseDataP->scar.res.restriction;
-  }
-  else if (ciP->restServiceP->request == UpdateContextAvailabilitySubscription)
-  {
-    restrictionP = &parseDataP->ucas.res.restriction;
-  }
   else if (ciP->restServiceP->request == QueryContext)
   {
     restrictionP = &parseDataP->qcr.res.restriction;
@@ -445,7 +437,7 @@ static bool compCheck(int components, const std::vector<std::string>& compV)
 {
   for (int ix = 0; ix < components; ++ix)
   {
-    if (compV[ix] == "")
+    if (compV[ix].empty())
     {
       return false;
     }
@@ -475,7 +467,7 @@ static bool compErrorDetect
     {
       std::string entityId = compV[2];
 
-      if (entityId == "")
+      if (entityId.empty())
       {
         details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
       }
@@ -485,11 +477,11 @@ static bool compErrorDetect
       std::string entityId = compV[2];
       std::string attrName = compV[4];
 
-      if (entityId == "")
+      if (entityId.empty())
       {
         details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
       }
-      else if (attrName == "")
+      else if (attrName.empty())
       {
         details = ERROR_DESC_BAD_REQUEST_EMPTY_ATTR_NAME;
       }
@@ -499,18 +491,18 @@ static bool compErrorDetect
       std::string entityId = compV[2];
       std::string attrName = compV[4];
 
-      if (entityId == "")
+      if (entityId.empty())
       {
         details = ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID;
       }
-      else if (attrName == "")
+      else if (attrName.empty())
       {
         details = ERROR_DESC_BAD_REQUEST_EMPTY_ATTR_NAME;
       }
     }
   }
 
-  if (details != "")
+  if (!details.empty())
   {
     oeP->fill(SccBadRequest, details);
     return true;  // means: this was an error, make the broker stop this request
@@ -540,7 +532,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
-  if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
+  if ((ciP->url.empty()) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.toJsonV1();
@@ -665,7 +657,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // underscores and alphanumeric characters.
     //
     std::string result;
-    if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+    if ((!ciP->tenant.empty()) && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
       OrionError  oe(SccBadRequest, result);
 
@@ -759,7 +751,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string  details = std::string("service '") + ciP->url + "' not recognized";
   std::string  answer;
 
-  restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
+  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
   alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
   restReply(ciP, answer);

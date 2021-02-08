@@ -3,6 +3,20 @@
 This document describes the guidelines to contribute to Orion Context Broker. If you are
 planning to contribute to the code you should read this document and get familiar with its content.
 
+## Ground rules & expectations
+
+Before we get started, here are a few things we expect from you (and that you should expect from others):
+
+* Be kind and thoughtful in your conversations around this project. We all come from different backgrounds and
+  projects, which means we likely have different perspectives on "how open source is done." Try to listen to others
+  rather than convince them that your way is correct.
+* Please ensure that your contribution passes all tests. If there are test failures, you will need to address them
+  before we can merge your contribution.
+* When adding content, please consider if it is widely valuable. Please don't add references or links to things you or
+  your employer have created as others will do so if they appreciate it.
+* When reporting a vulnerability on the software, please, put in contact with Orion repo maintainers in order to discuss it 
+  in a private way.
+
 ## General principles
 
 * Orion Context Broker programming languages are C and C++ (although some side pieces related with script tooling
@@ -19,7 +33,19 @@ planning to contribute to the code you should read this document and get familia
 Note that contribution workflows themselves (e.g. pull requests, etc.) are described in another document 
 ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)).
 
-## Pull Request protocol
+## How to contribute
+
+If you'd like to contribute, start by searching through the [issues](https://github.com/telefonicaid/fiware-orion/issues) and
+[pull requests](https://github.com/telefonicaid/fiware-orion/pulls) to see whether someone else has raised a similar idea or
+question.
+
+If you don't see your idea listed, and you think it fits into the goals of this guide, do one of the following:
+
+-   **If your contribution is minor,** such as a typo fix, open a pull request.
+-   **If your contribution is major,** such as a new guide, start by opening an issue first. That way, other people can
+    weigh in on the discussion before you do any work.
+
+### Pull Request protocol
 
 As explained in ([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)) 
 contributions are done using a pull request (PR). The detailed "protocol" used in such PR is described below:
@@ -45,6 +71,15 @@ Some additional remarks to take into account when contributing with new PRs:
 * PR must include not only code contributions, but their corresponding pieces of documentation (new or modifications to existing one) and tests
 * PR modifications must pass full regression based on existing test (unit, functional, memory, e2e) in addition to whichever new test added due to the new functionality
 * PR should be of an appropriated size that makes review achievable. Too large PRs could be closed with a "please, redo the work in smaller pieces" without any further discussing
+
+## Community
+
+Discussions about the Open Source Guides take place on this repository's
+[Issues](https://github.com/telefonicaid/fiware-orion/issues) and [Pull Requests](https://github.com/telefonicaid/fiware-orion/pulls)
+sections. Anybody is welcome to join these conversations.
+
+Wherever possible, do not take these conversations to private channels, including contacting the maintainers directly.
+Keeping communication public means everybody can benefit and learn from the conversation.
 
 ## Filesystem layout guidelines
 
@@ -750,6 +785,14 @@ void myFunction(const std::string s, std::string* err);
 
 *How to check*: manually
 
+#### S16 (Use empty() for checking zero-length strings)
+
+*Rule*: Use empty() for all string empty-ness checking, avoiding comparisons with `""` or `length() == 0`
+
+*Rationale*: empty() is [the best way of checking for zero-length strings](http://stackoverflow.com/questions/41425569/checking-for-empty-string-in-c-alternatives).
+
+*How to check*: manually
+
 ## Programming patterns
 
 Some patterns are not allowed in Orion Context Broker code, except if some strong reason justifies the use of it. 
@@ -778,4 +821,3 @@ void myFunction(const BigFish& in, BigFish* out)
 const std::string& myFunction(...)
 const char* myOtherFunction(...)
 ```
-

@@ -237,7 +237,7 @@ void JsonObjectHelper::addNumber(const std::string& key, double value)
 *
 * JsonObjectHelper::addDate -
 */
-void JsonObjectHelper::addDate(const std::string& key, long long timestamp)
+void JsonObjectHelper::addDate(const std::string& key, double timestamp)
 {
   if (!empty)
   {
@@ -369,7 +369,7 @@ void JsonVectorHelper::addNumber(double value)
 *
 * JsonVectorHelper::addDate -
 */
-void JsonVectorHelper::addDate(long long timestamp)
+void JsonVectorHelper::addDate(double timestamp)
 {
   if (!empty)
   {

@@ -527,7 +527,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 14. Update E1, to provoke another 3 notifications
 =================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -543,7 +542,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "data": [
@@ -576,7 +575,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "data": [
@@ -609,7 +608,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "data": [
@@ -639,13 +638,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 16. Check sub counts in order to see sub1, sub4 and sub6 has been triggered twice
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 434
+Content-Length: 437
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
@@ -677,13 +676,13 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 439
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
@@ -715,13 +714,13 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 438
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2050-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],

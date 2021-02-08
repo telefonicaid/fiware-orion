@@ -36,7 +36,6 @@ yum -y install \
   openssl-devel \
   libuuid-devel \
   make \
-  mongodb-org \
   mongodb-org-shell \
   nc \
   python \
@@ -64,31 +63,21 @@ echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && make install \
 && rm -Rf /opt/mongo-c-driver-1.16.0
 
-echo "INSTALL: mongodb c++ driver" \
-&& curl -L https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-cxx-driver-r3.4.0/build \
-&& cmake3 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-&& make EP_mnmlstc_core \
-&& make \
-&& make install \
-&& ldconfig \
-&& rm -Rf /opt/mongo-cxx-driver-r3.4.0
-
 echo "INSTALL: rapidjson" \
-&& curl -L https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz | tar xzC /opt/ \
-&& mv /opt/rapidjson-1.0.2/include/rapidjson/ /usr/local/include \
-&& rm -Rf /opt/rapidjson-1.0.2
+&& curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
+&& mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \
+&& rm -Rf /opt/rapidjson-1.1.0
 
 echo "INSTALL: libmicrohttpd" \
-&& curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz | tar xzC /opt/ \
-&& cd /opt/libmicrohttpd-0.9.48  \
+&& curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
+&& cd /opt/libmicrohttpd-0.9.70  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install \
-&& rm -Rf /opt/libmicrohttpd-0.9.48
+&& rm -Rf /opt/libmicrohttpd-0.9.70
 
 echo "INSTALL: gmock" \
-&& curl -L https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
+&& curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
 && ./configure \
 && make \
@@ -108,10 +97,14 @@ echo "INSTALL: gmock" \
 # in Werkzeug which makes an empty content-length header appear in the accumulator-server.py
 # dumps. The bug is fixed in Werkzeug==0.11.16. Thus, we override the system setting,
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
+#
+# In addition, note we upgrade pip before installing virtualenv. The virtualenv installation
+# may fail otherwise. Note that due to Python 2.7 End-of-Life we have to add "pip < 21.0"
+# (see https://stackoverflow.com/questions/65896334/python-pip-broken-wiith-sys-stderr-writeferror-exc)
 echo "INSTALL: python special dependencies" \
 && cd /opt \
-&& pip install --upgrade pip \
-&& pip install virtualenv\
+&& pip install --upgrade "pip < 21.0" \
+&& pip install virtualenv \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==1.0.2 \

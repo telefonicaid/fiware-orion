@@ -2,10 +2,12 @@
 
 * [ログ・ファイル](#log-file)
 * [ログ・フォーマット](#log-format)
+* [INFO レベルの詳細](#info-level-in-detail)
 * [アラーム](#alarms)
 * [サマリ・トレース](#summary-traces)
 * [ログ・ローテーション](#log-rotation)
 * [通知トランザクションのログの例](#log-examples-for-notification-transactions)
+* [ログに関連するコマンドライン・オプション](#command-line-options-related-with-logs)
 
 <a name="log-file"></a>
 ## ログ・ファイル
@@ -26,7 +28,7 @@ Orion コンテキスト broker を起動するときに、前のログ・ファ
 - INFO : INFO, WARN および ERROR メッセージがログされます
 - DEBUG : DEBUG, INFO, WARN および ERROR メッセージがログされます
 
-Orion がフォアグラウンドで実行されると (つまり、`-fg` [CLI 引数](cli.md)を使用して)、標準出力にも同じログトレースが (ただし簡略化されて) 出力されます。
+Orion がフォアグラウンドで実行されると (つまり、`-fg` [CLI 引数](cli.md)を使用して)、標準出力にも同じログトレースが出力されます。
 
 Orion によって公開される [admin API](management_api.md) を使用して、実行時にログレベルを変更 (および取得) することができます。
 
@@ -39,24 +41,18 @@ Orion によって公開される [admin API](management_api.md) を使用して
 
 ログ・ファイルの各行は、パイプ文字 (`|`) で区切られた複数のキー値フィールドで構成されています。例 :
 
-    time=2014-07-18T16:39:06.265Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1217]:main | msg=Orion Context Broker is running
-    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=MongoGlobal.cpp[122]:mongoConnect | msg=Successful connection to database
-    time=2014-07-18T16:39:06.266Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1055]:mongoInit | msg=Connected to mongo at localhost:orion
-    time=2014-07-18T16:39:06.452Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1290]:main | msg=Startup completed
+    time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[986]:main | msg=start command line <contextBroker -fg -logLevel INFO>
+    time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[873]:logEnvVars | msg=env var ORION_PORT (-port): 1026
+    time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1054]:main | msg=Orion Context Broker is running
+    time=2020-10-26T09:45:17.301Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=MongoGlobal.cpp[247]:mongoInit | msg=Connected to mongo at localhost/orion (poolsize: 10)
+    time=2020-10-26T09:45:17.304Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1180]:main | msg=Startup completed
     ...
-    time=2014-07-18T16:39:22.920Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.1:v1/v1/updateContext
-    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1499]:processContextElement | msg=Database Operation Successful (...)
-    time=2014-07-18T16:39:22.922Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[1318]:createEntity | msg=Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonUpdate.cpp[811]:addTriggeredSubscriptions | msg=Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000001 | from=10.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
+    time=2020-10-26T10:27:02.619Z | lvl=INFO | corr=c99e4592-1775-11eb-ad30-000c29df7908 | trans=1603707992-318-00000000001 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[79]:logInfoRequestWithoutPayload | msg=Request received: GET /v2/entities?type=Device, response code: 200
     ...
-    time=2014-07-18T16:39:35.415Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[615]:connectionTreat | msg=Starting transaction from 10.0.0.2:48373/v1/queryContext
-    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=MongoGlobal.cpp[877]:entitiesQuery | msg=Database Operation Successful (...)
-    time=2014-07-18T16:39:35.416Z | lvl=INFO | corr=2b60beba-fff5-11e5-bc30-643150a45f86 | trans=1405694346-265-00000000002 | from=10.0.0.2 | srv=s1 | subsrv=/A | comp=Orion | op=rest.cpp[745]:connectionTreat | msg=Transaction ended
+    time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df7908 | trans=1603708355-537-00000000002 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[130]:logInfoRequestWithPayload | msg=Request received: POST /v2/entities, request payload (34 bytes): {  "id": "Room1",  "type": "Room"}, response code: 201
     ...
-    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[968]:sigHandler | msg=Signal Handler (caught signal 2)
-    time=2014-07-18T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[974]:sigHandler | msg=Orion context broker exiting due to receiving a signal
+    time=2020-10-26T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[968]:sigHandler | msg=Signal Handler (caught signal 2)
+    time=2020-10-26T16:44:53.541Z | lvl=INFO | corr=N/A | trans=N/A | corr=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[974]:sigHandler | msg=Orion context broker exiting due to receiving a signal
 
 各行のさまざまなフィールドは次のとおりです :
 
@@ -65,11 +61,10 @@ Orion によって公開される [admin API](management_api.md) を使用して
     -   FATAL : このレベルは、アプリケーションを終了させる重大なエラーイベントを示します。プロセスはもはや機能しません。
     -   ERROR : このレベルはエラーイベントを示します。解決しなければならない重大な問題があります
     -   WARN : このレベルは潜在的に有害な状況を示します。解決すべき軽微な問題があります
-    -   INFO : このレベルは、Orion の進捗をハイライトする情報メッセージを示します
-    -   EBUG : このレベルは、アプリケーションをデバッグするのに最も役立つ細かい情報イベントを示します。トレース・レベルが使用されているときにのみ表示されます (`-t` コマンドライン・オプションで設定されます)
+    -   INFO : このレベルは、Orion の進捗をハイライトする情報メッセージを示します。このレベルの詳細については、[このセクション](#info-level-in-detail)を参照してください
+    -   DEBUG : このレベルは、アプリケーションをデバッグするのに最も役立つ細かい情報イベントを示します。トレース・レベルが使用されているときにのみ表示されます (`-t` コマンドライン・オプションで設定されます)
     -   SUMMARY : これはログ・サマリ・トレースで使用される特別なレベルで、`-logSummaryCLI` オプションで有効になっています。詳細については、[サマリ・トレースのセクション](#summary-traces)を見てください
--   **corr (correlator id).** : "N/A" (ログメッセージ "out of transaction"、たとえば Orion Context Broker の起動に対応するログ行)、または UUID 形式の文字列です
-例 : "550e8400-e29b-41d4-a716-446655440000"。この 'correlator id' は着信要求から転送されるか、または着信要求に HTTP ヘッダー "Fiware-Correlator" が含まれていない場合、corr は Orion Context broker によって生成され、ログ・ファイルで使用されます (転送メッセージ、通知およびレスポンスにに HTTP ヘッダーとして送信されるのと同様に)。correlator id は、特定の1つの要求に対して 'message chain' に関係するすべてのアプリケーションの共通識別子です
+-   **corr (correlator id).** : "N/A" (ログメッセージ "out of transaction"、たとえば Orion Context Broker の起動に対応するログ行)、または UUID 形式の文字列です。例 : "550e8400-e29b-41d4-a716-446655440000"。この UUID 文字列には、サフィックスが含まれる場合があります。たとえば、`550e8400-e29b-41d4-a716-446655440000; cbnotif=2` または `550e8400-e29b-41d4-a716-446655440000; cbfwd=1` (これについての詳細は[INFO レベルに関するセクション](#info-level-in-detail)にあります)。この 'correlator id' は着信要求から転送されるか、または着信要求に HTTP ヘッダ "Fiware-Correlator" が含まれていない場合、corr は Orion Context broker によって生成され、ログ・ファイルで使用されます (転送メッセージ、通知およびレスポンスにに HTTP ヘッダーとして送信されるのと同様に)。correlator id は、特定の1つの要求に対して 'message chain' に関係するすべてのアプリケーションの共通識別子です
 -   **trans (transaction id)** : "N/A" (Orion Context Broker の起動時に対応するログメッセージ "out of transaction") またはフォーマットの文字列 "1405598120-337-00000000001" になります。トランザクション id 生成ロジックは、すべてのトランザクション ID が一意であることを保証します。別 VM で実行されている Orion インスタンス (同じソースから別々のログを集約する場合に便利です) についても、それらが正確に同じミリ秒で開始されている場合は例外です。トランザクション ID は correlator ID とは無関係であることに注意してください。トランザクション ID はローカルな性質を持ち、correlator ID は意味のあるエンド・ツー・エンドであり、Context Broker 自体とは別のソフトウェアコンポーネントを含んでいます。Orion には2種類のトランザクションがあります :
     -   Orion によって公開された REST API を呼び出す外部クライアントによって開始されたものです。これらのトランザクションの最初のメッセージは、*url* に操作を呼び出すクライアントの IP とポートが含まれ、パスが Orion で呼び出された実際の操作である "Starting transaction **from** *url*" パターンを使用します。これらのトランザクションの最後のメッセージは "Transaction ended" です
     -   Orion が通知を送信するときに開始するものです。これらのトランザクションの最初のメッセージは、"Starting transaction **to** *url*" というパターンを使用します。*url* は、サブスクリプションの参照要素で使用される URL です。つまり、通知を送信するコールバックの URL です。両方の取引型の最後のメッセージは "Transaction ended" です
@@ -83,6 +78,96 @@ Orion によって公開される [admin API](management_api.md) を使用して
 -   **comp (component)** : 現在のバージョンでは常にこのフィールドに "Orion" が使用されます
 -   **op** : ログメッセージを生成したソースコード内の関数です。この情報は、開発者だけに役立ちます。
 -   **msg (message)** : 実際のログメッセージです。メッセージのテキストには、ファイルの名前とトレースを生成する行番号が含まれます (この情報は、主に Orion 開発者にとって役に立ちます)
+
+[トップ](#top)  
+
+<a name="info-level-in-detail"></a>
+
+## INFO レベルの詳細
+
+**注：** INFO レベルは Orion バージョン 2.5.0 で再設計され、シンプルにするために一部の
+トレースが削除されています。これらの古い INFO トレースを表示する場合は、DEBUG モードで
+トレース・レベル 240 を使用します (例： `-logLevel DEBUG -t 240`)
+
+起動時に、INFO レベルには、Orion がどのように開始されたか (CLI と環境変数の両方)
+に関するトレースと、MongoDB データベースへの接続に関する情報が表示されます:
+
+```
+time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[986]:main | msg=start command line <contextBroker -fg -logLevel INFO>
+time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[873]:logEnvVars | msg=env var ORION_PORT (-port): 1026
+time=2020-10-26T09:45:17.225Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1054]:main | msg=Orion Context Broker is running
+time=2020-10-26T09:45:17.301Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=MongoGlobal.cpp[247]:mongoInit | msg=Connected to mongo at localhost/orion (poolsize: 10)
+time=2020-10-26T09:45:17.304Z | lvl=INFO | corr=N/A | trans=N/A | from=N/A | srv=N/A | subsrv=N/A | comp=Orion | op=contextBroker.cpp[1180]:main | msg=Startup completed
+```
+
+実行時に、INFO レベルには、クライアント・リクエスト、ノーティフィケーション、およびフォワードされた
+リクエストに関する関連情報が表示されます。 特に:
+
+* *ペイロードなし*のクライアント・リクエストごとに、リクエストの処理が終了すると、Orion はこのような
+  トレースを表示します:
+
+```
+time=2020-10-26T10:27:02.619Z | lvl=INFO | corr=c99e4592-1775-11eb-ad30-000c29df7908 | trans=1603707992-318-00000000001 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[79]:logInfoRequestWithoutPayload | msg=Request received: GET /v2/entities?type=Device, response code: 200
+```
+
+* *ペイロード付き*のクライアント・リクエストごとに、リクエストの処理が終了すると、Orion はこのような
+  トレースを表示します:
+
+```
+time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df7908 | trans=1603708355-537-00000000002 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[130]:logInfoRequestWithPayload | msg=Request received: POST /v2/entities, request payload (34 bytes): {  "id": "Room1",  "type": "Room"}, response code: 201
+```
+
+* 送信されたノーティフィケーションごとに、Orion はこのようなトレースを表示します。Orion は、クライアント・
+  リクエストに関連付けられた "root correlator" に `cbnotif=` サフィックスを追加することに注意してください
+  (この例では、クライアント・リクエストは `corr=87f708a8-1776-11eb-b327-000c29df7908` を使用します)。
+  このサフィックスの値は自動インクリメント・カウンター (最初のノーティフィケーションでは1から始まります)
+  であるため、同じ更新によってトリガーされるすべてのノーティフィケーションは、correlator に対して厳密に
+  異なる値を持ちます
+
+```
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
+```
+
+* [コンテキスト・プロバイダ](../user/context_providers.md) (クエリまたは更新) にフォワードされたリクエスト
+  ごとに、Orion は次のようなトレースを表示します。Orion は、クライアント・リクエストに関連付けられた
+  "root correlator" に `cbfwd=` サフィックスを追加することに注意してください (この例では、クライアント・
+  リクエストは `corr=eabce3e2-149f-11eb-a2e8-000c29df7908` を使用します)。このサフィックスの値は
+  自動インクリメント・カウンター (最初の転送されたリクエストの場合は1から始まります）であるため、同じ更新に
+  よってトリガーされたすべてのフォワードされたリクエストは、correlator に対して厳密に異なる値を持ちます
+
+```
+time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=1 | trans=1603396258-520-00000000007 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da0697f): POST http://localhost:9801/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A1"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A1":{"type":"Text","value":"A1 in CP1","metadata":{}}}], response code: 200
+```
+
+いくつかの追加の考慮事項:
+
+* `-logInfoPayloadMaxSize` 設定は、上記のトレースのペイロードが持つ可能性のある最大サイズを指定するために
+  使用されます。ペイロードがこの制限を超えると、最初の `-logInfoPayloadMaxSize` バイトのみが出力されます
+  (`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値:5キロバイト
+* ノーティフィケーションおよびフォワーディング・トレースのレスポンス・コードは、番号
+  (ノーティフィケーションまたはフォワードされたリクエストの HTTP レスポンス・コードに対応)
+  または接続の問題が発生した場合の文字列のいずれかになります。 例えば:
+
+```
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: Couldn't connect to server
+```
+
+* クライアント・リクエストがコンテキスト・プロバイダへのフォワーディングをトリガーすると、最初に転送された
+  リクエストを開始する前に、 `Starting forwarding for <client request URL>` トレースが出力されます。
+  したがって、完全なフォワーディング・ブロック (たとえば、エンティティの個々の属性について5つの
+  コンテキスト・プロバイダにクエリを実行するクライアント・クエリ) は次のようになります。それらはすべて、
+  フォワードされたリクエストに関連付けられたログ・トレースで、同じ root correlator と `cbfwd=1` から
+  `cbfwd=5` のサフィックスを使用することに注意してください
+
+```
+time=2020-10-22T19:51:03.556Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908 | trans=1603396258-520-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[146]:logInfoFwdStart | msg=Starting forwarding for GET /v2/entities/E1?type=T1
+time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=1 | trans=1603396258-520-00000000007 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da0697f): POST http://localhost:9801/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A1"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A1":{"type":"Text","value":"A1 in CP1","metadata":{}}}], response code: 200
+time=2020-10-22T19:51:03.573Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=2 | trans=1603396258-520-00000000008 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da06980): POST http://localhost:9802/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A2"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A2":{"type":"Text","value":"A2 in CP2","metadata":{}}}], response code: 200
+time=2020-10-22T19:51:03.584Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=3 | trans=1603396258-520-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da06981): POST http://localhost:9803/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A3"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A3":{"type":"Text","value":"A3 in CP3","metadata":{}}}], response code: 200
+time=2020-10-22T19:51:03.593Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=4 | trans=1603396258-520-00000000010 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da06982): POST http://localhost:9804/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A4"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A4":{"type":"Text","value":"A4 in CP4","metadata":{}}}], response code: 200
+time=2020-10-22T19:51:03.601Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=5 | trans=1603396258-520-00000000011 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da06983): POST http://localhost:9805/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A5"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A5":{"type":"Text","value":"A5 in CP5","metadata":{}}}], response code: 200
+time=2020-10-22T19:51:03.602Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908 | trans=1603396258-520-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[79]:logInfoRequestWithoutPayload | msg=Request received: GET /v2/entities/E1?type=T1, response code: 200
+```
 
 [トップ](#top)  
 
@@ -170,7 +255,7 @@ Logrotate は、contextBroker とともに RPM としてインストールされ
 ## 通知トランザクションのログの例
 
 このセクションでは、通知トランザクションに対応するログの例をいくつか示します。
-これは Orion 2.2.0 リリースで生成されたものであり、将来大きな変更は予定されていませんが、
+これは Orion 2.5.0 リリースで生成されたものであり、将来大きな変更は予定されていませんが、
 正確なログトレースは新しいバージョンでは多少異なる可能性があります。
 
 このテストでは、Context Broker は次のように開始されました :
@@ -182,77 +267,67 @@ contextBroker -fg -httpTimeout 10000 -logLevel INFO -notificationMode threadpool
 送信成功 (レスポンス・コード 200) :
 
 ```
-time=2019-02-04T14:36:00.463Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme200
-time=2019-02-04T14:36:00.463Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 1 to HTTP server: sending message of 413 bytes to HTTP server
-time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme200
-time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[621]:httpRequestSendWithCurl | msg=Notification response OK, http code: 200
-time=2019-02-04T14:36:00.469Z | lvl=INFO | corr=31060508-288a-11e9-b1fa-000c29173617 | trans=1549290912-942-00000000002 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, response code: 200
 ```
 
 400 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
-time=2019-02-04T14:36:00.526Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme400
-time=2019-02-04T14:36:00.526Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 2 to HTTP server: sending message of 413 bytes to HTTP server
-time=2019-02-04T14:36:00.531Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme400
-time=2019-02-04T14:36:00.532Z | lvl=WARN | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
-time=2019-02-04T14:36:00.532Z | lvl=INFO | corr=310ea136-288a-11e9-98f5-000c29173617 | trans=1549290912-942-00000000004 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
+time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, response code: 400
 ```
 
 404 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
-time=2019-02-04T14:36:00.564Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme404
-time=2019-02-04T14:36:00.568Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 3 to HTTP server: sending message of 413 bytes to HTTP server
-time=2019-02-04T14:36:00.576Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme404
-time=2019-02-04T14:36:00.576Z | lvl=WARN | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
-time=2019-02-04T14:36:00.577Z | lvl=INFO | corr=31151d2c-288a-11e9-b5eb-000c29173617 | trans=1549290912-942-00000000006 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
+time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, response code: 404
 ```
 
 500 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
-time=2019-02-04T14:36:00.597Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/giveme500
-time=2019-02-04T14:36:00.597Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 4 to HTTP server: sending message of 413 bytes to HTTP server
-time=2019-02-04T14:36:00.612Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[612]:httpRequestSendWithCurl | msg=Notification Successfully Sent to http://localhost:1028/giveme500
-time=2019-02-04T14:36:00.612Z | lvl=WARN | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[625]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
-time=2019-02-04T14:36:00.613Z | lvl=INFO | corr=3119c48a-288a-11e9-b7aa-000c29173617 | trans=1549290912-942-00000000008 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
+time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
 ```
 
 10 秒以内にエンドポイントが応答しない、またはその他の何らかの接続エラーが発生しました (アラームは WARN レベルで発生します) :
 
 ```
-time=2019-02-04T14:36:00.609Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:1028/givemeDelay
-time=2019-02-04T14:36:00.609Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 5 to HTTP server: sending message of 415 bytes to HTTP server
-time=2019-02-04T14:36:10.611Z | lvl=WARN | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
-time=2019-02-04T14:36:10.611Z | lvl=INFO | corr=311c9d4a-288a-11e9-9301-000c29173617 | trans=1549290912-942-00000000010 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
+time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, response code: Timeout was reached
 ```
 
 応答しないポートのエンドポイント。例えば、localhost：9999 (アラームは WARN ログ・レベルで発生します) :
 
 ```
-time=2019-02-04T14:36:00.629Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://localhost:9999/giveme
-time=2019-02-04T14:36:00.629Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 6 to HTTP server: sending message of 421 bytes to HTTP server
-time=2019-02-04T14:36:00.661Z | lvl=WARN | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
-time=2019-02-04T14:36:00.661Z | lvl=INFO | corr=311fc164-288a-11e9-a611-000c29173617 | trans=1549290912-942-00000000012 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
+time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, response code: Couldn't connect to server
 ```
 
 解決できない名前のエンドポイント。例えば、foo.bar.bar.com (アラームは WARN ログ・レベルで発生します) :
 
 ```
-time=2019-02-04T14:36:00.653Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://foo.bar.bar.com:9999/giveme
-time=2019-02-04T14:36:00.653Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 7 to HTTP server: sending message of 427 bytes to HTTP server
-time=2019-02-04T14:36:01.184Z | lvl=WARN | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
-time=2019-02-04T14:36:01.184Z | lvl=INFO | corr=31235e78-288a-11e9-a0ac-000c29173617 | trans=1549290912-942-00000000014 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
+time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, response code: Couldn't resolve host name
 ```
 
 到達不能な IP のエンドポイント。例えば、12.34.56.87 (アラームは WARN ログ・レベルで発生します) :
 
 ```
-time=2019-02-04T14:36:01.534Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1841]:lmTransactionStart | msg=Starting transaction to http://12.34.56.78:9999/giveme
-time=2019-02-04T14:36:01.534Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=httpRequestSend.cpp[592]:httpRequestSendWithCurl | msg=Sending message 8 to HTTP server: sending message of 421 bytes to HTTP server
-time=2019-02-04T14:36:11.535Z | lvl=WARN | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
-time=2019-02-04T14:36:11.535Z | lvl=INFO | corr=31a9ac30-288a-11e9-9444-000c29173617 | trans=1549290912-942-00000000016 | from=0.0.0.0 | srv=aaa | subsrv=/BBB | comp=Orion | op=logMsg.h[1871]:lmTransactionEnd | msg=Transaction ended
+time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
+time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, response code: Timeout was reached
 ```
+
+[トップ](#top)
+
+## ログに関連するコマンドライン・オプション
+
+このドキュメントですでに説明されているもの (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-relogAlarms` and `-logSummary`) とは別に、次のコマンドライン・オプションはログに関連しています:
+
+* `-logForHumans`
+* `-logLineMaxSize`
+
+詳細については、[コマンドライン・オプションのドキュメント](cli.md)を参照してください。
 
 [トップ](#top)

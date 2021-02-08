@@ -48,6 +48,7 @@
 
 #define ERROR_PARSE                                   "ParseError"
 #define ERROR_DESC_PARSE                              "Errors found in incoming JSON buffer"
+#define ERROR_DESC_PARSE_MAX_JSON_NESTING             "attribute or metadata value has overpassed maximum nesting limit: " STR(MAX_JSON_NESTING)
 
 #define ERROR_BAD_REQUEST                             "BadRequest"
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI       "invalid character in URI"
@@ -84,6 +85,7 @@
 #define ERROR_DESC_BAD_REQUEST_FORMAT_UNIQUEVALUES            "attribute render format /uniqueValues/ not supported for notifications"
 #define ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM                  "attribute render format /custom/ not supported for notifications"
 #define ERROR_DESC_BAD_REQUEST_FORMAT_INVALID                 "invalid render format for notifications"
+#define ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND              "Service not found. Check your URL as probably it is wrong."
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"

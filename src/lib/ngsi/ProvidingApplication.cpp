@@ -69,7 +69,7 @@ std::string ProvidingApplication::check(void)
 */
 bool ProvidingApplication::isEmpty(void)
 {
-  return (string == "")? true : false;
+  return (string.empty())? true : false;
 }
 
 
@@ -98,6 +98,17 @@ void ProvidingApplication::setProviderFormat(const ProviderFormat _providerForma
 
 /* ****************************************************************************
 *
+* ProvidingApplication::setRegId -
+*/
+void ProvidingApplication::setRegId(const std::string& _regId)
+{
+  regId = _regId;
+}
+
+
+
+/* ****************************************************************************
+*
 * ProvidingApplication::getProviderFormat -
 */
 ProviderFormat ProvidingApplication::getProviderFormat(void)
@@ -109,7 +120,18 @@ ProviderFormat ProvidingApplication::getProviderFormat(void)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::get -
+* ProvidingApplication::getRegId -
+*/
+std::string ProvidingApplication::getRegId(void)
+{
+  return regId;
+}
+
+
+
+/* ****************************************************************************
+*
+* ProvidingApplication::getRegId -
 */
 std::string ProvidingApplication::get(void)
 {
@@ -124,7 +146,7 @@ std::string ProvidingApplication::get(void)
 */
 std::string ProvidingApplication::toJsonV1(bool comma)
 {
-  if (string == "")
+  if (string.empty())
   {
     return "";
   }

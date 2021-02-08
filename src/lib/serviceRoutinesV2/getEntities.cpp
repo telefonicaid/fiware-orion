@@ -95,7 +95,7 @@ std::string getEntities
   std::string  georel      = ciP->uriParam["georel"];
   std::string  out;
 
-  if ((idPattern != "") && (id != ""))
+  if ((!idPattern.empty()) && (!id.empty()))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern", "BadRequest");
 
@@ -103,7 +103,7 @@ std::string getEntities
     ciP->httpStatusCode = oe.code;
     return answer;
   }
-  else if (id != "")
+  else if (!id.empty())
   {
     pattern = "";
 
@@ -127,12 +127,12 @@ std::string getEntities
       pattern += idsV[ix] + "$";
     }
   }
-  else if (idPattern != "")
+  else if (!idPattern.empty())
   {
     pattern   = idPattern;
   }
 
-  if ((typePattern != "") && (type != ""))
+  if ((!typePattern.empty()) && (!type.empty()))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
 
@@ -144,7 +144,7 @@ std::string getEntities
   //
   // Making sure geometry, georel and coords are not used individually
   //
-  if ((coords != "") && (geometry == ""))
+  if ((!coords.empty()) && (geometry.empty()))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", "BadRequest");
 
@@ -152,7 +152,7 @@ std::string getEntities
     ciP->httpStatusCode = oe.code;
     return out;
   }
-  else if ((geometry != "") && (coords == ""))
+  else if ((!geometry.empty()) && (coords.empty()))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", "BadRequest");
 
@@ -161,7 +161,7 @@ std::string getEntities
     return out;
   }
 
-  if ((georel != "") && (geometry == ""))
+  if ((!georel.empty()) && (geometry.empty()))
   {
     OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", "BadRequest");
 
@@ -178,7 +178,7 @@ std::string getEntities
   // - georel
   // - coords
   //
-  if (geometry != "")
+  if (!geometry.empty())
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
@@ -207,7 +207,7 @@ std::string getEntities
   // The plain q-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
-  if (q != "")
+  if (!q.empty())
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
@@ -236,7 +236,7 @@ std::string getEntities
   // The plain mq-string is saved in Scope::value, just in case.
   // Might be useful for debugging, if nothing else.
   //
-  if (mq != "")
+  if (!mq.empty())
   {
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
     std::string  errorString;
@@ -271,7 +271,7 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    bool      isIdPattern = (idPattern != "" || pattern == ".*");
+    bool      isIdPattern = (!idPattern.empty() || pattern == ".*");
     EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
 
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
@@ -303,10 +303,7 @@ std::string getEntities
   }
 
   // Get attrs and metadata filters from URL params
-  // Note we cannot set the attrs filter on &parseDataP->qcr.res.attrsFilterList given that parameter is used for querying on DB
-  // and some .test would break. We use a fresh variable (attributeFilter) for that
-  StringList attributeFilter;
-  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &attributeFilter);
+  setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
@@ -331,8 +328,10 @@ std::string getEntities
     }
     else
     {
+      // Filtering again attributes may seem redundant, but it will prevent
+      // that faulty CPrs inject attributes not requested by client
       TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
-                                            attributeFilter.stringV,
+                                            parseDataP->qcr.res.attrsList.stringV,
                                             false,
                                             parseDataP->qcr.res.metadataList.stringV));
       ciP->httpStatusCode = SccOk;

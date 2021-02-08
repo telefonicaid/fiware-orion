@@ -215,7 +215,6 @@ Date: REGEX(.*)
 03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 ============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -224,7 +223,6 @@ Date: REGEX(.*)
 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 ============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -237,7 +235,6 @@ Date: REGEX(.*)
 06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
 ================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -246,7 +243,6 @@ Date: REGEX(.*)
 07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 ============================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -259,7 +255,6 @@ Date: REGEX(.*)
 09. Modify entity s01 w/ attr A w/o tenant - no notification as expired
 =======================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -274,7 +269,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [
@@ -308,7 +303,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
     "contextResponses": [

@@ -34,6 +34,7 @@
 #include "common/errorMessages.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "jsonParse/jsonRequest.h"
@@ -73,7 +74,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (aP->providingApplication.get() != "")
+      if (!aP->providingApplication.get().empty())
       {
         return true;
       }
@@ -101,7 +102,13 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 * 7. Freeing memory
 *
 */
-static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP)
+static bool updateForward
+(
+  ConnectionInfo*         ciP,
+  UpdateContextRequest*   upcrP,
+  const std::string&      regId,
+  unsigned int            correlatorCounter,
+  UpdateContextResponse*  upcrsP)
 {
   std::string      ip;
   std::string      protocol;
@@ -138,6 +145,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   std::string     verb;
   std::string     resource;
+  std::string     op;
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = "application/json";
@@ -148,15 +156,13 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
 
-    verb     = "POST";
-    resource = prefix + "/updateContext";
+    op = "/updateContext";
   }
   else
   {
     TIMED_RENDER(payload = upcrP->toJson());
 
-    verb     = "POST";
-    resource = prefix + "/op/update";
+    op = "/op/update";
 #if 0
     // FIXME #3485: this part is not removed by the moment, in the case it may be useful in the
     // context of issue #3485
@@ -171,13 +177,16 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     resource = prefix + "/entities/" + eP->id + "/attrs";
     verb     = "PATCH";
 
-    if (eP->type != "")
+    if (!eP->type.empty())
     {
       // Add ?type=<TYPE> to 'resource'
       resource += "?type=" + eP->type;
     }
 #endif
   }
+
+  verb     = "POST";
+  resource = prefix + op;
 
   ciP->outMimeType  = outMimeType;
   cleanPayload      = (char*) payload.c_str();
@@ -190,6 +199,10 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::map<std::string, std::string>  noHeaders;
   long long                           statusCode;
 
+  char suffix[STRING_SIZE_FOR_INT];
+  snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+  std::string effectiveCorrelator = ciP->httpHeaders.correlator + "; cbfwd=" + suffix;
+
   r = httpRequestSend(fromIp,   // thread variable
                       ip,
                       port,
@@ -201,7 +214,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       resource,
                       mimeType,
                       cleanPayload,
-                      ciP->httpHeaders.correlator,
+                      effectiveCorrelator,
                       "",
                       &out,
                       &statusCode,
@@ -212,6 +225,7 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error '%s' forwarding 'Update' to providing application)", out.c_str()));
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     return false;
   }
 
@@ -248,6 +262,8 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
       upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
+
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
     //
     // NOTE
@@ -305,6 +321,8 @@ static bool updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   else  // NGSIv2
   {
     // NGSIv2 forward - no payload to be received
+
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", statusCode);
 
     if (statusCode == SccNoContent)
     {
@@ -417,7 +435,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     // Add EntityId::id to StatusCode::details if 404, but only if StatusCode::details is empty
     //
-    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details == ""))
+    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details.empty()))
     {
       cerP->statusCode.details = cerP->entity.id;
     }
@@ -534,7 +552,7 @@ std::string postUpdateContext
 
     return answer;
   }
-  else if (ciP->servicePathV[0] == "")
+  else if (ciP->servicePathV[0].empty())
   {
     ciP->servicePathV[0] = SERVICE_PATH_ROOT;
   }
@@ -638,6 +656,8 @@ std::string postUpdateContext
   UpdateContextRequestVector  requestV;
   UpdateContextResponse       response;
 
+  std::vector<std::string>    regIdsV;
+
   response.errorCode.fill(SccOk);
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
@@ -670,7 +690,7 @@ std::string postUpdateContext
         //
         // 1. If the attribute is found locally - just add the attribute to the outgoing response
         //
-        if (aP->providingApplication.get() == "")
+        if (aP->providingApplication.get().empty())
         {
           ContextAttribute ca(aP);
           response.foundPush(&cerP->entity, &ca);
@@ -687,6 +707,7 @@ std::string postUpdateContext
           reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
           reqP->updateActionType = ActionTypeUpdate;
           requestV.push_back(reqP);
+          regIdsV.push_back(aP->providingApplication.getRegId());
         }
 
         //
@@ -722,9 +743,22 @@ std::string postUpdateContext
   //
   bool forwardOk = true;
 
+  // Note that queryForward() (due to internal calls to httpRequestSend())
+  // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
+  // FIXME P5: maybe this is not the right place to store&recover old transaction.
+  // What about inside httpRequestSend?
+
+  std::string prevCoorId  = correlationIdGet();
+  std::string prevTransId = transactionIdGetAsString();
+
+  if (requestV.size() > 0)
+  {
+    logInfoFwdStart(ciP->method.c_str(), ciP->uriForLogs.c_str());
+  }
+
   for (unsigned int ix = 0; ix < requestV.size() && ix < cprForwardLimit; ++ix)
   {
-    if (requestV[ix]->contextProvider == "")
+    if (requestV[ix]->contextProvider.empty())
     {
       LM_E(("Internal Error (empty context provider string)"));
       continue;
@@ -733,7 +767,7 @@ std::string postUpdateContext
     UpdateContextResponse upcrs;
     bool                  b;
 
-    b = updateForward(ciP, requestV[ix], &upcrs);
+    b = updateForward(ciP, requestV[ix], regIdsV[ix], ix + 1, &upcrs);
 
     if (b == false)
     {
@@ -745,6 +779,9 @@ std::string postUpdateContext
     //
     response.merge(&upcrs);
   }
+
+  correlatorIdSet(prevCoorId.c_str());
+  transactionIdSet(prevTransId.c_str());
 
   //
   // Note this is a slight break in the separation of concerns among the different layers (i.e.

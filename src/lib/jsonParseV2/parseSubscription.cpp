@@ -148,7 +148,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     const Value&  subject = document["subject"];
     std::string   r       = parseSubject(ciP, subsP, subject);
 
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }
@@ -164,7 +164,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     const Value&  notification = document["notification"];
     std::string   r            = parseNotification(ciP, subsP, notification);
 
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }
@@ -192,7 +192,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = parse8601Time(expires);
+      eT = (int64_t) parse8601Time(expires);
       if (eT == -1)
       {
         return badInput(ciP, "expires has an invalid format");
@@ -292,7 +292,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     }
 
     r = parseNotifyConditionVector(ciP, subsP, condition);
-    if (r != "")
+    if (!r.empty())
     {
       return r;
     }
@@ -454,7 +454,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
       std::string r = parseDictionary(ciP, subsP->notification.httpInfo.qs, qs, "notification httpCustom qs");
 
-      if (r != "")
+      if (!r.empty())
       {
         return r;
       }
@@ -480,7 +480,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
                                       headers,
                                       "notification httpCustom headers");
 
-      if (r != "")
+      if (!r.empty())
       {
         return r;
       }

@@ -27,7 +27,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -53,7 +53,7 @@ std::string badRequest
 
   alarmMgr.badInput(ciP->ip, details);
 
-  restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
+  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
 
   return answer;
 }

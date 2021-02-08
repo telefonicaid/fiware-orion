@@ -160,7 +160,7 @@ ContextElementResponse::ContextElementResponse
       {
       case String:
         ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
-        if (!includeEmpty && ca.stringValue.length() == 0)
+        if (!includeEmpty && ca.stringValue.empty())
         {
           continue;
         }
@@ -257,12 +257,12 @@ ContextElementResponse::ContextElementResponse
     /* Set creDate and modDate at attribute level */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
-      caP->creDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_CREATION_DATE);
+      caP->creDate = getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE);
     }
 
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      caP->modDate = (double) getIntOrLongFieldAsLongF(attr, ENT_ATTRS_MODIFICATION_DATE);
+      caP->modDate = getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE);
     }
 
     entity.attributeVector.push_back(caP);
@@ -271,12 +271,12 @@ ContextElementResponse::ContextElementResponse
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))
   {
-    entity.creDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_CREATION_DATE);
+    entity.creDate = getNumberFieldF(entityDoc, ENT_CREATION_DATE);
   }
 
   if (entityDoc.hasField(ENT_MODIFICATION_DATE))
   {
-    entity.modDate = (double) getIntOrLongFieldAsLongF(entityDoc, ENT_MODIFICATION_DATE);
+    entity.modDate = getNumberFieldF(entityDoc, ENT_MODIFICATION_DATE);
   }
 }
 
@@ -400,7 +400,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
     statusCode.fill(&qcrP->errorCode);
     entity.fill(entityId, entityType, "false");
 
-    if ((statusCode.code != SccOk) && (statusCode.details == ""))
+    if ((statusCode.code != SccOk) && (statusCode.details.empty()))
     {
       statusCode.details = "Entity id: /" + entityId + "/";
     }

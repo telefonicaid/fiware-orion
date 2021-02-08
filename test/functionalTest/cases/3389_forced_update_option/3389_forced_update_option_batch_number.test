@@ -294,7 +294,6 @@ echo
 01. POST /v2/op/update, to create Room1 and Room2 with temperature and pressure.
 ================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -381,7 +380,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. POST /v2/op/update without forcedUpdate, to update Room1 and Room2 with the same values.
 ============================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -394,7 +392,6 @@ Date: REGEX(.*)
 08. POST /v2/op/update?options=forcedUpdate (actionType = update), to update Room1 and Room2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -410,7 +407,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -435,7 +432,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -457,7 +454,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. POST /v2/op/update?options=forcedUpdate (actionType = append), to update Room1 and Room2 with same values.
 ==============================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -473,7 +469,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [
@@ -498,7 +494,7 @@ Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
 {
     "data": [

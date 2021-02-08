@@ -56,11 +56,11 @@ payload='{
   "id": "E1",
   "type": "T",
   "dateCreated": {
-    "value": "2050-01-01T00:00:00",
+    "value": "2050-01-01T00:00:00.666",
     "type": "DateTime"
   },
   "dateModified": {
-    "value": "2051-01-01T00:00:00",
+    "value": "2051-01-01T00:00:00.777",
     "type": "DateTime"
   }
 }'
@@ -181,7 +181,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 and get user defined dates
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 187
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -190,12 +190,12 @@ Date: REGEX(.*)
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2050-01-01T00:00:00.00Z"
+        "value": "2050-01-01T00:00:00.666Z"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2051-01-01T00:00:00.00Z"
+        "value": "2051-01-01T00:00:00.777Z"
     },
     "id": "E1",
     "type": "T"
@@ -205,7 +205,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1?attrs=dateModified,dateCreated and get user defined dates
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 187
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,12 +214,12 @@ Date: REGEX(.*)
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2050-01-01T00:00:00.00Z"
+        "value": "2050-01-01T00:00:00.666Z"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "2051-01-01T00:00:00.00Z"
+        "value": "2051-01-01T00:00:00.777Z"
     },
     "id": "E1",
     "type": "T"
@@ -251,7 +251,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?q=dateCreated<2049-01-01 and get E1-user [should get no entity]
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 189
+Content-Length: 191
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -261,12 +261,12 @@ Date: REGEX(.*)
         "dateCreated": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2050-01-01T00:00:00.00Z"
+            "value": "2050-01-01T00:00:00.666Z"
         },
         "dateModified": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2051-01-01T00:00:00.00Z"
+            "value": "2051-01-01T00:00:00.777Z"
         },
         "id": "E1",
         "type": "T"
@@ -277,7 +277,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?q=dateModified<2049-01-01 and get E1-user [should get no entity]
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 189
+Content-Length: 191
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -287,12 +287,12 @@ Date: REGEX(.*)
         "dateCreated": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2050-01-01T00:00:00.00Z"
+            "value": "2050-01-01T00:00:00.666Z"
         },
         "dateModified": {
             "metadata": {},
             "type": "DateTime",
-            "value": "2051-01-01T00:00:00.00Z"
+            "value": "2051-01-01T00:00:00.777Z"
         },
         "id": "E1",
         "type": "T"
@@ -303,7 +303,6 @@ Date: REGEX(.*)
 08. DELETE /v2/entities/E1/attrs/dateCreated (so automatic dateCreated will be used from now on)
 ================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -312,7 +311,6 @@ Date: REGEX(.*)
 09. DELETE /v2/entities/E1/attrs/dateModified (so automatic dateModified will be used from now on)
 ==================================================================================================
 HTTP/1.1 204 No Content
-Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
@@ -335,7 +333,7 @@ Date: REGEX(.*)
 11. GET /v2/entities/E1?attrs=dateModified,dateCreated and get automatic dates
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 187
+Content-Length: 189
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -344,12 +342,12 @@ Date: REGEX(.*)
     "dateCreated": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
     },
     "dateModified": {
         "metadata": {},
         "type": "DateTime",
-        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\dZ)"
+        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
     },
     "id": "E1",
     "type": "T"

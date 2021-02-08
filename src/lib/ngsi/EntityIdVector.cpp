@@ -92,8 +92,6 @@ std::string EntityIdVector::check(RequestType requestType)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == SubscribeContextAvailability)          ||
-      (requestType == UpdateContextAvailabilitySubscription) ||
       (requestType == QueryContext)                          ||
       (requestType == SubscribeContext))
   {
@@ -130,7 +128,7 @@ EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type,
   // isPattern:  "false" or "" is the same
   //
   std::string isPatternFromParam = isPattern;
-  if (isPatternFromParam == "")
+  if (isPatternFromParam.empty())
   {
     isPatternFromParam = "false";
   }
@@ -139,7 +137,7 @@ EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type,
   {
     std::string isPatternFromVec = vec[ix]->isPattern;
 
-    if (isPatternFromVec == "")
+    if (isPatternFromVec.empty())
     {
       isPatternFromVec = "false";
     }

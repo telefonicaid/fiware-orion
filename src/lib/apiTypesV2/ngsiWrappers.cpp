@@ -75,7 +75,7 @@ void entIdStdVector2EntityIdVector(const std::vector<ngsiv2::EntID>& entitiesV, 
   {
     EntityId* enP = new EntityId();
 
-    if (entitiesV[ix].id != "")
+    if (!entitiesV[ix].id.empty())
     {
       enP->fill(entitiesV[ix].id, entitiesV[ix].type, "false");
     }

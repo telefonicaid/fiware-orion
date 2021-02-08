@@ -74,9 +74,9 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-reqMutexPolicy <all|none|write|read>** : 内部 mutex ポリシーを指定します。詳細については、[パフォーマンス・チューニング](perf_tuning.md#mutex-policy-impact-on-performance)のドキュメントを参照してください。
 -   **-subCacheIval** : サブスクリプション・キャッシュの更新の呼び出し間隔 (秒単位)。ゼロ値は "リフレッシュしない" を意味します。デフォルト値は60秒で、mono-CB 配置に適しています。([このドキュメント](perf_tuning.md#subscription-cache)のサブスクリプション・キャッシュの詳細を参照してください
 -   **-noCache** : コンテキスト・サブスクリプション・キャッシュを無効にするので、サブスクリプション検索は常に DB で行われます。推奨されませんが、デバッグには便利です
--   **-notificationMode** : 通知モードを選択することができます。`transient`, `permanent` または `threadpool:q:n`。デフォルトモードは `transient` です
+-   **-notificationMode** : 通知モードを選択することができます。`transient`, `persistent` または `threadpool:q:n`。デフォルトモードは `transient` です
     * transient モードでは、通知を送信した直後に接続は CB によって閉じられます
-    * permanent 接続モードでは、通知が指定された URL パスに初めて送信されたときに、永続的な接続が作成されます (受信者が永続的な接続をサポートしている場合)。同じ URL パスへの通知が行われると、接続が再利用され、HTTP 接続時間が保存されます
+    * persistent 接続モードでは、通知が指定された URL パスに初めて送信されたときに、持続的な接続が作成されます (受信者が持続的な接続をサポートしている場合)。同じ URL パスへの通知が行われると、接続が再利用され、HTTP 接続時間が保存されます
     * threadpool モードでは、通知は `q` と `n` のサイズのキューにエンキューされます。スレッドがキューからの通知を取ると、非同期に発信リクエストを行います。このモードを使用する場合は、[スレッド・モデルのセクション](perf_tuning.md#orion)を参照してください
 -   **-notifFlowControl guage:stepDelay:maxInterval**. Enables flow control mechanism.
     [ドキュメントのこのセクション](perf_tuning.md#updates-flow-control-mechanism)を参照してください
@@ -92,6 +92,83 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-disableCustomNotifications** : NGSIv2 カスタム・通知を無効にします。特に :
     * `httpCustom` は、`http` として解釈されます。すなわち、`url` を除くすべてのサブフィールドが l 無視されます
     * `${...}` マクロ置換は実行されません
+-   **-disableFileLog** : Orion がファイルにロギングするのを避けます (デフォルトの動作はログ・ファイルを使用します)。このオプションは、kubernetes で実行している場合に役に立ちます
 -   **-logForHumans** : 人のために標準化されたトレースを作成します。ログ・ファイルのトレースは影響を受けないことに注意してください
+-   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト
+-   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
+
+## 環境変数を使用した設定
+
+Orion は、環境変数を使用した引数の受け渡しをサポートしています。
+以下の表に示すように、各 CLI パラメータには同等の環境変数があります
+(`contextBroker -U` も同じ情報を取得するために使用できます)。
+
+2つの事実を考慮する必要があります :
+
+* "フラグ" のように機能する CLI パラメータの環境変数は、
+  (つまり、有効か無効かのどちらかですが、実際の値はありません - `-fg` はその1つです)
+  大文字と小文字を区別する値の `TRUE` あるいは `true` (パラメータを有効にする) または
+  `FALSE` あるいは `false` (パラメータを無効にする) をとることができます
+* 競合する場合 (つまり、環境変数と CLI パラメータを同時に使用する場合)、
+  CLI パラメータが使用されます
+
+|   環境変数   |   同等の CLI パラメータ    |
+| ----------------- | --------- |
+|   ORION_LOG_DIR   |   logDir  |
+|   ORION_TRACE |   t   |
+|   ORION_LOG_LEVEL |   logLevel    |
+|   ORION_LOG_APPEND    |   logAppend   |
+|   ORION_FOREGROUND    |   fg  |
+|   ORION_LOCALIP   |   localIp |
+|   ORION_PORT  |   port    |
+|   ORION_PID_PATH  |   pidpath |
+|   ORION_MONGO_HOST    |   dbhost  |
+|   ORION_MONGO_REPLICA_SET |   rplSet  |
+|   ORION_MONGO_USER    |   dbuser  |
+|   ORION_MONGO_PASSWORD    |   dbpwd   |
+|   ORION_MONGO_AUTH_MECH   |   dbAuthMech  |
+|   ORION_MONGO_AUTH_SOURCE |   dbAuthDb    |
+|   ORION_MONGO_SSL |   dbSSL   |
+|   ORION_MONGO_DB  |   db  |
+|   ORION_MONGO_TIMEOUT |   dbTimeout   |
+|   ORION_MONGO_POOL_SIZE   |   dbPoolSize  |
+|   ORION_USEIPV4   |   ipv4    |
+|   ORION_USEIPV6   |   ipv6    |
+|   ORION_HTTPS |   https   |
+|   ORION_HTTPS_KEYFILE |   key |
+|   ORION_HTTPS_CERTFILE    |   cert    |
+|   ORION_MULTI_SERVICE |   multiservice    |
+|   ORION_HTTP_TIMEOUT  |   httpTimeout |
+|   ORION_REQ_TIMEOUT   |   reqTimeout  |
+|   ORION_MUTEX_POLICY  |   reqMutexPolicy  |
+|   ORION_MONGO_WRITE_CONCERN   |   writeConcern    |
+|   ORION_CORS_ALLOWED_ORIGIN   |   corsOrigin  |
+|   ORION_CORS_MAX_AGE  |   corsMaxAge  |
+|   ORION_CPR_FORWARD_LIMIT |   cprForwardLimit |
+|   ORION_SUBCACHE_IVAL |   subCacheIval    |
+|   ORION_NOCACHE   |   noCache |
+|   ORION_CONN_MEMORY   |   connectionMemory    |
+|   ORION_MAX_CONN  |   maxConnections  |
+|   ORION_TRQ_POOL_SIZE |   reqPoolSize |
+|   ORION_IN_REQ_PAYLOAD_MAX_SIZE   |   inReqPayloadMaxSize |
+|   ORION_OUT_REQ_MSG_MAX_SIZE  |   outReqMsgMaxSize    |
+|   ORION_NOTIF_MODE    |   notificationMode    |
+|   ORION_NOTIF_FLOW_CONTROL    |   notifFlowControl    |
+|   ORION_DROP_NOTIF    |   simulatedNotification   |
+|   ORION_STAT_COUNTERS |   statCounters    |
+|   ORION_STAT_SEM_WAIT |   statSemWait |
+|   ORION_STAT_TIMING   |   statTiming  |
+|   ORION_STAT_NOTIF_QUEUE  |   statNotifQueue  |
+|   ORION_LOG_SUMMARY_PERIOD    |   logSummary  |
+|   ORION_RELOG_ALARMS  |   relogAlarms |
+|   ORION_CHECK_ID_V1   |   strictNgsiv1Ids |
+|   ORION_DISABLE_CUSTOM_NOTIF  |   disableCustomNotifications  |
+|   ORION_DISABLE_FILE_LOG  |   disableFileLog  |
+|   ORION_LOG_FOR_HUMANS    |   logForHumans    |
+|   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
+|   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
+|   ORION_DISABLE_METRICS   |   disableMetrics  |
+|   ORION_INSECURE_NOTIF    |   insecureNotif   |
+|   ORION_NGSIV1_AUTOCAST   |   ngsiv1Autocast  |

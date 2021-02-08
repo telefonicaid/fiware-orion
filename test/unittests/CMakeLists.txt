@@ -77,7 +77,6 @@ SET (SOURCES
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
-    serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
 
     convenience/Convenience_test.cpp
     convenience/AppendContextElementRequest_test.cpp
@@ -101,14 +100,6 @@ SET (SOURCES
     ngsi9/RegisterContextResponse_test.cpp
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
     ngsi9/DiscoverContextAvailabilityResponse_test.cpp
-    ngsi9/SubscribeAvailabilityRequest_test.cpp
-    ngsi9/SubscribeContextAvailabilityResponse_test.cpp
-    ngsi9/NotifyContextAvailabilityRequest_test.cpp
-    ngsi9/NotifyContextAvailabilityResponse_test.cpp
-    ngsi9/UnsubscribeContextAvailabilityRequest_test.cpp
-    ngsi9/UnsubscribeContextAvailabilityResponse_test.cpp
-    ngsi9/UpdateContextAvailabilitySubscriptionRequest_test.cpp
-    ngsi9/UpdateContextAvailabilitySubscriptionResponse_test.cpp
 
     ngsi10/QueryContextRequest_test.cpp
     ngsi10/QueryContextResponse_test.cpp
@@ -169,11 +160,8 @@ SET (SOURCES
     mongoBackend/mongoQueryContextGeo_test.cpp
     mongoBackend/mongoRegisterContext_test.cpp
     mongoBackend/mongoRegisterContext_update_test.cpp
-    mongoBackend/mongoSubscribeContextAvailability_test.cpp
     mongoBackend/mongoSubscribeContext_test.cpp
-    mongoBackend/mongoUnsubscribeContextAvailability_test.cpp
     mongoBackend/mongoUnsubscribeContext_test.cpp
-    mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
     mongoBackend/mongoUpdateContextSubscription_test.cpp
     mongoBackend/mongoUpdateContext_test.cpp
     mongoBackend/mongoUpdateContext_2_test.cpp
@@ -181,8 +169,7 @@ SET (SOURCES
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptionsNoCache_test.cpp
     mongoBackend/mongoUpdateContextCompoundValues_test.cpp
-    mongoBackend/mongoNotifyContext_test.cpp
-    mongoBackend/mongoNotifyContextAvailability_test.cpp
+    mongoBackend/mongoNotifyContext_test.cpp    
     mongoBackend/mongoContextProvidersQuery_test.cpp
     mongoBackend/mongoContextProvidersUpdate_test.cpp
     mongoBackend/mongoQueryTypes_test.cpp

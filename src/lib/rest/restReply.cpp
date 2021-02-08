@@ -33,10 +33,6 @@
 
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi9/RegisterContextResponse.h"
-#include "ngsi9/SubscribeContextAvailabilityResponse.h"
-#include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
-#include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
-#include "ngsi9/NotifyContextAvailabilityResponse.h"
 
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/SubscribeContextResponse.h"
@@ -93,7 +89,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
-  if (answer != "")
+  if (!answer.empty())
   {
     if (ciP->outMimeType == JSON)
     {
@@ -106,7 +102,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if ((corsEnabled == true) && (ciP->httpHeaders.origin != "") && (ciP->httpStatusCode != SccBadVerb))
+  if ((corsEnabled == true) && (!ciP->httpHeaders.origin.empty()) && (ciP->httpStatusCode != SccBadVerb))
   {
     // Only GET method is supported for V1 API
     if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
@@ -180,26 +176,6 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   {
     DiscoverContextAvailabilityResponse dcar(errorCode);
     *outStringP = dcar.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == SubscribeContextAvailability)
-  {
-    SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-    *outStringP = scar.toJsonV1();
-  }
-  else if ((ciP->restServiceP->request == UpdateContextAvailabilitySubscription) || (ciP->restServiceP->request == Ngsi9SubscriptionsConvOp))
-  {
-    UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-    *outStringP = ucas.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == UnsubscribeContextAvailability)
-  {
-    UnsubscribeContextAvailabilityResponse ucar(errorCode);
-    *outStringP = ucar.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == NotifyContextAvailability)
-  {
-    NotifyContextAvailabilityResponse ncar(errorCode);
-    *outStringP = ncar.toJsonV1();
   }
   else if (ciP->restServiceP->request == QueryContext)
   {

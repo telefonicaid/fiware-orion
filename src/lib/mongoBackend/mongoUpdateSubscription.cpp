@@ -913,7 +913,7 @@ std::string mongoUpdateSubscription
 
   // Build the BSON object (using subOrig as starting point plus some info from cache)
   BSONObjBuilder      b;
-  std::string         servicePath      = servicePathV[0] == "" ? SERVICE_PATH_ALL : servicePathV[0];
+  std::string         servicePath      = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
   bool                notificationDone = false;
   long long           lastNotification = 0;
   CachedSubscription* subCacheP        = NULL;

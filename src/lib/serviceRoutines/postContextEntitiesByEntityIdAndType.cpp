@@ -100,7 +100,7 @@ std::string postContextEntitiesByEntityIdAndType
 
     return answer;
   }
-  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  else if ((typeNameFromUriParam != entityType) && (!typeNameFromUriParam.empty()))
   {
     alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 

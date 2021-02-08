@@ -68,7 +68,7 @@ std::string AppendContextElementResponse::toJsonV1
   }
   else
   {
-    if (entity.id != "")
+    if (!entity.id.empty())
     {
       out += entity.toJsonV1(true);
     }
@@ -97,7 +97,7 @@ std::string AppendContextElementResponse::check
 {
   std::string res;
 
-  if (predetectedError != "")
+  if (!predetectedError.empty())
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
@@ -187,7 +187,7 @@ void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std:
   }
 
   // Now, if the external error code is 404 and 'details' is empty - add the name of the incoming entity::id as details
-  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details == ""))
+  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details.empty()))
   {
     if (ucrsP->contextElementResponseVector.size() == 1)
     {
