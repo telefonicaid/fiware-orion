@@ -169,6 +169,23 @@
 #
 
 
+# -----------------------------------------------------------------------------
+#
+# Is the broker compiled with performance tests included?
+#
+nm /usr/bin/orionld | grep performanceTestInluded 2> /dev/null
+if [ $? != 0 ]
+then
+  echo
+  echo "  Sorry, can't perform performance tests on the current instance of Orion-LD."
+  echo "  Orion-LD hasn't been compiled for performance tests."
+  echo "  Enable it by editing 'src/lib/orionld/common/performance.h' - uncomment #define REQUEST_PERFORMANCE 1."
+  echo "  Recompile Orion-LD, and try again."
+  echo
+  exit 1
+fi
+
+
 
 # -----------------------------------------------------------------------------
 #
