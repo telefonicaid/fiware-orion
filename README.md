@@ -14,6 +14,7 @@
 ![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
 ![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4520/badge)](https://bestpractices.coreinfrastructure.org/projects/4520)
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context
 Broker GE, providing an
