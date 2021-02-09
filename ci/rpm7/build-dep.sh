@@ -53,12 +53,13 @@ echo "INSTALL: mongodb legacy c++ driver" \
 && scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl \
 && rm -Rf /opt/mongo-cxx-driver-legacy-1.1.2
 
+# Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
+# see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
 echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-c-driver-1.16.0 \
 && mkdir cmake-build \
 && cd cmake-build \
-# Recommended setting, to be removed in 2.0.0 see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
 && cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
 && make install \
