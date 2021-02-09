@@ -58,6 +58,7 @@ echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && cd /opt/mongo-c-driver-1.16.0 \
 && mkdir cmake-build \
 && cd cmake-build \
+# Recommended setting, to be removed in 2.0.0 see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
 && cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
 && make install \
