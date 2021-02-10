@@ -27,7 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -62,7 +62,7 @@ bool pgCompoundSubPropertyPush
   if ((renderedValue == NULL) || (sql == NULL))
     LM_RE(false, ("Internal Error (unable to allocate room for compound value of sub-attribute"));
 
-  kjRender(orionldState.kjsonP, compoundValueNodeP, renderedValue, renderedValueSize);
+  kjFastRender(orionldState.kjsonP, compoundValueNodeP, renderedValue, renderedValueSize);
 
   //
   // Two combinations for NULL/non-NULL 'observedAt'
