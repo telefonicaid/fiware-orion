@@ -56,14 +56,14 @@ echo "INSTALL: mongodb legacy c++ driver" \
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
 echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
-&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.16.0/mongo-c-driver-1.16.0.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-c-driver-1.16.0 \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz | tar xzC /opt/ \
+&& cd /opt/mongo-c-driver-1.17.4 \
 && mkdir cmake-build \
 && cd cmake-build \
 && cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
 && make install \
-&& rm -Rf /opt/mongo-c-driver-1.16.0
+&& rm -Rf /opt/mongo-c-driver-1.17.4
 
 echo "INSTALL: rapidjson" \
 && curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
