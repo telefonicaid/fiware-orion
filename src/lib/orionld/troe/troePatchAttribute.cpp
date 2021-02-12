@@ -27,7 +27,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -59,12 +59,6 @@ extern "C"
 //
 bool troePatchAttribute(ConnectionInfo* ciP)
 {
-  // <DEBUG>
-  char debugBuf[1024];
-  kjRender(orionldState.kjsonP, orionldState.requestTree, debugBuf, sizeof(debugBuf));
-  LM_TMP(("APPA: incoming tree: %s", debugBuf));
-  // </DEBUG>
-
   // Expand names of sub-attributes - FIXME - let the Service Routine do this for us!
   troeSubAttrsExpand(orionldState.requestTree);
 

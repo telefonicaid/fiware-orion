@@ -153,6 +153,7 @@ bool orionldGetVersion(ConnectionInfo* ciP)
   close(fd);
 
   // This request is ALWAYS returned with pretty-print
+  orionldState.uriParams.prettyPrint     = true;
   orionldState.kjsonP->spacesPerIndent   = 2;
   orionldState.kjsonP->nlString          = (char*) "\n";
   orionldState.kjsonP->stringBeforeColon = (char*) "";

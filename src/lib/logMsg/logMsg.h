@@ -42,6 +42,7 @@
 
 #include "common/globals.h"     /* transactionIdSet,correlatorIdSet          */
 #include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+#include "orionld/common/performance.h"             // REQUEST_PERFORMANCE
 
 
 
@@ -467,6 +468,7 @@ do                                                                        \
 *
 * LM_I - log info
 */
+#ifndef REQUEST_PERFORMANCE
 #define LM_I(s)                                                           \
 do                                                                        \
 {                                                                         \
@@ -478,6 +480,9 @@ do                                                                        \
     ::free(text);                                                         \
   }                                                                       \
 } while (0)
+#else
+#define LM_I(s)
+#endif
 #endif
 
 

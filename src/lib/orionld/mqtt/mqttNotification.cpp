@@ -28,7 +28,7 @@
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, ...
 }
 
@@ -70,7 +70,7 @@ int mqttNotification(const char* host, unsigned short port, const char* topic, c
   }
 
   kjChildAdd(metadataNodeP, contentTypeNodeP);
-  kjRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 1024);
+  kjFastRender(orionldState.kjsonP, metadataNodeP, metadataBuf, 1024);
 
   totalLen = strlen(body) + strlen(metadataBuf) + 50;
   totalBuf = kaAlloc(&orionldState.kalloc, totalLen);

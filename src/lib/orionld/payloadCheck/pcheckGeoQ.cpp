@@ -26,7 +26,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
-#include "kjson/kjRender.h"                                     // kjRender
+#include "kjson/kjRender.h"                                     // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
@@ -90,7 +90,7 @@ bool ngsildCoordinatesToAPIv1Datamodel(KjNode* coordinatesP, const char* fieldNa
   else
   {
     buf = kaAlloc(&orionldState.kalloc, 1024);
-    kjRender(orionldState.kjsonP, coordinatesP, buf, 1024);
+    kjFastRender(orionldState.kjsonP, coordinatesP, buf, 1024);
   }
 
   coordinatesP->name    = (char*) "coords";
