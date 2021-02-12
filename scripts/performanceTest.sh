@@ -193,12 +193,9 @@ fi
 #
 function perfCalc
 {
-  typeset -i skip
-
   PATTERN="$1"
   TITLE="$2"
   doTput=$3
-  skip=$4
 
   echo PATTERN: $PATTERN >> /tmp/kz
   echo TITLE:   $TITLE >> /tmp/kz
@@ -207,28 +204,23 @@ function perfCalc
   TITLE="$PATTERN: ........................................................................"
   TITLE=${TITLE:0:40}
 
-  typeset -i loopNo
   typeset -i sums
-  loopNo=0
   sums=0
 
-  for F in $(orionLogView | grep "$PATTERN" | awk -F: '{ print $5 }')
+  for F in $(orionLogView | grep "$PATTERN" | tail -100 | awk -F: '{ print $5 }')
   do
-    if [ $loopNo -ge $skip ]
-    then
-      SUM=$(echo "$SUM + $F" | bc)
-      sums=$sums+1
-      echo counting $F >> /tmp/kz
-    else
-      echo Skipping $F >> /tmp/kz
-    fi
-    loopNo=$loopNo+1
+    SUM=$(echo "$SUM + $F" | bc)
+    sums=$sums+1
+    echo $F >> /tmp/kz
   done
 
-  if [ $sums != 0 ]
+  if [ $SUM != 0 ] && [ $sums != 0 ]
   then
-    echo sums: $sums >> /tmp/kz
     AVG=$(echo "$SUM * 0.01" | bc)
+    echo sums: $sums >> /tmp/kz
+    echo SUM: $SUM   >> /tmp/kz
+    echo AVG: $AVG   >> /tmp/kz
+
     echo "$TITLE  $AVG seconds (average of 100 runs)"
 
     if [ "$doTput" == 1 ]
@@ -251,30 +243,26 @@ date > /tmp/kz
 function perfCalcLoop
 {
   TITLE="$1"
-  skip=$2
+
   echo
   echo $TITLE:
   echo "------------------------------------------------------"
   echo $TITLE: >> /tmp/kz
 
-  perfCalc "TPUT: Before Service Routine"     "Before SR"         0 $skip
-  perfCalc "TPUT: During Service Routine"     "During SR"         0 $skip
+  perfCalc "TPUT: Before Service Routine"     "Before SR"         0
+  perfCalc "TPUT: During Service Routine"     "During SR"         0
   avgDuring=$AVG
-  perfCalc "TPUT: After Service Routine"      "After SR"          0 $skip
+  perfCalc "TPUT: After Service Routine"      "After SR"          0
 
-  perfCalc "TPUT: Awaiting Mongo"             "In Mongo"          0 $skip
+  perfCalc "TPUT: Awaiting Mongo"             "In Mongo"          0
   avgAwaitingMongo=$AVG
 
-  perfCalc "TPUT: Payload Parse"              "Payload Parse"     0 $skip
-  perfCalc "TPUT: Sending Response"           "Queueing Response" 0 $skip
-  perfCalc "TPUT: Rendering Response"         "Render Response"   0 0
-  perfCalc "TPUT: TRoE Processing"            "TRoE Processing"   0 0
-  perfCalc "TPUT: MHD Delay (send response)"  "MHD Delay"         0 $skip
-
-  duringExceptDb=$(echo "$avgDuring - $avgAwaitingMongo" | bc)
-  echo "SR excl DB: ............................  $duringExceptDb (average)"
-
-  perfCalc "TPUT: Entire request"          "Total"            1 $skip
+  perfCalc "TPUT: Payload Parse"              "Payload Parse"     0
+  perfCalc "TPUT: Sending Response"           "Queueing Response" 0
+  perfCalc "TPUT: Rendering Response"         "Render Response"   0
+  perfCalc "TPUT: TRoE Processing"            "TRoE Processing"   0
+  perfCalc "TPUT: MHD Delay (send response)"  "MHD Delay"         0
+  perfCalc "TPUT: Entire request:"            "Total"             1
 
   echo "------------------------------------------------------"
   echo
@@ -284,16 +272,16 @@ function perfCalcLoop
 }
 
 ft ngsild_performance_POST_entities_100.test
-perfCalcLoop "POST /entities" 0
+perfCalcLoop "POST /entities"
 
 ft ngsild_performance_GET_entity_out_of_100.test
-perfCalcLoop "GET /entities/{EID} among 100" 100
+perfCalcLoop "GET /entities/{EID} among 100"
 
 ft ngsild_performance_GET_entity_out_of_10.test
-perfCalcLoop "GET /entities/{EID} among 10" 10
+perfCalcLoop "GET /entities/{EID} among 10"
 
 ft ngsild_performance_GET_entities_out_of_100.test
-perfCalcLoop "GET /entities?type=X among 100" 100
+perfCalcLoop "GET /entities?type=X among 100"
 
 ft ngsild_performance_GET_entities_out_of_10.test
-perfCalcLoop "GET /entities?type=X among 10" 10
+perfCalcLoop "GET /entities?type=X among 10"

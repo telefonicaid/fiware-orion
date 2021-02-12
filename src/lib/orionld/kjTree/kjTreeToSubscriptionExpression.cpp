@@ -25,7 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjRender.h"                                    // kjFastRender
 }
 
 #include "apiTypesV2/SubscriptionExpression.h"                 // SubscriptionExpression
@@ -120,7 +120,7 @@ bool kjTreeToSubscriptionExpression(KjNode* kNodeP, SubscriptionExpression* subE
     // NGSI-LD needs it to be able to be an array.
     // Easiest way to fix this is to render the JSON Array and translate it to a string, and then removing the '[]'
     //
-    kjRender(orionldState.kjsonP, coordinatesNodeP, coords, sizeof(coords));
+    kjFastRender(orionldState.kjsonP, coordinatesNodeP, coords, sizeof(coords));
     coords[strlen(coords) - 1] = 0;       // Removing last ']'
     subExpressionP->coords = &coords[1];  // Removing first '['
   }

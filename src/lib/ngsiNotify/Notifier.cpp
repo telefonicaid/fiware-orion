@@ -44,7 +44,7 @@
 
 #ifdef ORIONLD
 extern "C" {
-#include "kjson/kjRender.h"                                    // kjRender
+#include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjson.h"                                       // Kjson
 }
 #include "orionld/common/orionldState.h"                       // orionldState
@@ -525,7 +525,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       int   bufSize = 512 * 1024;
       char* buf     = (char*) malloc(bufSize);
 
-      kjRender(orionldState.kjsonP, kjTree, buf, bufSize);
+      kjFastRender(orionldState.kjsonP, kjTree, buf, bufSize);
       payloadString = buf;
       toFree        = buf;
     }

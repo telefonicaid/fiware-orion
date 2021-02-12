@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldErrorResponse.h"                 // OrionldBadRequestData, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
+#include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pcheckUri.h"                      // pcheckUri
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
@@ -484,8 +485,9 @@ MHD_Result orionldMhdConnectionInit
   // This call to LM_K should not be removed.
   // At most, commented out
   //
+#ifndef REQUEST_PERFORMANCE
   LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));
-
+#endif
 
   //
   // 1. Prepare connectionInfo

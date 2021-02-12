@@ -117,7 +117,7 @@ void orionldStateInit(void)
   //   About 'bzero(&orionldState, sizeof(orionldState))'
   //   This is NOT DONE by the operating system, so, it needs to be done here 'manually'
   //
-  bzero(&orionldState, sizeof(orionldState));
+  bzero(&orionldState, sizeof(orionldState));   // Performance: ~5 microseconds
 
   //
   // Creating kjson environment for KJson parse and render

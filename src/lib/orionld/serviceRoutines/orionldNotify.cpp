@@ -28,7 +28,7 @@
 
 extern "C"
 {
-#include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjRender.h"                                      // kjFastRender
 #include "kjson/kjBuilder.h"                                     // kjObject, kjArray, kjString, kjChildAdd, ...
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
@@ -260,7 +260,7 @@ void orionldNotify(void)
     kjChildAdd(notificationTree, dataNodeP);
     kjChildAdd(dataNodeP, niP->attrsForNotification);
 
-    kjRender(orionldState.kjsonP, notificationTree, payload, payloadLen);
+    kjFastRender(orionldState.kjsonP, notificationTree, payload, payloadLen);
 
     int sizeLeftForLen = 16;  // sizeof(contentLenHeader) - 16
     contentLength = strlen(payload);

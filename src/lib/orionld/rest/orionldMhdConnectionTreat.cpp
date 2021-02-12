@@ -34,7 +34,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBufferCreate.h"                                // kjBufferCreate
 #include "kjson/kjParse.h"                                       // kjParse
-#include "kjson/kjRender.h"                                      // kjRender
+#include "kjson/kjRender.h"                                      // kjRender, kjFastRender
 #include "kjson/kjClone.h"                                       // kjClone
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
@@ -1142,6 +1142,12 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     }
 
     kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+
+    if (orionldState.uriParams.prettyPrint == false)
+      kjFastRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+    else
+      kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
+
 
 #ifdef REQUEST_PERFORMANCE
     kTimeGet(&timestamps.renderEnd);
