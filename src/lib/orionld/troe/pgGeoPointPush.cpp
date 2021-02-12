@@ -95,7 +95,7 @@ bool pgGeoPointPush
   {
     snprintf(sql, sizeof(sql), "INSERT INTO attributes("
              "opMode, ts, instanceId, id, entityId, observedAt, valueType, subProperties, geoPoint) "
-             "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPoint', '%s', %s, ST_GeomFromText('POINT Z(%f %f %f)'))",
+             "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPoint', %s, ST_GeomFromText('POINT Z(%f %f %f)'))",
              opMode, orionldState.requestTimeString, attributeInstance, attributeName, entityId, observedAt, subPropertiesString, longitude, latitude, altitude);
   }
 
