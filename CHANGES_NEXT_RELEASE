@@ -1,4 +1,4 @@
 * Issue  #280   Implemented a native function for conversion from BSON to a KjNode tree - to gain performance
 * Issue  #280   Implemented GET /types with options=details
-
+* Issue  #280   Now supporting response in geojson format for Retrieve/Query Entity for Accept: application/geo+json
 
