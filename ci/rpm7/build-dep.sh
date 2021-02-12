@@ -55,6 +55,9 @@ echo "INSTALL: mongodb legacy c++ driver" \
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
+# FIXME: note that dynamic libraris are directly copied to /lib64. Not sure if this is the right way (maybe some
+# flag is missing in previous make install? maybe the dynamic library path in the OS is not correct?) but it
+# suffices by the moment
 echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-c-driver-1.17.4 \
@@ -63,6 +66,8 @@ echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
 && cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && make \
 && make install \
+&& cp src/libmongoc/libmongoc-1.0.so.0 /lib64/libmongoc-1.0.so.0 && \
+&& cp src/libbson/libbson-1.0.so.0 /lib64/libbson-1.0.so.0 && \
 && rm -Rf /opt/mongo-c-driver-1.17.4
 
 echo "INSTALL: rapidjson" \
