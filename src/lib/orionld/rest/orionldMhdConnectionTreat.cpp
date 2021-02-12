@@ -38,6 +38,7 @@ extern "C"
 #include "kjson/kjClone.h"                                       // kjClone
 #include "kjson/kjFree.h"                                        // kjFree
 #include "kjson/kjBuilder.h"                                     // kjString, ...
+#include "kjson/kjLookup.h"                                      // kjLookup
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
@@ -70,6 +71,8 @@ extern "C"
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/temporaryErrorPayloads.h"                 // Temporary Error Payloads
+#include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
+#include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
 
 
@@ -178,13 +181,9 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
   {
     const char* mediaRange = ciP->httpHeaders.acceptHeaderV[ix]->mediaRange.c_str();
 
-    LM_T(LmtAccept, ("ciP->Accept header %d: '%s'", ix, mediaRange));
-
     if (SCOMPARE12(mediaRange, 'a', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n', '/'))
     {
       const char* appType = &mediaRange[12];
-
-      LM_T(LmtAccept, ("mediaRange is application/..."));
 
       if (SCOMPARE8(appType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
       {
@@ -192,6 +191,8 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
         explicit_application_jsonld = true;
         weight_application_jsonld   = ciP->httpHeaders.acceptHeaderV[ix]->qvalue;
       }
+      else if (SCOMPARE9(appType, 'g', 'e', 'o', '+', 'j', 's', 'o', 'n', 0))
+        orionldState.acceptGeojson  = true;
       else if (SCOMPARE5(appType, 'j', 's', 'o', 'n', 0))
       {
         orionldState.acceptJson     = true;
@@ -208,16 +209,15 @@ static bool acceptHeaderExtractAndCheck(ConnectionInfo* ciP)
     {
       orionldState.acceptJsonld = true;
       orionldState.acceptJson   = true;
-      LM_T(LmtAccept, ("*/* - both json and jsonld OK"));
     }
   }
 
-  if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false))
+  if ((orionldState.acceptJsonld == false) && (orionldState.acceptJson == false) && (orionldState.acceptGeojson == false))
   {
     const char* title   = "invalid mime-type";
-    const char* details = "HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json'";
+    const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
 
-    LM_W(("Bad Input (HTTP Header /Accept/ contains neither 'application/json' nor 'application/ld+json')"));
+    LM_W(("Bad Input (HTTP Header /Accept/ none of 'application/json', 'application/ld+json', or 'application/geo+json')"));
     orionldErrorResponseCreate(OrionldBadRequestData, title, details);
     orionldState.httpStatusCode = SccNotAcceptable;
 
@@ -666,6 +666,152 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 
 // -----------------------------------------------------------------------------
 //
+// geojsonEntityTransform -
+//
+// About GeoJSON Representation of an Entity in the NGSI-LD API spec:
+// --------------------------------------------------------------------------------
+//
+// - Default GeoProperty is "location"
+// - The URL parameter "geometryProperty" can be used to use an arbitrary GeoProperty
+// - If the GeoProperty has multiple instances (datasetId):
+//   - Use the default instance (if the URL parameter 'datasetId' is not set)
+//   - Else, use the matching one (same datasetId) - and indicate the datasetId in the response
+// - If there the GeoProperty doesn't exist (or is of the wrong type), then the geometry shall be undefined
+//   and returned with a value of null - which is syntactically valid GeoJSON.
+//
+// OUTPUT FORMAT:
+// {
+//   "id": "entity id",
+//   "type": "Feature",
+//   "geometry": { "type": "Point", "coordinates": [1,2] }  # Note, NO subattrs nor timestamps nor ...
+//   "properties": [
+//     {
+//       "name": "type",
+//       "type": "Property",
+//       "value": "The type of the entity"
+//     },
+//     P1,
+//     P2,
+//     R1,
+//     R2, ...
+//   ]
+// }
+//
+static KjNode* geojsonEntityTransform(KjNode* tree)  // FIXME: Move to its own module
+{
+  //
+  // 1. Find and remove 'id' and 'type' from the original entity
+  //
+  KjNode* idP   = kjLookup(tree, "id");
+  KjNode* typeP = kjLookup(tree, "type");
+
+  kjChildRemove(tree, idP);
+  kjChildRemove(tree, typeP);
+
+  //
+  // Create the new tree, add 'id' and 'type' from the old tree
+  //
+  KjNode* geojsonTreeP = kjObject(orionldState.kjsonP, NULL);
+  KjNode* geojsonTypeP = kjString(orionldState.kjsonP, "type", "Feature");
+  KjNode* propertiesP  = kjObject(orionldState.kjsonP, "properties");
+  KjNode* typeProperty;
+
+  kjChildAdd(geojsonTreeP, idP);
+  kjChildAdd(geojsonTreeP, geojsonTypeP);
+  kjChildAdd(geojsonTreeP, propertiesP);
+
+
+  //
+  // Should the @context be added to the payload body?
+  //
+  if (orionldState.linkHeaderAdded == false)
+  {
+    KjNode* contextP;
+
+    if (orionldState.link == NULL)
+      contextP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL);
+    else
+      contextP = kjString(orionldState.kjsonP, "@context", orionldState.link);
+    kjChildAdd(geojsonTreeP, contextP);
+  }
+
+  //
+  // Add the entity type under properties::type as a special property
+  //
+  typeProperty = kjString(orionldState.kjsonP, "type", typeP->value.s);
+  kjChildAdd(propertiesP, typeProperty);
+
+  //
+  // Get the geoproperty
+  //
+  const char* geoPropertyName = (orionldState.uriParams.geoproperty == NULL)? "location" : orionldState.uriParams.geoproperty;
+  KjNode*     geoPropertyP    = kjLookup(tree, geoPropertyName);
+
+  if (geoPropertyP != NULL)
+  {
+    if (orionldState.uriParamOptions.keyValues == false)
+    {
+      KjNode* valueP      = kjLookup(geoPropertyP, "value");
+      KjNode* valueClone  = kjClone(orionldState.kjsonP, valueP);
+
+      geoPropertyP = valueClone;
+    }
+    else
+      geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
+
+    geoPropertyP->name = (char*) "geometry";
+  }
+  else
+    geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
+
+  kjChildAdd(geojsonTreeP, geoPropertyP);
+
+  //
+  // The rest of the properties
+  //
+  KjNode* treeAttrP = tree->value.firstChildP;
+  KjNode* next;
+
+  while (treeAttrP != NULL)
+  {
+    next = treeAttrP->next;
+    kjChildRemove(tree, treeAttrP);
+    kjChildAdd(propertiesP, treeAttrP);
+    treeAttrP = next;
+  }
+
+  return geojsonTreeP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// geojsonEntitiesTransform -
+//
+static KjNode* geojsonEntitiesTransform(KjNode* tree)  // FIXME: Move to its own module
+{
+  KjNode* geojsonTreeP        = kjObject(orionldState.kjsonP, NULL);
+  KjNode* geojsonTypeP        = kjString(orionldState.kjsonP, "type", "FeatureCollection");
+  KjNode* geojsonFeatureArray = kjArray(orionldState.kjsonP, "features");
+
+  kjChildAdd(geojsonTreeP, geojsonTypeP);
+  kjChildAdd(geojsonTreeP, geojsonFeatureArray);
+
+  for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    KjNode* geojsonEntityP = geojsonEntityTransform(entityP);
+
+    kjChildAdd(geojsonFeatureArray, geojsonEntityP);
+  }
+
+  return geojsonTreeP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldMhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
@@ -935,13 +1081,29 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   // Also, if there is no payload data in the response, no need for @context
   // Also, GET /.../contexts/{context-id} should NOT give back the link header
   //
+  bool linkHeader = false;
+
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false) && (orionldState.responseTree != NULL))
   {
-    if (orionldState.acceptJsonld == false)
-      httpHeaderLinkAdd(ciP, orionldState.link);
+    if (orionldState.acceptGeojson == true)
+    {
+      //
+      // Default is: @context in payload body
+      // Overridden only if "Prefer: body=json"
+      //
+      if ((orionldState.preferHeader != NULL) && (strcasecmp(orionldState.preferHeader, "body=json") == 0))
+        linkHeader = true;
+      else
+        orionldState.linkHeaderAdded = false;  // To indicate @context in payload body for geojsonEntityTransform
+    }
+    else if (orionldState.acceptJsonld == false)
+      linkHeader = true;
     else if (orionldState.responseTree == NULL)
-      httpHeaderLinkAdd(ciP, orionldState.link);
+      linkHeader = true;
   }
+
+  if (linkHeader == true)
+    httpHeaderLinkAdd(ciP, orionldState.link);  // sets orionldState.linkHeaderAdded to true => @context in payload body for geojsonEntityTransform
 
   //
   // Is there a KJSON response tree to render?
@@ -951,7 +1113,7 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
     //
     // Should a @context be added to the response payload?
     //
-    bool addContext = ((orionldState.serviceP != NULL) &&
+    bool addContext = ((orionldState.serviceP != NULL) && (orionldState.linkHeaderAdded == false) &&
                        ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0) &&
                        (orionldState.acceptJsonld == true));
 
@@ -969,6 +1131,17 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
 #ifdef REQUEST_PERFORMANCE
     kTimeGet(&timestamps.renderStart);
 #endif
+
+    if (orionldState.acceptGeojson == true)
+    {
+      if (orionldState.serviceP->serviceRoutine == orionldGetEntity)
+        orionldState.responseTree = geojsonEntityTransform(orionldState.responseTree);
+      else if (orionldState.serviceP->serviceRoutine == orionldGetEntities)
+        orionldState.responseTree = geojsonEntitiesTransform(orionldState.responseTree);
+      else
+        LM_W(("Bad Input (Accept: application/geo+json for non-compatible request)"));
+    }
+
     kjRender(orionldState.kjsonP, orionldState.responseTree, responsePayload, sizeof(responsePayload));
 
 #ifdef REQUEST_PERFORMANCE
