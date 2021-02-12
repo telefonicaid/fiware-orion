@@ -191,6 +191,7 @@ typedef struct OrionldConnectionState
   char*                   link;
   bool                    linkHeaderAdded;
   bool                    noLinkHeader;
+  char*                   preferHeader;
   char*                   xauthHeader;
   OrionldContext*         contextP;
   ApiVersion              apiVersion;
@@ -214,6 +215,7 @@ typedef struct OrionldConnectionState
   char*                   verbString;
   bool                    acceptJson;
   bool                    acceptJsonld;
+  bool                    acceptGeojson;
   bool                    ngsildContent;
   KjNode*                 payloadContextNode;
   KjNode*                 payloadIdNode;

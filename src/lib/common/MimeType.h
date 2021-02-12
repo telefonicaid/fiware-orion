@@ -48,7 +48,8 @@ typedef enum MimeType
   TEXT       = 2,
   HTML       = 3,
   JSONLD     = 4,
-  NOMIMETYPE = 5
+  GEOJSON    = 5,
+  NOMIMETYPE = 6
 } MimeType;
 
 

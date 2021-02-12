@@ -46,6 +46,7 @@ const char* mimeTypeToString(MimeType mimeType)
   case TEXT:        return "TEXT";
   case HTML:        return "HTML";
   case JSONLD:      return "JSONLD";
+  case GEOJSON:     return "GEOJSON";
   case NOMIMETYPE:  return "NOMIMETYPE";
   }
 
@@ -103,6 +104,7 @@ const char* mimeTypeToLongString(MimeType mimeType)
   case TEXT:        return "plain/text";
   case HTML:        return "application/html";
   case JSONLD:      return "application/ld+json";
+  case GEOJSON:     return "application/geo+json";
   case NOMIMETYPE:  return "NOMIMETYPE";
   }
 

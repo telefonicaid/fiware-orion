@@ -84,16 +84,25 @@ So, if an attribute has the name "P13" and "P13" isn't found antwhere, then "P13
 ```
 
 
-## Content-Type and the Context
-There are two different ways to supply the context in a NGSI-LD request:
+## Content-Type header and the Context
+There are two different ways to supply the context in an NGSI-LD request:
 
 * via an HTTP header called `Link`,
 * as part of the payload.
 
-If the context is passed in the `Link` HTTP header, then the `Context-Type` must be **application/json**.
-If in the payload data, then the `Context-Type` must be **application/ld+json**.
+If the context is passed in the `Link` HTTP header, then the `Content-Type` must be **application/json**.
+If in the payload data, then the `Content-Type` must be **application/ld+json**.
 If this is not fulfilled, Orion-LD will respond with an error.
 
+## Accept header and the Context
+Just like for `Content-Type`, the @context of a response can be served either in the payload body or in the "Link" HTTP header.
+By default (or issuing "Accept: application/ld+json"), the @context comes in the payload body.
+If you wish to receive the @context in the "Link" HTTP header, then use the HTTP header "Accept: application/json".
+
+For the broker, especially when dealing with Batch operations, it's preferred to receive the context in the "Link" HTTP header,
+and also to return the context in the "Link" HTTP header, i.e., limit the usage of `application/ld+json`.
+The only situation where `application/ld+json` is really necessary is when you need to use an inline context, a context that isn't
+served anywhere.
 
 ## Passing the Context in an Orion-LD Request
 To pass the context `http://context.store.es/myContexts/context1.jsonld` in the `Link` header using `curl` (e.g. to create an entity):
@@ -103,7 +112,7 @@ export payload='{ "id": "xxx", "type": "TTT", ... }'
 curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H 'Link: <http://context.store.es/myContexts/context1.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' -H "Content-Type: application/json"
 ```
 
-If instead you wish to pass the context inside the payload data, it may look like this:
+If instead you wish to pass the context inside the payload data, it would look like this:
 ```bash
 export payload='{ "id": "xxx", "type": "TTT", "@context": "url-to-context", ... }'
 curl localhost:1026/ngsi-ld/v1/entities -d "$payload" -H "Content-Type: application/ld+json"
@@ -142,23 +151,5 @@ Contexts inside the payload data can be expressed in a variety of ways:
       }
     ]
     ```
-
-
-## Value Expansion
-The value of a key-value in a context can be a little more complex that just a string. E.g.:
-```json
-"@context": {
-  "P1": {
-    "@id": "https://a.b.c/attributes/P1",
-    "@type": "vocab"
-  },
-  ...
-}
-```
-
-If an alias has a complex value in the @context, and that complex value contains a member "@type" that equals "@vocab",
-then also the value of that attribute (an attribute is a Property or a Relationship) is expanded according to the context.
-But, only if found inside that very same context. If not found, the value is untouched.
-
 
 If you want to learn more about contexts, please refer to documentation on JSON-LD. There is plenty out there.

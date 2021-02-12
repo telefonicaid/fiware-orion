@@ -443,7 +443,8 @@ static bool acceptItemParse(ConnectionInfo* ciP, char* value)
   if ((strcmp(cP, "*/*")              != 0) &&
       (strcmp(cP, "application/*")    != 0) &&
 #ifdef ORIONLD
-      (strcmp(cP, "application/ld+json") != 0) &&
+      (strcmp(cP, "application/ld+json")  != 0) &&
+      (strcmp(cP, "application/geo+json") != 0) &&
 #endif
       (strcmp(cP, "application/json") != 0) &&
       (strcmp(cP, "text/*")           != 0) &&
@@ -607,8 +608,6 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   HttpHeaders*     headerP = &ciP->httpHeaders;
   std::string      key     = ckey;
 
-  LM_T(LmtHttpHeaders, ("Got HTTP Header:   %s: %s", ckey, value));
-
   if      (strcasecmp(key.c_str(), HTTP_USER_AGENT) == 0)        headerP->userAgent      = value;
   else if (strcasecmp(key.c_str(), HTTP_HOST) == 0)              headerP->host           = value;
   else if (strcasecmp(key.c_str(), HTTP_ACCEPT) == 0)
@@ -678,6 +677,10 @@ MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   {
     orionldState.link                  = (char*) value;
     orionldState.linkHttpHeaderPresent = true;
+  }
+  else if (strcasecmp(key.c_str(), "Prefer") == 0)
+  {
+    orionldState.preferHeader = (char*) value;
   }
 #endif
   else
@@ -860,7 +863,7 @@ static void requestCompleted
 
   kTimeDiff(&timestamps.reqStart, &timestamps.reqEnd, &all,   &allF);
   kTimeDiff(&timestamps.dbStart,  &timestamps.dbEnd,  &mongo, &mongoF);
-  LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));
+  LM_TMP(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
 #endif
 }
 

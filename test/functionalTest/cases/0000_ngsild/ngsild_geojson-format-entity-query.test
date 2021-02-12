@@ -1,0 +1,356 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of entities in the GeoJSON format
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E1 with a location GeoProperty
+# 02. Create entity E2 with a location GeoProperty
+# 03. Query entities in GeoJSON format 
+# 04. Query entities in GeoJSON format with keyValues
+# 05. Query entities in GeoJSON format and Prefer header forcing Link header
+#
+
+echo "01. Create entity E1 with a location GeoProperty"
+echo "================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [-3.691944, 40.418889]
+    }
+  },
+  "P1": {
+    "type": "Property",
+    "value": 12
+  },
+  "R1": {
+    "type": "Relationship",
+    "object": "urn:xxx"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "02. Create entity E2 with a location GeoProperty"
+echo "================================================"
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "City",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [3.691944, 40.418889]
+    }
+  },
+  "P2": {
+    "type": "Property",
+    "value": 13
+  },
+  "R2": {
+    "type": "Relationship",
+    "object": "urn:xxx:R2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+echo
+echo
+
+
+echo "03. Query entities in GeoJSON format"
+echo "===================================="
+orionCurl --url /ngsi-ld/v1/entities?type=City --out "application/geo+json"
+echo
+echo
+
+
+echo "04. Query entities in GeoJSON format with keyValues"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=City&options=keyValues' --out "application/geo+json"
+echo
+echo
+
+
+echo "05. Query entities in GeoJSON format and Prefer header forcing Link header"
+echo "=========================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=City --out "application/geo+json" -H "Prefer: body=json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with a location GeoProperty
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Create entity E2 with a location GeoProperty
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+Date: REGEX(.*)
+
+
+
+03. Query entities in GeoJSON format
+====================================
+HTTP/1.1 200 OK
+Content-Length: 832
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "features": [
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:entities:E1",
+            "properties": {
+                "P1": {
+                    "type": "Property",
+                    "value": 12
+                },
+                "R1": {
+                    "object": "urn:xxx",
+                    "type": "Relationship"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            -3.691944,
+                            40.418889
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "type": "City"
+            },
+            "type": "Feature"
+        },
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:entities:E2",
+            "properties": {
+                "P2": {
+                    "type": "Property",
+                    "value": 13
+                },
+                "R2": {
+                    "object": "urn:xxx:R2",
+                    "type": "Relationship"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            3.691944,
+                            40.418889
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "type": "City"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
+
+
+04. Query entities in GeoJSON format with keyValues
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 648
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "features": [
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:entities:E1",
+            "properties": {
+                "P1": 12,
+                "R1": "urn:xxx",
+                "location": {
+                    "coordinates": [
+                        -3.691944,
+                        40.418889
+                    ],
+                    "type": "Point"
+                },
+                "type": "City"
+            },
+            "type": "Feature"
+        },
+        {
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "geometry": {
+                "coordinates": [
+                    3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:entities:E2",
+            "properties": {
+                "P2": 13,
+                "R2": "urn:xxx:R2",
+                "location": {
+                    "coordinates": [
+                        3.691944,
+                        40.418889
+                    ],
+                    "type": "Point"
+                },
+                "type": "City"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
+
+
+05. Query entities in GeoJSON format and Prefer header forcing Link header
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 686
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:entities:E1",
+            "properties": {
+                "P1": {
+                    "type": "Property",
+                    "value": 12
+                },
+                "R1": {
+                    "object": "urn:xxx",
+                    "type": "Relationship"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            -3.691944,
+                            40.418889
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "type": "City"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            },
+            "id": "urn:ngsi-ld:entities:E2",
+            "properties": {
+                "P2": {
+                    "type": "Property",
+                    "value": 13
+                },
+                "R2": {
+                    "object": "urn:xxx:R2",
+                    "type": "Relationship"
+                },
+                "location": {
+                    "type": "GeoProperty",
+                    "value": {
+                        "coordinates": [
+                            3.691944,
+                            40.418889
+                        ],
+                        "type": "Point"
+                    }
+                },
+                "type": "City"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
