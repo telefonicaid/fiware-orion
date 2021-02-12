@@ -741,9 +741,11 @@ static KjNode* geojsonEntityTransform(KjNode* tree)  // FIXME: Move to its own m
   kjChildAdd(propertiesP, typeProperty);
 
   //
-  // Get the geoproperty
+  // Get the geometry property
+  // No expansion of 'geoPropertyName' is necessary/needed as the tree context has been compressed already
+  // FIXME: Only problem is if orionldState.uriParams.geometryProperty is given in its expanded form ...
   //
-  const char* geoPropertyName = (orionldState.uriParams.geoproperty == NULL)? "location" : orionldState.uriParams.geoproperty;
+  const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
   KjNode*     geoPropertyP    = kjLookup(tree, geoPropertyName);
 
   if (geoPropertyP != NULL)
