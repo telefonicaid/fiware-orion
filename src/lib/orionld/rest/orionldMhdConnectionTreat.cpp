@@ -676,8 +676,10 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 // - If the GeoProperty has multiple instances (datasetId):
 //   - Use the default instance (if the URL parameter 'datasetId' is not set)
 //   - Else, use the matching one (same datasetId) - and indicate the datasetId in the response
-// - If there the GeoProperty doesn't exist (or is of the wrong type), then the geometry shall be undefined
+// - If the GeoProperty doesn't exist (or is of the wrong type), then the geometry shall be undefined
 //   and returned with a value of null - which is syntactically valid GeoJSON.
+// - The entity type (as 'type' is used to express 'Feature', is added as a special property name "type",
+//   and the value of this special property is just the value of the entity type.
 //
 // OUTPUT FORMAT:
 // {
@@ -685,15 +687,12 @@ bool uriParamSupport(uint32_t supported, uint32_t given, char** detailP)
 //   "type": "Feature",
 //   "geometry": { "type": "Point", "coordinates": [1,2] }  # Note, NO subattrs nor timestamps nor ...
 //   "properties": [
-//     {
-//       "name": "type",
-//       "type": "Property",
-//       "value": "The type of the entity"
-//     },
-//     P1,
-//     P2,
-//     R1,
-//     R2, ...
+//     "type": "The type of the entity"
+//     "P1": { "type": "Property", "value": ... },
+//     "P2": {},
+//     "R1": {},
+//     "R2": {},
+//     ...
 //   ]
 // }
 //
