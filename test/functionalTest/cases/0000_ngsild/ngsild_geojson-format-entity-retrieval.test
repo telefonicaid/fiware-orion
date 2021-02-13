@@ -38,6 +38,8 @@ brokerStart CB 0-255
 # 05. Retrieve E1 in GeoJSON format with URI param geometryProperty=abc (abc doesn't exist => geometry: null)
 # 06. Retrieve E1 in GeoJSON format with URI param geometryProperty=location
 # 07. Retrieve E1 in GeoJSON format with URI param geometryProperty=otherGeoProp
+# 08. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty)
+# 09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values
 #
 
 echo "01. Create an entity with a location GeoProperty"
@@ -68,7 +70,7 @@ payload='{
     "object": "urn:xxx"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
 echo
 echo
 
@@ -115,6 +117,20 @@ echo
 echo
 
 
+echo "08. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty)"
+echo "========================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid?geometryProperty=P1 --out "application/geo+json"
+echo
+echo
+
+
+echo "09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values"
+echo "========================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid?geometryProperty=P1&options=keyValues' --out "application/geo+json"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create an entity with a location GeoProperty
 ================================================
@@ -129,7 +145,7 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 200 OK
 Content-Length: 477
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -181,7 +197,7 @@ Date: REGEX(.*)
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 354
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -221,7 +237,7 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 404
-Content-Type: application/json
+Content-Type: application/geo+json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
@@ -273,7 +289,7 @@ Date: REGEX(.*)
 ===========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 429
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -319,7 +335,7 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 477
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -371,7 +387,7 @@ Date: REGEX(.*)
 ==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 461
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -412,6 +428,86 @@ Date: REGEX(.*)
                 ],
                 "type": "Point"
             }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+08. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty)
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 429
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": null,
+    "id": "urn:ngsi-ld:City:Madrid",
+    "properties": {
+        "P1": {
+            "type": "Property",
+            "value": 12
+        },
+        "R1": {
+            "object": "urn:xxx",
+            "type": "Relationship"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    -3.691944,
+                    40.418889
+                ],
+                "type": "Point"
+            }
+        },
+        "otherGeoProp": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    1,
+                    2
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "City"
+    },
+    "type": "Feature"
+}
+
+
+09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values
+========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 306
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": null,
+    "id": "urn:ngsi-ld:City:Madrid",
+    "properties": {
+        "P1": 12,
+        "R1": "urn:xxx",
+        "location": {
+            "coordinates": [
+                -3.691944,
+                40.418889
+            ],
+            "type": "Point"
+        },
+        "otherGeoProp": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
         },
         "type": "City"
     },
