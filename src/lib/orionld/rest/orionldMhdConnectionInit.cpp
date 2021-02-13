@@ -319,6 +319,11 @@ static MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const
     orionldState.uriParams.geoproperty = (char*) value;
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_GEOPROPERTY;
   }
+  else if (SCOMPARE17(key, 'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'y', 0))
+  {
+    orionldState.uriParams.geometryProperty = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
+  }
   else if (SCOMPARE6(key, 'c', 'o', 'u', 'n', 't', 0))
   {
     if (strcmp(value, "true") == 0)

@@ -119,6 +119,7 @@ typedef struct OrionldUriParams
   char*     georel;
   char*     geoloc;
   char*     geoproperty;
+  char*     geometryProperty;
   char*     datasetId;
   bool      deleteAll;
   char*     timeproperty;
