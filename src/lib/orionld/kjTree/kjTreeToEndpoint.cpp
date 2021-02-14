@@ -148,6 +148,8 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
         httpInfoP->mimeType = JSON;
       else if (SCOMPARE8(mimeType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
         httpInfoP->mimeType = JSONLD;
+      else if (SCOMPARE9(mimeType, 'g', 'e', 'o', '+', 'j', 's', 'o', 'n', 0))
+        httpInfoP->mimeType = GEOJSON;
       else
       {
         orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s);

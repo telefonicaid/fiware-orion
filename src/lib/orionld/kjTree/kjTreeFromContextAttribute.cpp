@@ -28,7 +28,6 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
-#include "parseArgs/baStd.h"                                   // BA_FT - for debugging only
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
@@ -65,13 +64,12 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
 {
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
-
-  bool ngsild = (renderFormat == NGSI_LD_V1_NORMALIZED)             ||
-                (renderFormat == NGSI_LD_V1_KEYVALUES)              ||
-                (renderFormat == NGSI_LD_V1_V2_NORMALIZED)          ||
-                (renderFormat == NGSI_LD_V1_V2_KEYVALUES)           ||
-                (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT)  ||
-                (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT);
+  bool     ngsild    = (renderFormat == NGSI_LD_V1_NORMALIZED)             ||
+                       (renderFormat == NGSI_LD_V1_KEYVALUES)              ||
+                       (renderFormat == NGSI_LD_V1_V2_NORMALIZED)          ||
+                       (renderFormat == NGSI_LD_V1_V2_KEYVALUES)           ||
+                       (renderFormat == NGSI_LD_V1_V2_NORMALIZED_COMPACT)  ||
+                       (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT);
   //
   // We want shortnames for:
   //   NGSI_LD_V1_NORMALIZED
@@ -120,6 +118,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       nodeP = kjTreeFromCompoundValue(caP->compoundValueP, NULL, false, detailsP);
       if (nodeP == NULL)
         return NULL;
+      nodeP->name = (char*) caP->name.c_str();  // FIXME: WORKAROUND - kjTreeFromCompoundValue should be fixed instead!
       break;
 
     case orion::ValueTypeNotGiven:
@@ -230,6 +229,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
       //   In the future we might want to keep this metadata, but the unit must be looked over (WGS84).
       //   What was default unit in orion v1 is not default for orionld
       //
+      LM_TMP(("FIXME: something needs to be implemented here!"));
       continue;
     }
 

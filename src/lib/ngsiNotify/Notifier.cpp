@@ -46,10 +46,13 @@
 extern "C" {
 #include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjson.h"                                       // Kjson
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
 }
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
+#include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "cache/subCache.h"                                    // CachedSubscription
 #endif
 
@@ -400,6 +403,30 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
 
 
+
+/* ****************************************************************************
+*
+* notificationDataToGeoJson -
+*/
+static void notificationDataToGeoJson(KjNode* notificationNodeP, bool keyValues)
+{
+  KjNode* dataP = kjLookup(notificationNodeP, "data");
+
+  if (dataP != NULL)
+  {
+    kjChildRemove(notificationNodeP, dataP);
+
+    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP, keyValues);
+
+    geojsonTree->name = (char*) "data";
+    kjChildAdd(notificationNodeP, geojsonTree);
+  }
+  else
+    LM_E(("Internal Error (no 'data' member found in a notification node)"));
+}
+
+
+
 /* ****************************************************************************
 *
 * Notifier::buildSenderParams -
@@ -522,8 +549,14 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         return paramsV;
       }
 
+      if (httpInfo.mimeType == GEOJSON)
+      {
+        bool keyValues = (renderFormat == NGSI_LD_V1_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES) || (renderFormat == NGSI_LD_V1_V2_KEYVALUES_COMPACT);
+        notificationDataToGeoJson(kjTree, keyValues);
+      }
+
       int   bufSize = 512 * 1024;
-      char* buf     = (char*) malloc(bufSize);
+      char* buf     = (char*) malloc(bufSize);  // FIXME: Use kjFastRenderSize for better allocation
 
       kjFastRender(orionldState.kjsonP, kjTree, buf, bufSize);
       payloadString = buf;
@@ -546,8 +579,11 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
 
     /* Set Content-Type */
-    std::string content_type = (httpInfo.mimeType == JSONLD)? "application/ld+json" : "application/json";
+    char* contentType;
 
+    if      (httpInfo.mimeType == JSONLD)   contentType = (char*) "application/ld+json";
+    else if (httpInfo.mimeType == GEOJSON)  contentType = (char*) "application/geo+json";
+    else                                    contentType = (char*) "application/json";
 
     SenderThreadParams*  params = new SenderThreadParams();
 
@@ -559,7 +595,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->servicePath      = spathList;
     params->xauthToken       = xauthToken;
     params->resource         = uriPath;
-    params->content_type     = content_type;
+    params->content_type     = contentType;
     params->content          = payloadString;
 #ifdef ORIONLD
     params->toFree           = toFree;

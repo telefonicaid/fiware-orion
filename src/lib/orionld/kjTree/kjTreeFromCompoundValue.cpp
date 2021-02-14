@@ -29,6 +29,9 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // Lmt*
+
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -78,7 +81,6 @@ static KjNode* kjTreeFromCompoundValue2(KjNode* parentP, orion::CompoundValueNod
       nodeP = kjArray(orionldState.kjsonP, name);
     else
       nodeP = kjObject(orionldState.kjsonP, name);
-
     size = compoundP->childV.size();
     for (unsigned int ix = 0; ix < size; ++ix)
     {
