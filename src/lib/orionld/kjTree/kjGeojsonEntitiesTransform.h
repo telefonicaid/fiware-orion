@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJCHILDADDORREPLACE_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJCHILDADDORREPLACE_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITIESTRANSFORM_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITIESTRANSFORM_H_
 
 /*
 *
@@ -34,10 +34,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjChildAddOrReplace -
+// kjGeojsonEntitiesTransform -
 //
-// FIXME: move to kjson library
-//
-extern void kjChildAddOrReplace(KjNode* container, const char* itemName, KjNode* replacementP);
+extern KjNode* kjGeojsonEntitiesTransform(KjNode* tree, bool keyValues);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJCHILDADDORREPLACE_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITIESTRANSFORM_H_

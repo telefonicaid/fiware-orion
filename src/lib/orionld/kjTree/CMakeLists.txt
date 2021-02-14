@@ -45,6 +45,8 @@ SET (SOURCES
     kjTreeRegistrationInfoExtract.cpp
     kjEntityIdArrayExtract.cpp
     kjChildAddOrReplace.cpp
+    kjGeojsonEntityTransform.cpp
+    kjGeojsonEntitiesTransform.cpp
 )
 
 # Include directories
