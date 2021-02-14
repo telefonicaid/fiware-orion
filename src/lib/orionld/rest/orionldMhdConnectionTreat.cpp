@@ -752,13 +752,30 @@ static KjNode* geojsonEntityTransform(KjNode* tree)  // FIXME: Move to its own m
   {
     if (orionldState.uriParamOptions.keyValues == false)
     {
-      KjNode* valueP      = kjLookup(geoPropertyP, "value");
-      KjNode* valueClone  = kjClone(orionldState.kjsonP, valueP);
+      KjNode* typeP  = kjLookup(geoPropertyP, "type");
 
-      geoPropertyP = valueClone;
+      if ((typeP == NULL) || (strcmp(typeP->value.s, "GeoProperty") != 0))
+        geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
+      else
+      {
+        KjNode* valueP      = kjLookup(geoPropertyP, "value");
+        KjNode* valueClone  = kjClone(orionldState.kjsonP, valueP);
+
+        geoPropertyP = valueClone;
+      }
     }
     else
-      geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
+    {
+      // FIXME: Is geoPropertyP a GeoProperty?
+      //        As key-values has already removed that info ... no way for me to know t hat - HERE
+      //        I'd have to do this processing BEFORE I remove stuff for key-values
+      //        For now I'll just check for KjObject
+      //
+      if (geoPropertyP->type != KjObject)
+        geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
+      else
+        geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
+    }
 
     geoPropertyP->name = (char*) "geometry";
   }
@@ -1075,8 +1092,8 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // Need to discuss any exceptions with NEC.
   // E.g.
-  //   What if "Accept: appplication/ld+json" in a creation request?
-  //   Creation requests have no payload data so the context can't be put in the payload ...
+  //   What if "Accept: application/ld+json" in a creation request?
+  //   Creation requests have no payload data in the response so the context can't be put in the payload ...
   //
   // What is clear is that no @context is to be returned for error reponses.
   // Also, if there is no payload data in the response, no need for @context

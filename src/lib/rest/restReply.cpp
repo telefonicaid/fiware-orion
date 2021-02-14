@@ -128,7 +128,9 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     if ((ciP->httpStatusCode >= 400) && (ciP->outMimeType == JSONLD))
       ciP->outMimeType = JSON;
 
-    if (ciP->outMimeType == JSON)
+    if (orionldState.acceptGeojson == true)
+      MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/geo+json");
+    else if (ciP->outMimeType == JSON)
     {
       MHD_add_response_header(response, HTTP_CONTENT_TYPE, "application/json");
     }

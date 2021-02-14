@@ -134,7 +134,7 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 200 OK
 Content-Length: 832
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 648
-Content-Type: application/json
+Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 ==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 686
-Content-Type: application/json
+Content-Type: application/geo+json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 
