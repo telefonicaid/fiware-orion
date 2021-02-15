@@ -95,7 +95,7 @@ echo
 
 echo "06. See TRoE sub-attributes - there aren't any"
 echo "=============================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -156,7 +156,7 @@ Append,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entiti
 
 06. See TRoE sub-attributes - there aren't any
 ==============================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 
 
 --TEARDOWN--

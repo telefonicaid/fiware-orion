@@ -130,7 +130,7 @@ bool pgAttributeTreat
   for (KjNode* subAttrP = attrP->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
     LM_TMP(("TEMP: Got a sub-attr: '%s'", subAttrP->name));
-    if (pgSubAttributeTreat(connectionP, subAttrP, entityId, id) == false)
+    if (pgSubAttributeTreat(connectionP, subAttrP, entityId, instanceId) == false)
     {
       LM_E(("Internal Error (pgSubAttributeTreat failed)"));
       return false;

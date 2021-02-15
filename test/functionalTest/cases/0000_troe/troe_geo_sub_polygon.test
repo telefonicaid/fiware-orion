@@ -82,7 +82,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoPolygon,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoPolygon,observedAt FROM subAttributes"
 echo
 echo
 
@@ -96,14 +96,14 @@ echo
 
 echo "06. GET the sub-attributes from TRoE using postgis"
 echo "=================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoPolygon, 'SRID=4267;POINT(2 2)'::geography, 1000000)"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoPolygon, 'SRID=4267;POINT(2 2)'::geography, 1000000)"
 echo
 echo
 
 
 echo "07. GET nothing from TRoE using postgis"
 echo "======================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoPolygon, 'SRID=4267;POINT(11 12)'::geography, 10)"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoPolygon,observedAt FROM subAttributes WHERE ST_DWithin(geoPolygon, 'SRID=4267;POINT(11 12)'::geography, 10)"
 echo
 echo
 
@@ -132,8 +132,8 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entiti
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,geopolygon,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Polygon,GeoPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,0103000020AB10000001000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C000000000000000000000000000000000,2021-01-08 13:15:17.456
+id,valuetype,entityid,attrinstanceid,unitcode,geopolygon,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Polygon,GeoPolygon,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,0103000020AB10000001000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C000000000000000000000000000000000,2021-01-08 13:15:17.456
 
 
 05. GET the entity
@@ -188,13 +188,13 @@ Date: REGEX(.*)
 
 06. GET the sub-attributes from TRoE using postgis
 ==================================================
-id,valuetype,entityid,attributeid,unitcode,geopolygon,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Polygon,GeoPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,0103000020AB10000001000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C000000000000000000000000000000000,2021-01-08 13:15:17.456
+id,valuetype,entityid,attrinstanceid,unitcode,geopolygon,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Polygon,GeoPolygon,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,0103000020AB10000001000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C000000000000000000000000000000000,2021-01-08 13:15:17.456
 
 
 07. GET nothing from TRoE using postgis
 =======================================
-id,valuetype,entityid,attributeid,unitcode,geopolygon,observedat
+id,valuetype,entityid,attrinstanceid,unitcode,geopolygon,observedat
 
 
 --TEARDOWN--

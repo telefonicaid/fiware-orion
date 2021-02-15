@@ -40,7 +40,7 @@ extern bool pgBoolSubPropertyPush
   const char*  instanceId,
   bool         boolValue,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  observedAt
 );
 

@@ -43,7 +43,7 @@ bool pgStringSubPropertyPush
   const char*  instanceId,
   const char*  stringValue,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  subAttributeName,
   const char*  observedAt
 )
@@ -57,16 +57,16 @@ bool pgStringSubPropertyPush
   if (observedAt != NULL)
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attributeId, ts, observedAt, valueType, text) "
+             "instanceId, id, entityId, attrInstanceId, ts, observedAt, valueType, text) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'String', '%s')",
-             instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, observedAt, stringValue);
+             instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, observedAt, stringValue);
   }
   else
   {
     snprintf(sql, sizeof(sql), "INSERT INTO subAttributes("
-             "instanceId, id, entityId, attributeId, ts, valueType, text) "
+             "instanceId, id, entityId, attrInstanceId, ts, valueType, text) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'String', '%s')",
-             instanceId, subAttributeName, entityId, attributeId, orionldState.requestTimeString, stringValue);
+             instanceId, subAttributeName, entityId, attrInstanceId, orionldState.requestTimeString, stringValue);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

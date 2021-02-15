@@ -49,7 +49,7 @@ bool pgGeoSubMultiLineStringPush
   KjNode*      coordinatesP,
   const char*  instanceId,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  subAttributeName,
   const char*  observedAt
 )
@@ -75,16 +75,16 @@ bool pgGeoSubMultiLineStringPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, ts, id, entityId, attributeId, observedAt, valueType, geoMultiLineString) "
+             "instanceId, ts, id, entityId, attrInstanceId, observedAt, valueType, geoMultiLineString) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
-             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attributeId, observedAt, coordsString);
+             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, observedAt, coordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, ts, id, entityId, attributeId, valueType, geoMultiLineString) "
+             "instanceId, ts, id, entityId, attrInstanceId, valueType, geoMultiLineString) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoMultiLineString', ST_GeomFromText('MULTILINESTRING(%s)'))",
-             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attributeId, coordsString);
+             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, coordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

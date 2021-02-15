@@ -167,7 +167,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,compound,observedAt FROM subAttributes"
 echo
 echo
 
@@ -217,14 +217,14 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,compound,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,urn:ngsi-ld:rel:R1,,,,2020-12-10 07:12:00.123
-https://uri.etsi.org/ngsi-ld/default-context/Sub-String,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,string sub-property,,,,2020-12-10 07:12:00.124
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,t,,2020-12-10 07:12:00.125
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Array,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,,"[1, 2, 3]",2020-12-10 07:12:00.126
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Object,Compound,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,,,,,"{""c3"": ""3"", ""pi"": 3.14, ""bTrue"": true}",2020-12-10 07:12:00.127
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-i,,33,,,2020-12-10 07:12:00.128
-https://uri.etsi.org/ngsi-ld/default-context/Sub-Float,Number,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/SP,pi-f,,3.141593,,,2020-12-10 07:12:00.129
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,compound,observedat
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:rel:R1,,,,2020-12-10 07:12:00.123
+https://uri.etsi.org/ngsi-ld/default-context/Sub-String,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,string sub-property,,,,2020-12-10 07:12:00.124
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Bool,Boolean,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,t,,2020-12-10 07:12:00.125
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Array,Compound,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,"[1, 2, 3]",2020-12-10 07:12:00.126
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Object,Compound,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,,,,"{""c3"": ""3"", ""pi"": 3.14, ""bTrue"": true}",2020-12-10 07:12:00.127
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Int,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),pi-i,,33,,,2020-12-10 07:12:00.128
+https://uri.etsi.org/ngsi-ld/default-context/Sub-Float,Number,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),pi-f,,3.141593,,,2020-12-10 07:12:00.129
 
 
 --TEARDOWN--
