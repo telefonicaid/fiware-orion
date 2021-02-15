@@ -26,13 +26,13 @@
 * Author: Fermín Galán
 */
 
-#include "mongo/client/dbclient.h"  // FIXME OLD-DR: change in next PoC stage
+#include <mongoc/mongoc.h>
 
 #include "mongoDriver/BSONObj.h"
 
-#define NEXTSAFE_CODE_NO_ERROR 0
-#define NEXTSAFE_CODE_MONGO_EXCEPTION 1
-#define NEXTSAFE_CODE_NO_MONGO_EXCEPTION 2
+#define ON_NEXT_NO_ERROR         0
+#define ON_NEXT_MANAGED_ERROR    1
+#define ON_NEXT_UNMANAGED_ERROR  2
 
 namespace orion
 {
@@ -43,17 +43,18 @@ namespace orion
 class DBCursor
 {
  private:
-  std::auto_ptr<mongo::DBClientCursor> dbc;
+  mongoc_cursor_t* c;
 
  public:
   // methods to be used by client code (without references to low-level driver code)
   DBCursor();
   bool more(void);
-  BSONObj nextSafe(int* errCode = NULL, std::string* err = NULL);
+  bool next(BSONObj* nextDoc, int* errTypeP = NULL, std::string* err = NULL);
   bool isNull(void);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
-  void set(std::auto_ptr<mongo::DBClientCursor> _dbc);
+  void set(mongoc_cursor_t* _c);
+  ~DBCursor();
 };
 }
 

@@ -33,6 +33,7 @@
 #include "mongoDriver/safeMongo.h"
 
 
+#if 0
 /* ****************************************************************************
 *
 * mongoTypeName -
@@ -66,8 +67,61 @@ static const char* mongoTypeName(mongo::BSONType type)
 
   return "Unknown Mongo Type";
 }
+#endif
+
+/* ****************************************************************************
+*
+* logKeyNotFound -
+*/
+void static logKeyNotFound(const char* supposed, const char* field, bson_t* b, const char* caller, int line)
+{
+  char* bsonStr = bson_as_relaxed_extended_json(b, NULL);
+
+  LM_E(("Runtime Error (field '%s' was supposed to be %s but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
+        supposed, field, "" /* mongoTypeName(b.getField(field).type()) */, 0 /*b.getField(field).type()*/, "", bsonStr, caller, line));
+
+  bson_free(bsonStr);
+}
 
 
+
+/* ****************************************************************************
+*
+* logWrongType -
+*/
+void static logWrongType(const char* supposed, const char* field, bson_t* b, const char* caller, int line)
+{
+  char* bsonStr = bson_as_relaxed_extended_json(b, NULL);
+
+  LM_E(("Runtime Error (%s field '%s' is missing in BSONObj <%s> from caller %s:%d)",
+        supposed,
+        field,
+        bsonStr,
+        caller,
+        line));
+
+  bson_free(bsonStr);
+}
+
+
+
+/* ****************************************************************************
+*
+* logNotStringInArray -
+*/
+void static logNotStringInArray(int ix, const char* caller, int line)
+{
+  //char* bsonStr = bson_as_relaxed_extended_json(b, NULL);
+
+  LM_E(("Runtime Error (element %d in array was supposed to be a string but the type is '%s' (type as integer: %d) from caller %s:%d)",
+        ix, "" /*mongoTypeName(ba[ix].type())*/, 0 /*ba[ix].type()*/, caller, line));
+
+  //bson_free(bsonStr);
+}
+
+
+
+#if 0
 /* ****************************************************************************
 *
 * orion::getObjectField -
@@ -85,7 +139,11 @@ orion::BSONObj orion::getObjectField
 
   if (b.hasField(field) && b.getField(field).type() == mongo::Object)
   {
+    // FIXME OLD-DR: try to make this as simpler as previous implemetnation, without using BSONObjBUilder
     return orion::BSONObj(b.getObjectField(field));
+    /*orion::BSONObjBuilder bob;
+    bob.appendElements(b.getObjectField(field));
+    return bob.obj();*/
   }
 
   // Detect error
@@ -100,13 +158,63 @@ orion::BSONObj orion::getObjectField
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an object but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
   }
+  return orion::BSONObj();
+}
+#endif
+
+
+/* ****************************************************************************
+*
+* orion::getObjectField -
+*/
+orion::BSONObj orion::getObjectField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_DOCUMENT)
+     {
+       const bson_value_t* bv = bson_iter_value(&iter);
+
+       size_t len    = (size_t) bv->value.v_doc.data_len;
+       uint8_t* data = bv->value.v_doc.data;
+
+       bson_t* doc = bson_new_from_buffer(&data, &len, NULL, NULL);
+       orion::BSONObj r = orion::BSONObj(doc);
+
+       bson_destroy(doc);
+
+       return r;
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("an object", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("object", field.c_str(), b, caller.c_str(), line);
+  }
+
   return orion::BSONObj();
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::getArrayField -
@@ -140,13 +248,63 @@ orion::BSONArray orion::getArrayField
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an array but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
   }
+  return orion::BSONArray();
+}
+#endif
+
+
+/* ****************************************************************************
+*
+* orion::getArrayField -
+*/
+orion::BSONArray orion::getArrayField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_ARRAY)
+     {
+       const bson_value_t* bv = bson_iter_value(&iter);
+
+       size_t len    = (size_t) bv->value.v_doc.data_len;
+       uint8_t* data = bv->value.v_doc.data;
+
+       bson_t* doc = bson_new_from_buffer(&data, &len, NULL, NULL);
+       orion::BSONArray r = orion::BSONArray(doc);
+
+       bson_destroy(doc);
+
+       return r;
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("an array", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("array", field.c_str(), b, caller.c_str(), line);
+  }
+
   return orion::BSONArray();
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::getStringField -
@@ -179,14 +337,55 @@ std::string orion::getStringField
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a string but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
+  }
+
+  return "";
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* orion::getStringField -
+*/
+std::string orion::getStringField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_UTF8)
+     {
+       return std::string(bson_iter_utf8(&iter, NULL));
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("a string", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("string", field.c_str(), b, caller.c_str(), line);
   }
 
   return "";
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::getNumberField -
@@ -225,7 +424,55 @@ double orion::getNumberField
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a Number (double/int/long) but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
+  }
+
+  return -1;
+}
+#endif
+
+
+/* ****************************************************************************
+*
+* orion::getNumberField -
+*/
+double orion::getNumberField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_DOUBLE)
+     {
+       return bson_iter_double(&iter);
+     }
+     else if (bson_iter_type(&iter) == BSON_TYPE_INT32)
+     {
+       return bson_iter_int32(&iter);
+     }
+     else if (bson_iter_type(&iter) == BSON_TYPE_INT64)
+     {
+       return bson_iter_int64(&iter);
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("a number (double/int/long)", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("double/int/long", field.c_str(), b, caller.c_str(), line);
   }
 
   return -1;
@@ -233,6 +480,7 @@ double orion::getNumberField
 
 
 
+#if 0
 /* ****************************************************************************
 *
 * orion::getIntField -
@@ -265,14 +513,55 @@ int orion::getIntField
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be an int but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
+  }
+
+  return -1;
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* orion::getIntField -
+*/
+int orion::getIntField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_INT32)
+     {
+       return bson_iter_int32(&iter);
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("an int", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("int", field.c_str(), b, caller.c_str(), line);
   }
 
   return -1;
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::getLongField -
@@ -305,14 +594,55 @@ long long orion::getLongField
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a long but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
+  }
+
+  return -1;
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* orion::getLongField -
+*/
+long long orion::getLongField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_INT64)
+     {
+       return bson_iter_int64(&iter);
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("a long", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("long", field.c_str(), b, caller.c_str(), line);
   }
 
   return -1;
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::getIntOrLongFieldAsLong -
@@ -352,14 +682,57 @@ long long orion::getIntOrLongFieldAsLong
   else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be int or long but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
+  }
+
+  return -1;
+}
+#endif
+
+/* ****************************************************************************
+*
+* orion::getIntOrLongFieldAsLong -
+*/
+long long orion::getIntOrLongFieldAsLong
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_INT32)
+     {
+       return bson_iter_int32(&iter);
+     }
+     else if (bson_iter_type(&iter) == BSON_TYPE_INT64)
+     {
+       return bson_iter_int64(&iter);
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("int or long", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("int/long", field.c_str(), b, caller.c_str(), line);
   }
 
   return -1;
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::getBoolField -
@@ -397,14 +770,55 @@ bool orion::getBoolField
     b.toString();
     b.toString().c_str();*/
     LM_E(("Runtime Error (field '%s' was supposed to be a bool but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-          field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str()));
+          field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str()));
+  }
+
+  return false;
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* orion::getBoolField -
+*/
+bool orion::getBoolField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_BOOL)
+     {
+       return bson_iter_bool(&iter);
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("a bool", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("bool", field.c_str(), b, caller.c_str(), line);
   }
 
   return false;
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * getField -
@@ -433,9 +847,42 @@ orion::BSONElement orion::getField
 
   return orion::BSONElement();
 }
+#endif
 
 
 
+/* ****************************************************************************
+*
+* getField -
+*/
+orion::BSONElement orion::getField
+(
+  const orion::BSONObj&  _b,
+  const std::string&     field,
+  const std::string&     caller,
+  int                    line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+    return orion::BSONElement(field, bson_iter_value(&iter));
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("", field.c_str(), b, caller.c_str(), line);
+  }
+
+  return orion::BSONElement();
+}
+
+
+#if 0
 /* ****************************************************************************
 *
 * setStringVector -
@@ -489,13 +936,71 @@ void orion::setStringVector
     else
     {
       LM_E(("Runtime Error (field '%s' was supposed to be an array but the type is '%s' (type as integer: %d) in BSONObj <%s> from caller %s:%d)",
-            field.c_str(), mongoTypeName(b.getField(field).type()), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
+            field.c_str(), "" /* mongoTypeName(b.getField(field).type()) */, "" /*b.getField(field).type()*/, b.toString().c_str(), caller.c_str(), line));
     }
+  }
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* setStringVector -
+*/
+void orion::setStringVector
+(
+  const orion::BSONObj&      _b,
+  const std::string&         field,
+  std::vector<std::string>*  v,
+  const std::string&         caller,
+  int                        line
+)
+{
+  // Getting the "low level" driver objects
+  bson_t* b = _b.get();
+
+  bson_iter_t iter;
+  bson_iter_t subiter;
+
+  if (bson_iter_init(&iter, b) && bson_iter_find(&iter, field.c_str()))
+  {
+     if (bson_iter_type(&iter) == BSON_TYPE_ARRAY)
+     {
+       v->clear();
+       bson_iter_recurse(&iter, &subiter);
+       int ix = 0;
+       while(bson_iter_next(&subiter))
+       {
+         if (bson_iter_type(&subiter) == BSON_TYPE_UTF8)
+         {
+           ix++;
+           v->push_back(std::string(bson_iter_utf8(&subiter, NULL)));
+         }
+         else
+         {
+           // All elements in the array are supposed to be strings
+           logNotStringInArray(ix, caller.c_str(), line);
+           v->clear();
+           return;
+         }
+       }
+     }
+     else
+     {
+       // Wrong type situation
+       logKeyNotFound("an array", field.c_str(), b, caller.c_str(), line);
+     }
+  }
+  else
+  {
+    // Key not found error
+    logWrongType("array", field.c_str(), b, caller.c_str(), line);
   }
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::moreSafe -
@@ -505,6 +1010,8 @@ void orion::setStringVector
 * an exception something really bad is happening, it is considered a Fatal Error.
 *
 * (The name resembles the same relationship between next() and nextSafe() in the mongo driver)
+*
+* FIXME OLD-DR: cursor.more() cannot raise exections... this method is probably useless
 */
 bool orion::moreSafe(orion::DBCursor* cursor)
 {
@@ -523,9 +1030,10 @@ bool orion::moreSafe(orion::DBCursor* cursor)
     return false;
   }
 }
+#endif
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * orion::nextSafeOrError -
@@ -563,9 +1071,40 @@ bool orion::nextSafeOrError
     return false;
   }
 }
+#endif
 
 
+#if 0
+/* ****************************************************************************
+*
+* orion::nextSafeOrError -
+*
+* FIXME OLD-DR: rename nextSafeOrError() -> nextOrError() ?
+*/
+bool orion::nextSafeOrError
+(
+  orion::DBCursor&    cursor,
+  orion::BSONObj*     r,
+  std::string*        err,
+  const std::string&  caller,
+  int                 line
+)
+{
+  int errorType;
+  if(!cursor.next(r, &errorType, err))
+  {
+    // Note that errorType doesn't progress upwards, as we only can provide the err string
+    char lineString[STRING_SIZE_FOR_INT];
+    snprintf(lineString, sizeof(lineString), "%d", line);
+    *err = *err + " at " + caller + ":" + lineString;
+    return false;
+  }
+  return true;
+}
+#endif
 
+
+# if 0
 /* ****************************************************************************
 *
 * orion::safeGetSubId -
@@ -628,4 +1167,34 @@ bool orion::safeGetRegId(const RegistrationId& regId, orion::OID* id, StatusCode
     sc->fill(SccReceiverInternalError, "generic exception");
     return false;
   }
+}
+#endif
+
+
+/* ****************************************************************************
+*
+* orion::safeGetSubId -
+*
+* FIXME OLD-DR: probably safeGetSubId and safeGetRegId could be refactored to unify
+* FIXME OLD-DR: sc parameter is useless?
+*/
+bool orion::safeGetSubId(const SubscriptionId& subId, orion::OID* id, StatusCode* sc)
+{
+  *id = orion::OID(subId.get());
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+*  orion::safeGetRegId -
+*
+* FIXME OLD-DR: probably safeGetSubId and safeGetRegId could be refactored to unify
+* FIXME OLD-DR: sc parameter is useless?
+*/
+bool orion::safeGetRegId(const RegistrationId& regId, orion::OID* id, StatusCode* sc)
+{
+ *id = orion::OID(regId.get());
+ return true;
 }

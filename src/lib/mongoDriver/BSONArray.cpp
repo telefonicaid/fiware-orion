@@ -27,6 +27,8 @@
 
 #include "mongoDriver/BSONArray.h"
 
+#include "logMsg/logMsg.h"  // FIXME OLD-DR: remove after use
+
 namespace orion
 {
 /* ****************************************************************************
@@ -35,6 +37,30 @@ namespace orion
 */
 BSONArray::BSONArray()
 {
+  // FIXME OLD-DR: is this constructor really needed?
+  b = bson_new();
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArray::BSONArray -
+*/
+BSONArray::BSONArray(const BSONArray& _ba)
+{
+  b = bson_copy(_ba.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArray::~BSONArray -
+*/
+BSONArray::~BSONArray(void)
+{
+  bson_destroy(b);
 }
 
 
@@ -45,7 +71,7 @@ BSONArray::BSONArray()
 */
 int BSONArray::nFields(void) const
 {
-  return ba.nFields();
+  return bson_count_keys(b);
 }
 
 
@@ -54,9 +80,32 @@ int BSONArray::nFields(void) const
 *
 * BSONArray::toString -
 */
-std::string BSONArray::toString(void)
+std::string BSONArray::toString(void) const
 {
-  return ba.toString();
+  char* str = bson_array_as_json(b, NULL);
+  std::string s(str);
+  bson_free(str);
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONArray::operator= -
+*
+* FIXME OLD-DR: we should try to use const BSONArray& as argument
+*/
+BSONArray& BSONArray::operator= (BSONArray rhs)
+{
+  // check not self-assignment
+  if (this != &rhs)
+  {
+    // destroy existing b object, then copy rhs.b object
+    bson_destroy(b);
+    b = bson_copy(rhs.b);
+  }
+  return *this;
 }
 
 
@@ -68,10 +117,11 @@ std::string BSONArray::toString(void)
 /* ****************************************************************************
 *
 * BSONArray::BSONArray -
+*
 */
-BSONArray::BSONArray(const mongo::BSONArray& _ba)
+BSONArray::BSONArray(const bson_t* _b)
 {
-  ba = _ba;
+  b = bson_copy(_b);
 }
 
 
@@ -80,9 +130,9 @@ BSONArray::BSONArray(const mongo::BSONArray& _ba)
 *
 * BSONObj::get -
 */
-mongo::BSONArray BSONArray::get(void) const
+bson_t* BSONArray::get(void) const
 {
-  return ba;
+  return b;
 }
 }
 

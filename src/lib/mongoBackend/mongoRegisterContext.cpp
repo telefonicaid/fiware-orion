@@ -110,11 +110,14 @@ HttpStatusCode mongoRegisterContext
 
   if (!orion::collectionFindOne(colName, bob.obj(), &reg, &err))
   {
-    reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
+    // FIXME OLD-DR: at the present moment we are unable to know if false means: "no result" or
+    // "fail in cursor". Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-find-function
+    // We assume "no result" by the moment, so disabling this code.
+    /*reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     responseP->errorCode.fill(SccReceiverInternalError, err);
     ++noOfRegistrationUpdateErrors;
 
-    return SccOk;
+    return SccOk;*/
   }
 
   if (reg.isEmpty())

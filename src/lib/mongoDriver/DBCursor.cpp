@@ -33,6 +33,21 @@ namespace orion
 */
 DBCursor::DBCursor()
 {
+  c = NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* DBCursor::~DBCursor -
+*/
+DBCursor::~DBCursor()
+{
+  if (c != NULL)
+  {
+    mongoc_cursor_destroy(c);
+  }
 }
 
 
@@ -44,7 +59,7 @@ DBCursor::DBCursor()
 */
 bool DBCursor::isNull(void)
 {
-  return (dbc.get() == NULL);
+  return (c == NULL);
 }
 
 
@@ -56,14 +71,85 @@ bool DBCursor::isNull(void)
 */
 bool DBCursor::more(void)
 {
-  return dbc->more();
+  // FIXME OLD-DR: probably this is not a good implementation
+  // see http://mongoc.org/libmongoc/1.17.3/mongoc_cursor_more.html#description.
+  // but the recommended way with mongoc_cursor_next() is not idempotent as it
+  // consumes elements.
+  // Probably this function should be removed in client API (.h)
+  return mongoc_cursor_more(c);
 }
 
 
 
 /* ****************************************************************************
 *
-* DBCursor::more -
+* DBCursor::next-
+*
+*/
+bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
+{
+  const bson_t* doc;
+
+  int           errType = ON_NEXT_NO_ERROR;
+  std::string   exErr;
+
+  bool r = mongoc_cursor_next(c, &doc);
+
+  if (r)
+  {
+    *nextDoc = BSONObj(doc);
+  }
+
+  // FIXME OLD-DR: should bson_destroy(doc)? According to http://mongoc.org/libmongoc/1.17.3/mongoc_cursor_next.html#lifecycle
+  // is emphemeral so it is not needed...
+
+  bson_error_t error;
+  if (mongoc_cursor_error(c, &error))
+  {
+    // We can't return the error 'as is', as it may contain forbidden characters.
+    // So, we can just match the error and send a less descriptive text.
+    //
+    const char* invalidPolygon      = "Exterior shell of polygon is invalid";
+    const char* sortError           = "nextSafe(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
+    const char* defaultErrorString  = "Error at querying MongoDB";
+
+    if (strncmp(error.message, invalidPolygon, strlen(invalidPolygon)) == 0)
+    {
+      exErr = invalidPolygon;
+      errType = ON_NEXT_MANAGED_ERROR;
+    }
+    else if (strncmp(error.message, sortError, strlen(sortError)) == 0)
+    {
+      exErr = "Sort operation used more than the maximum RAM. "
+              "You should create an index. "
+              "Check the Database Administration section in Orion documentation.";
+      errType = ON_NEXT_MANAGED_ERROR;
+    }
+    else
+    {
+      exErr = defaultErrorString;
+      errType = ON_NEXT_UNMANAGED_ERROR;
+    }
+  }
+
+  if (err != NULL)
+  {
+    *err = exErr;
+  }
+  if (errTypeP != NULL)
+  {
+    *errTypeP = errType;
+  }
+
+  return r;
+}
+
+
+
+#if 0
+/* ****************************************************************************
+*
+* DBCursor::nextSafe -
 *
 */
 BSONObj DBCursor::nextSafe(int* errTypeP, std::string* err)
@@ -122,6 +208,7 @@ BSONObj DBCursor::nextSafe(int* errTypeP, std::string* err)
   }
   return BSONObj(next);
 }
+#endif
 
 
 
@@ -133,8 +220,9 @@ BSONObj DBCursor::nextSafe(int* errTypeP, std::string* err)
 *
 * DBCursor::set -
 */
-void DBCursor::set(std::auto_ptr<mongo::DBClientCursor> _dbc)
+void DBCursor::set(mongoc_cursor_t* _c)
 {
-  dbc = _dbc;
+  // FIXME OLD-DR: is this safe? who is using this function?
+  c = _c;
 }
 }

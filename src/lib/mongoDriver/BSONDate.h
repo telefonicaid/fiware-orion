@@ -28,8 +28,7 @@
 
 #include <string>
 #include <vector>
-
-#include "mongo/util/time_support.h"  // FIXME OLD-DR: change in next PoC stage
+#include <stdint.h>  // CentOS 7 needs this explicit declaration (and doesn't hurts in other OS)
 
 namespace orion
 {
@@ -41,7 +40,7 @@ namespace orion
 class BSONDate
 {
  private:
-  mongo::Date_t date;
+  unsigned long long date;
 
  public:
   // methods to be used by client code (without references to low-level driver code)
@@ -49,7 +48,7 @@ class BSONDate
   bool equal(unsigned long long m);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
-  mongo::Date_t get(void) const;
+  int64_t get(void) const;
 };
 }
 

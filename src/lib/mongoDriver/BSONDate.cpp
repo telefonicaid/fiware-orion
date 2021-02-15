@@ -57,7 +57,7 @@ bool BSONDate::equal(unsigned long long m)
 *
 * BSONDate::get -
 */
-mongo::Date_t BSONDate::get(void) const
+int64_t BSONDate::get(void) const
 {
   return date;
 }

@@ -27,6 +27,13 @@
 
 #include "mongoDriver/BSONObjBuilder.h"
 
+#include "logMsg/logMsg.h"  // FIXME OLD-DR: remove after use
+
+// FIXME OLD-DR: general comment. Do we really need builder vs. no-builder classes or
+// only just one family? What about using the bson_append_document_begin() and
+// bson_append_document_end() methods (maybe performance is
+// better: http://mongoc.org/libbson/current/bson_append_array_begin.html#description)?
+
 namespace orion
 {
 /* ****************************************************************************
@@ -35,6 +42,18 @@ namespace orion
 */
 BSONObjBuilder::BSONObjBuilder(void)
 {
+  b = bson_new();
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::~BSONObjBuilder -
+*/
+BSONObjBuilder::~BSONObjBuilder(void)
+{
+  bson_destroy(b);
 }
 
 
@@ -45,7 +64,7 @@ BSONObjBuilder::BSONObjBuilder(void)
 */
 BSONObj BSONObjBuilder::obj(void)
 {
-  return BSONObj(bob.obj());
+  return BSONObj(b);
 }
 
 
@@ -56,7 +75,7 @@ BSONObj BSONObjBuilder::obj(void)
 */
 void BSONObjBuilder::append(const std::string& key, const std::string& value)
 {
-  bob.append(key, value);
+  BSON_APPEND_UTF8(b, key.c_str(), value.c_str());
 }
 
 
@@ -67,7 +86,7 @@ void BSONObjBuilder::append(const std::string& key, const std::string& value)
 */
 void BSONObjBuilder::append(const std::string& key, const char* value)
 {
-  bob.append(key, value);
+  BSON_APPEND_UTF8(b, key.c_str(), value);
 }
 
 
@@ -78,7 +97,8 @@ void BSONObjBuilder::append(const std::string& key, const char* value)
 */
 void BSONObjBuilder::append(const std::string& key, int value)
 {
-  bob.append(key, value);
+  // FIXME OLD-DR: or maybe BSON_APPEND_INT64 ?
+  BSON_APPEND_INT32(b, key.c_str(), value);
 }
 
 
@@ -89,7 +109,8 @@ void BSONObjBuilder::append(const std::string& key, int value)
 */
 void BSONObjBuilder::append(const std::string& key, long long value)
 {
-  bob.append(key, value);
+  // FIXME OLD-DR: or maybe BSON_APPEND_INT32 ?
+  BSON_APPEND_INT64(b, key.c_str(), value);
 }
 
 
@@ -100,7 +121,7 @@ void BSONObjBuilder::append(const std::string& key, long long value)
 */
 void BSONObjBuilder::append(const std::string& key, double value)
 {
-  bob.append(key, value);
+  BSON_APPEND_DOUBLE(b, key.c_str(), value);
 }
 
 
@@ -111,7 +132,7 @@ void BSONObjBuilder::append(const std::string& key, double value)
 */
 void BSONObjBuilder::append(const std::string& key, bool value)
 {
-  bob.append(key, value);
+  BSON_APPEND_BOOL(b, key.c_str(), value);
 }
 
 
@@ -122,7 +143,8 @@ void BSONObjBuilder::append(const std::string& key, bool value)
 */
 void BSONObjBuilder::append(const std::string& key, const orion::OID& value)
 {
-  bob.append(key, value.get());
+  const bson_oid_t v = value.get();
+  BSON_APPEND_OID(b, key.c_str(), &v);
 }
 
 
@@ -133,7 +155,7 @@ void BSONObjBuilder::append(const std::string& key, const orion::OID& value)
 */
 void BSONObjBuilder::append(const std::string& key, const BSONObj& value)
 {
-  bob.append(key, value.get());
+  BSON_APPEND_DOCUMENT(b, key.c_str(), value.get());
 }
 
 
@@ -144,7 +166,7 @@ void BSONObjBuilder::append(const std::string& key, const BSONObj& value)
 */
 void BSONObjBuilder::append(const std::string& key, const BSONArray& value)
 {
-  bob.append(key, value.get());
+  BSON_APPEND_ARRAY(b, key.c_str(), value.get());
 }
 
 
@@ -155,7 +177,7 @@ void BSONObjBuilder::append(const std::string& key, const BSONArray& value)
 */
 void BSONObjBuilder::appendCode(const std::string& key, const std::string& value)
 {
-  bob.appendCode(key, value);
+  BSON_APPEND_CODE(b, key.c_str(), value.c_str());
 }
 
 
@@ -166,7 +188,9 @@ void BSONObjBuilder::appendCode(const std::string& key, const std::string& value
 */
 void BSONObjBuilder::appendRegex(const std::string& key, const std::string& value)
 {
-  bob.appendRegex(key, value);
+  // FIXME OLD-DR: is NULL correct? Or should be ""?
+  // Doc at http://mongoc.org/libbson/current/bson_append_regex.html is not clear...
+  BSON_APPEND_REGEX(b, key.c_str(), value.c_str(), NULL);
 }
 
 
@@ -177,7 +201,7 @@ void BSONObjBuilder::appendRegex(const std::string& key, const std::string& valu
 */
 void BSONObjBuilder::appendDate(const std::string& key, const BSONDate& value)
 {
-  bob.appendDate(key, value.get());
+  BSON_APPEND_DATE_TIME(b, key.c_str(), value.get());
 }
 
 
@@ -188,7 +212,7 @@ void BSONObjBuilder::appendDate(const std::string& key, const BSONDate& value)
 */
 void BSONObjBuilder::appendNull(const std::string& key)
 {
-  bob.appendNull(key);
+  BSON_APPEND_NULL(b, key.c_str());
 }
 
 
@@ -197,10 +221,102 @@ void BSONObjBuilder::appendNull(const std::string& key)
 *
 * BSONObjBuilder::appendElements -
 */
-void BSONObjBuilder::appendElements(orion::BSONObj b)
+void BSONObjBuilder::appendElements(orion::BSONObj _b)
 {
-  // In the case the underlying driver doesn't provide a direct appendElements method
-  // this can be implemented with a loop on b elements with plain append()
-  bob.appendElements(b.get());
+  bson_iter_t iter;
+
+  // Used in object and array cases
+  size_t len;
+  uint8_t* data;
+  bson_t* doc;
+  const bson_value_t* bv;
+
+  if (bson_iter_init(&iter, _b.get()))
+  {
+     while (bson_iter_next(&iter))
+     {
+        const char* key = bson_iter_key(&iter);
+        switch (bson_iter_type(&iter))
+        {
+        case BSON_TYPE_DOUBLE:
+          append(key, bson_iter_double(&iter));
+          continue;
+        case BSON_TYPE_UTF8:
+          append(key, bson_iter_utf8(&iter, NULL));
+          continue;
+        case BSON_TYPE_DOCUMENT:
+          bv = bson_iter_value(&iter);
+
+          len  = (size_t) bv->value.v_doc.data_len;
+          data = bv->value.v_doc.data;
+
+          doc = bson_new_from_buffer(&data, &len, NULL, NULL);
+
+          BSON_APPEND_DOCUMENT(b, key, doc);
+
+          bson_destroy(doc);
+
+          continue;
+        case BSON_TYPE_ARRAY:
+          bv = bson_iter_value(&iter);
+
+          len  = (size_t) bv->value.v_doc.data_len;
+          data = bv->value.v_doc.data;
+
+          doc = bson_new_from_buffer(&data, &len, NULL, NULL);
+
+          BSON_APPEND_ARRAY(b, key, doc);
+
+          bson_destroy(doc);
+
+          continue;
+        case BSON_TYPE_BOOL:
+          append(key, bson_iter_bool(&iter));
+          continue;
+        case BSON_TYPE_DATE_TIME:
+          BSON_APPEND_DATE_TIME(b, key, bson_iter_date_time(&iter));
+          continue;
+        case BSON_TYPE_REGEX:
+          appendRegex(key, bson_iter_regex(&iter, NULL));
+          continue;
+        case BSON_TYPE_CODE:
+          appendCode(key, bson_iter_regex(&iter, NULL));
+          continue;
+        case BSON_TYPE_INT32:
+          append(key, (int) bson_iter_int32(&iter));
+          continue;
+        case BSON_TYPE_INT64:
+          append(key, (long long) bson_iter_int64(&iter));
+          continue;
+        default:
+          // FIXME OLD-DR: we should raise error here?
+          continue;
+        }
+     }
+  }
+  else
+  {
+    // FIME OLD-DR: raise error?
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::operator= -
+*
+* FIXME OLD-DR: we should try to use const BSONObjBuilder& as argument
+*/
+BSONObjBuilder& BSONObjBuilder::operator= (BSONObjBuilder rhs)
+{
+  // check not self-assignment
+  if (this != &rhs)
+  {
+    // destroy existing b object, then copy rhs.b object
+    bson_destroy(b);
+    b = bson_copy(rhs.b);
+  }
+  return *this;
 }
 }

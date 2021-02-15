@@ -213,7 +213,9 @@ SET (BOOST_MT
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
-    mongoclient.a
+    # FIXME OLD-DR: not working... using dynamic
+    #libmongoc-static-1.0.a
+    #libbson-static-1.0.a
 )
 
 SET (DYNAMIC_LIBS
@@ -225,6 +227,10 @@ SET (DYNAMIC_LIBS
     uuid
     crypto
     sasl2
+    # FIXME OLD-DR: I prefer static...
+    # (https://stackoverflow.com/questions/65937063/undefined-reference-to-symbol-error-when-linking-mongo-c-driver-static-library)
+    mongoc-1.0
+    bson-1.0
 )
 
 #
@@ -243,6 +249,12 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+
+
+# Needed for the new C driver
+include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libbson-1.0")
+
 
 #
 # Library directories

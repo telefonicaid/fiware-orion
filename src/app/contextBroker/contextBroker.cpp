@@ -494,7 +494,8 @@ void daemonize(void)
   }
 
   // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-  mongo::OID::justForked();
+  // FIXME OLD-DR: this is probably not needed with C driver
+  //mongo::OID::justForked();
 }
 
 

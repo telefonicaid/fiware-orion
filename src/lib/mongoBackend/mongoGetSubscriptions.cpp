@@ -307,15 +307,16 @@ void mongoListSubscriptions
   /* Process query result */
   unsigned int docs = 0;
 
-  while (orion::moreSafe(&cursor))
+  orion::BSONObj  r;
+  while (cursor.next(&r))
   {
-    orion::BSONObj  r;
-
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
+    */
 
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
@@ -386,10 +387,10 @@ void mongoGetSubscription
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (orion::moreSafe(&cursor))
+  orion::BSONObj r;
+  if (cursor.next(&r))
   {
-    orion::BSONObj r;
-
+    /* FIXME OLD-DR: remove?
     if (!nextSafeOrErrorFF(cursor, &r, &err))
     {
       orion::releaseMongoConnection(connection);
@@ -397,7 +398,7 @@ void mongoGetSubscription
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
-    }
+    }*/
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setNewSubscriptionId(sub, r);
@@ -406,6 +407,7 @@ void mongoGetSubscription
     setNotification(sub, r, tenant);
     setStatus(sub, r);
 
+    /* FIXME OLD-DR: excesive checing. By defition _id is unique, you will not get more than one
     if (orion::moreSafe(&cursor))
     {
       orion::releaseMongoConnection(connection);
@@ -415,7 +417,7 @@ void mongoGetSubscription
       *oe = OrionError(SccConflict);
 
       return;
-    }
+    }*/
   }
   else
   {

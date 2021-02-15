@@ -44,7 +44,7 @@ DBConnection::DBConnection()
 */
 bool DBConnection::operator== (const DBConnection &rhs)
 {
-  return dbcP == rhs.dbcP;
+  return (dbcP == rhs.dbcP);
 }
 
 
@@ -59,6 +59,7 @@ bool DBConnection::isNull(void)
 }
 
 
+
 ///////// from now on, only methods with low-level driver types in return or parameters /////////
 
 
@@ -67,7 +68,7 @@ bool DBConnection::isNull(void)
 *
 * DBConnection::DBConnection -
 */
-DBConnection::DBConnection(mongo::DBClientBase* _dbcP)
+DBConnection::DBConnection(mongoc_client_t* _dbcP)
 {
   dbcP = _dbcP;
 }
@@ -79,7 +80,7 @@ DBConnection::DBConnection(mongo::DBClientBase* _dbcP)
 * DBConnection::get -
 */
 
-mongo::DBClientBase* DBConnection::get(void)
+mongoc_client_t* DBConnection::get(void)
 {
   return dbcP;
 }

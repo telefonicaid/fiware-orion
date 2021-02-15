@@ -27,13 +27,12 @@
 */
 
 #include <string>
+#include <bson/bson.h>
 
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/OID.h"
 #include "mongoDriver/BSONArray.h"
 #include "mongoDriver/BSONDate.h"
-
-#include "mongo/bson/bsonobjbuilder.h"  // FIXME OLD-DR: change in next PoC stage
 
 namespace orion
 {
@@ -44,7 +43,7 @@ namespace orion
 class BSONObjBuilder
 {
  private:
-  mongo::BSONObjBuilder  bob;
+  bson_t*  b;
 
  public:
   // methods to be used by client code (without references to low-level driver code)
@@ -64,9 +63,10 @@ class BSONObjBuilder
   void appendNull(const std::string& key);
   void appendElements(orion::BSONObj b);
   BSONObj obj(void);
+  BSONObjBuilder& operator= (BSONObjBuilder rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
-  // (none so far)
+  ~BSONObjBuilder(void);
 };
 }
 

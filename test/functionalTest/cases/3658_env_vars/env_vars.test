@@ -46,6 +46,7 @@ echo "02. Set the broker pidfile using env var ORION_PID_PATH=/tmp/cb3658.pid, s
 echo "================================================================================================================================================"
 export ORION_PID_PATH=/tmp/cb3658.pid
 rm -f $ORION_PID_PATH
+export ORION_PORT=$CB_PORT
 contextBroker
 sleep .1
 if [ ! -f $ORION_PID_PATH ]

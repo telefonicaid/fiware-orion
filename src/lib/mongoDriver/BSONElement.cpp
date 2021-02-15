@@ -36,6 +36,7 @@ namespace orion
 */
 BSONElement::BSONElement(void)
 {
+  // FIXME OLD-DR: really needed?
 }
 
 
@@ -47,35 +48,43 @@ BSONElement::BSONElement(void)
 */
 BSONType BSONElement::type(void) const
 {
-  switch (be.type())
+  switch (bv.value_type)
   {
-  case mongo::MinKey:        return MinKey;
-  case mongo::EOO:           return EOO;
-  case mongo::NumberDouble:  return NumberDouble;
-  case mongo::String:        return orion::String;
-  case mongo::Object:        return Object;
-  case mongo::Array:         return orion::Array;
-  case mongo::BinData:       return BinData;
-  case mongo::Undefined:     return Undefined;
-  case mongo::jstOID:        return jstOID;
-  case mongo::Bool:          return orion::Bool;
-  case mongo::Date:          return Date;
-  case mongo::jstNULL:       return jstNULL;
-  case mongo::RegEx:         return RegEx;
-  case mongo::DBRef:         return DBRef;
-  case mongo::Code:          return Code;
-  case mongo::Symbol:        return Symbol;
-  case mongo::CodeWScope:    return CodeWScope;
-  case mongo::NumberInt:     return NumberInt;
-  case mongo::Timestamp:     return Timestamp;
-  case mongo::NumberLong:    return NumberLong;
-  case mongo::MaxKey:        return MaxKey;
+  case BSON_TYPE_EOD:        return orion::EOO;
+  case BSON_TYPE_DOUBLE:     return orion::NumberDouble;
+  case BSON_TYPE_UTF8:       return orion::String;
+  case BSON_TYPE_DOCUMENT:   return orion::Object;
+  case BSON_TYPE_ARRAY:      return orion::Array;
+  case BSON_TYPE_BINARY:     return orion::BinData;
+  case BSON_TYPE_UNDEFINED:  return orion::Undefined;
+  case BSON_TYPE_OID:        return orion::jstOID;
+  case BSON_TYPE_BOOL:       return orion::Bool;
+  case BSON_TYPE_DATE_TIME:  return orion::Date;
+  case BSON_TYPE_NULL:       return orion::jstNULL;
+  case BSON_TYPE_REGEX:      return orion::RegEx;
+  case BSON_TYPE_DBPOINTER:  return orion::DBRef;
+  case BSON_TYPE_CODE:       return orion::Code;
+  case BSON_TYPE_SYMBOL:     return orion::Symbol;
+  case BSON_TYPE_CODEWSCOPE: return orion::CodeWScope;
+  case BSON_TYPE_INT32:      return orion::NumberInt;
+  case BSON_TYPE_TIMESTAMP:  return orion::Timestamp;
+  case BSON_TYPE_INT64:      return orion::NumberLong;
+  case BSON_TYPE_DECIMAL128: return orion::BigDecimal;
+  case BSON_TYPE_MAXKEY:     return orion::MaxKey;
+  case BSON_TYPE_MINKEY:     return orion::MinKey;
   }
 
   // FIXME: maybe we should return some other thing...
-  return EOO;
+  return orion::EOO;
 }
 
+// FIXME OLD-DR: type check should be enformed in Double(), String(), eg:
+//
+// value = bson_iter_value(&iter);
+//
+//if (value->value_type == BSON_TYPE_INT32) {
+//   printf ("%d\n", value->value.v_int32);
+//}
 
 
 /* ****************************************************************************
@@ -84,7 +93,8 @@ BSONType BSONElement::type(void) const
 */
 bool BSONElement::isNull(void)
 {
-  return be.isNull();
+  // FIXME OLD-DR: who calls this method?
+  return (bv.value_type == BSON_TYPE_NULL);
 }
 
 
@@ -95,7 +105,9 @@ bool BSONElement::isNull(void)
 */
 std::string BSONElement::OID(void)
 {
-  return be.OID().toString();
+  char str[25];  // OID fixed length is 24 chars
+  bson_oid_to_string(&bv.value.v_oid, str);
+  return std::string(str);
 }
 
 
@@ -106,7 +118,7 @@ std::string BSONElement::OID(void)
 */
 std::string BSONElement::String(void) const
 {
-  return be.String();
+  return std::string(bv.value.v_utf8.str);
 }
 
 
@@ -117,7 +129,7 @@ std::string BSONElement::String(void) const
 */
 bool BSONElement::Bool(void) const
 {
-  return be.Bool();
+  return bv.value.v_bool;
 }
 
 
@@ -127,7 +139,7 @@ bool BSONElement::Bool(void) const
 */
 double BSONElement::Number(void) const
 {
-  return be.Number();
+  return bv.value.v_double;
 }
 
 
@@ -140,11 +152,25 @@ std::vector<BSONElement> BSONElement::Array(void) const
 {
   std::vector<BSONElement> v;
 
-  std::vector<mongo::BSONElement> bea = be.Array();
-  for (unsigned int ix = 0; ix < bea.size(); ++ix)
+  // First, get the bson_t corresponding to the array, from bv
+  size_t len    = (size_t) bv.value.v_doc.data_len;
+  uint8_t* data = bv.value.v_doc.data;
+
+  bson_t* b = bson_new_from_buffer(&data, &len, NULL, NULL);
+
+  // Next, iterate on the bson_t to build the array
+  bson_iter_t iter;
+  if (bson_iter_init(&iter, b))
   {
-    v.push_back(BSONElement(bea[ix]));
+     while (bson_iter_next(&iter))
+     {
+        v.push_back(BSONElement(bson_iter_key(&iter), bson_iter_value(&iter)));
+     }
   }
+
+  // Free bson_t memory
+  bson_destroy(b);
+
   return v;
 }
 
@@ -156,7 +182,16 @@ std::vector<BSONElement> BSONElement::Array(void) const
 */
 BSONObj BSONElement::embeddedObject(void) const
 {
-  return BSONObj(be.embeddedObject());
+  size_t len    = (size_t) bv.value.v_doc.data_len;
+  uint8_t* data = bv.value.v_doc.data;
+
+  bson_t* b = bson_new_from_buffer(&data, &len, NULL, NULL);
+
+  BSONObj bo(b);
+
+  bson_destroy(b);
+
+  return bo;
 }
 
 
@@ -167,7 +202,7 @@ BSONObj BSONElement::embeddedObject(void) const
 */
 BSONDate BSONElement::date(void)
 {
-  return BSONDate(be.date());
+  return BSONDate(bv.value.v_datetime);
 }
 
 
@@ -178,18 +213,19 @@ BSONDate BSONElement::date(void)
 */
 std::string BSONElement::fieldName(void) const
 {
-  return be.fieldName();
+  return field;
 }
 
 
 
 /* ****************************************************************************
 *
-* BSONElement::str -
+* BSONElement::_str -
 */
 std::string BSONElement::str() const
 {
-  return be.str();
+  // FIXME OLD-DR: probably this method can be removed. It's redundant. Who calls it?
+  return String();
 }
 
 
@@ -200,32 +236,20 @@ std::string BSONElement::str() const
 */
 bool BSONElement::eoo(void) const
 {
-  return be.eoo();
+  // FIXME OLD-DR: who calls this method?
+  return (bv.value_type == BSON_TYPE_NULL);
 }
 
-
-
 ///////// from now on, only methods with low-level driver types in return or parameters /////////
-
 
 
 /* ****************************************************************************
 *
 * BSONElement::BSONElement -
 */
-BSONElement::BSONElement(const mongo::BSONElement& _be)
+BSONElement::BSONElement(const std::string& _field, const bson_value_t* _bv)
 {
-  be = _be;
-}
-
-
-
-/* ****************************************************************************
-*
-* BSONElement::get -
-*/
-mongo::BSONElement BSONElement::get(void) const
-{
-  return be;
+  field = _field;
+  bv = *_bv;
 }
 }
