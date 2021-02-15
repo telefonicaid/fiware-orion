@@ -25,6 +25,8 @@
 
 #include <string>
 #include <map>
+#include <vector>
+#include <set>
 
 #include "mongoDriver/BSONObj.h"
 
@@ -69,8 +71,8 @@ BSONObj::~BSONObj(void)
 *
 * BSONObj::getFieldNames -
 */
-int BSONObj::getFieldNames(std::set<std::string>& fields) const
-{ 
+int BSONObj::getFieldNames(std::set<std::string>* fields) const
+{
   bson_iter_t iter;
   unsigned int n;
 
@@ -79,7 +81,7 @@ int BSONObj::getFieldNames(std::set<std::string>& fields) const
      while (bson_iter_next(&iter))
      {
         n++;
-        fields.insert(std::string(bson_iter_key(&iter)));
+        fields->insert(std::string(bson_iter_key(&iter)));
      }
      return n;
   }

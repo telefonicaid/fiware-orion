@@ -132,7 +132,7 @@ void utInit(bool notifierMocked, bool timerMocked)
   startTime       = getCurrentTime();
   statisticsTime  = getCurrentTime();
 
-  setupDatabase();
+  // setupDatabase(); // FIXME-OLD-DR: pending of unit test driver migration
 
 #ifdef UT_DEBUG
   printf("**************** FROM utInit (%d inits, %d exits)\n", noOfInits, noOfExits);

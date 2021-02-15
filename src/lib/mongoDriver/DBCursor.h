@@ -27,6 +27,7 @@
 */
 
 #include <mongoc/mongoc.h>
+#include <string>
 
 #include "mongoDriver/BSONObj.h"
 

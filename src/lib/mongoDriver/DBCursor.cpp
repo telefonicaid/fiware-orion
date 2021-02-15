@@ -23,6 +23,8 @@
 * Author: Fermín Galán
 */
 
+#include <string>
+
 #include "mongoDriver/DBCursor.h"
 
 namespace orion

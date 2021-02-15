@@ -23,6 +23,7 @@
 * Author: Fermín Galán
 */
 #include <string>
+#include <vector>
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
@@ -136,7 +137,7 @@ bool orion::collectionQuery
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -307,7 +308,7 @@ bool orion::collectionRangedQuery
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -488,7 +489,7 @@ bool orion::collectionCount
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -757,7 +758,7 @@ bool orion::collectionInsert
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -915,7 +916,7 @@ bool orion::collectionUpdate
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -1071,7 +1072,7 @@ bool orion::collectionRemove
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -1233,7 +1234,7 @@ bool orion::collectionCreateIndex
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -1406,7 +1407,7 @@ bool orion::collectionAggregate
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');
@@ -1606,7 +1607,7 @@ bool orion::runCollectionCommand
   // this tokenization logic
   std::stringstream ss(col);
   std::vector<std::string> tokens;
-  while(ss.good())
+  while (ss.good())
   {
     std::string substr;
     getline(ss, substr, '.');

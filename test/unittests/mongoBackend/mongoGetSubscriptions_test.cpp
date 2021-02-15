@@ -57,7 +57,7 @@ using ngsiv2::EntID;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(DBClientBase _connection);
 
 
 

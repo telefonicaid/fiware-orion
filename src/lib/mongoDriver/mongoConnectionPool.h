@@ -98,7 +98,7 @@ extern const char* mongoConnectionSemGet(void);
 // Higher level functions (previously in MongoGlobal)
 
 #ifdef UNIT_TEST
-extern void setMongoConnectionForUnitTest(mongo::DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(orion::DBConnection _connection);
 #endif
 
 

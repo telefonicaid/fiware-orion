@@ -111,12 +111,12 @@ void static logWrongType(const char* supposed, const char* field, bson_t* b, con
 */
 void static logNotStringInArray(int ix, const char* caller, int line)
 {
-  //char* bsonStr = bson_as_relaxed_extended_json(b, NULL);
+  // char* bsonStr = bson_as_relaxed_extended_json(b, NULL);
 
   LM_E(("Runtime Error (element %d in array was supposed to be a string but the type is '%s' (type as integer: %d) from caller %s:%d)",
         ix, "" /*mongoTypeName(ba[ix].type())*/, 0 /*ba[ix].type()*/, caller, line));
 
-  //bson_free(bsonStr);
+  // bson_free(bsonStr);
 }
 
 
@@ -141,7 +141,7 @@ orion::BSONObj orion::getObjectField
   {
     // FIXME OLD-DR: try to make this as simpler as previous implemetnation, without using BSONObjBUilder
     return orion::BSONObj(b.getObjectField(field));
-    /*orion::BSONObjBuilder bob;
+    /* orion::BSONObjBuilder bob;
     bob.appendElements(b.getObjectField(field));
     return bob.obj();*/
   }
@@ -970,7 +970,7 @@ void orion::setStringVector
        v->clear();
        bson_iter_recurse(&iter, &subiter);
        int ix = 0;
-       while(bson_iter_next(&subiter))
+       while (bson_iter_next(&subiter))
        {
          if (bson_iter_type(&subiter) == BSON_TYPE_UTF8)
          {
@@ -1091,7 +1091,7 @@ bool orion::nextSafeOrError
 )
 {
   int errorType;
-  if(!cursor.next(r, &errorType, err))
+  if (!cursor.next(r, &errorType, err))
   {
     // Note that errorType doesn't progress upwards, as we only can provide the err string
     char lineString[STRING_SIZE_FOR_INT];
@@ -1195,6 +1195,6 @@ bool orion::safeGetSubId(const SubscriptionId& subId, orion::OID* id, StatusCode
 */
 bool orion::safeGetRegId(const RegistrationId& regId, orion::OID* id, StatusCode* sc)
 {
- *id = orion::OID(regId.get());
- return true;
+  *id = orion::OID(regId.get());
+  return true;
 }
