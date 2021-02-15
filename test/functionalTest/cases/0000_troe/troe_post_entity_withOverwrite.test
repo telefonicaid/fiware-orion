@@ -112,7 +112,7 @@ echo
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
 echo
 echo
 
@@ -158,7 +158,7 @@ echo
 
 echo "09. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
 echo
 echo
 
@@ -197,11 +197,11 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P2,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P2,,Sub-P2,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R2,,urn:ngsi-ld:relationships:Sub-R2,,,REGEX(202.*)
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:Sub-R,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P2,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P2,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:Sub-R2,,
 
 
 06. Append P1 and R3 (P1 will overwrite the previous P1)
@@ -230,13 +230,13 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld
 
 09. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P2,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P2,,Sub-P2,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R2,,urn:ngsi-ld:relationships:Sub-R2,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,New Sub-P,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R3,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R3,,urn:ngsi-ld:relationships:Sub-R3,,,REGEX(202.*)
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:Sub-R,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P2,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P2,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R2,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:Sub-R2,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,New Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R3,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:Sub-R3,,
 
 
 --TEARDOWN--

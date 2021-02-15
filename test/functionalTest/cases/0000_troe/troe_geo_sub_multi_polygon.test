@@ -80,7 +80,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoMultiPolygon,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoMultiPolygon,observedAt FROM subAttributes"
 echo
 echo
 
@@ -137,8 +137,8 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Relationship,urn:ngsi-ld:
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,geomultipolygon,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mpol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,0106000020AB10000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
+id,valuetype,entityid,attrinstanceid,unitcode,geomultipolygon,observedat
+https://uri.etsi.org/ngsi-ld/default-context/mpol,GeoMultiPolygon,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,0106000020AB10000001000000010300000002000000050000000000000000000000000000000000000000000000000010400000000000000000000000000000104000000000000000C0000000000000000000000000000000C00000000000000000000000000000000005000000000000000000244000000000000000000000000000002C4000000000000000000000000000002C4000000000000000C0000000000000244000000000000000C000000000000024400000000000000000,
 
 
 05. GET the entity

@@ -48,7 +48,7 @@ bool pgSubAttributePush
   const char*  instanceId,
   const char*  subAttributeType,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  id,
   const char*  observedAt,
   const char*  unitCode
@@ -61,27 +61,27 @@ bool pgSubAttributePush
   {
     if (valueNodeP->type == KjString)
     {
-      if (pgStringSubPropertyPush(connectionP, instanceId, valueNodeP->value.s, entityId, attributeId, id, observedAt) == false)
+      if (pgStringSubPropertyPush(connectionP, instanceId, valueNodeP->value.s, entityId, attrInstanceId, id, observedAt) == false)
       LM_RE(false, ("pgStringSubPropertyPush failed"));
     }
     else if (valueNodeP->type == KjBoolean)
     {
-      if (pgBoolSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.b, entityId, attributeId, observedAt) == false)
+      if (pgBoolSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.b, entityId, attrInstanceId, observedAt) == false)
       LM_RE(false, ("pgStringSubPropertyPush failed"));
     }
     else if ((valueNodeP->type == KjObject) || (valueNodeP->type == KjArray))
     {
-      if (pgCompoundSubPropertyPush(connectionP, id, instanceId, valueNodeP, entityId, attributeId, observedAt) == false)
+      if (pgCompoundSubPropertyPush(connectionP, id, instanceId, valueNodeP, entityId, attrInstanceId, observedAt) == false)
         LM_RE(false, ("pgStringSubPropertyPush failed"));
     }
     else if (valueNodeP->type == KjInt)
     {
-      if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.i, entityId, attributeId, observedAt, unitCode) == false)
+      if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.i, entityId, attrInstanceId, observedAt, unitCode) == false)
       LM_RE(false, ("pgNumberSubPropertyPush[Integer] failed"));
     }
     else if (valueNodeP->type == KjFloat)
     {
-      if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.f, entityId, attributeId, observedAt, unitCode) == false)
+      if (pgNumberSubPropertyPush(connectionP, id, instanceId, valueNodeP->value.f, entityId, attrInstanceId, observedAt, unitCode) == false)
       LM_RE(false, ("pgNumberSubPropertyPush[Float] failed"));
     }
   }
@@ -90,7 +90,7 @@ bool pgSubAttributePush
   //
   else if (strcmp(subAttributeType, "Relationship") == 0)
   {
-    if (pgSubRelationshipPush(connectionP, instanceId, valueNodeP->value.s, entityId, attributeId, id, observedAt) == false)
+    if (pgSubRelationshipPush(connectionP, instanceId, valueNodeP->value.s, entityId, attrInstanceId, id, observedAt) == false)
       LM_RE(false, ("pgRelationshipPush failed"));
   }
   //
@@ -98,7 +98,7 @@ bool pgSubAttributePush
   //
   else if (strcmp(subAttributeType, "GeoProperty") == 0)
   {
-    if (pgGeoSubPropertyPush(connectionP, valueNodeP, instanceId, entityId, attributeId, id, observedAt) == false)
+    if (pgGeoSubPropertyPush(connectionP, valueNodeP, instanceId, entityId, attrInstanceId, id, observedAt) == false)
       LM_RE(false, ("pgGeoPropertyPush failed"));
   }
   else

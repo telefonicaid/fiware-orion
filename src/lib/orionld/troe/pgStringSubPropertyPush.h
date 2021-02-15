@@ -39,7 +39,7 @@ extern bool pgStringSubPropertyPush
   const char*  instanceId,
   const char*  stringValue,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  subAttributeName,
   const char*  observedAt
 );

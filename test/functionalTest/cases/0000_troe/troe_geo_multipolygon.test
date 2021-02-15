@@ -76,7 +76,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
 echo
 echo
 
@@ -133,7 +133,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/pol,GeoMultiPolygon,urn:ngsi
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 
 
 05. GET the entity

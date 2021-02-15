@@ -91,7 +91,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
 echo
 echo
 
@@ -138,7 +138,7 @@ echo
 
 echo "08. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
 echo
 echo
 
@@ -187,7 +187,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entiti
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 
 
 05. Issue a Batch Create attempting to create an entity that already exists, plus one new entity
@@ -233,7 +233,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/SP,String,urn:ngsi-ld:entiti
 
 08. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 
 
 --TEARDOWN--

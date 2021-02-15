@@ -70,7 +70,7 @@ echo "ATTRIBUTES:"
 postgresCmd -t ftest_t1 -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -t ftest_t1 -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
 echo
 echo
 
@@ -96,8 +96,8 @@ opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolea
 Create,https://uri.etsi.org/ngsi-ld/default-context/P,Number,urn:ngsi-ld:entities:E1,t,,,,1,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
-https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P,,urn:ngsi-ld:relationships:PR,,,REGEX(202.*)
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/PR,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:PR,,
 
 
 --TEARDOWN--

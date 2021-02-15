@@ -45,7 +45,7 @@ extern bool pgSubAttributePush
   const char*  instanceId,
   const char*  subAttributeType,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  id,
   const char*  observedAt,
   const char*  unitCode

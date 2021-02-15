@@ -94,7 +94,7 @@ echo "ATTRIBUTES:"
 postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -165,7 +165,7 @@ echo "ATTRIBUTES:"
 postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -268,7 +268,7 @@ echo "ATTRIBUTES:"
 postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,ts FROM attributes"
 echo
 echo "SUB-ATTRIBUTES:"
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -310,7 +310,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entiti
 Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step1:instance1:R1:E3,,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 
 
 03. Batch Update/Replace E1,E1,E2,E4 with P2 and R2
@@ -372,7 +372,7 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/P2,String,urn:ngsi-ld:entit
 Replace,https://uri.etsi.org/ngsi-ld/default-context/R2,Relationship,urn:ngsi-ld:entities:E2,f,,,urn:ngsi-ld:entities:step3:instance1:R2:E2,,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 
 
 05. Batch Update/Update E1,E1,E3,E5 - with P2+P3 and R2+R3
@@ -442,7 +442,7 @@ Append,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entiti
 Append,https://uri.etsi.org/ngsi-ld/default-context/R3,Relationship,urn:ngsi-ld:entities:E3,f,,,urn:ngsi-ld:entities:step5:instance1:R3:E3,,,REGEX(202.*)
 
 SUB-ATTRIBUTES:
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 
 
 --TEARDOWN--

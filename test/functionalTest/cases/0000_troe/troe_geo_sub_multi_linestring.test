@@ -80,7 +80,7 @@ echo
 
 echo "04. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeid,unitcode,geoMultiLineString,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,geoMultiLineString,observedAt FROM subAttributes"
 echo
 echo
 
@@ -137,8 +137,8 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Relationship,urn:ngsi-ld:
 
 04. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,geomultilinestring,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mls,GeoMultiLineString,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/A1,,0105000020E61000000200000001020000000300000000000000000000000000000000000000000000000000F03F000000000000F03F00000000000010400000000000001040010200000003000000000000000000F03F000000000000F03F0000000000000040000000000000004000000000000014400000000000001440,
+id,valuetype,entityid,attrinstanceid,unitcode,geomultilinestring,observedat
+https://uri.etsi.org/ngsi-ld/default-context/mls,GeoMultiLineString,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,0105000020E61000000200000001020000000300000000000000000000000000000000000000000000000000F03F000000000000F03F00000000000010400000000000001040010200000003000000000000000000F03F000000000000F03F0000000000000040000000000000004000000000000014400000000000001440,
 
 
 05. GET the entity

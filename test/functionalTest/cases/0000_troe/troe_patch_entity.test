@@ -107,7 +107,7 @@ echo
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean FROM subAttributes"
 echo
 echo
 
@@ -159,10 +159,10 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entit
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/R1,,urn:ngsi-ld:relationships:Sub-R,,,REGEX(202.*)
-https://uri.etsi.org/ngsi-ld/default-context/Sub-P12,String,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/P1,,Sub-P12,,,REGEX(202.*)
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-R,Relationship,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,urn:ngsi-ld:relationships:Sub-R,,
+https://uri.etsi.org/ngsi-ld/default-context/Sub-P12,String,urn:ngsi-ld:entities:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,Sub-P12,,
 
 
 --TEARDOWN--

@@ -49,7 +49,7 @@ bool pgGeoSubPolygonPush
   KjNode*      coordinatesP,
   const char*  instanceId,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  subAttributeName,
   const char*  observedAt
 )
@@ -75,16 +75,16 @@ bool pgGeoSubPolygonPush
   if (observedAt != NULL)
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, ts, id, entityId, attributeId, observedAt, valueType, geoPolygon) "
+             "instanceId, ts, id, entityId, attrInstanceId, observedAt, valueType, geoPolygon) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', 'GeoPolygon', ST_GeomFromText('POLYGON(%s)', 4267))",
-             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attributeId, observedAt, polygonCoordsString);
+             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, observedAt, polygonCoordsString);
   }
   else
   {
     snprintf(sql, sqlSize, "INSERT INTO subAttributes("
-             "instanceId, ts, id, entityId, attributeId, valueType, geoPolygon) "
+             "instanceId, ts, id, entityId, attrInstanceId, valueType, geoPolygon) "
              "VALUES ('%s', '%s', '%s', '%s', '%s', 'GeoPolygon', ST_GeomFromText('POLYGON(%s)', 4267))",
-             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attributeId, polygonCoordsString);
+             instanceId, orionldState.requestTimeString, subAttributeName, entityId, attrInstanceId, polygonCoordsString);
   }
 
   LM_TMP(("SQL[%p]: %s;", connectionP, sql));

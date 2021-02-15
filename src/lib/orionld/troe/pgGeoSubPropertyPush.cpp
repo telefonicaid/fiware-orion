@@ -52,7 +52,7 @@ bool pgGeoSubPropertyPush
   KjNode*      valueNodeP,
   const char*  instanceId,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  subAttributeName,
   const char*  observedAt
 )
@@ -68,15 +68,15 @@ bool pgGeoSubPropertyPush
 
 
   if (strcmp(geoTypeP->value.s, "Point") == 0)
-    ok = pgGeoSubPointPush(connectionP, coordinatesP, instanceId, entityId, attributeId, subAttributeName, observedAt);
+    ok = pgGeoSubPointPush(connectionP, coordinatesP, instanceId, entityId, attrInstanceId, subAttributeName, observedAt);
   else if (strcmp(geoTypeP->value.s, "Polygon") == 0)
-    ok = pgGeoSubPolygonPush(connectionP, coordinatesP, instanceId, entityId, attributeId, subAttributeName, observedAt);
+    ok = pgGeoSubPolygonPush(connectionP, coordinatesP, instanceId, entityId, attrInstanceId, subAttributeName, observedAt);
   else if (strcmp(geoTypeP->value.s, "LineString") == 0)
-    ok = pgGeoSubLineStringPush(connectionP, coordinatesP, instanceId, entityId, attributeId, subAttributeName, observedAt);
+    ok = pgGeoSubLineStringPush(connectionP, coordinatesP, instanceId, entityId, attrInstanceId, subAttributeName, observedAt);
   else if (strcmp(geoTypeP->value.s, "MultiPolygon") == 0)
-    ok = pgGeoSubMultiPolygonPush(connectionP, coordinatesP, instanceId, entityId, attributeId, subAttributeName, observedAt);
+    ok = pgGeoSubMultiPolygonPush(connectionP, coordinatesP, instanceId, entityId, attrInstanceId, subAttributeName, observedAt);
   else if (strcmp(geoTypeP->value.s, "MultiLineString") == 0)
-    ok = pgGeoSubMultiLineStringPush(connectionP, coordinatesP, instanceId, entityId, attributeId, subAttributeName, observedAt);
+    ok = pgGeoSubMultiLineStringPush(connectionP, coordinatesP, instanceId, entityId, attrInstanceId, subAttributeName, observedAt);
   else
     LM_RE(false, ("Bad Input (invalid geometry for GeoProperty: %s)", geoTypeP->value.s));
 

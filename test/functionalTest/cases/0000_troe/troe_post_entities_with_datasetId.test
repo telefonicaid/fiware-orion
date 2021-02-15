@@ -92,7 +92,7 @@ echo
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
 echo
 echo
 
@@ -156,7 +156,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:ngsi-ld:entiti
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,observedat
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
 
 
 --TEARDOWN--

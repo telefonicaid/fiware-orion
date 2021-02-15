@@ -40,7 +40,7 @@ extern bool pgNumberSubPropertyPush
   const char*  instanceId,
   double       numberValue,
   const char*  entityId,
-  const char*  attributeId,
+  const char*  attrInstanceId,
   const char*  observedAt,
   const char*  unitCode
 );

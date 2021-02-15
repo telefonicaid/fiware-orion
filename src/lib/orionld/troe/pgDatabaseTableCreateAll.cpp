@@ -99,7 +99,7 @@ bool pgDatabaseTableCreateAll(PGconn* connectionP)
     "instanceId          TEXT PRIMARY KEY,"
     "id                  TEXT NOT NULL,"
     "entityId            TEXT NOT NULL,"
-    "attributeId         TEXT NOT NULL,"
+    "attrInstanceId      TEXT NOT NULL,"
     "observedAt          TIMESTAMP,"
     "unitCode            TEXT,"
     "valueType           ValueType,"

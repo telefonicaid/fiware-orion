@@ -109,7 +109,7 @@ echo
 
 echo "05. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -171,7 +171,7 @@ echo
 
 echo "10. See the sub-attributes in the temporal database"
 echo "==================================================="
-postgresCmd -sql "SELECT id,valueType,entityId,attributeId,unitcode,text,number,boolean,ts FROM subAttributes"
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,ts FROM subAttributes"
 echo
 echo
 
@@ -242,7 +242,7 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/P4,String,urn:ngsi-ld:entit
 
 05. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 
 
 06. Upsert three instances of E1, with options=update - no new entity instance in TRoE entities table, but all new attrs in 'attributes' table marked as REPLACE
@@ -325,7 +325,7 @@ Replace,https://uri.etsi.org/ngsi-ld/default-context/P3,String,urn:ngsi-ld:entit
 
 10. See the sub-attributes in the temporal database
 ===================================================
-id,valuetype,entityid,attributeid,unitcode,text,number,boolean,ts
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,ts
 
 
 --TEARDOWN--
