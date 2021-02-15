@@ -26,13 +26,12 @@
 * Author: Fermín Galán
 */
 
-#include <string>
-#include <vector>
 #include <stdint.h>  // CentOS 7 needs this explicit declaration (and doesn't hurts in other OS)
+#include <vector>
+#include <string>
 
 namespace orion
 {
-
 /* ****************************************************************************
 *
 * BSONDate -
@@ -44,7 +43,7 @@ class BSONDate
 
  public:
   // methods to be used by client code (without references to low-level driver code)
-  BSONDate(unsigned long long m);
+  explicit BSONDate(unsigned long long m);
   bool equal(unsigned long long m);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

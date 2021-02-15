@@ -82,9 +82,9 @@ BSONType BSONElement::type(void) const
 //
 // value = bson_iter_value(&iter);
 //
-//if (value->value_type == BSON_TYPE_INT32) {
+// if (value->value_type == BSON_TYPE_INT32) {
 //   printf ("%d\n", value->value.v_int32);
-//}
+// }
 
 
 /* ****************************************************************************

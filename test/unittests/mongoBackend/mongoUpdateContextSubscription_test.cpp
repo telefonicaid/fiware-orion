@@ -61,7 +61,7 @@ using ::testing::Return;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(DBClientBase _connection);
 
 
 
@@ -4382,13 +4382,8 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 /* ****************************************************************************
 *
 * MongoDbFindOneFail -
-*
-* FIXME OLD-DR: we cannot inject the mock properly. mongoSubscribeContext is using
-* the "new driver" connection pool, but setMongoConnectionForUnitTest() used to
-* inject mocked connection does it the "old driver" connection pool.
-*
 */
-TEST(DISABLED_mongoUpdateContextSubscription, MongoDbFindOneFail)
+TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -4437,12 +4432,8 @@ TEST(DISABLED_mongoUpdateContextSubscription, MongoDbFindOneFail)
 /* ****************************************************************************
 *
 * MongoDbUpdateFail -
-
-* FIXME OLD-DR: we cannot inject the mock properly. mongoSubscribeContext is using
-* the "new driver" connection pool, but setMongoConnectionForUnitTest() used to
-* inject mocked connection does it the "old driver" connection pool.
 */
-TEST(DISABLED_mongoUpdateContextSubscription, MongoDbUpdateFail)
+TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;

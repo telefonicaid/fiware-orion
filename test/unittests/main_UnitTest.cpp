@@ -159,7 +159,7 @@ int main(int argC, char** argV)
   mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
-  setupDatabase();
+  // setupDatabase(); FIXME-OLD-DR: pending of unit test driver migration
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

@@ -275,7 +275,7 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
   std::set<std::string>  md1Set;
 
   // Assuming that md1 and md2 are of equal size, we can equally use md1 or md2 for the set
-  md1.getFieldNames(md1Set);
+  md1.getFieldNames(&md1Set);
 
   for (std::set<std::string>::iterator i = md1Set.begin(); i != md1Set.end(); ++i)
   {
@@ -506,7 +506,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
     case orion::Array:
       // FIXME OLD-DR: not sure if this will work... only place in all our code where
       // we use appendArray() mongo::BSONArray method
-      //ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldFF(attr, ENT_ATTRS_VALUE));
+      // ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldFF(attr, ENT_ATTRS_VALUE));
       ab.append(ENT_ATTRS_VALUE, getArrayFieldFF(attr, ENT_ATTRS_VALUE));
       break;
 
@@ -573,7 +573,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
     std::set<std::string>  mdsSet;
 
     md = getFieldFF(attr, ENT_ATTRS_MD).embeddedObject();
-    md.getFieldNames(mdsSet);
+    md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
@@ -1178,7 +1178,7 @@ static void fill_idNPtypeNP
 )
 {
   // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-   // should be changed?
+  // should be changed?
 
   /*
   bgP->idNPtypeNP = BSON(entIdQ << entityId <<
@@ -1472,7 +1472,6 @@ static bool addTriggeredSubscriptions_noCache
   orion::BSONObj sub;
   while (cursor.next(&sub))
   {
-
     /* FIXME OLD-DR: remove?
     std::string    err;
 
@@ -2435,7 +2434,7 @@ static bool deleteContextAttributeItem
      * of specifying that date expiration field is no longer used */
     if (targetAttr->name == DATE_EXPIRES)
     {
-      *dateExpiration = NO_EXPIRATION_DATE;
+      *dateExpiration = orion::BSONDate(NO_EXPIRATION_DATE);
     }
 
     ca->found = true;
@@ -2832,7 +2831,7 @@ static bool removeEntity
   {
     orion::BSONObjBuilder bobExist;
     bobExist.append("$exists", false);
-    bob.append(servicePathString,bobExist.obj());
+    bob.append(servicePathString, bobExist.obj());
   }
   else
   {
@@ -3633,7 +3632,7 @@ unsigned int processContextElement
     // FIXME OLD-DR: this is a kind of black magic... would we need this owned thing with the new driver? let's see...
     // by the moment we are using the "low level" forbidden methods to solve the issue
     //
-    //results.push_back(orion::BSONObj(r.get().getOwned()));
+    // results.push_back(orion::BSONObj(r.get().getOwned()));
     results.push_back(r);
   }
 

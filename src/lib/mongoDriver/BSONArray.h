@@ -26,8 +26,8 @@
 * Author: Fermín Galán
 */
 
-#include <string>
 #include <bson/bson.h>
+#include <string>
 
 namespace orion
 {
@@ -49,10 +49,9 @@ class BSONArray
   BSONArray& operator= (BSONArray rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
-  BSONArray(const bson_t* _b);
+  explicit BSONArray(const bson_t* _b);
   ~BSONArray(void);
   bson_t* get(void) const;
-
 };
 }
 

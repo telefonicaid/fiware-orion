@@ -347,7 +347,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
   for (std::vector<orion::BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     // FIXME OLD-DR: Obj() same as embeddedObject()
-    //orion::BSONObj  db      = (*i).Obj();
+    // orion::BSONObj  db      = (*i).Obj();
     orion::BSONObj  db      = (*i).embeddedObject();
     std::string     dbName  = getStringFieldFF(db, "name");
     std::string     prefix  = dbPrefix + "-";
@@ -1728,7 +1728,7 @@ bool entitiesQuery
   int             errType;
   std::string     nextSafeErr;
 
-  //while (orion::moreSafe(&cursor))
+  // while (orion::moreSafe(&cursor))
   while (cursor.next(&r, &errType, &nextSafeErr))
   {
     alarmMgr.dbErrorReset();

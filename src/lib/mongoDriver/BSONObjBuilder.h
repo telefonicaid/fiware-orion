@@ -26,8 +26,8 @@
 * Author: Fermín Galán
 */
 
-#include <string>
 #include <bson/bson.h>
+#include <string>
 
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/OID.h"

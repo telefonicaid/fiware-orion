@@ -24,9 +24,9 @@
 */
 #include <time.h>
 #include <semaphore.h>
+#include <mongoc/mongoc.h>
 #include <string>
 #include <vector>
-#include <mongoc/mongoc.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -343,19 +343,19 @@ int orion::mongoConnectionPoolInit
     // FIXME OLD-DR: auth not taken into account by the moment
     // FIXME OLD-DR: if we call mongoc_init() then mongoc_cleanup() should be called.. someplace
     mongoc_init();
-    //mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
-    //statusOk = status.isOK();
+    // mongo::Status status = mongo::client::initialize(mongo::client::Options().setSSLMode(mongo::client::Options::kSSLRequired));
+    // statusOk = status.isOK();
     statusOk = true;
-    //statusString = status.toString();
+    // statusString = status.toString();
   }
   else
   {
     // FIXME OLD-DR: if we call mongoc_init() then mongoc_cleanup() should be called.. someplace
     mongoc_init();
-    //mongo::Status status = mongo::client::initialize();
-    //statusOk = status.isOK();
+    // mongo::Status status = mongo::client::initialize();
+    // statusOk = status.isOK();
     statusOk = true;
-    //statusString = status.toString();
+    // statusString = status.toString();
   }
 
   if (!statusOk)
@@ -606,7 +606,7 @@ const char* orion::mongoConnectionSemGet(void)
 
 #ifdef UNIT_TEST
 
-static DBClientBase* connection = NULL;
+static orion::DBConnection connection;
 
 
 
@@ -614,10 +614,10 @@ static DBClientBase* connection = NULL;
 *
 * setMongoConnectionForUnitTest -
 *
-* For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
+* For unit tests there is only one connection. This connection is stored right here (orion::DBConnection* connection) and
 * given out using the function getMongoConnection().
 */
-void setMongoConnectionForUnitTest(DBClientBase* _connection)
+void setMongoConnectionForUnitTest(orion::DBConnection _connection)
 {
   connection = _connection;
 }
@@ -633,7 +633,7 @@ void setMongoConnectionForUnitTest(DBClientBase* _connection)
 * This will set the static variable 'connection' in MongoGlobal.cpp and later 'getMongoConnection'
 * returns that variable (getMongoConnection is used by the entire mongo backend).
 */
-DBClientBase* mongoInitialConnectionGetForUnitTest(void)
+orion::DBConnection mongoInitialConnectionGetForUnitTest(void)
 {
   return mongoPoolConnectionGet();
 }

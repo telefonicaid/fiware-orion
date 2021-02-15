@@ -55,7 +55,7 @@ using ::testing::_;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern void setMongoConnectionForUnitTest(DBClientBase _connection);
 
 
 

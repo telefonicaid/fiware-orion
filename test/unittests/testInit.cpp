@@ -27,25 +27,18 @@
 #include "logMsg/logMsg.h"
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoConnectionPool.h"
-#include "mongo/client/dbclient.h"
+// #include "mongoBackend/mongoConnectionPool.h"
 
 
 
-/* ****************************************************************************
-*
-* USING
-*/
-using mongo::DBClientBase;
-
-
-
+#if 0
+// FIXME OLD-DR: disabled until driver migration can be done
 /* ****************************************************************************
 *
 * External declarations
 */
-extern DBClientBase* mongoInitialConnectionGetForUnitTest();
-extern void          setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern DBClientBase mongoInitialConnectionGetForUnitTest();
+extern void         setMongoConnectionForUnitTest(DBClientBase* _connection);
 
 
 
@@ -81,6 +74,7 @@ void setupDatabase(void)
   setEntitiesCollectionName("entities");
   setSubscribeContextCollectionName("csubs");
 }
+#endif
 
 
 

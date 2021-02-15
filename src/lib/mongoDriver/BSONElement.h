@@ -26,9 +26,9 @@
 * Author: Fermín Galán
 */
 
+#include <bson/bson.h>
 #include <string>
 #include <vector>
-#include <bson/bson.h>
 
 #include "mongoDriver/BSONObj.h"
 #include "mongoDriver/BSONDate.h"

@@ -26,11 +26,11 @@
 * Author: Fermín Galán
 */
 
+#include <bson/bson.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <set>
-#include <bson/bson.h>
 
 #include "mongoDriver/BSONElement.h"
 
@@ -58,7 +58,7 @@ class BSONObj
   // methods to be used by client code (without references to low-level driver code)
   BSONObj();
   BSONObj(const BSONObj& _bo);
-  int getFieldNames(std::set<std::string>& fields) const;
+  int getFieldNames(std::set<std::string>* fields) const;
   bool hasField(const std::string& field) const;
   int nFields(void) const;
   std::string toString(void) const;
@@ -70,7 +70,7 @@ class BSONObj
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   ~BSONObj(void);
   bson_t* get(void) const;
-  BSONObj(const bson_t* _b);
+  explicit BSONObj(const bson_t* _b);
 };
 }
 

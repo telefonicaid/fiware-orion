@@ -29,7 +29,6 @@
 
 namespace orion
 {
-
 enum BSONType {
     MinKey = -1,
     EOO = 0,
@@ -57,5 +56,4 @@ enum BSONType {
 };
 }
 
-
-#endif // SRC_LIB_MONGODRIVER_BSONTYPES_H_
+#endif  // SRC_LIB_MONGODRIVER_BSONTYPES_H_

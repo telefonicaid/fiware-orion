@@ -104,7 +104,4 @@ bson_oid_t OID::get(void) const
 {
   return oid;
 }
-
-
-
 }

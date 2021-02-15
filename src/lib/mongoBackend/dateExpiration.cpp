@@ -156,7 +156,7 @@ bool processDateExpirationAtUpdateAttribute
     }
     else
     {
-      *dateExpiration = NO_EXPIRATION_DATE;
+      *dateExpiration = orion::BSONDate(NO_EXPIRATION_DATE);
     }
   }
 
@@ -190,7 +190,7 @@ bool processDateExpirationAtAppendAttribute
     }
     else
     {
-      *dateExpiration = 0;
+      *dateExpiration = orion::BSONDate(0);
     }
   }
 

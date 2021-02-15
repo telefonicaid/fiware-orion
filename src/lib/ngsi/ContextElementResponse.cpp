@@ -129,7 +129,7 @@ ContextElementResponse::ContextElementResponse
   orion::BSONObj         attrs = getObjectFieldFF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
-  attrs.getFieldNames(attrNames);
+  attrs.getFieldNames(&attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName                = *i;
@@ -218,7 +218,7 @@ ContextElementResponse::ContextElementResponse
       orion::BSONObj                mds = getObjectFieldFF(attr, ENT_ATTRS_MD);
       std::set<std::string>  mdsSet;
 
-      mds.getFieldNames(mdsSet);
+      mds.getFieldNames(&mdsSet);
       for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
       {
         std::string currentMd = *i;
