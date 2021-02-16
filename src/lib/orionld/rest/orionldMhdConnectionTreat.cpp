@@ -802,47 +802,52 @@ MHD_Result orionldMhdConnectionTreat(ConnectionInfo* ciP)
   //
   // NOTE: orionldState.link is set by httpHeaderGet() in rest.cpp, called by orionldMhdConnectionInit()
   //
-  if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck(ciP) == false))
-    goto respond;
-
+  // NOTE: Some requests don't use the context and thus should simplt ignore the Link header
   //
-  // Treat inline context
-  //
-  if (orionldState.payloadContextNode != NULL)
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED) == 0)
   {
-    OrionldProblemDetails pd = { OrionldBadRequestData, (char*) "naught", (char*) "naught", 0 };
-
-    char* id  = NULL;
-    char* url = NULL;
-
-    if (orionldState.payloadContextNode->type == KjString)
-      url = NULL;  // orionldState.payloadContextNode->value.s
-    else
-      url = orionldContextUrlGenerate(&id);
-
-    orionldState.contextP = orionldContextFromTree(url, true, orionldState.payloadContextNode, &pd);
-    if (orionldState.contextP == NULL)
-    {
-      LM_W(("Bad Input (invalid inline context. %s: %s)", pd.title, pd.detail));
-      orionldErrorResponseFromProblemDetails(&pd);
-      orionldState.httpStatusCode = (HttpStatusCode) pd.status;
-
+    if ((orionldState.linkHttpHeaderPresent == true) && (linkHeaderCheck(ciP) == false))
       goto respond;
-    }
 
-    if (id != NULL)
-      orionldState.contextP->id = id;
-
-    if (pd.status == 200)  // got an array with only Core Context
-      orionldState.contextP = orionldCoreContextP;
-
-    if (pd.status >= 400)
+    //
+    // Treat inline context
+    //
+    if (orionldState.payloadContextNode != NULL)
     {
-      LM_W(("Bad Input? (%s: %s (type == %d, status = %d))", pd.title, pd.detail, pd.type, pd.status));
-      orionldErrorResponseFromProblemDetails(&pd);
-      orionldState.httpStatusCode = (HttpStatusCode) pd.status;
+      OrionldProblemDetails pd = { OrionldBadRequestData, (char*) "naught", (char*) "naught", 0 };
 
-      goto respond;
+      char* id  = NULL;
+      char* url = NULL;
+
+      if (orionldState.payloadContextNode->type == KjString)
+        url = NULL;  // orionldState.payloadContextNode->value.s
+      else
+        url = orionldContextUrlGenerate(&id);
+
+      orionldState.contextP = orionldContextFromTree(url, true, orionldState.payloadContextNode, &pd);
+      if (orionldState.contextP == NULL)
+      {
+        LM_W(("Bad Input (invalid inline context. %s: %s)", pd.title, pd.detail));
+        orionldErrorResponseFromProblemDetails(&pd);
+        orionldState.httpStatusCode = (HttpStatusCode) pd.status;
+
+        goto respond;
+      }
+
+      if (id != NULL)
+        orionldState.contextP->id = id;
+
+      if (pd.status == 200)  // got an array with only Core Context
+        orionldState.contextP = orionldCoreContextP;
+
+      if (pd.status >= 400)
+      {
+        LM_W(("Bad Input? (%s: %s (type == %d, status = %d))", pd.title, pd.detail, pd.type, pd.status));
+        orionldErrorResponseFromProblemDetails(&pd);
+        orionldState.httpStatusCode = (HttpStatusCode) pd.status;
+
+        goto respond;
+      }
     }
   }
 

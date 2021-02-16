@@ -1,0 +1,81 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Deletion with a context that doesn't exist
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 212-249
+
+--SHELL--
+
+#
+# 01. Create Entity E1
+# 02. Attempt to delete E1 using a context that doesn't exist
+#
+
+
+echo "01. Create Entity E1"
+echo "===================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "A",
+  "name": {
+    "type": "Property",
+    "value": "1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+
+echo "02. Attempt to delete E1 using a context that doesn't exist"
+echo "==========================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1' -X DELETE -H 'Link: <https://fiware.github.io/NGSI-LD_TestSuite/error/noContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity E1
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+Date: REGEX(.*)
+
+
+
+02. Attempt to delete E1 using a context that doesn't exist
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
