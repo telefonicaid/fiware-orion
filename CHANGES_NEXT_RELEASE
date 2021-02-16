@@ -4,3 +4,4 @@
 * Issue  #280   Much faster response rendering function, giving a performance bump
 * Issue  #280   GeoJSON formated response for GET /entities and GET /entities/{EID}, if Accept header set to "application/geo+json"
 * Issue  #280   GeoJSON formated notifications, if notification:endpoint:accept is set to "application/geo+json"
+* Issue  #280   Some requests don't use the @context - e.g. DELETE /etntities/{entityId} - those requests now ignore the context

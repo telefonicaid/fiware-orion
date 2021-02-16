@@ -274,6 +274,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldDeleteEntity)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldPostEntity)
   {
@@ -329,6 +330,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldDeleteRegistration)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldPostSubscriptions)
   {
@@ -359,6 +361,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldDeleteSubscription)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
@@ -376,7 +379,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchDelete)
   {
-    serviceP->options  |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldPostQuery)
   {
@@ -397,6 +401,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldGetTenants)
   {
@@ -404,12 +409,14 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldGetDbIndexes)
   {
     serviceP->options  = 0;  // Tenant is Ignored
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_V2_URI_PARAMS;
+    serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
 
   if (troe)  // CLI Option to turn on Temporal Representation of Entities
