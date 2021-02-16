@@ -62,7 +62,7 @@ class BSONObj
   bool hasField(const std::string& field) const;
   int nFields(void) const;
   std::string toString(void) const;
-  bool isEmpty(void);
+  bool isEmpty(void) const;
   void toStringMap(std::map<std::string, std::string>* m);
   void toElementsVector(std::vector<BSONElement>* v);
   BSONObj& operator= (BSONObj rhs);

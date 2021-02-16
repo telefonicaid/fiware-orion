@@ -64,6 +64,8 @@ add_definitions(-fPIC)
 #
 #   One example of this warning (there are many warnings, but as in header files, just a few places):
 #
+#   FIXME OLD-DR: replace the example (this one no longer exists)
+#
 #   mongoBackend/safeMongo.h:
 #   ----------------------------------------------------------------
 #     extern bool nextSafeOrError

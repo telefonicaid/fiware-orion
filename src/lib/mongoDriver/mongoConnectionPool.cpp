@@ -40,7 +40,7 @@
 #include "mongoDriver/mongoConnectionPool.h"
 #include "mongoDriver/BSONObjBuilder.h"
 
-// FIXME OLD-DR: fix UNIT_TESTX marks in this file
+// FIXME OLD-DR: mongo c driver has pool functionality. Analyze it
 
 /* ****************************************************************************
 *
@@ -114,8 +114,7 @@ static orion::DBConnection mongoConnect
   std::string       err;
   mongoc_client_t*  connection = NULL;
 
-  // FIXME OLD-DR: remove orion:: mark
-  LM_T(LmtMongo, ("orion:: Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
+  LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
 
 #if 0
   // FIXME OLD-DR: we are skiping a lot of code to deal with reaplica sets and errors. It return NULL on fail
@@ -365,10 +364,10 @@ int orion::mongoConnectionPoolInit
   }
   atexit(shutdownClient);
 
-#ifdef UNIT_TESTX
+#ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
    * are mocked in similar way to ensure a coherent behaviour */
-  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout));
+  orion::setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, mechanism, authDb, multitenant, writeConcern, timeout));
   return 0;
 #else
   //
@@ -430,7 +429,7 @@ int orion::mongoConnectionPoolInit
   bob.append("buildinfo", 1);
 
   orion::runDatabaseCommand("admin", bob.obj(), &result, &err);
-  std::string versionString = std::string(getStringFieldFF(result, "version"));
+  std::string versionString = std::string(getStringFieldF(result, "version"));
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
     LM_X(1, ("Fatal Error (MongoDB invalid version format: %s)", versionString.c_str()));
@@ -510,7 +509,7 @@ static orion::DBConnection mongoPoolConnectionGet(void)
 }
 
 
-#ifndef UNIT_TESTX
+#ifndef UNIT_TEST
 /* ****************************************************************************
 *
 * mongoPoolConnectionRelease -
@@ -612,12 +611,12 @@ static orion::DBConnection connection;
 
 /* ****************************************************************************
 *
-* setMongoConnectionForUnitTest -
+* orion::setMongoConnectionForUnitTest -
 *
 * For unit tests there is only one connection. This connection is stored right here (orion::DBConnection* connection) and
 * given out using the function getMongoConnection().
 */
-void setMongoConnectionForUnitTest(orion::DBConnection _connection)
+void orion::setMongoConnectionForUnitTest(orion::DBConnection _connection)
 {
   connection = _connection;
 }
@@ -629,7 +628,7 @@ void setMongoConnectionForUnitTest(orion::DBConnection _connection)
 * mongoInitialConnectionGetForUnitTest -
 *
 * This function is meant to be used by unit tests, to get a connection from the pool
-* and then use that connection, setting it with the function 'setMongoConnectionForUnitTest'.
+* and then use that connection, setting it with the function 'orion::setMongoConnectionForUnitTest'.
 * This will set the static variable 'connection' in MongoGlobal.cpp and later 'getMongoConnection'
 * returns that variable (getMongoConnection is used by the entire mongo backend).
 */
@@ -650,7 +649,7 @@ orion::DBConnection mongoInitialConnectionGetForUnitTest(void)
 */
 orion::DBConnection orion::getMongoConnection(void)
 {
-#ifdef UNIT_TESTX
+#ifdef UNIT_TEST
   return connection;
 #else
   return mongoPoolConnectionGet();
@@ -670,7 +669,7 @@ orion::DBConnection orion::getMongoConnection(void)
 */
 void orion::releaseMongoConnection(const orion::DBConnection& connection)
 {
-#ifdef UNIT_TESTX
+#ifdef UNIT_TEST
   return;
 #else
   return mongoPoolConnectionRelease(connection);

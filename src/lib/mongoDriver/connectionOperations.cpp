@@ -39,7 +39,6 @@
 
 
 
-#if 0
 /* ****************************************************************************
 *
 * orion::collectionQuery -
@@ -50,99 +49,15 @@
 */
 bool orion::collectionQuery
 (
-  orion::DBConnection    _connection,
+  const orion::DBConnection&    _connection,
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  _q,
   orion::DBCursor*       cursor,
   std::string*           err
 )
 {
-  // Getting the "low level" driver objects
-  mongo::DBClientBase* connection = _connection.get();
-  const mongo::BSONObj q          = _q.get();
-
-  if (connection == NULL)
-  {
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
-
-  try
-  {
-    // Setting the call cursor with "low level" cursor
-    cursor->set(connection->query(col.c_str(), q));
-
-    // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-    // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-    // exception ourselves
-    //
-    if (cursor->isNull())
-    {
-      throw mongo::DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-    LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", q.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    std::string msg = std::string("collection: ") + col +
-      " - query(): " + q.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    std::string msg = std::string("collection: ") + col +
-      " - query(): " + q.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* orion::collectionQuery -
-*
-* Different from others, this function doesn't use getMongoConnection() and
-* releaseMongoConnection(). It is assumed that the caller will do, as the
-* connection cannot be released before the cursor has been used.
-*/
-bool orion::collectionQuery
-(
-  orion::DBConnection    _connection,
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  orion::DBCursor*       cursor,
-  std::string*           err
-)
-{
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking connection
   mongoc_client_t* connection = _connection.get();
@@ -158,8 +73,8 @@ bool orion::collectionQuery
   bson_t* q = _q.get();
   char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), bsonStr));
-  mongoc_collection_t *collection = mongoc_client_get_collection(connection, tokens[0].c_str(), tokens[1].c_str());
+  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", ns.c_str(), bsonStr));
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
   cursor->set(mongoc_collection_find_with_opts(collection, q, NULL, NULL));
   mongoc_collection_destroy(collection);
 
@@ -170,7 +85,7 @@ bool orion::collectionQuery
   // Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-update-function
   if (cursor->isNull())
   {
-    std::string msg = std::string("collection: ") + col +
+    std::string msg = std::string("collection: ") + ns +
       " - query(): " + bsonStr +
       " - exception: Null cursor from mongo (details on this is found in the source code";
 
@@ -189,7 +104,6 @@ bool orion::collectionQuery
 
 
 
-#if 0
 /* ****************************************************************************
 *
 * orion::collectionRangedQuery -
@@ -200,120 +114,19 @@ bool orion::collectionQuery
 */
 bool orion::collectionRangedQuery
 (
-  orion::DBConnection    _connection,
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  const orion::BSONObj&  _sort,  // FIXME: this change can be propagated independtly to master
-  int                    limit,
-  int                    offset,
-  orion::DBCursor*       cursor,
-  long long*             count,
-  std::string*           err
+  const orion::DBConnection&  _connection,
+  const std::string&         db,
+  const std::string&         col,
+  const orion::BSONObj&      _q,
+  const orion::BSONObj&      _sort,  // FIXME: this change can be propagated independtly to master
+  int                        limit,
+  int                        offset,
+  orion::DBCursor*           cursor,
+  long long*                 count,
+  std::string*               err
 )
 {
-  // Getting the "low level" driver objects
-  mongo::DBClientBase* connection = _connection.get();
-
-  // Compose the query
-  mongo::Query query(_q.get());
-  query.sort(_sort.get());
-
-  if (connection == NULL)
-  {
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
-                  col.c_str(),
-                  limit,
-                  offset,
-                  query.toString().c_str()));
-
-  try
-  {
-    if (count != NULL)
-    {
-      *count = connection->count(col.c_str(), _q.get());
-    }
-
-    // Setting the call cursor with "low level" cursor
-    cursor->set(connection->query(col.c_str(), query, limit, offset));
-
-    //
-    // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-    // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-    // exception ourselves
-    //
-    if (cursor->isNull())
-    {
-      throw mongo::DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-    LM_T(LmtOldInfo, ("Database Operation Successful (query: %s)", query.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - query(): " + query.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* orion::collectionRangedQuery -
-*
-* Different from others, this function doesn't use getMongoConnection() and
-* releaseMongoConnection(). It is assumed that the caller will do, as the
-* connection cannot be released before the cursor has been used.
-*/
-bool orion::collectionRangedQuery
-(
-  orion::DBConnection    _connection,
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  const orion::BSONObj&  _sort,  // FIXME: this change can be propagated independtly to master
-  int                    limit,
-  int                    offset,
-  orion::DBCursor*       cursor,
-  long long*             count,
-  std::string*           err
-)
-{
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking connection
   mongoc_client_t* connection = _connection.get();
@@ -330,8 +143,8 @@ bool orion::collectionRangedQuery
   char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
 
   LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
-                  col.c_str(), limit, offset, bsonStr));
-  mongoc_collection_t *collection = mongoc_client_get_collection(connection, tokens[0].c_str(), tokens[1].c_str());
+                  ns.c_str(), limit, offset, bsonStr));
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
 
   // First, set countP (if used). In the case of error, we return early and the actual query doesn't take place
   if (count != NULL)
@@ -344,7 +157,7 @@ bool orion::collectionRangedQuery
     }
     else
     {
-      std::string msg = std::string("collection: ") + col.c_str() +
+      std::string msg = std::string("collection: ") + ns.c_str() +
         " - count_documents(): " + bsonStr +
         " - exception: " + error.message;
 
@@ -376,7 +189,7 @@ bool orion::collectionRangedQuery
   // Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-update-function
   if (cursor->isNull())
   {
-    std::string msg = std::string("collection: ") + col +
+    std::string msg = std::string("collection: ") + ns +
       " - query(): " + bsonStr +
       " - exception: Null cursor from mongo (details on this is found in the source code";
 
@@ -397,13 +210,13 @@ bool orion::collectionRangedQuery
 
 
 
-#if 0
 /* ****************************************************************************
 *
 * orion::collectionCount -
 */
 bool orion::collectionCount
 (
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  _q,
   unsigned long long*    c,
@@ -412,89 +225,7 @@ bool orion::collectionCount
 {
   TIME_STAT_MONGO_READ_WAIT_START();
 
-  orion::DBConnection connection = orion::getMongoConnection();
-
-  // Getting the "low level" driver objects
-  const mongo::BSONObj q = _q.get();
-
-  if (connection.isNull())
-  {
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("count() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
-
-  try
-  {
-    *c = connection.get()->count(col.c_str(), q);
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_T(LmtOldInfo, ("Database Operation Successful (count: %s)", q.toString().c_str()));
-  }
-  catch (const std::exception& e)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - count(): " + q.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - query(): " + q.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* orion::collectionCount -
-*/
-bool orion::collectionCount
-(
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  unsigned long long*    c,
-  std::string*           err
-)
-{
-  TIME_STAT_MONGO_READ_WAIT_START();
-
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking connection
   orion::DBConnection connection = orion::getMongoConnection();
@@ -513,9 +244,9 @@ bool orion::collectionCount
   const bson_t* doc = _q.get();
   char* bsonStr = bson_as_relaxed_extended_json(doc, NULL);
 
-  LM_T(LmtMongo, ("count_documents() in '%s' collection: '%s'", col.c_str(), bsonStr));
+  LM_T(LmtMongo, ("count_documents() in '%s' collection: '%s'", ns.c_str(), bsonStr));
 
-  mongoc_collection_t* collection = mongoc_client_get_collection(connection.get(), tokens[0].c_str(), tokens[1].c_str());
+  mongoc_collection_t* collection = mongoc_client_get_collection(connection.get(), db.c_str(), col.c_str());
 
   bson_error_t error;
   long long n = mongoc_collection_count_documents(collection, doc, NULL, NULL, NULL, &error);
@@ -532,7 +263,7 @@ bool orion::collectionCount
   }
   else
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + ns.c_str() +
       " - count_documents(): " + bsonStr +
       " - exception: " + error.message;
 
@@ -546,79 +277,6 @@ bool orion::collectionCount
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* orion::collectionFindOne -
-*/
-bool orion::collectionFindOne
-(
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  orion::BSONObj*        doc,
-  std::string*           err
-)
-{
-  TIME_STAT_MONGO_READ_WAIT_START();
-
-  orion::DBConnection connection = orion::getMongoConnection();
-
-  // Getting the "low level" driver objects
-  const mongo::BSONObj q = _q.get();
-
-  if (connection.isNull())
-  {
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("findOne() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
-  try
-  {
-    *doc = orion::BSONObj(connection.get()->findOne(col.c_str(), q));
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-    LM_T(LmtOldInfo, ("Database Operation Successful (findOne: %s)", q.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-        " - findOne(): " + q.toString() +
-        " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-        " - findOne(): " + q.toString() +
-        " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
-
-
 
 /* ****************************************************************************
 *
@@ -630,6 +288,7 @@ bool orion::collectionFindOne
 */
 bool orion::collectionFindOne
 (
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  _q,
   orion::BSONObj*        doc,
@@ -642,7 +301,7 @@ bool orion::collectionFindOne
 
   orion::DBCursor cursor;
 
-  if (!collectionRangedQuery(connection, col, _q, orion::BSONObj(), 1, 0, &cursor, NULL, err))
+  if (!collectionRangedQuery(connection, db, col, _q, orion::BSONObj(), 1, 0, &cursor, NULL, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -667,13 +326,13 @@ bool orion::collectionFindOne
 
 
 
-#if 0
 /* ****************************************************************************
 *
 * orion::collectionInsert -
 */
 bool orion::collectionInsert
 (
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  _doc,
   std::string*           err
@@ -681,89 +340,7 @@ bool orion::collectionInsert
 {
   TIME_STAT_MONGO_WRITE_WAIT_START();
 
-  orion::DBConnection connection = orion::getMongoConnection();
-
-  // Getting the "low level" driver objects
-  const mongo::BSONObj doc = _doc.get();
-
-  if (connection.isNull())
-  {
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", col.c_str(), doc.toString().c_str()));
-
-  try
-  {
-    connection.get()->insert(col.c_str(), doc);
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_T(LmtOldInfo, ("Database Operation Successful (insert: %s)", doc.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - insert(): " + doc.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - insert(): " + doc.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* orion::collectionInsert -
-*/
-bool orion::collectionInsert
-(
-  const std::string&     col,
-  const orion::BSONObj&  _doc,
-  std::string*           err
-)
-{
-  TIME_STAT_MONGO_WRITE_WAIT_START();
-
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking connection
   orion::DBConnection connection = orion::getMongoConnection();
@@ -782,9 +359,9 @@ bool orion::collectionInsert
   const bson_t* doc = _doc.get();
   char* bsonStr = bson_as_relaxed_extended_json(doc, NULL);
 
-  LM_T(LmtMongo, ("insert_one() in '%s' collection: '%s'", col.c_str(), bsonStr));
+  LM_T(LmtMongo, ("insert_one() in '%s' collection: '%s'", ns.c_str(), bsonStr));
 
-  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), tokens[0].c_str(), tokens[1].c_str());
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), db.c_str(), col.c_str());
 
   bson_error_t error;
   bson_t* opt = BCON_NEW("validate", BCON_BOOL(false));
@@ -802,7 +379,7 @@ bool orion::collectionInsert
   }
   else
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + ns.c_str() +
       " - insert_one(): " + bsonStr +
       " - exception: " + error.message;
 
@@ -816,13 +393,14 @@ bool orion::collectionInsert
 }
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * orion::collectionUpdate -
 */
 bool orion::collectionUpdate
 (
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  _q,
   const orion::BSONObj&  _doc,
@@ -832,96 +410,7 @@ bool orion::collectionUpdate
 {
   TIME_STAT_MONGO_WRITE_WAIT_START();
 
-  orion::DBConnection connection = orion::getMongoConnection();
-
-  // Getting the "low level" driver objects
-  const mongo::BSONObj q   = _q.get();
-  const mongo::BSONObj doc = _doc.get();
-
-  if (connection.isNull())
-  {
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s",
-                  col.c_str(),
-                  q.toString().c_str(),
-                  doc.toString().c_str(),
-                  FT(upsert)));
-
-  try
-  {
-    connection.get()->update(col.c_str(), q, doc, upsert);
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_T(LmtOldInfo, ("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
-  }
-  catch (const std::exception& e)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - update(): <" + q.toString() + "," + doc.toString() + ">" +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - update(): <" + q.toString() + "," + doc.toString() + ">" +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  alarmMgr.dbErrorReset();
-
-  return true;
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* orion::collectionUpdate -
-*/
-bool orion::collectionUpdate
-(
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  const orion::BSONObj&  _doc,
-  bool                   upsert,
-  std::string*           err
-)
-{
-  TIME_STAT_MONGO_WRITE_WAIT_START();
-
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking connection
   orion::DBConnection connection = orion::getMongoConnection();
@@ -939,16 +428,16 @@ bool orion::collectionUpdate
   // Get log level driver objects
   const bson_t* q   = _q.get();
   const bson_t* doc = _doc.get();
-  char* bsonQStr   = bson_as_relaxed_extended_json(q, NULL);
-  char* bsonDocStr = bson_as_relaxed_extended_json(doc, NULL);
+  char* bsonQStr    = bson_as_relaxed_extended_json(q, NULL);
+  char* bsonDocStr  = bson_as_relaxed_extended_json(doc, NULL);
 
   LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s",
-                  col.c_str(),
+                  ns.c_str(),
                   bsonQStr,
                   bsonDocStr,
                   FT(upsert)));
 
-  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), tokens[0].c_str(), tokens[1].c_str());
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), db.c_str(), col.c_str());
 
   bson_error_t error;
   bool success = mongoc_collection_update(collection,
@@ -966,7 +455,7 @@ bool orion::collectionUpdate
   }
   else
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + ns.c_str() +
       " - update(): <" + bsonQStr + "," + bsonDocStr + ">" +
       " - exception: " + error.message;
 
@@ -981,79 +470,6 @@ bool orion::collectionUpdate
 }
 
 
-#if 0
-/* ****************************************************************************
-*
-* orion::collectionRemove -
-*/
-bool orion::collectionRemove
-(
-  const std::string&     col,
-  const orion::BSONObj&  _q,
-  std::string*           err
-)
-{
-  TIME_STAT_MONGO_WRITE_WAIT_START();
-
-  orion::DBConnection connection = orion::getMongoConnection();
-
-  // Getting the "low level" driver objects
-  const mongo::BSONObj q = _q.get();
-
-  if (connection.isNull())
-  {
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    LM_E(("Fatal Error (null DB connection)"));
-    *err = "null DB connection";
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col.c_str(), q.toString().c_str()));
-
-  try
-  {
-    connection.get()->remove(col.c_str(), q);
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-    LM_T(LmtOldInfo, ("Database Operation Successful (remove: %s)", q.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - remove(): " + q.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - remove(): " + q.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
-
-
 
 /* ****************************************************************************
 *
@@ -1061,6 +477,7 @@ bool orion::collectionRemove
 */
 bool orion::collectionRemove
 (
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  _q,
   std::string*           err
@@ -1068,16 +485,7 @@ bool orion::collectionRemove
 {
   TIME_STAT_MONGO_WRITE_WAIT_START();
 
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking conection
   orion::DBConnection connection = orion::getMongoConnection();
@@ -1096,9 +504,9 @@ bool orion::collectionRemove
   const bson_t* q = _q.get();
   char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
 
-  LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col.c_str(), bsonStr));
+  LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", ns.c_str(), bsonStr));
 
-  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), tokens[0].c_str(), tokens[1].c_str());
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection.get(), db.c_str(), col.c_str());
 
   bson_error_t error;
   bool success = mongoc_collection_remove(collection, MONGOC_REMOVE_NONE, q, NULL, &error);
@@ -1114,7 +522,7 @@ bool orion::collectionRemove
   }
   else
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + ns.c_str() +
       " - remove(): " + bsonStr +
       " - exception: " + error.message;
 
@@ -1129,98 +537,13 @@ bool orion::collectionRemove
 
 
 
-#if 0
 /* ****************************************************************************
 *
 * orion::collectionCreateIndex -
 */
 bool orion::collectionCreateIndex
 (
-  const std::string&     col,
-  const orion::BSONObj&  _indexes,
-  const bool&            isTTL,
-  std::string*           err
-)
-{
-  TIME_STAT_MONGO_COMMAND_WAIT_START();
-
-  orion::DBConnection connection = orion::getMongoConnection();
-
-  // Getting the "low level" driver objects
-  const mongo::BSONObj indexes = _indexes.get();
-
-  if (connection.isNull())
-  {
-    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    LM_E(("Fatal Error (null DB connection)"));
-
-    return false;
-  }
-
-  LM_T(LmtMongo, ("createIndex() in '%s' collection: '%s'", col.c_str(), indexes.toString().c_str()));
-
-  try
-  {
-    /**
-     * Differently from other indexes, a TTL index must contain the "expireAfterSeconds" field set to 0
-     * in the query issued to Mongo DB, in order to be defined with an "expireAt" behaviour.
-     * This filed is implemented in the Mongo driver with the Index Spec class.
-     */
-    if (isTTL)
-    {
-      connection.get()->createIndex(col.c_str(), mongo::IndexSpec().addKeys(indexes).expireAfterSeconds(0));
-    }
-    else
-    {
-      connection.get()->createIndex(col.c_str(), indexes);
-    }
-
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    LM_T(LmtOldInfo, ("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - createIndex(): " + indexes.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    orion::releaseMongoConnection(connection);
-    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - createIndex(): " + indexes.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  alarmMgr.dbErrorReset();
-
-  return true;
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* orion::collectionCreateIndex -
-*/
-bool orion::collectionCreateIndex
-(
+  const std::string&     db,
   const std::string&     col,
   const std::string&     name,
   const orion::BSONObj&  _index,
@@ -1229,17 +552,6 @@ bool orion::collectionCreateIndex
 )
 {
   // Recomended way: using commands (see http://mongoc.org/libmongoc/current/create-indexes.html)
-
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
 
   // Prepare command
   orion::BSONObjBuilder    cmd;
@@ -1255,137 +567,14 @@ bool orion::collectionCreateIndex
 
   indexes.append(index.obj());
 
-  cmd.append("createIndexes", tokens[1]);
+  cmd.append("createIndexes", col);
   cmd.append("indexes", indexes.arr());
 
   // Run index creation (result is irrelevant)
   orion::BSONObj r;
-  return runCollectionCommand(col, cmd.obj(), &r, err);
+  return runCollectionCommand(db, col, cmd.obj(), &r, err);
 }
 
-
-
-#if 0
-/* ****************************************************************************
-*
-* orion::runCollectionCommand -
-*/
-bool orion::runCollectionCommand
-(
-  const std::string&     col,
-  const orion::BSONObj&  command,
-  orion::BSONObj*        result,
-  std::string*           err
-)
-{
-  orion::DBConnection connection;
-
-  // Note that connection has a NULL mongo::DBConnection inside, so having the same
-  // effect that the version of this method for the old driver.
-
-  return orion::runCollectionCommand(connection, col, command, result, err);
-}
-
-
-
-/* ****************************************************************************
-*
-* runCollectionCommand -
-*
-* NOTE
-*   Different from other functions in this module, this function can get the connection
-*   in the params, instead of using getMongoConnection().
-*   This is only done from DB connection bootstrapping code .
-*/
-bool orion::runCollectionCommand
-(
-  orion::DBConnection    connection,
-  const std::string&     col,
-  const orion::BSONObj&  command,
-  orion::BSONObj*        result,
-  std::string*           err
-)
-{
-  bool releaseConnection = false;
-
-  //
-  // The call to TIME_STAT_MONGO_COMMAND_WAIT_START must be on toplevel so that local variables
-  // are visible for TIME_STAT_MONGO_COMMAND_WAIT_STOP()
-  //
-  TIME_STAT_MONGO_COMMAND_WAIT_START();
-
-  // FIXME OLD-DR: re-assign a veriable that comes from the function parameters is weird...
-  // probably this should be improved. Maybe a solution is to unify both runCollectionCommand functions
-  // into just one (the one that needs connection as parameters, assuming not NULL as other functions
-  // in this file)
-
-  if (connection.isNull())
-  {
-    connection        = orion::getMongoConnection();
-    releaseConnection = true;
-
-    if (connection.isNull())
-    {
-      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-      LM_E(("Fatal Error (null DB connection)"));
-
-      return false;
-    }
-  }
-
-  LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col.c_str(), command.toString().c_str()));
-
-  mongo::BSONObj mResult;
-  try
-  {
-    connection.get()->runCommand(col.c_str(), command.get(), mResult);
-    if (releaseConnection)
-    {
-      orion::releaseMongoConnection(connection);
-      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    }
-    LM_T(LmtOldInfo, ("Database Operation Successful (command: %s)", command.toString().c_str()));
-  }
-  catch (const std::exception &e)
-  {
-    if (releaseConnection)
-    {
-      orion::releaseMongoConnection(connection);
-      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    }
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - runCommand(): " + command.toString() +
-      " - exception: " + e.what();
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-  catch (...)
-  {
-    if (releaseConnection)
-    {
-      orion::releaseMongoConnection(connection);
-      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
-    }
-
-    std::string msg = std::string("collection: ") + col.c_str() +
-      " - runCommand(): " + command.toString() +
-      " - exception: generic";
-
-    *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
-
-    return false;
-  }
-
-  *result = orion::BSONObj(mResult);
-  alarmMgr.dbErrorReset();
-  return true;
-}
-#endif
 
 
 /* ****************************************************************************
@@ -1395,24 +584,16 @@ bool orion::runCollectionCommand
 */
 bool orion::collectionAggregate
 (
-  orion::DBConnection      _connection,
-  const std::string&       col,
-  const orion::BSONArray&  _pipeline,
-  unsigned int             batchSize,
-  DBCursor*                cursor,
-  std::string*             err
+  const orion::DBConnection&  _connection,
+  const std::string&          db,
+  const std::string&          col,
+  const orion::BSONArray&     _pipeline,
+  unsigned int                batchSize,
+  DBCursor*                   cursor,
+  std::string*                err
 )
 {
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
   // Getting & checking connection
   mongoc_client_t* connection = _connection.get();
@@ -1431,8 +612,8 @@ bool orion::collectionAggregate
   bson_t* opt = bson_new();
   BSON_APPEND_INT32(opt, "batchSize", batchSize);
 
-  LM_T(LmtMongo, ("aggregate() in '%s' collection: '%s'", col.c_str(), bsonStr));
-  mongoc_collection_t *collection = mongoc_client_get_collection(connection, tokens[0].c_str(), tokens[1].c_str());
+  LM_T(LmtMongo, ("aggregate() in '%s' collection: '%s'", ns.c_str(), bsonStr));
+  mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
 
   cursor->set(mongoc_collection_aggregate(collection, MONGOC_QUERY_NONE, pipeline, opt, NULL));
 
@@ -1446,7 +627,7 @@ bool orion::collectionAggregate
   // Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-update-function
   if (cursor->isNull())
   {
-    std::string msg = std::string("collection: ") + col +
+    std::string msg = std::string("collection: ") + ns +
       " - aggregate(): " + bsonStr +
       " - exception: Null cursor from mongo (details on this is found in the source code";
 
@@ -1549,6 +730,7 @@ bool orion::runDatabaseCommand
 */
 bool orion::runCollectionCommand
 (
+  const std::string&     db,
   const std::string&     col,
   const orion::BSONObj&  command,
   orion::BSONObj*        result,
@@ -1560,9 +742,8 @@ bool orion::runCollectionCommand
   // Note that connection has a NULL mongo::DBConnection inside, so having the same
   // effect that the version of this method for the old driver.
 
-  return orion::runCollectionCommand(connection, col, command, result, err);
+  return orion::runCollectionCommand(connection, db, col, command, result, err);
 }
-
 
 
 /* ****************************************************************************
@@ -1579,22 +760,20 @@ bool orion::runCollectionCommand
 * fucntions such as collectionInsert, collectionUpdate, etc. Maybe it is not used a this
 * moment but it's a good function for a module containing collection operations on DB
 *
-* FIXME OLD-DR: check if a the end we have callas to this function in client code
+* FIXME OLD-DR: check if a the end we have calls to this function in client code
 * (probably we should include it in mongoDriver API but warng about no-usage in
 * a comment in that case)
 */
 bool orion::runCollectionCommand
 (
-  orion::DBConnection    connection,
-  const std::string&     col,
-  const orion::BSONObj&  command,
-  orion::BSONObj*        result,
-  std::string*           err
+  const orion::DBConnection&  _connection,
+  const std::string&          db,
+  const std::string&          col,
+  const orion::BSONObj&       command,
+  orion::BSONObj*             result,
+  std::string*                err
 )
 {
-  bool releaseConnection = false;
-
-  //
   // The call to TIME_STAT_MONGO_COMMAND_WAIT_START must be on toplevel so that local variables
   // are visible for TIME_STAT_MONGO_COMMAND_WAIT_STOP()
   //
@@ -1603,23 +782,16 @@ bool orion::runCollectionCommand
   //
   TIME_STAT_MONGO_COMMAND_WAIT_START();
 
-  // FIXME OLD-DR: change function signature to have db and col separately and remove
-  // this tokenization logic
-  std::stringstream ss(col);
-  std::vector<std::string> tokens;
-  while (ss.good())
-  {
-    std::string substr;
-    getline(ss, substr, '.');
-    tokens.push_back(substr);
-  }
+  std::string ns = db + "." + col;
 
-  // FIXME OLD-DR: re-assign a veriable that comes from the function parameters is weird...
-  // probably this should be improved. Maybe a solution is to unify both runCollectionCommand functions
+  bool releaseConnection = false;
+
+  // FIXME OLD-DR: try to unify both runCollectionCommand functions
   // into just one (the one that needs connection as parameters, assuming not NULL as other functions
   // in this file)
 
-  if (connection.isNull())
+  orion::DBConnection connection;
+  if (_connection.isNull())
   {
     connection        = orion::getMongoConnection();
     releaseConnection = true;
@@ -1632,14 +804,18 @@ bool orion::runCollectionCommand
       return false;
     }
   }
+  else
+  {
+    connection = _connection;
+  }
 
   // Get low level driver object
   const bson_t* doc = command.get();
   char* bsonStr = bson_as_relaxed_extended_json(doc, NULL);
 
-  LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col.c_str(), bsonStr));
+  LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", ns.c_str(), bsonStr));
 
-  mongoc_collection_t* collection = mongoc_client_get_collection(connection.get(), tokens[0].c_str(), tokens[1].c_str());
+  mongoc_collection_t* collection = mongoc_client_get_collection(connection.get(), db.c_str(), col.c_str());
 
   bson_t reply;
   bson_error_t error;
@@ -1667,7 +843,7 @@ bool orion::runCollectionCommand
   }
   else
   {
-    std::string msg = std::string("collection: ") + col.c_str() +
+    std::string msg = std::string("collection: ") + ns.c_str() +
       " - runCommand(): " + bsonStr +
       " - exception: " + error.message;
 
@@ -1689,7 +865,7 @@ bool orion::runCollectionCommand
 */
 bool setWriteConcern
 (
-  DBClientBase*        connection,
+  const orion::DBConnection&  connection,
   const WriteConcern&  wc,
   std::string*         err
 )
@@ -1736,7 +912,7 @@ bool setWriteConcern
 */
 bool getWriteConcern
 (
-  DBClientBase*  connection,
+  const orion::DBConnection&  connection,
   WriteConcern*  wc,
   std::string*   err
 )
@@ -1781,12 +957,12 @@ bool getWriteConcern
 */
 extern bool connectionAuth
 (
-  DBClientBase*       connection,
-  const std::string&  db,
-  const std::string&  user,
-  const std::string&  password,
-  const std::string&  mechanism,
-  std::string*        err
+  const orion::DBConnection&   connection,
+  const std::string&           db,
+  const std::string&           user,
+  const std::string&           password,
+  const std::string&           mechanism,
+  std::string*                 err
 )
 {
   try

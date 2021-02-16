@@ -51,7 +51,7 @@
 */
 static void setRegistrationId(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
-  regP->id = getFieldFF(r, "_id").OID();
+  regP->id = getFieldF(r, "_id").OID();
 }
 
 
@@ -64,7 +64,7 @@ static void setDescription(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
   if (r.hasField(REG_DESCRIPTION))
   {
-    regP->description         = getStringFieldFF(r, REG_DESCRIPTION);
+    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
     regP->descriptionProvided = true;
   }
   else
@@ -82,11 +82,11 @@ static void setDescription(ngsiv2::Registration* regP, const orion::BSONObj& r)
 */
 static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode forwardingMode, const orion::BSONObj& r)
 {
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldFF(r, REG_PROVIDING_APPLICATION): "";
+  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
 
   regP->provider.supportedForwardingMode = forwardingMode;
 
-  std::string format = r.hasField(REG_FORMAT)? getStringFieldFF(r, REG_FORMAT) : "JSON";
+  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
   if (format == "JSON")
   {
     regP->provider.legacyForwardingMode = true;
@@ -105,7 +105,7 @@ static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode
 */
 static void setEntities(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 {
-  std::vector<orion::BSONElement>  dbEntityV = getFieldFF(cr0, REG_ENTITIES).Array();
+  std::vector<orion::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
   {
@@ -114,38 +114,38 @@ static void setEntities(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 
     if (ce.hasField(REG_ENTITY_ISPATTERN))
     {
-      std::string isPattern = getStringFieldFF(ce, REG_ENTITY_ISPATTERN);
+      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
 
       if (isPattern == "true")
       {
-        entity.idPattern = getStringFieldFF(ce, REG_ENTITY_ID);
+        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
       }
       else
       {
-        entity.id = getStringFieldFF(ce, REG_ENTITY_ID);
+        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
       }
     }
     else
     {
-      entity.id = getStringFieldFF(ce, REG_ENTITY_ID);
+      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
     }
 
     if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
     {
-      std::string isPattern = getStringFieldFF(ce, REG_ENTITY_ISTYPEPATTERN);
+      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
 
       if (isPattern == "true")
       {
-        entity.typePattern = getStringFieldFF(ce, REG_ENTITY_TYPE);
+        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
       }
       else
       {
-        entity.type = getStringFieldFF(ce, REG_ENTITY_TYPE);
+        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
       }
     }
     else
     {
-      entity.type = getStringFieldFF(ce, REG_ENTITY_TYPE);
+      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
     }
 
     regP->dataProvided.entities.push_back(entity);
@@ -160,12 +160,12 @@ static void setEntities(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 */
 static void setAttributes(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 {
-  std::vector<orion::BSONElement> dbAttributeV = getFieldFF(cr0, REG_ATTRS).Array();
+  std::vector<orion::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
   {
     orion::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldFF(aobj, REG_ATTRS_NAME);
+    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
 
     if (!attrName.empty())
     {
@@ -187,7 +187,7 @@ static void setAttributes(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 */
 static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r, bool arrayAllowed)
 {
-  std::vector<orion::BSONElement> crV = getFieldFF(r, REG_CONTEXT_REGISTRATION).Array();
+  std::vector<orion::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
 
   if (crV.size() > 1)
   {
@@ -218,7 +218,7 @@ static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r,
 */
 static void setExpires(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntOrLongFieldAsLongFF(r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getIntOrLongFieldAsLongF(r, REG_EXPIRATION) : -1;
 }
 
 
@@ -229,7 +229,7 @@ static void setExpires(ngsiv2::Registration* regP, const orion::BSONObj& r)
 */
 static void setStatus(ngsiv2::Registration* regP, const orion::BSONObj& r)
 {
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldFF(r, REG_STATUS): "";
+  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
 }
 
 
@@ -249,14 +249,7 @@ void mongoRegistrationGet
 {
   bool         reqSemTaken = false;
   std::string  err;
-  orion::OID   oid;
-  StatusCode   sc;
-
-  if (safeGetRegId(regId, &oid, &sc) == false)
-  {
-    oeP->fill(sc);
-    return;
-  }
+  orion::OID   oid = orion::OID(regId);
 
   reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
 
@@ -271,7 +264,7 @@ void mongoRegistrationGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
-  if (!orion::collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, q, &cursor, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -285,15 +278,6 @@ void mongoRegistrationGet
   orion::BSONObj r;
   if (cursor.next(&r))
   {
-    /* FIXME OLD-DR: remove?
-    if (!nextSafeOrErrorFF(cursor, &r, &err))
-    {
-      orion::releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
-      return;
-    }*/
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     //
@@ -313,16 +297,6 @@ void mongoRegistrationGet
 
     setExpires(regP, r);
     setStatus(regP, r);
-
-    /* FIXME OLD-DR: excesive checking. Looking by _id you cannot get more than one result!
-    if (orion::moreSafe(&cursor))  // Can only be one ...
-    {
-      orion::releaseMongoConnection(connection);
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId.c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      oeP->fill(SccConflict, "");
-      return;
-    }*/
   }
   else
   {
@@ -383,7 +357,7 @@ void mongoRegistrationsGet
 
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
-  if (!orion::collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), q, bSort.obj(), limit, offset, &cursor, countP, &err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, q, bSort.obj(), limit, offset, &cursor, countP, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -399,13 +373,6 @@ void mongoRegistrationsGet
   while (cursor.next(&r))
   {
     ngsiv2::Registration  reg;
-
-    /* FIXME OLD-DR: remove?
-    if (!nextSafeOrErrorFF(cursor, &r, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      continue;
-    }*/
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ++docs;

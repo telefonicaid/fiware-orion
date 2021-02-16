@@ -244,27 +244,15 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
       isTypePattern = false;
     }
 
-    // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-    // should be changed?
-    if (finalType.empty())  // no type provided
+    orion::BSONObjBuilder bob;
+    bob.append(CSUB_ENTITY_ID, finalId);
+    bob.append(CSUB_ENTITY_ISPATTERN, isIdPattern);
+    if (!finalType.empty())
     {
-      // FIXME OLD-DR: factorize common code
-      orion::BSONObjBuilder bob;
-      bob.append(CSUB_ENTITY_ID, finalId);
-      bob.append(CSUB_ENTITY_ISPATTERN, isIdPattern);
-
-      entities.append(bob.obj());
-    }
-    else  // type provided
-    {
-      orion::BSONObjBuilder bob;
-      bob.append(CSUB_ENTITY_ID, finalId);
-      bob.append(CSUB_ENTITY_ISPATTERN, isIdPattern);
       bob.append(CSUB_ENTITY_TYPE, finalType);
       bob.append(CSUB_ENTITY_ISTYPEPATTERN, isTypePattern);
-
-      entities.append(bob.obj());
     }
+    entities.append(bob.obj());
   }
 
   orion::BSONArray entitiesArr = entities.arr();
@@ -421,8 +409,7 @@ void setExpression(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   orion::BSONObjBuilder expressionB;
 
-  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-  // should be changed?
+  // FIXME #3774: previously this part was based in streamming instead of append()
   expressionB.append(CSUB_EXPR_Q, sub.subject.condition.expression.q);
   expressionB.append(CSUB_EXPR_MQ, sub.subject.condition.expression.mq);
   expressionB.append(CSUB_EXPR_GEOM, sub.subject.condition.expression.geometry);

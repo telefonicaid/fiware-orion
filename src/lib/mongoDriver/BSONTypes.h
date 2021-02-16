@@ -30,7 +30,6 @@
 namespace orion
 {
 enum BSONType {
-    MinKey = -1,
     EOO = 0,
     NumberDouble = 1,
     String = 2,
@@ -50,10 +49,20 @@ enum BSONType {
     NumberInt = 16,
     Timestamp = 17,
     NumberLong = 18,
-    JSTypeMax = 19,
-    BigDecimal = 20,
-    MaxKey = 127
+    BigDecimal = 19,
+    MaxKey = 127,
+    MinKey = 255
 };
+
+
+
+/* ****************************************************************************
+*
+* BSONObjBuilder::BSONObjBuilder -
+*/
+extern const char* bsonType2String(BSONType t);
 }
+
+
 
 #endif  // SRC_LIB_MONGODRIVER_BSONTYPES_H_

@@ -27,8 +27,6 @@
 
 #include "mongoDriver/BSONArray.h"
 
-#include "logMsg/logMsg.h"  // FIXME OLD-DR: remove after use
-
 namespace orion
 {
 /* ****************************************************************************

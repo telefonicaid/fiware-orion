@@ -30,8 +30,6 @@
 
 #include "mongoDriver/BSONObj.h"
 
-#include "logMsg/logMsg.h"  // FIXME OLD-DR: remove after use
-
 namespace orion
 {
 /* ****************************************************************************
@@ -131,7 +129,7 @@ std::string BSONObj::toString(void) const
 *
 * BSONObj::isEmpty -
 */
-bool BSONObj::isEmpty(void)
+bool BSONObj::isEmpty(void) const
 {
   return (bson_count_keys(b) == 0);
 }

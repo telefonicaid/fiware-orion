@@ -492,10 +492,6 @@ void daemonize(void)
   {
     LM_X(1, ("Fatal Error (chdir: %s)", strerror(errno)));
   }
-
-  // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-  // FIXME OLD-DR: this is probably not needed with C driver
-  //mongo::OID::justForked();
 }
 
 

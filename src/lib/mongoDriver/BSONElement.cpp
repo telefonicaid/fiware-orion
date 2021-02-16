@@ -91,7 +91,7 @@ BSONType BSONElement::type(void) const
 *
 * BSONElement::isNull -
 */
-bool BSONElement::isNull(void)
+bool BSONElement::isNull(void) const
 {
   // FIXME OLD-DR: who calls this method?
   return (bv.value_type == BSON_TYPE_NULL);
@@ -103,7 +103,7 @@ bool BSONElement::isNull(void)
 *
 * BSONElement::OID -
 */
-std::string BSONElement::OID(void)
+std::string BSONElement::OID(void) const
 {
   char str[25];  // OID fixed length is 24 chars
   bson_oid_to_string(&bv.value.v_oid, str);
@@ -200,7 +200,7 @@ BSONObj BSONElement::embeddedObject(void) const
 *
 * BSONElement::date -
 */
-BSONDate BSONElement::date(void)
+BSONDate BSONElement::date(void) const
 {
   return BSONDate(bv.value.v_datetime);
 }
@@ -220,27 +220,17 @@ std::string BSONElement::fieldName(void) const
 
 /* ****************************************************************************
 *
-* BSONElement::_str -
-*/
-std::string BSONElement::str() const
-{
-  // FIXME OLD-DR: probably this method can be removed. It's redundant. Who calls it?
-  return String();
-}
-
-
-
-/* ****************************************************************************
-*
 * BSONElement::eoo -
 */
 bool BSONElement::eoo(void) const
 {
-  // FIXME OLD-DR: who calls this method?
   return (bv.value_type == BSON_TYPE_NULL);
 }
 
+
+
 ///////// from now on, only methods with low-level driver types in return or parameters /////////
+
 
 
 /* ****************************************************************************

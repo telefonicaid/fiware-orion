@@ -83,10 +83,6 @@ using ngsiv2::EntID;
 * Globals
 */
 static std::string          dbPrefix;
-static std::string          entitiesCollectionName;
-static std::string          registrationsCollectionName;
-static std::string          subscribeContextCollectionName;
-static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
 
@@ -240,9 +236,6 @@ void mongoInit
   }
 
   setDbPrefix(dbName);
-  setEntitiesCollectionName(COL_ENTITIES);
-  setRegistrationsCollectionName(COL_REGISTRATIONS);
-  setSubscribeContextCollectionName(COL_CSUBS);
 
   //
   // Note that index creation operation is idempotent.
@@ -343,13 +336,11 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
     return false;
   }
 
-  std::vector<orion::BSONElement> databases = getFieldFF(result, "databases").Array();
+  std::vector<orion::BSONElement> databases = getFieldF(result, "databases").Array();
   for (std::vector<orion::BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
-    // FIXME OLD-DR: Obj() same as embeddedObject()
-    // orion::BSONObj  db      = (*i).Obj();
     orion::BSONObj  db      = (*i).embeddedObject();
-    std::string     dbName  = getStringFieldFF(db, "name");
+    std::string     dbName  = getStringFieldF(db, "name");
     std::string     prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
@@ -398,52 +389,6 @@ std::string tenantFromDb(const std::string& database)
 
 /* ***************************************************************************
 *
-* setEntitiesCollectionName -
-*/
-void setEntitiesCollectionName(const std::string& name)
-{
-  entitiesCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-void setRegistrationsCollectionName(const std::string& name)
-{
-  registrationsCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-void setSubscribeContextCollectionName(const std::string& name)
-{
-  subscribeContextCollectionName = name;
-}
-
-
-
-/* ***************************************************************************
-*
-* composeCollectionName -
-*
-* Common helper function for composing collection names
-*/
-static std::string composeCollectionName(std::string tenant, std::string colName)
-{
-  return composeDatabaseName(tenant) + "." + colName;
-}
-
-
-
-/* ***************************************************************************
-*
 * composeDatabaseName -
 *
 * Common helper function for composing database names
@@ -465,39 +410,6 @@ std::string composeDatabaseName(const std::string& tenant)
 
   LM_T(LmtBug, ("database name composed: '%s'", result.c_str()));
   return result;
-}
-
-
-
-/* ***************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-std::string getEntitiesCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, entitiesCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-std::string getRegistrationsCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, registrationsCollectionName);
-}
-
-
-
-/* ***************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-std::string getSubscribeContextCollectionName(const std::string& tenant)
-{
-  return composeCollectionName(tenant, subscribeContextCollectionName);
 }
 
 
@@ -554,7 +466,7 @@ void ensureLocationIndex(const std::string& tenant)
 
     std::string indexName = index + "_2dsphere";
 
-    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), indexName, bobIndex.obj(), false, &err);
+    orion::collectionCreateIndex(composeDatabaseName(tenant), COL_ENTITIES, indexName, bobIndex.obj(), false, &err);
     LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
   }
 }
@@ -578,7 +490,7 @@ void ensureDateExpirationIndex(const std::string& tenant)
 
     std::string indexName = index + "_1";
 
-    orion::collectionCreateIndex(getEntitiesCollectionName(tenant), indexName, bobIndex.obj(), true, &err);
+    orion::collectionCreateIndex(composeDatabaseName(tenant), COL_ENTITIES, indexName, bobIndex.obj(), true, &err);
     LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant <%s>)", index.c_str(), tenant.c_str()));
   }
 }
@@ -834,8 +746,7 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 */
 static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
 {
-  // FIXME OLD-DR: previously this function was based in streamming construction instead of append()
-  // should be changed?
+  // FIXME #3774: previously this part was based in streamming instead of append()
 
   std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
 
@@ -1034,8 +945,7 @@ static std::string sortCriteria(const std::string& sortToken)
 */
 bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsage)
 {
-  // FIXME OLD-DR: previously this function was based in streamming construction instead of append()
-  // should be changed?
+  // FIXME #3774: previously this part was based in streamming instead of append()
 
   std::string  keyLoc  = ENT_LOCATION "." ENT_LOCATION_COORDS;
 
@@ -1148,13 +1058,16 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
       // described at https://jira.mongodb.org/browse/DOCS-12834
       // This works as far as we don't have any other $and field in the query, in which
       // case the array for $and here needs to be combined with other items
-
+      //
       // Why don't use this query style without $near all the time? Because $near provides
       // ordering of results based in distance to the center, so in regular find() is the one
       // we want to use
-
-      // FIXME OLD-DR: this logic may be problematic if neither maxDistance and minDistance are not used
-      // because it leads to a $and: [ ] filter. Is this checked at parsing stage?
+      //
+      // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
+      // at least minDistance or maxDistance are there. Check functional tests
+      //
+      // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
+      // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
 
       orion::BSONArrayBuilder andArray;
 
@@ -1713,7 +1626,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, sort, limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1726,10 +1639,9 @@ bool entitiesQuery
 
   orion::BSONObj  r;
   int             errType;
-  std::string     nextSafeErr;
+  std::string     nextErr;
 
-  // while (orion::moreSafe(&cursor))
-  while (cursor.next(&r, &errType, &nextSafeErr))
+  while (cursor.next(&r, &errType, &nextErr))
   {
     alarmMgr.dbErrorReset();
 
@@ -1782,7 +1694,7 @@ bool entitiesQuery
   {
     ContextElementResponse*  cer   = new ContextElementResponse();
 
-    alarmMgr.dbError(nextSafeErr);
+    alarmMgr.dbError(nextErr);
 
     //
     // It would be nice to fill in the entity but it is difficult to do this.
@@ -1800,14 +1712,14 @@ bool entitiesQuery
       cer->entity.fill("", "", "");
     }
 
-    cer->statusCode.fill(SccReceiverInternalError, nextSafeErr);
+    cer->statusCode.fill(SccReceiverInternalError, nextErr);
     cerV->push_back(cer);
     return true;
   }
   else if (errType == ON_NEXT_UNMANAGED_ERROR)
   {
-    *err = nextSafeErr;
-    LM_E(("Runtime Error (exception in next(): %s - query: %s)", nextSafeErr.c_str(), query.toString().c_str()));
+    *err = nextErr;
+    LM_E(("Runtime Error (exception in next(): %s - query: %s)", nextErr.c_str(), query.toString().c_str()));
     return false;
   }
 
@@ -1959,9 +1871,9 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id        = getStringFieldFF(entity, REG_ENTITY_ID);
-  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldFF(entity, REG_ENTITY_TYPE)      : "";
-  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldFF(entity, REG_ENTITY_ISPATTERN) : "false";
+  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
+  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
+  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
 
   if (includedEntity(en, enV))
   {
@@ -1980,8 +1892,8 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const orion::BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
-    getStringFieldFF(attribute, REG_ATTRS_NAME),
-    getStringFieldFF(attribute, REG_ATTRS_TYPE));
+    getStringFieldF(attribute, REG_ATTRS_NAME),
+    getStringFieldF(attribute, REG_ATTRS_TYPE));
 
   if (includedAttribute(attr.name, attrL))
   {
@@ -2009,10 +1921,10 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(getStringFieldFF(cr, REG_PROVIDING_APPLICATION));
+  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
 
-  std::vector<orion::BSONElement> queryEntityV = getFieldFF(cr, REG_ENTITIES).Array();
+  std::vector<orion::BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
@@ -2024,7 +1936,7 @@ static void processContextRegistrationElement
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
     {
-      std::vector<orion::BSONElement> queryAttrV = getFieldFF(cr, REG_ATTRS).Array();
+      std::vector<orion::BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
@@ -2234,12 +2146,11 @@ bool registrationsQuery
 
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
-  std::string   colName    = getRegistrationsCollectionName(tenant);
 
   orion::BSONObjBuilder bobSort;
   bobSort.append("_id", 1);
 
-  if (!orion::collectionRangedQuery(connection, colName, query, bobSort.obj(), limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, bobSort.obj(), limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2253,21 +2164,15 @@ bool registrationsQuery
   orion::BSONObj r;
   while (cursor.next(&r))
   {
-    /* FIXME OLD-DR: remove?
-    if (!(cursor, &r, err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err->c_str(), query.toString().c_str()));
-      continue;
-    }*/
     docs++;
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
-    std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldFF(r, REG_CONTEXT_REGISTRATION).Array();
-    std::string               format                    = getStringFieldFF(r, REG_FORMAT);
+    std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+    std::string               format                    = getStringFieldF(r, REG_FORMAT);
     ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
-    std::string               regId                     = getFieldFF(r, "_id").OID();
+    std::string               regId                     = getFieldF(r, "_id").OID();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
@@ -2327,7 +2232,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 */
 bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
-  std::vector<orion::BSONElement>  conds = getFieldFF(sub, CSUB_CONDITIONS).Array();
+  std::vector<orion::BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
   if (conds.size() == 0)
   {
@@ -2362,14 +2267,14 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
 {
   EntityIdVector                   enV;
-  std::vector<orion::BSONElement>  subEnts = getFieldFF(sub, CSUB_ENTITIES).Array();
+  std::vector<orion::BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
     orion::BSONObj  subEnt = subEnts[ix].embeddedObject();
-    EntityId*       en     = new EntityId(getStringFieldFF(subEnt, CSUB_ENTITY_ID),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldFF(subEnt, CSUB_ENTITY_TYPE) : "",
-                                     getStringFieldFF(subEnt, CSUB_ENTITY_ISPATTERN));
+    EntityId*       en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
+                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 
@@ -2506,8 +2411,8 @@ StringList subToAttributeList
     return subToAttributeList(sub);
   }
   StringList                       attrL;
-  std::vector<orion::BSONElement>  subAttrs = getFieldFF(sub, CSUB_ATTRS).Array();
-  std::vector<orion::BSONElement>  condAttrs = getFieldFF(sub, CSUB_CONDITIONS).Array();
+  std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
   std::vector<std::string>         conditionAttrs;
   std::vector<std::string>         notificationAttrs;
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
@@ -2536,7 +2441,7 @@ StringList subToAttributeList
 StringList subToAttributeList(const orion::BSONObj& sub)
 {
   StringList                       attrL;
-  std::vector<orion::BSONElement>  subAttrs = getFieldFF(sub, CSUB_ATTRS).Array();
+  std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {

@@ -38,16 +38,15 @@ namespace orion
 /* ****************************************************************************
 *
 * orion::collectionQuery -
-*
-* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool collectionQuery
 (
-  DBConnection        connection,
-  const std::string&  col,
-  const BSONObj&      q,
-  DBCursor*           cursor,
-  std::string*        err
+  const DBConnection&  connection,
+  const std::string&   db,
+  const std::string&   col,
+  const BSONObj&       q ,
+  DBCursor*            cursor,
+  std::string*         err
 );
 
 
@@ -55,20 +54,19 @@ extern bool collectionQuery
 /* ****************************************************************************
 *
 * orion::collectionRangedQuery -
-*
-* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool collectionRangedQuery
 (
-  DBConnection        connection,
-  const std::string&  col,
-  const BSONObj&      q,
-  const BSONObj&      sort,  // FIXME: this change can be propagated independtly to master
-  int                 limit,
-  int                 offset,
-  DBCursor*           cursor,
-  long long*          count,
-  std::string*        err
+  const DBConnection&  connection,
+  const std::string&   db,
+  const std::string&   col,
+  const BSONObj&       q,
+  const BSONObj&       sort,  // FIXME: this change can be propagated independtly to master
+  int                  limit,
+  int                  offset,
+  DBCursor*            cursor,
+  long long*           count,
+  std::string*         err
 );
 
 
@@ -79,6 +77,7 @@ extern bool collectionRangedQuery
 */
 extern bool collectionCount
 (
+  const std::string&   db,
   const std::string&   col,
   const BSONObj&       q,
   unsigned long long*  c,
@@ -93,6 +92,7 @@ extern bool collectionCount
 */
 extern bool collectionFindOne
 (
+  const std::string&  db,
   const std::string&  col,
   const BSONObj&      q,
   BSONObj*            doc,
@@ -107,6 +107,7 @@ extern bool collectionFindOne
 */
 extern bool collectionInsert
 (
+  const std::string&  db,
   const std::string&  col,
   const BSONObj&      doc,
   std::string*        err
@@ -120,6 +121,7 @@ extern bool collectionInsert
 */
 extern bool collectionUpdate
 (
+  const std::string&  db,
   const std::string&  col,
   const BSONObj&      q,
   const BSONObj&      doc,
@@ -135,6 +137,7 @@ extern bool collectionUpdate
 */
 extern bool collectionRemove
 (
+  const std::string&  db,
   const std::string&  col,
   const BSONObj&      q,
   std::string*        err
@@ -148,6 +151,7 @@ extern bool collectionRemove
 */
 extern bool collectionCreateIndex
 (
+  const std::string&  db,
   const std::string&  col,
   const std::string&  name,
   const BSONObj&      indexes,
@@ -159,18 +163,17 @@ extern bool collectionCreateIndex
 
 /* ****************************************************************************
 *
-* orion::collectionQuery -
-*
-* FIXME OLD-DR: connection should be passed by reference
+* orion::collectionAggregate -
 */
 extern bool collectionAggregate
 (
-  DBConnection        connection,
-  const std::string&  col,
-  const BSONArray&      pipeline,
-  unsigned int        batchSize,
-  DBCursor*           cursor,
-  std::string*        err
+  const DBConnection&  connection,
+  const std::string&   db,
+  const std::string&   col,
+  const BSONArray&     pipeline,
+  unsigned int         batchSize,
+  DBCursor*            cursor,
+  std::string*         err
 );
 
 
@@ -196,6 +199,7 @@ extern bool runDatabaseCommand
 */
 extern bool runCollectionCommand
 (
+  const std::string&  db,
   const std::string&  col,
   const BSONObj&      command,
   BSONObj*            result,
@@ -207,16 +211,15 @@ extern bool runCollectionCommand
 /* ****************************************************************************
 *
 * orion::runCollectionCommand -
-*
-* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool runCollectionCommand
 (
-  DBConnection        connection,
-  const std::string&  col,
-  const BSONObj&      command,
-  BSONObj*            result,
-  std::string*        err
+  const DBConnection&  connection,
+  const std::string&   db,
+  const std::string&   col,
+  const BSONObj&       command,
+  BSONObj*             result,
+  std::string*         err
 );
 
 
@@ -224,12 +227,10 @@ extern bool runCollectionCommand
 /* ****************************************************************************
 *
 * setWriteConcern -
-*
-* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool setWriteConcern
 (
-  DBConnection*        connection,
+  const orion::DBConnection&  connection,
   const mongo::WriteConcern&  wc,
   std::string*                err
 );
@@ -239,14 +240,12 @@ extern bool setWriteConcern
 /* ****************************************************************************
 *
 * getWriteConcern -
-*
-* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool getWriteConcern
 (
-  DBConnection*  connection,
-  mongo::WriteConcern*  wc,
-  std::string*          err
+  const orion::DBConnection&  connection,
+  mongo::WriteConcern*        wc,
+  std::string*                err
 );
 
 
@@ -254,17 +253,15 @@ extern bool getWriteConcern
 /* ****************************************************************************
 *
 * connectionAuth -
-*
-* FIXME OLD-DR: connection should be passed by reference
 */
 extern bool connectionAuth
 (
-  DBConnection*  connection,
-  const std::string&    db,
-  const std::string&    user,
-  const std::string&    password,
-  const std::string&    mechanism,
-  std::string*          err
+  const orion::DBConnection&  connection,
+  const std::string&          db,
+  const std::string&          user,
+  const std::string&          password,
+  const std::string&          mechanism,
+  std::string*                err
 );
 #endif
 }

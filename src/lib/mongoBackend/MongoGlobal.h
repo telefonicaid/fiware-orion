@@ -145,58 +145,10 @@ extern std::string tenantFromDb(const std::string& database);
 
 /* ****************************************************************************
 *
-* setEntitiesCollectionName -
-*/
-extern void setEntitiesCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setRegistrationsCollectionName -
-*/
-extern void setRegistrationsCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
-* setSubscribeContextCollectionName -
-*/
-extern void setSubscribeContextCollectionName(const std::string& name);
-
-
-
-/* ****************************************************************************
-*
 * composeDatabaseName -
 *
 */
 extern std::string composeDatabaseName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getEntitiesCollectionName -
-*/
-extern std::string getEntitiesCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getRegistrationsCollectionName -
-*/
-extern std::string getRegistrationsCollectionName(const std::string& tenant);
-
-
-
-/* ****************************************************************************
-*
-* getSubscribeContextCollectionName -
-*/
-extern std::string getSubscribeContextCollectionName(const std::string& tenant);
 
 
 

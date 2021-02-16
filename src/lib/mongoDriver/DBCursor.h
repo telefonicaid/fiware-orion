@@ -49,9 +49,8 @@ class DBCursor
  public:
   // methods to be used by client code (without references to low-level driver code)
   DBCursor();
-  bool more(void);
   bool next(BSONObj* nextDoc, int* errTypeP = NULL, std::string* err = NULL);
-  bool isNull(void);
+  bool isNull(void) const;
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   void set(mongoc_cursor_t* _c);

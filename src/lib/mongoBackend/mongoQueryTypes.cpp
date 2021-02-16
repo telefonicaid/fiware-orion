@@ -44,10 +44,8 @@
 #include "mongoDriver/BSONArrayBuilder.h"
 
 
-// FIXME OLD-DR: this file uses streamming construction instead of append(). Specially for the contruction
-// of long aggragtion pipeline stages
-// should be changed?
-
+// FIXME #3774: previously this file done a heavy use of BSON streamming instead of append() to
+// build aggregation stages
 
 
 /* ****************************************************************************
@@ -106,7 +104,7 @@ static void getAttributeTypes
   TIME_STAT_MONGO_COMMAND_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, &cursor, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
@@ -119,20 +117,12 @@ static void getAttributeTypes
   orion::BSONObj r;
   while (cursor.next(&r))
   {
-    /* FIXME OLD-DR: remove?
-    if (!nextSafeOrErrorFF(cursor, &r, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
-      continue;
-    }
-    */
-
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    orion::BSONObj attrs = getObjectFieldFF(r, ENT_ATTRS);
-    orion::BSONObj attr  = getObjectFieldFF(attrs, attrName);
-    attrTypes->push_back(getStringFieldFF(attr, ENT_ATTRS_TYPE));
+    orion::BSONObj attrs = getObjectFieldF(r, ENT_ATTRS);
+    orion::BSONObj attr  = getObjectFieldF(attrs, attrName);
+    attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
   }
 
   orion::releaseMongoConnection(connection);
@@ -163,12 +153,112 @@ static long long countEntities
   std::string         err;
   unsigned long long  c;
 
-  if (!orion::collectionCount(getEntitiesCollectionName(tenant), bob.obj(), &c, &err))
+  if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bob.obj(), &c, &err))
   {
     return -1;
   }
 
   return c;
+}
+
+
+
+/* ****************************************************************************
+*
+* projectStage -
+*
+* This function adds to the pipeline array this token:
+*
+* {$project: {_id.type: {$ifNull: ["$_id.type", null]}, "attrNames": 1 } }
+*
+*/
+static void projectStage(orion::BSONArrayBuilder* pipeline)
+{
+  orion::BSONArrayBuilder baIfNull;
+  baIfNull.append(CS_ID_ENTITY);
+  baIfNull.appendNull();
+
+  orion::BSONObjBuilder bobIfNull;
+  bobIfNull.append("$ifNull", baIfNull.arr());
+
+  orion::BSONObjBuilder bobProjectContent;
+  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
+  bobProjectContent.append(ENT_ATTRNAMES, 1);
+
+  orion::BSONObjBuilder bobProject;
+  bobProject.append("$project", bobProjectContent.obj());
+  orion::BSONObj project = bobProject.obj();
+
+  pipeline->append(project);
+}
+
+
+
+/* ****************************************************************************
+*
+* groupStage -
+*
+* This function adds to the pipeline array this token:
+*
+* {$group: {_id: {$cond: [{$in: [$_id.type, [null, ""]]}, "", "$_id.type"]},
+*                                   attrs: {$addToSet: "$attrNames"}}
+*
+*/
+static void groupStage(orion::BSONArrayBuilder* pipeline)
+{
+  // sub-element: $cond
+  orion::BSONArrayBuilder innerArray;
+  innerArray.appendNull();
+  innerArray.append("");
+
+  orion::BSONArrayBuilder inArray;
+  inArray.append(CS_ID_ENTITY);
+  inArray.append(innerArray.arr());
+
+  orion::BSONObjBuilder inObj;
+  inObj.append("$in", inArray.arr());
+
+  orion::BSONArrayBuilder condArray;
+  condArray.append(inObj.obj());
+  condArray.append("");
+  condArray.append(CS_ID_ENTITY);
+
+  orion::BSONObjBuilder condObj;
+  condObj.append("$cond", condArray.arr());
+
+  // $group itself
+  orion::BSONObjBuilder atsObj;
+  atsObj.append("$addToSet", S_ATTRNAMES);
+
+  orion::BSONObjBuilder groupObj;
+  groupObj.append("_id", condObj.obj());
+  groupObj.append("attrs", atsObj.obj());
+
+  orion::BSONObjBuilder group;
+  group.append("$group", groupObj.obj());
+
+  pipeline->append(group.obj());
+}
+
+
+
+/* ****************************************************************************
+*
+* sortStage -
+*
+* This function adds to the pipeline array this token:
+*
+* {$sort: {_id: 1} }
+*
+*/
+static void sortStage(orion::BSONArrayBuilder* pipeline)
+{
+  orion::BSONObjBuilder idObj;
+  idObj.append("_id", 1);
+  orion::BSONObjBuilder sortObj;
+  sortObj.append("$sort", idObj.obj());
+
+  pipeline->append(sortObj.obj());
 }
 
 
@@ -233,21 +323,9 @@ HttpStatusCode mongoEntityTypesValues
 
     pipeline.append(match);
   }
+
   // $project
-  orion::BSONArrayBuilder baIfNull;
-  baIfNull.append(CS_ID_ENTITY);
-  baIfNull.appendNull();
-
-  orion::BSONObjBuilder bobIfNull;
-  bobIfNull.append("$ifNull", baIfNull.arr());
-
-  orion::BSONObjBuilder bobProjectContent;
-  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
-  bobProjectContent.append(ENT_ATTRNAMES, 1);
-
-  orion::BSONObjBuilder bobProject;
-  bobProject.append("$project", bobProjectContent.obj());
-  orion::BSONObj project = bobProject.obj();
+  projectStage(&pipeline);
 
   // $cond
   orion::BSONArrayBuilder baNullEmpty;
@@ -277,15 +355,10 @@ HttpStatusCode mongoEntityTypesValues
   bobGroup.append("$group", bobGroupContent.obj());
   orion::BSONObj group = bobGroup.obj();
 
-  pipeline.append(project);
   pipeline.append(group);
 
   // $sort
-  orion::BSONObjBuilder bobSortId;
-  bobSortId.append("_id", 1);
-  orion::BSONObjBuilder bobSort;
-  bobSort.append("$sort", bobSortId.obj());
-  pipeline.append(bobSort.obj());
+  sortStage(&pipeline);
 
   std::string err;
 
@@ -294,7 +367,7 @@ HttpStatusCode mongoEntityTypesValues
   TIME_STAT_MONGO_COMMAND_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionAggregate(connection, getEntitiesCollectionName(tenant), pipeline.arr(), BATCH_SIZE, &cursor, &err))
+  if (!orion::collectionAggregate(connection, composeDatabaseName(tenant), COL_ENTITIES, pipeline.arr(), BATCH_SIZE, &cursor, &err))
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
@@ -321,13 +394,13 @@ HttpStatusCode mongoEntityTypesValues
 
     std::string     type;
 
-    if (getFieldFF(resultItem, "_id").isNull())
+    if (getFieldF(resultItem, "_id").isNull())
     {
       type = "";
     }
     else
     {
-      type = getStringFieldFF(resultItem, "_id");
+      type = getStringFieldF(resultItem, "_id");
     }
 
     responseP->entityTypeVector.push_back(new EntityType(type));
@@ -423,106 +496,58 @@ HttpStatusCode mongoEntityTypes
     pipeline.append(match);
   }
 
-  // $project - FIXME OLD-DR: duplicated code in another fucntion
-  orion::BSONArrayBuilder baIfNull;
-  baIfNull.append(CS_ID_ENTITY);
-  baIfNull.appendNull();
+  // $project (first)
+  projectStage(&pipeline);
 
-  orion::BSONObjBuilder bobIfNull;
-  bobIfNull.append("$ifNull", baIfNull.arr());
-
-  orion::BSONObjBuilder bobProjectContent;
-  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
-  bobProjectContent.append(ENT_ATTRNAMES, 1);
-
-  orion::BSONObjBuilder bobProject;
-  bobProject.append("$project", bobProjectContent.obj());
-  orion::BSONObj project = bobProject.obj();
-
-  // $cond - FIXME OLD-DR: duplicated code in another fucntion
-  orion::BSONArrayBuilder baNullEmpty;
-  baNullEmpty.appendNull();
-  baNullEmpty.append("");
-
-  orion::BSONArrayBuilder baIn;
-  baIn.append(CS_ID_ENTITY);
-  baIn.append(baNullEmpty.arr());
-
-  orion::BSONObjBuilder bobIn;
-  bobIn.append("$in", baIn.arr());
-
-  orion::BSONArrayBuilder baCond;
-  baCond.append(bobIn.obj());
-  baCond.append("");
-  baCond.append(CS_ID_ENTITY);
-
-  orion::BSONObjBuilder bobCond;
-  bobCond.append("$cond", baCond.arr());
-
+  // $project (second)
   //
   // Building the projection part of the query that includes types that have no attributes
   // See bug: https://github.com/telefonicaid/fiware-orion/issues/686
-  //
 
   // FIXME P3. We are using the $cond: [ .. ] and not the $cond: { .. } one, due to the former was
   // the only one valid in MongoDB 2.4. However, MongoDB 2.4 support was removed time ago, so we could
   // change the syntax
-  orion::BSONArrayBuilder baEmpty;
-  orion::BSONArrayBuilder ba1;
-  ba1.append(S_ATTRNAMES);
-  ba1.append(baEmpty.arr());
 
-  orion::BSONObjBuilder bob1;
-  bob1.append("$eq", ba1.arr());
+  orion::BSONArrayBuilder emptyArray;
 
-  orion::BSONArrayBuilder ba2;
-  ba2.appendNull();
+  orion::BSONArrayBuilder innerArray;
+  innerArray.append(S_ATTRNAMES);
+  innerArray.append(emptyArray.arr());
 
-  orion::BSONArrayBuilder ba3;
-  ba3.append(bob1.obj());
-  ba3.append(ba2.arr());
-  ba3.append(S_ATTRNAMES);
+  orion::BSONObjBuilder eqObj;
+  eqObj.append("$eq", innerArray.arr());
 
-  orion::BSONObjBuilder bob2;
-  bob2.append("$cond", ba3.arr());
+  orion::BSONArrayBuilder nullArray;
+  nullArray.appendNull();
 
-  orion::BSONObjBuilder bob3;
-  bob3.append(ENT_ATTRNAMES, bob2.obj());
+  orion::BSONArrayBuilder condArray;
+  condArray.append(eqObj.obj());
+  condArray.append(nullArray.arr());
+  condArray.append(S_ATTRNAMES);
 
-  orion::BSONObjBuilder bob4;
-  bob4.append("$project", bob3.obj());
+  orion::BSONObjBuilder condObj;
+  condObj.append("$cond", condArray.arr());
 
-  orion::BSONObj projection = bob4.obj();
+  orion::BSONObjBuilder attrNamesObj;
+  attrNamesObj.append(ENT_ATTRNAMES, condObj.obj());
+
+  orion::BSONObjBuilder projectObj;
+  projectObj.append("$project", attrNamesObj.obj());
+
+  pipeline.append(projectObj.obj());
+
 
   // $unwind
   orion::BSONObjBuilder bobUnwind;
   bobUnwind.append("$unwind", S_ATTRNAMES);
   orion::BSONObj unwind = bobUnwind.obj();
+  pipeline.append(unwind);
 
   // $group
-  orion::BSONObjBuilder bobAddToSet;
-  bobAddToSet.append("$addToSet", S_ATTRNAMES);
+  groupStage(&pipeline);
 
-  orion::BSONObjBuilder bobGroupContent;
-  bobGroupContent.append("_id", bobCond.obj());
-  bobGroupContent.append("attrs", bobAddToSet.obj());
-
-  orion::BSONObjBuilder bobGroup;
-  bobGroup.append("$group", bobGroupContent.obj());
-
-  orion::BSONObj group = bobGroup.obj();
-
-  pipeline.append(project);
-  pipeline.append(projection);
-  pipeline.append(unwind);
-  pipeline.append(group);
-
-  // $sort - FIXME OLD-DR: duplicated code in another function
-  orion::BSONObjBuilder bobSortId;
-  bobSortId.append("_id", 1);
-  orion::BSONObjBuilder bobSort;
-  bobSort.append("$sort", bobSortId.obj());
-  pipeline.append(bobSort.obj());
+  // $sort
+  sortStage(&pipeline);
 
   std::string err;
 
@@ -531,7 +556,7 @@ HttpStatusCode mongoEntityTypes
   TIME_STAT_MONGO_COMMAND_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionAggregate(connection, getEntitiesCollectionName(tenant), pipeline.arr(), BATCH_SIZE, &cursor, &err))
+  if (!orion::collectionAggregate(connection, composeDatabaseName(tenant), COL_ENTITIES, pipeline.arr(), BATCH_SIZE, &cursor, &err))
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
@@ -556,10 +581,10 @@ HttpStatusCode mongoEntityTypes
     docs++;
     LM_T(LmtMongo, ("aggregation result [%d]: %s", docs, resultItem.toString().c_str()));
 
-    std::vector<orion::BSONElement>  attrsArray  = getFieldFF(resultItem, "attrs").Array();
+    std::vector<orion::BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
     EntityType*                      entityType;
 
-    entityType = new EntityType(getStringFieldFF(resultItem, "_id"));
+    entityType = new EntityType(getStringFieldF(resultItem, "_id"));
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
@@ -579,11 +604,11 @@ HttpStatusCode mongoEntityTypes
         {
           std::vector<std::string> attrTypes;
 
-          getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
+          getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].String(), &attrTypes);
 
           for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
           {
-            ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
+            ContextAttribute* ca = new ContextAttribute(attrsArray[jx].String(), attrTypes[kx], "");
 
             entityType->contextAttributeVector.push_back(ca);
 
@@ -600,7 +625,7 @@ HttpStatusCode mongoEntityTypes
           // NOTE: here we add a ContextAttribute with empty type, as a marker for
           //       this special condition of 'No Attribute Detail'
           //
-          ContextAttribute* caP = new ContextAttribute(attrsArray[jx].str(), "", "");
+          ContextAttribute* caP = new ContextAttribute(attrsArray[jx].String(), "", "");
           entityType->contextAttributeVector.push_back(caP);
         }
       }
@@ -703,25 +728,7 @@ HttpStatusCode mongoAttributesForEntityType
    *
    */
 
-  // $cond - FIXME OLD-DR: duplicated code in another function
-  orion::BSONArrayBuilder baNullEmpty;
-  baNullEmpty.appendNull();
-  baNullEmpty.append("");
-
-  orion::BSONArrayBuilder baIn;
-  baIn.append(CS_ID_ENTITY);
-  baIn.append(baNullEmpty.arr());
-
-  orion::BSONObjBuilder bobIn;
-  bobIn.append("$in", baIn.arr());
-
-  orion::BSONArrayBuilder baCond;
-  baCond.append(bobIn.obj());
-  baCond.append("");
-  baCond.append(CS_ID_ENTITY);
-
-  orion::BSONObjBuilder bobCond;
-  bobCond.append("$cond", baCond.arr());
+  orion::BSONArrayBuilder pipeline;
 
   // $match
   orion::BSONObjBuilder bobMatchContent;
@@ -734,40 +741,23 @@ HttpStatusCode mongoAttributesForEntityType
 
   orion::BSONObjBuilder bobMatch;
   bobMatch.append("$match", bobMatchContent.obj());
+  pipeline.append(bobMatch.obj());
 
-  // $project - FIXME OLD-DR: duplicated code in another function
-  orion::BSONArrayBuilder baIfNull;
-  baIfNull.append(CS_ID_ENTITY);
-  baIfNull.appendNull();
-
-  orion::BSONObjBuilder bobIfNull;
-  bobIfNull.append("$ifNull", baIfNull.arr());
-
-  orion::BSONObjBuilder bobProjectContent;
-  bobProjectContent.append(C_ID_ENTITY, bobIfNull.obj());
-  bobProjectContent.append(ENT_ATTRNAMES, 1);
-
-  orion::BSONObjBuilder bobProject;
-  bobProject.append("$project", bobProjectContent.obj());
+  // $project
+  projectStage(&pipeline);
 
   // $unwind (first)
   orion::BSONObjBuilder bobUnwind1;
   bobUnwind1.append("$unwind", S_ATTRNAMES);
+  pipeline.append(bobUnwind1.obj());
 
-  // $group (first) - FIXME OLD-DR: duplicated code in another function
-  orion::BSONObjBuilder bobAddToSet;
-  bobAddToSet.append("$addToSet", S_ATTRNAMES);
-
-  orion::BSONObjBuilder bobGroupContent1;
-  bobGroupContent1.append("_id", bobCond.obj());
-  bobGroupContent1.append("attrs", bobAddToSet.obj());
-
-  orion::BSONObjBuilder bobGroup1;
-  bobGroup1.append("$group", bobGroupContent1.obj());
+  // $group (first)
+  groupStage(&pipeline);
 
   // $unwind (second)
   orion::BSONObjBuilder bobUnwind2;
   bobUnwind2.append("$unwind", "$attrs");
+  pipeline.append(bobUnwind2.obj());
 
   // $group (second)
   orion::BSONObjBuilder bobGroupContent2;
@@ -775,22 +765,10 @@ HttpStatusCode mongoAttributesForEntityType
 
   orion::BSONObjBuilder bobGroup2;
   bobGroup2.append("$group", bobGroupContent2.obj());
-
-  // $sort - FIXME OLD-DR: duplicated code in another function
-  orion::BSONObjBuilder bobSortId;
-  bobSortId.append("_id", 1);
-  orion::BSONObjBuilder bobSort;
-  bobSort.append("$sort", bobSortId.obj());
-
-  // building pipeline
-  orion::BSONArrayBuilder pipeline;
-  pipeline.append(bobMatch.obj());
-  pipeline.append(bobProject.obj());
-  pipeline.append(bobUnwind1.obj());
-  pipeline.append(bobGroup1.obj());
-  pipeline.append(bobUnwind2.obj());
   pipeline.append(bobGroup2.obj());
-  pipeline.append(bobSort.obj());
+
+  // $sort
+  sortStage(&pipeline);
 
   std::string err;
 
@@ -798,7 +776,7 @@ HttpStatusCode mongoAttributesForEntityType
   orion::DBConnection connection = orion::getMongoConnection();
   orion::DBCursor cursor;
 
-  if (!orion::collectionAggregate(connection, getEntitiesCollectionName(tenant), pipeline.arr(), BATCH_SIZE, &cursor, &err))
+  if (!orion::collectionAggregate(connection, composeDatabaseName(tenant), COL_ENTITIES, pipeline.arr(), BATCH_SIZE, &cursor, &err))
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
@@ -823,7 +801,7 @@ HttpStatusCode mongoAttributesForEntityType
     docs++;
     LM_T(LmtMongo, ("aggregation result [%d]: %s", docs, resultItem.toString().c_str()));
 
-    orion::BSONElement idField = getFieldFF(resultItem, "_id");
+    orion::BSONElement idField = getFieldF(resultItem, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -848,11 +826,11 @@ HttpStatusCode mongoAttributesForEntityType
     {
       std::vector<std::string> attrTypes;
 
-      getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
+      getAttributeTypes(tenant, servicePathV, entityType , idField.String(), &attrTypes);
 
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
-        ContextAttribute*  ca = new ContextAttribute(idField.str(), attrTypes[kx], "");
+        ContextAttribute*  ca = new ContextAttribute(idField.String(), attrTypes[kx], "");
 
         responseP->entityType.contextAttributeVector.push_back(ca);
 
@@ -869,7 +847,7 @@ HttpStatusCode mongoAttributesForEntityType
       // NOTE: here we add a ContextAttribute with empty type, as a marker for
       //       this special condition of 'No Attribute Detail'
       //
-      ContextAttribute* caP = new ContextAttribute(idField.str(), "", "");
+      ContextAttribute* caP = new ContextAttribute(idField.String(), "", "");
       responseP->entityType.contextAttributeVector.push_back(caP);
     }
   }

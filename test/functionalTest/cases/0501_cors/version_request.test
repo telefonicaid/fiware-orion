@@ -94,7 +94,8 @@ Date: REGEX(.*)
      "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
-     "mongodriver": "REGEX(.*)"
+     "mongoc": "REGEX(.*)",
+     "bson": "REGEX(.*)"
   }
 }
 }
@@ -127,7 +128,8 @@ Date: REGEX(.*)
      "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
-     "mongodriver": "REGEX(.*)"
+     "mongoc": "REGEX(.*)",
+     "bson": "REGEX(.*)"
   }
 }
 }
@@ -158,7 +160,8 @@ Date: REGEX(.*)
      "libmicrohttpd": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
-     "mongodriver": "REGEX(.*)"
+     "mongoc": "REGEX(.*)",
+     "bson": "REGEX(.*)"
   }
 }
 }

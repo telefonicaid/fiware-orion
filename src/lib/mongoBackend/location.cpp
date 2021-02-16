@@ -186,7 +186,7 @@ static bool getGeoJson
 
     // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
     caP->valueBson(bo, "", true, apiVersion == V1);
-    geoJson->appendElements(getObjectFieldFF(bo.obj(), ENT_ATTRS_VALUE));
+    geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;
   }

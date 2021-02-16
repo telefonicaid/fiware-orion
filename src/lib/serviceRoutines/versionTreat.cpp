@@ -43,6 +43,8 @@
 #include "serviceRoutines/versionTreat.h"
 
 #include <boost/version.hpp>
+#include <mongoc/mongoc.h>
+#include <bson/bson.h>
 
 /* ****************************************************************************
 *
@@ -66,7 +68,8 @@ std::string libVersions(void)
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
-  std::string  mongo  = "     \"mongodriver\": ";
+  std::string  mongo  = "     \"mongoc\": ";
+  std::string  bson   = "     \"bson\": ";
 
   char*        curlVersion = curl_version();
 
@@ -75,10 +78,8 @@ std::string libVersions(void)
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
-  // FIXME OLD-DR: do this the proper way, see:
-  // http://mongoc.org/libmongoc/current/mongoc_version.html
-  // http://mongoc.org/libbson/current/version.html
-  total += mongo   + "\"legacy-1.1.2\"" + "\n";
+  total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
+  total += bson    + "\"" + BSON_VERSION_S "\"" + "\n";
 
   return total;
 }

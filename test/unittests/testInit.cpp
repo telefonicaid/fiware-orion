@@ -32,13 +32,13 @@
 
 
 #if 0
-// FIXME OLD-DR: disabled until driver migration can be done
+// FIXME #3775: pending on mongo unit test re-enabling
 /* ****************************************************************************
 *
 * External declarations
 */
-extern DBClientBase mongoInitialConnectionGetForUnitTest();
-extern void         setMongoConnectionForUnitTest(DBClientBase* _connection);
+extern orion::DBClientBase mongoInitialConnectionGetForUnitTest();
+extern void                orion::setMongoConnectionForUnitTest(orion::DBClientBase* _connection);
 
 
 

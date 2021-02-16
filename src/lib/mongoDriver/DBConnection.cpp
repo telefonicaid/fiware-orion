@@ -53,7 +53,7 @@ bool DBConnection::operator== (const DBConnection &rhs)
 *
 * DBConnection::isNull
 */
-bool DBConnection::isNull(void)
+bool DBConnection::isNull(void) const
 {
   return (dbcP == NULL);
 }
@@ -80,7 +80,7 @@ DBConnection::DBConnection(mongoc_client_t* _dbcP)
 * DBConnection::get -
 */
 
-mongoc_client_t* DBConnection::get(void)
+mongoc_client_t* DBConnection::get(void) const
 {
   return dbcP;
 }

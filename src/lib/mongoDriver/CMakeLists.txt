@@ -21,6 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    BSONTypes.cpp
     BSONObj.cpp
     BSONObjBuilder.cpp
     BSONArray.cpp
