@@ -1,0 +1,29 @@
+name: Sync to Upstream
+
+on:
+  schedule:
+    - cron:  '0 7 * * 1,2,3,4,5'
+    # scheduled at 07:00 every weekday
+  workflow_dispatch:
+
+jobs:
+  sync_with_upstream:
+    runs-on: ubuntu-latest
+    name: Sync HEAD with upstream latest
+
+    steps:
+    # Step 1: run a standard checkout action, provided by github
+    - name: Checkout HEAD
+      uses: actions/checkout@v2
+      with:
+        ref: develop
+    
+    # Step 2: run this sync action - specify the upstream repo, upstream branch to sync with, and target sync branch
+    - name: Pull upstream changes
+      id: sync
+      uses: aormsby/Fork-Sync-With-Upstream-action@v2.1
+      with:
+        upstream_repository: FIWARE/context.Orion-LD
+        upstream_branch: develop
+        target_branch: develop                       # optional
+        github_token: ${{ secrets.GITHUB_TOKEN }}   # optional, for accessing repos that require authentication
