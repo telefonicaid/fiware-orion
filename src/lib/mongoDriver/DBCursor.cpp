@@ -59,26 +59,9 @@ DBCursor::~DBCursor()
 * DBCursor::isNull -
 *
 */
-bool DBCursor::isNull(void)
+bool DBCursor::isNull(void) const
 {
   return (c == NULL);
-}
-
-
-
-/* ****************************************************************************
-*
-* DBCursor::more -
-*
-*/
-bool DBCursor::more(void)
-{
-  // FIXME OLD-DR: probably this is not a good implementation
-  // see http://mongoc.org/libmongoc/1.17.3/mongoc_cursor_more.html#description.
-  // but the recommended way with mongoc_cursor_next() is not idempotent as it
-  // consumes elements.
-  // Probably this function should be removed in client API (.h)
-  return mongoc_cursor_more(c);
 }
 
 
@@ -112,7 +95,7 @@ bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
     // So, we can just match the error and send a less descriptive text.
     //
     const char* invalidPolygon      = "Exterior shell of polygon is invalid";
-    const char* sortError           = "nextSafe(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
+    const char* sortError           = "next(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
     const char* defaultErrorString  = "Error at querying MongoDB";
 
     if (strncmp(error.message, invalidPolygon, strlen(invalidPolygon)) == 0)
@@ -145,72 +128,6 @@ bool DBCursor::next(BSONObj* nextDoc, int* errTypeP, std::string* err)
 
   return r;
 }
-
-
-
-#if 0
-/* ****************************************************************************
-*
-* DBCursor::nextSafe -
-*
-*/
-BSONObj DBCursor::nextSafe(int* errTypeP, std::string* err)
-{
-  mongo::BSONObj next;
-  std::string    exErr;
-  int            errType = NEXTSAFE_CODE_NO_ERROR;
-  try
-  {
-    next = dbc->nextSafe();
-  }
-  catch (const mongo::AssertionException &e)
-  {
-    errType = NEXTSAFE_CODE_MONGO_EXCEPTION;
-
-    // We can't return the error 'as is', as it may contain forbidden characters.
-    // So, we can just match the error and send a less descriptive text.
-    //
-    const char* invalidPolygon      = "Exterior shell of polygon is invalid";
-    const char* sortError           = "nextSafe(): { $err: \"Executor error: OperationFailed Sort operation used more than the maximum";
-    const char* defaultErrorString  = "Error at querying MongoDB";
-
-    if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
-    {
-      exErr = invalidPolygon;
-    }
-    else if (strncmp(exErr.c_str(), sortError, strlen(sortError)) == 0)
-    {
-      exErr = "Sort operation used more than the maximum RAM. "
-              "You should create an index. "
-              "Check the Database Administration section in Orion documentation.";
-    }
-    else
-    {
-      exErr = defaultErrorString;
-    }
-  }
-  catch (const std::exception &e)
-  {
-    errType = NEXTSAFE_CODE_NO_MONGO_EXCEPTION;
-    exErr   = e.what();
-  }
-  catch (...)
-  {
-    errType = NEXTSAFE_CODE_NO_MONGO_EXCEPTION;
-    exErr   = "generic exception at nextSafe()";
-  }
-
-  if (err != NULL)
-  {
-    *err = exErr;
-  }
-  if (errTypeP != NULL)
-  {
-    *errTypeP = errType;
-  }
-  return BSONObj(next);
-}
-#endif
 
 
 

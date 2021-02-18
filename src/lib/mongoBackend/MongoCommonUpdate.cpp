@@ -173,11 +173,11 @@ static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj&
   // If type exists in both metadata elments, check if they are the same
   if (md1TypeExist && md2TypeExist)
   {
-    if (getFieldFF(md1, ENT_ATTRS_MD_TYPE).type() != getFieldFF(md2, ENT_ATTRS_MD_TYPE).type())
+    if (getFieldF(md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(md2, ENT_ATTRS_MD_TYPE).type())
     {
       return false;
     }
-    switch (getFieldFF(md1, ENT_ATTRS_MD_TYPE).type())
+    switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
     {
       /* FIXME #643 P6: metadata array/object are now supported, but we haven't
          implemented yet the logic to compare compounds between them
@@ -191,47 +191,47 @@ static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj&
       */
 
     case orion::NumberDouble:
-      if (getNumberFieldFF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldFF(md2, ENT_ATTRS_MD_TYPE))
+      if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case orion::Bool:
-      if (getBoolFieldFF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldFF(md2, ENT_ATTRS_MD_TYPE))
+      if (getBoolFieldF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case orion::String:
-      if (getStringFieldFF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldFF(md2, ENT_ATTRS_MD_TYPE))
+      if (getStringFieldF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case orion::jstNULL:
-      if (!getFieldFF(md2, ENT_ATTRS_MD_TYPE).isNull())
+      if (!getFieldF(md2, ENT_ATTRS_MD_TYPE).isNull())
       {
         return false;
       }
       break;
 
     default:
-      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldFF(md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
       break;
     }
   }
 
   // declared types are equal. Same value ?
-  if (getFieldFF(md1, ENT_ATTRS_MD_VALUE).type() != getFieldFF(md2, ENT_ATTRS_MD_VALUE).type())
+  if (getFieldF(md1, ENT_ATTRS_MD_VALUE).type() != getFieldF(md2, ENT_ATTRS_MD_VALUE).type())
   {
     return false;
   }
 
-  switch (getFieldFF(md1, ENT_ATTRS_MD_VALUE).type())
+  switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
     case orion::Object:
@@ -244,19 +244,19 @@ static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj&
     */
 
     case orion::NumberDouble:
-      return getNumberFieldFF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldFF(md2, ENT_ATTRS_MD_VALUE);
+      return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case orion::Bool:
-      return getBoolFieldFF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldFF(md2, ENT_ATTRS_MD_VALUE);
+      return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case orion::String:
-      return getStringFieldFF(md1, ENT_ATTRS_MD_VALUE) == getStringFieldFF(md2, ENT_ATTRS_MD_VALUE);
+      return getStringFieldF(md1, ENT_ATTRS_MD_VALUE) == getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case orion::jstNULL:
-      return getFieldFF(md2, ENT_ATTRS_MD_VALUE).isNull();
+      return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
 
     default:
-      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldFF(md1, ENT_ATTRS_MD_VALUE).type()));
+      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(md1, ENT_ATTRS_MD_VALUE).type()));
       return false;
   }
 }
@@ -286,8 +286,8 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
       return false;
     }
 
-    orion::BSONObj md1Item = getObjectFieldFF(md1, currentMd);
-    orion::BSONObj md2Item = getObjectFieldFF(md2, currentMd);
+    orion::BSONObj md1Item = getObjectFieldF(md1, currentMd);
+    orion::BSONObj md2Item = getObjectFieldF(md2, currentMd);
 
     if (!equalMetadataValues(md1Item, md2Item))
     {
@@ -318,7 +318,7 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
     return false;
   }
 
-  switch (getFieldFF(attr, ENT_ATTRS_VALUE).type())
+  switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
   {
   case orion::Object:
   case orion::Array:
@@ -327,19 +327,19 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
     return true;
 
   case orion::NumberDouble:
-    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldFF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case orion::Bool:
-    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldFF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case orion::String:
-    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldFF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
 
   case orion::jstNULL:
     return caP->valueType != orion::ValueTypeNull;
 
   default:
-    LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldFF(attr, ENT_ATTRS_VALUE).type()));
+    LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
     return false;
   }
 }
@@ -489,7 +489,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab, getStringFieldFF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(ab, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
   }
   else
   {
@@ -497,29 +497,26 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
     // Slightly different treatment, depending on attribute value type
     // in DB (string, number, boolean, vector or object)
     //
-    switch (getFieldFF(attr, ENT_ATTRS_VALUE).type())
+    switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
     case orion::Object:
-      ab.append(ENT_ATTRS_VALUE, getObjectFieldFF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getObjectFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::Array:
-      // FIXME OLD-DR: not sure if this will work... only place in all our code where
-      // we use appendArray() mongo::BSONArray method
-      // ab.appendArray(ENT_ATTRS_VALUE, getArrayFieldFF(attr, ENT_ATTRS_VALUE));
-      ab.append(ENT_ATTRS_VALUE, getArrayFieldFF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getArrayFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::NumberDouble:
-      ab.append(ENT_ATTRS_VALUE, getNumberFieldFF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getNumberFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::Bool:
-      ab.append(ENT_ATTRS_VALUE, getBoolFieldFF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getBoolFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::String:
-      ab.append(ENT_ATTRS_VALUE, getStringFieldFF(attr, ENT_ATTRS_VALUE));
+      ab.append(ENT_ATTRS_VALUE, getStringFieldF(attr, ENT_ATTRS_VALUE));
       break;
 
     case orion::jstNULL:
@@ -527,7 +524,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
       break;
 
     default:
-      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldFF(attr, ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
     }
   }
 
@@ -540,7 +537,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, getStringFieldFF(attr, ENT_ATTRS_TYPE));
+      ab.append(ENT_ATTRS_TYPE, getStringFieldF(attr, ENT_ATTRS_TYPE));
     }
   }
 
@@ -572,13 +569,13 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
   {
     std::set<std::string>  mdsSet;
 
-    md = getFieldFF(attr, ENT_ATTRS_MD).embeddedObject();
+    md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
     md.getFieldNames(&mdsSet);
 
     for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
     {
       std::string  currentMd = *i;
-      orion::BSONObj      mdItem    = getObjectFieldFF(md, currentMd);
+      orion::BSONObj      mdItem    = getObjectFieldF(md, currentMd);
       Metadata     md(currentMd, mdItem);
 
       mdSize++;
@@ -607,7 +604,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldFF(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* Was it an actual update? */
@@ -625,7 +622,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
      */
     actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
                     ((!caP->type.empty()) &&
-                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldFF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                     mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
   }
   else
@@ -648,7 +645,7 @@ static bool mergeAttrInfo(const orion::BSONObj& attr, ContextAttribute* caP, ori
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldFF(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -791,7 +788,7 @@ static bool updateAttribute
     }
 
     orion::BSONObj newAttr;
-    orion::BSONObj attr = getObjectFieldFF(attrs, effectiveName);
+    orion::BSONObj attr = getObjectFieldF(attrs, effectiveName);
 
     *actualUpdate = mergeAttrInfo(attr, caP, &newAttr, forcedUpdate, apiVersion);
     if (*actualUpdate)
@@ -1177,17 +1174,15 @@ static void fill_idNPtypeNP
   const std::string&  typePatternQ
 )
 {
-  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-  // should be changed?
+  /* FIXME #3774: previously this part was based in streamming instead of append(). Draft:
 
-  /*
   bgP->idNPtypeNP = BSON(entIdQ << entityId <<
                          "$or" << BSON_ARRAY(BSON(entTypeQ << entityType) <<
                                              BSON(entTypeQ << BSON("$exists" << false))) <<
                          entPatternQ << "false" <<
                          typePatternQ << BSON("$ne" << true) <<
                          CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                         CSUB_EXPIRATION << BSON("$ne" << STATUS_INACTIVE));*/
+                         CSUB_EXPIRATION << BSON("$ne" << STATUS_INACTIVE)); */
 
   orion::BSONObjBuilder bob;
 
@@ -1447,18 +1442,18 @@ static bool addTriggeredSubscriptions_noCache
 
   bgP->query = bobQuery.obj();
 
-  std::string      collection  = getSubscribeContextCollectionName(tenant);
+  std::string      db  = composeDatabaseName(tenant);
   orion::DBCursor  cursor;
   std::string      errorString;
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getSubscribeContextCollectionName(tenant).c_str(),
+                  (db + '.' + COL_CSUBS).c_str(),
                   bgP->query.toString().c_str()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (orion::collectionQuery(connection, collection, bgP->query, &cursor, &errorString) != true)
+  if (orion::collectionQuery(connection, db, COL_CSUBS, bgP->query, &cursor, &errorString) != true)
   {
     TIME_STAT_MONGO_READ_WAIT_STOP();
     orion::releaseMongoConnection(connection);
@@ -1472,20 +1467,12 @@ static bool addTriggeredSubscriptions_noCache
   orion::BSONObj sub;
   while (cursor.next(&sub))
   {
-    /* FIXME OLD-DR: remove?
-    std::string    err;
-
-    if (!nextSafeOrErrorFF(cursor, &sub, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), bgP->query.toString().c_str()));
-      continue;
-    }*/
-    orion::BSONElement  idField  = getFieldFF(sub, "_id");
+    orion::BSONElement  idField  = getFieldF(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'getFieldFF(sub, "_id")' is not found, if we continue, calling OID() on it, then we get
+    // Now, if 'getFieldF(sub, "_id")' is not found, if we continue, calling OID() on it, then we get
     // an exception and the broker crashes.
     //
     if (idField.eoo() == true)
@@ -1519,16 +1506,15 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongFF(sub, CSUB_THROTTLING)       : -1;
-      long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongFF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldFF(sub, CSUB_FORMAT) : "legacy";
-      bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldFF(sub, CSUB_ONLYCHANGED) : false;
-      bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldFF(sub, CSUB_BLACKLIST) : false;
+      long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
+      long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
+      bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
 
-      // FIXME OLD-DR: this should be just "httpInfo.fill(sub);" when update entity logic would be "assimilated"
-      httpInfo.fill(orion::BSONObj(sub));
+      httpInfo.fill(sub);
 
       bool op = false;
       StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
@@ -1556,18 +1542,18 @@ static bool addTriggeredSubscriptions_noCache
 
       if (sub.hasField(CSUB_METADATA))
       {
-        setStringVectorFF(sub, CSUB_METADATA, &(trigs->metadata));
+        setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
       }
 
       if (sub.hasField(CSUB_EXPR))
       {
-        orion::BSONObj expr = getObjectFieldFF(sub, CSUB_EXPR);
+        orion::BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
 
-        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldFF(expr, CSUB_EXPR_Q)      : "";
-        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldFF(expr, CSUB_EXPR_MQ)     : "";
-        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldFF(expr, CSUB_EXPR_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldFF(expr, CSUB_EXPR_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldFF(expr, CSUB_EXPR_COORDS) : "";
+        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expr, CSUB_EXPR_Q)      : "";
+        std::string mq       = expr.hasField(CSUB_EXPR_MQ)     ? getStringFieldF(expr, CSUB_EXPR_MQ)     : "";
+        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
+        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
 
         trigs->fillExpression(georel, geometry, coords);
 
@@ -1873,7 +1859,7 @@ static unsigned int processSubscriptions
       bobQuery.append(keySp, sp);
 
       unsigned long long n;
-      if (!collectionCount(getEntitiesCollectionName(tenant), bobQuery.obj(), &n, &filterErr))
+      if (!collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;
@@ -1920,16 +1906,16 @@ static unsigned int processSubscriptions
       //
       if (subCacheActive == false)
       {
-        orion::BSONObj      subOrig;
-        std::string  newErr;
-        std::string  status;
+        orion::BSONObj  subOrig;
+        std::string     newErr;
+        std::string     status;
 
-        collectionFindOne(getSubscribeContextCollectionName(tenant), query, &subOrig, &newErr);
+        collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, query, &subOrig, &newErr);
         if (!subOrig.isEmpty())
         {
           if (subOrig.hasField(CSUB_STATUS))
           {
-            status = getStringFieldFF(subOrig, CSUB_STATUS);
+            status = getStringFieldF(subOrig, CSUB_STATUS);
           }
         }
 
@@ -1942,8 +1928,7 @@ static unsigned int processSubscriptions
           bobSet.append(CSUB_STATUS, STATUS_INACTIVE);
         }
 
-        // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-        // should be changed?
+        // FIXME #3774: previously this part was based in streamming instead of append()
         orion::BSONObjBuilder bobInc;
         bobInc.append(CSUB_COUNT, (long long) 1);
 
@@ -1951,7 +1936,7 @@ static unsigned int processSubscriptions
         bobUpdate.append("$set", bobSet.obj());
         bobUpdate.append("$inc", bobInc.obj());
 
-        orion::collectionUpdate(getSubscribeContextCollectionName(tenant), query, bobUpdate.obj(), false, err);
+        orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
       }
 
 
@@ -1975,7 +1960,7 @@ static unsigned int processSubscriptions
             bobUpdate.append("$set", bobSet.obj());
 
             // update the status to inactive as status is oneshot (in both DB and csubs cache)
-            orion::collectionUpdate(getSubscribeContextCollectionName(tenant), query, bobUpdate.obj(), false, err);
+            orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, query, bobUpdate.obj(), false, err);
             cSubP->status = STATUS_INACTIVE;
 
             LM_T(LmtSubCache, ("set status to '%s' as Subscription status is oneshot", cSubP->status.c_str()));
@@ -2659,7 +2644,7 @@ static bool createEntity
   OrionError*                      oeP
 )
 {
-  LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
+  LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", (composeDatabaseName(tenant) + '.' + COL_ENTITIES).c_str()));
 
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
@@ -2785,7 +2770,7 @@ static bool createEntity
   // (with cbnotif= in the correlator) so we need to use correlatorRoot()
   insertedDoc.append(ENT_LAST_CORRELATOR, correlatorRoot(fiwareCorrelator));
 
-  if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
+  if (!collectionInsert(composeDatabaseName(tenant), COL_ENTITIES, insertedDoc.obj(), errDetail))
   {
     oeP->fill(SccReceiverInternalError, *errDetail, "InternalError");
     return false;
@@ -2839,7 +2824,7 @@ static bool removeEntity
   }
 
   std::string err;
-  if (!collectionRemove(getEntitiesCollectionName(tenant), bob.obj(), &err))
+  if (!collectionRemove(composeDatabaseName(tenant), COL_ENTITIES, bob.obj(), &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -2981,11 +2966,11 @@ static unsigned int updateEntity
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
-  orion::BSONObj            idField           = getObjectFieldFF(r, "_id");
+  orion::BSONObj            idField           = getObjectFieldF(r, "_id");
 
-  std::string        entityId          = getStringFieldFF(idField, ENT_ENTITY_ID);
-  std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldFF(idField, ENT_ENTITY_TYPE) : "";
-  std::string        entitySPath       = getStringFieldFF(idField, ENT_SERVICE_PATH);
+  std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
+  std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
+  std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
   EntityId en(entityId, entityType);
 
@@ -3009,7 +2994,7 @@ static unsigned int updateEntity
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
 
-  orion::BSONObj           attrs     = getObjectFieldFF(r, ENT_ATTRS);
+  orion::BSONObj           attrs     = getObjectFieldF(r, ENT_ATTRS);
   orion::BSONObjBuilder    toSet;
   orion::BSONObjBuilder    toUnset;
   orion::BSONArrayBuilder  toPush;
@@ -3030,10 +3015,10 @@ static unsigned int updateEntity
 
   if (r.hasField(ENT_LOCATION))
   {
-    orion::BSONObj loc    = getObjectFieldFF(r, ENT_LOCATION);
+    orion::BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
 
-    locAttr        = getStringFieldFF(loc, ENT_LOCATION_ATTRNAME);
-    currentGeoJson = getObjectFieldFF(loc, ENT_LOCATION_COORDS);
+    locAttr        = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
+    currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
   /* Is the entity using date expiration? In that case, we fill the currentdateExpiration attribute with that information.
@@ -3085,15 +3070,15 @@ static unsigned int updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldFF(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldFF(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->entity.creDate = r.hasField(ENT_CREATION_DATE)     ? getNumberFieldF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->entity.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getNumberFieldF(r, ENT_MODIFICATION_DATE) : -1;
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
   bool loopDetected = false;
   if ((ngsiV2AttrsFormat == "custom") && (r.hasField(ENT_LAST_CORRELATOR)))
   {
-    loopDetected = (getStringFieldFF(r, ENT_LAST_CORRELATOR) == correlatorRoot(fiwareCorrelator));
+    loopDetected = (getStringFieldF(r, ENT_LAST_CORRELATOR) == correlatorRoot(fiwareCorrelator));
   }
 
   if (!processContextAttributeVector(eP,
@@ -3204,6 +3189,7 @@ static unsigned int updateEntity
 
   /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
    * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
+  // FIXME OLD-DR: I think new BSONObjBuilder would allow to to this
   orion::BSONObjBuilder  updatedEntity;
   orion::BSONObj         toSetObj    = toSet.obj();
   orion::BSONObj         toUnsetObj  = toUnset.obj();
@@ -3306,7 +3292,7 @@ static unsigned int updateEntity
   }
 
   std::string err;
-  if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
+  if (!collectionUpdate(composeDatabaseName(tenant), COL_ENTITIES, query.obj(), updatedEntityObj, false, &err))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3536,7 +3522,7 @@ unsigned int processContextElement
     unsigned long long entitiesNumber;
     std::string        err;
 
-    if (!orion::collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
+    if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, query, &entitiesNumber, &err))
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
       responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3575,7 +3561,7 @@ unsigned int processContextElement
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, &cursor, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -3600,22 +3586,15 @@ unsigned int processContextElement
   orion::BSONObj r;
   while (cursor.next(&r))
   {
-    /* FIXME OLD-DR: remove?
-    if (!nextSafeOrErrorFF(cursor, &r, &err))
-    {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
-      continue;
-    }*/
-
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    orion::BSONElement idField = getFieldFF(r, "_id");
+    orion::BSONElement idField = getFieldF(r, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'getFieldFF(r, "_id")' is not found, if we continue, calling embeddedObject() on it, then we get
+    // Now, if 'getFieldF(r, "_id")' is not found, if we continue, calling embeddedObject() on it, then we get
     // an exception and the broker crashes.
     //
     if (idField.eoo() == true)
@@ -3625,14 +3604,6 @@ unsigned int processContextElement
       continue;
     }
 
-    //
-    // We need to use getOwned() here, otherwise we have empirically found that bad things may happen with long BSONObjs
-    // (see http://stackoverflow.com/questions/36917731/context-broker-crashing-with-certain-update-queries)
-    //
-    // FIXME OLD-DR: this is a kind of black magic... would we need this owned thing with the new driver? let's see...
-    // by the moment we are using the "low level" forbidden methods to solve the issue
-    //
-    // results.push_back(orion::BSONObj(r.get().getOwned()));
     results.push_back(r);
   }
 

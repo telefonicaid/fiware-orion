@@ -103,16 +103,16 @@ std::string HttpInfo::toJson()
 */
 void HttpInfo::fill(const orion::BSONObj& bo)
 {
-  this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldFF(bo, CSUB_REFERENCE) : "";
-  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldFF(bo,   CSUB_CUSTOM)    : false;
+  this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
+  this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo,   CSUB_CUSTOM)    : false;
 
   if (this->custom)
   {
-    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldFF(bo, CSUB_PAYLOAD) : "";
+    this->payload  = bo.hasField(CSUB_PAYLOAD)? getStringFieldF(bo, CSUB_PAYLOAD) : "";
 
     if (bo.hasField(CSUB_METHOD))
     {
-      this->verb = str2Verb(getStringFieldFF(bo, CSUB_METHOD));
+      this->verb = str2Verb(getStringFieldF(bo, CSUB_METHOD));
     }
 
     // FIXME P10: toStringMap could raise exception if array elements are not strings
@@ -120,7 +120,7 @@ void HttpInfo::fill(const orion::BSONObj& bo)
     // qs
     if (bo.hasField(CSUB_QS))
     {
-      orion::BSONObj qs = getObjectFieldFF(bo, CSUB_QS);
+      orion::BSONObj qs = getObjectFieldF(bo, CSUB_QS);
       qs.toStringMap(&this->qs);
     }
 
@@ -129,7 +129,7 @@ void HttpInfo::fill(const orion::BSONObj& bo)
     // headers
     if (bo.hasField(CSUB_HEADERS))
     {
-      orion::BSONObj headers = getObjectFieldFF(bo, CSUB_HEADERS);
+      orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
     }
   }

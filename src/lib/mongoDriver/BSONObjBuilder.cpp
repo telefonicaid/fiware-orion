@@ -27,8 +27,6 @@
 
 #include "mongoDriver/BSONObjBuilder.h"
 
-#include "logMsg/logMsg.h"  // FIXME OLD-DR: remove after use
-
 // FIXME OLD-DR: general comment. Do we really need builder vs. no-builder classes or
 // only just one family? What about using the bson_append_document_begin() and
 // bson_append_document_end() methods (maybe performance is
@@ -188,8 +186,6 @@ void BSONObjBuilder::appendCode(const std::string& key, const std::string& value
 */
 void BSONObjBuilder::appendRegex(const std::string& key, const std::string& value)
 {
-  // FIXME OLD-DR: is NULL correct? Or should be ""?
-  // Doc at http://mongoc.org/libbson/current/bson_append_regex.html is not clear...
   BSON_APPEND_REGEX(b, key.c_str(), value.c_str(), NULL);
 }
 

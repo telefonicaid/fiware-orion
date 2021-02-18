@@ -65,7 +65,7 @@ using ::testing::Return;
 
 
 
-extern void setMongoConnectionForUnitTest(DBClientBase _connection);
+extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 
 
 

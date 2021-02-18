@@ -153,7 +153,7 @@ SET (SOURCES
     apiTypesV2/Entity_test.cpp  
     apiTypesV2/EntityVector_test.cpp
 
-    # FIXME OLD-DR: disabled, pending to be migrated to the new mongo driver
+    # FIXME #3775: pending on mongo unit test re-enabling
     #mongoBackend/mongoDiscoverContextAvailability_test.cpp
     #mongoBackend/mongoQueryContext_test.cpp
     #mongoBackend/mongoQueryContext_filters_test.cpp

@@ -35,7 +35,7 @@
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
 
-#include "mongoBackend/MongoGlobal.h"  // getSubscribeContextCollectionName (FIXME OLD-DR)
+#include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
 
 #include "mongoBackend/mongoCreateSubscription.h"
@@ -207,7 +207,7 @@ std::string mongoCreateSubscription
   // Insert in DB
   std::string err;
 
-  if (!orion::collectionInsert(getSubscribeContextCollectionName(tenant), doc, &err))
+  if (!orion::collectionInsert(composeDatabaseName(tenant), COL_CSUBS, doc, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);

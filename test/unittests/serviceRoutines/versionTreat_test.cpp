@@ -94,7 +94,8 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "libmicrohttpd") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "openssl") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "rapidjson") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), "mongodriver") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "mongoc") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "bson") != NULL);
 
   extern const char*  orionUnitTestVersion;
   std::string         expected = std::string("\"version\" : \"") + orionUnitTestVersion + "\"";

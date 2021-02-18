@@ -59,14 +59,7 @@ void mongoRegistrationDelete
 {
   bool         reqSemTaken = false;
   std::string  err;
-  orion::OID   oid;
-  StatusCode   sc;
-
-  if (safeGetRegId(regId, &oid, &sc) == false)
-  {
-    oeP->fill(sc);
-    return;
-  }
+  orion::OID   oid = orion::OID(regId);
 
   reqSemTake(__FUNCTION__, "Mongo Delete Registration", SemWriteOp, &reqSemTaken);
 
@@ -87,7 +80,7 @@ void mongoRegistrationDelete
   // Note also that current implementation calls collectionRemove(), which uses a connection internally, without having
   // released the connection object (this is not a big problem, but a bit unneficient).
   // If the change is done, then MB-27 diagram (and related texts) in devel manual should be also changed.
-  if (!orion::collectionQuery(connection, getRegistrationsCollectionName(tenant), q, &cursor, &err))
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, q, &cursor, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -102,29 +95,9 @@ void mongoRegistrationDelete
   orion::BSONObj r;
   if (cursor.next(&r))
   {
-    /* FIXME OLD-DR: remove?
-    if (!nextSafeOrErrorFF(cursor, &r, &err))
-    {
-      orion::releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
-      oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
-      return;
-    }*/
-
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    /* Useless checking: by definition _id is unique
-    if (orion::moreSafe(&cursor))  // There can only be one registration for a given ID
-    {
-      orion::releaseMongoConnection(connection);
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId.c_str()));
-      reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
-      oeP->fill(SccConflict, "");
-      return;
-    }*/
-
-    if (!orion::collectionRemove(getRegistrationsCollectionName(tenant), q, &err))
+    if (!orion::collectionRemove(composeDatabaseName(tenant), COL_REGISTRATIONS, q, &err))
     {
       orion::releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in collectionRemove(): %s - query: %s", err.c_str(), q.toString().c_str()));

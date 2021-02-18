@@ -43,11 +43,11 @@ class DBConnection
   // methods to be used by client code (without references to low-level driver code)
   DBConnection();
   bool operator== (const DBConnection &rhs);
-  bool isNull(void);
+  bool isNull(void) const;
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)
   explicit DBConnection(mongoc_client_t* _dbcP);
-  mongoc_client_t* get(void);
+  mongoc_client_t* get(void) const;
 };
 }
 

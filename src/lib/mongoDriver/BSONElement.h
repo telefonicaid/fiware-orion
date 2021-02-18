@@ -53,16 +53,15 @@ class BSONElement
   // methods to be used by client code (without references to low-level driver code)
   BSONElement();
   BSONType type(void) const;
-  bool isNull(void);
-  std::string OID(void);
+  bool isNull(void) const;
+  std::string OID(void) const;
   std::string String(void) const;
   bool Bool(void) const;
   double Number(void) const;
   std::vector<BSONElement> Array(void) const;
   BSONObj embeddedObject(void) const;
-  BSONDate date(void);
+  BSONDate date(void) const;
   std::string fieldName(void) const;
-  std::string str() const;
   bool eoo(void) const;
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

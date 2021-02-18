@@ -146,8 +146,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
     attrs.append(bob.obj());
   }
 
-  // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-  // should be changed?
+  // FIXME #3774: previously this part was based in streamming instead of append()
   orion::BSONObjBuilder bob;
   bob.append(REG_ENTITIES, entities.arr());
   bob.append(REG_ATTRS, attrs.arr());
@@ -238,7 +237,7 @@ void mongoRegistrationCreate
   orion::BSONObj  doc = bob.obj();
   std::string     err;
 
-  if (!orion::collectionInsert(getRegistrationsCollectionName(tenant), doc, &err))
+  if (!orion::collectionInsert(composeDatabaseName(tenant), COL_REGISTRATIONS, doc, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo Create Registration", reqSemTaken);
     oeP->fill(SccReceiverInternalError, err);

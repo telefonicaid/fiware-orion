@@ -28,6 +28,8 @@
 
 #include <string>
 
+#include "common/limits.h"
+
 #include "mongoDriver/BSONArray.h"
 #include "mongoDriver/BSONObj.h"
 
@@ -40,16 +42,15 @@ namespace orion
 class BSONArrayBuilder
 {
  private:
-  bson_t*     b;
-  uint32_t    size;     // current number of elements in array builder (starts at 0)
-  char        buf[16];  // for internal use in append methods. FIXME OLD-DR: unhardwire 16
-  const char* key;      // for internal use in append methods
-
+  bson_t*      b;
+  uint32_t     size;                      // current number of elements in array builder (starts at 0)
+  char         buf[STRING_SIZE_FOR_INT];  // for internal use in append methods
+  const char*  key;                       // for internal use in append methods
  public:
   // methods to be used by client code (without references to low-level driver code)
   BSONArrayBuilder();
   BSONArray arr(void);
-  int arrSize(void);
+  int arrSize(void) const;
   void append(const BSONObj& value);
   void append(const BSONArray& value);
   void append(const std::string& value);

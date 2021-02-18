@@ -67,7 +67,7 @@ BSONArray BSONArrayBuilder::arr(void)
 *
 * BSONArrayBuilder::arrSize -
 */
-int BSONArrayBuilder::arrSize(void)
+int BSONArrayBuilder::arrSize(void) const
 {
   return size;
 }
@@ -164,8 +164,6 @@ void BSONArrayBuilder::appendNull(void)
 */
 void BSONArrayBuilder::appendRegex(const std::string& value)
 {
-  // FIXME OLD-DR: is NULL correct? Or should be ""?
-  // Doc at http://mongoc.org/libbson/current/bson_append_regex.html is not clear...
   size_t keylen = bson_uint32_to_string(size++, &key, buf, sizeof buf);
   bson_append_regex(b, key, (int) keylen, value.c_str(), NULL);
 }

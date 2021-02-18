@@ -155,8 +155,7 @@ HttpStatusCode processRegisterContext
                       cra->type.c_str()));
     }
 
-    // FIXME OLD-DR: previously this part was based in streamming construction instead of append()
-    // should be changed?
+    // FIXME #3774: previously this part was based in streamming instead of append()
     orion::BSONObjBuilder bob;
     bob.append(REG_ENTITIES, entities.arr());
     bob.append(REG_ATTRS, attrs.arr());
@@ -175,7 +174,7 @@ HttpStatusCode processRegisterContext
    */
   orion::BSONObjBuilder bobId;
   bobId.append("_id", oid);
-  if (!orion::collectionUpdate(getRegistrationsCollectionName(tenant), bobId.obj(), reg.obj(), true, &err))
+  if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_REGISTRATIONS, bobId.obj(), reg.obj(), true, &err))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
     return SccOk;

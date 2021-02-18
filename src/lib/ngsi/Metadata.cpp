@@ -183,27 +183,27 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 Metadata::Metadata(const std::string& _name, const orion::BSONObj& mdB)
 {
   name            = _name;
-  type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldFF(mdB, ENT_ATTRS_MD_TYPE) : "";
+  type            = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
   typeGiven       = (type.empty())? false : true;
   compoundValueP  = NULL;
   shadowed        = false;
 
-  orion::BSONType bsonType = getFieldFF(mdB, ENT_ATTRS_MD_VALUE).type();
+  orion::BSONType bsonType = getFieldF(mdB, ENT_ATTRS_MD_VALUE).type();
   switch (bsonType)
   {
   case orion::String:
     valueType   = orion::ValueTypeString;
-    stringValue = getStringFieldFF(mdB, ENT_ATTRS_MD_VALUE);
+    stringValue = getStringFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case orion::NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getNumberFieldFF(mdB, ENT_ATTRS_MD_VALUE);
+    numberValue = getNumberFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case orion::Bool:
     valueType = orion::ValueTypeBoolean;
-    boolValue = getBoolFieldFF(mdB, ENT_ATTRS_MD_VALUE);
+    boolValue = getBoolFieldF(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
   case orion::jstNULL:
@@ -213,20 +213,20 @@ Metadata::Metadata(const std::string& _name, const orion::BSONObj& mdB)
   case orion::Object:
     valueType      = orion::ValueTypeObject;
     compoundValueP = new orion::CompoundValueNode();
-    compoundObjectResponse(compoundValueP, getFieldFF(mdB, ENT_ATTRS_VALUE));
+    compoundObjectResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
     compoundValueP->valueType = orion::ValueTypeObject;
     break;
 
   case orion::Array:
     valueType      = orion::ValueTypeVector;
     compoundValueP = new orion::CompoundValueNode();
-    compoundVectorResponse(compoundValueP, getFieldFF(mdB, ENT_ATTRS_VALUE));
+    compoundVectorResponse(compoundValueP, getFieldF(mdB, ENT_ATTRS_VALUE));
     compoundValueP->valueType = orion::ValueTypeVector;
     break;
 
   default:
     valueType = orion::ValueTypeNotGiven;
-    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldFF(mdB, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
     break;
   }
 }

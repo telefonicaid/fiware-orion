@@ -80,35 +80,13 @@ HttpStatusCode mongoRegisterContext
   /* It is not a new registration, so it must be an update */
   orion::BSONObj  reg;
   std::string     err;
-  orion::OID      id;
-
-  if (!safeGetRegId(requestP->registrationId, &id, &(responseP->errorCode)))
-  {
-    reqSemGive(__FUNCTION__, "ngsi9 register request (safeGetRegId fail)", reqSemTaken);
-    responseP->registrationId = requestP->registrationId;
-    ++noOfRegistrationUpdateErrors;
-
-    if (responseP->errorCode.code == SccContextElementNotFound)
-    {
-      // FIXME: doubt: invalid OID format?
-      std::string details = std::string("invalid OID format: '") + requestP->registrationId.get() + "'";
-      alarmMgr.badInput(clientIp, details);
-    }
-    else  // SccReceiverInternalError
-    {
-      LM_E(("Runtime Error (exception getting OID: %s)", responseP->errorCode.details.c_str()));
-    }
-
-    return SccOk;
-  }
-
-  const std::string    colName  = getRegistrationsCollectionName(tenant);
+  orion::OID      id = orion::OID(requestP->registrationId.get());
 
   orion::BSONObjBuilder bob;
   bob.append("_id", id);
   bob.append(REG_SERVICE_PATH, sPath);
 
-  if (!orion::collectionFindOne(colName, bob.obj(), &reg, &err))
+  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_REGISTRATIONS, bob.obj(), &reg, &err))
   {
     // FIXME OLD-DR: at the present moment we are unable to know if false means: "no result" or
     // "fail in cursor". Asked: https://stackoverflow.com/questions/66027858/how-to-get-errors-when-calling-mongoc-collection-find-function
