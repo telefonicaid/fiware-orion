@@ -6,14 +6,15 @@
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
-[![SOF support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/orion.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI v2](https://nexus.lab.fiware.org/repository/raw/public/badges/specifications/ngsiv2.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
+[![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
+[![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](http://fiware-ges.github.io/orion/api/v2/stable/)
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
 ![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
 ![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4520/badge)](https://bestpractices.coreinfrastructure.org/projects/4520)
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context
 Broker GE, providing an
@@ -110,6 +111,8 @@ recommended to have a look to the brief
 
 Build and Install documentation for Orion Context Broker can be found at
 [the corresponding section of the Admin Manual](doc/manuals/admin/install.md).
+
+> :point_right: If you want to run a production-grade instance of orion, carefully read all information in the [admin-section](doc/manuals/admin). 
 
 [Top](#top)
 

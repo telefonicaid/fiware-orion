@@ -27,6 +27,7 @@ yum -y install \
   boost-devel \
   bzip2 \
   cmake \
+  cmake3 \
   gcc-c++ \
   git \
   gnutls-devel \
@@ -44,24 +45,46 @@ yum -y install \
   tar \
   cyrus-sasl-devel
 
-curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
+# FIXME: remove legacy driver when it gets discontinued in the code
+echo "INSTALL: mongodb legacy c++ driver" \
+&& curl -L https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-cxx-driver-legacy-1.1.2 \
 && scons --disable-warnings-as-errors --use-sasl-client --ssl \
 && scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl \
 && rm -Rf /opt/mongo-cxx-driver-legacy-1.1.2
 
-curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
+# Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
+# see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
+# FIXME: note that dynamic libraris are directly copied to /lib64. Not sure if this is the right way (maybe some
+# flag is missing in previous make install? maybe the dynamic library path in the OS is not correct?) but it
+# suffices by the moment
+echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz | tar xzC /opt/ \
+&& cd /opt/mongo-c-driver-1.17.4 \
+&& mkdir cmake-build \
+&& cd cmake-build \
+&& cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
+&& make \
+&& make install \
+&& cp src/libmongoc/libmongoc-1.0.so.0 /lib64/libmongoc-1.0.so.0 \
+&& cp src/libbson/libbson-1.0.so.0 /lib64/libbson-1.0.so.0 \
+&& rm -Rf /opt/mongo-c-driver-1.17.4
+
+echo "INSTALL: rapidjson" \
+&& curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \
 && rm -Rf /opt/rapidjson-1.1.0
 
-curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
+echo "INSTALL: libmicrohttpd" \
+&& curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
 && cd /opt/libmicrohttpd-0.9.70  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install \
 && rm -Rf /opt/libmicrohttpd-0.9.70
 
-curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
+echo "INSTALL: gmock" \
+&& curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
 && ./configure \
 && make \
@@ -70,7 +93,8 @@ curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cf
 
 # FIXME: the MQTT notification work is yet ongoing, so this is not needed yet. It should be aligned
 # which the same procedure described in "Build from source" documentation
-#curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
+#  echo "INSTALL: mosquitto" \
+#  && curl -L http://mosquitto.org/files/source/mosquitto-1.5.tar.gz | tar xzC /opt/ \
 #  && cd /opt/mosquitto-1.5 \
 #  && make \
 #  && make install \
@@ -82,9 +106,11 @@ curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cf
 # installing in the virtual env Flask==1.0.2, which depends on Werkzeug==0.15.2
 #
 # In addition, note we upgrade pip before installing virtualenv. The virtualenv installation
-# may fail otherwise
-cd /opt \
-&& pip install --upgrade pip \
+# may fail otherwise. Note that due to Python 2.7 End-of-Life we have to add "pip < 21.0"
+# (see https://stackoverflow.com/questions/65896334/python-pip-broken-wiith-sys-stderr-writeferror-exc)
+echo "INSTALL: python special dependencies" \
+&& cd /opt \
+&& pip install --upgrade "pip < 21.0" \
 && pip install virtualenv \
 && virtualenv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
